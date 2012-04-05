@@ -43,7 +43,7 @@
       <artifactId>security-model</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--  testing -->
+    <!-- testing -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

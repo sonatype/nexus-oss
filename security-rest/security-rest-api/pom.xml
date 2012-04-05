@@ -79,12 +79,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    
-	<dependency>
-		<groupId>junit</groupId>
-		<artifactId>junit</artifactId>
-		<scope>test</scope>
-	</dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Using a simple jetty server -->
     <dependency>
@@ -164,7 +164,7 @@
                   <excludes>
                     <exclude>org.codehaus.plexus:plexus-container-default:*</exclude>
                   </excludes>
-                  <message>The Plexus Container is banned, use org.sonatype.spice.inject:guice-plexus-shim. 
+                  <message>The Plexus Container is banned, use org.sonatype.spice.inject:guice-plexus-shim.
                   </message>
                 </bannedDependencies>
               </rules>

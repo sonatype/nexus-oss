@@ -21,13 +21,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security.realms</groupId>
   <artifactId>security-realms</artifactId>
-  <packaging>pom</packaging>  
+  <packaging>pom</packaging>
   <name>Security: Realms Parent</name>
-  
+
   <modules>
-  	<module>security-xml-realm</module>
-  	<module>security-url-realm</module>
-  	<module>security-public-key-realm</module>
-  	<module>security-kenai-realm</module>
+    <module>security-xml-realm</module>
+    <module>security-url-realm</module>
+    <module>security-public-key-realm</module>
+    <module>security-kenai-realm</module>
   </modules>
 </project>

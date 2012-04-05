@@ -13,64 +13,64 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<groupId>org.sonatype.security.realms</groupId>
-		<artifactId>security-realms</artifactId>
-		<version>2.6-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>security-xml-realm</artifactId>
-	<name>Plexus XML Realm</name>
-	<description>The security.xml based Realm, which stores users, roles, privileges, and user to role mappings using security-model-xml.</description>
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.security</groupId>
-			<artifactId>security-model-xml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.security</groupId>
-			<artifactId>security-system</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+  <parent>
+    <groupId>org.sonatype.security.realms</groupId>
+    <artifactId>security-realms</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>security-xml-realm</artifactId>
+  <name>Plexus XML Realm</name>
+  <description>The security.xml based Realm, which stores users, roles, privileges, and user to role mappings using security-model-xml.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-model-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-system</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
 
-		<!-- A backend for testing -->
-		<dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<scope>test</scope>
-		</dependency>
+    <!-- A backend for testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>edu.umd.cs.mtc</groupId>
-			<artifactId>multithreadedtc</artifactId>
-			<version>1.01</version>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>edu.umd.cs.mtc</groupId>
+      <artifactId>multithreadedtc</artifactId>
+      <version>1.01</version>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.sonatype.plugin</groupId>
-			<artifactId>plugin-host-api</artifactId>
-			<version>1.0.2</version>
-		</dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+      <version>1.0.2</version>
+    </dependency>
 
-	</dependencies>
+  </dependencies>
 </project>

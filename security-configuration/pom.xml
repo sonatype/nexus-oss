@@ -13,85 +13,85 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<artifactId>security-parent</artifactId>
-		<groupId>org.sonatype.security</groupId>
-		<version>2.6-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.sonatype.security</groupId>
-	<artifactId>security-configuration</artifactId>
-	<name>Security: Configuration</name>
-	<description>Defines how the security system is configured, which realms are used, the anonymous username/password, and if security is enabled or not.</description>
+  <parent>
+    <artifactId>security-parent</artifactId>
+    <groupId>org.sonatype.security</groupId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.security</groupId>
+  <artifactId>security-configuration</artifactId>
+  <name>Security: Configuration</name>
+  <description>Defines how the security system is configured, which realms are used, the anonymous username/password, and if security is enabled or not.</description>
 
-	<dependencies>
+  <dependencies>
 
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.sisu</groupId>
-			<artifactId>sisu-inject-bean</artifactId>
-		</dependency>
-        <dependency>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-bean</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.sonatype.configuration</groupId>
-			<artifactId>base-configuration</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.sonatype.configuration</groupId>
+      <artifactId>base-configuration</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.sonatype.plexus</groupId>
-			<artifactId>plexus-cipher</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-cipher</artifactId>
+    </dependency>
 
-		<!-- TESTS -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+    <!-- TESTS -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-	</dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-	<build>
-		<plugins>
+  </dependencies>
 
-			<plugin>
-				<groupId>org.codehaus.modello</groupId>
-				<artifactId>modello-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>security-configuraiton.xml</id>
-						<goals>
-							<goal>java</goal>
-							<goal>xsd</goal>
-							<goal>xpp3-reader</goal>
-							<goal>xpp3-writer</goal>
-						</goals>
-						<configuration>
-							<version>2.0.3</version>
-							<models>
-								<model>src/main/mdo/security-configuration.xml</model>
-							</models>
-						</configuration>
-					</execution>
-				</executions>
-				<configuration>
-					<packageWithVersion>false</packageWithVersion>
-				</configuration>
-			</plugin>
+  <build>
+    <plugins>
 
-		</plugins>
-	</build>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>security-configuraiton.xml</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xsd</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+            <configuration>
+              <version>2.0.3</version>
+              <models>
+                <model>src/main/mdo/security-configuration.xml</model>
+              </models>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
 </project>
