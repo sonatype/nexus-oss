@@ -337,6 +337,11 @@
               collapsible : true,
               collapsed : true,
               items : [{
+                    title : 'Welcome',
+                    tabId : 'welcome',
+                    tabCode : Sonatype.view.welcomePanel
+                  },
+                  {
                     title : 'About Nexus',
                     tabId : 'AboutNexus',
                     tabCode : Sonatype.repoServer.HelpAboutPanel
@@ -444,6 +449,7 @@
         var itemCount = welcomePanelConfig.items.length;
 
         Sonatype.Events.fireEvent('welcomePanelInit', this, welcomePanelConfig);
+        Sonatype.Events.fireEvent('welcomeTabInit', this, welcomeTabConfig);
 
         // If nothing was added, then add the default blurb, if perm'd of course
         if (welcomePanelConfig.items.length <= itemCount && sp.checkPermission('nexus:repostatus', sp.READ))
@@ -460,7 +466,17 @@
               });
         }
 
-        Sonatype.view.welcomeTab = new Ext.Panel(welcomeTabConfig);
+        Sonatype.view.welcomePanel = function(config) {
+          var config = config || {};
+          var defaultConfig = {};
+          Ext.apply(this, config, defaultConfig);
+
+          Sonatype.view.welcomePanel.superclass.constructor.call(this, welcomeTabConfig );
+        }
+
+        Ext.extend(Sonatype.view.welcomePanel, Ext.Panel);
+
+        Sonatype.view.welcomeTab = new Sonatype.view.welcomePanel(welcomeTabConfig);
         Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
         Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
       },
