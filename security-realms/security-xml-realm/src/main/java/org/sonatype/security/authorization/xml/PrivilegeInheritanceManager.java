@@ -15,9 +15,9 @@ package org.sonatype.security.authorization.xml;
 import java.util.List;
 
 /**
- * Allows for an method to inherit from another.  For example:  'delete' imply that a user has access to 'read'.
+ * Allows for an method to inherit from another. For example: 'delete' imply that a user has access to 'read'.
+ * 
  * @author Brian Demers
- *
  */
 public interface PrivilegeInheritanceManager
 {

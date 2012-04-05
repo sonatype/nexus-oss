@@ -42,16 +42,15 @@ public class UserManagementTest
         Assert.assertTrue( userMap.containsKey( "pperalez" ) );
         Assert.assertTrue( userMap.containsKey( "dknudsen" ) );
         Assert.assertTrue( userMap.containsKey( "anonymous-user" ) );
-        
+
         Assert.assertTrue( userMap.containsKey( "bburton" ) );
         Assert.assertTrue( userMap.containsKey( "jblevins" ) );
         Assert.assertTrue( userMap.containsKey( "ksimmons" ) );
         Assert.assertTrue( userMap.containsKey( "fdahmen" ) );
         Assert.assertTrue( userMap.containsKey( "jcodar" ) );
-        
+
         // 2 different jcoders
         Assert.assertEquals( 11, users.size() );
-
 
         // we just need to check to make sure there are 2 jcoders with the correct source (the counts are already
         // checked above)
@@ -62,7 +61,7 @@ public class UserManagementTest
         throws Exception
     {
         SecuritySystem securitySystem = this.getSecuritySystem();
-        
+
         UserSearchCriteria criteria = new UserSearchCriteria();
 
         criteria.setUserId( "pperalez" );

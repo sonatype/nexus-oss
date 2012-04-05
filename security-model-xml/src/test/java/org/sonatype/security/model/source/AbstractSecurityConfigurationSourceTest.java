@@ -22,7 +22,7 @@ import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 public abstract class AbstractSecurityConfigurationSourceTest
     extends AbstractSecurityConfigTest
 {
-    
+
     protected SecurityModelConfigurationSource configurationSource;
 
     protected abstract SecurityModelConfigurationSource getConfigurationSource()
@@ -71,6 +71,5 @@ public abstract class AbstractSecurityConfigurationSourceTest
 
         assertFalse( configurationSource.getConfiguration() == null );
     }
-
 
 }

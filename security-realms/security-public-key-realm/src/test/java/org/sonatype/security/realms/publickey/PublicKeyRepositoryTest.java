@@ -62,7 +62,7 @@ public class PublicKeyRepositoryTest
         Set<PublicKey> userKeys = new HashSet<PublicKey>();
         userKeys.add( key1 );
         userKeys.add( key2 );
-        
+
         keyRepo.addPublicKeys( "user", userKeys );
         keyRepo.addPublicKey( "user", key3 );
 
@@ -75,7 +75,7 @@ public class PublicKeyRepositoryTest
 
     @Test
     public void testRemovePublicKey()
-    {   
+    {
         PublicKeyRepository keyRepo = this.getPublicKeyRepository();
 
         PublicKey key1 = new MockPublicKey( "key1" );
@@ -85,7 +85,7 @@ public class PublicKeyRepositoryTest
         keyRepo.addPublicKey( "user", key1 );
         keyRepo.addPublicKey( "user", key2 );
         keyRepo.addPublicKey( "user", key3 );
-        
+
         // now remove key2
         keyRepo.removePublicKey( "user", key2 );
 
@@ -102,7 +102,7 @@ public class PublicKeyRepositoryTest
         PublicKeyRepository keyRepo = this.getPublicKeyRepository();
         keyRepo.addPublicKey( "user1", new MockPublicKey( "key1" ) );
         keyRepo.addPublicKey( "user2", new MockPublicKey( "key2" ) );
-        
+
         Assert.assertTrue( keyRepo.hasAccount( "user1" ) );
         Assert.assertTrue( keyRepo.hasAccount( "user2" ) );
         Assert.assertFalse( keyRepo.hasAccount( "user3" ) );

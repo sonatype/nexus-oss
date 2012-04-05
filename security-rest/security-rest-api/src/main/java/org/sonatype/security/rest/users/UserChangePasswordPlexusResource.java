@@ -91,10 +91,8 @@ public class UserChangePasswordPlexusResource
             {
                 if ( !isAnonymousUser( resource.getUserId(), request ) )
                 {
-                    getSecuritySystem().changePassword(
-                        resource.getUserId(),
-                        resource.getOldPassword(),
-                        resource.getNewPassword() );
+                    getSecuritySystem().changePassword( resource.getUserId(), resource.getOldPassword(),
+                                                        resource.getNewPassword() );
 
                     response.setStatus( Status.SUCCESS_ACCEPTED );
                 }

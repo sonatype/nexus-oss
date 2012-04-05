@@ -219,9 +219,8 @@ public abstract class AbstractSecurityPlexusResource
         }
         catch ( NoSuchAuthorizationManagerException e )
         {
-            this.getLogger().warn(
-                "Failed to lookup the users Role: " + role.getRoleId() + " source: " + role.getSource()
-                    + " but the user has this role.", e );
+            this.getLogger().warn( "Failed to lookup the users Role: " + role.getRoleId() + " source: "
+                                       + role.getSource() + " but the user has this role.", e );
         }
         catch ( NoSuchRoleException e )
         {
@@ -229,15 +228,13 @@ public abstract class AbstractSecurityPlexusResource
             // found anyway.
             if ( DEFAULT_SOURCE.equals( role.getSource() ) )
             {
-                this.getLogger().warn(
-                    "Failed to lookup the users Role: " + role.getRoleId() + " source: " + role.getSource()
-                        + " but the user has this role.", e );
+                this.getLogger().warn( "Failed to lookup the users Role: " + role.getRoleId() + " source: "
+                                           + role.getSource() + " but the user has this role.", e );
             }
             else
             {
-                this.getLogger().debug(
-                    "Failed to lookup the users Role: " + role.getRoleId() + " source: " + role.getSource()
-                        + " falling back to the roleId for the role's name." );
+                this.getLogger().debug( "Failed to lookup the users Role: " + role.getRoleId() + " source: "
+                                            + role.getSource() + " falling back to the roleId for the role's name." );
             }
         }
 

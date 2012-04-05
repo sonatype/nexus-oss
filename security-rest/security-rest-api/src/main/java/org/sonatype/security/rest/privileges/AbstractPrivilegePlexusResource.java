@@ -28,28 +28,28 @@ public abstract class AbstractPrivilegePlexusResource
     public PrivilegeStatusResource securityToRestModel( Privilege privilege, Request request, boolean appendResourceId )
     {
         PrivilegeStatusResource resource = new PrivilegeStatusResource();
-        
+
         for ( Entry<String, String> prop : privilege.getProperties().entrySet() )
         {
             PrivilegeProperty privProp = new PrivilegeProperty();
             privProp.setKey( prop.getKey() );
             privProp.setValue( prop.getValue() );
-            
+
             resource.addProperty( privProp );
         }
-        
+
         resource.setType( privilege.getType() );
         resource.setId( privilege.getId() );
         resource.setName( privilege.getName() );
         resource.setDescription( privilege.getDescription() );
-        
+
         String resourceId = "";
         if ( appendResourceId )
         {
             resourceId = resource.getId();
         }
         resource.setResourceURI( this.createChildReference( request, resourceId ).toString() );
-        
+
         resource.setUserManaged( !privilege.isReadOnly() );
 
         return resource;

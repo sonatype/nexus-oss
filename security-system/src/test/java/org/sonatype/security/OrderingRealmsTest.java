@@ -45,7 +45,7 @@ public class OrderingRealmsTest
         realmHints.add( "MockRealmB" );
         realmHints.add( "MockRealmA" );
         securitySystem.setRealms( realmHints );
-        
+
         jcoder = securitySystem.getUser( "jcoder" );
         Assert.assertNotNull( jcoder );
 

@@ -44,7 +44,7 @@ public class DefaultConfigurationValidator
 {
     @Inject
     private Logger logger;
-    
+
     @Inject
     private ConfigurationIdGenerator idGenerator;
 
@@ -416,33 +416,36 @@ public class DefaultConfigurationValidator
 
         if ( !update && StringUtils.isEmpty( user.getId() ) )
         {
-            ValidationMessage message = new ValidationMessage( "userId", "User ID is required.", "User ID is required." );
-            
+            ValidationMessage message =
+                new ValidationMessage( "userId", "User ID is required.", "User ID is required." );
+
             response.addValidationError( message );
         }
-        
+
         if ( !update && StringUtils.isNotEmpty( user.getId() ) && existingIds.contains( user.getId() ) )
         {
-            ValidationMessage message = new ValidationMessage( "userId", "User ID '" + user.getId()
-                + "' is already in use.", "User ID '" + user.getId() + "' is already in use." );
+            ValidationMessage message =
+                new ValidationMessage( "userId", "User ID '" + user.getId() + "' is already in use.", "User ID '"
+                    + user.getId() + "' is already in use." );
 
             response.addValidationError( message );
         }
-        
+
         if ( StringUtils.isNotEmpty( user.getId() ) && user.getId().contains( " " ) )
         {
-            ValidationMessage message = new ValidationMessage( "userId", "User ID '" + user.getId()
-                + "' cannot contain spaces.", "User ID '" + user.getId() + "' cannot contain spaces." );
+            ValidationMessage message =
+                new ValidationMessage( "userId", "User ID '" + user.getId() + "' cannot contain spaces.", "User ID '"
+                    + user.getId() + "' cannot contain spaces." );
 
             response.addValidationError( message );
         }
 
-        if( StringUtils.isNotEmpty( user.getFirstName() ) )
+        if ( StringUtils.isNotEmpty( user.getFirstName() ) )
         {
             user.setFirstName( user.getFirstName() );
         }
 
-        if( StringUtils.isNotEmpty( user.getLastName() ) )
+        if ( StringUtils.isNotEmpty( user.getLastName() ) )
         {
             user.setLastName( user.getLastName() );
         }
@@ -468,8 +471,9 @@ public class DefaultConfigurationValidator
             {
                 if ( !user.getEmail().matches( ".+@.+" ) )
                 {
-                    ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getId()
-                        + "' has an invalid email address.", "Email address is invalid." );
+                    ValidationMessage message =
+                        new ValidationMessage( "email", "User ID '" + user.getId() + "' has an invalid email address.",
+                                               "Email address is invalid." );
                     response.addValidationError( message );
                 }
             }

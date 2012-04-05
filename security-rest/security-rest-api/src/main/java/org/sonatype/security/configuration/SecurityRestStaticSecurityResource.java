@@ -23,7 +23,6 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
  * A StaticSecurityResource that contributes static privileges and roles to the XML Realms.
  * 
  * @author bdemers
- *
  */
 @Singleton
 @Typed( value = StaticSecurityResource.class )
@@ -32,7 +31,8 @@ public class SecurityRestStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.sonatype.security.realms.tools.AbstractStaticSecurityResource#getResourcePath()
      */
     protected String getResourcePath()

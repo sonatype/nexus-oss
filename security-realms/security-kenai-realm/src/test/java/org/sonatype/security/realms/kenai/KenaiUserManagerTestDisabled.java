@@ -17,19 +17,20 @@ import junit.framework.Assert;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.usermanagement.UserManager;
 
-
 public class KenaiUserManagerTestDisabled
     extends AbstractSecurityTestCase
 {
 
-    private UserManager getUserManager() throws Exception
+    private UserManager getUserManager()
+        throws Exception
     {
         return this.lookup( UserManager.class, "kenai" );
     }
-    
-    public void testGetUser() throws Exception
+
+    public void testGetUser()
+        throws Exception
     {
         Assert.fail( "no coresponding API" );
     }
-    
+
 }

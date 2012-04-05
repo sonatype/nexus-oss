@@ -25,7 +25,7 @@ public class ApplicationPrivilegeMethodPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {
     public static final String ID = "method";
-    
+
     public String getHelpText()
     {
         return "The method (create, read, update, delete) assigned to this privilege.";
@@ -40,7 +40,7 @@ public class ApplicationPrivilegeMethodPropertyDescriptor
     {
         return "Method";
     }
-    
+
     public String getType()
     {
         return "string";

@@ -104,8 +104,8 @@ public class RoleListPlexusResource
         }
         catch ( NoSuchAuthorizationManagerException e )
         {
-           this.getLogger().error( "Unable to find AuthorizationManager 'default'", e );
-           throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to find AuthorizationManager 'default'" );
+            this.getLogger().error( "Unable to find AuthorizationManager 'default'", e );
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to find AuthorizationManager 'default'" );
         }
 
         return result;
@@ -146,11 +146,11 @@ public class RoleListPlexusResource
 
                 result.setData( resource );
             }
-             catch ( InvalidConfigurationException e )
-             {
-                 // build and throw exception
-                 handleInvalidConfigurationException( e );
-             }
+            catch ( InvalidConfigurationException e )
+            {
+                // build and throw exception
+                handleInvalidConfigurationException( e );
+            }
             catch ( NoSuchAuthorizationManagerException e )
             {
                 this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );

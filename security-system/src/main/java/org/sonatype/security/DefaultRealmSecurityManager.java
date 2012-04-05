@@ -42,8 +42,9 @@ public class DefaultRealmSecurityManager
     implements Initializable
 {
     private Logger logger;
+
     private RolePermissionResolver rolePermissionResolver;
-    
+
     @Inject
     public DefaultRealmSecurityManager( Logger logger, @Nullable RolePermissionResolver rolePermissionResolver )
     {
@@ -52,7 +53,7 @@ public class DefaultRealmSecurityManager
         this.rolePermissionResolver = rolePermissionResolver;
         init();
     }
-    
+
     @Override
     public void init()
         throws ShiroException

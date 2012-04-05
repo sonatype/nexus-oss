@@ -19,7 +19,8 @@ import java.util.Map;
 
 import org.sonatype.configuration.validation.ValidationContext;
 
-public class SecurityValidationContext implements ValidationContext
+public class SecurityValidationContext
+    implements ValidationContext
 {
     private List<String> existingPrivilegeIds;
 
@@ -30,11 +31,11 @@ public class SecurityValidationContext implements ValidationContext
     private Map<String, String> existingEmailMap;
 
     private Map<String, List<String>> roleContainmentMap;
-    
+
     private Map<String, String> existingRoleNameMap;
-    
+
     private Map<String, List<String>> existingUserRoleMap;
-   
+
     public void addExistingPrivilegeIds()
     {
         if ( this.existingPrivilegeIds == null )
@@ -54,13 +55,13 @@ public class SecurityValidationContext implements ValidationContext
         {
             this.roleContainmentMap = new HashMap<String, List<String>>();
         }
-        
-        if ( this.existingRoleNameMap == null)
+
+        if ( this.existingRoleNameMap == null )
         {
             this.existingRoleNameMap = new HashMap<String, String>();
         }
-        
-        if ( this.existingUserRoleMap == null)
+
+        if ( this.existingUserRoleMap == null )
         {
             this.existingUserRoleMap = new HashMap<String, List<String>>();
         }
@@ -113,6 +114,5 @@ public class SecurityValidationContext implements ValidationContext
     {
         return existingUserRoleMap;
     }
-    
-    
+
 }

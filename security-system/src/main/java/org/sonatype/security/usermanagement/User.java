@@ -51,6 +51,7 @@ public interface User
 
     /**
      * Gets the users first name.
+     * 
      * @return
      */
     public String getFirstName();
@@ -64,6 +65,7 @@ public interface User
 
     /**
      * Gets the users last name.
+     * 
      * @return
      */
     public String getLastName();

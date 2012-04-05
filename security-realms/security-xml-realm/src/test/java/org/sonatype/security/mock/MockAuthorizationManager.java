@@ -29,7 +29,8 @@ import org.sonatype.security.authorization.Role;
 @Singleton
 @Named( value = "Mock" )
 @Typed( value = AuthorizationManager.class )
-public class MockAuthorizationManager extends AbstractReadOnlyAuthorizationManager
+public class MockAuthorizationManager
+    extends AbstractReadOnlyAuthorizationManager
 {
 
     public String getSource()
@@ -40,11 +41,11 @@ public class MockAuthorizationManager extends AbstractReadOnlyAuthorizationManag
     public Set<Role> listRoles()
     {
         Set<Role> roles = new HashSet<Role>();
-        
+
         roles.add( new Role( "mockrole1", "MockRole1", "Mock Role1", "Mock", true, null, null ) );
         roles.add( new Role( "mockrole2", "MockRole2", "Mock Role2", "Mock", true, null, null ) );
         roles.add( new Role( "mockrole3", "MockRole3", "Mock Role3", "Mock", true, null, null ) );
-        
+
         return roles;
     }
 
@@ -53,12 +54,12 @@ public class MockAuthorizationManager extends AbstractReadOnlyAuthorizationManag
     {
         for ( Role role : this.listRoles() )
         {
-            if( roleId.equals( role.getRoleId() ) )
+            if ( roleId.equals( role.getRoleId() ) )
             {
                 return role;
             }
         }
-        throw new NoSuchRoleException( "Role: "+ roleId + " could not be found." );
+        throw new NoSuchRoleException( "Role: " + roleId + " could not be found." );
     }
 
     public Set<Privilege> listPrivileges()
@@ -69,7 +70,7 @@ public class MockAuthorizationManager extends AbstractReadOnlyAuthorizationManag
     public Privilege getPrivilege( String privilegeId )
         throws NoSuchPrivilegeException
     {
-        throw new NoSuchPrivilegeException( "Privilege: "+ privilegeId + " could not be found." );
+        throw new NoSuchPrivilegeException( "Privilege: " + privilegeId + " could not be found." );
     }
 
 }

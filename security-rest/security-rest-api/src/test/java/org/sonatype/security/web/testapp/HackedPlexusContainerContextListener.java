@@ -21,20 +21,18 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.plexus.rest.PlexusContainerContextListener;
 
-
 public class HackedPlexusContainerContextListener
     extends PlexusContainerContextListener
 {
 
     private static ThreadLocal<PlexusContainer> plexusContainer = new ThreadLocal<PlexusContainer>();
-    
-    
-//    @Override
-//    public void contextInitialized( ServletContextEvent sce )
-//    {
-//        SLF4JBridgeHandler.install();
-//        super.contextInitialized( sce );
-//    }
+
+    // @Override
+    // public void contextInitialized( ServletContextEvent sce )
+    // {
+    // SLF4JBridgeHandler.install();
+    // super.contextInitialized( sce );
+    // }
 
     @Override
     public void contextDestroyed( ServletContextEvent sce )
@@ -42,20 +40,17 @@ public class HackedPlexusContainerContextListener
         SLF4JBridgeHandler.uninstall();
     }
 
-
     @Override
     protected void initizlizePlexusContainer( ServletContext context, ContainerConfiguration configuration )
         throws PlexusContainerException
     {
-        context.setAttribute( "plexus", this.plexusContainer.get());
+        context.setAttribute( "plexus", this.plexusContainer.get() );
     }
-
 
     public PlexusContainer getPlexusContainer()
     {
         return plexusContainer.get();
     }
-
 
     public void setPlexusContainer( PlexusContainer plexusContainer )
     {

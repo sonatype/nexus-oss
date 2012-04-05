@@ -35,7 +35,7 @@ public class SecurityAuthenticationTest
         security = (SecuritySystem) lookup( SecuritySystem.class );
         security.start();
     }
-    
+
     public void testAuthcAndAuthzAfterRestart()
         throws Exception
     {
@@ -52,10 +52,10 @@ public class SecurityAuthenticationTest
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "password" );
 
-//        this.setupLoginContext( "test" );
-        
+        // this.setupLoginContext( "test" );
+
         Subject ai = security.login( upToken );
-       
+
         assertEquals( "username", ai.getPrincipal().toString() );
     }
 
@@ -79,21 +79,17 @@ public class SecurityAuthenticationTest
     public void testAuthorization()
         throws Exception
     {
-        assertTrue( security.isPermitted(
-            new SimplePrincipalCollection( "username", FakeRealm1.class.getName() ),
-            "test:perm" ) );
+        assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm1.class.getName() ),
+                                          "test:perm" ) );
 
-        assertTrue( security.isPermitted(
-            new SimplePrincipalCollection( "username", FakeRealm1.class.getName() ),
-            "other:perm" ) );
+        assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm1.class.getName() ),
+                                          "other:perm" ) );
 
-        assertTrue( security.isPermitted(
-            new SimplePrincipalCollection( "username", FakeRealm2.class.getName() ),
-            "other:perm" ) );
+        assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm2.class.getName() ),
+                                          "other:perm" ) );
 
-        assertTrue( security.isPermitted(
-            new SimplePrincipalCollection( "username", FakeRealm2.class.getName() ),
-            "test:perm" ) );
+        assertTrue( security.isPermitted( new SimplePrincipalCollection( "username", FakeRealm2.class.getName() ),
+                                          "test:perm" ) );
     }
 
     public static void assertImplied( Permission testPermission, Collection<Permission> assignedPermissions )

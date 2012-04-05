@@ -14,8 +14,8 @@ package org.sonatype.security.authorization;
 
 /**
  * Thrown when authorization fails.
+ * 
  * @author Brian Demers
- *
  */
 public class AuthorizationException
     extends Exception

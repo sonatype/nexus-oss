@@ -38,7 +38,7 @@ import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
 
 /**
- *  REST resource for listing security roles.
+ * REST resource for listing security roles.
  * 
  * @author bdemers
  * @see RoleListPlexusResource
@@ -53,11 +53,11 @@ import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
 public class PlexusRoleListPlexusResource
     extends AbstractSecurityPlexusResource
 {
-    
+
     public static final String SOURCE_ID_KEY = "sourceId";
 
     public static final String RESOURCE_URI = "/plexus_roles/{" + SOURCE_ID_KEY + "}";
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -78,12 +78,13 @@ public class PlexusRoleListPlexusResource
 
     /**
      * Retrieves the list of security roles.
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
+     * 
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PlexusRoleListResourceResponse.class, pathParams = { @PathParam(value = "sourceId") } )
+    @ResourceMethodSignature( output = PlexusRoleListResourceResponse.class, pathParams = { @PathParam( value = "sourceId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -100,7 +101,7 @@ public class PlexusRoleListPlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Role Source '" + source
                 + "' could not be found." );
         }
-        
+
         PlexusRoleListResourceResponse resourceResponse = new PlexusRoleListResourceResponse();
         for ( Role role : roles )
         {

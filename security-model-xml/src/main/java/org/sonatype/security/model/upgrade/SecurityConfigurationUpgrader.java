@@ -16,12 +16,13 @@ import org.sonatype.configuration.upgrade.ConfigurationUpgrader;
 import org.sonatype.security.model.Configuration;
 
 /**
- * A component involved only if old security configuration is found. It will fetch the old configuration, transform it to
- * current Configuration model and return it. Nothing else.
+ * A component involved only if old security configuration is found. It will fetch the old configuration, transform it
+ * to current Configuration model and return it. Nothing else.
  * 
  * @author cstamas
  */
-public interface SecurityConfigurationUpgrader extends ConfigurationUpgrader<Configuration>
+public interface SecurityConfigurationUpgrader
+    extends ConfigurationUpgrader<Configuration>
 {
 
 }

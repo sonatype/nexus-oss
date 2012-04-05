@@ -105,13 +105,12 @@ public class AssignedPrivilegesPlexusResource
                 try
                 {
                     handleRole( authzManager.getRole( roleIdentifier.getRoleId() ), null, authzManager,
-                        responseResource );
+                                responseResource );
                 }
                 catch ( NoSuchRoleException e )
                 {
-                    getLogger().debug(
-                        "Invalid roleId: " + roleIdentifier.getRoleId() + " from source: " + roleIdentifier.getSource()
-                            + " not found." );
+                    getLogger().debug( "Invalid roleId: " + roleIdentifier.getRoleId() + " from source: "
+                                           + roleIdentifier.getSource() + " not found." );
                 }
             }
 

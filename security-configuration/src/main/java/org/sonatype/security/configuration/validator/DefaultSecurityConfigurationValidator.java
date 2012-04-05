@@ -30,7 +30,7 @@ public class DefaultSecurityConfigurationValidator
 {
 
     public ValidationResponse validateModel( SecurityValidationContext context,
-        ValidationRequest<SecurityConfiguration> request )
+                                             ValidationRequest<SecurityConfiguration> request )
     {
         ValidationResponse validationResponse = new ValidationResponse();
         validationResponse.setContext( context );
@@ -44,8 +44,7 @@ public class DefaultSecurityConfigurationValidator
         return validationResponse;
     }
 
-    public ValidationResponse validateAnonymousPassword( SecurityValidationContext context,
-        String anonymousPassword )
+    public ValidationResponse validateAnonymousPassword( SecurityValidationContext context, String anonymousPassword )
     {
         // we are not currently doing anything here
         ValidationResponse validationResponse = new ValidationResponse();
@@ -53,8 +52,7 @@ public class DefaultSecurityConfigurationValidator
         return validationResponse;
     }
 
-    public ValidationResponse validateAnonymousUsername( SecurityValidationContext context,
-        String anonymousUsername )
+    public ValidationResponse validateAnonymousUsername( SecurityValidationContext context, String anonymousUsername )
     {
         // we are not currently doing anything here
         ValidationResponse validationResponse = new ValidationResponse();
@@ -62,8 +60,7 @@ public class DefaultSecurityConfigurationValidator
         return validationResponse;
     }
 
-    public ValidationResponse validateRealms( SecurityValidationContext context,
-        List<String> realms )
+    public ValidationResponse validateRealms( SecurityValidationContext context, List<String> realms )
     {
         ValidationResponse validationResponse = new ValidationResponse();
         validationResponse.setContext( context );
@@ -73,8 +70,7 @@ public class DefaultSecurityConfigurationValidator
         {
             if ( realms.size() < 1 )
             {
-                validationResponse
-                    .addValidationError( "Security is enabled, You must have at least one realm enabled." );
+                validationResponse.addValidationError( "Security is enabled, You must have at least one realm enabled." );
             }
             // TODO: we should also try to load each one to see if it exists
         }

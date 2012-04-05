@@ -14,12 +14,12 @@ package org.sonatype.security.model.upgrade;
 
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 
-
 /**
  * A marker interface for security upgraders.
  * 
  * @author cstamas
  */
-public interface SecurityUpgrader extends SingleVersionUpgrader
+public interface SecurityUpgrader
+    extends SingleVersionUpgrader
 {
 }

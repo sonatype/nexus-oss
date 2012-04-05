@@ -39,10 +39,9 @@ public class Upgrade203to204
 
     @Inject
     private Logger logger;
-    
+
     public Object loadConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException
+        throws IOException, ConfigurationIsCorruptedException
     {
         FileReader fr = null;
 
@@ -71,37 +70,39 @@ public class Upgrade203to204
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.security.model.v2_0_3.Configuration oldc = ( org.sonatype.security.model.v2_0_3.Configuration ) message.getConfiguration();
+        org.sonatype.security.model.v2_0_3.Configuration oldc =
+            (org.sonatype.security.model.v2_0_3.Configuration) message.getConfiguration();
 
         org.sonatype.security.model.v2_0_4.Configuration newc =
             new SecurityVersionUpgrade().upgradeConfiguration( oldc );
-        
+
         newc.setVersion( org.sonatype.security.model.v2_0_4.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.security.model.v2_0_4.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-    
-    class SecurityVersionUpgrade extends BasicVersionUpgrade
+
+    class SecurityVersionUpgrade
+        extends BasicVersionUpgrade
     {
 
         @Override
         public CUser upgradeCUser( org.sonatype.security.model.v2_0_3.CUser cUser, CUser value )
         {
-            CUser upgradedUser =  super.upgradeCUser( cUser, value );
-            
+            CUser upgradedUser = super.upgradeCUser( cUser, value );
+
             // get the old users name
             String name = cUser.getName();
             String[] nameParts = name.trim().split( " ", 2 );
-            
+
             // the first name is everything to the left of the first space
             upgradedUser.setFirstName( nameParts[0] );
-            
+
             // last name is everything else ( if it exists )
-            if( nameParts.length > 1 )
+            if ( nameParts.length > 1 )
             {
                 upgradedUser.setLastName( nameParts[1] );
             }
-            
+
             return upgradedUser;
         }
     }

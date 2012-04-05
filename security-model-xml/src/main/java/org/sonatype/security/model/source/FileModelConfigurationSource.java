@@ -86,8 +86,7 @@ public class FileModelConfigurationSource
     }
 
     public Configuration loadConfiguration()
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         // propagate call and fill in defaults too
         securityDefaults.loadConfiguration();
@@ -104,10 +103,10 @@ public class FileModelConfigurationSource
 
             // get the defaults and stick it to place
             setConfiguration( securityDefaults.getConfiguration() );
-            
+
             // check for a configuration before saving
             // if it is null use an empty configuraiton
-            if( this.getConfiguration() == null)
+            if ( this.getConfiguration() == null )
             {
                 Configuration configuration = new Configuration();
                 configuration.setVersion( Configuration.MODEL_VERSION );
@@ -155,8 +154,7 @@ public class FileModelConfigurationSource
     }
 
     protected void upgradeConfiguration( File file )
-        throws IOException,
-            ConfigurationException
+        throws IOException, ConfigurationException
     {
         getLogger().info( "Trying to upgrade the configuration file " + file.getAbsolutePath() );
 
@@ -227,12 +225,13 @@ public class FileModelConfigurationSource
             // bad bad bad
             if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
             {
-                String message = "\r\n******************************************************************************\r\n"
-                    + "* Could not create configuration file [ "
-                    + file.toString()
-                    + "]!!!! *\r\n"
-                    + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
-                    + "******************************************************************************";
+                String message =
+                    "\r\n******************************************************************************\r\n"
+                        + "* Could not create configuration file [ "
+                        + file.toString()
+                        + "]!!!! *\r\n"
+                        + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
+                        + "******************************************************************************";
 
                 getLogger().error( message );
             }

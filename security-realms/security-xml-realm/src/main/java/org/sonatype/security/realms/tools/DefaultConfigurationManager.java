@@ -65,7 +65,6 @@ public class DefaultConfigurationManager
     @Inject
     private List<SecurityConfigurationModifier> configurationModifiers;
 
-
     public List<CPrivilege> listPrivileges()
     {
         return Collections.unmodifiableList( getConfiguration().getPrivileges() );
@@ -271,9 +270,8 @@ public class DefaultConfigurationManager
         }
         catch ( NoSuchRoleMappingException e )
         {
-            this.getLogger().debug(
-                "User role mapping for user: " + id + " source: " + SecurityXmlUserManager.SOURCE
-                    + " could not be deleted because it does not exist." );
+            this.getLogger().debug( "User role mapping for user: " + id + " source: " + SecurityXmlUserManager.SOURCE
+                                        + " could not be deleted because it does not exist." );
         }
     }
 

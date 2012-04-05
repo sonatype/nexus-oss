@@ -32,11 +32,10 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-/** 
+/**
  * REST resource that searches for users based on a users source and partial user Id (user Id starts with xxx).
  * 
  * @author bdemers
- *
  */
 @Singleton
 @Typed( value = PlexusResource.class )
@@ -44,17 +43,18 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserSearchByIdPlexusResource.RESOURCE_URI )
-public class UserSearchByIdPlexusResource extends AbstractUserSearchPlexusResource
+public class UserSearchByIdPlexusResource
+    extends AbstractUserSearchPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
 
-    public static final String RESOURCE_URI = "/user_search/{" + USER_SOURCE_KEY +"}/{" + USER_ID_KEY + "}";
-    
+    public static final String RESOURCE_URI = "/user_search/{" + USER_SOURCE_KEY + "}/{" + USER_ID_KEY + "}";
+
     public UserSearchByIdPlexusResource()
     {
         setModifiable( false );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -74,31 +74,30 @@ public class UserSearchByIdPlexusResource extends AbstractUserSearchPlexusResour
     }
 
     /**
-     * Returns a list of users in which the source and partial user id matches the parameters. 
+     * Returns a list of users in which the source and partial user id matches the parameters.
      * 
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
-     * 
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
      * @param userId The Id of the user.
      */
-    @Override 
+    @Override
     @GET
-    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class, pathParams = { @PathParam( value = "userId"), @PathParam( value = "sourceId") } )
+    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class, pathParams = {
+        @PathParam( value = "userId" ), @PathParam( value = "sourceId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        
+
         UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.setUserId( this.getSearchArg( request ) );
         criteria.setSource( this.getUserSource( request ) );
-        
+
         return this.search( criteria );
     }
-    
-    
+
     protected String getSearchArg( Request request )
     {
         return getRequestAttribute( request, USER_ID_KEY );
     }
-    
+
 }

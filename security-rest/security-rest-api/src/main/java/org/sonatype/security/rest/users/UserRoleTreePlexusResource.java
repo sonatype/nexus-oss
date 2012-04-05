@@ -140,9 +140,8 @@ public class UserRoleTreePlexusResource
             }
             catch ( NoSuchRoleException e )
             {
-                getLogger().debug(
-                    "Invalid roleId: " + roleIdentifier.getRoleId() + " from source: " + roleIdentifier.getSource()
-                        + " not found." );
+                getLogger().debug( "Invalid roleId: " + roleIdentifier.getRoleId() + " from source: "
+                                       + roleIdentifier.getSource() + " not found." );
             }
         }
     }

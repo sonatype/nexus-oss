@@ -110,7 +110,7 @@ public abstract class AbstractMockUserManager
     {
         this.users = users;
     }
-   
+
     public Set<RoleIdentifier> getUsersRoles( String userId, String source )
         throws UserNotFoundException
     {
@@ -119,6 +119,6 @@ public abstract class AbstractMockUserManager
 
     public void changePassword( String userId, String newPassword )
         throws UserNotFoundException
-    {        
-    }    
+    {
+    }
 }

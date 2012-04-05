@@ -95,11 +95,12 @@ public class PublicKeyAuthenticatingRealmTest
         {
             // expected
         }
-        
+
         // try invalid user with valid key
-        Assert.assertNull( realm.getAuthenticationInfo( new PublicKeyAuthenticationToken( "Some-Random-Username", testUsersKey ) ) );
+        Assert.assertNull( realm.getAuthenticationInfo( new PublicKeyAuthenticationToken( "Some-Random-Username",
+                                                                                          testUsersKey ) ) );
     }
-    
+
     @Test
     public void testToken()
     {
@@ -109,12 +110,12 @@ public class PublicKeyAuthenticatingRealmTest
         // the content is not important, just the class type
         Assert.assertTrue( realm.supports( new PublicKeyAuthenticationToken( null, null ) ) );
     }
-    
-    
+
     @Test
     public void testAuthorization()
     {
         PublicKeyAuthenticatingRealm realm = new PublicKeyAuthenticatingRealm();
-        Assert.assertFalse( realm.isPermitted( new SimplePrincipalCollection( "user", realm.getName() ), "some:permission" ) );
+        Assert.assertFalse( realm.isPermitted( new SimplePrincipalCollection( "user", realm.getName() ),
+                                               "some:permission" ) );
     }
 }

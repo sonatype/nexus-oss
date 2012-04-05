@@ -47,7 +47,7 @@ public class AdditinalRoleSecuritySystemTest
         super.configure( properties );
         properties.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
     }
-    
+
     @Override
     public void configure( Binder binder )
     {

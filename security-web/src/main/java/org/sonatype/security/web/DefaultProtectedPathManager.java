@@ -26,7 +26,6 @@ import org.apache.shiro.web.filter.mgt.FilterChainManager;
  * The default implementation requires a FilterChainManager, so the configuration can be passed to it.
  * 
  * @author Brian Demers
- *
  */
 @Singleton
 @Typed( value = ProtectedPathManager.class )
@@ -35,18 +34,18 @@ public class DefaultProtectedPathManager
     implements ProtectedPathManager, FilterChainManagerAware
 {
     private FilterChainManager filterChainManager;
-    
+
     protected Map<String, String> pseudoChains = new LinkedHashMap<String, String>();
-    
 
     public void addProtectedResource( String pathPattern, String filterExpression )
     {
         // Only save the pathPattern and filterExpression in the pseudoChains, does not put real filters into the real
         // chain.
-        // We can not get the real filters because this method is invoked when the application is starting, when ShiroSecurityFilter
+        // We can not get the real filters because this method is invoked when the application is starting, when
+        // ShiroSecurityFilter
         // might not be located.
-     
-        if( this.filterChainManager != null )
+
+        if ( this.filterChainManager != null )
         {
             this.filterChainManager.createChain( pathPattern, filterExpression );
         }
@@ -59,7 +58,7 @@ public class DefaultProtectedPathManager
     public void setFilterChainManager( FilterChainManager filterChainManager )
     {
         this.filterChainManager = filterChainManager;
-        
+
         // lazy load: see https://issues.sonatype.org/browse/NEXUS-3111
         // which to me seems like a glassfish bug...
         for ( Entry<String, String> entry : this.pseudoChains.entrySet() )

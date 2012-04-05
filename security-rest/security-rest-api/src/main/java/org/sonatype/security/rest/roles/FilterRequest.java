@@ -113,9 +113,9 @@ public class FilterRequest
             {
                 if ( ( ( isShowRoles() && !resource.isExternal() && !( getUserId() != null && getRoleIds().isEmpty() ) ) || ( isShowExternalRoles() && resource.isExternal() ) )
                     && ( !getHiddenRoleIds().contains( resource.getId() ) )
-                    && ( resource.isExternal() || ( ( ( getRoleIds().isEmpty() && !isOnlySelected() ) || getRoleIds().contains(
-                        resource.getId() ) ) ) )
-                    && ( StringUtils.isEmpty( getText() ) || Pattern.compile( Pattern.quote( getText() ), Pattern.CASE_INSENSITIVE ).matcher( resource.getName() ).find() ) )
+                    && ( resource.isExternal() || ( ( ( getRoleIds().isEmpty() && !isOnlySelected() ) || getRoleIds().contains( resource.getId() ) ) ) )
+                    && ( StringUtils.isEmpty( getText() ) || Pattern.compile( Pattern.quote( getText() ),
+                                                                              Pattern.CASE_INSENSITIVE ).matcher( resource.getName() ).find() ) )
                 {
                     return true;
                 }
@@ -124,9 +124,9 @@ public class FilterRequest
             {
                 if ( isShowPrivileges()
                     && ( !getHiddenPrivilegeIds().contains( resource.getId() ) )
-                    && ( ( getPrivilegeIds().isEmpty() && !isOnlySelected() ) || getPrivilegeIds().contains(
-                        resource.getId() ) )
-                    && ( StringUtils.isEmpty( getText() ) || Pattern.compile( Pattern.quote( getText() ), Pattern.CASE_INSENSITIVE ).matcher( resource.getName() ).find() ) )
+                    && ( ( getPrivilegeIds().isEmpty() && !isOnlySelected() ) || getPrivilegeIds().contains( resource.getId() ) )
+                    && ( StringUtils.isEmpty( getText() ) || Pattern.compile( Pattern.quote( getText() ),
+                                                                              Pattern.CASE_INSENSITIVE ).matcher( resource.getName() ).find() ) )
                 {
                     return true;
                 }

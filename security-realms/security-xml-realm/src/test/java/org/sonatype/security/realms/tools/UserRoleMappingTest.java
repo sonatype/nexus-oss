@@ -53,7 +53,7 @@ public class UserRoleMappingTest
         Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
         Assert.assertEquals( 2, mapping.getRoles().size() );
     }
-    
+
     public void testGetUserWithEmptyRole()
         throws Exception
     {
@@ -73,12 +73,12 @@ public class UserRoleMappingTest
         Assert.assertTrue( mapping.getRoles().contains( "role1" ) );
         Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
         Assert.assertEquals( 3, mapping.getRoles().size() );
-        
+
         // try to update empty role
         config.updateUserRoleMapping( mapping );
         config.save();
         config.clearCache();
-        
+
         // make sure we still have the role mappings
         mapping = config.readUserRoleMapping( "test-user-with-empty-role", "default" );
 

@@ -203,7 +203,7 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
         }
         else
         {// subject is null
-            // we should not have got here if security is not enabled.
+         // we should not have got here if security is not enabled.
             int value = getSecuritySystem().isSecurityEnabled() ? NONE : ALL;
             for ( Entry<String, Integer> priv : privilegeMap.entrySet() )
             {

@@ -38,8 +38,8 @@ public class EmptyRoleManagementTest
 
         // copy the securityConf into place
         String securityXml = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security.xml";
-        FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ), new File(
-            CONFIG_DIR, "security.xml" ) );
+        FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ),
+                                 new File( CONFIG_DIR, "security.xml" ) );
     }
 
     public SecuritySystem getSecuritySystem()
@@ -58,12 +58,12 @@ public class EmptyRoleManagementTest
         throws Exception
     {
         String userId = "test-user-with-empty-role";
-    
+
         UserManager userManager = this.getUserManager();
         userManager.deleteUser( userId );
-    
+
         Configuration securityModel = this.getSecurityConfiguration();
-    
+
         for ( CUser tmpUser : securityModel.getUsers() )
         {
             if ( userId.equals( tmpUser.getId() ) )
@@ -71,7 +71,7 @@ public class EmptyRoleManagementTest
                 Assert.fail( "User " + userId + " was not removed." );
             }
         }
-    
+
         for ( CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings() )
         {
             if ( userId.equals( userRoleMapping.getUserId() ) && "default".equals( userRoleMapping.getSource() ) )
@@ -86,22 +86,22 @@ public class EmptyRoleManagementTest
     {
         String userId = "test-user-with-empty-role";
         String roleId = "empty-role";
-    
+
         RoleIdentifier emptyRole = new RoleIdentifier( "default", roleId );
-    
+
         UserManager userManager = this.getUserManager();
         User user = userManager.getUser( userId );
-    
+
         assertEquals( 3, user.getRoles().size() );
         assertTrue( user.getRoles().contains( emptyRole ) );
-    
+
         user.removeRole( emptyRole );
-    
+
         assertEquals( 2, user.getRoles().size() );
         assertFalse( user.getRoles().contains( emptyRole ) );
 
         userManager.updateUser( user );
-    
+
         Configuration securityModel = this.getSecurityConfiguration();
         for ( CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings() )
         {

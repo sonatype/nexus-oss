@@ -49,12 +49,12 @@ public class Privilege
     private Map<String, String> properties = new HashMap<String, String>();
 
     private boolean readOnly;
-    
+
     public Privilege()
     {
-        
+
     }
-    
+
     public Privilege( String id, String name, String description, String type, Map<String, String> properties,
                       boolean readOnly )
     {

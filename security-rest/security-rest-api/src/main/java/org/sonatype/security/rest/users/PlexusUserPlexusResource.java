@@ -53,14 +53,14 @@ public class PlexusUserPlexusResource
     extends AbstractSecurityPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
-    
+
     public static final String RESOURCE_URI = "/plexus_user/{" + USER_ID_KEY + "}";
-    
+
     public PlexusUserPlexusResource()
     {
         setModifiable( false );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -78,14 +78,15 @@ public class PlexusUserPlexusResource
     {
         return RESOURCE_URI;
     }
-    
+
     /**
      * Retrieves user information.
+     * 
      * @param userId The Id of the user.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PlexusUserResourceResponse.class, pathParams = {@PathParam( value = "userId" )} )
+    @ResourceMethodSignature( output = PlexusUserResourceResponse.class, pathParams = { @PathParam( value = "userId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -100,14 +101,14 @@ public class PlexusUserPlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
-        
+
         PlexusUserResource resource = securityToRestModel( user );
-        
+
         result.setData( resource );
-            
+
         return result;
     }
-    
+
     protected String getUserId( Request request )
     {
         return getRequestAttribute( request, USER_ID_KEY );

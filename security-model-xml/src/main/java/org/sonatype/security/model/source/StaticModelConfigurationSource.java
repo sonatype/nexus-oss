@@ -25,8 +25,8 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.model.Configuration;
 
 /**
- * A special "static" configuration source, that always return a factory provided defaults for Security configuration. It
- * is unmodifiable, since it actually reads the bundled config file from the module's JAR.
+ * A special "static" configuration source, that always return a factory provided defaults for Security configuration.
+ * It is unmodifiable, since it actually reads the bundled config file from the module's JAR.
  * 
  * @author cstamas
  */
@@ -36,12 +36,12 @@ import org.sonatype.security.model.Configuration;
 public class StaticModelConfigurationSource
     extends AbstractSecurityModelConfigurationSource
 {
-    
+
     private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security.xml";
-    
+
     @Inject
     private Logger logger;
-    
+
     /**
      * Gets the configuration using getResourceAsStream from "/META-INF/security/security.xml".
      */
@@ -52,25 +52,26 @@ public class StaticModelConfigurationSource
     }
 
     public Configuration loadConfiguration()
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
-        if( getClass().getResource( STATIC_SECURITY_RESOURCE ) != null )
+        if ( getClass().getResource( STATIC_SECURITY_RESOURCE ) != null )
         {
             loadConfiguration( getConfigurationAsStream() );
         }
         else
         {
-            this.logger.warn( "Default static security configuration not found in classpath: "+ STATIC_SECURITY_RESOURCE );
+            this.logger.warn( "Default static security configuration not found in classpath: "
+                + STATIC_SECURITY_RESOURCE );
         }
-        
+
         Configuration configuration = getConfiguration();
 
         return configuration;
     }
 
     /**
-     * This method will always throw UnsupportedOperationException, since SecurityDefaultsConfigurationSource is read only.
+     * This method will always throw UnsupportedOperationException, since SecurityDefaultsConfigurationSource is read
+     * only.
      */
     public void storeConfiguration()
         throws IOException

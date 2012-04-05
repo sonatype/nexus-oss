@@ -101,8 +101,8 @@ public class KenaiRealmTest
 
         try
         {
-            Assert.assertNotNull(
-                kenaiRealm.getAuthenticationInfo( new UsernamePasswordToken( "unknown-user-foo-bar", "invalid" ) ) );
+            Assert.assertNotNull( kenaiRealm.getAuthenticationInfo( new UsernamePasswordToken( "unknown-user-foo-bar",
+                                                                                               "invalid" ) ) );
             Assert.fail( "Expected: AccountException to be thrown" );
         }
         catch ( AccountException e )

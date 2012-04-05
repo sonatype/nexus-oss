@@ -13,12 +13,14 @@
 package org.sonatype.security.events;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
+
 /**
  * An event fired when the security configuration has changed.
  * 
  * @author Brian Demers
  */
-public class SecurityConfigurationChangedEvent extends AbstractEvent<Object>
+public class SecurityConfigurationChangedEvent
+    extends AbstractEvent<Object>
 {
 
     public SecurityConfigurationChangedEvent( Object component )

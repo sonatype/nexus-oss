@@ -39,7 +39,7 @@ public class DefaultSecuritySystemTest
     {
 
         SecuritySystem securitySystem = this.getSecuritySystem();
-                
+
         // login
         UsernamePasswordToken token = new UsernamePasswordToken( "jcoder", "jcoder" );
         Subject subject = securitySystem.login( token );
@@ -64,8 +64,8 @@ public class DefaultSecuritySystemTest
         securitySystem.start();
 
         // bind to a servlet request/response
-//        this.setupLoginContext( "test" );
-        
+        // this.setupLoginContext( "test" );
+
         // login
         UsernamePasswordToken token = new UsernamePasswordToken( "jcoder", "jcoder" );
         Subject subject = securitySystem.login( token );
@@ -73,9 +73,10 @@ public class DefaultSecuritySystemTest
 
         // check the logged in user
         Subject loggedinSubject = securitySystem.getSubject();
-//        Assert.assertEquals( subject.getSession().getId(), loggedinSubject.getSession().getId() );
+        // Assert.assertEquals( subject.getSession().getId(), loggedinSubject.getSession().getId() );
         Assert.assertTrue( subject.isAuthenticated() );
-        Assert.assertTrue( "Subject principal: " +loggedinSubject.getPrincipal() + " is not logged in", loggedinSubject.isAuthenticated() );
+        Assert.assertTrue( "Subject principal: " + loggedinSubject.getPrincipal() + " is not logged in",
+                           loggedinSubject.isAuthenticated() );
         // now logout
         securitySystem.logout( loggedinSubject );
 
@@ -152,7 +153,8 @@ public class DefaultSecuritySystemTest
 
     }
 
-    public void testAddUser() throws Exception
+    public void testAddUser()
+        throws Exception
     {
         SecuritySystem securitySystem = this.getSecuritySystem();
 
@@ -174,10 +176,8 @@ public class DefaultSecuritySystemTest
         throws Exception
     {
         this.getSecuritySystem().stop();
-        
+
         super.tearDown();
     }
 
-    
-    
 }

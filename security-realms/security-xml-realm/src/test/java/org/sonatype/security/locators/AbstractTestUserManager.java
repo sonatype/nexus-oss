@@ -57,7 +57,7 @@ public abstract class AbstractTestUserManager
 
     protected RoleIdentifier createFakeRole( String roleId )
     {
-        RoleIdentifier role = new RoleIdentifier(  this.getSource(), roleId );
+        RoleIdentifier role = new RoleIdentifier( this.getSource(), roleId );
         return role;
     }
 }

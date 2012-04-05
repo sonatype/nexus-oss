@@ -25,7 +25,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Properties;
 
-
 public abstract class AbstractKenaiRealmTest
     extends AbstractSecurityTestCase
 {
@@ -95,8 +94,8 @@ public abstract class AbstractKenaiRealmTest
         URL classUrl = this.getClass().getResource( classFileName );
 
         String filename = classUrl.getFile().substring( 0, classUrl.getFile().indexOf( classFileName ) );
-        File baseDir =
-            new File( filename ).getParentFile().getParentFile(); // this should give us the directory above /target
+        File baseDir = new File( filename ).getParentFile().getParentFile(); // this should give us the directory above
+                                                                             // /target
 
         if ( baseDir.exists() )
         {

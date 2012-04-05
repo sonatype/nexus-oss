@@ -51,10 +51,10 @@ public class SecurityXmlAuthorizationManager
     @Inject
     @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
-    
+
     @Inject
     private PrivilegeInheritanceManager privInheritance;
-    
+
     @Inject
     private ApplicationEventMulticaster eventMulticaster;
 
@@ -87,7 +87,7 @@ public class SecurityXmlAuthorizationManager
         secRole.setDescription( role.getDescription() );
         secRole.setReadOnly( role.isReadOnly() );
         // null check
-        if( role.getPrivileges() != null )
+        if ( role.getPrivileges() != null )
         {
             secRole.setPrivileges( new ArrayList<String>( role.getPrivileges() ) );
         }
@@ -95,9 +95,9 @@ public class SecurityXmlAuthorizationManager
         {
             secRole.setPrivileges( new ArrayList<String>() );
         }
-        
+
         // null check
-        if( role.getRoles() != null )
+        if ( role.getRoles() != null )
         {
             secRole.setRoles( new ArrayList<String>( role.getRoles() ) );
         }
@@ -188,8 +188,7 @@ public class SecurityXmlAuthorizationManager
     }
 
     public Role updateRole( Role role )
-        throws NoSuchRoleException,
-            InvalidConfigurationException
+        throws NoSuchRoleException, InvalidConfigurationException
     {
         CRole secRole = this.toRole( role );
 
@@ -234,8 +233,8 @@ public class SecurityXmlAuthorizationManager
     {
         CPrivilege secPriv = this.toPrivilege( privilege );
         // create implies read, so we need to add logic for that
-        addInheritedPrivileges( secPriv ); 
-        
+        addInheritedPrivileges( secPriv );
+
         this.configuration.createPrivilege( secPriv );
         this.saveConfiguration();
 
@@ -243,8 +242,7 @@ public class SecurityXmlAuthorizationManager
     }
 
     public Privilege updatePrivilege( Privilege privilege )
-        throws NoSuchPrivilegeException,
-            InvalidConfigurationException
+        throws NoSuchPrivilegeException, InvalidConfigurationException
     {
         CPrivilege secPriv = this.toPrivilege( privilege );
         this.configuration.updatePrivilege( secPriv );
@@ -263,7 +261,7 @@ public class SecurityXmlAuthorizationManager
     private void saveConfiguration()
     {
         this.configuration.save();
-        
+
         // notify any listeners that the config changed
         this.fireAuthorizationChangedEvent();
     }
@@ -272,8 +270,7 @@ public class SecurityXmlAuthorizationManager
     {
         return true;
     }
-    
-    
+
     private void addInheritedPrivileges( CPrivilege privilege )
     {
         CProperty methodProperty = null;
@@ -307,10 +304,10 @@ public class SecurityXmlAuthorizationManager
             }
         }
     }
-    
+
     private void fireAuthorizationChangedEvent()
     {
-        this.eventMulticaster.notifyEventListeners( new AuthorizationConfigurationChangedEvent(null) );
+        this.eventMulticaster.notifyEventListeners( new AuthorizationConfigurationChangedEvent( null ) );
     }
 
 }

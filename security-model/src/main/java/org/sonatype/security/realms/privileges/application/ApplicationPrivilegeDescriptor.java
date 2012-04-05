@@ -38,15 +38,15 @@ public class ApplicationPrivilegeDescriptor
     implements PrivilegeDescriptor
 {
     public static final String TYPE = "method";
-    
+
     @Inject
     @Named( value = "ApplicationPrivilegeMethodPropertyDescriptor" )
     private PrivilegePropertyDescriptor methodProperty;
-    
+
     @Inject
     @Named( value = "ApplicationPrivilegePermissionPropertyDescriptor" )
     private PrivilegePropertyDescriptor permissionProperty;
-    
+
     public String getName()
     {
         return "Application";
@@ -56,27 +56,27 @@ public class ApplicationPrivilegeDescriptor
     {
         return TYPE;
     }
-    
+
     public List<PrivilegePropertyDescriptor> getPropertyDescriptors()
     {
         List<PrivilegePropertyDescriptor> propertyDescriptors = new ArrayList<PrivilegePropertyDescriptor>();
-        
+
         propertyDescriptors.add( methodProperty );
         propertyDescriptors.add( permissionProperty );
-        
+
         return propertyDescriptors;
     }
-    
+
     public String buildPermission( CPrivilege privilege )
     {
         if ( !TYPE.equals( privilege.getType() ) )
         {
             return null;
         }
-        
+
         String permission = getProperty( privilege, ApplicationPrivilegePermissionPropertyDescriptor.ID );
         String method = getProperty( privilege, ApplicationPrivilegeMethodPropertyDescriptor.ID );
-        
+
         if ( StringUtils.isEmpty( permission ) )
         {
             permission = "*:*";
@@ -86,20 +86,20 @@ public class ApplicationPrivilegeDescriptor
         {
             method = "*";
         }
-        
+
         return permission + ":" + method;
     }
-    
+
     @Override
     public ValidationResponse validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update )
-    {        
+    {
         ValidationResponse response = super.validatePrivilege( privilege, ctx, update );
-        
+
         if ( !TYPE.equals( privilege.getType() ) )
         {
             return response;
         }
-        
+
         // validate method
         // method is of form ('*' | 'read' | 'create' | 'update' | 'delete' [, method]* )
         // so, 'read' method is correct, but so is also 'create,update,delete'
@@ -118,12 +118,12 @@ public class ApplicationPrivilegeDescriptor
                 permission = property.getValue();
             }
         }
-        
+
         if ( StringUtils.isEmpty( permission ) )
         {
             response.addValidationError( "Permission cannot be empty on a privilege!" );
         }
-        
+
         if ( StringUtils.isEmpty( method ) )
         {
             response.addValidationError( "Method cannot be empty on a privilege!" );
@@ -148,8 +148,7 @@ public class ApplicationPrivilegeDescriptor
             for ( String singlemethod : methods )
             {
                 if ( !"create".equals( singlemethod ) && !"delete".equals( singlemethod )
-                    && !"read".equals( singlemethod ) && !"update".equals( singlemethod )
-                    && !"*".equals( singlemethod ) )
+                    && !"read".equals( singlemethod ) && !"update".equals( singlemethod ) && !"*".equals( singlemethod ) )
                 {
                     valid = false;
 
@@ -159,11 +158,10 @@ public class ApplicationPrivilegeDescriptor
 
             if ( !valid )
             {
-                ValidationMessage message = new ValidationMessage(
-                    "method",
-                    "Privilege ID '" + privilege.getId()
+                ValidationMessage message =
+                    new ValidationMessage( "method", "Privilege ID '" + privilege.getId()
                         + "' Method is wrong! (Allowed methods are: create, delete, read and update)",
-                    "Invalid method selected." );
+                                           "Invalid method selected." );
                 response.addValidationError( message );
             }
         }

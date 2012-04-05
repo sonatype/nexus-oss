@@ -66,7 +66,7 @@ public class EnhancedConfiguration
         delegate.addUserRoleMapping( cUserRoleMapping );
 
         id2roleMappings.put( getUserRoleMappingKey( cUserRoleMapping.getUserId(), cUserRoleMapping.getSource() ),
-            cUserRoleMapping );
+                             cUserRoleMapping );
     }
 
     public String getModelEncoding()

@@ -32,14 +32,14 @@ public class AllPermissionsAreDefinedTest
     extends AbstractSecurityRestTest
 {
     private static String SECURITY_FILE = "./target/security.xml";
-    
+
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        
-//        FileUtils.copyFile( new File(""), new File( SECURITY_FILE ) );
+
+        // FileUtils.copyFile( new File(""), new File( SECURITY_FILE ) );
     }
 
     @Override
@@ -58,7 +58,7 @@ public class AllPermissionsAreDefinedTest
     @SuppressWarnings( "unchecked" )
     public void testEnsurePermissions()
         throws Exception
-    {   
+    {
         Set<String> restPerms = new HashSet<String>();
         Set<String> staticPerms = new HashSet<String>();
 
@@ -69,16 +69,16 @@ public class AllPermissionsAreDefinedTest
             String expression = ppd.getFilterExpression();
             if ( expression.contains( "[" ) )
             {
-                String permission = ppd.getFilterExpression().substring(
-                    expression.indexOf( '[' ) + 1,
-                    expression.indexOf( ']' ) );
+                String permission =
+                    ppd.getFilterExpression().substring( expression.indexOf( '[' ) + 1, expression.indexOf( ']' ) );
                 restPerms.add( permission );
             }
         }
 
         // now we have a list of permissions, we need to make sure all of these are in the static security xml.
 
-        StaticSecurityResource restResource = this.lookup( StaticSecurityResource.class, "SecurityRestStaticSecurityResource" );
+        StaticSecurityResource restResource =
+            this.lookup( StaticSecurityResource.class, "SecurityRestStaticSecurityResource" );
         Configuration staticConfig = restResource.getConfiguration();
 
         List<CPrivilege> privs = staticConfig.getPrivileges();
@@ -90,11 +90,12 @@ public class AllPermissionsAreDefinedTest
         // make sure everything in the restPerms is in the staticPerms
         for ( String perm : restPerms )
         {
-            
+
             // TODO: need to find a way of dealing with test resources
-            if( !perm.startsWith( "sample" ) )
+            if ( !perm.startsWith( "sample" ) )
             {
-                Assert.assertTrue( "Permission: " + perm + " is missing from SecurityRestStaticSecurityResource", staticPerms.contains( perm ) );
+                Assert.assertTrue( "Permission: " + perm + " is missing from SecurityRestStaticSecurityResource",
+                                   staticPerms.contains( perm ) );
             }
         }
 

@@ -90,8 +90,7 @@ public class FileSecurityConfigurationSource
     }
 
     public SecurityConfiguration loadConfiguration()
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         // propagate call and fill in defaults too
         securityDefaults.loadConfiguration();
@@ -207,11 +206,8 @@ public class FileSecurityConfigurationSource
                 }
                 catch ( PlexusCipherException e )
                 {
-                    this
-                        .getLogger()
-                        .error(
-                            "Failed to decrype anonymous user's password in security-configuration.xml, password might be encrypted in memory.",
-                            e );
+                    this.getLogger().error( "Failed to decrype anonymous user's password in security-configuration.xml, password might be encrypted in memory.",
+                                            e );
                 }
             }
         }
@@ -243,12 +239,13 @@ public class FileSecurityConfigurationSource
             // bad bad bad
             if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
             {
-                String message = "\r\n******************************************************************************\r\n"
-                    + "* Could not create configuration file [ "
-                    + file.toString()
-                    + "]!!!! *\r\n"
-                    + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
-                    + "******************************************************************************";
+                String message =
+                    "\r\n******************************************************************************\r\n"
+                        + "* Could not create configuration file [ "
+                        + file.toString()
+                        + "]!!!! *\r\n"
+                        + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
+                        + "******************************************************************************";
 
                 this.getLogger().error( message );
             }

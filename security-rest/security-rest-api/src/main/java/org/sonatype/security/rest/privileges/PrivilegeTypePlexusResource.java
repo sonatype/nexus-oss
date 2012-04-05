@@ -39,8 +39,9 @@ import org.sonatype.security.rest.model.PrivilegeTypeResource;
 import org.sonatype.security.rest.model.PrivilegeTypeResourceResponse;
 
 /**
- * REST resource to retrieve the list of Privilege Types.  Each type of privilege that can be created is described by 
- * a {@link PrivilegeTypeResource}. Each PrivilegeTypeResource lists the set of properties used to define a type of privilege.
+ * REST resource to retrieve the list of Privilege Types. Each type of privilege that can be created is described by a
+ * {@link PrivilegeTypeResource}. Each PrivilegeTypeResource lists the set of properties used to define a type of
+ * privilege.
  * 
  * @author bdemers
  */
@@ -55,11 +56,11 @@ public class PrivilegeTypePlexusResource
 {
 
     public static final String RESOURCE_URI = "/privilege_types";
-    
+
     @Inject
-    @Named( value = "resourceMerging")
+    @Named( value = "resourceMerging" )
     private ConfigurationManager configurationManager;
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -96,7 +97,7 @@ public class PrivilegeTypePlexusResource
             PrivilegeTypeResource type = new PrivilegeTypeResource();
             type.setId( privDescriptor.getType() );
             type.setName( privDescriptor.getName() );
-            
+
             for ( PrivilegePropertyDescriptor propDescriptor : privDescriptor.getPropertyDescriptors() )
             {
                 PrivilegeTypePropertyResource typeProp = new PrivilegeTypePropertyResource();
@@ -104,10 +105,10 @@ public class PrivilegeTypePlexusResource
                 typeProp.setName( propDescriptor.getName() );
                 typeProp.setHelpText( propDescriptor.getHelpText() );
                 typeProp.setType( propDescriptor.getType() );
-                
+
                 type.addProperty( typeProp );
             }
-            
+
             result.addData( type );
         }
 

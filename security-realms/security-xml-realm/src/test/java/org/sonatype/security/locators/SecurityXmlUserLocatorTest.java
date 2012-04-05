@@ -37,7 +37,7 @@ public class SecurityXmlUserLocatorTest
     {
         binder.bind( StaticSecurityResource.class ).annotatedWith( Names.named( "mock" ) ).to( MockStaticSecurityResource.class );
     }
-    
+
     public UserManager getUserManager()
         throws Exception
     {
@@ -108,7 +108,7 @@ public class SecurityXmlUserLocatorTest
         Assert.assertTrue( roleMap.containsKey( "role2" ) );
         Assert.assertEquals( 3, roleMap.size() );
     }
-    
+
     public void testSearchUser()
         throws Exception
     {

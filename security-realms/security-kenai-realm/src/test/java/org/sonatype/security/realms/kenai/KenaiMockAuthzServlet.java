@@ -26,24 +26,24 @@ import org.json.JSONException;
 public class KenaiMockAuthzServlet
     extends HttpServlet
 {
-    
+
     private int totalProjectSize = 301;
-    
+
     public static String TOTAL_PROJECTS_KEY = "totalProjects";
 
     /**
      * Genearted serial uid.
      */
     private static final long serialVersionUID = -881495552351752305L;
-    
+
     @Override
     public void init( ServletConfig config )
         throws ServletException
     {
         super.init( config );
-        
+
         String totalProjectsParam = config.getInitParameter( TOTAL_PROJECTS_KEY );
-        if( totalProjectsParam != null )
+        if ( totalProjectsParam != null )
         {
             totalProjectSize = Integer.parseInt( totalProjectsParam );
         }
@@ -51,48 +51,46 @@ public class KenaiMockAuthzServlet
 
     @Override
     protected void doGet( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException,
-            IOException
+        throws ServletException, IOException
     {
-        
+
         int pageSize = 200;
         int pageIndex = 1;
 
         String username = req.getParameter( "username" );
-        if( username == null )
+        if ( username == null )
         {
             resp.setStatus( 400 );
             return;
         }
-        String[] roles = URLDecoder.decode( req.getParameter( "roles" ), "UTF8").split( "," );
+        String[] roles = URLDecoder.decode( req.getParameter( "roles" ), "UTF8" ).split( "," );
 
-
-        
         String sizeParam = req.getParameter( "size" );
-        if( sizeParam != null )
+        if ( sizeParam != null )
         {
             pageSize = Integer.parseInt( sizeParam );
         }
 
         String pageIndexParam = req.getParameter( "page" );
-        if( pageIndexParam != null )
+        if ( pageIndexParam != null )
         {
             pageIndex = Integer.parseInt( pageIndexParam );
         }
-        
+
         String reqUrl = req.getRequestURL().substring( 0, req.getRequestURL().indexOf( "/api/" ) );
-        
-        
+
         try
         {
-            String output = new KenaiProjectsJsonGenerator( pageSize, totalProjectSize, reqUrl ).generate( pageIndex, username, roles );
+            String output =
+                new KenaiProjectsJsonGenerator( pageSize, totalProjectSize, reqUrl ).generate( pageIndex, username,
+                                                                                               roles );
             resp.getOutputStream().write( output.getBytes() );
         }
         catch ( JSONException e )
         {
             this.log( "Failed to generate JSON", e );
             resp.setStatus( 500 );
-        } 
-    }    
+        }
+    }
 
 }

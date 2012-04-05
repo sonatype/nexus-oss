@@ -67,7 +67,7 @@ public abstract class AbstractRolePlexusResource
         }
 
         role.setRoleId( resource.getId() );
-        
+
         role.setDescription( resource.getDescription() );
         role.setName( resource.getName() );
 
@@ -85,19 +85,15 @@ public abstract class AbstractRolePlexusResource
 
         return role;
     }
-    
+
     public void validateRoleContainment( Role role )
         throws ResourceException
     {
-        if ( role.getRoles().size() == 0 
-            && role.getPrivileges().size() == 0)
+        if ( role.getRoles().size() == 0 && role.getPrivileges().size() == 0 )
         {
-            throw new PlexusResourceException( 
-                Status.CLIENT_ERROR_BAD_REQUEST, 
-                "Configuration error.", 
-                getErrorResponse( 
-                    "privileges", 
-                    "One or more roles/privilegs are required." ) );
+            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.",
+                                               getErrorResponse( "privileges",
+                                                                 "One or more roles/privilegs are required." ) );
         }
     }
 

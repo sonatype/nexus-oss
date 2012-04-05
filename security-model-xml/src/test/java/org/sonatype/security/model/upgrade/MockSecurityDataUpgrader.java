@@ -36,7 +36,7 @@ public class MockSecurityDataUpgrader
                 user.setId( "admin-user" );
             }
         }
-        
+
         for ( CUserRoleMapping roleMapping : (List<CUserRoleMapping>) configuration.getUserRoleMappings() )
         {
             if ( roleMapping.getUserId().equals( "admin" ) )
@@ -44,7 +44,7 @@ public class MockSecurityDataUpgrader
                 roleMapping.setUserId( "admin-user" );
             }
         }
-        
+
     }
 
 }

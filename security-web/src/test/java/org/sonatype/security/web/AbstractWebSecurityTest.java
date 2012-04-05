@@ -46,7 +46,7 @@ public abstract class AbstractWebSecurityTest
         throws Exception
     {
         super.setUp();
-        
+
         // delete the plexus home dir
         FileUtils.deleteDirectory( PLEXUS_HOME );
 

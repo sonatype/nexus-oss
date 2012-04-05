@@ -41,18 +41,19 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Singleton
 @Typed( value = Realm.class )
 @Named( value = "Mock" )
-public class MockRealm extends AuthorizingRealm
+public class MockRealm
+    extends AuthorizingRealm
 {
 
     @Inject
-    @Named( value = "Mock")
+    @Named( value = "Mock" )
     private UserManager userManager;
-    
+
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
-    {   
+    {
         String userId = principals.getPrimaryPrincipal().toString();
-        
+
         Set<String> roles = new HashSet<String>();
         try
         {
@@ -65,36 +66,37 @@ public class MockRealm extends AuthorizingRealm
         {
             return null;
         }
-        
+
         return new SimpleAuthorizationInfo( roles );
-        
+
     }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
         throws AuthenticationException
     {
-       
+
         UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-        
-        String password = new String (  upToken.getPassword() );
+
+        String password = new String( upToken.getPassword() );
         String userId = upToken.getUsername();
-        
+
         // username == password
         try
         {
-            if( userId.endsWith( password ) && userManager.getUser( userId ) != null )
+            if ( userId.endsWith( password ) && userManager.getUser( userId ) != null )
             {
-                return new SimpleAuthenticationInfo( new SimplePrincipalCollection( token.getPrincipal(), this.getName() ), userId );
+                return new SimpleAuthenticationInfo( new SimplePrincipalCollection( token.getPrincipal(),
+                                                                                    this.getName() ), userId );
             }
             else
             {
-                throw new IncorrectCredentialsException("User [" + userId + "] bad credentials.");
+                throw new IncorrectCredentialsException( "User [" + userId + "] bad credentials." );
             }
         }
         catch ( UserNotFoundException e )
         {
-            throw new UnknownAccountException("User [" + userId + "] not found.");
+            throw new UnknownAccountException( "User [" + userId + "] not found." );
         }
     }
 

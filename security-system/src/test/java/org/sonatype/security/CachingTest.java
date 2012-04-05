@@ -34,9 +34,8 @@ public class CachingTest
         // cache should be empty to start
         Assert.assertTrue( mockRealmB.getAuthorizationCache().keys().isEmpty() );
 
-        Assert.assertTrue( securitySystem.isPermitted(
-            new SimplePrincipalCollection( "jcool", mockRealmB.getName() ),
-            "test:heHasIt" ) );
+        Assert.assertTrue( securitySystem.isPermitted( new SimplePrincipalCollection( "jcool", mockRealmB.getName() ),
+                                                       "test:heHasIt" ) );
 
         // now something will be in the cache, just make sure
         Assert.assertFalse( mockRealmB.getAuthorizationCache().keys().isEmpty() );

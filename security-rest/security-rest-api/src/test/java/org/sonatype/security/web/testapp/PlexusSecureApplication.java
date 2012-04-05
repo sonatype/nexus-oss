@@ -52,8 +52,7 @@ public class PlexusSecureApplication
             return;
         }
 
-        this.protectedPathManager.addProtectedResource( descriptor
-                                                                         .getPathPattern(), descriptor.getFilterExpression() );
-       
+        this.protectedPathManager.addProtectedResource( descriptor.getPathPattern(), descriptor.getFilterExpression() );
+
     }
 }

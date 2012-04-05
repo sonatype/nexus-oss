@@ -45,27 +45,26 @@ public class RolesPRTest
         Reference ref = new Reference( "http://localhost:12345/" );
         request.setRootRef( ref );
         request.setResourceRef( new Reference( ref, "roles" ) );
-        
+
         Response response = new Response( request );
 
         RoleResourceResponse roleResponse = (RoleResourceResponse) resource.post( null, request, response, roleRequest );
 
         Assert.assertEquals( "with spaces", roleResponse.getData().getId() );
 
-        
         // ok now we try the gets
         resource = this.lookup( PlexusResource.class, "RolePlexusResource" );
-        
+
         // first with +
         request.getAttributes().put( "roleId", "with+spaces" );
         roleResponse = (RoleResourceResponse) resource.get( null, request, response, null );
         Assert.assertEquals( "with spaces", roleResponse.getData().getId() );
-        
+
         // then with %20
         request.getAttributes().put( "roleId", "with%20spaces" );
         roleResponse = (RoleResourceResponse) resource.get( null, request, response, null );
         Assert.assertEquals( "with spaces", roleResponse.getData().getId() );
-        
+
     }
 
 }

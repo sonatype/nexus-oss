@@ -37,7 +37,8 @@ import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
- * ConfigurationManager that aggregates {@link StaticSecurityResource}s and {@link DynamicSecurityResource}s with default ConfigurationManager.
+ * ConfigurationManager that aggregates {@link StaticSecurityResource}s and {@link DynamicSecurityResource}s with
+ * default ConfigurationManager.
  * 
  * @author Brian Demers
  */
@@ -54,7 +55,7 @@ public class ResourceMergingConfigurationManager
 
     @Inject
     private List<StaticSecurityResource> staticResources;
-    
+
     @Inject
     private List<DynamicSecurityResource> dynamicResources;
 
@@ -502,7 +503,7 @@ public class ResourceMergingConfigurationManager
                 appendConfig( configuration, resConfig );
             }
         }
-        
+
         for ( DynamicSecurityResource resource : dynamicResources )
         {
             Configuration resConfig = resource.getConfiguration();

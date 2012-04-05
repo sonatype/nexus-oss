@@ -46,10 +46,9 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
- * REST resource to manage a users list of roles.  Used when a user belongs to an external source.
+ * REST resource to manage a users list of roles. Used when a user belongs to an external source.
  * 
  * @author bdemers
- *
  */
 @Singleton
 @Typed( value = PlexusResource.class )
@@ -64,7 +63,7 @@ public class UserToRolePlexusResource
     public static final String SOURCE_ID_KEY = "sourceId";
 
     public static final String RESOURCE_URI = "/user_to_roles/{" + SOURCE_ID_KEY + "}/{" + USER_ID_KEY + "}";
-    
+
     public UserToRolePlexusResource()
     {
         this.setModifiable( true );
@@ -102,14 +101,14 @@ public class UserToRolePlexusResource
     /**
      * Sets a users roles.
      * 
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
-     * 
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
      * @param userId The Id of the user.
      */
     @Override
     @PUT
-    @ResourceMethodSignature( input = UserToRoleResourceRequest.class, pathParams = { @PathParam( value = "sourceId"), @PathParam( value = "userId") } )
+    @ResourceMethodSignature( input = UserToRoleResourceRequest.class, pathParams = { @PathParam( value = "sourceId" ),
+        @PathParam( value = "userId" ) } )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -117,9 +116,8 @@ public class UserToRolePlexusResource
 
         if ( mappingRequest.getData() == null )
         {
-            throw new ResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "User Role Mapping was not found in the Request." );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                                         "User Role Mapping was not found in the Request." );
         }
 
         String userId = this.getUserId( request );
@@ -150,10 +148,8 @@ public class UserToRolePlexusResource
 
         if ( roleIdentifiers.size() == 0 )
         {
-            throw new PlexusResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "Configuration error.",
-                getErrorResponse( "roles", "User requires one or more roles." ) );
+            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.",
+                                               getErrorResponse( "roles", "User requires one or more roles." ) );
         }
 
         try
@@ -177,14 +173,14 @@ public class UserToRolePlexusResource
     /**
      * Gets a users roles.
      * 
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
-     * 
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
      * @param userId The Id of the user.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = UserToRoleResourceRequest.class, pathParams = { @PathParam( value = "sourceId"), @PathParam( value = "userId") } )
+    @ResourceMethodSignature( output = UserToRoleResourceRequest.class, pathParams = {
+        @PathParam( value = "sourceId" ), @PathParam( value = "userId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -216,14 +212,13 @@ public class UserToRolePlexusResource
     /**
      * Removes all roles from a user.
      * 
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
-     * 
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
      * @param userId The Id of the user.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "sourceId"), @PathParam( value = "userId") } )
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "sourceId" ), @PathParam( value = "userId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

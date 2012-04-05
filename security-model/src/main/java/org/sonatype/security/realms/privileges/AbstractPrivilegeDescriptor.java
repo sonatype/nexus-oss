@@ -64,8 +64,7 @@ public abstract class AbstractPrivilegeDescriptor
         }
 
         if ( !update
-            && ( StringUtils.isEmpty( privilege.getId() ) || "0".equals( privilege.getId() ) || ( existingIds
-                .contains( privilege.getId() ) ) ) )
+            && ( StringUtils.isEmpty( privilege.getId() ) || "0".equals( privilege.getId() ) || ( existingIds.contains( privilege.getId() ) ) ) )
         {
             String newId = idGenerator.generateId();
 

@@ -25,7 +25,7 @@ public class StaticConfigurationSourceTest
     protected SecurityModelConfigurationSource getConfigurationSource()
         throws Exception
     {
-        return ( SecurityModelConfigurationSource ) lookup( SecurityModelConfigurationSource.class, "static" );
+        return (SecurityModelConfigurationSource) lookup( SecurityModelConfigurationSource.class, "static" );
     }
 
     @Override
@@ -75,12 +75,12 @@ public class StaticConfigurationSourceTest
     }
 
     // NOT EXPOSED
-//    public void testGetDefaultsSource()
-//        throws Exception
-//    {
-//        configurationSource = getConfigurationSource();
-//
-//        assertEquals( null, configurationSource.getDefaultsSource() );
-//    }
+    // public void testGetDefaultsSource()
+    // throws Exception
+    // {
+    // configurationSource = getConfigurationSource();
+    //
+    // assertEquals( null, configurationSource.getDefaultsSource() );
+    // }
 
 }

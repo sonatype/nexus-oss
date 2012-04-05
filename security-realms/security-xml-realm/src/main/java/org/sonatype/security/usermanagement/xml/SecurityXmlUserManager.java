@@ -195,7 +195,7 @@ public class SecurityXmlUserManager
         throws UserNotFoundException, InvalidConfigurationException
     {
         CUser secUser = this.configuration.readUser( userId );
-        Set<String> roles = new HashSet<String>(); 
+        Set<String> roles = new HashSet<String>();
         try
         {
             CUserRoleMapping userRoleMapping = this.configuration.readUserRoleMapping( userId, SOURCE );
@@ -203,7 +203,7 @@ public class SecurityXmlUserManager
         }
         catch ( NoSuchRoleMappingException e )
         {
-            this.logger.debug( "User: "+ userId +" has no roles." );
+            this.logger.debug( "User: " + userId + " has no roles." );
         }
         secUser.setPassword( this.hashPassword( newPassword ) );
         this.configuration.updateUser( secUser, new HashSet<String>( roles ) );
@@ -287,12 +287,12 @@ public class SecurityXmlUserManager
                     catch ( UserNotFoundException e )
                     {
                         this.logger.debug( "User: '" + roleMapping.getUserId() + "' of source: '"
-                            + roleMapping.getSource() + "' could not be found.", e );
+                                               + roleMapping.getSource() + "' could not be found.", e );
                     }
                     catch ( NoSuchUserManagerException e )
                     {
                         this.logger.warn( "User: '" + roleMapping.getUserId() + "' of source: '"
-                            + roleMapping.getSource() + "' could not be found.", e );
+                                              + roleMapping.getSource() + "' could not be found.", e );
                     }
 
                 }

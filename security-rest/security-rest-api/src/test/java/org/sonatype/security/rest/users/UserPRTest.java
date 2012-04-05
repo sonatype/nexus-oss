@@ -93,11 +93,11 @@ public class UserPRTest
     }
 
     public void testUserIdWithSpace()
-    throws Exception
+        throws Exception
     {
-    
+
         PlexusResource resource = this.lookup( PlexusResource.class, "UserListPlexusResource" );
-    
+
         UserResourceRequest resourceRequest = new UserResourceRequest();
         UserResource userResource = new UserResource();
         resourceRequest.setData( userResource );
@@ -107,10 +107,10 @@ public class UserPRTest
         userResource.setStatus( "active" );
         userResource.setUserId( "test User Id With Space" );
         userResource.addRole( "admin" );
-    
+
         try
         {
-    
+
             resource.post( null, this.buildRequest(), null, resourceRequest );
             Assert.fail( "expected PlexusResourceException" );
         }
@@ -120,17 +120,15 @@ public class UserPRTest
             ErrorMessage errorMessage = (ErrorMessage) errorResponse.getErrors().get( 0 );
             Assert.assertTrue( errorMessage.getId().contains( "userId" ) );
         }
-    
+
         // fix it
         userResource.setUserId( "testUserIdWithSpace" );
         resource.post( null, this.buildRequest(), null, resourceRequest );
-        
+
         // NOTE: update not supported
-        
+
     }
-    
-    
-    
+
     public void testUpdateUserValidation()
         throws Exception
     {

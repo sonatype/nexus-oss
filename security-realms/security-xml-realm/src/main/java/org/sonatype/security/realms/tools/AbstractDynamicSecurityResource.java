@@ -36,7 +36,7 @@ public abstract class AbstractDynamicSecurityResource
     }
 
     protected abstract Configuration doGetConfiguration();
-    
+
     public Configuration getConfiguration()
     {
         Configuration config = doGetConfiguration();

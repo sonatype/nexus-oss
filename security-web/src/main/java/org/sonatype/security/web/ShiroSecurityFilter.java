@@ -89,7 +89,7 @@ public class ShiroSecurityFilter
             ( (FilterChainManagerAware) protectedPathManager ).setFilterChainManager( filterChainManager );
         }
     }
-    
+
     protected String getWebSecurityManagerName()
     {
         return "web";
@@ -153,7 +153,7 @@ public class ShiroSecurityFilter
                 return injector.getInstance( Key.get( clazz, Names.named( name ) ) );
             }
         }
-        
+
         // support old plexus container as fallback, just in case
         PlexusContainer plexusContainer = getPlexusContainer();
 

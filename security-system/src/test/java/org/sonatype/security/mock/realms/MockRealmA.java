@@ -43,9 +43,9 @@ public class MockRealmA
 {
 
     @Inject
-    @Named(value = "MockUserManagerA" )
+    @Named( value = "MockUserManagerA" )
     private UserManager userManager;
-    
+
     public MockRealmA()
     {
         this.setAuthenticationTokenClass( UsernamePasswordToken.class );
@@ -61,8 +61,8 @@ public class MockRealmA
         UsernamePasswordToken userpass = (UsernamePasswordToken) token;
         if ( "jcoder".equals( userpass.getUsername() ) && "jcoder".equals( new String( userpass.getPassword() ) ) )
         {
-            return new SimpleAuthenticationInfo( userpass.getUsername(), new String( userpass.getPassword() ), this
-                .getName() );
+            return new SimpleAuthenticationInfo( userpass.getUsername(), new String( userpass.getPassword() ),
+                                                 this.getName() );
         }
 
         return null;
@@ -131,7 +131,7 @@ public class MockRealmA
             User user = this.userManager.getUser( subjectPrincipal.oneByType( String.class ) );
             for ( RoleIdentifier eachRoleIdentifier : user.getRoles() )
             {
-                if( eachRoleIdentifier.getRoleId().equals( roleIdentifier ) )
+                if ( eachRoleIdentifier.getRoleId().equals( roleIdentifier ) )
                 {
                     return true;
                 }
@@ -142,7 +142,7 @@ public class MockRealmA
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         return false;
     }
 
@@ -192,6 +192,6 @@ public class MockRealmA
         throws AuthorizationException
     {
         // TODO Auto-generated method stub
-        
+
     }
 }

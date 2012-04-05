@@ -42,10 +42,9 @@ public class Upgrade202to203
 
     @Inject
     private Logger logger;
-    
+
     public Object loadConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException
+        throws IOException, ConfigurationIsCorruptedException
     {
         FileReader fr = null;
 
@@ -74,33 +73,35 @@ public class Upgrade202to203
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.security.model.v2_0_2.Configuration oldc = ( org.sonatype.security.model.v2_0_2.Configuration ) message.getConfiguration();
+        org.sonatype.security.model.v2_0_2.Configuration oldc =
+            (org.sonatype.security.model.v2_0_2.Configuration) message.getConfiguration();
 
         org.sonatype.security.model.v2_0_3.Configuration newc = new BasicVersionUpgrade().upgradeConfiguration( oldc );
 
         // now strip out all the unused role mappings
-        
-        for ( Iterator<CUserRoleMapping> iter = newc.getUserRoleMappings().iterator(); iter.hasNext() ;  )
+
+        for ( Iterator<CUserRoleMapping> iter = newc.getUserRoleMappings().iterator(); iter.hasNext(); )
         {
             CUserRoleMapping roleMapping = iter.next();
-            
-            if( DEFAULT_SOURCE.equalsIgnoreCase( roleMapping.getSource() ) && !this.hasUser( roleMapping.getUserId(), newc ) )
+
+            if ( DEFAULT_SOURCE.equalsIgnoreCase( roleMapping.getSource() )
+                && !this.hasUser( roleMapping.getUserId(), newc ) )
             {
-                logger.info( "Removing orphaned user role mapping for user: '"+ roleMapping.getUserId() + "'." );
+                logger.info( "Removing orphaned user role mapping for user: '" + roleMapping.getUserId() + "'." );
                 iter.remove();
             }
         }
-        
+
         newc.setVersion( org.sonatype.security.model.v2_0_3.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.security.model.v2_0_3.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-    
+
     private boolean hasUser( String userId, Configuration configuration )
     {
         for ( CUser user : configuration.getUsers() )
         {
-            if( user.getId().equals( userId ))
+            if ( user.getId().equals( userId ) )
             {
                 return true;
             }

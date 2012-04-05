@@ -43,7 +43,8 @@ import org.sonatype.security.rest.model.RoleResourceRequest;
 import org.sonatype.security.rest.model.RoleResourceResponse;
 
 /**
- *  REST resource for managing security roles.
+ * REST resource for managing security roles.
+ * 
  * @author tstevens
  */
 @Singleton
@@ -59,7 +60,7 @@ public class RolePlexusResource
     public static final String ROLE_ID_KEY = "roleId";
 
     public static final String RESOURCE_URI = "/roles/{" + ROLE_ID_KEY + "}";
-    
+
     public RolePlexusResource()
     {
         this.setModifiable( true );
@@ -90,11 +91,12 @@ public class RolePlexusResource
 
     /**
      * Returns the request security role.
+     * 
      * @param roleId Id of the role.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = RoleResourceResponse.class, pathParams = { @PathParam(value = "roleId") }  )
+    @ResourceMethodSignature( output = RoleResourceResponse.class, pathParams = { @PathParam( value = "roleId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -122,11 +124,12 @@ public class RolePlexusResource
 
     /**
      * Updates and returns a security role.
+     * 
      * @param roleId Id of the role to be updated.
      */
     @Override
     @PUT
-    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class, pathParams = { @PathParam(value = "roleId") }  )
+    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class, pathParams = { @PathParam( value = "roleId" ) } )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -152,15 +155,14 @@ public class RolePlexusResource
 
                 resourceResponse.getData().setUserManaged( !role.isReadOnly() );
 
-                resourceResponse.getData().setResourceURI(
-                    createChildReference( request, resource.getId() ).toString() );
+                resourceResponse.getData().setResourceURI( createChildReference( request, resource.getId() ).toString() );
 
             }
             catch ( NoSuchRoleException e )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
-             catch ( InvalidConfigurationException e )
+            catch ( InvalidConfigurationException e )
             {
                 // build and throw exception
                 handleInvalidConfigurationException( e );
@@ -178,11 +180,12 @@ public class RolePlexusResource
 
     /**
      * Removes a security role.
+     * 
      * @param roleId Id of the role to be removed.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam(value = "roleId") } )
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "roleId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
@@ -199,8 +202,8 @@ public class RolePlexusResource
         {
             this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
             // we should not ever get here
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: "
-                + ROLE_SOURCE + " could not be found." );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: " + ROLE_SOURCE
+                + " could not be found." );
         }
     }
 

@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This Authenticator will only try to authenticate with each realm. The first successful AuthenticationInfo found will
- * be returned and other realms will not be queried. <BR/><BR/>
+ * be returned and other realms will not be queried. <BR/>
+ * <BR/>
  * This makes for the performance short comings when using the {@link ModularRealmAuthenticator} and
  * {@link FirstSuccessfulAuthenticationStrategy} where all the realms will be queried, but only the first success is
  * returned.
@@ -50,9 +51,10 @@ public class FirstSuccessfulModularRealmAuthenticator
             {
                 if ( log.isTraceEnabled() )
                 {
-                    log.trace( "Attempting to authenticate token [" + token + "] " + "using realm of type [" + realm + "]" );
+                    log.trace( "Attempting to authenticate token [" + token + "] " + "using realm of type [" + realm
+                        + "]" );
                 }
-                
+
                 try
                 {
                     // try to login
@@ -72,8 +74,8 @@ public class FirstSuccessfulModularRealmAuthenticator
                 {
                     if ( log.isTraceEnabled() )
                     {
-                        String msg = "Realm [" + realm
-                            + "] threw an exception during a multi-realm authentication attempt:";
+                        String msg =
+                            "Realm [" + realm + "] threw an exception during a multi-realm authentication attempt:";
                         log.trace( msg, t );
                     }
                 }
@@ -87,8 +89,8 @@ public class FirstSuccessfulModularRealmAuthenticator
                 }
             }
         }
-        throw new org.apache.shiro.authc.AuthenticationException( "Authentication token of type [" + token.getClass() + "] "
-            + "could not be authenticated by any configured realms.  Please ensure that at least one realm can "
+        throw new org.apache.shiro.authc.AuthenticationException( "Authentication token of type [" + token.getClass()
+            + "] " + "could not be authenticated by any configured realms.  Please ensure that at least one realm can "
             + "authenticate these tokens." );
     }
 }

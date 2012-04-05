@@ -93,7 +93,7 @@ public class ConfiguredUsersUserManager
             catch ( NoSuchUserManagerException e )
             {
                 this.logger.warn( "User: '" + userRoleMapping.getUserId() + "' of source: '"
-                    + userRoleMapping.getSource() + "' could not be found.", e );
+                                      + userRoleMapping.getSource() + "' could not be found.", e );
             }
         }
 

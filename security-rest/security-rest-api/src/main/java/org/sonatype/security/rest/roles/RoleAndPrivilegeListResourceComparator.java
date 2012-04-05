@@ -38,7 +38,7 @@ public final class RoleAndPrivilegeListResourceComparator
     }
 
     public int compare( RoleAndPrivilegeListResource o1, RoleAndPrivilegeListResource o2 )
-    {        
+    {
         // always sort by roles first, then privileges
         if ( o1.getType().equals( "role" ) && o2.getType().equals( "privilege" ) )
         {

@@ -21,8 +21,12 @@ import org.sonatype.security.realms.validator.SecurityValidationContext;
 public interface PrivilegeDescriptor
 {
     String getType();
+
     String getName();
+
     List<PrivilegePropertyDescriptor> getPropertyDescriptors();
+
     String buildPermission( CPrivilege privilege );
+
     ValidationResponse validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update );
 }

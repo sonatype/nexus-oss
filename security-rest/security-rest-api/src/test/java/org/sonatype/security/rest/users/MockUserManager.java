@@ -22,7 +22,8 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
-public class MockUserManager extends AbstractReadOnlyUserManager
+public class MockUserManager
+    extends AbstractReadOnlyUserManager
 {
     public String getSource()
     {
@@ -114,13 +115,15 @@ public class MockUserManager extends AbstractReadOnlyUserManager
         Set<User> result = new HashSet<User>();
         for ( User User : this.listUsers() )
         {
-            if ( User.getUserId().toLowerCase().startsWith( criteria.getUserId() ) );
+            if ( User.getUserId().toLowerCase().startsWith( criteria.getUserId() ) )
+                ;
             {
                 result.add( User );
             }
         }
         return result;
     }
+
     protected RoleIdentifier createFakeRole( String roleId )
     {
         RoleIdentifier role = new RoleIdentifier( this.getSource(), roleId );

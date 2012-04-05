@@ -19,15 +19,18 @@ import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.security.model.Configuration;
 
 /**
- * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also stores one
- * instance of Configuration object maintained thru life of the application. This component is also able to persist security config.
+ * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also
+ * stores one instance of Configuration object maintained thru life of the application. This component is also able to
+ * persist security config.
  * 
  * @author cstamas
  */
-public interface SecurityModelConfigurationSource extends ConfigurationSource<Configuration>
+public interface SecurityModelConfigurationSource
+    extends ConfigurationSource<Configuration>
 {
 
-    InputStream getConfigurationAsStream() throws IOException;
+    InputStream getConfigurationAsStream()
+        throws IOException;
 
     void backupConfiguration()
         throws IOException;

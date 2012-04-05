@@ -41,7 +41,6 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * REST resource for retrieving a users by source. The sources is typically the security realm the user belongs too.
  * 
  * @author bdemers
- *
  */
 @Singleton
 @Typed( value = PlexusResource.class )
@@ -53,16 +52,16 @@ public class UserBySourcePlexusResource
     extends AbstractSecurityPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
-    
+
     public static final String USER_SOURCE_KEY = "userSource";
-    
-    public static final String RESOURCE_URI = "/plexus_user/{"+ USER_SOURCE_KEY +"}/{" + USER_ID_KEY + "}";
-        
+
+    public static final String RESOURCE_URI = "/plexus_user/{" + USER_SOURCE_KEY + "}/{" + USER_ID_KEY + "}";
+
     public UserBySourcePlexusResource()
     {
         setModifiable( false );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -80,18 +79,18 @@ public class UserBySourcePlexusResource
     {
         return RESOURCE_URI;
     }
-    
+
     /**
      * Retrieves user information.
      * 
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
-     * 
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
      * @param userId The Id of the user.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PlexusUserResourceResponse.class, pathParams = { @PathParam( value = "sourceId"), @PathParam( value = "sourceId") }  )
+    @ResourceMethodSignature( output = PlexusUserResourceResponse.class, pathParams = {
+        @PathParam( value = "sourceId" ), @PathParam( value = "sourceId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -100,10 +99,11 @@ public class UserBySourcePlexusResource
         User user;
         try
         {
-            // TODO: remove the "all" we either need to move it down into the SecuritySystem, or remove it, i vote remove it.
+            // TODO: remove the "all" we either need to move it down into the SecuritySystem, or remove it, i vote
+            // remove it.
             String source = getUserSource( request );
-            
-            if( "all".equalsIgnoreCase( source ))
+
+            if ( "all".equalsIgnoreCase( source ) )
             {
                 user = this.getSecuritySystem().getUser( getUserId( request ) );
             }
@@ -111,7 +111,7 @@ public class UserBySourcePlexusResource
             {
                 user = this.getSecuritySystem().getUser( getUserId( request ), source );
             }
-            
+
         }
         catch ( UserNotFoundException e )
         {
@@ -122,19 +122,19 @@ public class UserBySourcePlexusResource
             this.getLogger().warn( e.getMessage(), e );
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
-        
+
         if ( user == null )
         {
-            
+
         }
-        
+
         PlexusUserResource resource = securityToRestModel( user );
-        
+
         result.setData( resource );
-            
+
         return result;
     }
-    
+
     protected String getUserId( Request request )
     {
         return getRequestAttribute( request, USER_ID_KEY );

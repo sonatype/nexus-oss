@@ -26,12 +26,14 @@ public interface DynamicSecurityResource
 {
     /**
      * Gets the security configuration.
+     * 
      * @return
      */
     Configuration getConfiguration();
 
     /**
      * Marks the Configuration dirty so it can be reloaded.
+     * 
      * @return
      */
     boolean isDirty();

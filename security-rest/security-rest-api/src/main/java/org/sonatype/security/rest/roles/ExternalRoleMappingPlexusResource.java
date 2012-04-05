@@ -56,9 +56,9 @@ public class ExternalRoleMappingPlexusResource
     public static final String SOURCE_ID_KEY = "sourceId";
 
     public static final String ROLE_ID_KEY = "roleId";
-    
+
     public static final String RESOURCE_URI = "/external_role_map/{" + SOURCE_ID_KEY + "}/{" + ROLE_ID_KEY + "}";
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -78,11 +78,11 @@ public class ExternalRoleMappingPlexusResource
     }
 
     /**
-    * Retrieves the list of external role mappings.
-    * 
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
-    */
+     * Retrieves the list of external role mappings.
+     * 
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
+     */
     @Override
     @GET
     @ResourceMethodSignature( output = ExternalRoleMappingResourceResponse.class, pathParams = {

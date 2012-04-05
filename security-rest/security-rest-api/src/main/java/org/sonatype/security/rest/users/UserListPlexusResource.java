@@ -49,7 +49,6 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 @Singleton
 @Typed( value = PlexusResource.class )
 @Named( value = "UserListPlexusResource" )
-
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserListPlexusResource.RESOURCE_URI )
@@ -93,7 +92,7 @@ public class UserListPlexusResource
     {
         UserListResourceResponse result = new UserListResourceResponse();
 
-        for ( User user : getSecuritySystem().searchUsers( new UserSearchCriteria(null, null, DEFAULT_SOURCE) ) )
+        for ( User user : getSecuritySystem().searchUsers( new UserSearchCriteria( null, null, DEFAULT_SOURCE ) ) )
         {
             UserResource res = securityToRestModel( user, request, true );
 
@@ -125,9 +124,9 @@ public class UserListPlexusResource
             try
             {
                 User user = restToSecurityModel( null, resource );
-                
+
                 validateUserContainment( user );
-                
+
                 String password = resource.getPassword();
                 getSecuritySystem().addUser( user, password );
 
@@ -137,7 +136,7 @@ public class UserListPlexusResource
                 resource.setStatus( user.getStatus().name() );
 
                 resource.setResourceURI( createChildReference( request, resource.getUserId() ).toString() );
-                
+
                 result.setData( resource );
 
             }
@@ -149,7 +148,8 @@ public class UserListPlexusResource
             catch ( NoSuchUserManagerException e )
             {
                 ErrorResponse errorResponse = getErrorResponse( "*", e.getMessage() );
-                throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Unable to create user.", errorResponse);
+                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to create user.",
+                                                   errorResponse );
             }
         }
         return result;

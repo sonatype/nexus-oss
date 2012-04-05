@@ -19,8 +19,8 @@ import org.apache.shiro.authc.credential.Md5CredentialsMatcher;
 import org.apache.shiro.authc.credential.Sha1CredentialsMatcher;
 
 /**
- * For users migrated from Artifactory, their password is encrypted with md5, while users' password is enrypted
- * with sha1, so here we use first try sha1, then md5, to meet both requirements.
+ * For users migrated from Artifactory, their password is encrypted with md5, while users' password is enrypted with
+ * sha1, so here we use first try sha1, then md5, to meet both requirements.
  * 
  * @author Juven Xu
  */

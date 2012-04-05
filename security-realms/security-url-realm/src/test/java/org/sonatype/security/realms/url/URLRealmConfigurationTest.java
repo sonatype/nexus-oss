@@ -27,16 +27,18 @@ import com.sonatype.security.realms.url.config.model.Configuration;
 import com.sonatype.security.realms.url.config.model.io.xpp3.UrlRealmConfigurationXpp3Reader;
 
 public class URLRealmConfigurationTest
-extends AbstractSecurityTestCase
+    extends AbstractSecurityTestCase
 {
 
     public void testWriteThenRead()
         throws Exception
     {
-        
+
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-        securitySystem.getAuthorizationManager( "default" ).addRole( new Role("defaultRole", "Default Test Role", "Default Test Role Description", "default",  true, null, null ) );
-        
+        securitySystem.getAuthorizationManager( "default" ).addRole( new Role( "defaultRole", "Default Test Role",
+                                                                               "Default Test Role Description",
+                                                                               "default", true, null, null ) );
+
         UrlRealmConfiguration realmConfiguration = this.lookup( UrlRealmConfiguration.class );
 
         File dest = new File( CONFIG_DIR, "url-realm.xml" );

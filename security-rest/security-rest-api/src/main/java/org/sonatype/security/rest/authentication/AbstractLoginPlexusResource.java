@@ -33,7 +33,7 @@ public abstract class AbstractLoginPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
 {
     public static final String RESOURCE_URI = "/authentication/login";
-    
+
     @Override
     public Object getPayloadInstance()
     {

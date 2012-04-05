@@ -26,10 +26,11 @@ public class FileConfigurationSourceTest
     protected SecurityModelConfigurationSource getConfigurationSource()
         throws Exception
     {
-        FileModelConfigurationSource source = ( FileModelConfigurationSource ) lookup( SecurityModelConfigurationSource.class, "file" );
-        
+        FileModelConfigurationSource source =
+            (FileModelConfigurationSource) lookup( SecurityModelConfigurationSource.class, "file" );
+
         source.setConfigurationFile( new File( getSecurityConfiguration() ) );
-        
+
         return source;
     }
 
@@ -80,7 +81,7 @@ public class FileConfigurationSourceTest
         throws Exception
     {
         copyDefaultSecurityConfigToPlace();
-        
+
         configurationSource = getConfigurationSource();
 
         configurationSource.loadConfiguration();
@@ -89,11 +90,11 @@ public class FileConfigurationSourceTest
     }
 
     // NOT EXPOSED
-//    public void testGetDefaultsSource()
-//        throws Exception
-//    {
-//        configurationSource = getConfigurationSource();
-//
-//        assertFalse( configurationSource.getDefaultsSource() == null );
-//    }
+    // public void testGetDefaultsSource()
+    // throws Exception
+    // {
+    // configurationSource = getConfigurationSource();
+    //
+    // assertFalse( configurationSource.getDefaultsSource() == null );
+    // }
 }

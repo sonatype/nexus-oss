@@ -43,9 +43,9 @@ import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 /**
- *  REST resource for listing external role mappings.  An external role mapping, maps a role of an external 
- *  source to one of managed by the system, giving a user all the privileges contained in this system role.
- *  
+ * REST resource for listing external role mappings. An external role mapping, maps a role of an external source to one
+ * of managed by the system, giving a user all the privileges contained in this system role.
+ * 
  * @author bdemers
  */
 @Singleton
@@ -59,9 +59,9 @@ public class ExternalRoleMappingListPlexusResource
 {
 
     public static final String SOURCE_ID_KEY = "sourceId";
-    
+
     public static final String RESOURCE_URI = "/external_role_map/{" + SOURCE_ID_KEY + "}";
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -81,11 +81,11 @@ public class ExternalRoleMappingListPlexusResource
     }
 
     /**
-    * Retrieves the list of external role mappings.
-    * 
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
-    */
+     * Retrieves the list of external role mappings.
+     * 
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
+     */
     @Override
     @GET
     @ResourceMethodSignature( output = ExternalRoleMappingListResourceResponse.class, pathParams = { @PathParam( value = "sourceId" ) } )

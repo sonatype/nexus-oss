@@ -37,12 +37,10 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * REST resource to allow an administrator to change a user's password.
  * 
  * @author bdemers
- *
  */
 @Singleton
 @Typed( value = PlexusResource.class )
 @Named( value = "UserSetPasswordPlexusResource" )
-
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserSetPasswordPlexusResource.RESOURCE_URI )
@@ -51,7 +49,7 @@ public class UserSetPasswordPlexusResource
 {
 
     public static final String RESOURCE_URI = "/users_setpw";
-    
+
     public UserSetPasswordPlexusResource()
     {
         this.setModifiable( true );

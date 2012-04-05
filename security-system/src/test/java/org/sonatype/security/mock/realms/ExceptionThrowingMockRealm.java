@@ -36,13 +36,13 @@ public class ExceptionThrowingMockRealm
     protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
         throws AuthenticationException
     {
-        throw new AuthenticationException("This realm only throws exceptions");
+        throw new AuthenticationException( "This realm only throws exceptions" );
     }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
     {
-        throw new AuthorizationException("This realm only throws exceptions");
+        throw new AuthorizationException( "This realm only throws exceptions" );
     }
 
 }

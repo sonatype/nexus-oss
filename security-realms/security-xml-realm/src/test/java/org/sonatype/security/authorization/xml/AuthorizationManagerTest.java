@@ -45,9 +45,8 @@ public class AuthorizationManagerTest
 
         // copy the securityConf into place
         String securityXml = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security.xml";
-        FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ), new File(
-            CONFIG_DIR,
-            "security.xml" ) );
+        FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ),
+                                 new File( CONFIG_DIR, "security.xml" ) );
     }
 
     public SecuritySystem getSecuritySystem()
@@ -106,8 +105,9 @@ public class AuthorizationManagerTest
         Assert.assertTrue( role1.getPrivileges().contains( "2" ) );
         Assert.assertEquals( 2, role1.getPrivileges().size() );
     }
-    
-    public void testAddRole() throws Exception
+
+    public void testAddRole()
+        throws Exception
     {
 
         AuthorizationManager authzManager = this.getAuthorizationManager();
@@ -119,7 +119,7 @@ public class AuthorizationManagerTest
         role.addPrivilege( "2" );
         role.addPrivilege( "4" );
 
-        authzManager.addRole(role );
+        authzManager.addRole( role );
 
         CRole secRole = this.getConfigurationManager().readRole( role.getRoleId() );
 
@@ -129,7 +129,7 @@ public class AuthorizationManagerTest
         Assert.assertTrue( secRole.getPrivileges().contains( "2" ) );
         Assert.assertTrue( secRole.getPrivileges().contains( "4" ) );
         Assert.assertEquals( 2, secRole.getPrivileges().size() );
-        
+
     }
 
     public void testUpdateRole()

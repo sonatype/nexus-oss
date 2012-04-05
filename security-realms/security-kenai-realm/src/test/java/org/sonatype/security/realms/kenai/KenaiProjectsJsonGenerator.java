@@ -65,7 +65,7 @@ public class KenaiProjectsJsonGenerator
             for ( Iterator<String> iter = Arrays.asList( roles ).iterator(); iter.hasNext(); )
             {
                 urlPart.append( iter.next() );
-                if( iter.hasNext())
+                if ( iter.hasNext() )
                 {
                     urlPart.append( "%2C" );
                 }

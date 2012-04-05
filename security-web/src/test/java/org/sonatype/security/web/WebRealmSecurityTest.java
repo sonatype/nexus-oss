@@ -33,7 +33,7 @@ public class WebRealmSecurityTest
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         securitySystem.start();
         RealmSecurityManager plexusSecurityManager = this.lookup( RealmSecurityManager.class, "default" );
-                
+
         List<String> realms = securitySystem.getRealms();
         realms.clear();
         realms.add( SimpleAccountRealm.class.getName() );
@@ -47,13 +47,13 @@ public class WebRealmSecurityTest
         // init method?
         realms.add( SimpleAccountRealm.class.getName() );
         securitySystem.setRealms( realms );
-        
+
         // this list should have exactly 2 elements
         Assert.assertEquals( 2, plexusSecurityManager.getRealms().size() );
-        
+
         for ( Realm realm : plexusSecurityManager.getRealms() )
         {
-            Assert.assertNotNull( "Realm has null cacheManager", ((CachingRealm) realm).getCacheManager() );
+            Assert.assertNotNull( "Realm has null cacheManager", ( (CachingRealm) realm ).getCacheManager() );
         }
     }
 

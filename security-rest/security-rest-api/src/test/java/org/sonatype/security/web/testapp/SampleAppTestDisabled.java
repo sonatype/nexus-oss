@@ -45,10 +45,9 @@ public class SampleAppTestDisabled
     private static String CONF_DIR = "target/plexus-work/conf";
 
     private static final int USER_COUNT = 1;
-    
+
     private static final int REQUEST_COUNT = 10000;
-    
-    
+
     private ServletServer server;
 
     public void testMemoryUsage()
@@ -56,40 +55,41 @@ public class SampleAppTestDisabled
     {
         Response response = this.doGet( "sample/test", "admin", "admin123" );
         String responseText = ( response.getEntity() != null ) ? response.getEntity().getText() : "";
-        Assert.assertTrue( "Response: "+ response.getStatus() +"\n" + responseText + "\nredirect: "+ response.getLocationRef(), response.getStatus().isSuccess() );
+        Assert.assertTrue( "Response: " + response.getStatus() + "\n" + responseText + "\nredirect: "
+                               + response.getLocationRef(), response.getStatus().isSuccess() );
 
         // memory size after one request
         long usedMemoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        
-        
-        
+
         for ( int ii = 0; ii < USER_COUNT; ii++ )
         {
             String userId = "user" + ii;
-            
+
             for ( int requestCountTmp = 0; requestCountTmp < REQUEST_COUNT; requestCountTmp++ )
             {
                 response = this.doGet( "sample/test", userId, "password" );
                 responseText = ( response.getEntity() != null ) ? response.getEntity().getText() : "";
-                
-                Assert.assertTrue( "Response: "+ response.getStatus() +"\n" + responseText + "\nredirect: "+ response.getLocationRef(), response.getStatus().isSuccess() );   
+
+                Assert.assertTrue( "Response: " + response.getStatus() + "\n" + responseText + "\nredirect: "
+                    + response.getLocationRef(), response.getStatus().isSuccess() );
             }
         }
-        
+
         long usedMemoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        
-//        System.out.println( "Memory used after 1 request: " + usedMemoryBefore );
-//        
-//        System.out.println( "Memory used after "+ USER_COUNT +" request: " + usedMemoryAfter );
+
+        // System.out.println( "Memory used after 1 request: " + usedMemoryBefore );
+        //
+        // System.out.println( "Memory used after "+ USER_COUNT +" request: " + usedMemoryAfter );
         long difference = usedMemoryAfter - usedMemoryBefore;
         double differenceInMB = difference / 1024d / 1024d;
 
-        System.out.println( "Difference of: " + difference + " bytes " + ( difference / 1024d ) + "Kb " + difference + "MB");
-        
-        Assert.assertTrue( "Expected memory usage is less then 40, but actual was: " + differenceInMB, 55d > differenceInMB );
-        
-    }
+        System.out.println( "Difference of: " + difference + " bytes " + ( difference / 1024d ) + "Kb " + difference
+            + "MB" );
 
+        Assert.assertTrue( "Expected memory usage is less then 40, but actual was: " + differenceInMB,
+                           55d > differenceInMB );
+
+    }
 
     private Response doGet( String urlPart, String username, String password )
     {
@@ -114,7 +114,7 @@ public class SampleAppTestDisabled
     {
         configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
     }
-    
+
     @Override
     protected void customizeContext( org.codehaus.plexus.context.Context context )
     {
@@ -128,7 +128,7 @@ public class SampleAppTestDisabled
         throws Exception
     {
         super.setUp();
-        
+
         // copy security.xml in place
         // the test security.xml name will be <package-name>.<test-name>-security.xml
         String baseName = "target/test-classes/" + this.getClass().getName().replaceAll( "\\.", "/" );
@@ -139,42 +139,42 @@ public class SampleAppTestDisabled
         FileUtils.copyFile( securityConfigXml, new File( CONF_DIR, "security-configuration.xml" ) );
 
         // create users
-        this.createUsers();        
-        
+        this.createUsers();
+
         new HackedPlexusContainerContextListener().setPlexusContainer( this.getContainer() );
 
-        
         this.server = this.lookup( ServletServer.class );
         server.start();
     }
 
-    private void createUsers() throws Exception
+    private void createUsers()
+        throws Exception
     {
-        
+
         // use the ConfigurationManager directly because it is way faster
-        
+
         ConfigurationManager configManager = this.lookup( ConfigurationManager.class );
-        
+
         for ( int ii = 0; ii < USER_COUNT; ii++ )
         {
-            String userId =  "user"+ ii; 
-            
+            String userId = "user" + ii;
+
             CUser user = new CUser();
-            user.setEmail(  userId + "@invalidDomain.foobar" );
+            user.setEmail( userId + "@invalidDomain.foobar" );
             user.setId( userId );
             user.setFirstName( userId );
             user.setLastName( userId );
             user.setStatus( UserStatus.active.toString() );
-            
+
             Set<String> roles = new HashSet<String>();
             roles.add( "role1" );
-            
+
             // add each user
-//            System.out.println( "creating user: " + userId );
+            // System.out.println( "creating user: " + userId );
             configManager.createUser( user, "password", roles );
-            
+
         }
-        
+
     }
 
     @Override

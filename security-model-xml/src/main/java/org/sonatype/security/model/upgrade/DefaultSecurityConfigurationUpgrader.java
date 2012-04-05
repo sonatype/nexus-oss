@@ -46,22 +46,21 @@ public class DefaultSecurityConfigurationUpgrader
 {
     @Inject
     private Logger logger;
-    
+
     @Inject
     private Map<String, SecurityUpgrader> upgraders;
-    
+
     @Inject
     private Map<String, SecurityDataUpgrader> dataUpgraders;
 
     /**
      * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is
      * the needed (current) model version.
-     * @throws  
+     * 
+     * @throws
      */
     public Configuration loadOldConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException,
-            UnsupportedConfigurationVersionException
+        throws IOException, ConfigurationIsCorruptedException, UnsupportedConfigurationVersionException
     {
         // try to find out the model version
         String modelVersion = null;
@@ -93,23 +92,22 @@ public class DefaultSecurityConfigurationUpgrader
 
         if ( upgrader != null )
         {
-            logger.info(
-                "Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
-                    + file.getAbsolutePath() );
-            
+            logger.info( "Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
+                + file.getAbsolutePath() );
+
             msg.setConfiguration( upgrader.loadConfiguration( file ) );
 
             while ( !Configuration.MODEL_VERSION.equals( msg.getModelVersion() ) )
             {
-                
+
                 // an application might need to upgrade content, that is NOT part of the model
                 SecurityDataUpgrader dataUpgrader = this.dataUpgraders.get( msg.getModelVersion() );
-                
+
                 if ( upgrader != null )
                 {
                     upgrader.upgrade( msg );
-                    
-                    if( dataUpgrader != null)
+
+                    if ( dataUpgrader != null )
                     {
                         dataUpgrader.upgrade( msg.getConfiguration() );
                     }
@@ -123,8 +121,8 @@ public class DefaultSecurityConfigurationUpgrader
                 upgrader = upgraders.get( msg.getModelVersion() );
             }
 
-            logger.info(
-                "Security configuration file upgraded to current version " + msg.getModelVersion() + " succesfully." );
+            logger.info( "Security configuration file upgraded to current version " + msg.getModelVersion()
+                + " succesfully." );
 
             return (Configuration) msg.getConfiguration();
         }

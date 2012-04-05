@@ -43,7 +43,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 @Path( LogoutPlexusResource.RESOURCE_URI )
 public class LogoutPlexusResource
     extends AbstractPlexusResource
-{    
+{
     public static final String RESOURCE_URI = "/authentication/logout";
 
     @Override

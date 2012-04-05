@@ -40,10 +40,9 @@ public class Upgrade201to202
     implements SecurityUpgrader
 {
     private static String DEFAULT_SOURCE = "default";
-    
+
     public Object loadConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException
+        throws IOException, ConfigurationIsCorruptedException
     {
         FileReader fr = null;
 
@@ -87,7 +86,7 @@ public class Upgrade201to202
             newu.setName( oldu.getName() );
             newu.setPassword( oldu.getPassword() );
             newu.setStatus( oldu.getStatus() );
-            
+
             // convert the old roles mapping to the new one
             this.migrateOldRolesToUserRoleMapping( oldu.getId(), DEFAULT_SOURCE, oldu.getRoles(), newc );
 
@@ -98,51 +97,53 @@ public class Upgrade201to202
 
         for ( CRole oldr : (List<CRole>) oldc.getRoles() )
         {
-                org.sonatype.security.model.v2_0_2.CRole newr = new org.sonatype.security.model.v2_0_2.CRole();
+            org.sonatype.security.model.v2_0_2.CRole newr = new org.sonatype.security.model.v2_0_2.CRole();
 
-                newr.setDescription( oldr.getDescription() );
-                newr.setId( oldr.getId() );
-                newr.setName( oldr.getName() );
-                newr.setPrivileges( oldr.getPrivileges() );
-                newr.setRoles( oldr.getRoles() );
-                newr.setSessionTimeout( oldr.getSessionTimeout() );
+            newr.setDescription( oldr.getDescription() );
+            newr.setId( oldr.getId() );
+            newr.setName( oldr.getName() );
+            newr.setPrivileges( oldr.getPrivileges() );
+            newr.setRoles( oldr.getRoles() );
+            newr.setSessionTimeout( oldr.getSessionTimeout() );
 
-                newc.addRole( newr );
+            newc.addRole( newr );
 
         }
 
         for ( CPrivilege oldp : (List<CPrivilege>) oldc.getPrivileges() )
         {
-                org.sonatype.security.model.v2_0_2.CPrivilege newp = new org.sonatype.security.model.v2_0_2.CPrivilege();
+            org.sonatype.security.model.v2_0_2.CPrivilege newp = new org.sonatype.security.model.v2_0_2.CPrivilege();
 
-                newp.setDescription( oldp.getDescription() );
-                newp.setId( oldp.getId() );
-                newp.setName( oldp.getName() );
-                newp.setType( oldp.getType() );
+            newp.setDescription( oldp.getDescription() );
+            newp.setId( oldp.getId() );
+            newp.setName( oldp.getName() );
+            newp.setType( oldp.getType() );
 
-                for ( CProperty oldprop : (List<CProperty>) oldp.getProperties() )
-                {
-                    org.sonatype.security.model.v2_0_2.CProperty newprop = new org.sonatype.security.model.v2_0_2.CProperty();
-                    newprop.setKey( oldprop.getKey() );
-                    newprop.setValue( oldprop.getValue() );
-                    newp.addProperty( newprop );
-                }
-                newc.addPrivilege( newp );
+            for ( CProperty oldprop : (List<CProperty>) oldp.getProperties() )
+            {
+                org.sonatype.security.model.v2_0_2.CProperty newprop =
+                    new org.sonatype.security.model.v2_0_2.CProperty();
+                newprop.setKey( oldprop.getKey() );
+                newprop.setValue( oldprop.getValue() );
+                newp.addProperty( newprop );
+            }
+            newc.addPrivilege( newp );
         }
 
         message.setModelVersion( org.sonatype.security.model.v2_0_2.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-    
-    private void migrateOldRolesToUserRoleMapping( String userId, String source, List<String> roles, org.sonatype.security.model.v2_0_2.Configuration config)
+
+    private void migrateOldRolesToUserRoleMapping( String userId, String source, List<String> roles,
+                                                   org.sonatype.security.model.v2_0_2.Configuration config )
     {
-        org.sonatype.security.model.v2_0_2.CUserRoleMapping roleMapping = new org.sonatype.security.model.v2_0_2.CUserRoleMapping();
+        org.sonatype.security.model.v2_0_2.CUserRoleMapping roleMapping =
+            new org.sonatype.security.model.v2_0_2.CUserRoleMapping();
         roleMapping.setRoles( roles );
         roleMapping.setSource( source );
         roleMapping.setUserId( userId );
-        
+
         config.addUserRoleMapping( roleMapping );
     }
 
-   
 }

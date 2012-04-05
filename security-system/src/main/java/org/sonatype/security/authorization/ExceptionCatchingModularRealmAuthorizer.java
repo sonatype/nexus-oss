@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.apache.shiro.authz.AuthorizationException;
 
 /**
- * A implementation of the Shiro ModularRealmAuthorizer, that catches exceptions caused by individual realms and
- * ignores them. For example if a JDBC realm throws an exception while getting the list of users Roles (and is not
- * caught, the system should continue looking for permissions in other realms).
+ * A implementation of the Shiro ModularRealmAuthorizer, that catches exceptions caused by individual realms and ignores
+ * them. For example if a JDBC realm throws an exception while getting the list of users Roles (and is not caught, the
+ * system should continue looking for permissions in other realms).
  */
 
 public class ExceptionCatchingModularRealmAuthorizer
@@ -34,7 +34,7 @@ public class ExceptionCatchingModularRealmAuthorizer
 {
 
     private final Logger logger = LoggerFactory.getLogger( this.getClass() );
-    
+
     public ExceptionCatchingModularRealmAuthorizer( Collection<Realm> realms )
     {
         super( realms );
@@ -172,12 +172,14 @@ public class ExceptionCatchingModularRealmAuthorizer
             {
                 if ( realm.isPermitted( subjectPrincipal, permission ) )
                 {
-                    this.logger.trace( "Realm: "+ realm.getName() +" user: "+ subjectPrincipal.iterator().next() +" has permisison: "+ permission );
+                    this.logger.trace( "Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
+                        + " has permisison: " + permission );
                     return true;
                 }
                 else
                 {
-                    this.logger.trace( "Realm: "+ realm.getName() +" user: "+ subjectPrincipal.iterator().next() +" does NOT have permisison: "+ permission );
+                    this.logger.trace( "Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
+                        + " does NOT have permisison: " + permission );
                 }
 
             }

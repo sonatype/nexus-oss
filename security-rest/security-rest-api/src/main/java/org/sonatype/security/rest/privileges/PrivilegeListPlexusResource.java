@@ -50,7 +50,7 @@ public class PrivilegeListPlexusResource
 {
 
     public static final String RESOURCE_URI = "/privileges";
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -70,8 +70,8 @@ public class PrivilegeListPlexusResource
     }
 
     /**
-    * Retrieves the list of security privileges.
-    */
+     * Retrieves the list of security privileges.
+     */
     @Override
     @GET
     @ResourceMethodSignature( output = PrivilegeListResourceResponse.class )

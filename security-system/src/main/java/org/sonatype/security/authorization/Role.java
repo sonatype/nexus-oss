@@ -17,10 +17,11 @@ import java.util.Set;
 
 /**
  * A simple bean that represents a security Role.
+ * 
  * @author Brian Demers
- *
  */
-public class Role implements Comparable<Role>
+public class Role
+    implements Comparable<Role>
 {
     private String roleId;
 
@@ -33,14 +34,14 @@ public class Role implements Comparable<Role>
     private boolean readOnly;
 
     private Set<String> roles = new HashSet<String>();
-    
+
     private Set<String> privileges = new HashSet<String>();
-    
+
     public Role()
     {
-        
+
     }
-    
+
     public Role( String roleId, String name, String description, String source, boolean readOnly, Set<String> roles,
                  Set<String> privileges )
     {
@@ -93,7 +94,7 @@ public class Role implements Comparable<Role>
     {
         this.roles.add( role );
     }
-    
+
     public void setRoles( Set<String> roles )
     {
         this.roles = roles;
@@ -280,5 +281,4 @@ public class Role implements Comparable<Role>
         return true;
     }
 
-    
 }

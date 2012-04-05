@@ -52,7 +52,7 @@ import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 public class PrivilegePlexusResource
     extends AbstractPrivilegePlexusResource
 {
-    
+
     public static final String RESOURCE_URI = "/privileges/{" + PRIVILEGE_ID_KEY + "}";
 
     protected static final String PRIVILEGE_SOURCE = "default";
@@ -87,11 +87,12 @@ public class PrivilegePlexusResource
 
     /**
      * Retrieves the details of a security privilege.
+     * 
      * @param privilegeId The Id of the privilege.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PrivilegeStatusResourceResponse.class, pathParams = { @PathParam(value = "privilegeId") } )
+    @ResourceMethodSignature( output = PrivilegeStatusResourceResponse.class, pathParams = { @PathParam( value = "privilegeId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -128,7 +129,7 @@ public class PrivilegePlexusResource
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam(value = "privilegeId") } )
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "privilegeId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
@@ -142,9 +143,8 @@ public class PrivilegePlexusResource
 
             if ( priv.getType().equals( ApplicationPrivilegeDescriptor.TYPE ) )
             {
-                throw new ResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Cannot delete an application type privilege" );
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                                             "Cannot delete an application type privilege" );
             }
             else
             {
@@ -157,7 +157,7 @@ public class PrivilegePlexusResource
         }
         catch ( NoSuchAuthorizationManagerException e )
         {
-            this.getLogger().warn( "Could not found AuthorizationManager: "+ PRIVILEGE_SOURCE, e );
+            this.getLogger().warn( "Could not found AuthorizationManager: " + PRIVILEGE_SOURCE, e );
             // we should not ever get here
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: "
                 + PRIVILEGE_SOURCE + " could not be found." );

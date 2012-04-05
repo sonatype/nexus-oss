@@ -19,25 +19,24 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-
 public class URLUserLocatorTest
     extends AbstractSecurityTestCase
 {
 
-    public void testBasics() throws Exception
+    public void testBasics()
+        throws Exception
     {
-        
+
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-        
+
         User user = securitySystem.getUser( "ANYBODY" );
         Assert.assertNotNull( user );
         Assert.assertEquals( "url", user.getSource() );
-        
+
         Assert.assertNotNull( securitySystem.getUser( "RANDOM", "url" ) );
-        
-        Assert.assertEquals( 1, securitySystem.searchUsers( new UserSearchCriteria("abcd", null, "url") ).size() );
-        
-        
+
+        Assert.assertEquals( 1, securitySystem.searchUsers( new UserSearchCriteria( "abcd", null, "url" ) ).size() );
+
     }
-    
+
 }

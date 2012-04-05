@@ -36,7 +36,6 @@ import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-
 /**
  * REST resource for listing users.
  * 
@@ -83,12 +82,12 @@ public class PlexusUserListPlexusResource
     /**
      * Retrieves the list of users.
      * 
-     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
-     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
+     * @param sourceId The Id of the source. A source specifies where the users/roles came from, for example the source
+     *            Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class, pathParams = { @PathParam( value = "sourceId") }  )
+    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class, pathParams = { @PathParam( value = "sourceId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -107,7 +106,7 @@ public class PlexusUserListPlexusResource
         }
 
         result.setData( this.securityToRestModel( users ) );
-        
+
         return result;
     }
 

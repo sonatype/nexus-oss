@@ -49,8 +49,8 @@ public class MockRealmB
         UsernamePasswordToken userpass = (UsernamePasswordToken) token;
         if ( "jcool".equals( userpass.getUsername() ) && "jcool".equals( new String( userpass.getPassword() ) ) )
         {
-            return new SimpleAuthenticationInfo( userpass.getUsername(), new String( userpass.getPassword() ), this
-                .getName() );
+            return new SimpleAuthenticationInfo( userpass.getUsername(), new String( userpass.getPassword() ),
+                                                 this.getName() );
         }
 
         return null;

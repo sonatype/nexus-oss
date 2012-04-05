@@ -39,8 +39,7 @@ public class Upgrade100to200
     implements SecurityUpgrader
 {
     public Object loadConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException
+        throws IOException, ConfigurationIsCorruptedException
     {
         FileReader fr = null;
 

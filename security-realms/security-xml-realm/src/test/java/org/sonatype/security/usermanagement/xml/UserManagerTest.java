@@ -52,9 +52,8 @@ public class UserManagerTest
 
         // copy the securityConf into place
         String securityXml = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security.xml";
-        FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ), new File(
-            CONFIG_DIR,
-            "security.xml" ) );
+        FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ),
+                                 new File( CONFIG_DIR, "security.xml" ) );
     }
 
     public SecuritySystem getSecuritySystem()
@@ -124,7 +123,7 @@ public class UserManagerTest
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
         CUserRoleMapping roleMapping = config.readUserRoleMapping( "testCreateUser", "default" );
-        
+
         Assert.assertTrue( roleMapping.getRoles().contains( "role1" ) );
         Assert.assertTrue( roleMapping.getRoles().contains( "role3" ) );
         Assert.assertEquals( 2, roleMapping.getRoles().size() );
@@ -142,8 +141,8 @@ public class UserManagerTest
         UserManager userManager = this.getUserManager();
         userManager.changePassword( "test-user", "new-user-password" );
 
-        Assert.assertEquals( this.getConfigurationManager().readUser( "test-user" ).getPassword(), StringDigester
-            .getSha1Digest( "new-user-password" ) );
+        Assert.assertEquals( this.getConfigurationManager().readUser( "test-user" ).getPassword(),
+                             StringDigester.getSha1Digest( "new-user-password" ) );
     }
 
     public void testUpdateUser()
@@ -173,7 +172,7 @@ public class UserManagerTest
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
         CUserRoleMapping roleMapping = config.readUserRoleMapping( "test-user", "default" );
-        
+
         Assert.assertTrue( roleMapping.getRoles().contains( "role3" ) );
         Assert.assertEquals( "roles: " + roleMapping.getRoles(), 1, roleMapping.getRoles().size() );
     }
@@ -287,15 +286,15 @@ public class UserManagerTest
             if ( roleMapping.getUserId().equals( "admin" ) )
             {
                 found = true;
-                
+
                 Assert.assertEquals( 1, roleMapping.getRoles().size() );
                 Assert.assertEquals( "role2", roleMapping.getRoles().get( 0 ) );
             }
         }
-        
+
         Assert.assertTrue( "did not find admin user in role mapping", found );
     }
-    
+
     public void testSetUserRolesForAnonymous()
         throws Exception
     {
@@ -323,46 +322,47 @@ public class UserManagerTest
 
         Assert.assertTrue( "did not find anon user in role mapping", found );
     }
-    
-    public void testLoadConfigWithInvalidEmail() throws Exception
-    {   
+
+    public void testLoadConfigWithInvalidEmail()
+        throws Exception
+    {
         File securityXML = new File( CONFIG_DIR, "security.xml" );
         FileInputStream fis = null;
         FileWriter fileWriter = null;
         Configuration config = null;
-        
+
         String userId = null;
-        
+
         try
         {
             fis = new FileInputStream( securityXML );
             SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
             config = reader.read( fis );
-            
+
             IOUtil.close( fis );
-            
+
             fileWriter = new FileWriter( securityXML );
-            
+
             config.getUsers().get( 0 ).setEmail( "testLoadConfigWithInvalidEmail" );
             userId = config.getUsers().get( 0 ).getId();
-            
+
             SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
             writer.write( fileWriter, config );
-            
+
         }
         finally
         {
             IOUtil.close( fis );
             IOUtil.close( fileWriter );
         }
-        
+
         // now restart the security
         this.getSecuritySystem().start();
-        
+
         // that should have went well,
         User user = this.getSecuritySystem().getUser( userId, "default" );
         Assert.assertEquals( "testLoadConfigWithInvalidEmail", user.getEmailAddress() );
-        
+
     }
 
     private List<String> getRoleIds( User user )
@@ -376,7 +376,5 @@ public class UserManagerTest
 
         return roleIds;
     }
-    
-    
 
 }

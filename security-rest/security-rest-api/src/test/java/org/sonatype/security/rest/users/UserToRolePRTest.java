@@ -88,8 +88,7 @@ public class UserToRolePRTest
         {
             // expected
             Assert.assertEquals( 400, e.getStatus().getCode() );
-            Assert.assertTrue( this
-                .getErrorString( (ErrorResponse) e.getResultObject(), 0 ).toLowerCase().contains( "role" ) );
+            Assert.assertTrue( this.getErrorString( (ErrorResponse) e.getResultObject(), 0 ).toLowerCase().contains( "role" ) );
         }
     }
 
@@ -182,7 +181,7 @@ public class UserToRolePRTest
             this.getConfig().readUserRoleMapping( "jcoder", REALM_KEY );
             Assert.fail( "Expected: NoSuchRoleMappingException" );
         }
-        catch ( NoSuchRoleMappingException e)
+        catch ( NoSuchRoleMappingException e )
         {
             // expected
         }
@@ -222,7 +221,7 @@ public class UserToRolePRTest
             this.getConfig().readUserRoleMapping( "cdugas", REALM_KEY );
             Assert.fail( "Expected: NoSuchRoleMappingException" );
         }
-        catch ( NoSuchRoleMappingException e)
+        catch ( NoSuchRoleMappingException e )
         {
             // expected
         }

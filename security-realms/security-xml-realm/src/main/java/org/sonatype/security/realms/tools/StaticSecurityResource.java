@@ -26,12 +26,14 @@ public interface StaticSecurityResource
 {
     /**
      * Gets the security configuration.
+     * 
      * @return
      */
     Configuration getConfiguration();
 
     /**
      * Marks the Configuration dirty so it can be reloaded.
+     * 
      * @deprecated Use DynamicSecurityResource instead
      * @return
      */

@@ -37,7 +37,8 @@ import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
 /**
  * The UserManager for the URL Realm. The remote URL used by the URL Realm is NOT hit. When performing a search for a
  * user the name in the search criteria is returned. <BR/>
- * NOTE: This realm is typically used when trying to integrate with an existing system, and another directory is not available.
+ * NOTE: This realm is typically used when trying to integrate with an existing system, and another directory is not
+ * available.
  * 
  * @author Brian Demers
  */
@@ -56,7 +57,7 @@ public class URLUserManager
 
     @Inject
     private UrlRealmConfiguration urlRealmConfiguration;
-    
+
     @Inject
     private List<UserManager> userLocators;
 
@@ -192,7 +193,7 @@ public class URLUserManager
     private User toUser( String userId, boolean addDefaultRole )
     {
         String defaultRole = urlRealmConfiguration.getConfiguration().getDefaultRole();
-        
+
         DefaultUser user = new DefaultUser();
         user.setEmailAddress( userId + "@" + defaultRole );
         user.setName( userId );

@@ -53,7 +53,6 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Singleton
 @Typed( value = PlexusResource.class )
 @Named( value = "UserPlexusResource" )
-
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserPlexusResource.RESOURCE_URI )
@@ -93,11 +92,12 @@ public class UserPlexusResource
 
     /**
      * Retrieves a user's information.
+     * 
      * @param userId The Id of the user.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( value = "userId" )} )
+    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( value = "userId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -118,11 +118,12 @@ public class UserPlexusResource
 
     /**
      * Updates a user's information.
+     * 
      * @param userId The Id of the user.
      */
     @Override
     @POST
-    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( value = "userId" )} )
+    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( value = "userId" ) } )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -136,9 +137,10 @@ public class UserPlexusResource
             // the password can not be set on update, The only way to set a password is using the users_setpw resource
             if ( StringUtils.isNotEmpty( resource.getPassword() ) )
             {
-                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, this.getErrorResponse(
-                    "*",
-                    "Updating a users password using this URI is not allowed." ) );
+                throw new PlexusResourceException(
+                                                   Status.CLIENT_ERROR_BAD_REQUEST,
+                                                   this.getErrorResponse( "*",
+                                                                          "Updating a users password using this URI is not allowed." ) );
             }
 
             try
@@ -146,13 +148,13 @@ public class UserPlexusResource
                 User user = restToSecurityModel( getSecuritySystem().getUser( resource.getUserId() ), resource );
 
                 validateUserContainment( user );
-                
+
                 getSecuritySystem().updateUser( user );
 
                 result = new UserResourceResponse();
 
                 result.setData( resourceRequest.getData() );
-                
+
                 result.getData().setResourceURI( createChildReference( request, resource.getUserId() ).toString() );
 
             }
@@ -168,7 +170,8 @@ public class UserPlexusResource
             catch ( NoSuchUserManagerException e )
             {
                 ErrorResponse errorResponse = getErrorResponse( "*", e.getMessage() );
-                throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Unable to create user.", errorResponse);
+                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to create user.",
+                                                   errorResponse );
             }
         }
         return result;
@@ -176,11 +179,12 @@ public class UserPlexusResource
 
     /**
      * Removes a user.
+     * 
      * @param userId The Id of the user.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "userId" )} )
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "userId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
@@ -189,13 +193,12 @@ public class UserPlexusResource
             // not allowed to delete system Anonymous user
             if ( isAnonymousUser( getUserId( request ), request ) )
             {
-                String error = "The user with user ID ["
-                    + getUserId( request )
-                    + "] cannot be deleted, since it is marked user used for Anonymous access in Server Administration. To delete this user, disable anonymous access or, change the anonymous username and password to another valid values!";
+                String error =
+                    "The user with user ID ["
+                        + getUserId( request )
+                        + "] cannot be deleted, since it is marked user used for Anonymous access in Server Administration. To delete this user, disable anonymous access or, change the anonymous username and password to another valid values!";
 
-                getLogger()
-                    .info(
-                        "Anonymous user cannot be deleted! Unset the Allow Anonymous access first in Server Administration!" );
+                getLogger().info( "Anonymous user cannot be deleted! Unset the Allow Anonymous access first in Server Administration!" );
 
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, error );
             }
@@ -203,12 +206,13 @@ public class UserPlexusResource
             // not allowed to delete the current user himself
             if ( isCurrentUser( request ) )
             {
-                String error = "The user with user ID [" + getUserId( request )
-                    + "] cannot be deleted, as that is the user currently logged into the application.";
-
-                getLogger().info(
+                String error =
                     "The user with user ID [" + getUserId( request )
-                        + "] cannot be deleted, as that is the user currently logged into the application." );
+                        + "] cannot be deleted, as that is the user currently logged into the application.";
+
+                getLogger().info( "The user with user ID ["
+                                      + getUserId( request )
+                                      + "] cannot be deleted, as that is the user currently logged into the application." );
 
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, error );
             }

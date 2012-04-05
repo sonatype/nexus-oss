@@ -21,13 +21,15 @@ public interface SecurityConfigurationCleaner
 {
     /**
      * Called when a role is removed so additional cleanup logic can be done.
+     * 
      * @param configuration
      * @param roleId
      */
     void roleRemoved( Configuration configuration, String roleId );
-    
+
     /**
      * Called when a privilege isremoved so additional cleanup logic can be done.
+     * 
      * @param configuration
      * @param privilegeId
      */

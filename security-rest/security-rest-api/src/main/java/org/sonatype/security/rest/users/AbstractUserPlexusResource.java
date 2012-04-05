@@ -37,10 +37,8 @@ public abstract class AbstractUserPlexusResource
         {
             getLogger().info( "The userId (" + resource.getUserId() + ") cannot have 0 roles!" );
 
-            throw new PlexusResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                ROLE_VALIDATION_ERROR,
-                getErrorResponse( "users", ROLE_VALIDATION_ERROR ) );
+            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, ROLE_VALIDATION_ERROR,
+                                               getErrorResponse( "users", ROLE_VALIDATION_ERROR ) );
         }
 
         return true;
@@ -49,7 +47,8 @@ public abstract class AbstractUserPlexusResource
     protected boolean isAnonymousUser( String username, Request request )
         throws ResourceException
     {
-        return getSecuritySystem().isAnonymousAccessEnabled() && getSecuritySystem().getAnonymousUsername().equals( username );
+        return getSecuritySystem().isAnonymousAccessEnabled()
+            && getSecuritySystem().getAnonymousUsername().equals( username );
     }
 
     protected void validateUserContainment( User user )
@@ -57,12 +56,8 @@ public abstract class AbstractUserPlexusResource
     {
         if ( user.getRoles().size() == 0 )
         {
-            throw new PlexusResourceException( 
-                Status.CLIENT_ERROR_BAD_REQUEST, 
-                "Configuration error.", 
-                getErrorResponse( 
-                    "roles", 
-                    "User requires one or more roles." ) );
+            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.",
+                                               getErrorResponse( "roles", "User requires one or more roles." ) );
         }
     }
 }

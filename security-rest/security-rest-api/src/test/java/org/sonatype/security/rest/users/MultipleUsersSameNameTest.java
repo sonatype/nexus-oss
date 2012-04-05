@@ -36,7 +36,7 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 public class MultipleUsersSameNameTest
     extends AbstractSecurityRestTest
 {
-    
+
     SecuritySystem securitySystem = null;
 
     @Override
@@ -44,7 +44,7 @@ public class MultipleUsersSameNameTest
         throws Exception
     {
         super.setUp();
-        
+
         securitySystem = this.lookup( SecuritySystem.class );
         securitySystem.start();
 
@@ -69,98 +69,96 @@ public class MultipleUsersSameNameTest
         Request request = this.buildRequest();
         request.getAttributes().put( UserSearchPlexusResource.USER_SOURCE_KEY, "all" );
         request.getAttributes().put( UserSearchPlexusResource.USER_ID_KEY, "jcoder" );
-        
-        List<PlexusUserResource> result = ( (PlexusUserListResourceResponse) userSearchResource.get(
-            null,
-            request,
-            null,
-            null ) ).getData();
-        
+
+        List<PlexusUserResource> result =
+            ( (PlexusUserListResourceResponse) userSearchResource.get( null, request, null, null ) ).getData();
+
         // now make sure we have 2 jcoders
         PlexusUserResource jcoderXML = null;
         PlexusUserResource jcoderMock = null;
-        
+
         for ( PlexusUserResource plexusUserResource : result )
         {
-            if( plexusUserResource.getUserId().equals( "jcoder" ))
+            if ( plexusUserResource.getUserId().equals( "jcoder" ) )
             {
-                if( plexusUserResource.getSource().endsWith( SecurityXmlUserManager.SOURCE ) )
+                if ( plexusUserResource.getSource().endsWith( SecurityXmlUserManager.SOURCE ) )
                 {
                     jcoderXML = plexusUserResource;
                 }
-                else if(plexusUserResource.getSource().endsWith( MockUserManagerA.SOURCE ) )
+                else if ( plexusUserResource.getSource().endsWith( MockUserManagerA.SOURCE ) )
                 {
                     jcoderMock = plexusUserResource;
                 }
                 else
                 {
-                    Assert.fail( "found a jcoder with an unknown source of: "+ plexusUserResource.getSource() );
+                    Assert.fail( "found a jcoder with an unknown source of: " + plexusUserResource.getSource() );
                 }
             }
         }
-        
+
         Assert.assertNotNull( "jcoderXML is null", jcoderXML );
         Assert.assertNotNull( "jcoderMock is null", jcoderMock );
     }
 
-    public void updateUserRoleTest() throws Exception
-    {   
+    public void updateUserRoleTest()
+        throws Exception
+    {
         // first get the list of the previous users roles so we can make sure they change
         User jcoderXML = securitySystem.getUser( "jcoder", SecurityXmlUserManager.SOURCE );
         User jcoderMock = securitySystem.getUser( "jcoder", MockUserManagerA.SOURCE );
-        
+
         List<String> jcoderXMLOriginalRoles = new ArrayList<String>();
         for ( RoleIdentifier role : jcoderXML.getRoles() )
         {
-            jcoderXMLOriginalRoles.add( role.getRoleId() );    
+            jcoderXMLOriginalRoles.add( role.getRoleId() );
         }
-        
+
         List<String> jcoderMockOriginalRoles = new ArrayList<String>();
         for ( RoleIdentifier role : jcoderMock.getRoles() )
         {
-            jcoderMockOriginalRoles.add( role.getRoleId() );    
+            jcoderMockOriginalRoles.add( role.getRoleId() );
         }
-        
+
         // now update one... and check the other
-        
+
         Request request = this.buildRequest();
         Response response = new Response( request );
         request.getAttributes().put( UserToRolePlexusResource.USER_ID_KEY, "jcoder" );
         request.getAttributes().put( UserToRolePlexusResource.SOURCE_ID_KEY, MockUserManagerA.SOURCE );
-        
+
         PlexusResource userToRoleResource = this.lookup( PlexusResource.class, "UserSearchPlexusResource" );
-        
+
         UserToRoleResourceRequest payload = new UserToRoleResourceRequest();
         payload.setData( new UserToRoleResource() );
         payload.getData().setUserId( "jcoder" );
         payload.getData().setSource( MockUserManagerA.SOURCE );
         payload.getData().getRoles().add( "admin" );
-        
+
         userToRoleResource.put( null, request, response, null );
-        
+
         // the xml user should have the original roles the mock users should only have admin.
-        
+
         jcoderXML = securitySystem.getUser( "jcoder", SecurityXmlUserManager.SOURCE );
         jcoderMock = securitySystem.getUser( "jcoder", MockUserManagerA.SOURCE );
-        
+
         List<String> jcoderXMLNewRoles = new ArrayList<String>();
         for ( RoleIdentifier role : jcoderXML.getRoles() )
         {
-            jcoderXMLNewRoles.add( role.getRoleId() );    
+            jcoderXMLNewRoles.add( role.getRoleId() );
         }
-        
+
         List<String> jcoderMockNewRoles = new ArrayList<String>();
         for ( RoleIdentifier role : jcoderMock.getRoles() )
         {
-            jcoderMockNewRoles.add( role.getRoleId() );    
+            jcoderMockNewRoles.add( role.getRoleId() );
         }
-        
+
         Assert.assertEquals( jcoderXMLOriginalRoles, jcoderXMLNewRoles );
-        
+
         Assert.assertEquals( 1, jcoderMockNewRoles.size() );
         Assert.assertTrue( jcoderMockNewRoles.contains( "admin" ) );
     }
-    
+
     private Request buildRequest()
     {
         Request request = new Request();

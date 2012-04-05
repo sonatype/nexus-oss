@@ -41,8 +41,7 @@ public class Upgrade200to201
     implements SecurityUpgrader
 {
     public Object loadConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException
+        throws IOException, ConfigurationIsCorruptedException
     {
         FileReader fr = null;
 
@@ -68,7 +67,7 @@ public class Upgrade200to201
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
@@ -91,7 +90,7 @@ public class Upgrade200to201
 
             newc.addUser( newu );
         }
-        
+
         List<RoleMap> roleMapList = new ArrayList<RoleMap>();
 
         for ( CRole oldr : (List<CRole>) oldc.getRoles() )
@@ -100,30 +99,30 @@ public class Upgrade200to201
             if ( !getRolesToRemove().contains( oldr.getId() ) )
             {
                 org.sonatype.security.model.v2_0_1.CRole newr = new org.sonatype.security.model.v2_0_1.CRole();
-    
+
                 newr.setDescription( oldr.getDescription() );
                 newr.setId( oldr.getId() );
                 newr.setName( oldr.getName() );
                 newr.setPrivileges( oldr.getPrivileges() );
                 newr.setRoles( oldr.getRoles() );
                 newr.setSessionTimeout( oldr.getSessionTimeout() );
-    
+
                 newc.addRole( newr );
             }
             // If we have internally, and the user has changed the role previously (as read only is new in this version)
             else if ( shouldArchiveRole( oldr ) )
-            {                
+            {
                 org.sonatype.security.model.v2_0_1.CRole newr = new org.sonatype.security.model.v2_0_1.CRole();
-                
+
                 newr.setDescription( oldr.getDescription() );
                 newr.setId( oldr.getId() + "-customized" );
                 newr.setName( oldr.getName() + " (Customized)" );
                 newr.setPrivileges( oldr.getPrivileges() );
                 newr.setRoles( oldr.getRoles() );
                 newr.setSessionTimeout( oldr.getSessionTimeout() );
-    
+
                 newc.addRole( newr );
-                
+
                 roleMapList.add( new RoleMap( oldr.getId(), newr.getId() ) );
             }
             // else the role will be removed, if it is now internal, and the user hasn't changed it
@@ -133,71 +132,73 @@ public class Upgrade200to201
         {
             if ( !getPrivsToRemove().contains( oldp.getId() ) )
             {
-                org.sonatype.security.model.v2_0_1.CPrivilege newp = new org.sonatype.security.model.v2_0_1.CPrivilege();
-    
+                org.sonatype.security.model.v2_0_1.CPrivilege newp =
+                    new org.sonatype.security.model.v2_0_1.CPrivilege();
+
                 newp.setDescription( oldp.getDescription() );
                 newp.setId( oldp.getId() );
                 newp.setName( oldp.getName() );
                 newp.setType( oldp.getType() );
-                
-                for ( CProperty oldprop : ( List<CProperty> ) oldp.getProperties() )
+
+                for ( CProperty oldprop : (List<CProperty>) oldp.getProperties() )
                 {
-                    org.sonatype.security.model.v2_0_1.CProperty newprop = new org.sonatype.security.model.v2_0_1.CProperty();
+                    org.sonatype.security.model.v2_0_1.CProperty newprop =
+                        new org.sonatype.security.model.v2_0_1.CProperty();
                     newprop.setKey( oldprop.getKey() );
                     newprop.setValue( oldprop.getValue() );
                     newp.addProperty( newprop );
-                }    
+                }
                 newc.addPrivilege( newp );
             }
         }
-        
+
         // Fix to use the archived roles
         for ( RoleMap roleMap : roleMapList )
         {
             applyArchivedRoles( roleMap, newc );
         }
-        
+
         // Fix the new anon and deployment roles if assigned to users
         applyNewRepoRoles( newc );
 
         message.setModelVersion( org.sonatype.security.model.v2_0_1.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-    
-    @SuppressWarnings("unchecked")
+
+    @SuppressWarnings( "unchecked" )
     private void applyNewRepoRoles( org.sonatype.security.model.v2_0_1.Configuration config )
     {
-        for ( org.sonatype.security.model.v2_0_1.CUser user : ( List<org.sonatype.security.model.v2_0_1.CUser> )config.getUsers() )
+        for ( org.sonatype.security.model.v2_0_1.CUser user : (List<org.sonatype.security.model.v2_0_1.CUser>) config.getUsers() )
         {
             if ( user.getRoles().contains( "anonymous" ) )
             {
                 user.getRoles().add( "repo-all-read" );
             }
-            
+
             if ( user.getRoles().contains( "deployment" ) )
             {
                 user.getRoles().add( "repo-all-full" );
             }
         }
-        
-        for ( org.sonatype.security.model.v2_0_1.CRole role : ( List<org.sonatype.security.model.v2_0_1.CRole> )config.getRoles() )
+
+        for ( org.sonatype.security.model.v2_0_1.CRole role : (List<org.sonatype.security.model.v2_0_1.CRole>) config.getRoles() )
         {
             if ( role.getRoles().contains( "anonymous" ) )
             {
                 role.getRoles().add( "repo-all-read" );
             }
-            
+
             if ( role.getRoles().contains( "deployment" ) )
             {
                 role.getRoles().add( "repo-all-full" );
             }
         }
     }
-    
-    @SuppressWarnings("unchecked")
+
+    @SuppressWarnings( "unchecked" )
     private void applyArchivedRoles( RoleMap roleMap, org.sonatype.security.model.v2_0_1.Configuration config )
     {
-        for ( org.sonatype.security.model.v2_0_1.CUser user : ( List<org.sonatype.security.model.v2_0_1.CUser> )config.getUsers() )
+        for ( org.sonatype.security.model.v2_0_1.CUser user : (List<org.sonatype.security.model.v2_0_1.CUser>) config.getUsers() )
         {
             if ( user.getRoles().contains( roleMap.oldId ) )
             {
@@ -206,8 +207,8 @@ public class Upgrade200to201
                 user.getRoles().add( index, roleMap.newId );
             }
         }
-        
-        for ( org.sonatype.security.model.v2_0_1.CRole role : ( List<org.sonatype.security.model.v2_0_1.CRole> )config.getRoles() )
+
+        for ( org.sonatype.security.model.v2_0_1.CRole role : (List<org.sonatype.security.model.v2_0_1.CRole>) config.getRoles() )
         {
             if ( role.getRoles().contains( roleMap.oldId ) )
             {
@@ -217,235 +218,161 @@ public class Upgrade200to201
             }
         }
     }
-    
+
     private boolean shouldArchiveRole( CRole oldRole )
     {
         boolean result = true;
-        
-        if ( "admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 1
-            && oldRole.getPrivileges().contains( "1000" ) 
+
+        if ( "admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 1
+            && oldRole.getPrivileges().contains( "1000" ) && oldRole.getRoles().size() == 0 )
+        {
+            result = false;
+        }
+        else if ( "anonymous".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 14
+            && oldRole.getPrivileges().contains( "1" ) && oldRole.getPrivileges().contains( "6" )
+            && oldRole.getPrivileges().contains( "14" ) && oldRole.getPrivileges().contains( "17" )
+            && oldRole.getPrivileges().contains( "19" ) && oldRole.getPrivileges().contains( "44" )
+            && oldRole.getPrivileges().contains( "54" ) && oldRole.getPrivileges().contains( "55" )
+            && oldRole.getPrivileges().contains( "56" ) && oldRole.getPrivileges().contains( "57" )
+            && oldRole.getPrivileges().contains( "58" ) && oldRole.getPrivileges().contains( "64" )
+            && oldRole.getPrivileges().contains( "T1" ) && oldRole.getPrivileges().contains( "T2" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "anonymous".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 14
-            && oldRole.getPrivileges().contains( "1" )
-            && oldRole.getPrivileges().contains( "6" )
-            && oldRole.getPrivileges().contains( "14" )
-            && oldRole.getPrivileges().contains( "17" )
-            && oldRole.getPrivileges().contains( "19" )
-            && oldRole.getPrivileges().contains( "44" )
-            && oldRole.getPrivileges().contains( "54" )
-            && oldRole.getPrivileges().contains( "55" ) 
-            && oldRole.getPrivileges().contains( "56" )
-            && oldRole.getPrivileges().contains( "57" )
-            && oldRole.getPrivileges().contains( "58" )
-            && oldRole.getPrivileges().contains( "64" )
-            && oldRole.getPrivileges().contains( "T1" )
-            && oldRole.getPrivileges().contains( "T2" )
-            && oldRole.getRoles().size() == 0 )
-        {
-            result = false;
-        }
-        else if ( "deployment".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 9
-            && oldRole.getPrivileges().contains( "64" )
-            && oldRole.getPrivileges().contains( "T1" )
-            && oldRole.getPrivileges().contains( "T2" )
-            && oldRole.getPrivileges().contains( "T3" )
-            && oldRole.getPrivileges().contains( "T4" )
-            && oldRole.getPrivileges().contains( "T5" )
-            && oldRole.getPrivileges().contains( "T6" )
-            && oldRole.getPrivileges().contains( "T7" )
-            && oldRole.getPrivileges().contains( "T8" )
-            && oldRole.getRoles().size() == 1
+        else if ( "deployment".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 9
+            && oldRole.getPrivileges().contains( "64" ) && oldRole.getPrivileges().contains( "T1" )
+            && oldRole.getPrivileges().contains( "T2" ) && oldRole.getPrivileges().contains( "T3" )
+            && oldRole.getPrivileges().contains( "T4" ) && oldRole.getPrivileges().contains( "T5" )
+            && oldRole.getPrivileges().contains( "T6" ) && oldRole.getPrivileges().contains( "T7" )
+            && oldRole.getPrivileges().contains( "T8" ) && oldRole.getRoles().size() == 1
             && oldRole.getRoles().contains( "anonymous" ) )
         {
             result = false;
         }
-        else if ( "developer".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 1
-            && oldRole.getPrivileges().contains( "2" )
-            && oldRole.getRoles().size() == 2
-            && oldRole.getRoles().contains( "deployment" )
-            && oldRole.getRoles().contains( "anonymous" ) )
+        else if ( "developer".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 1
+            && oldRole.getPrivileges().contains( "2" ) && oldRole.getRoles().size() == 2
+            && oldRole.getRoles().contains( "deployment" ) && oldRole.getRoles().contains( "anonymous" ) )
         {
             result = false;
         }
-        else if ( "repo-all-read".equals( oldRole.getId() ) 
-            && oldRole.getPrivileges().size() == 2
-            && oldRole.getPrivileges().contains( "T1" )
-            && oldRole.getPrivileges().contains( "T2" )
+        else if ( "repo-all-read".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 2
+            && oldRole.getPrivileges().contains( "T1" ) && oldRole.getPrivileges().contains( "T2" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "repo-all-full".equals( oldRole.getId() ) 
-            && oldRole.getPrivileges().size() == 8
-            && oldRole.getPrivileges().contains( "T1" )
-            && oldRole.getPrivileges().contains( "T2" )
-            && oldRole.getPrivileges().contains( "T3" )
-            && oldRole.getPrivileges().contains( "T4" )
-            && oldRole.getPrivileges().contains( "T5" )
-            && oldRole.getPrivileges().contains( "T6" )
-            && oldRole.getPrivileges().contains( "T7" )
-            && oldRole.getPrivileges().contains( "T8" )
+        else if ( "repo-all-full".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 8
+            && oldRole.getPrivileges().contains( "T1" ) && oldRole.getPrivileges().contains( "T2" )
+            && oldRole.getPrivileges().contains( "T3" ) && oldRole.getPrivileges().contains( "T4" )
+            && oldRole.getPrivileges().contains( "T5" ) && oldRole.getPrivileges().contains( "T6" )
+            && oldRole.getPrivileges().contains( "T7" ) && oldRole.getPrivileges().contains( "T8" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-search".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 2
-            && oldRole.getPrivileges().contains( "17" )
-            && oldRole.getPrivileges().contains( "19" )
+        else if ( "ui-search".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 2
+            && oldRole.getPrivileges().contains( "17" ) && oldRole.getPrivileges().contains( "19" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-repo-browser".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 3
-            && oldRole.getPrivileges().contains( "6" )
-            && oldRole.getPrivileges().contains( "14" )
-            && oldRole.getPrivileges().contains( "55" )
+        else if ( "ui-repo-browser".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 3
+            && oldRole.getPrivileges().contains( "6" ) && oldRole.getPrivileges().contains( "14" )
+            && oldRole.getPrivileges().contains( "55" ) && oldRole.getRoles().size() == 0 )
+        {
+            result = false;
+        }
+        else if ( "ui-system-feeds".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 1
+            && oldRole.getPrivileges().contains( "44" ) && oldRole.getRoles().size() == 0 )
+        {
+            result = false;
+        }
+        else if ( "ui-logs-config-files".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 2
+            && oldRole.getPrivileges().contains( "42" ) && oldRole.getPrivileges().contains( "43" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-system-feeds".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 1
-            && oldRole.getPrivileges().contains( "44" )
+        else if ( "ui-server-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 2
+            && oldRole.getPrivileges().contains( "3" ) && oldRole.getPrivileges().contains( "4" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-logs-config-files".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 2
-            && oldRole.getPrivileges().contains( "42" )
-            && oldRole.getPrivileges().contains( "43" )
+        else if ( "ui-repository-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 5
+            && oldRole.getPrivileges().contains( "5" ) && oldRole.getPrivileges().contains( "6" )
+            && oldRole.getPrivileges().contains( "7" ) && oldRole.getPrivileges().contains( "8" )
+            && oldRole.getPrivileges().contains( "10" ) && oldRole.getRoles().size() == 0 )
+        {
+            result = false;
+        }
+        else if ( "ui-group-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 5
+            && oldRole.getPrivileges().contains( "6" ) && oldRole.getPrivileges().contains( "13" )
+            && oldRole.getPrivileges().contains( "14" ) && oldRole.getPrivileges().contains( "15" )
+            && oldRole.getPrivileges().contains( "16" ) && oldRole.getRoles().size() == 0 )
+        {
+            result = false;
+        }
+        else if ( "ui-routing-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 6
+            && oldRole.getPrivileges().contains( "6" ) && oldRole.getPrivileges().contains( "14" )
+            && oldRole.getPrivileges().contains( "22" ) && oldRole.getPrivileges().contains( "23" )
+            && oldRole.getPrivileges().contains( "24" ) && oldRole.getPrivileges().contains( "25" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-server-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 2
-            && oldRole.getPrivileges().contains( "3" )
-            && oldRole.getPrivileges().contains( "4" )
-            && oldRole.getRoles().size() == 0 )
+        else if ( "ui-scheduled-tasks-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 7
+            && oldRole.getPrivileges().contains( "6" ) && oldRole.getPrivileges().contains( "14" )
+            && oldRole.getPrivileges().contains( "26" ) && oldRole.getPrivileges().contains( "27" )
+            && oldRole.getPrivileges().contains( "28" ) && oldRole.getPrivileges().contains( "29" )
+            && oldRole.getPrivileges().contains( "69" ) && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-repository-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 5
-            && oldRole.getPrivileges().contains( "5" )
-            && oldRole.getPrivileges().contains( "6" )
-            && oldRole.getPrivileges().contains( "7" )
-            && oldRole.getPrivileges().contains( "8" )
-            && oldRole.getPrivileges().contains( "10" )
-            && oldRole.getRoles().size() == 0 )
+        else if ( "ui-repository-targets-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 5
+            && oldRole.getPrivileges().contains( "45" ) && oldRole.getPrivileges().contains( "46" )
+            && oldRole.getPrivileges().contains( "47" ) && oldRole.getPrivileges().contains( "48" )
+            && oldRole.getPrivileges().contains( "56" ) && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-group-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 5
-            && oldRole.getPrivileges().contains( "6" )
-            && oldRole.getPrivileges().contains( "13" )
-            && oldRole.getPrivileges().contains( "14" )
-            && oldRole.getPrivileges().contains( "15" )
-            && oldRole.getPrivileges().contains( "16" )
-            && oldRole.getRoles().size() == 0 )
+        else if ( "ui-users-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 5
+            && oldRole.getPrivileges().contains( "35" ) && oldRole.getPrivileges().contains( "38" )
+            && oldRole.getPrivileges().contains( "39" ) && oldRole.getPrivileges().contains( "40" )
+            && oldRole.getPrivileges().contains( "41" ) && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-routing-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 6
-            && oldRole.getPrivileges().contains( "6" )
-            && oldRole.getPrivileges().contains( "14" )
-            && oldRole.getPrivileges().contains( "22" )
-            && oldRole.getPrivileges().contains( "23" )
-            && oldRole.getPrivileges().contains( "24" )
-            && oldRole.getPrivileges().contains( "25" )
-            && oldRole.getRoles().size() == 0 )
+        else if ( "ui-roles-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 5
+            && oldRole.getPrivileges().contains( "31" ) && oldRole.getPrivileges().contains( "34" )
+            && oldRole.getPrivileges().contains( "35" ) && oldRole.getPrivileges().contains( "36" )
+            && oldRole.getPrivileges().contains( "37" ) && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-scheduled-tasks-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 7
-            && oldRole.getPrivileges().contains( "6" )
-            && oldRole.getPrivileges().contains( "14" )
-            && oldRole.getPrivileges().contains( "26" )
-            && oldRole.getPrivileges().contains( "27" )
-            && oldRole.getPrivileges().contains( "28" )
-            && oldRole.getPrivileges().contains( "29" )
-            && oldRole.getPrivileges().contains( "69" )
-            && oldRole.getRoles().size() == 0 )
+        else if ( "ui-privileges-admin".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 7
+            && oldRole.getPrivileges().contains( "6" ) && oldRole.getPrivileges().contains( "14" )
+            && oldRole.getPrivileges().contains( "30" ) && oldRole.getPrivileges().contains( "31" )
+            && oldRole.getPrivileges().contains( "32" ) && oldRole.getPrivileges().contains( "33" )
+            && oldRole.getPrivileges().contains( "46" ) && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-repository-targets-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 5
-            && oldRole.getPrivileges().contains( "45" )
-            && oldRole.getPrivileges().contains( "46" )
-            && oldRole.getPrivileges().contains( "47" )
-            && oldRole.getPrivileges().contains( "48" )
-            && oldRole.getPrivileges().contains( "56" )
-            && oldRole.getRoles().size() == 0 )
+        else if ( "ui-basic".equals( oldRole.getId() ) && oldRole.getPrivileges().size() == 3
+            && oldRole.getPrivileges().contains( "1" ) && oldRole.getPrivileges().contains( "2" )
+            && oldRole.getPrivileges().contains( "64" ) && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
-        else if ( "ui-users-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 5
-            && oldRole.getPrivileges().contains( "35" )
-            && oldRole.getPrivileges().contains( "38" )
-            && oldRole.getPrivileges().contains( "39" )
-            && oldRole.getPrivileges().contains( "40" )
-            && oldRole.getPrivileges().contains( "41" )
-            && oldRole.getRoles().size() == 0 )
-        {
-            result = false;
-        }
-        else if ( "ui-roles-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 5
-            && oldRole.getPrivileges().contains( "31" )
-            && oldRole.getPrivileges().contains( "34" )
-            && oldRole.getPrivileges().contains( "35" )
-            && oldRole.getPrivileges().contains( "36" )
-            && oldRole.getPrivileges().contains( "37" )
-            && oldRole.getRoles().size() == 0 )
-        {
-            result = false;
-        }
-        else if ( "ui-privileges-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 7
-            && oldRole.getPrivileges().contains( "6" )
-            && oldRole.getPrivileges().contains( "14" )
-            && oldRole.getPrivileges().contains( "30" )
-            && oldRole.getPrivileges().contains( "31" )
-            && oldRole.getPrivileges().contains( "32" )
-            && oldRole.getPrivileges().contains( "33" )
-            && oldRole.getPrivileges().contains( "46" )
-            && oldRole.getRoles().size() == 0 )
-        {
-            result = false;
-        }
-        else if ( "ui-basic".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 3
-            && oldRole.getPrivileges().contains( "1" )
-            && oldRole.getPrivileges().contains( "2" )
-            && oldRole.getPrivileges().contains( "64" )
-            && oldRole.getRoles().size() == 0 )
-        {
-            result = false;
-        }
-        
+
         return result;
     }
-    
+
     private Set<String> getRolesToRemove()
     {
         Set<String> set = new HashSet<String>();
-        
+
         set.add( "admin" );
         set.add( "deployment" );
         set.add( "anonymous" );
@@ -464,14 +391,14 @@ public class Upgrade200to201
         set.add( "ui-roles-admin" );
         set.add( "ui-privileges-admin" );
         set.add( "ui-basic" );
-        
+
         return set;
     }
-    
+
     private Set<String> getPrivsToRemove()
     {
         Set<String> set = new HashSet<String>();
-        
+
         set.add( "T1" );
         set.add( "T2" );
         set.add( "T3" );
@@ -547,26 +474,27 @@ public class Upgrade200to201
         set.add( "70" );
         set.add( "71" );
         set.add( "72" );
-        
+
         return set;
     }
-    
+
     private static class RoleMap
     {
         private String oldId;
+
         private String newId;
-        
+
         protected RoleMap( String oldId, String newId )
         {
             this.oldId = oldId;
             this.newId = newId;
         }
-        
+
         public String getNewId()
         {
             return newId;
         }
-        
+
         public String getOldId()
         {
             return oldId;

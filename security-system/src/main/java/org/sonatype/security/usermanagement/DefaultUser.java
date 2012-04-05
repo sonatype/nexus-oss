@@ -76,7 +76,7 @@ public class DefaultUser
             }
         }
     }
-    
+
     public String getFirstName()
     {
         return firstName;

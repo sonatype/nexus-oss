@@ -28,9 +28,9 @@ public class UnitTestDynamicSecurityResource
     private boolean configCalledAfterSetDirty = false;
 
     private static int INSTANCE_COUNT = 1;
-    
+
     private String privId = "priv-" + INSTANCE_COUNT++;
-    
+
     public String getId()
     {
         return privId;
@@ -39,10 +39,10 @@ public class UnitTestDynamicSecurityResource
     protected Configuration doGetConfiguration()
     {
         configCalledAfterSetDirty = true;
-        
+
         setConfigCalledAfterSetDirty( true );
         Configuration config = new Configuration();
-        
+
         CPrivilege priv = new CPrivilege();
         priv.setId( privId );
         priv.setName( privId );
@@ -52,14 +52,14 @@ public class UnitTestDynamicSecurityResource
         method.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
         method.setValue( "read" );
         priv.addProperty( method );
-        
+
         CProperty permission = new CProperty();
         permission.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
-        permission.setValue( "foo:bar:"+ privId );
+        permission.setValue( "foo:bar:" + privId );
         priv.addProperty( permission );
-        
+
         config.addPrivilege( priv );
-        
+
         return config;
     }
 
@@ -76,13 +76,11 @@ public class UnitTestDynamicSecurityResource
     @Override
     protected void setDirty( boolean dirty )
     {
-        if( dirty )
+        if ( dirty )
         {
             this.configCalledAfterSetDirty = false;
         }
         super.setDirty( dirty );
     }
-    
-    
-    
+
 }

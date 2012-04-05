@@ -55,10 +55,11 @@ public class SecurityDataUpgraderTest
     public void testFrom100()
         throws Exception
     {
-        copyFromClasspathToFile( "/org/sonatype/security/model/upgrade/data-upgrade/security.xml", getSecurityConfiguration() );
+        copyFromClasspathToFile( "/org/sonatype/security/model/upgrade/data-upgrade/security.xml",
+                                 getSecurityConfiguration() );
 
-        Configuration configuration = configurationUpgrader
-            .loadOldConfiguration( new File( getSecurityConfiguration() ) );
+        Configuration configuration =
+            configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 

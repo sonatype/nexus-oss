@@ -25,7 +25,7 @@ public class ApplicationPrivilegePermissionPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {
     public static final String ID = "permission";
-    
+
     public String getHelpText()
     {
         return "The Shiro permission string associated with this privilege";
@@ -40,7 +40,7 @@ public class ApplicationPrivilegePermissionPropertyDescriptor
     {
         return "Permission";
     }
-    
+
     public String getType()
     {
         return "string";

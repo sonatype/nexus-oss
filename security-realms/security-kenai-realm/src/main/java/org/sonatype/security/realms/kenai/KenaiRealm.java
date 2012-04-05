@@ -53,7 +53,7 @@ import java.util.Set;
 
 /**
  * A Realm that connects to a java.net kenai API.
- *
+ * 
  * @author Brian Demers
  */
 @Singleton
@@ -84,9 +84,9 @@ public class KenaiRealm
     }
 
     /*
-    * (non-Javadoc)
-    * @see org.jsecurity.realm.AuthenticatingRealm#getCredentialsMatcher()
-    */
+     * (non-Javadoc)
+     * @see org.jsecurity.realm.AuthenticatingRealm#getCredentialsMatcher()
+     */
     @Override
     public CredentialsMatcher getCredentialsMatcher()
     {
@@ -124,11 +124,10 @@ public class KenaiRealm
         return new SimpleAuthenticationInfo( principal, credentials, getName() );
     }
 
-
     private boolean authenticateViaUrl( String username, String password )
     {
-        StringBuffer buffer = new StringBuffer( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() ).append(
-            "api/login/authenticate.json" );
+        StringBuffer buffer =
+            new StringBuffer( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() ).append( "api/login/authenticate.json" );
         Response response = this.makeRemoteAuthcRequest( username, password, buffer.toString() );
 
         try
@@ -136,9 +135,8 @@ public class KenaiRealm
             boolean success = response.getStatus().isSuccess();
             if ( !success )
             {
-                this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}",
-                                   new Object[]{ username, response.getRequest().getResourceRef(),
-                                       response.getStatus() } );
+                this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}", new Object[] { username,
+                    response.getRequest().getResourceRef(), response.getStatus() } );
             }
             return success;
         }
@@ -172,7 +170,7 @@ public class KenaiRealm
         return response;
     }
 
-    //------------ AUTHORIZATION ------------
+    // ------------ AUTHORIZATION ------------
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
@@ -215,9 +213,8 @@ public class KenaiRealm
             }
         }
 
-        throw new AuthorizationException(
-            "Failed to authorize user: " + username + " for url: " + response.getRequest().getResourceRef() + " status:"
-                + response.getStatus() );
+        throw new AuthorizationException( "Failed to authorize user: " + username + " for url: "
+            + response.getRequest().getResourceRef() + " status:" + response.getStatus() );
 
     }
 
