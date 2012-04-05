@@ -823,10 +823,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
             {
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
             }
-            else if ( t instanceof StorageException )
-            {
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t );
-            }
             else if ( t instanceof RepositoryNotAvailableException )
             {
                 throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t );
@@ -862,6 +858,15 @@ public abstract class AbstractResourceStoreContentPlexusResource
             else if ( t instanceof AccessDeniedException )
             {
                 challengeIfNeeded( req, res, (AccessDeniedException) t );
+            }
+            else if ( t instanceof IOException )
+            {
+                // StorageException is subclass of IOEx, it will be catched here
+
+                // Internal error, we force it to log
+                shouldLogInfoStackTrace = true;
+
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t );
             }
             else
             {
