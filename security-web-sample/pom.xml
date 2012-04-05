@@ -70,7 +70,6 @@
     <dependency>
       <groupId>org.sonatype.sisu.inject</groupId>
       <artifactId>guice-multibindings</artifactId>
-      <version>${sisu-guice.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.sonatype.sisu</groupId>
@@ -109,6 +108,13 @@
       <groupId>com.ning</groupId>
       <artifactId>async-http-client</artifactId>
       <version>1.6.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>3.1</version>
       <scope>test</scope>
     </dependency>
 
