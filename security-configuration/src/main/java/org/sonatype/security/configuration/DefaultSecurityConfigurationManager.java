@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -37,6 +38,7 @@ import org.sonatype.security.configuration.validator.SecurityValidationContext;
 public class DefaultSecurityConfigurationManager
     implements SecurityConfigurationManager
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     @Named( "file" )
@@ -44,9 +46,6 @@ public class DefaultSecurityConfigurationManager
 
     @Inject
     private SecurityConfigurationValidator validator;
-
-    @Inject
-    private Logger logger;
 
     /**
      * This will hold the current configuration in memory, to reload, will need to set this to null

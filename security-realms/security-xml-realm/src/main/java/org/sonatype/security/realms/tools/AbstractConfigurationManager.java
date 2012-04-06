@@ -13,15 +13,13 @@
 package org.sonatype.security.realms.tools;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.model.Configuration;
-
-import com.google.inject.Inject;
 
 public abstract class AbstractConfigurationManager
     implements ConfigurationManager
 {
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     protected Logger getLogger()
     {

@@ -15,11 +15,11 @@ package org.sonatype.security.realms.tools;
 import java.util.List;
 
 import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
@@ -37,8 +37,7 @@ import org.sonatype.security.model.Configuration;
 public class DefaultSecurityConfigurationCleaner
     implements SecurityConfigurationCleaner
 {
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public void privilegeRemoved( Configuration configuration, String privilegeId )
     {

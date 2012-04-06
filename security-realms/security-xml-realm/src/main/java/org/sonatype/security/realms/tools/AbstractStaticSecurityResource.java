@@ -17,12 +17,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import javax.inject.Inject;
-
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 
@@ -34,8 +33,7 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 public abstract class AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     protected boolean dirty = false;
 
