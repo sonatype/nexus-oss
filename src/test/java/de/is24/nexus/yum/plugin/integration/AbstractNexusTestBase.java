@@ -31,12 +31,12 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
-import org.apache.maven.cli.MavenCli;
 import org.apache.maven.index.artifact.Gav;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,23 +220,24 @@ public class AbstractNexusTestBase {
     return format("{id : '%s', name: '%s'}", repo.getId(), repo.getName());
   }
 
-  protected void givenUploadedRpmToStaging(String groupId, String artifactId, String version) throws NoSuchAlgorithmException, IOException {
-    File rpmFile = createDummyRpm(artifactId, version);
-    executeMaven("deploy:deploy-file", "-Dfile=" + rpmFile.getAbsolutePath(),
-      "-Durl=" + SERVICE_BASE_URL + "/staging/deploy/maven2", "-DgroupId=" + groupId,
-      "-DartifactId=" + artifactId,
-      "-Dversion=" + version, "-Dpackaging=rpm",
-      "-DrepositoryId=local-nexus", "-s",
-      "../src/test/resources/maven/settings.xml");
+  protected void givenUploadedRpmToStaging(String groupId, String artifactId, String version) throws NoSuchAlgorithmException, IOException,
+      AuthenticationException {
+    final File rpmFile = createDummyRpm(artifactId, version);
+    final String url = getRpmStagingUploadUrl(groupId, artifactId, version);
+    final HttpPut request = new HttpPut(url);
+    setCredentials(request);
+    request.setEntity(new FileEntity(rpmFile, "application/x-rpm"));
+
+    LOG.info("Uploading {} to {} ...", rpmFile, url);
+    final HttpResponse response = client.execute(request);
+    consume(response.getEntity());
+    assertThat(response.getStatusLine().getStatusCode(), is(SC_CREATED));
   }
 
-  protected void executeMaven(String... params) {
-    final MavenCli maven = new MavenCli();
-    int exitCode = maven.doMain(params, "target", null, null);
-
-    if (exitCode != 0) {
-      throw new RuntimeException("Maven ended with exit code " + exitCode);
-    }
+  private String getRpmStagingUploadUrl(String groupId, String artifactId, String version) {
+    final String url = SERVICE_BASE_URL + "/staging/deploy/maven2/" + groupId.replace('.', '/') + "/" + artifactId + "/" + version + "/"
+        + artifactId + "-" + version + ".rpm";
+    return url;
   }
 
   protected String getStagingRepositoryId(String profileId) throws Exception {
