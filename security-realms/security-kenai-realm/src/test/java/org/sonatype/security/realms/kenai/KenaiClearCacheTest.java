@@ -12,16 +12,12 @@
  */
 package org.sonatype.security.realms.kenai;
 
+import java.util.Collections;
+
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.EventMulticaster;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.events.SecurityConfigurationChangedEvent;
-
-import java.util.Collections;
 
 public class KenaiClearCacheTest
     extends AbstractKenaiRealmTest

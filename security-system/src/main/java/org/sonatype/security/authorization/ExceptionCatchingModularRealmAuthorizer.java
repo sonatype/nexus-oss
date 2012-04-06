@@ -15,13 +15,13 @@ package org.sonatype.security.authorization;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.shiro.authz.AuthorizationException;
 
 /**
  * A implementation of the Shiro ModularRealmAuthorizer, that catches exceptions caused by individual realms and ignores

@@ -15,8 +15,8 @@ package org.sonatype.security.authorization.xml;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;

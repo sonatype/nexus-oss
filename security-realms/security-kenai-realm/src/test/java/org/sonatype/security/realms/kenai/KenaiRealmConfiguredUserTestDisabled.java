@@ -17,7 +17,6 @@ import java.util.Properties;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;

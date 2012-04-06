@@ -12,18 +12,19 @@
  */
 package org.sonatype.security.realms.kenai;
 
-import com.sonatype.security.realms.kenai.config.model.Configuration;
+import java.io.File;
+import java.net.ServerSocket;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Properties;
+
 import org.sonatype.jettytestsuite.ServletInfo;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 
-import java.io.File;
-import java.net.ServerSocket;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Properties;
+import com.sonatype.security.realms.kenai.config.model.Configuration;
 
 public abstract class AbstractKenaiRealmTest
     extends AbstractSecurityTestCase

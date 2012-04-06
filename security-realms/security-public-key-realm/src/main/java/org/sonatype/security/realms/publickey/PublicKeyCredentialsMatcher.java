@@ -12,14 +12,14 @@
  */
 package org.sonatype.security.realms.publickey;
 
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.credential.CredentialsMatcher;
-
 import java.security.PublicKey;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
 
 /**
  * Matches authentication tokens which are {@link java.security.PublicKey}.

@@ -17,7 +17,6 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.model.AbstractSecurityConfigTest;
-import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
 public abstract class AbstractSecurityConfigurationSourceTest
     extends AbstractSecurityConfigTest

@@ -12,17 +12,13 @@
  */
 package org.sonatype.security.rest.authentication;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.security.rest.model.AuthenticationLoginResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
-import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * The login resource handler. It creates a user token.

@@ -13,7 +13,6 @@
 package org.sonatype.security.web.testapp;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,11 +31,8 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserStatus;
 
 public class SampleAppTestDisabled

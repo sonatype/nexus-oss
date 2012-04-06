@@ -15,8 +15,6 @@ package org.sonatype.security.model.source;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.security.model.source.SecurityModelConfigurationSource;
-
 public class StaticConfigurationSourceTest
     extends AbstractSecurityConfigurationSourceTest
 {

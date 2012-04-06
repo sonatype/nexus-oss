@@ -12,12 +12,12 @@
  */
 package org.sonatype.security.realms.kenai;
 
+import java.util.Arrays;
+import java.util.Iterator;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Arrays;
-import java.util.Iterator;
 
 public class KenaiProjectsJsonGenerator
 {

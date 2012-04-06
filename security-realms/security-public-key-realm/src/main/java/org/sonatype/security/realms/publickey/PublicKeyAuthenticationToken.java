@@ -12,9 +12,9 @@
  */
 package org.sonatype.security.realms.publickey;
 
-import org.apache.shiro.authc.AuthenticationToken;
-
 import java.security.PublicKey;
+
+import org.apache.shiro.authc.AuthenticationToken;
 
 /**
  * {@link AuthenticationToken} for a {@link PublicKey}.

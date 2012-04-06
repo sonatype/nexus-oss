@@ -12,6 +12,15 @@
  */
 package org.sonatype.security.realms.kenai;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -26,7 +35,6 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,14 +50,6 @@ import org.restlet.data.Response;
 import org.slf4j.Logger;
 import org.sonatype.inject.Description;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
-
-import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A Realm that connects to a java.net kenai API.

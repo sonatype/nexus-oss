@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;

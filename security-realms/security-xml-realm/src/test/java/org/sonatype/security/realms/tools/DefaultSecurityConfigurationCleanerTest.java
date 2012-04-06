@@ -19,8 +19,6 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.realms.tools.DefaultSecurityConfigurationCleaner;
-import org.sonatype.security.realms.tools.SecurityConfigurationCleaner;
 
 public class DefaultSecurityConfigurationCleanerTest
     extends AbstractSecurityTestCase

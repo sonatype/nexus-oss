@@ -12,33 +12,13 @@
  */
 package org.sonatype.security.realms.kenai;
 
-import com.sonatype.security.realms.kenai.config.model.Configuration;
 import junit.framework.Assert;
+
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.jettytestsuite.ServletInfo;
-import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.jettytestsuite.WebappContext;
-import org.sonatype.plexus.appevents.EventMulticaster;
-import org.sonatype.security.AbstractSecurityTestCase;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.events.SecurityConfigurationChangedEvent;
-import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.net.ServerSocket;
-import java.net.URL;
-import java.security.Security;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Properties;
 
 public class KenaiRealmTest
     extends AbstractKenaiRealmTest
