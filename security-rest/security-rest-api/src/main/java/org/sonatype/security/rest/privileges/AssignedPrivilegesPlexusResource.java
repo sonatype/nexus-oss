@@ -51,8 +51,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * privilege is assigned to this user (through roles).
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "AssignedPrivilegesPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "AssignedPrivilegesPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( AssignedPrivilegesPlexusResource.RESOURCE_URI )

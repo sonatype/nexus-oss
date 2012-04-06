@@ -29,8 +29,8 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
 @Singleton
-@Named( value = "Mock" )
-@Typed( value = UserManager.class )
+@Named( "Mock" )
+@Typed( UserManager.class )
 public class MockUserManager
     extends AbstractReadOnlyUserManager
 {

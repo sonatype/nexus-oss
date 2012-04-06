@@ -44,9 +44,9 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = UserManager.class )
-@Named( value = "allConfigured" )
-@Description( value = "All Configured Users" )
+@Typed( UserManager.class )
+@Named( "allConfigured" )
+@Description( "All Configured Users" )
 public class ConfiguredUsersUserManager
     extends AbstractReadOnlyUserManager
 {
@@ -58,7 +58,7 @@ public class ConfiguredUsersUserManager
     private SecuritySystem securitySystem;
 
     @Inject
-    @Named( value = "resourceMerging" )
+    @Named( "resourceMerging" )
     private ConfigurationManager configuration;
 
     public static final String SOURCE = "allConfigured";

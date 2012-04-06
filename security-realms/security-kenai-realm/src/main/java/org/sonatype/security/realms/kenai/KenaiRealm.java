@@ -57,9 +57,9 @@ import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = Realm.class )
-@Named( value = "kenai" )
-@Description( value = "Kenai Realm" )
+@Typed( Realm.class )
+@Named( "kenai" )
+@Description( "Kenai Realm" )
 public class KenaiRealm
     extends AuthorizingRealm
 {

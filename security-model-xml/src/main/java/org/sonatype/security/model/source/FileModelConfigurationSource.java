@@ -36,8 +36,8 @@ import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
  * @author cstamas
  */
 @Singleton
-@Typed( value = SecurityModelConfigurationSource.class )
-@Named( value = "file" )
+@Typed( SecurityModelConfigurationSource.class )
+@Named( "file" )
 public class FileModelConfigurationSource
     extends AbstractSecurityModelConfigurationSource
 {
@@ -46,7 +46,7 @@ public class FileModelConfigurationSource
      * The configuration file.
      */
     @Inject
-    @Named( value = "${security-xml-file}" )
+    @Named( "${security-xml-file}" )
     private File configurationFile;
 
     /**
@@ -59,7 +59,7 @@ public class FileModelConfigurationSource
      * The defaults configuration source.
      */
     @Inject
-    @Named( value = "static" )
+    @Named( "static" )
     private SecurityModelConfigurationSource securityDefaults;
 
     /** Flag to mark defaulted config */

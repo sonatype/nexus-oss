@@ -22,8 +22,8 @@ import javax.inject.Singleton;
  * Default implementation of PasswordGenerator.
  */
 @Singleton
-@Typed( value = PasswordGenerator.class )
-@Named( value = "default" )
+@Typed( PasswordGenerator.class )
+@Named( "default" )
 public class DefaultPasswordGenerator
     implements PasswordGenerator
 {

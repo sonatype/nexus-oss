@@ -44,8 +44,8 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
  * @author velo
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "ExternalRoleMappingPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "ExternalRoleMappingPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( ExternalRoleMappingPlexusResource.RESOURCE_URI )
@@ -86,8 +86,8 @@ public class ExternalRoleMappingPlexusResource
     @Override
     @GET
     @ResourceMethodSignature( output = ExternalRoleMappingResourceResponse.class, pathParams = {
-        @PathParam( value = ExternalRoleMappingPlexusResource.SOURCE_ID_KEY ),
-        @PathParam( value = ExternalRoleMappingPlexusResource.ROLE_ID_KEY ) } )
+        @PathParam( ExternalRoleMappingPlexusResource.SOURCE_ID_KEY ),
+        @PathParam( ExternalRoleMappingPlexusResource.ROLE_ID_KEY ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

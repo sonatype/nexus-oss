@@ -19,8 +19,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Singleton
-@Typed( value = ConfigurationIdGenerator.class )
-@Named( value = "default" )
+@Typed( ConfigurationIdGenerator.class )
+@Named( "default" )
 public class DefaultConfigurationIdGenerator
     implements ConfigurationIdGenerator
 {

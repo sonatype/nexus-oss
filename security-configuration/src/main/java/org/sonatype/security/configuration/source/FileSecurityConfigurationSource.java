@@ -37,8 +37,8 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  * @author tstevens
  */
 @Singleton
-@Typed( value = SecurityConfigurationSource.class )
-@Named( value = "file" )
+@Typed( SecurityConfigurationSource.class )
+@Named( "file" )
 public class FileSecurityConfigurationSource
     extends AbstractSecurityConfigurationSource
 {
@@ -47,7 +47,7 @@ public class FileSecurityConfigurationSource
      * The configuration file.
      */
     @Inject
-    @Named( value = "${application-conf}/security-configuration.xml" )
+    @Named( "${application-conf}/security-configuration.xml" )
     private File configurationFile;
 
     // /**
@@ -60,7 +60,7 @@ public class FileSecurityConfigurationSource
      * The defaults configuration source.
      */
     @Inject
-    @Named( value = "static" )
+    @Named( "static" )
     private SecurityConfigurationSource securityDefaults;
 
     @Inject

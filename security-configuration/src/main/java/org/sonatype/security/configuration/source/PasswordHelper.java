@@ -25,8 +25,8 @@ import org.sonatype.plexus.components.cipher.PlexusCipherException;
  * base-configuration (or something) it becomes less secure, as we are using the same key for everything)
  */
 @Singleton
-@Typed( value = PasswordHelper.class )
-@Named( value = "default" )
+@Typed( PasswordHelper.class )
+@Named( "default" )
 public class PasswordHelper
 {
 

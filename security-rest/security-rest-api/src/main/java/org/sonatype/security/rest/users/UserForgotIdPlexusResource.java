@@ -37,8 +37,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author tstevens
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserForgotIdPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserForgotIdPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserForgotIdPlexusResource.RESOURCE_URI )
@@ -78,7 +78,7 @@ public class UserForgotIdPlexusResource
      */
     @Override
     @POST
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "email" ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( "email" ) } )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

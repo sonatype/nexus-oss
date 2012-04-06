@@ -47,9 +47,9 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = Realm.class )
-@Named( value = XmlAuthorizingRealm.ROLE )
-@Description( value = "Xml Authorizing Realm" )
+@Typed( Realm.class )
+@Named( XmlAuthorizingRealm.ROLE )
+@Description( "Xml Authorizing Realm" )
 public class XmlAuthorizingRealm
     extends AuthorizingRealm
     implements Realm

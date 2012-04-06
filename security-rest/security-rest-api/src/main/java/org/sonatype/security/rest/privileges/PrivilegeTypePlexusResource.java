@@ -46,8 +46,8 @@ import org.sonatype.security.rest.model.PrivilegeTypeResourceResponse;
  * @author bdemers
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "PrivilegeTypePlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "PrivilegeTypePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( PrivilegeTypePlexusResource.RESOURCE_URI )
@@ -58,7 +58,7 @@ public class PrivilegeTypePlexusResource
     public static final String RESOURCE_URI = "/privilege_types";
 
     @Inject
-    @Named( value = "resourceMerging" )
+    @Named( "resourceMerging" )
     private ConfigurationManager configurationManager;
 
     @Override

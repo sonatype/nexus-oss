@@ -43,13 +43,13 @@ import com.sonatype.security.realms.kenai.config.model.io.xpp3.KenaiRealmConfigu
 
 @Singleton
 @Named
-@Typed( value = KenaiRealmConfiguration.class )
+@Typed( KenaiRealmConfiguration.class )
 public class DefaultKenaiRealmConfiguration
     implements KenaiRealmConfiguration
 {
 
     @Inject
-    @Named( value = "${application-conf}/kenai-realm.xml" )
+    @Named( "${application-conf}/kenai-realm.xml" )
     private File configurationFile;
 
     @Inject

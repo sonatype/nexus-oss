@@ -40,8 +40,8 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
  * AuthorizationManager that wraps roles from security-xml-realm.
  */
 @Singleton
-@Typed( value = AuthorizationManager.class )
-@Named( value = "default" )
+@Typed( AuthorizationManager.class )
+@Named( "default" )
 public class SecurityXmlAuthorizationManager
     implements AuthorizationManager
 {
@@ -49,7 +49,7 @@ public class SecurityXmlAuthorizationManager
     public static final String SOURCE = "default";
 
     @Inject
-    @Named( value = "resourceMerging" )
+    @Named( "resourceMerging" )
     private ConfigurationManager configuration;
 
     @Inject

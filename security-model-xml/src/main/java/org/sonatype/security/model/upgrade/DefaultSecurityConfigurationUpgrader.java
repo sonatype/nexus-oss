@@ -39,8 +39,8 @@ import org.sonatype.security.model.Configuration;
  * @author cstamas
  */
 @Singleton
-@Typed( value = SecurityConfigurationUpgrader.class )
-@Named( value = "default" )
+@Typed( SecurityConfigurationUpgrader.class )
+@Named( "default" )
 public class DefaultSecurityConfigurationUpgrader
     implements SecurityConfigurationUpgrader
 {

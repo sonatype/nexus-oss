@@ -43,14 +43,14 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = ConfigurationManager.class )
-@Named( value = "resourceMerging" )
+@Typed( ConfigurationManager.class )
+@Named( "resourceMerging" )
 public class ResourceMergingConfigurationManager
     extends AbstractConfigurationManager
 {
     // This will handle all normal security.xml file loading/storing
     @Inject
-    @Named( value = "default" )
+    @Named( "default" )
     private ConfigurationManager manager;
 
     @Inject

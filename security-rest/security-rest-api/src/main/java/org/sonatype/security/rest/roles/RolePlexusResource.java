@@ -48,8 +48,8 @@ import org.sonatype.security.rest.model.RoleResourceResponse;
  * @author tstevens
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "RolePlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "RolePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( RolePlexusResource.RESOURCE_URI )
@@ -96,7 +96,7 @@ public class RolePlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = RoleResourceResponse.class, pathParams = { @PathParam( value = "roleId" ) } )
+    @ResourceMethodSignature( output = RoleResourceResponse.class, pathParams = { @PathParam( "roleId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -129,7 +129,7 @@ public class RolePlexusResource
      */
     @Override
     @PUT
-    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class, pathParams = { @PathParam( value = "roleId" ) } )
+    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class, pathParams = { @PathParam( "roleId" ) } )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -185,7 +185,7 @@ public class RolePlexusResource
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "roleId" ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( "roleId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

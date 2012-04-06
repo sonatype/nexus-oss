@@ -23,7 +23,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 
 @Singleton
-@Typed( value = UserManagerFacade.class )
+@Typed( UserManagerFacade.class )
 @Named( "default" )
 public class UserManagerFacade
 {

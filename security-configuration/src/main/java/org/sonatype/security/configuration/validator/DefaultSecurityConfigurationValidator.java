@@ -23,8 +23,8 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 @Singleton
-@Typed( value = SecurityConfigurationValidator.class )
-@Named( value = "default" )
+@Typed( SecurityConfigurationValidator.class )
+@Named( "default" )
 public class DefaultSecurityConfigurationValidator
     implements SecurityConfigurationValidator
 {

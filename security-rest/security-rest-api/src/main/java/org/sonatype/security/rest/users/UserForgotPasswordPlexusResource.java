@@ -39,8 +39,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author tstevens
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserForgotPasswordPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserForgotPasswordPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserForgotPasswordPlexusResource.RESOURCE_URI )

@@ -43,8 +43,8 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
  * @see UserListPlexusResource
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "PlexusUserListPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "PlexusUserListPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( PlexusUserListPlexusResource.RESOURCE_URI )
@@ -87,7 +87,7 @@ public class PlexusUserListPlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class, pathParams = { @PathParam( value = "sourceId" ) } )
+    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class, pathParams = { @PathParam( "sourceId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

@@ -29,8 +29,8 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * A Resource that simple returns "Hello".
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "sample-resource" )
+@Typed( PlexusResource.class )
+@Named( "sample-resource" )
 public class SimplePlexusResource
     extends AbstractPlexusResource
 {

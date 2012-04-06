@@ -37,8 +37,8 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
  * component is loaded from a servelet ), but that might be cleaner then what we are doing now.
  */
 @Singleton
-@Typed( value = RealmSecurityManager.class )
-@Named( value = "web" )
+@Typed( RealmSecurityManager.class )
+@Named( "web" )
 public class WebRealmSecurityManager
     extends DefaultWebSecurityManager
     implements org.apache.shiro.util.Initializable

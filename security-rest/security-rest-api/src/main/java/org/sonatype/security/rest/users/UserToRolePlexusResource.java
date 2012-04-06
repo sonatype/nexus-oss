@@ -51,8 +51,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author bdemers
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserToRolePlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserToRolePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserToRolePlexusResource.RESOURCE_URI )
@@ -107,8 +107,8 @@ public class UserToRolePlexusResource
      */
     @Override
     @PUT
-    @ResourceMethodSignature( input = UserToRoleResourceRequest.class, pathParams = { @PathParam( value = "sourceId" ),
-        @PathParam( value = "userId" ) } )
+    @ResourceMethodSignature( input = UserToRoleResourceRequest.class, pathParams = { @PathParam( "sourceId" ),
+        @PathParam( "userId" ) } )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -179,8 +179,8 @@ public class UserToRolePlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = UserToRoleResourceRequest.class, pathParams = {
-        @PathParam( value = "sourceId" ), @PathParam( value = "userId" ) } )
+    @ResourceMethodSignature( output = UserToRoleResourceRequest.class, pathParams = { @PathParam( "sourceId" ),
+        @PathParam( value = "userId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -218,7 +218,7 @@ public class UserToRolePlexusResource
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "sourceId" ), @PathParam( value = "userId" ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( "sourceId" ), @PathParam( value = "userId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

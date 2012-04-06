@@ -29,8 +29,8 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  * @author cstamas
  */
 @Singleton
-@Typed( value = SecurityConfigurationSource.class )
-@Named( value = "static" )
+@Typed( SecurityConfigurationSource.class )
+@Named( "static" )
 public class StaticSecurityConfigurationSource
     extends AbstractSecurityConfigurationSource
 {

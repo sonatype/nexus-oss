@@ -35,8 +35,8 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = RealmSecurityManager.class )
-@Named( value = "default" )
+@Typed( RealmSecurityManager.class )
+@Named( "default" )
 public class DefaultRealmSecurityManager
     extends DefaultSecurityManager
     implements Initializable

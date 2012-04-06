@@ -21,8 +21,8 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserManager;
 
 @Singleton
-@Typed( value = UserManager.class )
-@Named( value = "MockUserManagerA" )
+@Typed( UserManager.class )
+@Named( "MockUserManagerA" )
 public class MockUserManagerA
     extends AbstractMockUserManager
 

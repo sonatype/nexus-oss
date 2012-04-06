@@ -47,8 +47,8 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
  * @author tstevens
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserListPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserListPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserListPlexusResource.RESOURCE_URI )

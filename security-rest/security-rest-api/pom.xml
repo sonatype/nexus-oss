@@ -29,9 +29,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-plexus-shim</artifactId>
-      <version>${sisu-inject.version}</version>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -143,6 +142,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>edu.umd.cs.mtc</groupId>
+      <artifactId>multithreadedtc</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -164,7 +169,7 @@
                   <excludes>
                     <exclude>org.codehaus.plexus:plexus-container-default:*</exclude>
                   </excludes>
-                  <message>The Plexus Container is banned, use org.sonatype.spice.inject:guice-plexus-shim.
+                  <message>The Plexus Container is banned, use org.sonatype.sisu:sisu-inject-plexus.
                   </message>
                 </bannedDependencies>
               </rules>
@@ -188,6 +193,5 @@
       </plugin>
     </plugins>
   </build>
-
 
 </project>

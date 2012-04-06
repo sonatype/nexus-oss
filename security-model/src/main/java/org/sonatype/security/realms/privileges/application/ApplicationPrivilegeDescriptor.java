@@ -31,8 +31,8 @@ import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 @Singleton
-@Typed( value = PrivilegeDescriptor.class )
-@Named( value = "ApplicationPrivilegeDescriptor" )
+@Typed( PrivilegeDescriptor.class )
+@Named( "ApplicationPrivilegeDescriptor" )
 public class ApplicationPrivilegeDescriptor
     extends AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
@@ -40,11 +40,11 @@ public class ApplicationPrivilegeDescriptor
     public static final String TYPE = "method";
 
     @Inject
-    @Named( value = "ApplicationPrivilegeMethodPropertyDescriptor" )
+    @Named( "ApplicationPrivilegeMethodPropertyDescriptor" )
     private PrivilegePropertyDescriptor methodProperty;
 
     @Inject
-    @Named( value = "ApplicationPrivilegePermissionPropertyDescriptor" )
+    @Named( "ApplicationPrivilegePermissionPropertyDescriptor" )
     private PrivilegePropertyDescriptor permissionProperty;
 
     public String getName()

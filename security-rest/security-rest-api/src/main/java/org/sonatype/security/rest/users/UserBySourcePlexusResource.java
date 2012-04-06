@@ -43,8 +43,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author bdemers
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserBySourcePlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserBySourcePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserBySourcePlexusResource.RESOURCE_URI )
@@ -89,8 +89,8 @@ public class UserBySourcePlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PlexusUserResourceResponse.class, pathParams = {
-        @PathParam( value = "sourceId" ), @PathParam( value = "sourceId" ) } )
+    @ResourceMethodSignature( output = PlexusUserResourceResponse.class, pathParams = { @PathParam( "sourceId" ),
+        @PathParam( value = "sourceId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

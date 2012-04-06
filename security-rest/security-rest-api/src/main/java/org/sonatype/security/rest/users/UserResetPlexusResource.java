@@ -40,8 +40,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author tstevens
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserResetPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserResetPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserResetPlexusResource.RESOURCE_URI )
@@ -81,7 +81,7 @@ public class UserResetPlexusResource
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "userId" ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( "userId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

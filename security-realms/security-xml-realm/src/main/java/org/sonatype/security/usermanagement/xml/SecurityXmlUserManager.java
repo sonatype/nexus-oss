@@ -49,9 +49,9 @@ import org.sonatype.security.usermanagement.UserStatus;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = UserManager.class )
-@Named( value = "default" )
-@Description( value = "Default" )
+@Typed( UserManager.class )
+@Named( "default" )
+@Description( "Default" )
 public class SecurityXmlUserManager
     extends AbstractUserManager
     implements RoleMappingUserManager
@@ -59,7 +59,7 @@ public class SecurityXmlUserManager
     public static final String SOURCE = "default";
 
     @Inject
-    @Named( value = "resourceMerging" )
+    @Named( "resourceMerging" )
     private ConfigurationManager configuration;
 
     @Inject

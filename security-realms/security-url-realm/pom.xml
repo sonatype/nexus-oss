@@ -31,9 +31,9 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-plexus-shim</artifactId>
-      <version>${sisu-inject.version}</version>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
