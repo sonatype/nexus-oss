@@ -98,11 +98,15 @@ public class CapabilitiesPlexusResource
         final boolean includeHidden = Boolean.parseBoolean(
             request.getResourceRef().getQueryAsForm().getFirstValue( "includeHidden", true, "false" )
         );
+        final boolean includeNotExposed = Boolean.parseBoolean(
+            request.getResourceRef().getQueryAsForm().getFirstValue( "includeNotExposed", true, "false" )
+        );
         final CapabilitiesListResponseResource result = new CapabilitiesListResponseResource();
 
         for ( final CapabilityReference reference : capabilityRegistry.getAll() )
         {
-            if ( includeHidden || !reference.context().descriptor().isHidden() )
+            if ( ( includeNotExposed || reference.context().descriptor().isExposed() ) &&
+                ( includeHidden || !reference.context().descriptor().isHidden() ) )
             {
                 result.addData(
                     asCapabilityListItemResource(

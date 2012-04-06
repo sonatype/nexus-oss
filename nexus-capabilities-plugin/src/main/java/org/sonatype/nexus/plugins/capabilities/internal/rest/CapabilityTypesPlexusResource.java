@@ -82,6 +82,9 @@ public class CapabilityTypesPlexusResource
         final boolean includeHidden = Boolean.parseBoolean(
             request.getResourceRef().getQueryAsForm().getFirstValue( "includeHidden", true, "false" )
         );
+        final boolean includeNotExposed = Boolean.parseBoolean(
+            request.getResourceRef().getQueryAsForm().getFirstValue( "includeNotExposed", true, "false" )
+        );
         final CapabilityTypeResourceResponse envelope = new CapabilityTypeResourceResponse();
 
         final CapabilityDescriptor[] descriptors = capabilityDescriptorRegistry.getAll();
@@ -90,7 +93,8 @@ public class CapabilityTypesPlexusResource
         {
             for ( final CapabilityDescriptor descriptor : descriptors )
             {
-                if ( descriptor.isExposed() && ( includeHidden || !descriptor.isHidden() ) )
+                if ( ( includeNotExposed || descriptor.isExposed() )
+                    && ( includeHidden || !descriptor.isHidden() ) )
                 {
                     final CapabilityTypeResource capabilityTypeResource = new CapabilityTypeResource();
                     capabilityTypeResource.setId( descriptor.type().toString() );
