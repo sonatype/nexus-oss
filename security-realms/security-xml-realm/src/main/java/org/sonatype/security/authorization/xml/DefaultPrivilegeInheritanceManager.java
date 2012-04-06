@@ -26,8 +26,8 @@ import javax.inject.Singleton;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = PrivilegeInheritanceManager.class )
-@Named( value = "default" )
+@Typed( PrivilegeInheritanceManager.class )
+@Named( "default" )
 public class DefaultPrivilegeInheritanceManager
     implements PrivilegeInheritanceManager
 {

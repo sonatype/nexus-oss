@@ -28,8 +28,8 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserStatus;
 
 @Singleton
-@Typed( value = UserManager.class )
-@Named( value = "MockUserManagerB" )
+@Typed( UserManager.class )
+@Named( "MockUserManagerB" )
 public class MockUserManagerB
     extends AbstractTestUserManager
 {

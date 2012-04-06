@@ -20,8 +20,8 @@ import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 @Singleton
-@Typed( value = StaticSecurityResource.class )
-@Named( value = "MockStaticSecurityResource" )
+@Typed( StaticSecurityResource.class )
+@Named( "MockStaticSecurityResource" )
 public class MockStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource

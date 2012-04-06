@@ -29,8 +29,8 @@ import org.sonatype.security.model.v2_0_4.io.xpp3.SecurityConfigurationXpp3Reade
 import org.sonatype.security.model.v2_0_5.upgrade.BasicVersionUpgrade;
 
 @Singleton
-@Typed( value = SecurityUpgrader.class )
-@Named( value = "2.0.4" )
+@Typed( SecurityUpgrader.class )
+@Named( "2.0.4" )
 public class Upgrade204to205
     implements SecurityUpgrader
 {

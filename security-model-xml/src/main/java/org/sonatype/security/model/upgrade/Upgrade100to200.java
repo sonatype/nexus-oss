@@ -33,8 +33,8 @@ import org.sonatype.security.legacy.model.v1_0_0.Configuration;
 import org.sonatype.security.legacy.model.v1_0_0.io.xpp3.SecurityLegacyConfigurationXpp3Reader;
 
 @Singleton
-@Typed( value = SecurityUpgrader.class )
-@Named( value = "1.0.0" )
+@Typed( SecurityUpgrader.class )
+@Named( "1.0.0" )
 public class Upgrade100to200
     implements SecurityUpgrader
 {

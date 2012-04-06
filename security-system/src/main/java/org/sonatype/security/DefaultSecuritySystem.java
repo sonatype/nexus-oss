@@ -71,8 +71,8 @@ import org.sonatype.sisu.ehcache.CacheManagerComponent;
  * This implementation wraps a Shiro SecurityManager, and adds user management.
  */
 @Singleton
-@Typed( value = SecuritySystem.class )
-@Named( value = "default" )
+@Typed( SecuritySystem.class )
+@Named( "default" )
 public class DefaultSecuritySystem
     implements SecuritySystem, EventListener
 {

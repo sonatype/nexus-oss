@@ -27,8 +27,8 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 
 @Singleton
-@Typed( value = AuthorizationManager.class )
-@Named( value = "sourceB" )
+@Typed( AuthorizationManager.class )
+@Named( "sourceB" )
 public class MockAuthorizationManagerB
     extends AbstractReadOnlyAuthorizationManager
 {

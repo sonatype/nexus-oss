@@ -25,8 +25,8 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.web.ProtectedPathManager;
 
 @Singleton
-@Typed( value = Application.class )
-@Named( value = "secureApplication" )
+@Typed( Application.class )
+@Named( "secureApplication" )
 public class PlexusSecureApplication
     extends PlexusRestletApplicationBridge
 {

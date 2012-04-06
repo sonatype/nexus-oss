@@ -44,8 +44,8 @@ import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
  * @see RoleListPlexusResource
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "PlexusRoleListPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "PlexusRoleListPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( PlexusRoleListPlexusResource.RESOURCE_URI )
@@ -84,7 +84,7 @@ public class PlexusRoleListPlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PlexusRoleListResourceResponse.class, pathParams = { @PathParam( value = "sourceId" ) } )
+    @ResourceMethodSignature( output = PlexusRoleListResourceResponse.class, pathParams = { @PathParam( "sourceId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

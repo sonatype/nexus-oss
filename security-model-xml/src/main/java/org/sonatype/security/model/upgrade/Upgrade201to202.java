@@ -34,8 +34,8 @@ import org.sonatype.security.model.v2_0_1.Configuration;
 import org.sonatype.security.model.v2_0_1.io.xpp3.SecurityConfigurationXpp3Reader;
 
 @Singleton
-@Typed( value = SecurityUpgrader.class )
-@Named( value = "2.0.1" )
+@Typed( SecurityUpgrader.class )
+@Named( "2.0.1" )
 public class Upgrade201to202
     implements SecurityUpgrader
 {

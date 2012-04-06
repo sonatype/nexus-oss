@@ -21,8 +21,8 @@ import javax.inject.Singleton;
 import org.sonatype.security.email.SecurityEmailer;
 
 @Singleton
-@Typed( value = SecurityEmailer.class )
-@Named( value = "default" )
+@Typed( SecurityEmailer.class )
+@Named( "default" )
 public class MockEmailer
     implements SecurityEmailer
 {

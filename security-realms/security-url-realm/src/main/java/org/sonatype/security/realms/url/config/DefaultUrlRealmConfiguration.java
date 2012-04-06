@@ -43,13 +43,13 @@ import com.sonatype.security.realms.url.config.model.io.xpp3.UrlRealmConfigurati
 
 @Singleton
 @Named
-@Typed( value = UrlRealmConfiguration.class )
+@Typed( UrlRealmConfiguration.class )
 public class DefaultUrlRealmConfiguration
     implements UrlRealmConfiguration
 {
 
     @Inject
-    @Named( value = "${application-conf}/url-realm.xml" )
+    @Named( "${application-conf}/url-realm.xml" )
     private File configurationFile;
 
     @Inject

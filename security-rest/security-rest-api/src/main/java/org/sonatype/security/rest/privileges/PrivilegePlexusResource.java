@@ -44,8 +44,8 @@ import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
  * @author tstevens
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "PrivilegePlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "PrivilegePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( PrivilegePlexusResource.RESOURCE_URI )
@@ -92,7 +92,7 @@ public class PrivilegePlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PrivilegeStatusResourceResponse.class, pathParams = { @PathParam( value = "privilegeId" ) } )
+    @ResourceMethodSignature( output = PrivilegeStatusResourceResponse.class, pathParams = { @PathParam( "privilegeId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -129,7 +129,7 @@ public class PrivilegePlexusResource
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "privilegeId" ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( "privilegeId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

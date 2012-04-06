@@ -30,8 +30,8 @@ import org.sonatype.security.model.v2_0_4.CUser;
 import org.sonatype.security.model.v2_0_4.upgrade.BasicVersionUpgrade;
 
 @Singleton
-@Typed( value = SecurityUpgrader.class )
-@Named( value = "2.0.3" )
+@Typed( SecurityUpgrader.class )
+@Named( "2.0.3" )
 public class Upgrade203to204
     implements SecurityUpgrader
 {

@@ -32,8 +32,8 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 
 @Singleton
-@Typed( value = Realm.class )
-@Named( value = "FakeRealm2" )
+@Typed( Realm.class )
+@Named( "FakeRealm2" )
 public class FakeRealm2
     extends AuthorizingRealm
 {

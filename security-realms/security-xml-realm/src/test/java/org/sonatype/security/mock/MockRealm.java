@@ -38,14 +38,14 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Singleton
-@Typed( value = Realm.class )
-@Named( value = "Mock" )
+@Typed( Realm.class )
+@Named( "Mock" )
 public class MockRealm
     extends AuthorizingRealm
 {
 
     @Inject
-    @Named( value = "Mock" )
+    @Named( "Mock" )
     private UserManager userManager;
 
     @Override

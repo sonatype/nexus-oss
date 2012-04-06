@@ -50,8 +50,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * REST resource for listing security roles and privileges. Supports pagination
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "RoleAndPrivilegeListPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "RoleAndPrivilegeListPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( RoleAndPrivilegeListPlexusResource.RESOURCE_URI )

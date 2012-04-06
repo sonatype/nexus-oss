@@ -47,8 +47,8 @@ import org.sonatype.security.usermanagement.UserManager;
  * @author bdemers
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserLocatorComponentListPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserLocatorComponentListPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserLocatorComponentListPlexusResource.RESOURCE_URI )

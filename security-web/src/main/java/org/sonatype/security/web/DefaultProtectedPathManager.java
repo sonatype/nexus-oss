@@ -28,8 +28,8 @@ import org.apache.shiro.web.filter.mgt.FilterChainManager;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = ProtectedPathManager.class )
-@Named( value = "default" )
+@Typed( ProtectedPathManager.class )
+@Named( "default" )
 public class DefaultProtectedPathManager
     implements ProtectedPathManager, FilterChainManagerAware
 {

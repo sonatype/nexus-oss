@@ -51,8 +51,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author tstevens
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserPlexusResource.RESOURCE_URI )
@@ -97,7 +97,7 @@ public class UserPlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( value = "userId" ) } )
+    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( "userId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -123,7 +123,7 @@ public class UserPlexusResource
      */
     @Override
     @POST
-    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( value = "userId" ) } )
+    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( "userId" ) } )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -184,7 +184,7 @@ public class UserPlexusResource
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "userId" ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( "userId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

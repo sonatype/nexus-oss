@@ -46,8 +46,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * REST resource to retrieve the tree of roles and privileges assigned to a user.
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "UserRoleTreePlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "UserRoleTreePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserRoleTreePlexusResource.RESOURCE_URI )

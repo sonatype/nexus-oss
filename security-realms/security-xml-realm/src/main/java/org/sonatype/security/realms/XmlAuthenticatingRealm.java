@@ -41,9 +41,9 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = Realm.class )
-@Named( value = XmlAuthenticatingRealm.ROLE )
-@Description( value = "Xml Authenticating Realm" )
+@Typed( Realm.class )
+@Named( XmlAuthenticatingRealm.ROLE )
+@Description( "Xml Authenticating Realm" )
 public class XmlAuthenticatingRealm
     extends AuthorizingRealm
     implements Realm
@@ -53,7 +53,7 @@ public class XmlAuthenticatingRealm
     private ConfigurationManager configuration;
 
     @Inject
-    public XmlAuthenticatingRealm( @Named( value = "resourceMerging" ) ConfigurationManager configuration )
+    public XmlAuthenticatingRealm( @Named( "resourceMerging" ) ConfigurationManager configuration )
     {
         super();
         this.configuration = configuration;

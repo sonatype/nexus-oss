@@ -36,8 +36,8 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Singleton
-@Typed( value = PlexusResource.class )
-@Named( value = "LogoutPlexusResource" )
+@Typed( PlexusResource.class )
+@Named( "LogoutPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( LogoutPlexusResource.RESOURCE_URI )

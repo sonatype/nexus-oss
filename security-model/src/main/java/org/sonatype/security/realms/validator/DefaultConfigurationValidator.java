@@ -37,8 +37,8 @@ import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 
 @Singleton
-@Typed( value = SecurityConfigurationValidator.class )
-@Named( value = "default" )
+@Typed( SecurityConfigurationValidator.class )
+@Named( "default" )
 public class DefaultConfigurationValidator
     implements SecurityConfigurationValidator
 {

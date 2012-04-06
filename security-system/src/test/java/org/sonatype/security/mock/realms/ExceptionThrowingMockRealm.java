@@ -26,8 +26,8 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 
 @Singleton
-@Typed( value = Realm.class )
-@Named( value = "ExceptionThrowingMockRealm" )
+@Typed( Realm.class )
+@Named( "ExceptionThrowingMockRealm" )
 public class ExceptionThrowingMockRealm
     extends AuthorizingRealm
 {

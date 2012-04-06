@@ -59,17 +59,17 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author Brian Demers
  */
 @Singleton
-@Typed( value = Realm.class )
-@Named( value = "url" )
-@Description( value = "URL Realm" )
+@Typed( Realm.class )
+@Named( "url" )
+@Description( "URL Realm" )
 public class URLRealm
     extends AuthorizingRealm
 {
-    @Named( value = "default-authentication-cache" )
+    @Named( "default-authentication-cache" )
     private String authenticationCacheName;
 
     @Inject
-    @Named( value = "url" )
+    @Named( "url" )
     private UserManager userManager;
 
     @Inject

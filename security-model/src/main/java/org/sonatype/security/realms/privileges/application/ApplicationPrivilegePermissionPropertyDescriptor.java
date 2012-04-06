@@ -19,8 +19,8 @@ import javax.inject.Singleton;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
 @Singleton
-@Typed( value = PrivilegePropertyDescriptor.class )
-@Named( value = "ApplicationPrivilegePermissionPropertyDescriptor" )
+@Typed( PrivilegePropertyDescriptor.class )
+@Named( "ApplicationPrivilegePermissionPropertyDescriptor" )
 public class ApplicationPrivilegePermissionPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {

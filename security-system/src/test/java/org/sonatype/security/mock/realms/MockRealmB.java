@@ -28,8 +28,8 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 
 @Singleton
-@Typed( value = Realm.class )
-@Named( value = "MockRealmB" )
+@Typed( Realm.class )
+@Named( "MockRealmB" )
 public class MockRealmB
     extends AuthorizingRealm
 {

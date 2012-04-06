@@ -25,8 +25,8 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
  * @author bdemers
  */
 @Singleton
-@Typed( value = StaticSecurityResource.class )
-@Named( value = "SecurityRestStaticSecurityResource" )
+@Typed( StaticSecurityResource.class )
+@Named( "SecurityRestStaticSecurityResource" )
 public class SecurityRestStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
