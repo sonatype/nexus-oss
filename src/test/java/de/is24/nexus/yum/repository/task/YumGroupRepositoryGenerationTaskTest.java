@@ -2,7 +2,11 @@ package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.task.YumGroupRepositoryGenerationTask.ID;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepository;
+import static de.is24.test.reflection.ReflectionTestUtils.setField;
 import static java.util.Arrays.asList;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -26,7 +30,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.scheduling.ScheduledTask;
 
-import de.is24.nexus.yum.repository.task.YumGroupRepositoryGenerationTask;
+import de.is24.nexus.yum.config.YumConfiguration;
 
 public class YumGroupRepositoryGenerationTaskTest {
 
@@ -88,6 +92,10 @@ public class YumGroupRepositoryGenerationTaskTest {
   private void thenGenerateYumRepo() throws Exception {
     YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
     task.setGroupRepository(groupRepo);
+    final YumConfiguration yumConfig = createMock(YumConfiguration.class);
+    expect(yumConfig.isActive()).andReturn(true).anyTimes();
+    replay(yumConfig);
+    setField(task, "yumConfig", yumConfig);
     task.doRun();
   }
 

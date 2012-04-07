@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration>
+    <active>true</active>
     <repositoryCreationTimeout>150</repositoryCreationTimeout>
     <repositoryOfRepositoryVersionsActive>true</repositoryOfRepositoryVersionsActive>
     <aliasMappings>
