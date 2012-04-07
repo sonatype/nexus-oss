@@ -83,16 +83,6 @@
       <artifactId>nexus-plugin-test-api</artifactId>
       <version>${nexus.version}</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>maven-repository-metadata</artifactId>
-          <groupId>org.apache.maven</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>maven-aether-provider</artifactId>
-          <groupId>org.apache.maven</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
