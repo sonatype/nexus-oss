@@ -21,4 +21,5 @@
     </aliasMappings>
     <deleteProcessing>true</deleteProcessing>
     <delayAfterDeletion>10</delayAfterDeletion>
+    <maxParallelThreadCount>10</maxParallelThreadCount>
 </configuration>

@@ -54,7 +54,6 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
   private static final String CACHE_DIR_PREFIX = ".cache-";
   private static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTask.class);
-  public static final int MAXIMAL_PARALLEL_RUNS = 10;
   public static final String PARAM_REPO_ID = "yumMetadataGenerationRepoId";
   public static final String PARAM_RPM_DIR = "yumMetadataGenerationRpmDir";
   public static final String PARAM_REPO_DIR = "yumMetadataGenerationRepoDir";
@@ -168,7 +167,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
           activeRunningTasks++;
         }
       }
-      return activeRunningTasks < MAXIMAL_PARALLEL_RUNS;
+      return activeRunningTasks < yumConfig.getMaxParallelThreadCount();
     }
 
     return true;

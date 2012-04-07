@@ -23,6 +23,7 @@ public class XmlYumConfiguration {
   protected static final boolean DEFAULT_DELETE_PROCESSING = true;
   protected static final int DEFAULT_TIMEOUT_IN_SEC = 120;
   protected static final boolean DEFAULT_REPOSITORY_OF_REPOSITORY_VERSIONS = true;
+  protected static final int DEFAULT_MAX_PARALLEL_THREAD_COUNT = 10;
 
   private int repositoryCreationTimeout = DEFAULT_TIMEOUT_IN_SEC;
 
@@ -35,6 +36,8 @@ public class XmlYumConfiguration {
   private boolean deleteProcessing = DEFAULT_DELETE_PROCESSING;
 
   private long delayAfterDeletion = DEFAULT_DELAY_AFTER_DELETION_IN_SEC;
+
+  private int maxParallelThreadCount = DEFAULT_MAX_PARALLEL_THREAD_COUNT;
 
   public XmlYumConfiguration() {
     super();
@@ -129,6 +132,14 @@ public class XmlYumConfiguration {
 
   public void setDelayAfterDeletion(long delayAfterDeletion) {
     this.delayAfterDeletion = delayAfterDeletion;
+  }
+
+  public int getMaxParallelThreadCount() {
+    return maxParallelThreadCount;
+  }
+
+  public void setMaxParallelThreadCount(int maxParallelThreadCount) {
+    this.maxParallelThreadCount = maxParallelThreadCount;
   }
 
 }

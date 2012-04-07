@@ -195,4 +195,10 @@ public class DefaultYumConfiguration implements YumConfiguration {
 
     return baseTempDir;
   }
+
+  @Override
+  public int getMaxParallelThreadCount() {
+    checkForUpdates();
+    return xmlYumConfiguration.getMaxParallelThreadCount();
+  }
 }

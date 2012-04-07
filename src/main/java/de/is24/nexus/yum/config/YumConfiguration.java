@@ -34,4 +34,6 @@ public interface YumConfiguration {
   public void setDelayAfterDeletion(long timeout);
 
   public File getBaseTempDir();
+
+  public int getMaxParallelThreadCount();
 }
