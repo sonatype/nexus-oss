@@ -2,6 +2,9 @@ package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 import static de.is24.test.reflection.ReflectionTestUtils.setField;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -29,6 +32,7 @@ import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.repository.YumRepository;
 
 @SuppressWarnings("unchecked")
@@ -143,6 +147,11 @@ public class YumMetadataGenerationTaskTest {
     task.setVersion(version);
     task.setAddedFiles(null);
     task.setSingleRpmPerDirectory(true);
+
+    final YumConfiguration yumConfig = createMock(YumConfiguration.class);
+    expect(yumConfig.getMaxParallelThreadCount()).andReturn(10).anyTimes();
+    replay(yumConfig);
+    setField(task, "yumConfig", yumConfig);
 		return task;
 	}
 
