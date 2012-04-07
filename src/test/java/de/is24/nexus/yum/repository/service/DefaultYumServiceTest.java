@@ -78,20 +78,6 @@ public class DefaultYumServiceTest extends AbstractYumNexusTestCase {
     Assert.assertNotNull(repositoryRegistry.findRepositoryForId(SNAPSHOTS));
   }
 
-  @Test
-  public void shouldReuseQueuedScheduledTaskForTheSameRepository() throws Exception {
-    // given
-    // final DefaultYumService service = new DefaultYumService();
-    // final ScheduledTask<YumRepository> scheduledTask =
-    // service.addToYumRepository(createRepository(SNAPSHOTS), FILE_PATH1);
-    // when
-    // final ScheduledTask<YumRepository> nextScheduledTask =
-    // service.addToYumRepository(createRepository(SNAPSHOTS), FILE_PATH2);
-    // then
-    // Assert.assertEquals(scheduledTask, nextScheduledTask);
-    // scheduledTask.getTask()
-  }
-
   public static MavenRepository createRepository(String id) {
     MavenRepository repo = createMock(MavenRepository.class);
     expect(repo.getId()).andReturn(id).anyTimes();
