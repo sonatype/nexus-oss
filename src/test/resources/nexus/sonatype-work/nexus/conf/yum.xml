@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+  <!-- general switch to activate / deactivate the plugin -->
+  <active>true</active>
+
   <!-- timeout for requests for a filtered (versionized) repository -->
   <repositoryCreationTimeout>150</repositoryCreationTimeout><!-- in seconds -->
   
@@ -11,6 +14,9 @@
   
   <!-- delay after which the rebuild of a repository is triggered in which one or more rpms got deleted -->
   <delayAfterDeletion>10</delayAfterDeletion><!-- in seconds -->
+  
+  <!-- maximal number of parallel createrepo executions -->
+  <maxParallelThreadCount>10</maxParallelThreadCount>
   
   <!-- configured aliases -->
   <aliasMappings>
