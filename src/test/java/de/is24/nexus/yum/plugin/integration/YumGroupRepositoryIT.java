@@ -3,11 +3,9 @@ package de.is24.nexus.yum.plugin.integration;
 import static de.is24.nexus.yum.plugin.m2yum.M2YumGroupRepository.ID;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.apache.http.util.EntityUtils.consume;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -75,7 +73,7 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
     givenGroupRepoWith2Rpms();
     givenTestRepository(MEMBER_REPO3);
     wait(5, SECONDS);
-    assertEquals(deployRpm(DUMMY_ARTIFACT3, GROUP_ID, ARTIFACT_VERSION3, MEMBER_REPO3), SC_CREATED);
+    deployRpmToRepo(DUMMY_ARTIFACT3, GROUP_ID, ARTIFACT_VERSION3, MEMBER_REPO3);
     wait(5, SECONDS);
     addMemberRepo(MEMBER_REPO3);
     wait(5, SECONDS);
@@ -129,8 +127,8 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
     givenTestRepository(MEMBER_REPO2);
     givenGroupRepository(GROUP_REPO_ID, ID, repo(MEMBER_REPO1), repo(MEMBER_REPO2));
     wait(5, SECONDS);
-    assertEquals(deployRpm(DUMMY_ARTIFACT1, GROUP_ID, ARTIFACT_VERSION1, MEMBER_REPO1), SC_CREATED);
-    assertEquals(deployRpm(DUMMY_ARTIFACT2, GROUP_ID, ARTIFACT_VERSION2, MEMBER_REPO2), SC_CREATED);
+    deployRpmToRepo(DUMMY_ARTIFACT1, GROUP_ID, ARTIFACT_VERSION1, MEMBER_REPO1);
+    deployRpmToRepo(DUMMY_ARTIFACT2, GROUP_ID, ARTIFACT_VERSION2, MEMBER_REPO2);
     wait(5, SECONDS);
   }
 

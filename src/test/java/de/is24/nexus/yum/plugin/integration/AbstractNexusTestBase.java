@@ -4,6 +4,7 @@ import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.createDummy
 import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.http.util.EntityUtils.consume;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -37,13 +38,10 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
-import org.apache.maven.index.artifact.Gav;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.integrationtests.NexusRestClient;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.test.utils.DeployUtils;
 
 public class AbstractNexusTestBase {
   private static final String NEXUS_PASSWORD = "admin123";
@@ -51,6 +49,7 @@ public class AbstractNexusTestBase {
   protected static final Logger LOG = LoggerFactory.getLogger(AbstractNexusTestBase.class);
   protected static final String NEXUS_BASE_URL = "http://localhost:8080/nexus";
   protected static final String SERVICE_BASE_URL = NEXUS_BASE_URL + "/service/local";
+  protected static final String STAGING_UPLOAD_URL = SERVICE_BASE_URL + "/staging/deploy/maven2";
   private static final String REPO_XML = "<repository>" + "<data>" + "<contentResourceURI>%s/repositories/%s</contentResourceURI>"
       + "<id>%s</id>" + "<name>%s</name>" + "<provider>maven2</provider>"
       + "<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>" + "<format>maven2</format>"
@@ -139,16 +138,18 @@ public class AbstractNexusTestBase {
     }
   }
 
-  protected int deployRpm(File rpmFile, String artifactId, String groupId, String version, String repositoryId) throws HttpException,
-      IOException {
-    final NexusRestClient nexusRestClient = new NexusRestClient(testContext());
-    final Gav gav = new Gav(groupId, artifactId, version, null, "rpm", null, null, null, false, null, false, null);
-    return new DeployUtils(nexusRestClient).deployUsingGavWithRest(repositoryId, gav, rpmFile);
+  protected void deployToRepo(File file, String artifactId, String groupId, String version, String repositoryId) throws HttpException,
+      IOException, AuthenticationException {
+    deployFile(file, groupId, artifactId, version, getRepoUrl(repositoryId));
   }
 
-  protected int deployRpm(String artifactId, String groupId, String version, String repositoryId) throws NoSuchAlgorithmException,
-      IOException {
-    return deployRpm(createDummyRpm(artifactId, version), artifactId, groupId, version, repositoryId);
+  private String getRepoUrl(String repositoryId) {
+    return NEXUS_BASE_URL + "/content/repositories/" + repositoryId;
+  }
+
+  protected void deployRpmToRepo(String artifactId, String groupId, String version, String repositoryId) throws NoSuchAlgorithmException,
+      IOException, AuthenticationException {
+    deployToRepo(createDummyRpm(artifactId, version), artifactId, groupId, version, repositoryId);
   }
 
   protected void givenTestRepository(String repositoryId) throws Exception {
@@ -223,21 +224,25 @@ public class AbstractNexusTestBase {
   protected void givenUploadedRpmToStaging(String groupId, String artifactId, String version) throws NoSuchAlgorithmException, IOException,
       AuthenticationException {
     final File rpmFile = createDummyRpm(artifactId, version);
-    final String url = getRpmStagingUploadUrl(groupId, artifactId, version);
+    deployFile(rpmFile, groupId, artifactId, version, STAGING_UPLOAD_URL);
+  }
+
+  private void deployFile(final File file, String groupId, String artifactId, String version, String repoUrl)
+      throws AuthenticationException,
+      IOException, ClientProtocolException {
+    final String url = repoUrl + getArtifactPath(groupId, artifactId, version, getExtension(file.getName()));
     final HttpPut request = new HttpPut(url);
     setCredentials(request);
-    request.setEntity(new FileEntity(rpmFile, "application/x-rpm"));
+    request.setEntity(new FileEntity(file, "application/octet-stream"));
 
-    LOG.info("Uploading {} to {} ...", rpmFile, url);
+    LOG.info("Uploading {} to {} ...", file, url);
     final HttpResponse response = client.execute(request);
     consume(response.getEntity());
     assertThat(response.getStatusLine().getStatusCode(), is(SC_CREATED));
   }
 
-  private String getRpmStagingUploadUrl(String groupId, String artifactId, String version) {
-    final String url = SERVICE_BASE_URL + "/staging/deploy/maven2/" + groupId.replace('.', '/') + "/" + artifactId + "/" + version + "/"
-        + artifactId + "-" + version + ".rpm";
-    return url;
+  private String getArtifactPath(String groupId, String artifactId, String version, String extension) {
+    return "/" + groupId.replace('.', '/') + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + "." + extension;
   }
 
   protected String getStagingRepositoryId(String profileId) throws Exception {

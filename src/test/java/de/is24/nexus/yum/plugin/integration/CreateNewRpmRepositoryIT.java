@@ -1,8 +1,6 @@
 package de.is24.nexus.yum.plugin.integration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -25,8 +23,8 @@ public class CreateNewRpmRepositoryIT extends AbstractNexusTestBase {
 
     wait(5, SECONDS);
 
-    assertEquals(deployRpm(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION_1, NEW_REPO_ID), SC_CREATED);
-    assertEquals(deployRpm(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION_2, NEW_REPO_ID), SC_CREATED);
+    deployRpmToRepo(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION_1, NEW_REPO_ID);
+    deployRpmToRepo(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION_2, NEW_REPO_ID);
 
     wait(5, SECONDS);
 

@@ -1,7 +1,6 @@
 package de.is24.nexus.yum.plugin.integration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.apache.http.util.EntityUtils.consume;
 import static org.hamcrest.Matchers.containsString;
@@ -29,7 +28,7 @@ public class RemoveRpmIT extends AbstractNexusTestBase {
   public void shouldRemoveRpmFromYumRepoIfRemovedByWebGui() throws Exception {
     givenTestRepository(NEW_REPO_ID);
     wait(5, SECONDS);
-    assertEquals(deployRpm(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION, NEW_REPO_ID), SC_CREATED);
+    deployRpmToRepo(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION, NEW_REPO_ID);
     wait(5, SECONDS);
     executeDelete("/repositories/" + NEW_REPO_ID + "/content/" + GROUP_ID);
     wait(25, SECONDS);
