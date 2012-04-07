@@ -1,6 +1,5 @@
 package de.is24.nexus.yum.repository;
 
-import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.isActive;
 import static java.io.File.pathSeparator;
 import static java.io.File.separator;
 import static java.lang.String.format;
@@ -174,9 +173,6 @@ public class RpmListWriter {
       Writer writer = new FileWriter(rpmListFile);
       try {
         for (Entry<String, String> entry : fileMap.entrySet()) {
-          if (!isActive()) {
-            return;
-          }
           writer.append(format("%s%s\n", entry.getKey(), entry.getValue()));
         }
       } finally {

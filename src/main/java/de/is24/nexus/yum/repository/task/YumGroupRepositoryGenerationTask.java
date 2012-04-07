@@ -1,7 +1,6 @@
 package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
-import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.isActive;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -25,6 +25,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.execution.CommandLineExecutor;
 import de.is24.nexus.yum.repository.YumRepository;
 
@@ -37,13 +38,16 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
                                                       // yum cache repo first
   private GroupRepository groupRepository;
 
+  @Requirement
+  private YumConfiguration yumConfig;
+
   public void setGroupRepository(GroupRepository groupRepository) {
     this.groupRepository = groupRepository;
   }
 
   @Override
   protected YumRepository doRun() throws Exception {
-    if (isActive() && isValidRepository(groupRepository)) {
+    if (yumConfig.isActive() && isValidRepository(groupRepository)) {
       cleanYumCacheDir();
       final File repoBaseDir = getBaseDir(groupRepository);
       final List<File> memberRepoBaseDirs = validYumRepositoryBaseDirs();

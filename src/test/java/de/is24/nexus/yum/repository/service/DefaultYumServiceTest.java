@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.YumRepository;
 
@@ -34,9 +35,12 @@ public class DefaultYumServiceTest extends AbstractYumNexusTestCase {
   @Inject
   private RepositoryRegistry repositoryRegistry;
 
+  @Inject
+  private YumConfiguration yumConfig;
+
   @Before
   public void activateService() {
-    yumService.activate();
+    yumConfig.setActive(true);
   }
 
   @Test
@@ -59,7 +63,7 @@ public class DefaultYumServiceTest extends AbstractYumNexusTestCase {
 
   @Test
   public void shouldNotCreateYumRepo() throws Exception {
-    yumService.deactivate();
+    yumConfig.setActive(false);
     Assert.assertNull(yumService.createYumRepository(createRepository(SNAPSHOTS)));
   }
 

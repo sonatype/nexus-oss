@@ -34,7 +34,7 @@ public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
     deleteDirectory(PACKAGE_CACHE_DIR);
     deleteDirectory(REPODATA_DIR);
     deleteDirectory(yumConfig.getBaseTempDir());
-		YumMetadataGenerationTask.activate();
+    yumConfig.setActive(true);
   }
 
   @Test
@@ -46,7 +46,7 @@ public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
 
   @Test
   public void shouldNotExecuteCreateRepoIfDeactivated() throws Exception {
-		YumMetadataGenerationTask.deactivate();
+    yumConfig.setActive(false);
     executeJob(createTask(RPM_BASE_FILE, BASE_URL, TARGET_DIR, SNAPSHOTS));
     Assert.assertFalse(REPODATA_DIR.exists());
   }

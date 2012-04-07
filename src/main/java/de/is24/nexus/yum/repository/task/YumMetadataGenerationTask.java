@@ -63,7 +63,6 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   public static final String PARAM_REPO_URL = "yumMetadataGenerationRepoUrl";
   public static final String PARAM_ADDED_FILES = "yumMetadataGenerationAddedFiles";
   public static final String PARAM_SINGLE_RPM_PER_DIR = "yumMetadataGenerationSingleRpmPerDir";
-  private static boolean activated = true;
 
   public YumMetadataGenerationTask() {
     this(null);
@@ -89,7 +88,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   @Override
   protected YumRepository doRun() throws Exception {
     setDefaults();
-    if (activated) {
+    if (yumConfig.isActive()) {
       LOG.info("Generating Yum-Repository for '{}' ...", getRpmDir());
       try {
         getRepoDir().mkdirs();
@@ -224,7 +223,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
 
   private void replaceUrl() throws IOException {
     File repomd = new File(getRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML);
-    if (activated && repomd.exists() && getRepoUrl() != null) {
+    if (yumConfig.isActive() && repomd.exists() && getRepoUrl() != null) {
       String repomdStr = FileUtils.readFileToString(repomd);
       repomdStr = repomdStr.replace(getRpmUrl(), getRepoUrl());
       writeStringToFile(repomd, repomdStr);
@@ -236,14 +235,6 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     String cacheDir = createCacheDir().getAbsolutePath();
     return format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getRepoDir().getAbsolutePath(), getRpmUrl(), packageFile,
         cacheDir, getRpmDir());
-  }
-
-  public static void deactivate() {
-    activated = false;
-  }
-
-  public static void activate() {
-    activated = true;
   }
 
   @Override
@@ -264,10 +255,6 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   @Override
   public File getRpmListFile(String repositoryId, String version) {
     return new File(createPackageDir(), getRepositoryId() + "-" + version + ".txt");
-  }
-
-  public static boolean isActive() {
-    return activated;
   }
 
   public String getRepositoryId() {

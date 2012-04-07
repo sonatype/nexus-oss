@@ -25,6 +25,8 @@ public class XmlYumConfiguration {
   protected static final boolean DEFAULT_REPOSITORY_OF_REPOSITORY_VERSIONS = true;
   protected static final int DEFAULT_MAX_PARALLEL_THREAD_COUNT = 10;
 
+  private boolean active = true;
+
   private int repositoryCreationTimeout = DEFAULT_TIMEOUT_IN_SEC;
 
   private boolean repositoryOfRepositoryVersionsActive = DEFAULT_REPOSITORY_OF_REPOSITORY_VERSIONS;
@@ -44,8 +46,21 @@ public class XmlYumConfiguration {
   }
 
   public XmlYumConfiguration(final XmlYumConfiguration other) {
+    setActive(other.isActive());
     repositoryCreationTimeout = other.getRepositoryCreationTimeout();
+    repositoryOfRepositoryVersionsActive = other.isRepositoryOfRepositoryVersionsActive();
     aliasMappings = other.getAliasMappings();
+    deleteProcessing = other.isDeleteProcessing();
+    delayAfterDeletion = other.getDelayAfterDeletion();
+    maxParallelThreadCount = other.getMaxParallelThreadCount();
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 
   public int getRepositoryCreationTimeout() {
@@ -141,5 +156,4 @@ public class XmlYumConfiguration {
   public void setMaxParallelThreadCount(int maxParallelThreadCount) {
     this.maxParallelThreadCount = maxParallelThreadCount;
   }
-
 }

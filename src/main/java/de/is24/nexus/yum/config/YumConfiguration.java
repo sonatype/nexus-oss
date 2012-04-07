@@ -36,4 +36,8 @@ public interface YumConfiguration {
   public File getBaseTempDir();
 
   public int getMaxParallelThreadCount();
+
+  public boolean isActive();
+
+  public void setActive(boolean active);
 }

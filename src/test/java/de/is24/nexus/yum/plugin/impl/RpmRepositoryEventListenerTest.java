@@ -12,9 +12,9 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import de.is24.nexus.yum.AbstractRepositoryTester;
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.plugin.ItemEventListener;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
-import de.is24.nexus.yum.repository.service.YumService;
 
 
 public class RpmRepositoryEventListenerTest extends AbstractRepositoryTester {
@@ -25,16 +25,16 @@ public class RpmRepositoryEventListenerTest extends AbstractRepositoryTester {
   private RepositoryRegistry repositoryRegistry;
 
   @Inject
-  private YumService yumService;
+  private YumConfiguration yumConfig;
 
   @Before
   public void activateRepo() {
-    yumService.activate();
+    yumConfig.setActive(true);
   }
 
   @After
   public void reactivateRepo() {
-    yumService.activate();
+    yumConfig.setActive(true);
   }
 
   @Test
@@ -61,7 +61,7 @@ public class RpmRepositoryEventListenerTest extends AbstractRepositoryTester {
 
   @Test
   public void shouldNotCreateRepoForPom() {
-    yumService.deactivate();
+    yumConfig.setActive(false);
 
     MavenRepository repo = createRepository(true);
     repositoryRegistry.registerRepository(repo);
@@ -70,7 +70,7 @@ public class RpmRepositoryEventListenerTest extends AbstractRepositoryTester {
 
   @Test
   public void shouldCreateRepoForPom() {
-    yumService.deactivate();
+    yumConfig.setActive(false);
 
     MavenRepository repo = createRepository(true);
     repositoryRegistry.registerRepository(repo);

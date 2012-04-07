@@ -45,16 +45,11 @@ public class DefaultYumService implements YumService {
   }
 
   @Override
-  public void deactivate() {
-		YumMetadataGenerationTask.deactivate();
-  }
-
-  @Override
   public ScheduledTask<YumRepository> createYumRepository(File rpmBaseDir, String rpmBaseUrl, File yumRepoBaseDir,
     URL yumRepoUrl, String id,
     boolean singleRpmPerDirectory) {
     try {
-			if (YumMetadataGenerationTask.isActive()) {
+      if (yumConfig.isActive()) {
         YumMetadataGenerationTask task = createTask();
         task.setRpmDir(rpmBaseDir.getAbsolutePath());
         task.setRpmUrl(rpmBaseUrl);
@@ -76,7 +71,7 @@ public class DefaultYumService implements YumService {
     URL yumRepoUrl) {
     try {
       File rpmBaseDir = getBaseDir(repository);
-			if (YumMetadataGenerationTask.isActive()) {
+      if (yumConfig.isActive()) {
         YumMetadataGenerationTask task = createTask();
         task.setRpmDir(rpmBaseDir.getAbsolutePath());
         task.setRpmUrl(getBaseUrl(repository));
@@ -142,15 +137,10 @@ public class DefaultYumService implements YumService {
   }
 
   @Override
-  public void activate() {
-		YumMetadataGenerationTask.activate();
-  }
-
-  @Override
   public ScheduledTask<YumRepository> addToYumRepository(Repository repository, String filePath) {
     try {
       File rpmBaseDir = getBaseDir(repository);
-			if (YumMetadataGenerationTask.isActive()) {
+      if (yumConfig.isActive()) {
         YumMetadataGenerationTask task = createTask();
         task.setRpmDir(rpmBaseDir.getAbsolutePath());
         task.setRpmUrl(getBaseUrl(repository));
@@ -163,11 +153,6 @@ public class DefaultYumService implements YumService {
     }
 
     return null;
-  }
-
-  @Override
-  public boolean isActive() {
-		return YumMetadataGenerationTask.isActive();
   }
 
   @Override

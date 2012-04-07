@@ -16,13 +16,9 @@ public interface YumService {
   ScheduledTask<YumRepository> createYumRepository(Repository repository, String version, File yumRepoDir,
     URL yumRepoUrl);
 
-  void deactivate();
-
   YumRepository getRepository(Repository repository, String version, URL repoBaseUrl) throws Exception;
 
   void markDirty(Repository repository, String itemVersion);
-
-  void activate();
 
   ScheduledTask<YumRepository> createYumRepository(File rpmBaseDir, String rpmBaseUrl, File yumRepoBaseDir,
     URL yumRepoUrl,
@@ -30,8 +26,6 @@ public interface YumService {
     boolean singleRpmPerDirectory);
 
   ScheduledTask<YumRepository> addToYumRepository(Repository repository, String path);
-
-  boolean isActive();
 
   void recreateRepository(Repository repository);
 

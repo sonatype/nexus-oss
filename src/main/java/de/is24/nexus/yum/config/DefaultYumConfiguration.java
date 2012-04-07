@@ -206,4 +206,17 @@ public class DefaultYumConfiguration implements YumConfiguration {
     checkForUpdates();
     return xmlYumConfiguration.getMaxParallelThreadCount();
   }
+
+  @Override
+  public boolean isActive() {
+    checkForUpdates();
+    return xmlYumConfiguration.isActive();
+  }
+
+  @Override
+  public void setActive(boolean active) {
+    final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
+    newConfig.setActive(active);
+    saveConfig(newConfig);
+  }
 }

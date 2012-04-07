@@ -33,9 +33,9 @@ import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
 
 import de.is24.nexus.yum.AbstractRepositoryTester;
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.plugin.ItemEventListener;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
-import de.is24.nexus.yum.repository.service.YumService;
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
 
 
@@ -62,16 +62,16 @@ public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester 
   private RepositoryRegistry repositoryRegistry;
 
   @Inject
-  private YumService yumService;
+  private YumConfiguration yumConfig;
 
   @Before
   public void activateRepo() {
-    yumService.activate();
+    yumConfig.setActive(true);
   }
 
   @After
   public void reactivateRepo() {
-    yumService.activate();
+    yumConfig.setActive(true);
   }
 
   @Concurrent(count = 1)
