@@ -46,6 +46,8 @@ public class DefaultYumConfiguration implements YumConfiguration {
   private final Unmarshaller unmarshaller;
   private final Marshaller marshaller;
 
+  private File configFile;
+
   public DefaultYumConfiguration() throws JAXBException {
     final JAXBContext jc = JAXBContext.newInstance(XmlYumConfiguration.class, AliasMapping.class);
     this.marshaller = jc.createMarshaller();
@@ -82,7 +84,10 @@ public class DefaultYumConfiguration implements YumConfiguration {
 
   @Override
   public File getConfigFile() {
-    return new File(nexusConfiguration.getConfigurationDirectory(), filename);
+    if (configFile == null || !configFile.getName().equals(filename)) {
+      configFile = new File(nexusConfiguration.getConfigurationDirectory(), filename);
+    }
+    return configFile;
   }
 
   @Override
