@@ -14,6 +14,8 @@ package org.sonatype.security.realms.privileges;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -25,12 +27,8 @@ import org.sonatype.security.realms.validator.SecurityValidationContext;
 public abstract class AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
 {
-    private final ConfigurationIdGenerator idGenerator;
-
-    protected AbstractPrivilegeDescriptor( ConfigurationIdGenerator idGenerator )
-    {
-        this.idGenerator = idGenerator;
-    }
+    @Inject
+    private ConfigurationIdGenerator idGenerator;
 
     protected String getProperty( CPrivilege privilege, String key )
     {
