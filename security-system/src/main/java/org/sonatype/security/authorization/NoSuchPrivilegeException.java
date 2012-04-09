@@ -24,7 +24,6 @@ public class NoSuchPrivilegeException
 
     public NoSuchPrivilegeException()
     {
-        super();
     }
 
     public NoSuchPrivilegeException( String message, Throwable cause )

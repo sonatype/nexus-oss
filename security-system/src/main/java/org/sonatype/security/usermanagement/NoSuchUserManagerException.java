@@ -25,7 +25,6 @@ public class NoSuchUserManagerException
 
     public NoSuchUserManagerException()
     {
-        super();
     }
 
     public NoSuchUserManagerException( String message, Throwable cause )

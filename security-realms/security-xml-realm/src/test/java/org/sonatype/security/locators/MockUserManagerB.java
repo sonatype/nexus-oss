@@ -36,7 +36,7 @@ public class MockUserManagerB
 
     public String getSource()
     {
-        return "MockUserLocatorB";
+        return "MockUserManagerB";
     }
 
     public Set<User> listUsers()

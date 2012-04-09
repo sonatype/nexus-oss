@@ -40,12 +40,9 @@ public class DefaultSecurityConfigurationManager
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    @Named( "file" )
-    private SecurityConfigurationSource configurationSource;
+    private final SecurityConfigurationSource configurationSource;
 
-    @Inject
-    private SecurityConfigurationValidator validator;
+    private final SecurityConfigurationValidator validator;
 
     /**
      * This will hold the current configuration in memory, to reload, will need to set this to null
@@ -53,6 +50,14 @@ public class DefaultSecurityConfigurationManager
     private SecurityConfiguration configuration = null;
 
     private ReentrantLock lock = new ReentrantLock();
+
+    @Inject
+    public DefaultSecurityConfigurationManager( @Named( "file" ) SecurityConfigurationSource configurationSource,
+                                                SecurityConfigurationValidator validator )
+    {
+        this.configurationSource = configurationSource;
+        this.validator = validator;
+    }
 
     public boolean isEnabled()
     {

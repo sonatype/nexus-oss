@@ -49,7 +49,6 @@ public class DefaultRealmSecurityManager
     @Inject
     public DefaultRealmSecurityManager( @Nullable RolePermissionResolver rolePermissionResolver )
     {
-        super();
         this.rolePermissionResolver = rolePermissionResolver;
         init();
     }

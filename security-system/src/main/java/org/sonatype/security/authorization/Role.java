@@ -45,7 +45,6 @@ public class Role
     public Role( String roleId, String name, String description, String source, boolean readOnly, Set<String> roles,
                  Set<String> privileges )
     {
-        super();
         this.roleId = roleId;
         this.name = name;
         this.description = description;

@@ -25,7 +25,6 @@ public class NoSuchAuthorizationManagerException
 
     public NoSuchAuthorizationManagerException()
     {
-        super();
     }
 
     public NoSuchAuthorizationManagerException( String message, Throwable cause )

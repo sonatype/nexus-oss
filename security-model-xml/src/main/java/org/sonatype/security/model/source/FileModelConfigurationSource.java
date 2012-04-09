@@ -41,29 +41,33 @@ import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
 public class FileModelConfigurationSource
     extends AbstractSecurityModelConfigurationSource
 {
-
     /**
      * The configuration file.
      */
-    @Inject
-    @Named( "${security-xml-file}" )
     private File configurationFile;
 
     /**
      * The configuration upgrader.
      */
-    @Inject
-    private SecurityConfigurationUpgrader configurationUpgrader;
+    private final SecurityConfigurationUpgrader configurationUpgrader;
 
     /**
      * The defaults configuration source.
      */
-    @Inject
-    @Named( "static" )
-    private SecurityModelConfigurationSource securityDefaults;
+    private final SecurityModelConfigurationSource securityDefaults;
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
+
+    @Inject
+    public FileModelConfigurationSource( @Named( "${security-xml-file}" ) File configurationFile,
+                                         @Named( "static" ) SecurityModelConfigurationSource securityDefaults,
+                                         SecurityConfigurationUpgrader configurationUpgrader )
+    {
+        this.configurationFile = configurationFile;
+        this.securityDefaults = securityDefaults;
+        this.configurationUpgrader = configurationUpgrader;
+    }
 
     /**
      * Gets the configuration file.
@@ -79,7 +83,9 @@ public class FileModelConfigurationSource
      * Sets the configuration file.
      * 
      * @param configurationFile the new configuration file
+     * @deprecated replaced by constructor injection
      */
+    @Deprecated
     public void setConfigurationFile( File configurationFile )
     {
         this.configurationFile = configurationFile;

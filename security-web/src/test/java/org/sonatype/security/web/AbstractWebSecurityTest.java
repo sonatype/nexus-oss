@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSession;
 import org.codehaus.plexus.util.FileUtils;
 import org.easymock.EasyMock;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.SecuritySystem;
 
 public abstract class AbstractWebSecurityTest
@@ -39,6 +40,12 @@ public abstract class AbstractWebSecurityTest
     {
         super.configure( properties );
         properties.put( "application-conf", APP_CONF.getAbsolutePath() );
+    }
+
+    @Override
+    public BeanScanning scanning()
+    {
+        return BeanScanning.INDEX;
     }
 
     @Override

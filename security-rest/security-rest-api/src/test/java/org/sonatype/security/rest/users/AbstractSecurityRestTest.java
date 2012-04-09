@@ -36,7 +36,7 @@ public abstract class AbstractSecurityRestTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
         configuration.setAutoWiring( true );
 
         super.customizeContainerConfiguration( configuration );

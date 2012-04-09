@@ -71,18 +71,22 @@ public class URLRealm
     @Named( "default-authentication-cache" )
     private String authenticationCacheName;
 
-    @Inject
-    @Named( "url" )
-    private UserManager userManager;
+    private final UserManager userManager;
 
-    @Inject
-    private UrlRealmConfiguration urlRealmConfiguration;
+    private final UrlRealmConfiguration urlRealmConfiguration;
 
     private Cache<Object, Object> authenticatingCache = null;
 
     private String DEFAULT_AUTHENTICATION_CACHE_POSTFIX = "-authentication";
 
     private static int INSTANCE_COUNT = 0;
+
+    @Inject
+    public URLRealm( UrlRealmConfiguration urlRealmConfiguration, @Named( "url" ) UserManager userManager )
+    {
+        this.urlRealmConfiguration = urlRealmConfiguration;
+        this.userManager = userManager;
+    }
 
     @Override
     public String getName()

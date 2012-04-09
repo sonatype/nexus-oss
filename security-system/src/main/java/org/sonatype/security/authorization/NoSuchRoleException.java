@@ -24,7 +24,6 @@ public class NoSuchRoleException
 
     public NoSuchRoleException()
     {
-        super();
     }
 
     public NoSuchRoleException( String message, Throwable cause )

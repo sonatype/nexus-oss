@@ -48,13 +48,17 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
 public class XmlRolePermissionResolver
     implements RolePermissionResolver
 {
+    private final ConfigurationManager configuration;
+
+    private final List<PrivilegeDescriptor> privilegeDescriptors;
 
     @Inject
-    @Named( "resourceMerging" )
-    private ConfigurationManager configuration;
-
-    @Inject
-    private List<PrivilegeDescriptor> privilegeDescriptors;
+    public XmlRolePermissionResolver( @Named( "resourceMerging" ) ConfigurationManager configuration,
+                                      List<PrivilegeDescriptor> privilegeDescriptors )
+    {
+        this.configuration = configuration;
+        this.privilegeDescriptors = privilegeDescriptors;
+    }
 
     public Collection<Permission> resolvePermissionsInRole( String roleString )
     {

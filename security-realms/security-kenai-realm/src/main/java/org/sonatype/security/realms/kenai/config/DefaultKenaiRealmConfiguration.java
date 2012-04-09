@@ -50,16 +50,21 @@ public class DefaultKenaiRealmConfiguration
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    @Named( "${application-conf}/kenai-realm.xml" )
-    private File configurationFile;
+    private final File configurationFile;
 
-    @Inject
-    private SecuritySystem securitySystem; // used for validation
+    private final SecuritySystem securitySystem; // used for validation
 
     private Configuration configuration;
 
     private ReentrantLock lock = new ReentrantLock();
+
+    @Inject
+    public DefaultKenaiRealmConfiguration( @Named( "${application-conf}/kenai-realm.xml" ) File configurationFile,
+                                           SecuritySystem securitySystem )
+    {
+        this.configurationFile = configurationFile;
+        this.securitySystem = securitySystem;
+    }
 
     public Configuration getConfiguration()
     {

@@ -180,7 +180,7 @@ public class UserToRolePlexusResource
     @Override
     @GET
     @ResourceMethodSignature( output = UserToRoleResourceRequest.class, pathParams = { @PathParam( "sourceId" ),
-        @PathParam( value = "userId" ) } )
+        @PathParam( "userId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -218,7 +218,7 @@ public class UserToRolePlexusResource
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( "sourceId" ), @PathParam( value = "userId" ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( "sourceId" ), @PathParam( "userId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

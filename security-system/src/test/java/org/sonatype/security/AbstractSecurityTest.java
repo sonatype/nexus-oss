@@ -15,8 +15,10 @@ package org.sonatype.security;
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 public abstract class AbstractSecurityTest
@@ -57,8 +59,15 @@ public abstract class AbstractSecurityTest
         }
         finally
         {
+            ThreadContext.remove();
             super.tearDown();
         }
+    }
+
+    @Override
+    public BeanScanning scanning()
+    {
+        return BeanScanning.INDEX;
     }
 
     protected SecuritySystem getSecuritySystem()
