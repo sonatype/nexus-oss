@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUserRoleMapping;
@@ -50,9 +51,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 public class ConfiguredUsersUserManager
     extends AbstractReadOnlyUserManager
 {
-
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     private SecuritySystem securitySystem;

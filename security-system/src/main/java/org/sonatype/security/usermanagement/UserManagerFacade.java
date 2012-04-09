@@ -21,17 +21,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 @Typed( UserManagerFacade.class )
 @Named( "default" )
 public class UserManagerFacade
 {
-    @Inject
-    Map<String, UserManager> userManagers;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
-    Logger logger;
+    Map<String, UserManager> userManagers;
 
     public User getUser( String userId, String source )
         throws UserNotFoundException, NoSuchUserManagerException

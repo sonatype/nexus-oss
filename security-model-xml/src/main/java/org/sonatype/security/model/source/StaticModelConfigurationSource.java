@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.model.Configuration;
 
@@ -36,11 +36,9 @@ import org.sonatype.security.model.Configuration;
 public class StaticModelConfigurationSource
     extends AbstractSecurityModelConfigurationSource
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security.xml";
-
-    @Inject
-    private Logger logger;
 
     /**
      * Gets the configuration using getResourceAsStream from "/META-INF/security/security.xml".

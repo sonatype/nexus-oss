@@ -48,6 +48,7 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.inject.Description;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 
@@ -63,8 +64,7 @@ import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 public class KenaiRealm
     extends AuthorizingRealm
 {
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     private KenaiRealmConfiguration kenaiRealmConfiguration;

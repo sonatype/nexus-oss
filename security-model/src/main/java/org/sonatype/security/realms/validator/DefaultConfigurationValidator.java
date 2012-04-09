@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -42,8 +43,7 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 public class DefaultConfigurationValidator
     implements SecurityConfigurationValidator
 {
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     private ConfigurationIdGenerator idGenerator;

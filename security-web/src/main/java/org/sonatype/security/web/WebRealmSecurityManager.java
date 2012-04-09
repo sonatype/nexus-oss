@@ -27,6 +27,7 @@ import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
@@ -43,14 +44,13 @@ public class WebRealmSecurityManager
     extends DefaultWebSecurityManager
     implements org.apache.shiro.util.Initializable
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private Map<String, RolePermissionResolver> rolePermissionResolverMap;
 
-    private Logger logger;
-
     @Inject
-    public WebRealmSecurityManager( Logger logger, Map<String, RolePermissionResolver> rolePermissionResolverMap )
+    public WebRealmSecurityManager( Map<String, RolePermissionResolver> rolePermissionResolverMap )
     {
-        this.logger = logger;
         this.rolePermissionResolverMap = rolePermissionResolverMap;
 
         // set the realm authenticator, that will automatically deligate the authentication to all the realms.

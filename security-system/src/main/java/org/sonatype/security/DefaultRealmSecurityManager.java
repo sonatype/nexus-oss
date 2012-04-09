@@ -25,6 +25,7 @@ import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.util.Initializable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.inject.Nullable;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
@@ -41,15 +42,14 @@ public class DefaultRealmSecurityManager
     extends DefaultSecurityManager
     implements Initializable
 {
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private RolePermissionResolver rolePermissionResolver;
 
     @Inject
-    public DefaultRealmSecurityManager( Logger logger, @Nullable RolePermissionResolver rolePermissionResolver )
+    public DefaultRealmSecurityManager( @Nullable RolePermissionResolver rolePermissionResolver )
     {
         super();
-        this.logger = logger;
         this.rolePermissionResolver = rolePermissionResolver;
         init();
     }

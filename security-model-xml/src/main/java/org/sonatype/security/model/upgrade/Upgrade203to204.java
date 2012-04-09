@@ -17,12 +17,12 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.security.model.v2_0_3.io.xpp3.SecurityConfigurationXpp3Reader;
@@ -35,10 +35,9 @@ import org.sonatype.security.model.v2_0_4.upgrade.BasicVersionUpgrade;
 public class Upgrade203to204
     implements SecurityUpgrader
 {
-    private static String DEFAULT_SOURCE = "default";
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private Logger logger;
+    private static String DEFAULT_SOURCE = "default";
 
     public Object loadConfiguration( File file )
         throws IOException, ConfigurationIsCorruptedException

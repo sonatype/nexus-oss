@@ -39,6 +39,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
@@ -76,6 +77,8 @@ import org.sonatype.sisu.ehcache.CacheManagerComponent;
 public class DefaultSecuritySystem
     implements SecuritySystem, EventListener
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private SecurityConfigurationManager securityConfiguration;
 
     private Map<String, RealmSecurityManager> securityManagers;
@@ -92,8 +95,6 @@ public class DefaultSecuritySystem
 
     private ApplicationEventMulticaster eventMulticaster;
 
-    private Logger logger;
-
     private List<SecurityEmailer> securityEmailers;
 
     private SecurityEmailer securityEmailer;
@@ -101,15 +102,14 @@ public class DefaultSecuritySystem
     private static final String ALL_ROLES_KEY = "all";
 
     @Inject
-    public DefaultSecuritySystem( List<SecurityEmailer> securityEmailers, Logger logger,
-                                  ApplicationEventMulticaster eventMulticaster, PasswordGenerator passwordGenerator,
+    public DefaultSecuritySystem( List<SecurityEmailer> securityEmailers, ApplicationEventMulticaster eventMulticaster,
+                                  PasswordGenerator passwordGenerator,
                                   Map<String, AuthorizationManager> authorizationManagers, Map<String, Realm> realmMap,
                                   SecurityConfigurationManager securityConfiguration,
                                   Map<String, RealmSecurityManager> securityManagers,
                                   CacheManagerComponent cacheManagerComponent, UserManagerFacade userManagerFacade )
     {
         this.securityEmailers = securityEmailers;
-        this.logger = logger;
         this.eventMulticaster = eventMulticaster;
         this.passwordGenerator = passwordGenerator;
         this.authorizationManagers = authorizationManagers;

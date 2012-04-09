@@ -23,8 +23,7 @@ import org.slf4j.LoggerFactory;
 public class NullSecurityEmailer
     implements SecurityEmailer
 {
-
-    private Logger logger = LoggerFactory.getLogger( NullSecurityEmailer.class );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public void sendForgotUsername( String email, List<String> userIds )
     {
