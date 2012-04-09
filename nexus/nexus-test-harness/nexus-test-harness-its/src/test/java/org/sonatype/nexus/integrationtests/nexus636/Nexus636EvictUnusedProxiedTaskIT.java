@@ -16,9 +16,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -95,12 +97,15 @@ public class Nexus636EvictUnusedProxiedTaskIT
 
             boolean isAllDotFiles = true;
 
+            List<String> paths = new ArrayList<String>();
+
             for ( File file : files )
             {
+                paths.add( file.getPath() );
                 isAllDotFiles = isAllDotFiles && file.getName().startsWith( "." );
             }
 
-            Assert.assertTrue( isAllDotFiles, "The only files left should be \"dotted\" files! We have: " + files );
+            Assert.assertTrue( isAllDotFiles, "The only files left should be \"dotted\" files! We have: " + paths );
         }
     }
 
@@ -111,7 +116,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         executeTask( "keepTestDeployedFiles", "release-proxy-repo-1", 2 );
 
         File artifact = new File( repositoryPath, "nexus636/artifact-new/1.0/artifact-new-1.0.jar" );
-        Assert.assertTrue( artifact.exists(), "The files deployed by this test should be young enought to be kept" );
+        Assert.assertTrue( artifact.exists(), "The files deployed by this test should be young enough to be kept" );
 
     }
 
