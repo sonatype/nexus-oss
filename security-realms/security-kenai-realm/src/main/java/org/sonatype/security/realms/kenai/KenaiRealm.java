@@ -66,10 +66,15 @@ public class KenaiRealm
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private KenaiRealmConfiguration kenaiRealmConfiguration;
+    private final KenaiRealmConfiguration kenaiRealmConfiguration;
 
     private static final int PAGE_SIZE = 200;
+
+    @Inject
+    public KenaiRealm( KenaiRealmConfiguration kenaiRealmConfiguration )
+    {
+        this.kenaiRealmConfiguration = kenaiRealmConfiguration;
+    }
 
     @Override
     public String getName()

@@ -32,8 +32,7 @@ public class SecurityAuthenticationTest
     {
         super.setUp();
 
-        security = (SecuritySystem) lookup( SecuritySystem.class );
-        security.start();
+        security = (SecuritySystem) lookup( SecuritySystem.class ); // started in parent class
     }
 
     public void testAuthcAndAuthzAfterRestart()

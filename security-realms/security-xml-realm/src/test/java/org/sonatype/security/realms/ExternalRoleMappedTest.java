@@ -79,7 +79,7 @@ public class ExternalRoleMappedTest
         // jcohen has the role mockrole1, there is also xml role with the same ID, which means jcohen automaticly has
         // this xml role
 
-        PrincipalCollection jcohen = new SimplePrincipalCollection( "jcohen", new MockRealm().getName() );
+        PrincipalCollection jcohen = new SimplePrincipalCollection( "jcohen", MockRealm.NAME );
 
         try
         {

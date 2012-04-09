@@ -28,6 +28,7 @@ import org.sonatype.security.model.CProperty;
 import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
+import org.sonatype.security.realms.validator.ConfigurationIdGenerator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 @Singleton
@@ -39,13 +40,19 @@ public class ApplicationPrivilegeDescriptor
 {
     public static final String TYPE = "method";
 
-    @Inject
-    @Named( "ApplicationPrivilegeMethodPropertyDescriptor" )
-    private PrivilegePropertyDescriptor methodProperty;
+    private final PrivilegePropertyDescriptor methodProperty;
+
+    private final PrivilegePropertyDescriptor permissionProperty;
 
     @Inject
-    @Named( "ApplicationPrivilegePermissionPropertyDescriptor" )
-    private PrivilegePropertyDescriptor permissionProperty;
+    public ApplicationPrivilegeDescriptor( ConfigurationIdGenerator idGenerator,
+                                           @Named( "ApplicationPrivilegeMethodPropertyDescriptor" ) PrivilegePropertyDescriptor methodProperty,
+                                           @Named( "ApplicationPrivilegePermissionPropertyDescriptor" ) PrivilegePropertyDescriptor permissionProperty )
+    {
+        super( idGenerator );
+        this.methodProperty = methodProperty;
+        this.permissionProperty = permissionProperty;
+    }
 
     public String getName()
     {

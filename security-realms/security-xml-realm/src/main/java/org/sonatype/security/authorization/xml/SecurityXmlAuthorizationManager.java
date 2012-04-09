@@ -45,18 +45,23 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 public class SecurityXmlAuthorizationManager
     implements AuthorizationManager
 {
-
     public static final String SOURCE = "default";
 
-    @Inject
-    @Named( "resourceMerging" )
-    private ConfigurationManager configuration;
+    private final ConfigurationManager configuration;
+
+    private final PrivilegeInheritanceManager privInheritance;
+
+    private final ApplicationEventMulticaster eventMulticaster;
 
     @Inject
-    private PrivilegeInheritanceManager privInheritance;
-
-    @Inject
-    private ApplicationEventMulticaster eventMulticaster;
+    public SecurityXmlAuthorizationManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
+                                            PrivilegeInheritanceManager privInheritance,
+                                            ApplicationEventMulticaster eventMulticaster )
+    {
+        this.configuration = configuration;
+        this.privInheritance = privInheritance;
+        this.eventMulticaster = eventMulticaster;
+    }
 
     public String getSource()
     {

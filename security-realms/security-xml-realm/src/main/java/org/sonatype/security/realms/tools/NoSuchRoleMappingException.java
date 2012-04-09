@@ -24,7 +24,6 @@ public class NoSuchRoleMappingException
 
     public NoSuchRoleMappingException()
     {
-        super();
     }
 
     public NoSuchRoleMappingException( String message, Throwable cause )

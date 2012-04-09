@@ -61,12 +61,17 @@ public class SecurityXmlUserManager
 
     public static final String SOURCE = "default";
 
-    @Inject
-    @Named( "resourceMerging" )
-    private ConfigurationManager configuration;
+    private final ConfigurationManager configuration;
+
+    private final SecuritySystem securitySystem;
 
     @Inject
-    private SecuritySystem securitySystem;
+    public SecurityXmlUserManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
+                                   SecuritySystem securitySystem )
+    {
+        this.configuration = configuration;
+        this.securitySystem = securitySystem;
+    }
 
     protected CUser toUser( User user )
     {

@@ -50,16 +50,21 @@ public class DefaultUrlRealmConfiguration
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    @Named( "${application-conf}/url-realm.xml" )
-    private File configurationFile;
+    private final File configurationFile;
 
-    @Inject
-    private SecuritySystem securitySystem; // used for validation
+    private final SecuritySystem securitySystem; // used for validation
 
     private Configuration configuration;
 
     private ReentrantLock lock = new ReentrantLock();
+
+    @Inject
+    public DefaultUrlRealmConfiguration( SecuritySystem securitySystem,
+                                         @Named( "${application-conf}/url-realm.xml" ) File configurationFile )
+    {
+        this.securitySystem = securitySystem;
+        this.configurationFile = configurationFile;
+    }
 
     public Configuration getConfiguration()
     {

@@ -51,15 +51,20 @@ public class URLUserManager
 {
     public static final String SOURCE = "url";
 
-    @Inject
-    @Named( "resourceMerging" )
-    private ConfigurationManager configuration;
+    private final ConfigurationManager configuration;
+
+    private final UrlRealmConfiguration urlRealmConfiguration;
+
+    private final List<UserManager> userLocators;
 
     @Inject
-    private UrlRealmConfiguration urlRealmConfiguration;
-
-    @Inject
-    private List<UserManager> userLocators;
+    public URLUserManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
+                           List<UserManager> userLocators, UrlRealmConfiguration urlRealmConfiguration )
+    {
+        this.configuration = configuration;
+        this.userLocators = userLocators;
+        this.urlRealmConfiguration = urlRealmConfiguration;
+    }
 
     public String getSource()
     {

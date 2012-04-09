@@ -83,7 +83,7 @@ public class UserSearchByIdPlexusResource
     @Override
     @GET
     @ResourceMethodSignature( output = PlexusUserListResourceResponse.class, pathParams = { @PathParam( "userId" ),
-        @PathParam( value = "sourceId" ) } )
+        @PathParam( "sourceId" ) } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

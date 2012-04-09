@@ -59,17 +59,19 @@ public class XmlAuthorizingRealm
 
     public static final String ROLE = "XmlAuthorizingRealm";
 
-    @Inject
-    private UserManager userManager;
+    private final UserManager userManager;
+
+    private final Map<String, UserManager> userManagerMap;
+
+    private final SecuritySystem securitySystem;
 
     @Inject
-    private Map<String, UserManager> userManagerMap;
-
-    @Inject
-    private SecuritySystem securitySystem;
-
-    public XmlAuthorizingRealm()
+    public XmlAuthorizingRealm( UserManager userManager, SecuritySystem securitySystem,
+                                Map<String, UserManager> userManagerMap )
     {
+        this.userManager = userManager;
+        this.securitySystem = securitySystem;
+        this.userManagerMap = userManagerMap;
         setCredentialsMatcher( new Sha1CredentialsMatcher() );
     }
 

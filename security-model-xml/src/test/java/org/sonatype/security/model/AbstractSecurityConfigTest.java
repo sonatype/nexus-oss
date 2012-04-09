@@ -21,6 +21,7 @@ import java.util.Properties;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.inject.BeanScanning;
 
 public abstract class AbstractSecurityConfigTest
     extends InjectedTestCase
@@ -35,6 +36,12 @@ public abstract class AbstractSecurityConfigTest
     {
         properties.put( "security-xml-file", getSecurityConfiguration() );
         super.configure( properties );
+    }
+
+    @Override
+    public BeanScanning scanning()
+    {
+        return BeanScanning.INDEX;
     }
 
     protected void copyDefaultSecurityConfigToPlace()

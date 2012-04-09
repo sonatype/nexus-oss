@@ -47,11 +47,17 @@ public class DefaultSecurityConfigurationUpgrader
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private Map<String, SecurityUpgrader> upgraders;
+    private final Map<String, SecurityUpgrader> upgraders;
+
+    private final Map<String, SecurityDataUpgrader> dataUpgraders;
 
     @Inject
-    private Map<String, SecurityDataUpgrader> dataUpgraders;
+    public DefaultSecurityConfigurationUpgrader( Map<String, SecurityUpgrader> upgraders,
+                                                 Map<String, SecurityDataUpgrader> dataUpgraders )
+    {
+        this.upgraders = upgraders;
+        this.dataUpgraders = dataUpgraders;
+    }
 
     /**
      * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is

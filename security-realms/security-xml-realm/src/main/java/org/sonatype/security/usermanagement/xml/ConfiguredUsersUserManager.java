@@ -53,14 +53,19 @@ public class ConfiguredUsersUserManager
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private SecuritySystem securitySystem;
+    private final SecuritySystem securitySystem;
 
-    @Inject
-    @Named( "resourceMerging" )
-    private ConfigurationManager configuration;
+    private final ConfigurationManager configuration;
 
     public static final String SOURCE = "allConfigured";
+
+    @Inject
+    public ConfiguredUsersUserManager( SecuritySystem securitySystem,
+                                       @Named( "resourceMerging" ) ConfigurationManager configuration )
+    {
+        this.securitySystem = securitySystem;
+        this.configuration = configuration;
+    }
 
     public String getSource()
     {

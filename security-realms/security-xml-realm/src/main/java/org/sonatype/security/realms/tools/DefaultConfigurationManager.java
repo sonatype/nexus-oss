@@ -49,21 +49,29 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 public class DefaultConfigurationManager
     extends AbstractConfigurationManager
 {
-    @Inject
-    @Named( "file" )
-    private SecurityModelConfigurationSource configurationSource;
+    private final SecurityModelConfigurationSource configurationSource;
+
+    private final SecurityConfigurationValidator validator;
+
+    private final List<PrivilegeDescriptor> privilegeDescriptors;
+
+    private final SecurityConfigurationCleaner configCleaner;
+
+    private final List<SecurityConfigurationModifier> configurationModifiers;
 
     @Inject
-    private SecurityConfigurationValidator validator;
-
-    @Inject
-    private List<PrivilegeDescriptor> privilegeDescriptors;
-
-    @Inject
-    private SecurityConfigurationCleaner configCleaner;
-
-    @Inject
-    private List<SecurityConfigurationModifier> configurationModifiers;
+    public DefaultConfigurationManager( List<SecurityConfigurationModifier> configurationModifiers,
+                                        SecurityConfigurationCleaner configCleaner,
+                                        SecurityConfigurationValidator validator,
+                                        @Named( "file" ) SecurityModelConfigurationSource configurationSource,
+                                        List<PrivilegeDescriptor> privilegeDescriptors )
+    {
+        this.configurationModifiers = configurationModifiers;
+        this.configCleaner = configCleaner;
+        this.validator = validator;
+        this.configurationSource = configurationSource;
+        this.privilegeDescriptors = privilegeDescriptors;
+    }
 
     public List<CPrivilege> listPrivileges()
     {

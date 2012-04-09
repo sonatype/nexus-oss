@@ -55,7 +55,6 @@ public class XmlAuthenticatingRealm
     @Inject
     public XmlAuthenticatingRealm( @Named( "resourceMerging" ) ConfigurationManager configuration )
     {
-        super();
         this.configuration = configuration;
         setCredentialsMatcher( new Sha1ThenMd5CredentialsMatcher() );
     }

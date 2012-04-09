@@ -39,14 +39,19 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Singleton
 @Typed( Realm.class )
-@Named( "Mock" )
+@Named( MockRealm.NAME )
 public class MockRealm
     extends AuthorizingRealm
 {
+    public static final String NAME = "Mock";
+
+    private final UserManager userManager;
 
     @Inject
-    @Named( "Mock" )
-    private UserManager userManager;
+    public MockRealm( @Named( "Mock" ) UserManager userManager )
+    {
+        this.userManager = userManager;
+    }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )

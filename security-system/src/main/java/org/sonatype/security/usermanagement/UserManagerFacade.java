@@ -30,8 +30,13 @@ public class UserManagerFacade
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
+    private final Map<String, UserManager> userManagers;
+
     @Inject
-    Map<String, UserManager> userManagers;
+    public UserManagerFacade( Map<String, UserManager> userManagers )
+    {
+        this.userManagers = userManagers;
+    }
 
     public User getUser( String userId, String source )
         throws UserNotFoundException, NoSuchUserManagerException

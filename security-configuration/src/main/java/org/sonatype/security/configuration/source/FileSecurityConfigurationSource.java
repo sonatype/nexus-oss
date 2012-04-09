@@ -42,32 +42,35 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 public class FileSecurityConfigurationSource
     extends AbstractSecurityConfigurationSource
 {
-
     /**
      * The configuration file.
      */
-    @Inject
-    @Named( "${application-conf}/security-configuration.xml" )
     private File configurationFile;
 
     // /**
     // * The configuration upgrader.
     // */
-    // @@Inject
     // private SecurityConfigurationUpgrader configurationUpgrader;
 
     /**
      * The defaults configuration source.
      */
-    @Inject
-    @Named( "static" )
-    private SecurityConfigurationSource securityDefaults;
+    private final SecurityConfigurationSource securityDefaults;
 
-    @Inject
-    private PasswordHelper passwordHelper;
+    private final PasswordHelper passwordHelper;
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
+
+    @Inject
+    public FileSecurityConfigurationSource( @Named( "static" ) SecurityConfigurationSource securityDefaults,
+                                            @Named( "${application-conf}/security-configuration.xml" ) File configurationFile,
+                                            PasswordHelper passwordHelper )
+    {
+        this.securityDefaults = securityDefaults;
+        this.configurationFile = configurationFile;
+        this.passwordHelper = passwordHelper;
+    }
 
     /**
      * Gets the configuration file.
@@ -83,7 +86,9 @@ public class FileSecurityConfigurationSource
      * Sets the configuration file.
      * 
      * @param configurationFile the new configuration file
+     * @deprecated replaced by constructor injection
      */
+    @Deprecated
     public void setConfigurationFile( File configurationFile )
     {
         this.configurationFile = configurationFile;

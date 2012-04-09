@@ -32,7 +32,6 @@ public class KenaiProjectsJsonGenerator
 
     public KenaiProjectsJsonGenerator( int pageSize, int totalProjects, String baseUrl )
     {
-        super();
         this.pageSize = pageSize;
         this.totalProjects = totalProjects;
         this.baseUrl = baseUrl;

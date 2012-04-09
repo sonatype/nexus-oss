@@ -58,7 +58,6 @@ public class Privilege
     public Privilege( String id, String name, String description, String type, Map<String, String> properties,
                       boolean readOnly )
     {
-        super();
         this.id = id;
         this.name = name;
         this.description = description;

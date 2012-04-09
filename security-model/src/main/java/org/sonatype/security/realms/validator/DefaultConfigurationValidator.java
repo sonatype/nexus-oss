@@ -45,13 +45,19 @@ public class DefaultConfigurationValidator
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private ConfigurationIdGenerator idGenerator;
-
-    @Inject
-    private List<PrivilegeDescriptor> privilegeDescriptors;
-
     private static String DEFAULT_SOURCE = "default";
+
+    private final ConfigurationIdGenerator idGenerator;
+
+    private final List<PrivilegeDescriptor> privilegeDescriptors;
+
+    @Inject
+    public DefaultConfigurationValidator( List<PrivilegeDescriptor> privilegeDescriptors,
+                                          ConfigurationIdGenerator idGenerator )
+    {
+        this.privilegeDescriptors = privilegeDescriptors;
+        this.idGenerator = idGenerator;
+    }
 
     public ValidationResponse validateModel( ValidationRequest<Configuration> request )
     {
