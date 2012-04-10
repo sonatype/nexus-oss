@@ -859,15 +859,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
             {
                 challengeIfNeeded( req, res, (AccessDeniedException) t );
             }
-            else if ( t instanceof IOException )
-            {
-                // StorageException is subclass of IOEx, it will be catched here
-
-                // Internal error, we force it to log
-                shouldLogInfoStackTrace = true;
-
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t );
-            }
             else
             {
                 // Internal error, we force it to log
