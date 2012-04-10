@@ -53,6 +53,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractHTTPRemoteRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
@@ -143,7 +144,7 @@ class HttpClientRemoteStorage
                 // _should_
                 // give us URL with ending "/"
                 release( httpResponse );
-                throw new ItemNotFoundException(
+                throw new RemoteItemNotFoundException(
                     "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
                         + remoteURL.toString() + "\")", request, repository );
             }
@@ -195,17 +196,15 @@ class HttpClientRemoteStorage
             release( httpResponse );
             if ( httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND )
             {
-                throw new ItemNotFoundException(
+                throw new RemoteItemNotFoundException(
                     "The remoteURL we requested does not exists on remote server (remoteUrl=\"" + remoteURL.toString()
-                        + "\")", request, repository );
+                        + "\", response code is 404)", request, repository );
             }
             else
             {
-                throw new RemoteStorageException( "The method execution returned result code "
-                                                      + httpResponse.getStatusLine().getStatusCode()
-                                                      + ". [repositoryId=\"" + repository.getId() + "\", requestPath=\""
-                                                      + request.getRequestPath()
-                                                      + "\", remoteUrl=\"" + remoteURL.toString() + "\"]" );
+                throw new RemoteStorageException( "The method execution returned result code " + httpResponse.getStatusLine().getStatusCode()
+                    + " (expected 200). [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]" );
             }
         }
     }

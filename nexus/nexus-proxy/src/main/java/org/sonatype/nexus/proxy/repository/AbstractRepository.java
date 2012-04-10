@@ -1200,7 +1200,7 @@ public abstract class AbstractRepository
                                 + " is in NFC and still active, throwing ItemNotFoundException." );
                     }
 
-                    throw new ItemNotFoundException( request );
+                    throw new ItemNotFoundException( request, this );
                 }
             }
         }

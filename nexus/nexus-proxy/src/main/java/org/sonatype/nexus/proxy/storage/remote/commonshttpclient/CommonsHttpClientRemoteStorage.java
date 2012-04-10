@@ -55,6 +55,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractHTTPRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
+import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
@@ -113,7 +114,6 @@ public class CommonsHttpClientRemoteStorage
 
         if ( response == HttpStatus.SC_OK )
         {
-
             if ( method.getPath().endsWith( "/" ) )
             {
                 // this is a collection and not a file!
@@ -122,7 +122,7 @@ public class CommonsHttpClientRemoteStorage
                 // give us URL with ending "/"
                 method.releaseConnection();
 
-                throw new ItemNotFoundException(
+                throw new RemoteItemNotFoundException(
                     "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
                         + remoteURL.toString() + "\")", request, repository );
             }
@@ -194,14 +194,14 @@ public class CommonsHttpClientRemoteStorage
 
             if ( response == HttpStatus.SC_NOT_FOUND )
             {
-                throw new ItemNotFoundException(
+                throw new RemoteItemNotFoundException(
                     "The remoteURL we requested does not exists on remote server (remoteUrl=\"" + remoteURL.toString()
-                        + "\")", request, repository );
+                        + "\", response code is 404)", request, repository );
             }
             else
             {
                 throw new RemoteStorageException( "The method execution returned result code " + response
-                    + ". [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + " (expected 200). [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
                     + "\", remoteUrl=\"" + remoteURL.toString() + "\"]" );
             }
         }

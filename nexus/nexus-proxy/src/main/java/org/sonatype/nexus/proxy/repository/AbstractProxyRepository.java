@@ -1754,7 +1754,8 @@ public abstract class AbstractProxyRepository
                 {
                     if ( !getProxyMode().shouldCheckRemoteStatus() )
                     {
-                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request ) );
+                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request,
+                            AbstractProxyRepository.this ) );
                     }
                     else
                     {
@@ -1764,7 +1765,7 @@ public abstract class AbstractProxyRepository
                         }
                         else
                         {
-                            autoBlockProxying( new ItemNotFoundException( request ) );
+                            autoBlockProxying( new ItemNotFoundException( request, AbstractProxyRepository.this ) );
                         }
                     }
                 }

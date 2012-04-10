@@ -219,7 +219,7 @@ public abstract class AbstractShadowRepository
         catch ( AccessDeniedException e )
         {
             // if client has no access to content over shadow, we just hide the fact
-            throw new ItemNotFoundException( request, e );
+            throw new ItemNotFoundException( request, this, e );
         }
     }
 }

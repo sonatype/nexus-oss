@@ -323,8 +323,7 @@ public class ArtifactStoreHelper
 
             if ( gav == null )
             {
-                throw new ItemNotFoundException( "GAV: " + gavRequest.getGroupId() + " : " + gavRequest.getArtifactId()
-                    + " : " + gavRequest.getVersion(), gavRequest, repository );
+                throw new ItemNotFoundException( gavRequest, repository );
             }
 
             return gav;
