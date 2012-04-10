@@ -26,6 +26,7 @@ import org.easymock.EasyMock;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 public abstract class AbstractWebSecurityTest
     extends InjectedTestCase
@@ -58,6 +59,20 @@ public abstract class AbstractWebSecurityTest
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
         this.getSecuritySystem().start();
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        try
+        {
+            this.lookup( CacheManagerComponent.class ).shutdown();
+        }
+        finally
+        {
+            super.tearDown();
+        }
     }
 
     protected SecuritySystem getSecuritySystem()

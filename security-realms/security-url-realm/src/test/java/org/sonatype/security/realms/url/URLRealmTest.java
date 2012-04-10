@@ -18,6 +18,7 @@ import java.util.Properties;
 import junit.framework.Assert;
 
 import org.apache.shiro.authc.AccountException;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
@@ -63,6 +64,35 @@ public class URLRealmTest
 
         AuthenticationInfo info = urlRealm.getAuthenticationInfo( new UsernamePasswordToken( username, password ) );
         Assert.assertNotNull( info );
+    }
+
+    public void testAuthenticateThenStopServerToTestCache()
+        throws Exception
+    {
+
+        URLRealm urlRealm = this.getRealm();
+
+        AuthenticationInfo info1 = urlRealm.getAuthenticationInfo( new UsernamePasswordToken( username, password ) );
+        Assert.assertNotNull( info1 );
+
+        this.server.stop();
+
+        AuthenticationInfo info2 = urlRealm.getAuthenticationInfo( new UsernamePasswordToken( username, password ) );
+        Assert.assertNotNull( info2 );
+
+        // cache implementation specific
+        Assert.assertEquals( info1, info2 );
+
+        // make sure we cannot login with an invalid password
+        try
+        {
+            urlRealm.getAuthenticationInfo( new UsernamePasswordToken( username, "INVALID-PASSWORD" ) );
+            Assert.fail( "expected AuthenticationException" );
+        }
+        catch ( AuthenticationException e )
+        {
+            // expected
+        }
     }
 
     public void testAuthorize()

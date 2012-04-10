@@ -29,17 +29,17 @@ public class KenaiRealmTest
         return 302;
     }
 
-    private Realm getRealm()
+    private KenaiRealm getRealm()
         throws Exception
     {
-        Realm kenaiRealm = (KenaiRealm) this.lookup( Realm.class, "kenai" );
+        KenaiRealm kenaiRealm = (KenaiRealm) this.lookup( Realm.class, "kenai" );
         return kenaiRealm;
     }
 
     public void testAuthenticate()
         throws Exception
     {
-        Realm kenaiRealm = this.getRealm();
+        KenaiRealm kenaiRealm = this.getRealm();
 
         AuthenticationInfo info = kenaiRealm.getAuthenticationInfo( new UsernamePasswordToken( username, password ) );
         Assert.assertNotNull( info );
@@ -48,7 +48,7 @@ public class KenaiRealmTest
     public void testAuthorize()
         throws Exception
     {
-        Realm kenaiRealm = this.getRealm();
+        KenaiRealm kenaiRealm = this.getRealm();
 
         // check all roles
         for ( int ii = 0; ii < getTotalNumberOfProjects(); ii++ )
@@ -61,7 +61,7 @@ public class KenaiRealmTest
     public void testAuthFail()
         throws Exception
     {
-        Realm kenaiRealm = this.getRealm();
+        KenaiRealm kenaiRealm = this.getRealm();
 
         try
         {
@@ -77,7 +77,7 @@ public class KenaiRealmTest
     public void testAuthFailAuthFail()
         throws Exception
     {
-        Realm kenaiRealm = this.getRealm();
+        KenaiRealm kenaiRealm = this.getRealm();
 
         try
         {
