@@ -70,12 +70,6 @@
     <dependency>
       <groupId>org.sonatype.sisu.inject</groupId>
       <artifactId>guice-multibindings</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-guice</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu.inject</groupId>
