@@ -53,7 +53,6 @@ public class DefaultRealmSecurityManager
         init();
     }
 
-    @Override
     public void init()
         throws ShiroException
     {

@@ -26,6 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import net.sf.ehcache.CacheManager;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -33,6 +35,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -128,11 +131,8 @@ public class DefaultSecuritySystem
     {
         try
         {
-            Subject subject = new Subject.Builder( getSecurityManager() ).buildSubject();
-            // TODO: consider doing something else here, read the javadoc for the login method
+            Subject subject = this.getSubject();
             subject.login( token );
-            // Subject subject = this.getApplicationSecurityManager().login( null, token );
-            // ThreadContext.bind( subject );
             return subject;
         }
         catch ( org.apache.shiro.authc.AuthenticationException e )
@@ -858,10 +858,26 @@ public class DefaultSecuritySystem
         // reload the config
         this.securityConfiguration.clearCache();
 
+        // if we are restarting this component the getCacheManager will be null
+        // TODO: need better lifecycle management of cache (done), make sure this works with the NEXUS tests before
+        // removing comment
+        CacheManager cacheManager = this.cacheManagerComponent.getCacheManager();
+        // if( cacheManager == null)
+        // {
+        // try
+        // {
+        // cacheManager = this.cacheManagerComponent.buildCacheManager( null );
+        // }
+        // catch ( IOException e )
+        // {
+        // throw new IllegalStateException( "Failed to restart CacheManagerComponent" );
+        // }
+        // }
+
         // setup the CacheManager ( this could be injected if we where less coupled with ehcache)
         // The plexus wrapper can interpolate the config
         EhCacheManager ehCacheManager = new EhCacheManager();
-        ehCacheManager.setCacheManager( cacheManagerComponent.getCacheManager() );
+        ehCacheManager.setCacheManager( cacheManager );
         this.getSecurityManager().setCacheManager( ehCacheManager );
 
         if ( org.apache.shiro.util.Initializable.class.isInstance( this.getSecurityManager() ) )
@@ -873,8 +889,24 @@ public class DefaultSecuritySystem
 
     public void stop()
     {
+        if ( getSecurityManager().getRealms() != null )
+        {
+            for ( Realm realm : getSecurityManager().getRealms() )
+            {
+                if ( AuthenticatingRealm.class.isInstance( realm ) )
+                {
+                    ( (AuthenticatingRealm) realm ).setAuthenticationCache( null );
+                }
+                if ( AuthorizingRealm.class.isInstance( realm ) )
+                {
+                    ( (AuthorizingRealm) realm ).setAuthorizationCache( null );
+                }
+            }
+        }
+
         // we need to kill caches on stop
         getSecurityManager().destroy();
+        // cacheManagerComponent.shutdown();
     }
 
     private void setSecurityManagerRealms()
