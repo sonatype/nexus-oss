@@ -153,7 +153,7 @@ public class HttpClientProxyUtilTest
         // get last changed
         long lastChanged = ctx.getLastChanged();
         // making sure we will have subtraction result grater than 0
-        Thread.sleep( 5 );
+        Thread.sleep( 15 );
 
         // 1st invocation, should modify it
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, logger );
@@ -162,7 +162,7 @@ public class HttpClientProxyUtilTest
         // get last changed
         lastChanged = ctx.getLastChanged();
         // making sure we will have subtraction result grater than 0
-        Thread.sleep( 5 );
+        Thread.sleep( 15 );
 
         // now 2nd invocation, should not change
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, logger );
