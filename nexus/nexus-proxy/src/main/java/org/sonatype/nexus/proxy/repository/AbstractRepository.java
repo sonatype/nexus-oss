@@ -849,17 +849,6 @@ public abstract class AbstractRepository
                     throw new ItemNotFoundException( request, this );
                 }
             }
-            // plain file? wrap it
-            else if ( item instanceof StorageFileItem )
-            {
-                StorageFileItem file = (StorageFileItem) item;
-
-                // wrap the content locator if needed
-                if ( !( file.getContentLocator() instanceof ReadLockingContentLocator ) )
-                {
-                    file.setContentLocator( new ReadLockingContentLocator( uid, file.getContentLocator() ) );
-                }
-            }
 
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventRetrieve( this, item ) );
 
@@ -1358,6 +1347,19 @@ public abstract class AbstractRepository
         try
         {
             localItem = getLocalStorage().retrieveItem( this, request );
+
+            // plain file? wrap it
+            if ( localItem instanceof StorageFileItem )
+            {
+                StorageFileItem file = (StorageFileItem) localItem;
+
+                // wrap the content locator if needed
+                if ( !( file.getContentLocator() instanceof ReadLockingContentLocator ) )
+                {
+                    final RepositoryItemUid uid = createUid( request.getRequestPath() );
+                    file.setContentLocator( new ReadLockingContentLocator( uid, file.getContentLocator() ) );
+                }
+            }
 
             if ( getLogger().isDebugEnabled() )
             {
