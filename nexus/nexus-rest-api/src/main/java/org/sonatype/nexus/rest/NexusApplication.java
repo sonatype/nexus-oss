@@ -19,6 +19,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Directory;
 import org.restlet.Router;
+import org.restlet.service.StatusService;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
@@ -76,6 +77,9 @@ public class NexusApplication
 
     @Requirement( role = ErrorReportingManager.class )
     private ErrorReportingManager errorManager;
+
+    @Requirement( role = StatusService.class )
+    private StatusService statusService;
 
     /**
      * Listener.
@@ -153,6 +157,9 @@ public class NexusApplication
             return;
         }
         
+        // set our StatusService
+        setStatusService( statusService );
+
         // Add error manager to context
         getContext().getAttributes().put( ErrorReportingManager.class.getName(), errorManager );
 
@@ -209,11 +216,13 @@ public class NexusApplication
 
         // protecting the content service manually
         this.protectedPathManager.addProtectedResource( "/content"
-                    + contentResource.getResourceProtection().getPathPattern(), contentResource.getResourceProtection().getFilterExpression() );
+            + contentResource.getResourceProtection().getPathPattern(),
+            contentResource.getResourceProtection().getFilterExpression() );
 
         // protecting service resources with "wall" permission
         this.protectedPathManager.addProtectedResource( "/service/**",
-                                                        "authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );    }
+            "authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
+    }
 
     @Override
     protected void handlePlexusResourceSecurity( PlexusResource resource )
@@ -225,8 +234,8 @@ public class NexusApplication
             return;
         }
 
-        this.protectedPathManager.addProtectedResource( "/service/*"
-                                                        + descriptor.getPathPattern(), descriptor.getFilterExpression() );
+        this.protectedPathManager.addProtectedResource( "/service/*" + descriptor.getPathPattern(),
+            descriptor.getFilterExpression() );
     }
 
     @Override
