@@ -18,9 +18,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
-import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -69,20 +67,5 @@ public class NexusStatusService
             new VelocityRepresentation( null, "/templates/errorPageContentHtml.vm", dataModel, MediaType.TEXT_HTML );
 
         return representation;
-    }
-
-    // ==
-
-    protected Reference getNexusRoot( final Request request )
-    {
-        Reference result = request.getRootRef();
-
-        // fix for when restlet is at webapp root
-        if ( StringUtils.isEmpty( result.getPath() ) )
-        {
-            result.setPath( "/" );
-        }
-
-        return result;
     }
 }

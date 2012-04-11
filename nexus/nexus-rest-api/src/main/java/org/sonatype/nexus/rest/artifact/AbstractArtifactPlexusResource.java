@@ -484,9 +484,9 @@ public abstract class AbstractArtifactPlexusResource
             getLogger().debug( "Got error while uploading artifact", t );
 
             StringBuffer resp = new StringBuffer();
-            resp.append( "<html>" ).append( "<body>" ).append( "<error>");
+            resp.append( "<html><body><error>");
             resp.append(  StringEscapeUtils.escapeHtml( e.getMessage() ));
-            resp.append( "</error>" ).append( "</body>" ).append( "</html>" );
+            resp.append( "</error></body></html>" );
 
             String forceSuccess = request.getResourceRef().getQueryAsForm().getFirstValue( "forceSuccess" );
 
