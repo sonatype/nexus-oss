@@ -12,8 +12,6 @@
  */
 package org.sonatype.security.rest.users;
 
-import java.util.Map;
-
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,8 +22,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -33,6 +29,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.inject.BeanEntry;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -55,14 +52,10 @@ import org.sonatype.security.usermanagement.UserManager;
 public class UserLocatorComponentListPlexusResource
     extends AbstractPlexusResource
 {
-
     public static final String RESOURCE_URI = "/components/userLocators";
 
     @Inject
-    private PlexusContainer container;
-
-    @Inject
-    private Map<String, UserManager> userManagers;
+    private Iterable<BeanEntry<Named, UserManager>> userManagers;
 
     @Override
     public Object getPayloadInstance()
@@ -92,24 +85,25 @@ public class UserLocatorComponentListPlexusResource
     {
         PlexusComponentListResourceResponse result = new PlexusComponentListResourceResponse();
 
-        if ( userManagers == null || userManagers.isEmpty() )
+        if ( userManagers != null )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
+            for ( BeanEntry<Named, UserManager> entry : userManagers )
+            {
+                String hint = entry.getKey().value();
+                String description = entry.getDescription();
+
+                PlexusComponentListResource resource = new PlexusComponentListResource();
+                resource.setRoleHint( hint );
+                resource.setDescription( ( StringUtils.isNotEmpty( description ) ) ? description : hint );
+
+                // add it to the collection
+                result.addData( resource );
+            }
         }
 
-        for ( String hint : userManagers.keySet() )
+        if ( result.getData().isEmpty() )
         {
-            ComponentDescriptor<?> componentDescriptor =
-                container.getComponentDescriptor( UserManager.class, UserManager.class.getName(), hint );
-
-            PlexusComponentListResource resource = new PlexusComponentListResource();
-
-            resource.setRoleHint( componentDescriptor.getRoleHint() );
-            resource.setDescription( ( StringUtils.isNotEmpty( componentDescriptor.getDescription() ) ) ? componentDescriptor.getDescription()
-                            : componentDescriptor.getRoleHint() );
-
-            // add it to the collection
-            result.addData( resource );
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
 
         return result;
