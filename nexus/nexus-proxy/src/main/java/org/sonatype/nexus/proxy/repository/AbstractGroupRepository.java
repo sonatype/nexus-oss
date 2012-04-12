@@ -90,11 +90,11 @@ public abstract class AbstractGroupRepository
     public void onEvent( Event<?> evt )
     {
         // we must do this before the super.onEvent() call!
+        // members changed if config was dirty AND the "old" and "new" member ID list (List<String>) are NOT equal
         boolean membersChanged =
             getCurrentCoreConfiguration().isDirty()
-                && ( getExternalConfiguration( false ).getMemberRepositoryIds().size() != getExternalConfiguration(
-                    true ).getMemberRepositoryIds().size() || !getExternalConfiguration( false ).getMemberRepositoryIds().containsAll(
-                    getExternalConfiguration( true ).getMemberRepositoryIds() ) );
+                && !getExternalConfiguration( false ).getMemberRepositoryIds().equals(
+                    getExternalConfiguration( true ).getMemberRepositoryIds() );
 
         List<String> currentMemberIds = Collections.emptyList();
         List<String> newMemberIds = Collections.emptyList();
