@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.realm.Realm;
@@ -119,10 +120,14 @@ public class ExceptionCatchingModularRealmAuthorizer
     {
         for ( Realm realm : this.getRealms() )
         {
+            if ( !( realm instanceof Authorizer ) )
+            {
+                continue; // ignore non-authorizing realms
+            }
             // need to catch an AuthorizationException, the user might only belong to on of the realms
             try
             {
-                if ( realm.hasRole( subjectPrincipal, roleIdentifier ) )
+                if ( ( (Authorizer) realm ).hasRole( subjectPrincipal, roleIdentifier ) )
                 {
                     return true;
                 }
@@ -143,9 +148,13 @@ public class ExceptionCatchingModularRealmAuthorizer
 
         for ( Realm realm : this.getRealms() )
         {
+            if ( !( realm instanceof Authorizer ) )
+            {
+                continue; // ignore non-authorizing realms
+            }
             try
             {
-                boolean[] result = realm.hasRoles( subjectPrincipal, roleIdentifiers );
+                boolean[] result = ( (Authorizer) realm ).hasRoles( subjectPrincipal, roleIdentifiers );
 
                 for ( int i = 0; i < combinedResult.length; i++ )
                 {
@@ -167,9 +176,13 @@ public class ExceptionCatchingModularRealmAuthorizer
     {
         for ( Realm realm : this.getRealms() )
         {
+            if ( !( realm instanceof Authorizer ) )
+            {
+                continue; // ignore non-authorizing realms
+            }
             try
             {
-                if ( realm.isPermitted( subjectPrincipal, permission ) )
+                if ( ( (Authorizer) realm ).isPermitted( subjectPrincipal, permission ) )
                 {
                     this.logger.trace( "Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
                         + " has permisison: " + permission );
@@ -196,9 +209,13 @@ public class ExceptionCatchingModularRealmAuthorizer
     {
         for ( Realm realm : this.getRealms() )
         {
+            if ( !( realm instanceof Authorizer ) )
+            {
+                continue; // ignore non-authorizing realms
+            }
             try
             {
-                if ( realm.isPermitted( subjectPrincipal, permission ) )
+                if ( ( (Authorizer) realm ).isPermitted( subjectPrincipal, permission ) )
                 {
                     return true;
                 }
@@ -219,9 +236,13 @@ public class ExceptionCatchingModularRealmAuthorizer
 
         for ( Realm realm : this.getRealms() )
         {
+            if ( !( realm instanceof Authorizer ) )
+            {
+                continue; // ignore non-authorizing realms
+            }
             try
             {
-                boolean[] result = realm.isPermitted( subjectPrincipal, permissions );
+                boolean[] result = ( (Authorizer) realm ).isPermitted( subjectPrincipal, permissions );
 
                 for ( int i = 0; i < combinedResult.length; i++ )
                 {
@@ -244,9 +265,13 @@ public class ExceptionCatchingModularRealmAuthorizer
 
         for ( Realm realm : this.getRealms() )
         {
+            if ( !( realm instanceof Authorizer ) )
+            {
+                continue; // ignore non-authorizing realms
+            }
             try
             {
-                boolean[] result = realm.isPermitted( subjectPrincipal, permissions );
+                boolean[] result = ( (Authorizer) realm ).isPermitted( subjectPrincipal, permissions );
 
                 for ( int i = 0; i < combinedResult.length; i++ )
                 {
