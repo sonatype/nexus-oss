@@ -57,6 +57,9 @@ public class NexusApplication
     @Requirement( hint = "indexTemplate" )
     private ManagedPlexusResource indexTemplateResource;
 
+    @Requirement( hint = "licenseTemplate", optional = true )
+    private ManagedPlexusResource licenseTemplateResource;
+
     @Requirement( hint = "IndexRedirectingPlexusResource" )
     private ManagedPlexusResource indexRedirectingResource;
 
@@ -177,6 +180,10 @@ public class NexusApplication
 
         // the indexTemplateResource
         attach( root, false, indexTemplateResource );
+        if( licenseTemplateResource != null )
+        {
+            attach( root, false, licenseTemplateResource );
+        }
 
         // publish the WAR contents
         Directory rootDir = new NexusDirectory( getContext(), "war:///" );
