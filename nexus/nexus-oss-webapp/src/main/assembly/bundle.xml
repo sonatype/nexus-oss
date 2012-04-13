@@ -91,6 +91,7 @@
         <excludes>
           <exclude>META-INF/**</exclude>
           <exclude>WEB-INF/lib/appcontext*.jar</exclude>
+          <exclude>WEB-INF/classes/logback.xml</exclude>
         </excludes>
       </unpackOptions>
       <useTransitiveDependencies>false</useTransitiveDependencies>
