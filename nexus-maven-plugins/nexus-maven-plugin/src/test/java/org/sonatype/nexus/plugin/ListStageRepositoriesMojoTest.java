@@ -12,17 +12,16 @@
  */
 package org.sonatype.nexus.plugin;
 
-import static junit.framework.Assert.fail;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.jdom.JDOMException;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasSize;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
@@ -30,10 +29,14 @@ import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import static junit.framework.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 
 public class ListStageRepositoriesMojoTest
     extends NexusMojoTestSupport
@@ -210,7 +213,83 @@ public class ListStageRepositoriesMojoTest
         runMojo( mojo );
     }
 
+    @Test
+    public void usingUAFilterMatchingNone()
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
+    {
+        printTestName();
+        usingUAFilter( "None" );
+    }
+
+    @Test
+    public void usingUAFilterMatchingMultiple()
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
+    {
+        printTestName();
+        usingUAFilter( "Apache-Maven/2.1 (Java 1.4.2_18; Mac OS X 10.5.6) maven-artifact/2.1.0", "tp1-001", "tp1-002" );
+    }
+
+    @Test
+    public void usingUAFilterMatchingOne()
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
+    {
+        printTestName();
+        usingUAFilter( "Apache-Maven/3.0.2", "tp1-005" );
+    }
+
+    @Test
+    public void usingUAFilterMatchingAnotherOne()
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
+    {
+        printTestName();
+        usingUAFilter( "Apache-Maven/3.0.3", "tp1-006" );
+    }
+
+    // ==
+
+    private void usingUAFilter( final String userAgent, String... expectedRepoIds )
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
+    {
+        printTestName();
+
+        ListStageRepositoriesMojo mojo = newMojo();
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+        mojo.setNexusUrl( getBaseUrl() );
+
+        mojo.setUserAgent( userAgent );
+
+        final StringBuilderLog stringLog = new StringBuilderLog( log );
+        runMojo( stringLog, mojo );
+
+        final String output = stringLog.getLoggedOutput();
+
+        if ( userAgent != null )
+        {
+            // in log message
+            assertThat( output, containsString( userAgent ) );
+        }
+
+        if ( expectedRepoIds.length == 0 )
+        {
+            assertThat( output, containsString( "None." ) );
+        }
+        else
+        {
+            for ( String expectedRepoId : expectedRepoIds )
+            {
+                assertThat( output, containsString( expectedRepoId ) );
+            }
+        }
+    }
+
     private void runMojo( final ListStageRepositoriesMojo mojo )
+        throws JDOMException, IOException, MojoExecutionException
+    {
+        runMojo( log, mojo );
+    }
+
+    private void runMojo( final Log log, final ListStageRepositoriesMojo mojo )
         throws JDOMException, IOException, MojoExecutionException
     {
         mojo.setLog( log );

@@ -50,7 +50,15 @@ public class ListStageRepositoriesMojo
         if ( repos != null )
         {
             StringBuilder builder = new StringBuilder();
-            builder.append( String.format( "The following OPEN staging repositories were found for user-agent: '%s'", getUserAgent() ) );
+            if ( getUserAgent() == null )
+            {
+                builder.append( "The following OPEN staging repositories were found: " );
+            }
+            else
+            {
+                builder.append( String.format(
+                    "The following OPEN staging repositories were found for user-agent: '%s'", getUserAgent() ) );
+            }
 
             if ( !repos.isEmpty() )
             {
