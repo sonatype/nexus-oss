@@ -22,14 +22,13 @@ import org.sonatype.nexus.proxy.events.RepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.scheduling.ScheduledTask;
 
 @Component( role = EventInspector.class, hint = "RepositoryUrlChangeEventListener" )
 public class RepositoryUpdateMirrorEventListener
     extends AbstractEventInspector
     implements EventInspector
 {
-    public static final String TASKNAME_MIRROR_ECLIPSE_SITE = "Mirror Eclipse Update Site";
-
     @Requirement
     private NexusScheduler scheduler;
 
@@ -48,7 +47,8 @@ public class RepositoryUpdateMirrorEventListener
         if ( updateSite != null
             && ( evt instanceof RepositoryEventExpireNotFoundCaches || ( (RepositoryConfigurationUpdatedEvent) evt ).isRemoteUrlChanged() ) )
         {
-            getLogger().debug( "Submitted " + UpdateSiteMirrorTask.submit( scheduler, updateSite, false ).getName() );
+            final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit( scheduler, updateSite, false );
+            getLogger().debug( "Submitted " + mirrorTask.getName() );
         }
     }
 }

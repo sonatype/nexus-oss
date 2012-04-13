@@ -660,10 +660,12 @@ public class P2ProxyRepositoryImpl
             }
             catch ( final RemoteStorageException e )
             {
-                getLogger().warn(
+                getLogger().debug(
                     "isRemoteStorageReachable: RepositoryId=" + getId() + ": Caught exception while trying to access "
                         + metadataFilePath, e );
 
+                // rethrow and core will say _why_ it autoblocked too
+                // everything else than RemoteStorageException will bubble up too
                 throw e;
             }
         }

@@ -21,6 +21,7 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.scheduling.ScheduledTask;
 
 @Component( role = EventInspector.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT )
 public class RepositoryCreationEventListener
@@ -48,8 +49,8 @@ public class RepositoryCreationEventListener
         if ( updateSite != null )
         {
             updateSite.setExposed( false );
-            UpdateSiteMirrorTask.submit( scheduler, updateSite, true );
-            getLogger().debug( "Submitted " + UpdateSiteMirrorTask.submit( scheduler, updateSite, true ).getName() );
+            final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit( scheduler, updateSite, true );
+            getLogger().debug( "Submitted " + mirrorTask.getName() );
         }
     }
 }
