@@ -15,10 +15,13 @@ package org.sonatype.nexus.plugins.p2.repository.updatesite;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 import com.google.common.collect.Lists;
@@ -28,6 +31,15 @@ public class UpdateSiteMirrorTask
     extends AbstractNexusRepositoriesTask<Object>
 {
     public static final String ROLE_HINT = "UpdateSiteMirrorTask";
+
+    public static ScheduledTask<?> submit( final NexusScheduler scheduler, final UpdateSiteProxyRepository updateSite,
+                                           final boolean force )
+    {
+        final UpdateSiteMirrorTask task = scheduler.createTaskInstance( UpdateSiteMirrorTask.class );
+        task.setRepositoryId( updateSite.getId() );
+        task.setForce( force );
+        return scheduler.submit( "Eclipse Update Site Mirror (" + updateSite.getId() + ")", task );
+    }
 
     @Override
     protected String getRepositoryFieldId()
@@ -39,24 +51,24 @@ public class UpdateSiteMirrorTask
     protected Object doRun()
         throws Exception
     {
-        List<UpdateSiteRepository> repos = getRepositories();
-        for ( UpdateSiteRepository updateSite : repos )
+        List<UpdateSiteProxyRepository> repos = getRepositories();
+        for ( UpdateSiteProxyRepository updateSite : repos )
         {
-            updateSite.doMirror( getForce() );
+            updateSite.mirror( getForce() );
         }
 
         return null;
     }
 
-    private List<UpdateSiteRepository> getRepositories()
+    private List<UpdateSiteProxyRepository> getRepositories()
         throws NoSuchRepositoryException
     {
         if ( getRepositoryId() != null )
         {
             Repository repo = getRepositoryRegistry().getRepository( getRepositoryId() );
-            if ( repo.getRepositoryKind().isFacetAvailable( UpdateSiteRepository.class ) )
+            if ( repo.getRepositoryKind().isFacetAvailable( UpdateSiteProxyRepository.class ) )
             {
-                return Lists.newArrayList( repo.adaptToFacet( UpdateSiteRepository.class ) );
+                return Lists.newArrayList( repo.adaptToFacet( UpdateSiteProxyRepository.class ) );
             }
             else if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
             {
@@ -68,18 +80,18 @@ public class UpdateSiteMirrorTask
             }
         }
 
-        return getRepositoryRegistry().getRepositoriesWithFacet( UpdateSiteRepository.class );
+        return getRepositoryRegistry().getRepositoriesWithFacet( UpdateSiteProxyRepository.class );
     }
 
-    private List<UpdateSiteRepository> updateSites( GroupRepository group )
+    private List<UpdateSiteProxyRepository> updateSites( GroupRepository group )
     {
-        List<UpdateSiteRepository> us = Lists.newArrayList();
+        List<UpdateSiteProxyRepository> us = Lists.newArrayList();
 
         for ( Repository repo : group.getMemberRepositories() )
         {
-            if ( repo.getRepositoryKind().isFacetAvailable( UpdateSiteRepository.class ) )
+            if ( repo.getRepositoryKind().isFacetAvailable( UpdateSiteProxyRepository.class ) )
             {
-                us.add( repo.adaptToFacet( UpdateSiteRepository.class ) );
+                us.add( repo.adaptToFacet( UpdateSiteProxyRepository.class ) );
             }
         }
 

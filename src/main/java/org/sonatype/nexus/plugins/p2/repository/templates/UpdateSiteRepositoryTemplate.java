@@ -19,7 +19,8 @@ import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
-import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteRepository;
+import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
+import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteProxyRepositoryImpl;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
@@ -32,7 +33,7 @@ public class UpdateSiteRepositoryTemplate
     public UpdateSiteRepositoryTemplate( final P2RepositoryTemplateProvider provider, final String id,
                                          final String description )
     {
-        super( provider, id, description, new P2ContentClass(), UpdateSiteRepository.class );
+        super( provider, id, description, new P2ContentClass(), UpdateSiteProxyRepository.class );
     }
 
     public UpdateSiteRepositoryConfiguration getExternalConfiguration( final boolean forWrite )
@@ -50,7 +51,7 @@ public class UpdateSiteRepositoryTemplate
         repo.setName( "" );
 
         repo.setProviderRole( Repository.class.getName() );
-        repo.setProviderHint( UpdateSiteRepository.ROLE_HINT );
+        repo.setProviderHint( UpdateSiteProxyRepositoryImpl.ROLE_HINT );
 
         repo.setRemoteStorage( new CRemoteStorage() );
         repo.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );

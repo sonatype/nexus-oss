@@ -19,8 +19,9 @@ import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
-import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepository;
+import org.sonatype.nexus.plugins.p2.repository.P2ProxyRepository;
 import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepositoryConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepositoryImpl;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
@@ -50,7 +51,7 @@ public class P2ProxyRepositoryTemplate
         repo.setName( "" );
 
         repo.setProviderRole( Repository.class.getName() );
-        repo.setProviderHint( P2ProxyRepository.ROLE_HINT );
+        repo.setProviderHint( P2ProxyRepositoryImpl.ROLE_HINT );
 
         repo.setRemoteStorage( new CRemoteStorage() );
         repo.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );

@@ -60,5 +60,4 @@ public class P2ProxyRepositoryConfiguration
     {
         setNodeValue( getRootNode(), CHECKSUM_POLICY, policy.toString() );
     }
-
 }

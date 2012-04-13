@@ -18,8 +18,9 @@ import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
-import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepository;
+import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryImpl;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
@@ -48,7 +49,7 @@ public class P2GroupRepositoryTemplate
         repo.setName( "" );
 
         repo.setProviderRole( GroupRepository.class.getName() );
-        repo.setProviderHint( P2GroupRepository.ROLE_HINT );
+        repo.setProviderHint( P2GroupRepositoryImpl.ROLE_HINT );
 
         final Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );

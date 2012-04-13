@@ -22,6 +22,7 @@ import java.util.TreeMap;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
+import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.metadata.AbstractP2MetadataSource;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts;
 import org.sonatype.nexus.plugins.p2.repository.metadata.ArtifactsMerge;

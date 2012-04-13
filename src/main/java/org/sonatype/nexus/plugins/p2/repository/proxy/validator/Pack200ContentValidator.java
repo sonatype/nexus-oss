@@ -23,12 +23,10 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyMetadataSource;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
@@ -37,6 +35,9 @@ public class Pack200ContentValidator
     extends AbstractLogEnabled
     implements ItemContentValidator
 {
+    private final byte[] PACK200_MAGIC = new byte[] { 31, -117, 8, 0 };
+
+    private final byte[] JAR_MAGIC = new byte[] { 80, 75, 3, 4 };
 
     @Override
     public boolean isRemoteItemContentValid( final ProxyRepository proxy, final ResourceStoreRequest request,
@@ -63,9 +64,6 @@ public class Pack200ContentValidator
         final byte[] magicBytes = new byte[4];
         InputStream input = null;
 
-        final RepositoryItemUidLock lock = uid.getLock();
-
-        lock.lock( Action.read );
         try
         {
             input = ( (DefaultStorageFileItem) item ).getInputStream();
@@ -79,11 +77,10 @@ public class Pack200ContentValidator
         finally
         {
             IOUtil.close( input );
-            lock.unlock();
         }
 
-        return Arrays.equals( magicBytes, new byte[] { 31, -117, 8, 0 } ) // real pack.gz
-            || Arrays.equals( magicBytes, new byte[] { 80, 75, 3, 4 } ) // plain jar works too
+        return Arrays.equals( magicBytes, PACK200_MAGIC ) // real pack.gz
+            || Arrays.equals( magicBytes, JAR_MAGIC ) // plain jar works too
         ;
     }
 

@@ -13,37 +13,43 @@
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
+import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
 
-@Component( role = EventInspector.class, hint = UpdateSiteRepository.ROLE_HINT )
+@Component( role = EventInspector.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT )
 public class RepositoryCreationEventListener
+    extends AbstractEventInspector
     implements EventInspector
 {
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
 
-    private boolean active;
+    @Requirement
+    private NexusScheduler scheduler;
 
     @Override
     public boolean accepts( final Event<?> evt )
     {
-        active |= evt instanceof NexusStartedEvent;
-
-        return active && evt instanceof RepositoryRegistryEventAdd;
+        return applicationStatusSource.getSystemStatus().isNexusStarted() && evt instanceof RepositoryRegistryEventAdd;
     }
 
     @Override
     public void inspect( final Event<?> evt )
     {
-        final Repository repository = ( (RepositoryRegistryEventAdd) evt ).getRepository();
+        final UpdateSiteProxyRepository updateSite =
+            ( (RepositoryRegistryEventAdd) evt ).getRepository().adaptToFacet( UpdateSiteProxyRepository.class );
 
-        if ( repository instanceof UpdateSiteRepository )
+        if ( updateSite != null )
         {
-            repository.setExposed( false );
-            ( (UpdateSiteRepository) repository ).mirror( true );
+            updateSite.setExposed( false );
+            UpdateSiteMirrorTask.submit( scheduler, updateSite, true );
+            getLogger().debug( "Submitted " + UpdateSiteMirrorTask.submit( scheduler, updateSite, true ).getName() );
         }
     }
-
 }

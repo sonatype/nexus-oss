@@ -22,7 +22,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
-import org.sonatype.nexus.plugins.p2.repository.P2Repository;
+import org.sonatype.nexus.plugins.p2.repository.P2GroupRepository;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -38,12 +38,11 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-@Component( role = GroupRepository.class, hint = P2GroupRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Artifacts" )
-public class P2GroupRepository
+@Component( role = GroupRepository.class, hint = P2GroupRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Artifacts" )
+public class P2GroupRepositoryImpl
     extends AbstractGroupRepository
-    implements P2Repository, GroupRepository
+    implements P2GroupRepository, GroupRepository
 {
-
     public static final String ROLE_HINT = "p2";
 
     @Requirement( hint = P2ContentClass.ID )
@@ -56,6 +55,12 @@ public class P2GroupRepository
     private P2GroupRepositoryConfigurator p2GroupRepositoryConfigurator;
 
     private RepositoryKind repositoryKind;
+
+    @Override
+    public P2MetadataSource<P2GroupRepository> getMetadataSource()
+    {
+        return metadataSource;
+    }
 
     @Override
     public ContentClass getRepositoryContentClass()

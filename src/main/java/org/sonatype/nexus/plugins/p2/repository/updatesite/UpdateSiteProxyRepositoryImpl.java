@@ -41,6 +41,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
+import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.plugins.p2.repository.metadata.AbstractP2MetadataSource;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -72,10 +73,10 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.p2.bridge.Publisher;
 
-@Component( role = Repository.class, hint = UpdateSiteRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse Update Site" )
-public class UpdateSiteRepository
+@Component( role = Repository.class, hint = UpdateSiteProxyRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse Update Site" )
+public class UpdateSiteProxyRepositoryImpl
     extends AbstractProxyRepository
-    implements Initializable, Repository
+    implements UpdateSiteProxyRepository, Initializable
 {
     private static final String DEFAULT_FEATURES_DIR = "features/";
 
@@ -127,7 +128,7 @@ public class UpdateSiteRepository
         {
             repositoryKind =
                 new MutableProxyRepositoryKind( this, null, new DefaultRepositoryKind( HostedRepository.class, null ),
-                    new DefaultRepositoryKind( UpdateSiteRepository.class, null ) );
+                    new DefaultRepositoryKind( UpdateSiteProxyRepository.class, null ) );
         }
 
         return repositoryKind;
@@ -270,7 +271,7 @@ public class UpdateSiteRepository
 
         final DefaultStorageFileItem file =
             new DefaultStorageFileItem( this, request, source.canRead(), source.canWrite(), new FileContentLocator(
-                source, getMimeUtil().getMimeType( source ) ) );
+                source, getMimeSupport().guessMimeTypeFromPath( source.getName() ) ) );
         file.setModified( source.lastModified() );
         file.setCreated( source.lastModified() );
         file.setLength( source.length() );
@@ -680,17 +681,8 @@ public class UpdateSiteRepository
         }
     }
 
+    @Override
     public void mirror( final boolean force )
-    {
-        final UpdateSiteMirrorTask task = scheduler.createTaskInstance( UpdateSiteMirrorTask.class );
-
-        task.setRepositoryId( getId() );
-        task.setForce( force );
-
-        scheduler.submit( "Eclipse Update Site Mirror (" + getId() + ")", task );
-    }
-
-    /* package */void doMirror( final boolean force )
     {
         if ( force )
         {
@@ -724,7 +716,7 @@ public class UpdateSiteRepository
         {
             if ( !isItemValid( P2Constants.SITE_XML ) )
             {
-                mirror( false );
+                UpdateSiteMirrorTask.submit( scheduler, this, false );
             }
         }
 
@@ -776,21 +768,25 @@ public class UpdateSiteRepository
         return (DefaultFSLocalRepositoryStorage) super.getLocalStorage();
     }
 
+    @Override
     public int getArtifactMaxAge()
     {
         return getExternalConfiguration( false ).getArtifactMaxAge();
     }
 
+    @Override
     public void setArtifactMaxAge( final int maxAge )
     {
         getExternalConfiguration( true ).setArtifactMaxAge( maxAge );
     }
 
+    @Override
     public int getMetadataMaxAge()
     {
         return getExternalConfiguration( false ).getMetadataMaxAge();
     }
 
+    @Override
     public void setMetadataMaxAge( final int metadataMaxAge )
     {
         getExternalConfiguration( true ).setMetadataMaxAge( metadataMaxAge );

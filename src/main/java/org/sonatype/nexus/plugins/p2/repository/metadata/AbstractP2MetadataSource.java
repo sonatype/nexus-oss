@@ -32,6 +32,7 @@ import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
+import org.sonatype.nexus.plugins.p2.repository.P2Repository;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -50,8 +51,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-
-public abstract class AbstractP2MetadataSource<E extends Repository>
+ 
+public abstract class AbstractP2MetadataSource<E extends P2Repository>
     extends AbstractLoggingComponent
     implements P2MetadataSource<E>
 {

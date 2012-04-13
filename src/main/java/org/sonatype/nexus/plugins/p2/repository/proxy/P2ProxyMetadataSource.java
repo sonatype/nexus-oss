@@ -27,6 +27,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
+import org.sonatype.nexus.plugins.p2.repository.P2ProxyRepository;
 import org.sonatype.nexus.plugins.p2.repository.metadata.AbstractP2MetadataSource;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
@@ -240,14 +241,14 @@ public class P2ProxyMetadataSource
     protected boolean isArtifactsOld( final AbstractStorageItem artifactsItem, final P2ProxyRepository repository )
         throws StorageException
     {
-        return repository.isOld( artifactsItem );
+        return repository.isMetadataOld( artifactsItem );
     }
 
     @Override
     protected boolean isContentOld( final AbstractStorageItem contentItem, final P2ProxyRepository repository )
         throws StorageException
     {
-        return repository.isOld( contentItem );
+        return repository.isMetadataOld( contentItem );
     }
 
     private void storeItemFromFile( final String path, final File file, final P2ProxyRepository repository )

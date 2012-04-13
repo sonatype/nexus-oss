@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
-import org.sonatype.nexus.plugins.p2.repository.P2Repository;
+import org.sonatype.nexus.plugins.p2.repository.P2ProxyRepository;
 import org.sonatype.nexus.plugins.p2.repository.mappings.ArtifactMapping;
 import org.sonatype.nexus.plugins.p2.repository.mappings.ArtifactPath;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
@@ -44,6 +45,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -65,14 +67,15 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Mirror;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.util.StringDigester;
 
-@Component( role = Repository.class, hint = P2ProxyRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Proxy Repository" )
-public class P2ProxyRepository
+@Component( role = Repository.class, hint = P2ProxyRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Proxy Repository" )
+public class P2ProxyRepositoryImpl
     extends AbstractProxyRepository
-    implements P2Repository, Repository
+    implements P2ProxyRepository
 {
     public static final String ROLE_HINT = "p2";
 
@@ -93,9 +96,15 @@ public class P2ProxyRepository
 
     private P2ProxyDownloadMirrors downloadMirrors;
 
-    public P2ProxyRepository()
+    public P2ProxyRepositoryImpl()
     {
         initArtifactMappingsAndMirrors();
+    }
+
+    @Override
+    public P2MetadataSource<P2ProxyRepository> getMetadataSource()
+    {
+        return metadataSource;
     }
 
     @Override
@@ -112,9 +121,11 @@ public class P2ProxyRepository
     {
         if ( repositoryKind == null )
         {
+            // is this class able to be hosted at all?
             repositoryKind =
                 new MutableProxyRepositoryKind( this, null, new DefaultRepositoryKind( HostedRepository.class, null ),
-                    new DefaultRepositoryKind( P2ProxyRepository.class, null ) );
+                    new DefaultRepositoryKind( ProxyRepository.class,
+                        Arrays.asList( new Class<?>[] { P2ProxyRepository.class } ) ) );
         }
 
         return repositoryKind;
@@ -192,19 +203,14 @@ public class P2ProxyRepository
                 {
                     // The remote repository is a SimpleArtifactRepository with mirrors configured
                     getLogger().debug(
-                        "Repository " + getId() + ": configureMirrors: found single mirrors URL=" + mirrorsURL
-                    );
+                        "Repository " + getId() + ": configureMirrors: found single mirrors URL=" + mirrorsURL );
                     final AbstractStorageItem remoteMirrorsItem = getMirrorsItemRemote( mirrorsURL );
-                    final ContentLocator content = new PreparedContentLocator(
-                        ( (StorageFileItem) remoteMirrorsItem ).getInputStream(), "text/xml"
-                    );
-                    mirrorsItem = new DefaultStorageFileItem(
-                        this,
-                        new ResourceStoreRequest( PRIVATE_MIRRORS_PATH ),
-                        true /* isReadable */,
-                        false /* isWritable */,
-                        content
-                    );
+                    final ContentLocator content =
+                        new PreparedContentLocator( ( (StorageFileItem) remoteMirrorsItem ).getInputStream(),
+                            "text/xml" );
+                    mirrorsItem =
+                        new DefaultStorageFileItem( this, new ResourceStoreRequest( PRIVATE_MIRRORS_PATH ),
+                            true /* isReadable */, false /* isWritable */, content );
                     mirrorsItem = doCacheItem( mirrorsItem );
                 }
                 else
@@ -259,8 +265,7 @@ public class P2ProxyRepository
             {
                 getLogger().warn(
                     "Could not retrieve list of repository mirrors. "
-                        + "All downloads will come from repository canonical URL.", e
-                );
+                        + "All downloads will come from repository canonical URL.", e );
             }
             else
             {
@@ -273,8 +278,7 @@ public class P2ProxyRepository
                     }
                 }
                 getLogger().warn(
-                    "Could not retrieve list of repository mirrors ("
-                        + message
+                    "Could not retrieve list of repository mirrors (" + message
                         + "). All downloads will come from repository canonical URL." );
             }
         }
@@ -488,7 +492,8 @@ public class P2ProxyRepository
 
     private volatile boolean hasArtifactMappings;
 
-    /* package */void initArtifactMappingsAndMirrors()
+    @Override
+    public void initArtifactMappingsAndMirrors()
     {
         hasArtifactMappings = true;
         remoteArtifactMappings = null;
@@ -496,6 +501,7 @@ public class P2ProxyRepository
         mirrorsConfigured = false;
     }
 
+    @Override
     public Map<String, ArtifactMapping> getArtifactMappings()
         throws IllegalOperationException, StorageException
     {
@@ -652,39 +658,51 @@ public class P2ProxyRepository
                     return true;
                 }
             }
-            catch ( final Exception e )
+            catch ( final RemoteStorageException e )
             {
-                getLogger().debug(
+                getLogger().warn(
                     "isRemoteStorageReachable: RepositoryId=" + getId() + ": Caught exception while trying to access "
                         + metadataFilePath, e );
+
+                throw e;
             }
         }
 
         return false;
     }
 
+    @Override
     public int getArtifactMaxAge()
     {
         return getExternalConfiguration( false ).getArtifactMaxAge();
     }
 
+    @Override
     public void setArtifactMaxAge( final int maxAge )
     {
         getExternalConfiguration( true ).setArtifactMaxAge( maxAge );
     }
 
+    @Override
     public int getMetadataMaxAge()
     {
         return getExternalConfiguration( false ).getMetadataMaxAge();
     }
 
+    @Override
     public void setMetadataMaxAge( final int metadataMaxAge )
     {
         getExternalConfiguration( true ).setMetadataMaxAge( metadataMaxAge );
     }
 
     @Override
-    public boolean isOld( final StorageItem item )
+    public boolean isMetadataOld( final StorageItem metadataItem )
+    {
+        return isOld( metadataItem );
+    }
+
+    @Override
+    protected boolean isOld( final StorageItem item )
     {
         if ( P2ProxyMetadataSource.isP2MetadataItem( item.getPath() ) )
         {

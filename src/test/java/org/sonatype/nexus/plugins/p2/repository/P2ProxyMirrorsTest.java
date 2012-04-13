@@ -24,7 +24,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;

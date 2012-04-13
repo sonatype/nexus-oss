@@ -14,12 +14,12 @@ package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEvent;
-import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
 
@@ -28,7 +28,6 @@ public class RepositoryUpdateMirrorEventListener
     extends AbstractEventInspector
     implements EventInspector
 {
-
     public static final String TASKNAME_MIRROR_ECLIPSE_SITE = "Mirror Eclipse Update Site";
 
     @Requirement
@@ -37,21 +36,19 @@ public class RepositoryUpdateMirrorEventListener
     @Override
     public boolean accepts( final Event<?> evt )
     {
-        return evt instanceof RepositoryConfigurationUpdatedEvent || evt instanceof RepositoryEventExpireCaches;
+        return evt instanceof RepositoryConfigurationUpdatedEvent || evt instanceof RepositoryEventExpireNotFoundCaches;
     }
 
     @Override
     public void inspect( final Event<?> evt )
     {
-        final Repository repository = ( (RepositoryEvent) evt ).getRepository();
+        final UpdateSiteProxyRepository updateSite =
+            ( (RepositoryEvent) evt ).getRepository().adaptToFacet( UpdateSiteProxyRepository.class );
 
-        if ( repository instanceof UpdateSiteRepository
-            && ( evt instanceof RepositoryEventExpireCaches || ( (RepositoryConfigurationUpdatedEvent) evt ).isRemoteUrlChanged() ) )
+        if ( updateSite != null
+            && ( evt instanceof RepositoryEventExpireNotFoundCaches || ( (RepositoryConfigurationUpdatedEvent) evt ).isRemoteUrlChanged() ) )
         {
-            final UpdateSiteMirrorTask mirrorTask = scheduler.createTaskInstance( UpdateSiteMirrorTask.class );
-            mirrorTask.setRepositoryId( repository.getId() );
-            scheduler.submit( TASKNAME_MIRROR_ECLIPSE_SITE, mirrorTask );
-            getLogger().debug( "Submitted " + TASKNAME_MIRROR_ECLIPSE_SITE );
+            getLogger().debug( "Submitted " + UpdateSiteMirrorTask.submit( scheduler, updateSite, false ).getName() );
         }
     }
 }

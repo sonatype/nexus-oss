@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.metadata;
 
+import org.sonatype.nexus.plugins.p2.repository.P2Repository;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.Repository;
 
-public interface P2MetadataSource<E extends Repository>
+public interface P2MetadataSource<E extends P2Repository>
 {
     StorageItem doRetrieveItem( ResourceStoreRequest request, E repository )
         throws StorageException, ItemNotFoundException;

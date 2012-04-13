@@ -16,9 +16,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepository;
-import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepository;
-import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteRepository;
+import org.sonatype.nexus.plugins.p2.repository.group.P2GroupRepositoryImpl;
+import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepositoryImpl;
+import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteProxyRepositoryImpl;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -67,13 +67,13 @@ public class P2RepositoryTemplateProvider
         throws InitializationException
     {
         repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor( Repository.class,
-            P2ProxyRepository.ROLE_HINT, "repositories" ) );
+            P2ProxyRepositoryImpl.ROLE_HINT, "repositories" ) );
 
         repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor( Repository.class,
-            UpdateSiteRepository.ROLE_HINT, "repositories" ) );
+            UpdateSiteProxyRepositoryImpl.ROLE_HINT, "repositories" ) );
 
         repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor( GroupRepository.class,
-            P2GroupRepository.ROLE_HINT, "groups" ) );
+            P2GroupRepositoryImpl.ROLE_HINT, "groups" ) );
 
     }
 }

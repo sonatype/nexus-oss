@@ -12,23 +12,25 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm2812;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.testng.annotations.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.hamcrest.Matchers.containsString;
 
 public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
     extends AbstractNexusProxyP2IT
@@ -66,10 +68,8 @@ public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
         proxyServer.stop();
         proxyServer.getServer().setHandler( new AbstractHandler()
         {
-
             @Override
-            public void handle( final String target, final HttpServletRequest request,
-                                final HttpServletResponse response, final int dispatch )
+            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
                 throws IOException, ServletException
             {
                 for ( final String path : P2Constants.METADATA_FILE_PATHS )
@@ -80,7 +80,7 @@ public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
                         return;
                     }
                 }
-                handler.handle( target, request, response, dispatch );
+                handler.handle( target, baseRequest, request, response );
             }
         } );
         proxyServer.start();

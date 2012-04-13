@@ -16,10 +16,10 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
+import org.sonatype.nexus.plugins.p2.repository.P2ProxyRepository;
 import org.sonatype.nexus.plugins.p2.repository.mappings.ArtifactMapping;
 import org.sonatype.nexus.plugins.p2.repository.mappings.ArtifactPath;
 import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyMetadataSource;
-import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepository;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
