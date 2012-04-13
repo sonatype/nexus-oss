@@ -250,8 +250,6 @@ public class ListStageRepositoriesMojoTest
     private void usingUAFilter( final String userAgent, String... expectedRepoIds )
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
-        printTestName();
-
         ListStageRepositoriesMojo mojo = newMojo();
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
