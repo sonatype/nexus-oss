@@ -20,7 +20,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -64,9 +64,9 @@ public class DefaultFSLocalRepositoryStorage
 
     @Inject
     public DefaultFSLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister,
-                                            MimeSupport mimeSupport, Map<String, Long> repositoryContexts, FSPeer fsPeer )
+                                            MimeSupport mimeSupport, FSPeer fsPeer )
     {
-        super( wastebasket, linkPersister, mimeSupport, repositoryContexts );
+        super( wastebasket, linkPersister, mimeSupport );
         this.fsPeer = fsPeer;
     }
 

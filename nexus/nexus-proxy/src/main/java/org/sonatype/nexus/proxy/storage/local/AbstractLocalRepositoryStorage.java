@@ -51,31 +51,30 @@ public abstract class AbstractLocalRepositoryStorage
     /**
      * The wastebasket.
      */
-    private Wastebasket wastebasket;
+    private final Wastebasket wastebasket;
 
     /**
      * The default Link persister.
      */
-    private LinkPersister linkPersister;
+    private final LinkPersister linkPersister;
 
     /**
      * The MIME support.
      */
-    private MimeSupport mimeSupport;
+    private final MimeSupport mimeSupport;
 
     /**
      * Since storages are shared, we are tracking the last changes from each of them.
      */
-    private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
+    private final Map<String, Integer> repositoryContexts;
 
-
-    protected AbstractLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister, MimeSupport mimeSupport,
-                                              Map<String, Long> repositoryContexts )
+    protected AbstractLocalRepositoryStorage( final Wastebasket wastebasket, final LinkPersister linkPersister,
+                                              final MimeSupport mimeSupport )
     {
         this.wastebasket = wastebasket;
         this.linkPersister = linkPersister;
         this.mimeSupport = mimeSupport;
-        this.repositoryContexts = repositoryContexts;
+        this.repositoryContexts = new HashMap<String, Integer>();
     }
 
     protected Logger getLogger()
@@ -118,13 +117,13 @@ public abstract class AbstractLocalRepositoryStorage
         {
             // we have repo specific settings
             // if contextContains key and is newer, or does not contain yet
-            if ( ( repositoryContexts.containsKey( repository.getId() ) && repository.getLocalStorageContext().getLastChanged() > ( repositoryContexts.get( repository.getId() ).longValue() ) )
+            if ( ( repositoryContexts.containsKey( repository.getId() ) && ( repository.getLocalStorageContext().getGeneration() > ( repositoryContexts.get( repository.getId() ).intValue() ) ) )
                 || !repositoryContexts.containsKey( repository.getId() ) )
             {
                 updateContext( repository, repository.getLocalStorageContext() );
 
                 repositoryContexts.put( repository.getId(),
-                    Long.valueOf( repository.getLocalStorageContext().getLastChanged() ) );
+                    Integer.valueOf( repository.getLocalStorageContext().getGeneration() ) );
             }
         }
 

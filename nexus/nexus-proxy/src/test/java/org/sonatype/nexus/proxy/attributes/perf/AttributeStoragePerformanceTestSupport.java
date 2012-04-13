@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -59,7 +58,6 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
-import com.google.common.collect.Maps;
 
 /**
  * The performance tests for specific implementations of AttributesStorage.
@@ -110,7 +108,6 @@ public abstract class AttributeStoragePerformanceTestSupport
         Wastebasket wastebasket = mock( Wastebasket.class );
         LinkPersister linkPersister = mock( LinkPersister.class );
         MimeSupport mimeSupport = mock( MimeSupport.class );
-        Map<String, Long> repositoryContexts = Maps.newHashMap();
 
         // Application Config
         applicationConfiguration = mock( ApplicationConfiguration.class );
@@ -139,8 +136,7 @@ public abstract class AttributeStoragePerformanceTestSupport
 
         // setup the class under test
         localRepositoryStorageUnderTest =
-            new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, repositoryContexts,
-                new DefaultFSPeer() );
+            new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, new DefaultFSPeer() );
 
         // prime the retrieve
         ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );

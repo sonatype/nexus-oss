@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
@@ -44,8 +43,6 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
-
-import com.google.common.collect.Maps;
 
 /**
  * Tests {@link DefaultFSLocalRepositoryStorage}
@@ -83,7 +80,6 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         Wastebasket wastebasket = mock( Wastebasket.class );
         LinkPersister linkPersister = mock( LinkPersister.class );
         MimeSupport mimeUtil = mock( MimeSupport.class );
-        Map<String, Long> repositoryContexts = Maps.newHashMap();
 
         // Mock FSPeer to return the results created above
         FSPeer fsPeer = mock( FSPeer.class );
@@ -99,7 +95,7 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         when( repository.getAttributesHandler() ).thenReturn( attributesHandler );
 
 
-        DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeUtil, repositoryContexts, fsPeer );
+        DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeUtil, fsPeer );
 
         ResourceStoreRequest validRequest = new ResourceStoreRequest( "valid" );
 
@@ -131,7 +127,6 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         Repository repository = mock( Repository.class );
         FSPeer fsPeer = mock( FSPeer.class );
         MimeSupport mimeSupport = mock( MimeSupport.class );
-        Map<String, Long> repositoryContexts = Maps.newHashMap();
 
         // mock file
         File mockFile = mock( File.class );
@@ -145,7 +140,7 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         when( linkPersister.isLinkContent( Mockito.any( ContentLocator.class ) ) ).thenThrow( new FileNotFoundException( "Expected to be thrown from mock." ) );
 
         // object to test
-        DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, repositoryContexts, fsPeer )
+        DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, fsPeer )
         {
             // expose protected method
             @Override
