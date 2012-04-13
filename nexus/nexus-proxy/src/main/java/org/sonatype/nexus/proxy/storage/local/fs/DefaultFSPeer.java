@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.ItemPathUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
@@ -110,9 +111,9 @@ public class DefaultFSPeer
                     hiddenTarget.delete();
                 }
 
-                throw new LocalStorageException( "Got exception during storing on path "
-                    + item.getRepositoryItemUid().toString() + " (while writing to hiddenTarget: "
-                    + hiddenTarget.getAbsolutePath() + ")", e );
+                throw new LocalStorageException( String.format(
+                    "Got exception during storing on path \"%s\" (while writing to hiddenTarget: \"%s\")",
+                    item.getRepositoryItemUid().toString(), hiddenTarget.getAbsolutePath() ), e );
             }
             finally
             {
@@ -164,8 +165,9 @@ public class DefaultFSPeer
                         item.getRepositoryItemUid().toString(), hiddenTarget.getAbsolutePath() );
                 }
 
-                throw new LocalStorageException( "Got exception during storing on path "
-                    + item.getRepositoryItemUid().toString() + " (while moving to final destination)", e );
+                throw new LocalStorageException( String.format(
+                    "Got exception during storing on path \"%s\" (while moving to final destination)",
+                    item.getRepositoryItemUid().toString() ), e );
             }
             finally
             {
@@ -196,16 +198,22 @@ public class DefaultFSPeer
             }
             catch ( IOException ex )
             {
-                throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
-                    + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath(), ex );
+                throw new LocalStorageException( String.format(
+                    "Could not delete directory in repository %s from path \"%s\"",
+                    RepositoryStringUtils.getHumanizedNameString( repository ), target.getAbsolutePath() ), ex );
             }
         }
         else if ( target.isFile() )
         {
-            if ( !target.delete() )
+            try
             {
-                throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
-                    + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath() );
+                FileUtils.forceDelete( target );
+            }
+            catch ( IOException ex )
+            {
+                throw new LocalStorageException( String.format(
+                    "Could not delete file in repository %s from path \"%s\"",
+                    RepositoryStringUtils.getHumanizedNameString( repository ), target.getAbsolutePath() ) );
             }
         }
         else
@@ -302,7 +310,8 @@ public class DefaultFSPeer
             }
             else
             {
-                getLogger().warn( "Cannot list directory " + target.getAbsolutePath() );
+                getLogger().warn( "Cannot list directory in repository {}, path \"{}\"",
+                    RepositoryStringUtils.getHumanizedNameString( repository ), target.getAbsolutePath() );
             }
 
             return result;
@@ -343,9 +352,9 @@ public class DefaultFSPeer
             // re-check is it really a "good" parent?
             if ( !target.getParentFile().isDirectory() )
             {
-                throw new LocalStorageException( "Could not create the directory hiearchy in repository \""
-                    + repository.getName() + "\" (id=\"" + repository.getId() + "\") to write "
-                    + target.getAbsolutePath() );
+                throw new LocalStorageException( String.format(
+                    "Could not create the directory hiearchy in repository %s to write \"%s\"",
+                    RepositoryStringUtils.getHumanizedNameString( repository ), target.getAbsolutePath() ) );
             }
         }
     }
@@ -411,9 +420,8 @@ public class DefaultFSPeer
         // if retries enabled go ahead and start the retry process
         for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
         {
-            getLogger().debug(
-                "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath() + " --> "
-                    + target.getAbsolutePath() + " will wait " + getRenameRetryDelay() + " milliseconds and try again" );
+            getLogger().debug( "Rename operation attempt {} failed on {} --> {}, will wait {} ms and try again",
+                new Object[] { i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), getRenameRetryDelay() } );
 
             try
             {
@@ -434,9 +442,8 @@ public class DefaultFSPeer
 
             if ( success )
             {
-                getLogger().info(
-                    "Rename operation succeeded after " + i + " retries on " + hiddenTarget.getAbsolutePath() + " --> "
-                        + target.getAbsolutePath() );
+                getLogger().info( "Rename operation succeeded after {} retries on {} --> {}",
+                    new Object[] { i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath() } );
             }
         }
 
@@ -449,11 +456,12 @@ public class DefaultFSPeer
             catch ( IOException e )
             {
                 getLogger().error(
-                    "Rename operation failed after " + getRenameRetryCount() + " retries in " + getRenameRetryDelay()
-                        + " ms intervals " + hiddenTarget.getAbsolutePath() + " --> " + target.getAbsolutePath() );
+                    "Rename operation failed after {} retries in {} ms intervals {} --> {}",
+                    new Object[] { getRenameRetryCount(), getRenameRetryDelay(), hiddenTarget.getAbsolutePath(),
+                        target.getAbsolutePath() } );
 
-                throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
-                    + target.getAbsolutePath() + "\"! " + e.getMessage() );
+                throw new IOException( String.format( "Cannot rename file \"%s\" to \"%s\"! Message: %s",
+                    hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), e.getMessage() ), e );
             }
         }
     }
