@@ -1379,6 +1379,12 @@
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
+                    <exclude>commons-vfs:commons-vfs</exclude>
+                  </excludes>
+                  <message>commons-vfs 1.0 has a potential security vulnerability (osvdb-58760). Use org.apache.commons:commons-vfs2:2.0 or greater</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
                     <exclude>*:plexus-container-default</exclude>
                   </excludes>
                   <message>Plexus IoC container is phased out, use Sisu Inject Plexus instead!</message>
