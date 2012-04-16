@@ -177,12 +177,12 @@
     <sisu-jetty8.version>1.1</sisu-jetty8.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.19</plexus.restlet.bridge.version>
-    <plexus-security.version>2.5</plexus-security.version>
+    <plexus-security.version>2.6</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
-    <shiro.version>1.1.0</shiro.version>
+    <shiro.version>1.2.0</shiro.version>
     <spice-timeline.version>2.1</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
     <surefire.version>2.10</surefire.version>

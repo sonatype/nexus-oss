@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -101,6 +102,20 @@ public class DefaultRepositoryRouterTest
         this.securitySystem = this.lookup( SecuritySystem.class );
         this.securitySystem.start();
 
+    }
+
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        try
+        {
+            ThreadContext.remove();
+        }
+        finally
+        {
+            super.tearDown();
+        }
     }
 
     @Test

@@ -26,6 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -112,6 +113,20 @@ public class ProtectedRepositoryRegistryTest
         // this.securitySystem.start();
 
         waitForTasksToStop();
+    }
+
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        try
+        {
+            ThreadContext.remove();
+        }
+        finally
+        {
+            super.tearDown();
+        }
     }
 
     @Test

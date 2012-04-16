@@ -33,7 +33,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,8 +61,7 @@ public class StatelessAndStatefulWebSessionManagerTest
         simpleAccountRealm.addAccount( "user", "user123" );
 
         securityManager =
-            new NexusWebRealmSecurityManager( LoggerFactory.getLogger( getClass() ),
-                                              new HashMap<String, RolePermissionResolver>() );
+            new NexusWebRealmSecurityManager( new HashMap<String, RolePermissionResolver>() );
         securityManager.setRealm( simpleAccountRealm );
         securityManager.init();
 
