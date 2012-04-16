@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -69,6 +70,20 @@ public class AccessTest
 
         // setup security
         this.lookup( SecuritySystem.class ).start(); // need to call start to clear caches
+    }
+
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        try
+        {
+            ThreadContext.remove();
+        }
+        finally
+        {
+            super.tearDown();
+        }
     }
 
     @Override

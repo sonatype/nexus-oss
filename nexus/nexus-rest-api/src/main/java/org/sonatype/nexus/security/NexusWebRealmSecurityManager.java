@@ -23,7 +23,6 @@ import org.apache.shiro.ShiroException;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
-import org.slf4j.Logger;
 import org.sonatype.security.web.WebRealmSecurityManager;
 
 /**
@@ -37,9 +36,9 @@ public class NexusWebRealmSecurityManager
     implements org.apache.shiro.util.Initializable
 {
     @Inject
-    public NexusWebRealmSecurityManager( Logger logger, Map<String, RolePermissionResolver> rolePermissionResolverMap )
+    public NexusWebRealmSecurityManager( Map<String, RolePermissionResolver> rolePermissionResolverMap )
     {
-        super( logger, rolePermissionResolverMap );
+        super( rolePermissionResolverMap );
     }    
 
     public void init()

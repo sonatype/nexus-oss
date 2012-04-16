@@ -30,7 +30,7 @@ public class SonatypeLdapTest
     extends PlexusTestCaseSupport
 {
 
-    private Realm realm;
+    private SimpleLdapAuthenticatingRealm realm;
 
     private PasswordEncoderManager passwordManager;
 
@@ -40,7 +40,7 @@ public class SonatypeLdapTest
     {
         super.setUp();
 
-        realm = this.lookup( Realm.class, "LdapAuthenticatingRealm" );
+        realm = (SimpleLdapAuthenticatingRealm) this.lookup( Realm.class, "LdapAuthenticatingRealm" );
         passwordManager = (PasswordEncoderManager) this.lookup( PasswordEncoderManager.class );
         passwordManager.setPreferredEncoding( "crypt" );
     }
