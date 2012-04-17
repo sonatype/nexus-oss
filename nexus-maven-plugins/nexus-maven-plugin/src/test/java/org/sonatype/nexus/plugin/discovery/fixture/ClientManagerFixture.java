@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugin.discovery.fixture;
 
 import org.sonatype.nexus.plugin.discovery.NexusTestClientManager;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
 
 public final class ClientManagerFixture
     implements NexusTestClientManager
@@ -24,7 +25,7 @@ public final class ClientManagerFixture
 
     public String testPassword;
 
-    public boolean testConnection( final String url, final String user, final String password )
+    public boolean testConnection( final String url, final String user, final String password, ProxyConfig proxyConfig )
     {
         return ( testUrl == null || url.equals( testUrl ) ) && ( testUser == null || user.equals( testUser ) )
             && ( testPassword == null || password.equals( testPassword ) );
