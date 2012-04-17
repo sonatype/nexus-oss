@@ -30,6 +30,7 @@
 
   <name>Nexus Plugin :: OBR</name>
   <description>Adds a repository type for OBR repositories.</description>
+  <url/>
   
   <licenses>
     <license>
