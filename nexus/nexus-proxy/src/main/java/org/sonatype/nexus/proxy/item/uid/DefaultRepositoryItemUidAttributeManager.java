@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.slf4j.Logger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
@@ -29,11 +29,9 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  */
 @Component( role = RepositoryItemUidAttributeManager.class )
 public class DefaultRepositoryItemUidAttributeManager
+    extends AbstractLoggingComponent
     implements RepositoryItemUidAttributeManager
 {
-    @Requirement
-    private Logger logger;
-
     @Requirement( role = RepositoryItemUidAttributeSource.class )
     private Map<String, RepositoryItemUidAttributeSource> attributeSources;
 
@@ -68,9 +66,9 @@ public class DefaultRepositoryItemUidAttributeManager
             }
         }
 
-        if ( logger.isDebugEnabled() )
+        if ( getLogger().isDebugEnabled() )
         {
-            logger.debug( "Registered {} UID Attributes coming from following sources: {}",
+            getLogger().debug( "Registered {} UID Attributes coming from following sources: {}",
                 new Object[] { attributes.size(), sources.toString() } );
         }
     }
