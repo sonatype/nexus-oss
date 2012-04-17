@@ -73,7 +73,7 @@ public class PromoteToStageProfileMojo
         List<StageRepository> repos;
         try
         {
-            repos = client.getClosedStageRepositories();
+            repos = filterUserAgent( client.getClosedStageRepositories() );
             Collections.sort( repos, new BeanComparator( "repositoryId" ) );
         }
         catch ( RESTLightClientException e )

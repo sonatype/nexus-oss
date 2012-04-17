@@ -37,12 +37,19 @@ public abstract class AbstractStagingMojo
 
     /**
      * If provided, and this repository is available for selection, use it.
-     *
+     * 
      * @parameter expression="${nexus.repositoryId}"
      */
     private String repositoryId;
 
     private StageClient client;
+
+    /**
+     * Filter opened staging repositories using the provided user agent
+     * 
+     * @parameter expression="${nexus.userAgent}"
+     */
+    private String userAgent;
 
     public AbstractStagingMojo()
     {
@@ -102,12 +109,15 @@ public abstract class AbstractStagingMojo
             if ( groupId != null )
             {
                 repos = getClient().getClosedStageRepositoriesForUser( groupId, artifactId, version );
-                builder.append( String.format( " for: '%s:%s:%s'", groupId, artifactId, version ) );
+                builder.append( String.format( " for: '%s:%s:%s', user-agent: '%s'", groupId, artifactId, version,
+                    getUserAgent() ) );
             }
             else
             {
                 repos = getClient().getClosedStageRepositories();
+                builder.append( String.format( " for user-agent: '%s'", getUserAgent() ) );
             }
+            repos = filterUserAgent( repos );
             builder.append( ": " );
         }
         catch ( RESTLightClientException e )
@@ -149,10 +159,8 @@ public abstract class AbstractStagingMojo
             builder.append( "\n   Description: " ).append( repo.getDescription() );
         }
 
-        builder.append( String.format(
-            "\n   Details: (user: %s, ip: %s, user agent: %s)",
-            repo.getUser(), repo.getIpAddress(), repo.getUserAgent() )
-        );
+        builder.append( String.format( "\n   Details: (user: %s, ip: %s, user agent: %s)", repo.getUser(),
+            repo.getIpAddress(), repo.getUserAgent() ) );
 
         return builder;
     }
@@ -161,10 +169,8 @@ public abstract class AbstractStagingMojo
     {
         StringBuilder builder = new StringBuilder();
 
-        builder
-            .append( "Id: " ).append( profile.getProfileId() )
-            .append( "\tname: " ).append( profile.getName() )
-            .append( "\tmode: " ).append( profile.getMode() );
+        builder.append( "Id: " ).append( profile.getProfileId() ).append( "\tname: " ).append( profile.getName() ).append(
+            "\tmode: " ).append( profile.getMode() );
 
         return builder;
     }
@@ -243,6 +249,16 @@ public abstract class AbstractStagingMojo
         }
     }
 
+    public String getUserAgent()
+    {
+        return userAgent;
+    }
+
+    public void setUserAgent( final String userAgent )
+    {
+        this.userAgent = userAgent;
+    }
+
     public String getRepositoryId()
     {
         return repositoryId;
@@ -255,6 +271,7 @@ public abstract class AbstractStagingMojo
 
     /**
      * Create an error message from a staging rule failure's XML document.
+     * 
      * @throws NullPointerException if the given document is {@code null}
      */
     protected String ruleFailureMessage( final Document document )
@@ -273,7 +290,8 @@ public abstract class AbstractStagingMojo
             }
         }
 
-        final StringBuilder msg = new StringBuilder( "There were failed staging rules when finishing the repository.\n" );
+        final StringBuilder msg =
+            new StringBuilder( "There were failed staging rules when finishing the repository.\n" );
 
         final Element failuresNode = document.getRootElement().getChild( "failures" );
         if ( failuresNode == null )
@@ -285,8 +303,8 @@ public abstract class AbstractStagingMojo
 
         for ( Element entry : failures )
         {
-            msg.append(" * ").append( entry.getChild( "ruleName" ).getText() ).append( "\n" );
-            final Element messageList = entry.getChild("messages");
+            msg.append( " * " ).append( entry.getChild( "ruleName" ).getText() ).append( "\n" );
+            final Element messageList = entry.getChild( "messages" );
             List<Element> messages = (List<Element>) messageList.getChildren();
             for ( Element message : messages )
             {
@@ -299,13 +317,15 @@ public abstract class AbstractStagingMojo
         // staging rules return HTML markup in their results. Get rid of it.
         // Usually this should not be done with a regular expression (b/c HTML is not a regular language)
         // but this is (to date...) just stuff like '<b>$item</b>', so all will be well.
-        // FIXME we should change staging rules etc. server-side to return all the necessary information to build messages.
+        // FIXME we should change staging rules etc. server-side to return all the necessary information to build
+        // messages.
         return StringEscapeUtils.unescapeHtml( htmlString.replaceAll( "<[^>]*>", "" ) );
     }
 
     /**
-     * Log the detailed error document if it's available, return MojoExecutionException with appropriate message and cause.
-     *
+     * Log the detailed error document if it's available, return MojoExecutionException with appropriate message and
+     * cause.
+     * 
      * @throws NullPointerException if the given exception is null
      */
     protected MojoExecutionException logErrorDetailAndCreateException( final RESTLightClientException e,
@@ -331,7 +351,7 @@ public abstract class AbstractStagingMojo
                 }
                 catch ( IOException e1 )
                 {
-                    //  cannot write to StringWriter - unlikely, but we cannot do anything here anyway.
+                    // cannot write to StringWriter - unlikely, but we cannot do anything here anyway.
                 }
             }
 
@@ -339,5 +359,34 @@ public abstract class AbstractStagingMojo
         }
 
         return new MojoExecutionException( msg + ": " + e.getMessage(), e );
+    }
+
+    /**
+     * Returns the list of staging repositories filtered by user agent. It returns the same list of no userAgent
+     * provided.
+     * 
+     * @param repos the list of staging repositories to be filtered.
+     * @return the filtered list of staging repositories or the passed in list if no userAgent explicitly defined.
+     */
+    protected List<StageRepository> filterUserAgent( List<StageRepository> repos )
+    {
+        final String userAgent = getUserAgent();
+        List<StageRepository> filteredRepos;
+        if ( userAgent == null )
+        {
+            filteredRepos = repos;
+        }
+        else
+        {
+            filteredRepos = new ArrayList<StageRepository>();
+            for ( StageRepository stageRepository : repos )
+            {
+                if ( userAgent.equals( stageRepository.getUserAgent() ) )
+                {
+                    filteredRepos.add( stageRepository );
+                }
+            }
+        }
+        return filteredRepos;
     }
 }
