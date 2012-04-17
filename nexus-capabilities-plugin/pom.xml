@@ -31,6 +31,7 @@
 
   <name>Nexus : Plugins : Capabilities</name>
   <description>Allows Nexus to define configurable capabilities</description>
+  <url/>
 
   <properties>
     <debug-js>false</debug-js>
