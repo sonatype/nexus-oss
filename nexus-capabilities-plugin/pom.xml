@@ -130,19 +130,19 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <extensions>true</extensions>
         <dependencies>
           <dependency>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
           </dependency>
         </dependencies>
         <configuration>
-          <componentDependencies>
-            <componentDependency>org.sonatype.sisu.goodies:goodies-eventbus</componentDependency>
-          </componentDependencies>
+          <sharedDependencies>
+            <sharedDependency>org.sonatype.sisu.goodies:goodies-eventbus</sharedDependency>
+          </sharedDependencies>
         </configuration>
       </plugin>
       <plugin>
