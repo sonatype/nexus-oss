@@ -30,8 +30,8 @@
   <packaging>nexus-plugin</packaging>
 
   <name>Nexus :: Plugin :: P2 Repository</name>
-
   <description>Adds P2 repository support</description>
+  <url/>
 
   <licenses>
     <license>
