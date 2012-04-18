@@ -29,8 +29,8 @@
   <packaging>nexus-plugin</packaging>
 
   <name>Nexus :: Plugin :: P2 Bridge</name>
-
   <description>Bridge between Nexus and P2 Eclipse Runtime</description>
+  <url/>
 
   <licenses>
     <license>
