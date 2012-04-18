@@ -27,7 +27,7 @@
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Core Documentation</name>
   <description>Exposes Nexus core documentation.</description>
-  <url>http://nexus.sonatype.org/</url>
+  <url/>
 
   <dependencies>
     <dependency>
