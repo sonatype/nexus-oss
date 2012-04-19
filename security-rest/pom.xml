@@ -25,12 +25,6 @@
   <packaging>pom</packaging>
   <name>Plexus Security Rest Parent</name>
 
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-security</connection>
-    <url>http://svn.sonatype.org/spice/trunk/plexus-security</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-security</developerConnection>
-  </scm>
-
   <properties>
     <plexus-maven-plugin.version>1.3.8</plexus-maven-plugin.version>
     <plexus-component-annotations.version>1.0-alpha-17</plexus-component-annotations.version>
