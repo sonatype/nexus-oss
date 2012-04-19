@@ -40,8 +40,9 @@ body {
 #logo {
   color: white;
   font-size: 9px;
-  padding-top: 1px;
-  text-align: right;
+  position: absolute;
+  top: 30px;
+  right: 10px;
 }
 
 #logo a {
@@ -62,6 +63,26 @@ a:link, a:visited, a:hover, a:active {
 
 #head-link-r {
      color: #FAC500;
+}
+
+#head-link-logged-in button {
+    color: #FAC500;
+}
+
+.user-profile-menu {
+    background-color: black;
+    background-image: url("../images/header_bg.gif");
+}
+
+.user-profile-menu a.x-menu-item {
+    color: #FAC500;
+    background-color: black;
+    background-image: url("../images/header_bg.gif");
+}
+
+.user-profile-menu a.x-menu-item :hover {
+    background-color: darkgray;
+    background-image: url("../images/header_bg.gif");
 }
 
 #header div.left-side {

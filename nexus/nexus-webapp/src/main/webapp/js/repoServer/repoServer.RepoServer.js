@@ -278,7 +278,9 @@
               title : 'Security',
               id : 'st-nexus-security',
               collapsed : true,
-              items : [{
+              items : [
+                  // MARKER NXCM-4097
+                  {
                     enabled : Sonatype.user.curr.isLoggedIn && Sonatype.user.curr.loggedInUserSource == 'default' && sp.checkPermission('security:userschangepw', sp.CREATE),
                     title : 'Change Password',
                     handler : Sonatype.utils.changePassword,
@@ -389,6 +391,30 @@
           }
           this.loginWindow.show();
         }
+      },
+      profileMenu : new Ext.menu.Menu({
+        cls : 'user-profile-menu',
+        items : [
+          {
+            text : 'Logout',
+            handler : function() {
+              Sonatype.repoServer.RepoServer.loginHandler();
+            }
+          },
+          {
+            text : 'Profile',
+            handler : function() {
+              alert('profile page!')
+            }
+          }
+        ]
+      }),
+
+      /**
+       * Shows the profile menu at the position of the scope of this function.
+       */
+      showProfileMenu : function() {
+        Sonatype.repoServer.RepoServer.profileMenu.show(this);
       },
 
       resetMainTabPanel : function() {
