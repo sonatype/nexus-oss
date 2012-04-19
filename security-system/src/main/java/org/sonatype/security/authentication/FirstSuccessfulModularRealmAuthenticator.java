@@ -36,22 +36,21 @@ import org.slf4j.LoggerFactory;
 public class FirstSuccessfulModularRealmAuthenticator
     extends ModularRealmAuthenticator
 {
-
-    private static final Logger log = LoggerFactory.getLogger( FirstSuccessfulModularRealmAuthenticator.class );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Override
     protected AuthenticationInfo doMultiRealmAuthentication( Collection<Realm> realms, AuthenticationToken token )
     {
-        log.trace( "Iterating through [" + realms.size() + "] realms for PAM authentication" );
+        logger.trace( "Iterating through [" + realms.size() + "] realms for PAM authentication" );
 
         for ( Realm realm : realms )
         {
             // check if the realm supports this token
             if ( realm.supports( token ) )
             {
-                if ( log.isTraceEnabled() )
+                if ( logger.isTraceEnabled() )
                 {
-                    log.trace( "Attempting to authenticate token [" + token + "] " + "using realm of type [" + realm
+                    logger.trace( "Attempting to authenticate token [" + token + "] " + "using realm of type [" + realm
                         + "]" );
                 }
 
@@ -67,24 +66,24 @@ public class FirstSuccessfulModularRealmAuthenticator
                     }
                     else
                     {
-                        log.warn( "Realm [" + realm + "] returned null when authenticating token " + "[" + token + "]" );
+                        logger.warn( "Realm [" + realm + "] returned null when authenticating token " + "[" + token + "]" );
                     }
                 }
                 catch ( Throwable t )
                 {
-                    if ( log.isTraceEnabled() )
+                    if ( logger.isTraceEnabled() )
                     {
                         String msg =
                             "Realm [" + realm + "] threw an exception during a multi-realm authentication attempt:";
-                        log.trace( msg, t );
+                        logger.trace( msg, t );
                     }
                 }
             }
             else
             {
-                if ( log.isTraceEnabled() )
+                if ( logger.isTraceEnabled() )
                 {
-                    log.trace( "Realm of type [" + realm + "] does not support token " + "[" + token
+                    logger.trace( "Realm of type [" + realm + "] does not support token " + "[" + token
                         + "].  Skipping realm." );
                 }
             }
