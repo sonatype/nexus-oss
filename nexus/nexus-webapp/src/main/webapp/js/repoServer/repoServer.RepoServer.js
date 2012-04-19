@@ -404,7 +404,7 @@
           {
             text : 'Profile',
             handler : function() {
-              alert('profile page!')
+              Sonatype.view.mainTabPanel.addOrShowTab('user-profile-tab', Sonatype.repoServer.userProfilePanel)
             }
           }
         ]

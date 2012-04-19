@@ -33,24 +33,6 @@ Ext.apply(Sonatype.headLinks.prototype, {
 
       updateRightWhenLoggedIn : function(linkEl) {
         linkEl.update(Sonatype.user.curr.username);
-        var menu = Ext.menu.MenuMgr.get({
-          id : 'user-profile-menu',
-          items : [
-            {
-              text : 'Logout',
-              handler : function() {
-                Sonatype.repoServer.RepoServer.loginHandler();
-              }
-            },
-            {
-              text : 'Profile',
-              handler : function() {
-                alert('profile page!')
-              }
-            }
-          ]
-        });
-
         linkEl.un('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer)
         linkEl.on('click', Sonatype.repoServer.RepoServer.showProfileMenu);
       },

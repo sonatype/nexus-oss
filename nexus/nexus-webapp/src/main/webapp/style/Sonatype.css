@@ -85,6 +85,22 @@ a:link, a:visited, a:hover, a:active {
     background-image: url("../images/header_bg.gif");
 }
 
+/*
+#user-profile-selector {
+    position: absolute;
+    left: 20px;
+    top: 10px;
+    z-index: 100;
+}
+*/
+
+.user-profile-dynamic-content {
+    /*border-style: solid;*/
+    /*border-color: black;*/
+    border-width: 1px;
+    padding: 20px;
+}
+
 #header div.left-side {
   float: left;
   display: block;
