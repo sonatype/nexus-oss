@@ -108,6 +108,12 @@
       <groupId>org.codehaus.swizzle</groupId>
       <artifactId>swizzle-jira</artifactId>
       <version>1.4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>xmlrpc</groupId>
+          <artifactId>xmlrpc-client</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Testing -->
