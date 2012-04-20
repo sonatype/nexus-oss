@@ -15,14 +15,18 @@ package org.sonatype.security.authorization;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.inject.Nullable;
 
 /**
  * A implementation of the Shiro ModularRealmAuthorizer, that catches exceptions caused by individual realms and ignores
@@ -38,6 +42,18 @@ public class ExceptionCatchingModularRealmAuthorizer
     public ExceptionCatchingModularRealmAuthorizer( Collection<Realm> realms )
     {
         super( realms );
+    }
+
+    @Inject
+    public ExceptionCatchingModularRealmAuthorizer( Collection<Realm> realms,
+                                                    @Nullable RolePermissionResolver rolePermissionResolver )
+    {
+        super( realms );
+
+        if ( null != rolePermissionResolver )
+        {
+            setRolePermissionResolver( rolePermissionResolver );
+        }
     }
 
     // Authorization
