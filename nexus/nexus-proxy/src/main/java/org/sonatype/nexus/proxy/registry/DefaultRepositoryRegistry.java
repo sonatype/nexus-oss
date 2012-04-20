@@ -31,7 +31,6 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.EventListener;
 
@@ -75,7 +74,10 @@ public class DefaultRepositoryRegistry
 
         insertRepository( rtd, repository );
 
-        getLogger().info( "Added repository {}", RepositoryStringUtils.getFullHumanizedNameString( repository ) );
+        getLogger().info(
+            "Added repository ID='" + repository.getId() + "' (contentClass='"
+                + repository.getRepositoryContentClass().getId() + "', mainFacet='"
+                + repository.getRepositoryKind().getMainFacet().getName() + "')" );
     }
 
     public void removeRepository( final String repoId )
@@ -254,7 +256,10 @@ public class DefaultRepositoryRegistry
 
         if ( !silently )
         {
-            getLogger().info( "Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString( repository ) );
+            getLogger().info(
+                "Removed repository ID='" + repository.getId() + "' (contentClass='"
+                    + repository.getRepositoryContentClass().getId() + "', mainFacet='"
+                    + repository.getRepositoryKind().getMainFacet().getName() + "')" );
         }
     }
 

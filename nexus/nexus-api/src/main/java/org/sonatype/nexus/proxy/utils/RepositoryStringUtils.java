@@ -25,10 +25,4 @@ public class RepositoryStringUtils
     {
         return String.format( "\"%s\" [id=%s]", repository.getName(), repository.getId() );
     }
-
-    public static String getFullHumanizedNameString( final Repository repository )
-    {
-        return String.format( "%s[contentClass=%s][mainFacet=%s]", getHumanizedNameString( repository ),
-            repository.getRepositoryContentClass().getName(), repository.getRepositoryKind().getMainFacet().getName() );
-    }
 }
