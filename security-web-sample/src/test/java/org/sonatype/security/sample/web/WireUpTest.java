@@ -43,7 +43,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 import org.sonatype.security.realms.XmlRolePermissionResolver;
-import org.sonatype.security.web.guice.ShiroWebGuiceModule;
+import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -113,7 +113,7 @@ public class WireUpTest
 
     private static Module getShiroModule()
     {
-        return new ShiroWebGuiceModule( createMock( ServletContext.class ), false );
+        return new SecurityWebModule( createMock( ServletContext.class ), false );
     }
 
     protected AbstractModule getPropertiesModule()

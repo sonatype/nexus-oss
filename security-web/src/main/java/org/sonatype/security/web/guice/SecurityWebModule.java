@@ -60,12 +60,12 @@ import com.google.inject.name.Names;
  * 
  * @since 2.7
  */
-public class ShiroWebGuiceModule
+public class SecurityWebModule
     extends ShiroWebModule
 {
     private final boolean injectFilterMap;
 
-    public ShiroWebGuiceModule( ServletContext servletContext, boolean injectFilterMap )
+    public SecurityWebModule( ServletContext servletContext, boolean injectFilterMap )
     {
         super( servletContext );
         this.injectFilterMap = injectFilterMap;

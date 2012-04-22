@@ -28,7 +28,7 @@ import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.reflect.URLClassSpace;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.sample.web.services.SampleService;
-import org.sonatype.security.web.guice.ShiroWebGuiceModule;
+import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -82,7 +82,7 @@ public class SampleGuiceServletConfig
 
     protected ShiroWebModule getShiroModule( ServletContext servletContext )
     {
-        return new ShiroWebGuiceModule( servletContext, false )
+        return new SecurityWebModule( servletContext, false )
         {
             @Override
             @SuppressWarnings( "unchecked" )

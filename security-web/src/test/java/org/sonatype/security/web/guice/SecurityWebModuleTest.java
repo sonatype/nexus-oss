@@ -62,7 +62,7 @@ import com.google.inject.Module;
  * 
  * @since 2.7
  */
-public class ShiroWebGuiceModuleTest
+public class SecurityWebModuleTest
 {
     private Injector injector;
 
@@ -132,7 +132,7 @@ public class ShiroWebGuiceModuleTest
 
     private Module getShiroModule()
     {
-        return new ShiroWebGuiceModule( createMock( ServletContext.class ), true )
+        return new SecurityWebModule( createMock( ServletContext.class ), true )
         {
             @Override
             protected void configureShiroWeb()

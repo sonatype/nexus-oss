@@ -39,7 +39,7 @@ import com.google.inject.name.Names;
  * configuration, if any role param is given. Otherwise it fallbacks to the standard stuff from JSecurityFilter.
  * 
  * @author cstamas
- * @deprecated use {@link org.sonatype.security.web.guice.ShiroWebGuiceModule} instead.
+ * @deprecated use {@link org.sonatype.security.web.guice.SecurityWebModule} instead.
  */
 @Deprecated
 public class ShiroSecurityFilter
