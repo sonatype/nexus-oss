@@ -82,7 +82,7 @@ public class SampleGuiceServletConfig
 
     protected ShiroWebModule getShiroModule( ServletContext servletContext )
     {
-        return new ShiroWebGuiceModule( servletContext )
+        return new ShiroWebGuiceModule( servletContext, false )
         {
             @Override
             @SuppressWarnings( "unchecked" )

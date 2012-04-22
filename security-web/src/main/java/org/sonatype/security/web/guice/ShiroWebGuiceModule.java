@@ -13,8 +13,16 @@
 package org.sonatype.security.web.guice;
 
 import java.lang.reflect.Constructor;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.Filter;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -28,6 +36,10 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
+import org.apache.shiro.web.filter.mgt.FilterChainManager;
+import org.apache.shiro.web.filter.mgt.FilterChainResolver;
+import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
@@ -35,19 +47,28 @@ import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthentic
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
 import com.google.common.base.Throwables;
+import com.google.inject.Key;
 import com.google.inject.binder.AnnotatedBindingBuilder;
+import com.google.inject.name.Names;
 
 /**
  * Extends ShiroWebModule to configure commonly set commponents such as SessionDAO, Authenticator, Authorizer, etc.
+ * <p>
+ * When {@link #injectFilterMap} is {@code true} the {@link #addFilterChain} method has no affect; instead all named
+ * filters bound in this application are injected into the {@link FilterChainManager} so they can be added to filter
+ * chains programatically.
  * 
  * @since 2.7
  */
 public class ShiroWebGuiceModule
     extends ShiroWebModule
 {
-    public ShiroWebGuiceModule( ServletContext servletContext )
+    private final boolean injectFilterMap;
+
+    public ShiroWebGuiceModule( ServletContext servletContext, boolean injectFilterMap )
     {
         super( servletContext );
+        this.injectFilterMap = injectFilterMap;
     }
 
     @Override
@@ -57,8 +78,16 @@ public class ShiroWebGuiceModule
 
         // configure our preferred security components
         bind( SessionDAO.class ).to( EnterpriseCacheSessionDAO.class ).asEagerSingleton();
-        bind( Authenticator.class ).to( FirstSuccessfulModularRealmAuthenticator.class ).asEagerSingleton();
-        bind( Authorizer.class ).to( ExceptionCatchingModularRealmAuthorizer.class ).asEagerSingleton();
+        bind( Authenticator.class ).to( FirstSuccessfulModularRealmAuthenticator.class ).in( Singleton.class );
+        bind( Authorizer.class ).to( ExceptionCatchingModularRealmAuthorizer.class ).in( Singleton.class );
+
+        if ( injectFilterMap )
+        {
+            // override the default resolver with one backed by a FilterChainManager using an injected filter map
+            bind( FilterChainResolver.class ).toConstructor( ctor( PathMatchingFilterChainResolver.class ) ).asEagerSingleton();
+            bind( FilterChainManager.class ).toProvider( FilterChainManagerProvider.class ).in( Singleton.class );
+            expose( FilterChainManager.class );
+        }
     }
 
     @Override
@@ -81,6 +110,20 @@ public class ShiroWebGuiceModule
     {
         // use native web session management instead of delegating to servlet container
         bind.toConstructor( ctor( DefaultWebSessionManager.class ) ).asEagerSingleton();
+    }
+
+    /**
+     * Binds this {@link Filter} instance under the given name in the injected filter map.
+     * 
+     * @param name The filter name
+     * @param filter The filter instance
+     */
+    protected void bindNamedFilter( String name, Filter filter )
+    {
+        Key<Filter> key = Key.get( Filter.class, Names.named( name ) );
+        bind( key ).toInstance( filter );
+
+        expose( key ); // expose binding so it appears in the aggregate injected map
     }
 
     /**
@@ -119,6 +162,73 @@ public class ShiroWebGuiceModule
         {
             Throwables.propagateIfPossible( e );
             throw new ConfigurationException( e );
+        }
+    }
+
+    /**
+     * Constructs a {@link DefaultFilterChainManager} from an injected {@link Filter} map.
+     */
+    private static final class FilterChainManagerProvider
+        implements Provider<FilterChainManager>
+    {
+        private final FilterConfig filterConfig;
+
+        private final Map<String, Filter> filterMap;
+
+        @Inject
+        private FilterChainManagerProvider( @Named( "SHIRO" ) ServletContext servletContext,
+                                            Map<String, Filter> filterMap )
+        {
+            // simple configuration so we can initialize filters as we add them
+            this.filterConfig = new SimpleFilterConfig( "SHIRO", servletContext );
+            this.filterMap = filterMap;
+        }
+
+        public FilterChainManager get()
+        {
+            FilterChainManager filterChainManager = new DefaultFilterChainManager( filterConfig );
+            for ( Entry<String, Filter> entry : filterMap.entrySet() )
+            {
+                filterChainManager.addFilter( entry.getKey(), entry.getValue(), true );
+            }
+            return filterChainManager;
+        }
+    }
+
+    /**
+     * Simple {@link FilterConfig} that delegates to the surrounding {@link ServletContext}.
+     */
+    private static final class SimpleFilterConfig
+        implements FilterConfig
+    {
+        private final String filterName;
+
+        private final ServletContext servletContext;
+
+        SimpleFilterConfig( String filterName, ServletContext servletContext )
+        {
+            this.filterName = filterName;
+            this.servletContext = servletContext;
+        }
+
+        public String getFilterName()
+        {
+            return filterName;
+        }
+
+        public ServletContext getServletContext()
+        {
+            return servletContext;
+        }
+
+        public String getInitParameter( String name )
+        {
+            return servletContext.getInitParameter( name );
+        }
+
+        public Enumeration<?> getInitParameterNames()
+        {
+            return servletContext.getInitParameterNames();
         }
     }
 }

@@ -113,7 +113,7 @@ public class WireUpTest
 
     private static Module getShiroModule()
     {
-        return new ShiroWebGuiceModule( createMock( ServletContext.class ) );
+        return new ShiroWebGuiceModule( createMock( ServletContext.class ), false );
     }
 
     protected AbstractModule getPropertiesModule()

@@ -14,6 +14,7 @@ package org.sonatype.security.web.guice;
 
 import static org.easymock.EasyMock.createMock;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
 
@@ -24,12 +25,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletContext;
 
+import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
+import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
+import org.apache.shiro.web.filter.mgt.FilterChainManager;
+import org.apache.shiro.web.filter.mgt.NamedFilterList;
+import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
@@ -84,6 +91,27 @@ public class ShiroWebGuiceModuleTest
         assertThat( defaultSecurityManager.getSessionManager(), instanceOf( DefaultWebSessionManager.class ) );
         DefaultSessionManager sessionManager = (DefaultSessionManager) defaultSecurityManager.getSessionManager();
         assertThat( sessionManager.getSessionDAO(), instanceOf( EnterpriseCacheSessionDAO.class ) );
+
+        GuiceShiroFilter guiceFilter = injector.getInstance( GuiceShiroFilter.class );
+        assertThat( guiceFilter.getFilterChainResolver(), instanceOf( PathMatchingFilterChainResolver.class ) );
+
+        PathMatchingFilterChainResolver filterChainResolver =
+            (PathMatchingFilterChainResolver) guiceFilter.getFilterChainResolver();
+        assertThat( filterChainResolver.getFilterChainManager(), instanceOf( DefaultFilterChainManager.class ) );
+
+        assertThat( filterChainResolver.getFilterChainManager(),
+                    sameInstance( injector.getInstance( FilterChainManager.class ) ) );
+
+        // now add a protected path
+        injector.getInstance( FilterChainManager.class ).createChain( "/service/**", "foobar,perms[sample:priv-name]" );
+
+        NamedFilterList filterList = filterChainResolver.getFilterChainManager().getChain( "/service/**" );
+        assertThat( filterList.get( 0 ), instanceOf( SimpleAccessControlFilter.class ) );
+        assertThat( filterList.get( 1 ), instanceOf( HttpMethodPermissionFilter.class ) );
+
+        // test that injection of filters works
+        assertThat( ( (SimpleAccessControlFilter) filterList.get( 0 ) ).getSecurityXMLFilePath(),
+                    equalTo( "target/foo/security.xml" ) );
     }
 
     @After
@@ -104,7 +132,7 @@ public class ShiroWebGuiceModuleTest
 
     private Module getShiroModule()
     {
-        return new ShiroWebGuiceModule( createMock( ServletContext.class ) )
+        return new ShiroWebGuiceModule( createMock( ServletContext.class ), true )
         {
             @Override
             protected void configureShiroWeb()
@@ -113,6 +141,9 @@ public class ShiroWebGuiceModuleTest
 
                 SimpleAccessControlFilter foobar = new SimpleAccessControlFilter();
                 foobar.setApplicationName( "Foobar Application" );
+
+                bindNamedFilter( "foobar", foobar );
+                bindNamedFilter( "perms", new HttpMethodPermissionFilter() );
             }
         };
     }
