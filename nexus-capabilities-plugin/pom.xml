@@ -31,7 +31,6 @@
 
   <name>Nexus : Plugins : Capabilities</name>
   <description>Allows Nexus to define configurable capabilities</description>
-  <url/>
 
   <properties>
     <debug-js>false</debug-js>
@@ -141,6 +140,7 @@
           </dependency>
         </dependencies>
         <configuration>
+          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
           <sharedDependencies>
             <sharedDependency>org.sonatype.sisu.goodies:goodies-eventbus</sharedDependency>
           </sharedDependencies>
