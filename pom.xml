@@ -21,7 +21,6 @@
 
   <name>Nexus Professional Plugin :: Unpack</name>
   <description>A plugin that will automatically unpack deployed bundles</description>
-  <url/>
 
   <dependencies>
 
