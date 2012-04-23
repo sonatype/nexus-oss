@@ -145,17 +145,11 @@ Ext.extend(Sonatype.repoServer.UserProfile, Ext.Panel, {
                 if (!isSuccess)
                 {
                   this.el.unmask();
-                  Sonatype.utils.connectionError(response, 'There is a problem changing your password.');
+                  Sonatype.utils.connectionError(response, 'Could not save your user details.');
                 }
                 else
                 {
                   this.el.unmask();
-                  Ext.Msg.show({
-                        title : 'Succeeded!',
-                        msg : 'Your account "' + this.formPanel.find('name', 'userId')[0].getValue() + '" is updated successfully.',
-                        buttons : Ext.Msg.OK
-                      });
-
                   Ext.getDom('user-picture').src = 'http://www.gravatar.com/avatar/' + Ext.util.MD5(Sonatype.utils.lowercase(this.formPanel.find('name', 'email')[0].getValue().trim()));
                 }
               },
