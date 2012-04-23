@@ -115,7 +115,7 @@ public abstract class AbstractDeployMojo
      * The ID of the server entry in the Maven settings.xml from which to pick credentials to contact the Insight
      * service.
      * 
-     * @parameter expression="${nexus.serverId}" default-value="nexus"
+     * @parameter expression="${serverId}" default-value="nexus"
      */
     private String serverId;
 
@@ -192,8 +192,6 @@ public abstract class AbstractDeployMojo
     protected void deployStagedArtifacts()
         throws ArtifactDeploymentException
     {
-        getLog().info( "Deploying staged artifacts to: " + deployUrl );
-        final long started = System.currentTimeMillis();
         try
         {
             final ZapperRequest request = new ZapperRequest( getStagingDirectory(), deployUrl );
@@ -220,6 +218,7 @@ public abstract class AbstractDeployMojo
             }
 
             LogbackUtils.syncLogLevelWithMaven( getLog() );
+            getLog().info( "Deploying staged artifacts to: " + deployUrl );
             zapper.deployDirectory( request );
         }
         catch ( IOException e )
@@ -230,8 +229,6 @@ public abstract class AbstractDeployMojo
         {
             throw new ArtifactDeploymentException( "Cannot decipher passwords for deploy!", e );
         }
-        getLog().info(
-            String.format( "Deployed staged artifacts in %s seconds.", ( System.currentTimeMillis() - started ) / 1000L ) );
     }
 
     // ==
