@@ -28,7 +28,6 @@
 
   <name>Nexus : Core Plugins : Maven Archetype Catalog</name>
   <description>Adds a content generator for archetype.xml files.</description>
-  <url/>
 
   <dependencies>
     <dependency>

@@ -27,7 +27,6 @@
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Remote Repository Browsing</name>
   <description>Adds browsing support for proxied remote repositories</description>
-  <url/>
 
   <developers>
     <developer>
