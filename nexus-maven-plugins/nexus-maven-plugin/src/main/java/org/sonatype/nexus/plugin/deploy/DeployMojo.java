@@ -61,9 +61,9 @@ public class DeployMojo
     /**
      * Set this to {@code true} to bypass artifact deploy that would happen once last project is being staged.
      * 
-     * @parameter expression="${nexus.deployStaged.skip}" default-value="false"
+     * @parameter expression="${nexus.deploy.skipDeploy}" default-value="false"
      */
-    private boolean skipDeployStaged;
+    private boolean skipDeploy;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -140,7 +140,7 @@ public class DeployMojo
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
-        if ( !skipDeployStaged && isThisLastProjectInExecution() )
+        if ( !skipDeploy && isThisLastProjectInExecution() )
         {
             failIfOffline();
 

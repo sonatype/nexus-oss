@@ -1,12 +1,13 @@
 package org.sonatype.nexus.plugin.deploy;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ProxyServer;
+import com.ning.http.client.ProxyServer.Protocol;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Realm.AuthScheme;
 
@@ -21,22 +22,56 @@ import eu.flatwhite.zapper.internal.ParametersImpl;
 public class ZapperImpl
     implements Zapper
 {
+
     @Override
-    public void deployDirectory( final String remoteUrl, final File directory )
+    public void deployDirectory( final ZapperRequest zapperRequest )
         throws IOException
     {
         try
         {
-            final Parameters parameters = new ParametersImpl();
+            AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
 
-            final Realm realm =
-                new Realm.RealmBuilder().setPrincipal( "admin" ).setPassword( "admin123" ).setUsePreemptiveAuth( true ).setScheme(
-                    AuthScheme.BASIC ).build();
-            final AsyncHttpClientConfig config =
-                new AsyncHttpClientConfig.Builder().setRealm( realm ).setIOThreadMultiplier( 3 ).build();
-            final AsyncHttpClient asyncHttpClient = new AsyncHttpClient( config );
-            final Client client = new AhcClient( parameters, remoteUrl, asyncHttpClient );
-            final IOSourceListable deployables = new DirectoryIOSource( directory );
+            if ( zapperRequest.getProxyProtocol() != null )
+            {
+                Protocol protocol;
+                if ( "http".equalsIgnoreCase( zapperRequest.getProxyProtocol() ) )
+                {
+                    protocol = Protocol.HTTP;
+                }
+                else if ( "https".equalsIgnoreCase( zapperRequest.getProxyProtocol() ) )
+                {
+                    protocol = Protocol.HTTPS;
+                }
+                else
+                {
+                    throw new IllegalArgumentException( "Unsupported HTTP proxy protocol: "
+                        + zapperRequest.getProxyProtocol() );
+                }
+
+                if ( zapperRequest.getProxyUsername() != null )
+                {
+                    builder.setProxyServer( new ProxyServer( protocol, zapperRequest.getProxyHost(),
+                        zapperRequest.getProxyPort(), zapperRequest.getProxyUsername(),
+                        zapperRequest.getProxyPassword() ) );
+                }
+                else
+                {
+                    builder.setProxyServer( new ProxyServer( protocol, zapperRequest.getProxyHost(),
+                        zapperRequest.getProxyPort() ) );
+                }
+            }
+
+            if ( zapperRequest.getRemoteUsername() != null )
+            {
+                builder.setRealm( new Realm.RealmBuilder().setPrincipal( zapperRequest.getRemoteUsername() ).setPassword(
+                    zapperRequest.getRemotePassword() ).setUsePreemptiveAuth( true ).setScheme( AuthScheme.BASIC ).build() );
+            }
+
+            final AsyncHttpClient asyncHttpClient = new AsyncHttpClient( builder.setIOThreadMultiplier( 3 ).build() );
+
+            final Parameters parameters = new ParametersImpl();
+            final Client client = new AhcClient( parameters, zapperRequest.getRemoteUrl(), asyncHttpClient );
+            final IOSourceListable deployables = new DirectoryIOSource( zapperRequest.getStageRepository() );
 
             try
             {

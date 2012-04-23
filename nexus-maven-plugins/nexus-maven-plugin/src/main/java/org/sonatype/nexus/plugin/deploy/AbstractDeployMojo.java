@@ -14,6 +14,11 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
+import org.sonatype.maven.skeleton.logback.LogbackUtils;
+import org.sonatype.maven.skeleton.settings.MavenSettings;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 public abstract class AbstractDeployMojo
     extends AbstractMojo
@@ -106,6 +111,14 @@ public abstract class AbstractDeployMojo
      */
     private String deployUrl;
 
+    /**
+     * The ID of the server entry in the Maven settings.xml from which to pick credentials to contact the Insight
+     * service.
+     * 
+     * @parameter expression="${nexus.serverId}" default-value="nexus"
+     */
+    private String serverId;
+
     protected MavenSession getMavenSession()
     {
         return mavenSession;
@@ -179,15 +192,43 @@ public abstract class AbstractDeployMojo
     protected void deployStagedArtifacts()
         throws ArtifactDeploymentException
     {
-        getLog().info( "Deploying staged artifacts:" );
+        getLog().info( "Deploying staged artifacts to: " + deployUrl );
         final long started = System.currentTimeMillis();
         try
         {
-            zapper.deployDirectory( deployUrl, getStagingDirectory() );
+            final ZapperRequest request = new ZapperRequest( getStagingDirectory(), deployUrl );
+
+            final Server server = MavenSettings.selectServer( mavenSession.getSettings(), serverId );
+            if ( server != null )
+            {
+                // TODO: secDispatcher
+                final Server dServer = MavenSettings.decrypt( null, server );
+                request.setRemoteUsername( dServer.getUsername() );
+                request.setRemotePassword( dServer.getPassword() );
+            }
+
+            final Proxy proxy = MavenSettings.selectProxy( mavenSession.getSettings(), deployUrl );
+            if ( proxy != null )
+            {
+                // TODO: secDispatcher
+                final Proxy dProxy = MavenSettings.decrypt( null, proxy );
+                request.setProxyProtocol( dProxy.getProtocol() );
+                request.setProxyHost( dProxy.getHost() );
+                request.setProxyPort( dProxy.getPort() );
+                request.setProxyUsername( dProxy.getUsername() );
+                request.setProxyPassword( dProxy.getPassword() );
+            }
+
+            LogbackUtils.syncLogLevelWithMaven( getLog() );
+            zapper.deployDirectory( request );
         }
         catch ( IOException e )
         {
             throw new ArtifactDeploymentException( "Cannot deploy!", e );
+        }
+        catch ( SecDispatcherException e )
+        {
+            throw new ArtifactDeploymentException( "Cannot decipher passwords for deploy!", e );
         }
         getLog().info(
             String.format( "Deployed staged artifacts in %s seconds.", ( System.currentTimeMillis() - started ) / 1000L ) );

@@ -1,10 +1,9 @@
 package org.sonatype.nexus.plugin.deploy;
 
-import java.io.File;
 import java.io.IOException;
 
 public interface Zapper
 {
-    void deployDirectory( String remoteUrl, File directory )
+    void deployDirectory( ZapperRequest zapperRequest )
         throws IOException;
 }
