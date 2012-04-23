@@ -62,6 +62,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.item.uid.IsRemotelyAccessibleAttribute;
 import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResource;
@@ -638,21 +639,25 @@ public abstract class AbstractResourceStoreContentPlexusResource
         return result;
     }
 
-    protected NotFoundReasoning buildNotFoundReasoning( final Throwable t )
+    protected NotFoundReasoning buildNotFoundReasoning( final Repository repository, final Throwable t )
     {
         final NotFoundReasoning reasoning = new NotFoundReasoning();
 
         reasoning.setReasonMessage( t.getMessage() );
         reasoning.setThrowableType( t.getClass().getName() );
+        if ( repository != null )
+        {
+            reasoning.setRepositoryId( repository.getId() );
+        }
 
         if ( t instanceof GroupItemNotFoundException )
         {
             final GroupItemNotFoundException ginf = (GroupItemNotFoundException) t;
             reasoning.setRepositoryId( ginf.getRepository().getId() );
 
-            for ( Throwable r : ginf.getMemberReasons().values() )
+            for ( Map.Entry<Repository, Throwable> r : ginf.getMemberReasons().entrySet() )
             {
-                reasoning.addNotFoundReasoning( buildNotFoundReasoning( r ) );
+                reasoning.addNotFoundReasoning( buildNotFoundReasoning( r.getKey(), r.getValue() ) );
             }
         }
 
@@ -679,7 +684,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             if ( e != null )
             {
-                result.addNotFoundReasoning( buildNotFoundReasoning( e ) );
+                result.addNotFoundReasoning( buildNotFoundReasoning( null, e ) );
             }
 
             return result;
