@@ -31,7 +31,6 @@
 
   <name>Nexus :: Plugin :: P2 Repository</name>
   <description>Adds P2 repository support</description>
-  <url/>
 
   <licenses>
     <license>
@@ -309,13 +308,16 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <extensions>true</extensions>
+        <configuration>
+          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/p2</pluginSiteUrl>
+        </configuration>
         <dependencies>
           <dependency>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
           </dependency>
         </dependencies>
       </plugin>
