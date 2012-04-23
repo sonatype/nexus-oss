@@ -21,7 +21,6 @@
 
   <name>Nexus Professional Plugin :: Maven Site Plugin</name>
   <description>Adds a repository type for deploying maven sites.</description>
-  <url/>
 
   <dependencies>
 
