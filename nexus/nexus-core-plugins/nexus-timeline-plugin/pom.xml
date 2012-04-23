@@ -26,7 +26,6 @@
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Timeline</name>
   <description>Adds timeline and feeds based on it.</description>
-  <url/>
 
   <properties>
     <truezip.version>7.0-rc1</truezip.version>

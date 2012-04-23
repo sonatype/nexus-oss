@@ -26,7 +26,6 @@
   <artifactId>nexus-maven-bridge-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <description>Adds an API to access maven dependency resolution for Nexus plugins.</description>
-  <url/>
 
   <name>Nexus : Core Plugins : Maven Bridge</name>
 

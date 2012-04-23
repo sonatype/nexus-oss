@@ -26,7 +26,6 @@
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Indexer Lucene</name>
   <description>Adds search capablities for repository content.</description>
-  <url/>
 
   <properties>
     <maven.indexer.version>4.1.3-SONATYPE</maven.indexer.version>

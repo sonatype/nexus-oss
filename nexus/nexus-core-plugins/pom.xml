@@ -54,6 +54,9 @@
               <version>${applifecycle.version}</version>
             </dependency>
           </dependencies>
+          <configuration>
+            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
