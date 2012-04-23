@@ -30,7 +30,6 @@
 
   <name>Nexus Plugin :: OBR</name>
   <description>Adds a repository type for OBR repositories.</description>
-  <url/>
   
   <licenses>
     <license>
@@ -126,6 +125,9 @@
           <artifactId>app-lifecycle-maven-plugin</artifactId>
           <version>${applifecycle.version}</version>
           <extensions>true</extensions>
+          <configuration>
+            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/obr</pluginSiteUrl>
+          </configuration>
           <dependencies>
             <dependency>
               <groupId>org.sonatype.plugins</groupId>
