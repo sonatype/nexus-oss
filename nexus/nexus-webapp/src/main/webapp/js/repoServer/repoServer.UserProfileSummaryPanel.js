@@ -29,6 +29,7 @@ Sonatype.repoServer.UserProfile = function(config) {
   };
 
   this.formPanel = new Ext.form.FormPanel({
+        id : 'user-profile-summary-form',
         region : 'center',
         trackResetOnLoad : true,
         autoScroll : true,
@@ -44,7 +45,6 @@ Sonatype.repoServer.UserProfile = function(config) {
         items : [{
           xtype : 'fieldset',
           title : 'Details',
-          anchor : Sonatype.view.FIELDSET_OFFSET,
           autoHeight : true,
           layoutConfig : {
             labelSeparator : ''
@@ -91,12 +91,13 @@ Sonatype.repoServer.UserProfile = function(config) {
               itemCls : 'required-field'
             }, {
               xtype : 'label',
-              fieldLabel : 'Password',
+              // make this label's font look like the others
+              cls : 'x-form-item',
               text : 'Change Password',
               style : 'text-decoration: underline; color: blue; cursor: pointer;',
               listeners : {
                 'render' : function(component) {
-                  component.getEl().on('click', Sonatype.utils.changePassword);
+                  component.getEl().on('click', function() {Sonatype.utils.changePassword()});
                 }
               }
             }]
@@ -114,11 +115,12 @@ Sonatype.repoServer.UserProfile = function(config) {
               scope : this,
               handler : this.saveUserProfile
             }, {
-              text : 'Cancel',
-              handler : this.cancel,
+              text : 'Reset',
+              handler : this.resetHandler,
               scope : this
             }]
-      });
+        }
+  );
 
   Sonatype.repoServer.UserProfile.superclass.constructor.call(this, {
         autoScroll : false,
@@ -129,8 +131,8 @@ Sonatype.repoServer.UserProfile = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.UserProfile, Ext.Panel, {
-      cancel : function() {
-        Sonatype.view.mainTabPanel.remove(this.id, true);
+      resetHandler : function() {
+        this.loadUserProfile();
       },
       saveUserProfile : function() {
         var accountIdVal = this.formPanel.find('name', 'userId')[0].getValue();
@@ -188,15 +190,3 @@ Ext.extend(Sonatype.repoServer.UserProfile, Ext.Panel, {
         field.focus(true, 100);
       }
     });
-
-//Sonatype.Events.addListener('nexusNavigationInit', function(nexusPanel) {
-//      var sp = Sonatype.lib.Permissions;
-//      var isEnabled = sp.checkPermission('nexus:useraccountmgt', sp.EDIT) && sp.checkPermission('nexus:useraccountmgt', sp.READ);
-//      nexusPanel.add({
-//            enabled : isEnabled,
-//            sectionId : 'st-nexus-security',
-//            title : 'User Profile',
-//            tabId : 'user-profile',
-//            tabCode : Sonatype.repoServer.UserProfile
-//          });
-//    });

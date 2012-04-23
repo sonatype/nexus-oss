@@ -85,20 +85,16 @@ a:link, a:visited, a:hover, a:active {
     background-image: url("../images/header_bg.gif");
 }
 
-/*
-#user-profile-selector {
-    position: absolute;
-    left: 20px;
-    top: 10px;
-    z-index: 100;
-}
-*/
-
 .user-profile-dynamic-content {
     /*border-style: solid;*/
     /*border-color: black;*/
     border-width: 1px;
-    padding-top: 20px;
+    /* padding == fieldset offset */
+    padding: 21px;
+}
+
+#user-profile-summary-form .x-panel-footer {
+    background: none white;
 }
 
 #header div.left-side {
