@@ -162,7 +162,7 @@ Ext.extend(Sonatype.repoServer.UserProfile, Ext.Panel, {
               scope : this,
               method : 'PUT',
               url : Sonatype.config.servicePath + '/user_account/' + accountIdVal,
-              jsonData : '{"data":{"id":"' + accountIdVal + '","name":"' + accountNameVal + '","email":"' + accountEmailVal + '","resourceURI":""}}',
+              jsonData : '{"data":{"id":"' + accountIdVal + '","name":"' + accountNameVal + '","email":"' + accountEmailVal + '"}}',
               suppressStatus : 400
             });
       },

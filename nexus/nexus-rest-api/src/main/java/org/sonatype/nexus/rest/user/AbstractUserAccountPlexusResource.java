@@ -15,14 +15,13 @@ package org.sonatype.nexus.rest.user;
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
-import org.sonatype.nexus.rest.user.dto.UserAccountDTO;
-import org.sonatype.nexus.rest.user.dto.UserAccountRequestDTO;
-import org.sonatype.nexus.rest.user.dto.UserAccountResponseDTO;
+import org.sonatype.nexus.rest.model.UserAccount;
+import org.sonatype.nexus.rest.model.UserAccountRequestResponseWrapper;
+import org.sonatype.nexus.user.UserAccountManager;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserStatus;
-import org.sonatype.nexus.user.UserAccountManager;
 
 public abstract class AbstractUserAccountPlexusResource
     extends AbstractSecurityPlexusResource
@@ -35,14 +34,13 @@ public abstract class AbstractUserAccountPlexusResource
     {
         super.configureXStream( xstream );
 
-        xstream.processAnnotations( UserAccountDTO.class );
-        xstream.processAnnotations( UserAccountRequestDTO.class );
-        xstream.processAnnotations( UserAccountResponseDTO.class );
+        xstream.processAnnotations( UserAccount.class );
+        xstream.processAnnotations( UserAccountRequestResponseWrapper.class );
     }
 
-    protected UserAccountDTO nexusToRestModel( User user, Request request )
+    protected UserAccount nexusToRestModel( User user, Request request )
     {
-        UserAccountDTO dto = new UserAccountDTO();
+        UserAccount dto = new UserAccount();
 
         dto.setId( user.getUserId() );
 
@@ -50,12 +48,10 @@ public abstract class AbstractUserAccountPlexusResource
 
         dto.setEmail( user.getEmailAddress() );
 
-        dto.setResourceURI( this.createChildReference( request, "" ).toString() );
-
         return dto;
     }
 
-    protected User restToNexusModel( UserAccountDTO dto )
+    protected User restToNexusModel( UserAccount dto )
     {
         User user = new DefaultUser();
 

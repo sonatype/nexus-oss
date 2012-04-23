@@ -21,7 +21,6 @@ import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -29,18 +28,16 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.rest.user.dto.UserAccountDTO;
-import org.sonatype.nexus.rest.user.dto.UserAccountRequestDTO;
-import org.sonatype.nexus.rest.user.dto.UserAccountResponseDTO;
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.rest.model.UserAccount;
+import org.sonatype.nexus.rest.model.UserAccountRequestResponseWrapper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
-import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.nexus.proxy.AccessDeniedException;
 
 /**
  * Resource managing user account details.
@@ -64,7 +61,7 @@ public class UserAccountPlexusResource
     @Override
     public Object getPayloadInstance()
     {
-        return new UserAccountRequestDTO();
+        return new UserAccountRequestResponseWrapper();
     }
 
     @Override
@@ -84,11 +81,11 @@ public class UserAccountPlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( pathParams = { @PathParam( UserAccountPlexusResource.ACCOUNT_ID_KEY ) }, output = UserAccountResponseDTO.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( UserAccountPlexusResource.ACCOUNT_ID_KEY ) }, output = UserAccountRequestResponseWrapper.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        UserAccountResponseDTO result = new UserAccountResponseDTO();
+        UserAccountRequestResponseWrapper result = new UserAccountRequestResponseWrapper();
 
         try
         {
@@ -118,13 +115,13 @@ public class UserAccountPlexusResource
      */
     @Override
     @PUT
-    @ResourceMethodSignature( pathParams = { @PathParam( UserAccountPlexusResource.ACCOUNT_ID_KEY ) }, input = UserAccountRequestDTO.class, output = UserAccountResponseDTO.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( UserAccountPlexusResource.ACCOUNT_ID_KEY ) }, input = UserAccountRequestResponseWrapper.class, output = UserAccountRequestResponseWrapper.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
-        UserAccountResponseDTO result = new UserAccountResponseDTO();
+        UserAccountRequestResponseWrapper result = new UserAccountRequestResponseWrapper();
 
-        UserAccountDTO dto = ( (UserAccountRequestDTO) payload ).getData();
+        UserAccount dto = ((UserAccountRequestResponseWrapper)payload).getData();
 
         try
         {
@@ -134,14 +131,7 @@ public class UserAccountPlexusResource
 
             user.setEmailAddress( dto.getEmail() );
 
-            if ( StringUtils.isNotEmpty( dto.getPassword() ) )
-            {
-                userAccountManager.updateAccount( user, dto.getOldPassword(), dto.getPassword() );
-            }
-            else
-            {
-                userAccountManager.updateAccount( user );
-            }
+            userAccountManager.updateAccount( user );
 
             result.setData( nexusToRestModel( user, request ) );
         }
@@ -158,12 +148,6 @@ public class UserAccountPlexusResource
             getLogger().debug( msg, e );
 
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, msg );
-        }
-        catch ( InvalidCredentialsException e )
-        {
-            getLogger().debug( "Invalid credentials!", e );
-
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid credentials supplied." );
         }
         catch ( NoSuchUserManagerException e )
         {
