@@ -396,15 +396,15 @@
         cls : 'user-profile-menu',
         items : [
           {
-            text : 'Logout',
-            handler : function() {
-              Sonatype.repoServer.RepoServer.loginHandler();
-            }
-          },
-          {
             text : 'Profile',
             handler : function() {
               Sonatype.view.mainTabPanel.addOrShowTab('user-profile-tab', Sonatype.repoServer.userProfilePanel)
+            }
+          },
+          {
+            text : 'Logout',
+            handler : function() {
+              Sonatype.repoServer.RepoServer.loginHandler();
             }
           }
         ]
