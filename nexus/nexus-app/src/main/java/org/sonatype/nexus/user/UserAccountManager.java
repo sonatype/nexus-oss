@@ -1,4 +1,4 @@
-package org.sonatype.nexus.user; /**
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,6 +10,7 @@ package org.sonatype.nexus.user; /**
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.user;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
