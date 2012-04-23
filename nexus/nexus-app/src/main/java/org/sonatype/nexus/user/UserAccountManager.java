@@ -1,4 +1,4 @@
-/**
+package org.sonatype.nexus.user; /**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,12 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rest.user;
 
-import java.util.List;
-
-import org.restlet.data.Request;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
@@ -31,8 +28,7 @@ public interface UserAccountManager
      * @return
      */
     User readAccount( String userId )
-        throws UserNotFoundException,
-            AccessDeniedException;
+        throws UserNotFoundException, AccessDeniedException;
 
     /**
      * Update the account info, but do not change password

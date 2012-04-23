@@ -22,6 +22,7 @@ import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserStatus;
+import org.sonatype.nexus.user.UserAccountManager;
 
 public abstract class AbstractUserAccountPlexusResource
     extends AbstractSecurityPlexusResource

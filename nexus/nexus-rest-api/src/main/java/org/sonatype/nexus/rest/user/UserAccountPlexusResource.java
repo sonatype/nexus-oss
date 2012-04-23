@@ -40,6 +40,7 @@ import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 
 /**
  * Resource managing user account details.
