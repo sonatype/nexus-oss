@@ -18,7 +18,7 @@ public class DeployStagedMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if ( isThisLastProjectInExecution() )
+        if ( isThisLastProjectWithThisMojoInExecution() )
         {
             failIfOffline();
 

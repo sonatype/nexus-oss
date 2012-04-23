@@ -13,9 +13,9 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
+import org.sonatype.maven.skeleton.execution.MojoExecution;
 import org.sonatype.maven.skeleton.logback.LogbackUtils;
 import org.sonatype.maven.skeleton.settings.MavenSettings;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
@@ -40,6 +40,18 @@ public abstract class AbstractDeployMojo
      * @readonly
      */
     protected File basedir;
+
+    /**
+     * @parameter default-value="${plugin.groupId}"
+     * @readonly
+     */
+    private String pluginGroupId;
+
+    /**
+     * @parameter default-value="${plugin.artifactId}"
+     * @readonly
+     */
+    private String pluginArtifactId;
 
     /**
      * @component
@@ -309,26 +321,12 @@ public abstract class AbstractDeployMojo
     }
 
     /**
-     * Returns true if the current project is located at the Execution Root Directory (where mvn was launched).
-     * 
-     * @return true if execution root.
-     */
-    protected boolean isThisTheExecutionRoot()
-    {
-        return mavenSession.getExecutionRootDirectory().equalsIgnoreCase( basedir.toString() );
-    }
-
-    /**
-     * Returns true if the current project is the last one being executed in this build.
+     * Returns true if the current project is the last one being executed in this build that has this mojo defined.
      * 
      * @return true if last project is being built.
      */
-    protected boolean isThisLastProjectInExecution()
+    protected boolean isThisLastProjectWithThisMojoInExecution()
     {
-        final MavenProject currentProject = mavenSession.getCurrentProject();
-        final MavenProject lastProject =
-            mavenSession.getSortedProjects().get( mavenSession.getSortedProjects().size() - 1 );
-
-        return currentProject == lastProject;
+        return MojoExecution.isThisLastProjectWithMojoInExecution( mavenSession, pluginGroupId, pluginArtifactId );
     }
 }

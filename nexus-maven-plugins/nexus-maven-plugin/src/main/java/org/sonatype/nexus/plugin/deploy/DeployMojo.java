@@ -140,7 +140,7 @@ public class DeployMojo
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
-        if ( !skipDeploy && isThisLastProjectInExecution() )
+        if ( !skipDeploy && isThisLastProjectWithThisMojoInExecution() )
         {
             failIfOffline();
 

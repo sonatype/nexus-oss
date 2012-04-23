@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.ProxyServer.Protocol;
 import com.ning.http.client.Realm;
@@ -14,9 +12,9 @@ import com.ning.http.client.Realm.AuthScheme;
 import eu.flatwhite.zapper.Client;
 import eu.flatwhite.zapper.IOSourceListable;
 import eu.flatwhite.zapper.Parameters;
-import eu.flatwhite.zapper.client.ahc.AhcClient;
+import eu.flatwhite.zapper.ParametersBuilder;
+import eu.flatwhite.zapper.client.ahc.AhcClientBuilder;
 import eu.flatwhite.zapper.fs.DirectoryIOSource;
-import eu.flatwhite.zapper.internal.ParametersImpl;
 
 @Component( role = Zapper.class )
 public class ZapperImpl
@@ -29,8 +27,7 @@ public class ZapperImpl
     {
         try
         {
-            AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-
+            final ProxyServer proxyServer;
             if ( zapperRequest.getProxyProtocol() != null )
             {
                 Protocol protocol;
@@ -50,27 +47,44 @@ public class ZapperImpl
 
                 if ( zapperRequest.getProxyUsername() != null )
                 {
-                    builder.setProxyServer( new ProxyServer( protocol, zapperRequest.getProxyHost(),
-                        zapperRequest.getProxyPort(), zapperRequest.getProxyUsername(),
-                        zapperRequest.getProxyPassword() ) );
+                    proxyServer =
+                        new ProxyServer( protocol, zapperRequest.getProxyHost(), zapperRequest.getProxyPort(),
+                            zapperRequest.getProxyUsername(), zapperRequest.getProxyPassword() );
                 }
                 else
                 {
-                    builder.setProxyServer( new ProxyServer( protocol, zapperRequest.getProxyHost(),
-                        zapperRequest.getProxyPort() ) );
+                    proxyServer =
+                        new ProxyServer( protocol, zapperRequest.getProxyHost(), zapperRequest.getProxyPort() );
                 }
             }
-
-            if ( zapperRequest.getRemoteUsername() != null )
+            else
             {
-                builder.setRealm( new Realm.RealmBuilder().setPrincipal( zapperRequest.getRemoteUsername() ).setPassword(
-                    zapperRequest.getRemotePassword() ).setUsePreemptiveAuth( true ).setScheme( AuthScheme.BASIC ).build() );
+                proxyServer = null;
             }
 
-            final AsyncHttpClient asyncHttpClient = new AsyncHttpClient( builder.setIOThreadMultiplier( 3 ).build() );
+            final Realm realm;
+            if ( zapperRequest.getRemoteUsername() != null )
+            {
+                realm =
+                    new Realm.RealmBuilder().setPrincipal( zapperRequest.getRemoteUsername() ).setPassword(
+                        zapperRequest.getRemotePassword() ).setUsePreemptiveAuth( true ).setScheme( AuthScheme.BASIC ).build();
+            }
+            else
+            {
+                realm = null;
+            }
 
-            final Parameters parameters = new ParametersImpl();
-            final Client client = new AhcClient( parameters, zapperRequest.getRemoteUrl(), asyncHttpClient );
+            final Parameters parameters = ParametersBuilder.defaults().build();
+            final AhcClientBuilder clientBuilder = new AhcClientBuilder( parameters, zapperRequest.getRemoteUrl() );
+            if ( realm != null )
+            {
+                clientBuilder.withRealm( realm );
+            }
+            if ( proxyServer != null )
+            {
+                clientBuilder.withProxy( proxyServer );
+            }
+            final Client client = clientBuilder.build();
             final IOSourceListable deployables = new DirectoryIOSource( zapperRequest.getStageRepository() );
 
             try
