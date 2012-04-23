@@ -30,7 +30,6 @@
 
   <name>Nexus :: Plugin :: P2 Bridge</name>
   <description>Bridge between Nexus and P2 Eclipse Runtime</description>
-  <url/>
 
   <licenses>
     <license>
@@ -292,16 +291,17 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <extensions>true</extensions>
         <configuration>
+          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/p2</pluginSiteUrl>
           <assemblyDescriptor>src/main/assemble/bundle.xml</assemblyDescriptor>
         </configuration>
         <dependencies>
           <dependency>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
           </dependency>
         </dependencies>
       </plugin>
