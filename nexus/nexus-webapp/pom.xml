@@ -352,6 +352,7 @@
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoSummaryPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.Maven2InformationPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.UserProfilePanel.js</include>
+                    <include>${compressed-dir}/js/repoServer/repoServer.UserProfileSummaryPanel.js</include>
                   </includes>
                 </aggregation>
               </aggregations>

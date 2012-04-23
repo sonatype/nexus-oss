@@ -21,27 +21,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
 
   var summaryPanel = {
     name : 'Summary',
-    item : new Ext.form.FormPanel({
-//      title : 'Summary Panel',
-//      width : 300,
-//      height : 300,
-      id : 'userProfileSummaryPanel',
-      border : false,
-      frame : false,
-      style : 'border-width: 0;',
-      items : [{
-          xtype : 'fieldset',
-          title : 'Details',
-          anchor : Sonatype.view.FIELDSET_OFFSET,
-          items : [{
-              xtype : 'field',
-              name : 'foo',
-              fieldLabel: 'foo'
-            }
-          ]
-        }
-      ]
-    })
+    item : new Sonatype.repoServer.UserProfile()
   };
 
   var views = [
@@ -60,7 +40,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
 
   this.selector = new Ext.form.ComboBox({
     id: 'user-profile-selector',
-    x : 60,
+    x : 30,
     y : 11,
     listeners : {
       'select' : {
@@ -71,7 +51,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
       },
       'show' : {
         fn : function(combo) {
-          combo.selectByValue('Summary', true);
+          combo.select(0);
           this.content.display(summaryPanel);
         },
         scope : this

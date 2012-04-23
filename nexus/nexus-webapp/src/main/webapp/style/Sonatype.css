@@ -98,7 +98,7 @@ a:link, a:visited, a:hover, a:active {
     /*border-style: solid;*/
     /*border-color: black;*/
     border-width: 1px;
-    padding: 20px;
+    padding-top: 20px;
 }
 
 #header div.left-side {
