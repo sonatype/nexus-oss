@@ -111,12 +111,11 @@
     <!-- end of required ordering... -->
 
     <!-- mojo-commons shall be used by this (and any other Sonatype) Maven plugin -->
-    <!-- Currently, mojo-commons is not yet fully usable for this case, but Stuart will make it usable -->
-    <!--dependency>
+    <dependency>
       <groupId>org.sonatype.maven</groupId>
       <artifactId>mojo-commons</artifactId>
-      <version>0.0.1</version>
-    </dependency-->
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>commons-lang</groupId>
@@ -133,11 +132,6 @@
       <artifactId>guava</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.maven</groupId>
-      <artifactId>maven-plugin-skeleton</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>

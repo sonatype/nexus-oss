@@ -15,9 +15,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.sonatype.maven.skeleton.execution.MojoExecution;
-import org.sonatype.maven.skeleton.logback.LogbackUtils;
-import org.sonatype.maven.skeleton.settings.MavenSettings;
+import org.sonatype.maven.mojo.execution.MojoExecution;
+import org.sonatype.maven.mojo.logback.LogbackUtils;
+import org.sonatype.maven.mojo.settings.MavenSettings;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 public abstract class AbstractDeployMojo
