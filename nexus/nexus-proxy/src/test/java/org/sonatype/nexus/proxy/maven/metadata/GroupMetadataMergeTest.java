@@ -235,6 +235,11 @@ public class GroupMetadataMergeTest
         }
     }
 
+    /**
+     * NEXUS-4970: merging should not fail by incompatible artifact ids ( incompatible one should be skipped).
+     *
+     * @throws Exception unexpected
+     */
     @Test
     public void testConflictMerge()
         throws Exception
@@ -244,8 +249,6 @@ public class GroupMetadataMergeTest
         try
         {
             getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
-
-            fail( "Should not be able to retrieve the maven-metadata.xml, since the merge should fail caused by incompatible artifactId." );
         }
         catch ( StorageException e )
         {
