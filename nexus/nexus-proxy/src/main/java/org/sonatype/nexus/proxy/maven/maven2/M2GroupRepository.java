@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -277,7 +278,21 @@ public class M2GroupRepository
                     ops.add( new NexusMergeOperation( new MetadataOperand( existingMetadatas.get( i ) ) ) );
                 }
 
-                MetadataBuilder.changeMetadata( result, ops );
+                final Collection<MetadataException> metadataExceptions = MetadataBuilder.changeMetadataIgnoringFailures(
+                    result, ops
+                );
+                if ( metadataExceptions != null && !metadataExceptions.isEmpty() )
+                {
+                    for ( final MetadataException metadataException : metadataExceptions )
+                    {
+                        getLogger().warn(
+                            "Ignored exception during M2 metadata merging: "
+                                + metadataException.getMessage()
+                            + " (request " + request.getRequestPath() + ")",
+                            metadataException
+                        );
+                    }
+                }
             }
 
             // build the result item

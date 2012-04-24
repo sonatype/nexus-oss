@@ -15,7 +15,9 @@ package org.sonatype.nexus.proxy.maven.metadata.operations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,11 +84,11 @@ public class MetadataBuilder
     }
 
     /**
-     * apply a list of operators to the specified serialized Metadata object
+     * Apply a list of operators to the specified metadata.
      * 
-     * @param metadataBytes - serialized Metadata object
+     * @param metadata - to be changed
      * @param mutators - operators
-     * @return changed serialized object
+     * @return changed metadata
      * @throws MetadataException
      */
     public static void changeMetadata( Metadata metadata, List<MetadataOperation> mutators )
@@ -119,6 +121,38 @@ public class MetadataBuilder
         }
 
         // ModelVersionUtility.setModelVersion( metadata, mdModelVersion );
+    }
+
+    /**
+     * Apply a list of operators to the specified metadata ignoring failing operations (failing operations will not
+     * affect original metadata).
+     *
+     * @param metadata - to be changed
+     * @param operations - operators
+     * @return collection of failing operations exceptions
+     */
+    public static Collection<MetadataException> changeMetadataIgnoringFailures(
+        final Metadata metadata,
+        final List<MetadataOperation> operations )
+    {
+        final Collection<MetadataException> failures = new ArrayList<MetadataException>();
+
+        if ( metadata != null && operations != null && operations.size() > 0 )
+        {
+            for ( MetadataOperation op : operations )
+            {
+                try
+                {
+                    op.perform( metadata );
+                }
+                catch ( MetadataException e )
+                {
+                    failures.add( e );
+                }
+            }
+        }
+
+        return failures;
     }
 
     public static void changeMetadata( Metadata metadata, MetadataOperation op )

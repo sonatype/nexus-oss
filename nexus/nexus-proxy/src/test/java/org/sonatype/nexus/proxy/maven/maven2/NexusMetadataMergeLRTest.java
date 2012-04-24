@@ -49,7 +49,7 @@ public class NexusMetadataMergeLRTest
             ops.add( new NexusMergeOperation( new MetadataOperand( existingMetadatas.get( i ) ) ) );
         }
 
-        MetadataBuilder.changeMetadata( result, ops );
+        MetadataBuilder.changeMetadataIgnoringFailures( result, ops );
 
         return result;
     }
