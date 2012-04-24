@@ -22,7 +22,7 @@ Sonatype.repoServer.UserProfile = function(config) {
   this.listeners = {
     'beforerender' : {
       fn : function() {
-        this.loadUserProfile();
+        this.loadUserProfile(this.username);
       },
       scope : this
     }
@@ -131,6 +131,12 @@ Sonatype.repoServer.UserProfile = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.UserProfile, Ext.Panel, {
+      /*
+       * Interface for UserProfilePanel, AdminProfileTabs.
+       */
+      initProfile : function(username) {
+        this.username = username;
+      },
       resetHandler : function() {
         this.loadUserProfile();
       },
@@ -160,7 +166,7 @@ Ext.extend(Sonatype.repoServer.UserProfile, Ext.Panel, {
               suppressStatus : 400
             });
       },
-      loadUserProfile : function() {
+      loadUserProfile : function(username) {
         Ext.Ajax.request({
               callback : function(options, isSuccess, response) {
                 if (!isSuccess)
@@ -177,7 +183,7 @@ Ext.extend(Sonatype.repoServer.UserProfile, Ext.Panel, {
               },
               scope : this,
               method : 'GET',
-              url : Sonatype.config.servicePath + '/user_account/' + Sonatype.user.curr.username
+              url : Sonatype.config.servicePath + '/user_account/' + username // Sonatype.user.curr.username
             });
 
         var field = this.formPanel.find('name', 'userId')[0];

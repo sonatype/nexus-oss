@@ -92,6 +92,7 @@ Sonatype.repoServer.userProfilePanel.contentClass = function(config)
     }
     this.remove(cmp);
     this.add(panel);
+    panel.initProfile(Sonatype.user.curr.username);
     this.doLayout();
   }
 }
