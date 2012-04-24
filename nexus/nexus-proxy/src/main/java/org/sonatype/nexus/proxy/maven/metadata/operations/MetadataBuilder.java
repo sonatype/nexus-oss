@@ -87,37 +87,28 @@ public class MetadataBuilder
      * Apply a list of operators to the specified metadata.
      * 
      * @param metadata - to be changed
-     * @param mutators - operators
+     * @param operations -
      * @return changed metadata
      * @throws MetadataException
      */
-    public static void changeMetadata( Metadata metadata, List<MetadataOperation> mutators )
+    public static void changeMetadata( Metadata metadata, List<MetadataOperation> operations )
         throws MetadataException
     {
-        boolean changed = false;
-
-        if ( metadata == null )
-        {
-            metadata = new Metadata();
-        }
-
         // Uncomment these once the fixes are in place
         // Version mdModelVersion = ModelVersionUtility.getModelVersion( metadata );
 
-        if ( mutators != null && mutators.size() > 0 )
+        if ( metadata != null && operations != null && operations.size() > 0 )
         {
-            boolean currentChanged = false;
-
-            for ( MetadataOperation op : mutators )
+            final Metadata clone = metadata.clone();
+            for ( MetadataOperation op : operations )
             {
-                currentChanged = op.perform( metadata );
+                op.perform( clone );
 
                 // if (currentChanged) {
                 // mdModelVersion = max of mdModelVersion and op.getModelVersion;
                 // }
-
-                changed = currentChanged || changed;
             }
+            replace( metadata, clone );
         }
 
         // ModelVersionUtility.setModelVersion( metadata, mdModelVersion );
@@ -128,7 +119,7 @@ public class MetadataBuilder
      * affect original metadata).
      *
      * @param metadata - to be changed
-     * @param operations - operators
+     * @param operations - operations to be applied to metadata
      * @return collection of failing operations exceptions
      */
     public static Collection<MetadataException> changeMetadataIgnoringFailures(
@@ -139,20 +130,39 @@ public class MetadataBuilder
 
         if ( metadata != null && operations != null && operations.size() > 0 )
         {
+            Metadata savePoint = metadata;
             for ( MetadataOperation op : operations )
             {
                 try
                 {
-                    op.perform( metadata );
+                    final Metadata clone = savePoint.clone();
+                    op.perform( clone );
+                    savePoint = clone;
                 }
                 catch ( MetadataException e )
                 {
                     failures.add( e );
                 }
             }
+            replace( metadata, savePoint );
         }
 
         return failures;
+    }
+
+    private static void replace( final Metadata metadata, final Metadata newMetadata )
+    {
+        if ( metadata == null || newMetadata == null )
+        {
+            return;
+        }
+        metadata.setArtifactId( newMetadata.getArtifactId() );
+        metadata.setGroupId( newMetadata.getGroupId() );
+        metadata.setModelEncoding( newMetadata.getModelEncoding() );
+        metadata.setModelVersion( newMetadata.getModelVersion() );
+        metadata.setPlugins( newMetadata.getPlugins() );
+        metadata.setVersion( newMetadata.getVersion() );
+        metadata.setVersioning( newMetadata.getVersioning() );
     }
 
     public static void changeMetadata( Metadata metadata, MetadataOperation op )
