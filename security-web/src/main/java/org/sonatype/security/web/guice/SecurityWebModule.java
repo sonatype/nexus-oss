@@ -45,6 +45,7 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
+import org.sonatype.security.web.ProtectedPathManager;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Key;
@@ -54,21 +55,21 @@ import com.google.inject.name.Names;
 /**
  * Extends ShiroWebModule to configure commonly set commponents such as SessionDAO, Authenticator, Authorizer, etc.
  * <p>
- * When {@link #injectFilterMap} is {@code true} the {@link #addFilterChain} method has no affect; instead all named
- * filters bound in this application are injected into the {@link FilterChainManager} so they can be added to filter
- * chains programatically.
+ * When {@link #useFilterChainManager} is {@code true} the {@link #addFilterChain} method has no affect; instead all
+ * named filters bound in this application are injected into the {@link FilterChainManager} so they can be added to
+ * filter chains programatically.
  * 
  * @since 2.7
  */
 public class SecurityWebModule
     extends ShiroWebModule
 {
-    private final boolean injectFilterMap;
+    private final boolean useFilterChainManager;
 
-    public SecurityWebModule( ServletContext servletContext, boolean injectFilterMap )
+    public SecurityWebModule( ServletContext servletContext, boolean useFilterChainManager )
     {
         super( servletContext );
-        this.injectFilterMap = injectFilterMap;
+        this.useFilterChainManager = useFilterChainManager;
     }
 
     @Override
@@ -80,17 +81,18 @@ public class SecurityWebModule
         bind( SessionDAO.class ).to( EnterpriseCacheSessionDAO.class ).asEagerSingleton();
         bind( Authenticator.class ).to( FirstSuccessfulModularRealmAuthenticator.class ).in( Singleton.class );
         bind( Authorizer.class ).to( ExceptionCatchingModularRealmAuthorizer.class ).in( Singleton.class );
+        bind( ProtectedPathManager.class ).to( SimpleProtectedPathManager.class ).in( Singleton.class );
 
-        if ( injectFilterMap )
+        if ( useFilterChainManager )
         {
             // override the default resolver with one backed by a FilterChainManager using an injected filter map
             bind( FilterChainResolver.class ).toConstructor( ctor( PathMatchingFilterChainResolver.class ) ).asEagerSingleton();
             bind( FilterChainManager.class ).toProvider( FilterChainManagerProvider.class ).in( Singleton.class );
         }
 
-        // expose bindings to other modules
+        // bindings used by external modules
+        expose( ProtectedPathManager.class );
         expose( FilterChainResolver.class );
-        expose( FilterChainManager.class );
     }
 
     @Override
@@ -103,7 +105,7 @@ public class SecurityWebModule
         bind( RealmSecurityManager.class ).to( DefaultWebSecurityManager.class );
         bind.to( DefaultWebSecurityManager.class );
 
-        // expose bindings to other modules
+        // bindings used by external modules
         expose( RealmSecurityManager.class );
         expose( WebSecurityManager.class );
     }
@@ -116,7 +118,7 @@ public class SecurityWebModule
     }
 
     /**
-     * Binds this {@link Filter} instance under the given name in the injected filter map.
+     * Binds the named {@link Filter} instance and exposes this binding to other modules.
      * 
      * @param name The filter name
      * @param filter The filter instance
@@ -125,8 +127,7 @@ public class SecurityWebModule
     {
         Key<Filter> key = Key.get( Filter.class, Names.named( name ) );
         bind( key ).toInstance( filter );
-
-        expose( key ); // expose binding so it appears in the aggregate injected map
+        expose( key );
     }
 
     /**
@@ -232,6 +233,26 @@ public class SecurityWebModule
         public Enumeration<?> getInitParameterNames()
         {
             return servletContext.getInitParameterNames();
+        }
+    }
+
+    /**
+     * Simpler wrapper around Shiro's {@link FilterChainManager}.
+     */
+    private static final class SimpleProtectedPathManager
+        implements ProtectedPathManager
+    {
+        private final FilterChainManager filterChainManager;
+
+        @Inject
+        private SimpleProtectedPathManager( FilterChainManager filterChainManager )
+        {
+            this.filterChainManager = filterChainManager;
+        }
+
+        public void addProtectedResource( String pathPattern, String filterExpression )
+        {
+            this.filterChainManager.createChain( pathPattern, filterExpression );
         }
     }
 }

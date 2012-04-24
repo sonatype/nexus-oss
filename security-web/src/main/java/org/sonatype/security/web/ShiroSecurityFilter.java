@@ -55,7 +55,7 @@ public class ShiroSecurityFilter
 
     public ShiroSecurityFilter()
     {
-        logger.info( "@Deprecated use org.sonatype.security.web.guice.ShiroWebGuiceModule instead" );
+        logger.info( "@Deprecated use org.sonatype.security.web.guice.SecurityWebModule instead" );
     }
 
     @Override

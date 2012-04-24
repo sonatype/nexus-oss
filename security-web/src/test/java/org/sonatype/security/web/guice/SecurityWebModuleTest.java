@@ -33,7 +33,7 @@ import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
 import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
-import org.apache.shiro.web.filter.mgt.FilterChainManager;
+import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.NamedFilterList;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -49,6 +49,7 @@ import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.reflect.URLClassSpace;
 import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.web.ProtectedPathManager;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.AbstractModule;
@@ -97,12 +98,11 @@ public class SecurityWebModuleTest
         PathMatchingFilterChainResolver filterChainResolver =
             (PathMatchingFilterChainResolver) shiroFilter.getFilterChainResolver();
         assertThat( filterChainResolver.getFilterChainManager(), instanceOf( DefaultFilterChainManager.class ) );
-
-        assertThat( filterChainResolver.getFilterChainManager(),
-                    sameInstance( injector.getInstance( FilterChainManager.class ) ) );
+        assertThat( filterChainResolver, sameInstance( injector.getInstance( FilterChainResolver.class ) ) );
 
         // now add a protected path
-        injector.getInstance( FilterChainManager.class ).createChain( "/service/**", "foobar,perms[sample:priv-name]" );
+        ProtectedPathManager protectedPathManager = injector.getInstance( ProtectedPathManager.class );
+        protectedPathManager.addProtectedResource( "/service/**", "foobar,perms[sample:priv-name]" );
 
         NamedFilterList filterList = filterChainResolver.getFilterChainManager().getChain( "/service/**" );
         assertThat( filterList.get( 0 ), instanceOf( SimpleAccessControlFilter.class ) );
