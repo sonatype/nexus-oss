@@ -19,6 +19,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
@@ -33,7 +34,7 @@ public class DefaultUserAccountManager
     private SecuritySystem securitySystem;
 
     public User readAccount( String userId )
-        throws UserNotFoundException, AccessDeniedException
+        throws UserNotFoundException, AuthorizationException
     {
         checkPermission( userId );
 
@@ -41,7 +42,8 @@ public class DefaultUserAccountManager
     }
 
     public User updateAccount( User user )
-        throws InvalidConfigurationException, UserNotFoundException, NoSuchUserManagerException, AccessDeniedException
+        throws InvalidConfigurationException, UserNotFoundException, NoSuchUserManagerException,
+        AuthorizationException
     {
         checkPermission( user.getUserId() );
 
@@ -50,7 +52,7 @@ public class DefaultUserAccountManager
 
     public User updateAccount( User user, String oldPassword, String newPassword )
         throws InvalidConfigurationException, UserNotFoundException, InvalidCredentialsException,
-        NoSuchUserManagerException, AccessDeniedException
+        NoSuchUserManagerException, AuthorizationException
     {
         checkPermission( user.getUserId() );
 
@@ -60,17 +62,19 @@ public class DefaultUserAccountManager
     }
 
     protected void checkPermission( String userId )
-        throws AccessDeniedException
+        throws AuthorizationException
     {
         if ( !securitySystem.isSecurityEnabled() )
         {
             return;
         }
 
-        if ( !securitySystem.getSubject().getPrincipal().equals( userId ) )
+        if ( securitySystem.getSubject().getPrincipal().equals( userId ) )
         {
-            throw new AccessDeniedException( "Only '" + userId + "' is allowed to perform this operation." );
+             return;
         }
+
+        securitySystem.checkPermission( securitySystem.getSubject().getPrincipals(), "security:users" );
     }
 
 }

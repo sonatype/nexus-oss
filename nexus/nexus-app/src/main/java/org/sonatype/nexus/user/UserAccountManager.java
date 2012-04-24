@@ -14,6 +14,7 @@ package org.sonatype.nexus.user;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
@@ -29,7 +30,7 @@ public interface UserAccountManager
      * @return
      */
     User readAccount( String userId )
-        throws UserNotFoundException, AccessDeniedException;
+        throws UserNotFoundException, AuthorizationException;
 
     /**
      * Update the account info, but do not change password
@@ -39,9 +40,9 @@ public interface UserAccountManager
      */
     User updateAccount( User user )
         throws InvalidConfigurationException,
-            UserNotFoundException,
-            NoSuchUserManagerException,
-            AccessDeniedException;
+        UserNotFoundException,
+        NoSuchUserManagerException,
+        AuthorizationException;
 
     /**
      * Update the account info, and change password
@@ -53,9 +54,9 @@ public interface UserAccountManager
      */
     User updateAccount( User user, String oldPassword, String newPassword )
         throws InvalidConfigurationException,
-            UserNotFoundException,
-            InvalidCredentialsException,
-            NoSuchUserManagerException,
-            AccessDeniedException;
+        UserNotFoundException,
+        InvalidCredentialsException,
+        NoSuchUserManagerException,
+        AuthorizationException;
 
 }

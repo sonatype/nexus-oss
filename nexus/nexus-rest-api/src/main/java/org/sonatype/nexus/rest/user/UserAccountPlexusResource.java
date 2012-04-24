@@ -35,6 +35,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -101,7 +102,7 @@ public class UserAccountPlexusResource
 
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, msg );
         }
-        catch ( AccessDeniedException e )
+        catch ( AuthorizationException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Not allowed to read account '"
                 + getUserId( request ) + "'." );
@@ -156,7 +157,7 @@ public class UserAccountPlexusResource
             throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to update account '"
                 + dto.getId() + "'.", errorResponse );
         }
-        catch ( AccessDeniedException e )
+        catch ( AuthorizationException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Not allowed to update account '" + dto.getId()
                 + "'." );
