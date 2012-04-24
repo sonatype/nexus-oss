@@ -190,3 +190,10 @@ Ext.extend(Sonatype.repoServer.UserProfile, Ext.Panel, {
         field.focus(true, 100);
       }
     });
+
+Sonatype.Events.addListener('userAdminViewInit', function(views){
+  views.push({
+    name : 'Summary',
+    item : new Sonatype.repoServer.UserProfile()
+  });
+});
