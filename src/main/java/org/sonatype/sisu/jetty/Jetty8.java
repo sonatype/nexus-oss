@@ -75,7 +75,7 @@ public class Jetty8
     {
         if ( isStarted() )
         {
-            throw new IllegalStateException( "Jetty7 already started, stop if first before starting again!" );
+            throw new IllegalStateException( "Jetty already started, stop if first before starting again!" );
         }
 
         serverThread = new JettyWrapperThread( server );
@@ -88,7 +88,7 @@ public class Jetty8
     {
         if ( !isStarted() )
         {
-            throw new IllegalStateException( "Jetty7 not started, start if first before stopping!" );
+            throw new IllegalStateException( "Jetty not started, start if first before stopping!" );
         }
 
         serverThread.stopJetty();
