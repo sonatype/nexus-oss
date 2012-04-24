@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletContext;
 
-import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -92,11 +91,11 @@ public class SecurityWebModuleTest
         DefaultSessionManager sessionManager = (DefaultSessionManager) defaultSecurityManager.getSessionManager();
         assertThat( sessionManager.getSessionDAO(), instanceOf( EnterpriseCacheSessionDAO.class ) );
 
-        GuiceShiroFilter guiceFilter = injector.getInstance( GuiceShiroFilter.class );
-        assertThat( guiceFilter.getFilterChainResolver(), instanceOf( PathMatchingFilterChainResolver.class ) );
+        SecurityWebFilter shiroFilter = injector.getInstance( SecurityWebFilter.class );
+        assertThat( shiroFilter.getFilterChainResolver(), instanceOf( PathMatchingFilterChainResolver.class ) );
 
         PathMatchingFilterChainResolver filterChainResolver =
-            (PathMatchingFilterChainResolver) guiceFilter.getFilterChainResolver();
+            (PathMatchingFilterChainResolver) shiroFilter.getFilterChainResolver();
         assertThat( filterChainResolver.getFilterChainManager(), instanceOf( DefaultFilterChainManager.class ) );
 
         assertThat( filterChainResolver.getFilterChainManager(),

@@ -18,7 +18,6 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
-import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.sonatype.guice.bean.binders.ParameterKeys;
@@ -28,6 +27,7 @@ import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.reflect.URLClassSpace;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.sample.web.services.SampleService;
+import org.sonatype.security.web.guice.SecurityWebFilter;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
@@ -114,7 +114,7 @@ public class SampleGuiceServletConfig
                     @Override
                     protected void configurePreFilters()
                     {
-                        filter( "/*" ).through( GuiceShiroFilter.class );
+                        filter( "/*" ).through( SecurityWebFilter.class );
                     }
                 };
             }

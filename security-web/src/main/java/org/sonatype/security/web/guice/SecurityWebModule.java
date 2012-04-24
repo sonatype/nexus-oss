@@ -86,8 +86,11 @@ public class SecurityWebModule
             // override the default resolver with one backed by a FilterChainManager using an injected filter map
             bind( FilterChainResolver.class ).toConstructor( ctor( PathMatchingFilterChainResolver.class ) ).asEagerSingleton();
             bind( FilterChainManager.class ).toProvider( FilterChainManagerProvider.class ).in( Singleton.class );
-            expose( FilterChainManager.class );
         }
+
+        // expose bindings to other modules
+        expose( FilterChainResolver.class );
+        expose( FilterChainManager.class );
     }
 
     @Override
