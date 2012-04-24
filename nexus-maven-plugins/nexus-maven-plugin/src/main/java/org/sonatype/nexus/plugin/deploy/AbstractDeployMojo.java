@@ -13,6 +13,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.sonatype.maven.mojo.execution.MojoExecution;
@@ -249,25 +250,26 @@ public abstract class AbstractDeployMojo
     {
         if ( altStagingDirectory != null )
         {
-            getLog().info( "Using alternate staging directory " + altStagingDirectory.getAbsolutePath() );
             return altStagingDirectory;
         }
         else
         {
-            final File stagingDirectory =
-                new File( getMavenSession().getExecutionRootDirectory() + "/target/nexus-staging" );
-            getLog().info( "Using default staging directory " + stagingDirectory.getAbsolutePath() );
-            return stagingDirectory;
+            final MavenProject firstWithThisMojo =
+                MojoExecution.getFirstProjectWithMojoInExecution( mavenSession, pluginGroupId, pluginArtifactId );
+            if ( firstWithThisMojo != null )
+            {
+                // the target of 1st project having this mojo defined
+                return new File( firstWithThisMojo.getBasedir().getAbsolutePath(), "target/nexus-staging" );
+            }
+            else
+            {
+                // top level (invocation place)
+                return new File( getMavenSession().getExecutionRootDirectory() + "/target/nexus-staging" );
+            }
         }
     }
 
-    protected ArtifactRepository getStagingRepository()
-        throws MojoFailureException
-    {
-        return getStagingRepositoryFor( getStagingDirectory() );
-    }
-
-    private ArtifactRepository getStagingRepositoryFor( final File stagingDirectory )
+    protected ArtifactRepository getStagingRepositoryFor( final File stagingDirectory )
         throws MojoFailureException
     {
         if ( stagingDirectory != null )
@@ -327,6 +329,6 @@ public abstract class AbstractDeployMojo
      */
     protected boolean isThisLastProjectWithThisMojoInExecution()
     {
-        return MojoExecution.isThisLastProjectWithMojoInExecution( mavenSession, pluginGroupId, pluginArtifactId );
+        return MojoExecution.isCurrentTheLastProjectWithMojoInExecution( mavenSession, pluginGroupId, pluginArtifactId );
     }
 }

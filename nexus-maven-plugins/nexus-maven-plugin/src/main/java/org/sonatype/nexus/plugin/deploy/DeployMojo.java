@@ -74,7 +74,11 @@ public class DeployMojo
             return;
         }
 
-        final ArtifactRepository repo = getStagingRepository();
+        final File stagingDirectory = getStagingDirectory();
+
+        getLog().info( "Using staging directory " + stagingDirectory.getAbsolutePath() );
+
+        final ArtifactRepository repo = getStagingRepositoryFor( stagingDirectory );
 
         // Deploy the POM
         boolean isPomArtifact = "pom".equals( packaging );
@@ -140,17 +144,24 @@ public class DeployMojo
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
-        if ( !skipDeploy && isThisLastProjectWithThisMojoInExecution() )
+        if ( isThisLastProjectWithThisMojoInExecution() )
         {
-            failIfOffline();
+            if ( !skipDeploy )
+            {
+                failIfOffline();
 
-            try
-            {
-                deployStagedArtifacts();
+                try
+                {
+                    deployStagedArtifacts();
+                }
+                catch ( ArtifactDeploymentException e )
+                {
+                    throw new MojoExecutionException( e.getMessage(), e );
+                }
             }
-            catch ( ArtifactDeploymentException e )
+            else
             {
-                throw new MojoExecutionException( e.getMessage(), e );
+                getLog().info( "Artifacts staged in directory " + stagingDirectory.getAbsolutePath() + ", skipping deploy." );
             }
         }
     }
