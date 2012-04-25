@@ -47,14 +47,14 @@ Sonatype.repoServer.userProfilePanel = function(config) {
         fn : function(combo, record, index) {
           var cls = record.get('value');
           // FIXME chache this and reuse instances
-          this.content.display(new cls({username:Sonatype.user.curr.username}));
+          this.content.display(new cls({username:Sonatype.user.curr.username, border : false,frame : false}));
         },
         scope : this
       },
       'show' : {
         fn : function(combo) {
           combo.select(0);
-          this.content.display(new summaryPanel({username:Sonatype.user.curr.username}));
+          this.content.display(new summaryPanel.item({username:Sonatype.user.curr.username, border : false,frame : false}));
         },
         scope : this
       }

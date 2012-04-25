@@ -36,16 +36,11 @@ Sonatype.repoServer.UserProfile = function(config) {
     email : ''
   };
 
+  // defining payload.id is a must, see Sonatype.ext.FormPanel#getActionUrl
+  // in short, `payload.id` will be used to extend `this.uri` if `payload.data.resourceUri` is not set.
+  // otherwise, `payload.data.resourceUri` is used as is.
   this.payload = {
-    id : this.username,
-    // this is the initial data
-    data : {
-      userId : this.username,
-      firstName : 'first',
-      lastName : 'last',
-      email : 'first@last.invalid',
-      resourceUri : Sonatype.config.servicePath + '/user_account/' + this.username
-    }
+    id : this.username
   }
 
   this.checkPayload();
@@ -133,7 +128,7 @@ Sonatype.repoServer.UserProfile = function(config) {
     }
   ];
 
-  Sonatype.repoServer.UserProfile.superclass.constructor.call(this, {
+  Sonatype.repoServer.UserProfile.superclass.constructor.call(this, Ext.apply(config, {
     items : items,
     listeners : {
       submit : {
@@ -147,7 +142,7 @@ Sonatype.repoServer.UserProfile = function(config) {
 
     },
     dataModifiers : {}
-  });
+  }));
 };
 
 Ext.extend(Sonatype.repoServer.UserProfile, Sonatype.ext.FormPanel, {
