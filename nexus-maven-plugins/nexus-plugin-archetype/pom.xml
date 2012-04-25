@@ -6,7 +6,6 @@
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins-parent</artifactId>
     <version>8</version>
-    <relativePath>../nexus-plugins-parent/pom.xml</relativePath>
   </parent>
   
   <groupId>org.sonatype.nexus.archetypes</groupId>
