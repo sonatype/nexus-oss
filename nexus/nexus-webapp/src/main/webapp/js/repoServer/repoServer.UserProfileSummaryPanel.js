@@ -11,39 +11,15 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 Sonatype.repoServer.UserProfile = function(config) {
-  var config = config || {};
-  var defaultConfig = {
-    labelWidth : 100
-  };
-  Ext.apply(this, config, defaultConfig);
-
   var ht = Sonatype.repoServer.resources.help.users;
 
-  this.COMBO_WIDTH = 300;
+  var config = config || {};
 
-  if ( !this.username ){
+  if ( !config.username ){
     throw 'No username in config';
   }
 
-  // URI template, payload.id will be appended
-  this.uri = Sonatype.config.servicePath + '/user_account';
-
-  // this is a template for the data to be sent from the form fields
-  this.referenceData = {
-    userId : '',
-    firstName : '',
-    lastName : '',
-    email : ''
-  };
-
-  // defining payload.id is a must, see Sonatype.ext.FormPanel#getActionUrl
-  // in short, `payload.id` will be used to extend `this.uri` if `payload.data.resourceUri` is not set.
-  // otherwise, `payload.data.resourceUri` is used as is.
-  this.payload = {
-    id : this.username
-  }
-
-  this.checkPayload();
+  this.COMBO_WIDTH = 300;
 
   var items = [
     {
@@ -64,7 +40,7 @@ Sonatype.repoServer.UserProfile = function(config) {
               {
                 tag : 'img',
                 qtip : 'Profile picture from gravatar (http://www.gravatar.com/)',
-                id : 'user-picture-' + this.username
+                id : 'user-picture-' + config.username
               }
             ]
           }
@@ -128,8 +104,8 @@ Sonatype.repoServer.UserProfile = function(config) {
     }
   ];
 
-  Sonatype.repoServer.UserProfile.superclass.constructor.call(this, Ext.apply(config, {
-    items : items,
+  var defaultConfig = {
+    labelWidth : 100,
     listeners : {
       submit : {
         fn : this.loadGravatarPicture,
@@ -139,10 +115,34 @@ Sonatype.repoServer.UserProfile = function(config) {
         fn : this.loadGravatarPicture,
         scope : this
       }
-
     },
-    dataModifiers : {}
-  }));
+    items : items
+  };
+
+  Ext.apply(this, config, defaultConfig);
+
+
+  // URI template, payload.id will be appended
+  this.uri = Sonatype.config.servicePath + '/user_account';
+
+  // this is a template for the data to be sent from the form fields
+  this.referenceData = {
+    userId : '',
+    firstName : '',
+    lastName : '',
+    email : ''
+  };
+
+  // defining payload.id and payload.data is a must, see Sonatype.ext.FormPanel#getActionUrl
+  // in short, `payload.id` will be used to extend `this.uri` if `payload.data.resourceUri` is not set.
+  // otherwise, `payload.data.resourceUri` is used as is.
+  this.payload = {
+    id : this.username
+  }
+
+  this.checkPayload();
+
+  Sonatype.repoServer.UserProfile.superclass.constructor.call(this, config);
 };
 
 Ext.extend(Sonatype.repoServer.UserProfile, Sonatype.ext.FormPanel, {
