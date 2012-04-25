@@ -41,6 +41,11 @@ public class MUtils
         {
             String raw = StringUtils.chomp( IOUtil.toString( inputStream, "UTF-8" ) ).trim();
 
+            if ( raw != null && StringUtils.isEmpty( raw ) )
+            {
+                return "";
+            }
+
             String digest;
             // digest string at end with separator, e.g.:
             // MD5 (pom.xml) = 68da13206e9dcce2db9ec45a9f7acd52
