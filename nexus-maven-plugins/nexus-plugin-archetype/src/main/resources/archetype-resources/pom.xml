@@ -14,7 +14,7 @@
 
   <properties>
     <!-- Set the Nexus version here, against which you build the plugin -->
-    <nexus-version>${nexusVersion}</nexus-version>
+    <nexus.version>${nexusVersion}</nexus.version>
     <app-lifecycle.version>1.4</app-lifecycle.version>
   </properties>
 
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <version>${nexus-version}</version>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${nexus-version}</version>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus-version}</version>
+      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -65,7 +65,7 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
       <scope>test</scope>
-      <version>${nexus-version}</version>
+      <version>${nexus.version}</version>
     </dependency>
     <!-- #ITSet ENDS -->
 
@@ -79,7 +79,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${nexus-version}</version>
+        <version>${nexus.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -119,9 +119,9 @@
       <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
       <!-- There are dependencies connected to this set of plugin, see above! -->
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
+        <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.6</version>
+        <version>${nexus.version}</version>
         <executions>
           <execution>
             <goals>
@@ -131,17 +131,17 @@
               <nexusBundleArtifact>
                 <groupId>org.sonatype.nexus</groupId>
                 <artifactId>nexus-oss-webapp</artifactId>
-                <version>${nexus-version}</version>
+                <version>${nexus.version}</version>
                 <type>zip</type>
                 <classifier>bundle</classifier>
               </nexusBundleArtifact>
-              <nexusBundleName>nexus-oss-webapp-${nexus-version}</nexusBundleName>
-              <nexusVersion>${nexus-version}</nexusVersion>
+              <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
+              <nexusVersion>${nexus.version}</nexusVersion>
             </configuration>
           </execution>
         </executions>
         <configuration>
-          <nexusVersion>${nexus-version}</nexusVersion>
+          <nexusVersion>${nexus.version}</nexusVersion>
         </configuration>
       </plugin>
 
