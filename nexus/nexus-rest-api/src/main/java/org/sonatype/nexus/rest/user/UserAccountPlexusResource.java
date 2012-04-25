@@ -128,7 +128,8 @@ public class UserAccountPlexusResource
         {
             User user = getSecuritySystem().getUser( getUserId( request ) );
 
-            user.setName( dto.getName() );
+            user.setFirstName( dto.getFirstName() );
+            user.setLastName( dto.getLastName() );
 
             user.setEmailAddress( dto.getEmail() );
 
@@ -155,11 +156,11 @@ public class UserAccountPlexusResource
             ErrorResponse errorResponse = getErrorResponse( "*", e.getMessage() );
 
             throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to update account '"
-                + dto.getId() + "'.", errorResponse );
+                + dto.getUserId() + "'.", errorResponse );
         }
         catch ( AuthorizationException e )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Not allowed to update account '" + dto.getId()
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Not allowed to update account '" + dto.getUserId()
                 + "'." );
         }
 

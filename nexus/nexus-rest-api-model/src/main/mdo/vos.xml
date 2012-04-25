@@ -4412,14 +4412,21 @@
       </annotations>
       <fields>
         <field>
-          <name>id</name>
+          <name>userId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>The user id.</description>
         </field>
         <field>
-          <name>name</name>
+          <name>firstName</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The name of the user.</description>
+        </field>
+        <field>
+          <name>lastName</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>

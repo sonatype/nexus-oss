@@ -42,9 +42,10 @@ public abstract class AbstractUserAccountPlexusResource
     {
         UserAccount dto = new UserAccount();
 
-        dto.setId( user.getUserId() );
+        dto.setUserId( user.getUserId() );
 
-        dto.setName( user.getName() );
+        dto.setFirstName( user.getFirstName() );
+        dto.setLastName( user.getLastName() );
 
         dto.setEmail( user.getEmailAddress() );
 
@@ -55,9 +56,10 @@ public abstract class AbstractUserAccountPlexusResource
     {
         User user = new DefaultUser();
 
-        user.setUserId( dto.getId() );
+        user.setUserId( dto.getUserId() );
 
-        user.setName( dto.getName() );
+        user.setFirstName( dto.getFirstName() );
+        user.setLastName( dto.getLastName() );
 
         user.setEmailAddress( dto.getEmail() );
 
