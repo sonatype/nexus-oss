@@ -41,7 +41,7 @@ public class MUtils
         {
             String raw = StringUtils.chomp( IOUtil.toString( inputStream, "UTF-8" ) ).trim();
 
-            if ( raw != null && StringUtils.isEmpty( raw ) )
+            if ( StringUtils.isEmpty( raw ) )
             {
                 return "";
             }
