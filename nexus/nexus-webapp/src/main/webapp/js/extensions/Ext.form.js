@@ -17,6 +17,14 @@
  */
 
 Ext.override(Ext.form.BasicForm, {
+      clearInvalid : function() {
+        // same as before, but ignore items without clearInvalid (== non-form-items)
+        this.items.each(function(f) {
+          if (f.clearInvalid) {
+            f.clearInvalid();
+          }
+        })
+      },
       /**
        * Override findField to look for enabled field and return that, otherwise
        * return first found
@@ -595,6 +603,7 @@ Sonatype.ext.FormPanel = function(config) {
       });
   this.form.on('actioncomplete', this.actionCompleteHandler, this);
   this.form.on('actionfailed', this.actionFailedHandler, this);
+
   this.addEvents({
         cancel : true,
         load : true,

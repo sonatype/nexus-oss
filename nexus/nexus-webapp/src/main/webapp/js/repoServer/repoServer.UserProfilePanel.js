@@ -21,7 +21,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
 
   var summaryPanel = {
     name : 'Summary',
-    item : new Sonatype.repoServer.UserProfile()
+    item : Sonatype.repoServer.UserProfile
   };
 
   var views = [
@@ -45,14 +45,16 @@ Sonatype.repoServer.userProfilePanel = function(config) {
     listeners : {
       'select' : {
         fn : function(combo, record, index) {
-          this.content.display(record.get('value'));
+          var cls = record.get('value');
+          // FIXME chache this and reuse instances
+          this.content.display(new cls({username:Sonatype.user.curr.username}));
         },
         scope : this
       },
       'show' : {
         fn : function(combo) {
           combo.select(0);
-          this.content.display(summaryPanel);
+          this.content.display(new summaryPanel({username:Sonatype.user.curr.username}));
         },
         scope : this
       }
@@ -92,7 +94,6 @@ Sonatype.repoServer.userProfilePanel.contentClass = function(config)
     }
     this.remove(cmp);
     this.add(panel);
-    panel.initProfile(Sonatype.user.curr.username);
     this.doLayout();
   }
 }

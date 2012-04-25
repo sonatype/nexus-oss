@@ -1130,8 +1130,8 @@ Sonatype.Events.addListener('userViewInit', function(cardPanel, rec) {
 
     for( var i = 0; i < views.length; i++ ) {
       var view = views[i];
-      var content = view.item;
-      content.initProfile(rec.get('userId'));
+      var content = new view.item({username:rec.get('userId')});
+      content.tabTitle = view.name;
       cardPanel.add(content);
     }
   });
