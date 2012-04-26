@@ -362,8 +362,8 @@
     </dependency>
 
     <dependency>
-      <groupId>eu.flatwhite.zapper</groupId>
-      <artifactId>zapper</artifactId>
+      <groupId>org.sonatype.spice.zapper</groupId>
+      <artifactId>spice-zapper</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
 

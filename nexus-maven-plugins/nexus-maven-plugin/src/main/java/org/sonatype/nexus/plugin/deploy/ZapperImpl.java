@@ -3,18 +3,17 @@ package org.sonatype.nexus.plugin.deploy;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.spice.zapper.Client;
+import org.sonatype.spice.zapper.IOSourceListable;
+import org.sonatype.spice.zapper.Parameters;
+import org.sonatype.spice.zapper.ParametersBuilder;
+import org.sonatype.spice.zapper.client.ahc.AhcClientBuilder;
+import org.sonatype.spice.zapper.fs.DirectoryIOSource;
 
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.ProxyServer.Protocol;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Realm.AuthScheme;
-
-import eu.flatwhite.zapper.Client;
-import eu.flatwhite.zapper.IOSourceListable;
-import eu.flatwhite.zapper.Parameters;
-import eu.flatwhite.zapper.ParametersBuilder;
-import eu.flatwhite.zapper.client.ahc.AhcClientBuilder;
-import eu.flatwhite.zapper.fs.DirectoryIOSource;
 
 @Component( role = Zapper.class )
 public class ZapperImpl
