@@ -36,10 +36,13 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
  * does, because the have different parents. We should look into a better way of doing this. Something like pushing the
  * configuration into the SecuritySystem. The downside to that is we would need to expose an accessor for it. ( This
  * component is loaded from a servelet ), but that might be cleaner then what we are doing now.
+ * 
+ * @deprecated use shiro-guice with @{link org.sonatype.security.web.guice.SecurityWebModule} instead.
  */
 @Singleton
 @Typed( RealmSecurityManager.class )
 @Named( "web" )
+@Deprecated
 public class WebRealmSecurityManager
     extends DefaultWebSecurityManager
     implements org.apache.shiro.util.Initializable
@@ -51,6 +54,8 @@ public class WebRealmSecurityManager
     @Inject
     public WebRealmSecurityManager( Map<String, RolePermissionResolver> rolePermissionResolverMap )
     {
+        logger.info( "@Deprecated use shiro-guice with org.sonatype.security.web.guice.SecurityWebModule instead" );
+
         this.rolePermissionResolverMap = rolePermissionResolverMap;
 
         // set the realm authenticator, that will automatically deligate the authentication to all the realms.

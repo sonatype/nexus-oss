@@ -13,19 +13,22 @@
 package org.sonatype.security.sample.web;
 
 import java.io.IOException;
-import java.net.URLClassLoader;
-import java.util.Map;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
+import org.apache.shiro.guice.web.ShiroWebModule;
+import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.sonatype.guice.bean.binders.ParameterKeys;
 import org.sonatype.guice.bean.binders.SpaceModule;
 import org.sonatype.guice.bean.binders.WireModule;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.reflect.URLClassSpace;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.sample.web.services.SampleService;
-import org.sonatype.security.web.ShiroSecurityFilter;
+import org.sonatype.security.web.guice.SecurityWebFilter;
+import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -33,11 +36,14 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.sitebricks.SitebricksModule;
+import com.google.sitebricks.SitebricksServletModule;
 
 public class SampleGuiceServletConfig
     extends GuiceServletContextListener
 {
     private Injector injector = null;
+
+    private ShiroWebModule shiroWebModule;
 
     @Override
     protected Injector getInjector()
@@ -53,15 +59,41 @@ public class SampleGuiceServletConfig
     @Override
     public void contextInitialized( ServletContextEvent servletContextEvent )
     {
-        servletContextEvent.getServletContext().setAttribute( ShiroSecurityFilter.INJECTORY_KEY, getInjector() );
+        shiroWebModule = getShiroModule( servletContextEvent.getServletContext() );
+
+        // start security and verify that the realm and web security managers are the same instance
+        WebSecurityManager webSecurityManager = getInjector().getInstance( WebSecurityManager.class );
+        SecuritySystem securitySystem = getInjector().getInstance( SecuritySystem.class );
+
+        securitySystem.start();
+
+        assert ( securitySystem.getSecurityManager() == webSecurityManager ) : "SecuritySystem.securityManager != WebSecurityManager";
+
         super.contextInitialized( servletContextEvent );
     }
 
     protected Module getWireModule()
     {
-        ClassSpace space = new URLClassSpace( (URLClassLoader) getClass().getClassLoader() );
+        ClassSpace space = new URLClassSpace( getClass().getClassLoader() );
 
-        return new WireModule( new SpaceModule( space ), getPropertiesModule(), getSitebricksModule() );
+        // order matters; shiro must be first so its bindings take priority over any bindings discovered during scanning
+        return new WireModule( shiroWebModule, new SpaceModule( space ), getPropertiesModule(), getSitebricksModule() );
+    }
+
+    protected ShiroWebModule getShiroModule( ServletContext servletContext )
+    {
+        return new SecurityWebModule( servletContext, false )
+        {
+            @Override
+            @SuppressWarnings( "unchecked" )
+            protected void configureShiroWeb()
+            {
+                super.configureShiroWeb();
+
+                addFilterChain( "/test", AUTHC_BASIC, config( REST, "sample:priv-name" ) );
+                addFilterChain( "/**", AUTHC_BASIC, config( REST, "sample:permToCatchAllUnprotecteds" ) );
+            }
+        };
     }
 
     protected AbstractModule getSitebricksModule()
@@ -73,6 +105,19 @@ public class SampleGuiceServletConfig
             {
                 scan( SampleService.class.getPackage() );
             }
+
+            @Override
+            protected SitebricksServletModule servletModule()
+            {
+                return new SitebricksServletModule()
+                {
+                    @Override
+                    protected void configurePreFilters()
+                    {
+                        filter( "/*" ).through( SecurityWebFilter.class );
+                    }
+                };
+            }
         };
     }
 
@@ -80,16 +125,12 @@ public class SampleGuiceServletConfig
     {
         return new AbstractModule()
         {
-            @SuppressWarnings( { "rawtypes", "unchecked" } )
             @Override
             protected void configure()
             {
-                Properties properties = getProperties();
-
-                binder().bind( ParameterKeys.PROPERTIES ).toInstance( (Map) properties );
+                binder().bind( ParameterKeys.PROPERTIES ).toInstance( getProperties() );
             }
         };
-
     }
 
     protected Properties getProperties()
@@ -101,8 +142,8 @@ public class SampleGuiceServletConfig
         }
         catch ( IOException e )
         {
+            // ignore...
         }
-
         return properties;
     }
 }

@@ -34,10 +34,12 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
  * Componentize the Shiro DefaultSecurityManager, and sets up caching.
  * 
  * @author Brian Demers
+ * @deprecated use shiro-guice with @{link org.sonatype.security.guice.SecurityModule} instead.
  */
 @Singleton
 @Typed( RealmSecurityManager.class )
 @Named( "default" )
+@Deprecated
 public class DefaultRealmSecurityManager
     extends DefaultSecurityManager
     implements Initializable
@@ -49,6 +51,8 @@ public class DefaultRealmSecurityManager
     @Inject
     public DefaultRealmSecurityManager( @Nullable RolePermissionResolver rolePermissionResolver )
     {
+        logger.info( "@Deprecated use shiro-guice with org.sonatype.security.guice.SecurityModule instead" );
+
         this.rolePermissionResolver = rolePermissionResolver;
         init();
     }

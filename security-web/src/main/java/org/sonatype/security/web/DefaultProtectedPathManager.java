@@ -17,10 +17,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
+import org.apache.shiro.web.filter.mgt.FilterChainResolver;
+import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
+import org.sonatype.inject.Nullable;
 
 /**
  * The default implementation requires a FilterChainManager, so the configuration can be passed to it.
@@ -36,6 +40,20 @@ public class DefaultProtectedPathManager
     private FilterChainManager filterChainManager;
 
     protected Map<String, String> pseudoChains = new LinkedHashMap<String, String>();
+
+    @Inject
+    public DefaultProtectedPathManager( @Nullable FilterChainResolver filterChainResolver )
+    {
+        if ( filterChainResolver instanceof PathMatchingFilterChainResolver )
+        {
+            setFilterChainManager( ( (PathMatchingFilterChainResolver) filterChainResolver ).getFilterChainManager() );
+        }
+    }
+
+    public DefaultProtectedPathManager()
+    {
+        // legacy constructor
+    }
 
     public void addProtectedResource( String pathPattern, String filterExpression )
     {
@@ -57,14 +75,16 @@ public class DefaultProtectedPathManager
 
     public void setFilterChainManager( FilterChainManager filterChainManager )
     {
-        this.filterChainManager = filterChainManager;
-
-        // lazy load: see https://issues.sonatype.org/browse/NEXUS-3111
-        // which to me seems like a glassfish bug...
-        for ( Entry<String, String> entry : this.pseudoChains.entrySet() )
+        if ( filterChainManager != null && filterChainManager != this.filterChainManager )
         {
-            this.filterChainManager.createChain( entry.getKey(), entry.getValue() );
+            this.filterChainManager = filterChainManager;
+
+            // lazy load: see https://issues.sonatype.org/browse/NEXUS-3111
+            // which to me seems like a glassfish bug...
+            for ( Entry<String, String> entry : this.pseudoChains.entrySet() )
+            {
+                this.filterChainManager.createChain( entry.getKey(), entry.getValue() );
+            }
         }
     }
-
 }

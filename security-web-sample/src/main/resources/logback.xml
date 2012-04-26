@@ -15,9 +15,6 @@
 <configuration>
 
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>ERROR</level>
-    </filter>
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
@@ -38,4 +35,7 @@
     <appender-ref ref="console" />
     <appender-ref ref="file" />
   </root>
+
+  <logger name="org.eclipse.jetty" level="INFO"/>
+
 </configuration>

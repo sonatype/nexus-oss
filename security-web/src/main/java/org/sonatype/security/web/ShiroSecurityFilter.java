@@ -25,6 +25,8 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 
@@ -37,15 +39,24 @@ import com.google.inject.name.Names;
  * configuration, if any role param is given. Otherwise it fallbacks to the standard stuff from JSecurityFilter.
  * 
  * @author cstamas
+ * @deprecated use shiro-guice with {@link org.sonatype.security.web.guice.SecurityWebModule} instead.
  */
+@Deprecated
 public class ShiroSecurityFilter
     extends IniShiroFilter
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private SecuritySystem securitySystem;
 
     private WebSecurityManager securityManager;
 
     public static final String INJECTORY_KEY = "injector.key";
+
+    public ShiroSecurityFilter()
+    {
+        logger.info( "@Deprecated use shiro-guice with org.sonatype.security.web.guice.SecurityWebModule instead" );
+    }
 
     @Override
     protected Map<String, ?> applySecurityManager( Ini ini )
