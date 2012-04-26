@@ -19,7 +19,7 @@ Sonatype.repoServer.UserProfile = function(config) {
     throw 'No username in config';
   }
 
-  this.COMBO_WIDTH = 250;
+  this.FIELD_WIDTH = 250;
 
   var items = [
     {
@@ -32,7 +32,7 @@ Sonatype.repoServer.UserProfile = function(config) {
       items : [
         {
           xtype : 'box',
-          style : 'position: absolute; left: 500px; top: 13px;',
+          style : 'position: absolute; left: 500px; top: 33px;',
           hideLabel : true,
           autoEl : {
             tag : 'div',
@@ -54,7 +54,7 @@ Sonatype.repoServer.UserProfile = function(config) {
           name : 'userId',
           disabled : true,
           allowBlank : false,
-          width : this.COMBO_WIDTH
+          width : this.FIELD_WIDTH
         },
         {
           xtype : 'textfield',
@@ -63,7 +63,7 @@ Sonatype.repoServer.UserProfile = function(config) {
           helpText : ht.firstName,
           name : 'firstName',
           allowBlank : true,
-          width : this.COMBO_WIDTH,
+          width : this.FIELD_WIDTH,
           validator : function(v) {
             if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
               return true;
@@ -80,7 +80,7 @@ Sonatype.repoServer.UserProfile = function(config) {
           helpText : ht.lastName,
           name : 'lastName',
           allowBlank : true,
-          width : this.COMBO_WIDTH,
+          width : this.FIELD_WIDTH,
           validator : function(v) {
             if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
               return true;
@@ -98,7 +98,7 @@ Sonatype.repoServer.UserProfile = function(config) {
           helpText : ht.email,
           name : 'email',
           allowBlank : false,
-          width : this.COMBO_WIDTH
+          width : this.FIELD_WIDTH
         },
         {
           xtype : 'label',
@@ -146,7 +146,7 @@ Sonatype.repoServer.UserProfile = function(config) {
     email : ''
   };
 
-  // defining payload.id and payload.data is a must, see Sonatype.ext.FormPanel#getActionUrl
+  // defining payload.id is a must, see Sonatype.ext.FormPanel#getActionUrl
   // in short, `payload.id` will be used to extend `this.uri` if `payload.data.resourceUri` is not set.
   // otherwise, `payload.data.resourceUri` is used as is.
   this.payload = {
@@ -168,7 +168,13 @@ Ext.extend(Sonatype.repoServer.UserProfile, Sonatype.ext.FormPanel, {
   }
 });
 
-Sonatype.Events.addListener('userAdminViewInit', function(views){
+Sonatype.Events.addListener('userAdminViewInit', function(views) {
+  views.push({
+    name : 'Summary',
+    item : Sonatype.repoServer.UserProfile
+  });
+});
+Sonatype.Events.addListener('userProfileInit', function(views) {
   views.push({
     name : 'Summary',
     item : Sonatype.repoServer.UserProfile

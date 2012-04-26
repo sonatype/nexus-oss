@@ -20,14 +20,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
   };
   Ext.apply(this, config, defaultConfig);
 
-  var summaryPanel = {
-    name : 'Summary',
-    item : Sonatype.repoServer.UserProfile
-  };
-
-  var views = [
-    summaryPanel
-  ];
+  var views = [];
 
   Sonatype.Events.fireEvent('userProfileInit', views);
 
