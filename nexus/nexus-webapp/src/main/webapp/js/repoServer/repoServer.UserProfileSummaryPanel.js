@@ -134,7 +134,6 @@ Sonatype.repoServer.UserProfile = function(config) {
 
   Ext.apply(this, config, defaultConfig);
 
-
   // URI template, payload.id will be appended
   this.uri = Sonatype.config.servicePath + '/user_account';
 
@@ -153,6 +152,7 @@ Sonatype.repoServer.UserProfile = function(config) {
     id : this.username
   }
 
+  // mandatory call
   this.checkPayload();
 
   Sonatype.repoServer.UserProfile.superclass.constructor.call(this, config);
@@ -168,15 +168,21 @@ Ext.extend(Sonatype.repoServer.UserProfile, Sonatype.ext.FormPanel, {
   }
 });
 
+// add this view to the admin tabs in security/users
 Sonatype.Events.addListener('userAdminViewInit', function(views) {
   views.push({
-    name : 'Summary',
+    name : 'Summary', // title of the tab
+
+    // class definition of the panel, constructor will be called with {username:$selectedUsername}
     item : Sonatype.repoServer.UserProfile
   });
 });
 Sonatype.Events.addListener('userProfileInit', function(views) {
   views.push({
-    name : 'Summary',
+    name : 'Summary', // name displayed in the combo box selector
+
+    // class definition of the panel,
+    // constructor will be called with {username:$currentUsername, frame:false, border:false}
     item : Sonatype.repoServer.UserProfile
   });
 });
