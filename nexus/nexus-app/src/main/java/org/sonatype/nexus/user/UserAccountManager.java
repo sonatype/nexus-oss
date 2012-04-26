@@ -44,19 +44,4 @@ public interface UserAccountManager
         NoSuchUserManagerException,
         AuthorizationException;
 
-    /**
-     * Update the account info, and change password
-     * 
-     * @param user
-     * @param oldPassword
-     * @param newPassword
-     * @return
-     */
-    User updateAccount( User user, String oldPassword, String newPassword )
-        throws InvalidConfigurationException,
-        UserNotFoundException,
-        InvalidCredentialsException,
-        NoSuchUserManagerException,
-        AuthorizationException;
-
 }

@@ -17,10 +17,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationException;
-import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -46,17 +44,6 @@ public class DefaultUserAccountManager
         AuthorizationException
     {
         checkPermission( user.getUserId() );
-
-        return securitySystem.updateUser( user );
-    }
-
-    public User updateAccount( User user, String oldPassword, String newPassword )
-        throws InvalidConfigurationException, UserNotFoundException, InvalidCredentialsException,
-        NoSuchUserManagerException, AuthorizationException
-    {
-        checkPermission( user.getUserId() );
-
-        securitySystem.changePassword( user.getUserId(), oldPassword, newPassword );
 
         return securitySystem.updateUser( user );
     }
