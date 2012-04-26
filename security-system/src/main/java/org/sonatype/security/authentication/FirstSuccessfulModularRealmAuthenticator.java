@@ -64,9 +64,10 @@ public class FirstSuccessfulModularRealmAuthenticator
                     {
                         return info;
                     }
-                    else
+                    else if ( logger.isTraceEnabled() )
                     {
-                        logger.warn( "Realm [" + realm + "] returned null when authenticating token " + "[" + token + "]" );
+                        logger.trace( "Realm [" + realm + "] returned null when authenticating token " + "[" + token
+                            + "]" );
                     }
                 }
                 catch ( Throwable t )
