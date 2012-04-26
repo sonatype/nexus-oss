@@ -45,16 +45,15 @@ Sonatype.repoServer.userProfilePanel = function(config) {
     listeners : {
       'select' : {
         fn : function(combo, record, index) {
-          var cls = record.get('value');
-          // FIXME chache this and reuse instances
-          this.content.display(new cls({username:Sonatype.user.curr.username, border : false,frame : false}));
+          this.content.display(record.get('value'));
         },
         scope : this
       },
-      'show' : {
+      'render' : {
         fn : function(combo) {
-          combo.select(0);
-          this.content.display(new summaryPanel.item({username:Sonatype.user.curr.username, border : false,frame : false}));
+          var rec = combo.store.getAt(0);
+          combo.setValue(rec.get('text'));
+          this.content.display(rec.get('value'));
         },
         scope : this
       }
@@ -63,7 +62,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
       // [ (v.item,v.name) for v in views]
       var viewArray = [];
       Ext.each(views, function(v) {
-        viewArray.push([v.item, v.name])
+        viewArray.push([new v.item({username:Sonatype.user.curr.username, border : false,frame : false}), v.name])
       });
       return viewArray;
     })()
