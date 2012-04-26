@@ -20,9 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.DelegatingSession;
 import org.apache.shiro.session.mgt.SessionContext;
-import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
@@ -31,21 +29,29 @@ import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 
+/**
+ * @deprecated replaced with 'noSessionCreation' filter in Shiro 1.2.
+ */
+@Deprecated
 public class StatelessAndStatefulWebSessionManager
     extends DefaultWebSessionManager
 {
-    private static final Logger log = LoggerFactory.getLogger( StatelessAndStatefulWebSessionManager.class );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     public static final String NO_SESSION_HEADER = "X-Nexus-Session";
     public static final String DO_NOT_STORE_SESSION_KEY = "NO_SESSION";
 
     private SessionIdGenerator fakeSessionIdGenerator = new JavaUuidSessionIdGenerator();
+
+    public StatelessAndStatefulWebSessionManager()
+    {
+        log.info( "@Deprecated replaced with 'noSessionCreation' filter in Shiro 1.2" );
+    }
 
     protected Session doCreateSession( SessionContext context )
     {

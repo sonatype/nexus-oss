@@ -14,6 +14,7 @@ package org.sonatype.nexus.security.filter.authz;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.security.SecuritySystem;
 
 /**
  * A filter that maps the action from the HTTP Verb.
@@ -43,39 +45,15 @@ public class FailureLoggingHttpMethodPermissionFilter
     extends HttpMethodPermissionFilter
 {
     private final Logger logger = LoggerFactory.getLogger( this.getClass() );
+    @Inject
+    private SecuritySystem securitySystem;
 
-    // this comes from attributes set by plexus helper listener (nexus-web-utils module)
-    private PlexusContainer plexusContainer;
-
-    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
-    private Nexus nexus;
-    
-    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
-    private NexusConfiguration nexusConfiguration;
-
-    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
+    @Inject
     private ApplicationEventMulticaster applicationEventMulticaster;
-
-    protected void onFilterConfigSet()
-        throws Exception
-    {
-        super.onFilterConfigSet();
-
-        plexusContainer = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
-
-        nexus = plexusContainer.lookup( Nexus.class );
-        nexusConfiguration = plexusContainer.lookup( NexusConfiguration.class );
-        applicationEventMulticaster = plexusContainer.lookup( ApplicationEventMulticaster.class );
-    }
 
     protected Logger getLogger()
     {
         return logger;
-    }
-    
-    protected Nexus getNexus()
-    {
-        return nexus;
     }
 
     @Override
@@ -93,7 +71,7 @@ public class FailureLoggingHttpMethodPermissionFilter
     {
         Subject subject = getSubject( request, response );
 
-        if ( nexusConfiguration.getAnonymousUsername().equals( subject.getPrincipal() ) )
+        if ( securitySystem.getAnonymousUsername().equals( subject.getPrincipal() ) )
         {
             return;
         }

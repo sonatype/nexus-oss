@@ -18,7 +18,7 @@ import java.net.ServerSocket;
 import org.codehaus.plexus.context.Context;
 
 public abstract class AbstractNexusTestCase
-    extends org.sonatype.nexus.configuration.AbstractNexusTestCase
+    extends org.sonatype.nexus.security.AbstractNexusTestCase
 {
 
     public static final String PROXY_SERVER_PORT = "proxy.server.port";

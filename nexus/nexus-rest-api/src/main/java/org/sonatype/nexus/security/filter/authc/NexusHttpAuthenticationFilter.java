@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
+import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -25,20 +26,19 @@ import org.apache.shiro.codec.Base64;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.security.SecuritySystem;
 
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
@@ -55,43 +55,24 @@ public class NexusHttpAuthenticationFilter
 
     private boolean fakeAuthScheme;
 
-    // this comes from attributes set by plexus helper listener (nexus-web-utils module)
+    @Inject
     protected PlexusContainer plexusContainer;
 
-    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
-    private NexusConfiguration nexusConfiguration;
+    @Inject
+    private SecuritySystem securitySystem;
 
-    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
+    @Inject
     private ApplicationEventMulticaster applicationEventMulticaster;
 
-    protected void onFilterConfigSet()
-        throws Exception
-    {
-        super.onFilterConfigSet();
-
-        plexusContainer = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
-
-        // this might be null, at least the old removed code was prepared for it (why? when? -- cstamas)
-        try
-        {
-            applicationEventMulticaster = plexusContainer.lookup( ApplicationEventMulticaster.class );
-        }
-        catch ( ComponentLookupException e )
-        {
-            applicationEventMulticaster = null;
-        }
-
-        nexusConfiguration = plexusContainer.lookup( NexusConfiguration.class );
-    }
-
+    @Deprecated
     protected PlexusContainer getPlexusContainer()
     {
         return plexusContainer;
     }
 
-    protected NexusConfiguration getNexusConfiguration()
+    protected SecuritySystem getSecuritySystem()
     {
-        return nexusConfiguration;
+        return securitySystem;
     }
 
     protected Logger getLogger()
@@ -157,7 +138,7 @@ public class NexusHttpAuthenticationFilter
         else
         {
             // let the user "fall thru" until we get some permission problem
-            if ( getNexusConfiguration().isAnonymousAccessEnabled() )
+            if ( getSecuritySystem().isAnonymousAccessEnabled() )
             {
                 loggedIn = executeAnonymousLogin( request, response );
             }
@@ -211,6 +192,9 @@ public class NexusHttpAuthenticationFilter
         }
     }
 
+    /**
+     * TODO: consider moving this to a new filter, and chain them together
+     */
     protected boolean executeAnonymousLogin( ServletRequest request, ServletResponse response )
     {
         getLogger().debug( "Attempting to authenticate Subject as Anonymous request..." );
@@ -219,9 +203,12 @@ public class NexusHttpAuthenticationFilter
 
         Subject subject = getSubject( request, response );
 
+        // disable the session creation for the anon user.
+        request.setAttribute( DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
+
         UsernamePasswordToken usernamePasswordToken =
-            new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(),
-                getNexusConfiguration().getAnonymousPassword() );
+            new UsernamePasswordToken( getSecuritySystem().getAnonymousUsername(),
+                                       getSecuritySystem().getAnonymousPassword() );
 
         try
         {
@@ -272,7 +259,7 @@ public class NexusHttpAuthenticationFilter
         {
             getLogger().debug( "Successfully logged in as anonymous" );
 
-            postAuthcEvent( request, getNexusConfiguration().getAnonymousUsername(), getUserAgent( request ), true );
+            postAuthcEvent( request, getSecuritySystem().getAnonymousUsername(), getUserAgent( request ), true );
 
             return true;
         }
@@ -295,6 +282,7 @@ public class NexusHttpAuthenticationFilter
     protected boolean onLoginSuccess( AuthenticationToken token, Subject subject, ServletRequest request,
                                       ServletResponse response )
     {
+        // TODO: consider moving this to a new filter, and chain them together
         postAuthcEvent( request, token.getPrincipal().toString(), getUserAgent( request ), true );
 
         return true;
@@ -341,7 +329,7 @@ public class NexusHttpAuthenticationFilter
                     }
                     else
                     {
-                        username = getNexusConfiguration().getAnonymousUsername();
+                        username = getSecuritySystem().getAnonymousUsername();
                     }
 
                     getLogger().debug(

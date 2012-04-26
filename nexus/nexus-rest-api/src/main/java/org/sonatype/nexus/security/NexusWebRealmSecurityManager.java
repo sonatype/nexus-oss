@@ -23,22 +23,30 @@ import org.apache.shiro.ShiroException;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.web.WebRealmSecurityManager;
 
 /**
- * An extension of WebRealmSecurityManager used because we have a mix of POJO's and @Inject ojbects
+ * An extension of WebRealmSecurityManager used because we have a mix of POJO's and @Inject objects.
+ * @deprecated use shiro-guice with @{link org.sonatype.security.web.guice.SecurityWebModule} instead.
  */
 @Singleton
 @Typed( value = RealmSecurityManager.class )
 @Named( value = "nexus" )
+@Deprecated
 public class NexusWebRealmSecurityManager
     extends WebRealmSecurityManager
     implements org.apache.shiro.util.Initializable
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     @Inject
     public NexusWebRealmSecurityManager( Map<String, RolePermissionResolver> rolePermissionResolverMap )
     {
         super( rolePermissionResolverMap );
+
+        logger.info( "@Deprecated use shiro-guice with org.sonatype.security.web.guice.SecurityWebModule instead" );
     }    
 
     public void init()
