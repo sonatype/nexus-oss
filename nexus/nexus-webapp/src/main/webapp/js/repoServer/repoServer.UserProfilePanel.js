@@ -15,6 +15,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
   var config = config || {};
   var defaultConfig = {
     autoScroll : true,
+    minWidth : 270,
     layout : 'absolute'
   };
   Ext.apply(this, config, defaultConfig);

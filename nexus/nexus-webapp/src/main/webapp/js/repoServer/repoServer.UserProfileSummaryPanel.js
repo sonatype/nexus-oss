@@ -19,7 +19,7 @@ Sonatype.repoServer.UserProfile = function(config) {
     throw 'No username in config';
   }
 
-  this.COMBO_WIDTH = 300;
+  this.COMBO_WIDTH = 250;
 
   var items = [
     {
@@ -32,7 +32,7 @@ Sonatype.repoServer.UserProfile = function(config) {
       items : [
         {
           xtype : 'box',
-          style : 'position: absolute; right: 15px',
+          style : 'position: absolute; left: 500px; top: 13px;',
           hideLabel : true,
           autoEl : {
             tag : 'div',
@@ -99,13 +99,26 @@ Sonatype.repoServer.UserProfile = function(config) {
           name : 'email',
           allowBlank : false,
           width : this.COMBO_WIDTH
+        },
+        {
+          xtype : 'label',
+          // make this label's font look like the others
+          cls : 'x-form-item',
+          text : 'Change Password',
+          style : 'text-decoration: underline; color: blue; cursor: pointer;',
+          listeners : {
+            'render' : function(component) {
+              component.getEl().on('click', function() {Sonatype.utils.changePassword()});
+            }
+          }
         }
       ]
     }
   ];
 
   var defaultConfig = {
-    labelWidth : 100,
+    minWidth : 650,
+    labelWidth : 50,
     listeners : {
       submit : {
         fn : this.loadGravatarPicture,
