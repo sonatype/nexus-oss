@@ -61,6 +61,10 @@ a:link, a:visited, a:hover, a:active {
   padding: 5px;
 }
 
+.head-link {
+    color: #FAC500;
+}
+
 #head-link-r {
      color: #FAC500;
 }
