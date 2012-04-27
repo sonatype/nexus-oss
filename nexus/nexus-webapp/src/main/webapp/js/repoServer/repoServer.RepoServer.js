@@ -279,13 +279,7 @@
               id : 'st-nexus-security',
               collapsed : true,
               items : [
-                  // MARKER NXCM-4097
                   {
-                    enabled : Sonatype.user.curr.isLoggedIn && Sonatype.user.curr.loggedInUserSource == 'default' && sp.checkPermission('security:userschangepw', sp.CREATE),
-                    title : 'Change Password',
-                    handler : Sonatype.utils.changePassword,
-                    tabId : 'change-password'
-                  }, {
                     enabled : sp.checkPermission('security:users', sp.READ) && (sp.checkPermission('security:users', sp.CREATE) || sp.checkPermission('security:users', sp.DELETE) || sp.checkPermission('security:users', sp.EDIT)),
                     title : 'Users',
                     tabId : 'security-users',
