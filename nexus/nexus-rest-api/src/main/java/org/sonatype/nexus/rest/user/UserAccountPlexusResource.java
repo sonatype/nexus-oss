@@ -68,7 +68,7 @@ public class UserAccountPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/user_account/*", "authcBasic,perms[nexus:useraccountmgt]" );
+        return new PathProtectionDescriptor( "/user_account/*", "authcBasic" );
     }
 
     @Override
