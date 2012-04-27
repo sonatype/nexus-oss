@@ -13,7 +13,6 @@
 Sonatype.headLinks = Ext.emptyFn;
 
 Ext.apply(Sonatype.headLinks.prototype, {
-      linkEventApplied : false,
       /**
        * Update the head links based on the current status of Nexus
        */
@@ -47,10 +46,7 @@ Ext.apply(Sonatype.headLinks.prototype, {
             });
       },
       setClickLink : function(el) {
-        if (!this.linkEventApplied)
-        {
-          el.on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
-          this.linkEventApplied = true;
-        }
+        el.removeAllListeners();
+        el.on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
       }
     });
