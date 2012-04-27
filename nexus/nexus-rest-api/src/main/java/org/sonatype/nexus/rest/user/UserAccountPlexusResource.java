@@ -42,6 +42,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * Resource managing user account details.
+ * @since 2.1
  */
 @Component( role = PlexusResource.class, hint = "UserAccountPlexusResource" )
 @Path( "/user_account/{" + UserAccountPlexusResource.ACCOUNT_ID_KEY + "}" )

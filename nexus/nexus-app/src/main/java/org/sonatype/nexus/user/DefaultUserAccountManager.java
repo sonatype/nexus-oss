@@ -23,6 +23,11 @@ import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+/**
+ * Provides functionality to read and update basic user data.
+ *
+ * @since 2.1
+ */
 @Component( role = UserAccountManager.class )
 public class DefaultUserAccountManager
     extends AbstractLogEnabled
