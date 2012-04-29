@@ -303,7 +303,9 @@ public class M2RepositoryTest
     public void testExpirationAlwaysUpdate()
         throws Exception
     {
+        getLogger().info("Start testExpirationAlwaysUpdate() for '/spoof/maven-metadata.xml' at (" + System.currentTimeMillis() + ")");
         doTestExpiration( "/spoof/maven-metadata.xml", 0, 1, 2, 3 );
+        getLogger().info("Start testExpirationAlwaysUpdate() for '/spoof/spoof/1.0/spoof-1.0.txt' at (" + System.currentTimeMillis() + ")");
         doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 1, 2, 3 );
     }
 
@@ -311,7 +313,9 @@ public class M2RepositoryTest
     public void testExpirationNeverUpdate()
         throws Exception
     {
+        getLogger().info("Start testExpirationNeverUpdate() for '/spoof/maven-metadata.xml' at (" + System.currentTimeMillis() + ")");
         doTestExpiration( "/spoof/maven-metadata.xml", -1, 1, 1, 1 );
+        getLogger().info("Start testExpirationNeverUpdate() for '/spoof/spoof/1.0/spoof-1.0.txt' at (" + System.currentTimeMillis() + ")");
         doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1, 1, 1 );
     }
 
@@ -319,12 +323,18 @@ public class M2RepositoryTest
     public void testExpiration()
         throws Exception
     {
+        getLogger().info("Start testExpiration() for '/spoof/maven-metadata.xml' at (" + System.currentTimeMillis() + ")");
         doTestExpiration( "/spoof/maven-metadata.xml", 1, 1, 1, 2 );
+        getLogger().info("Start testExpiration() for '/spoof/spoof/1.0/spoof-1.0.txt' at (" + System.currentTimeMillis() + ")");
         doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 1, 1, 2 );
     }
 
     /**
      * For expiration-related issues and stories see: NEXUS-1675 NEXUS-3065 NEXUS-4099
+     * <p />
+     *
+     * Note: This test is somewhat fragile on Windows in the past if IO is slow or
+     * CPU is thrashing at time of test run.
      */
     private void doTestExpiration( String path, final int age, final int... expectedHits )
         throws Exception
@@ -359,12 +369,14 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
+
         assertThat( "File timestamp did not change, first pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
         fileTimestamp = mdFile.lastModified();
 
         final StorageItem item = repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        assertThat( "Remote hits count fail after first request", ch.getRequestCount(), equalTo( expectedHits[0] ) );
+        getLogger().info(path + " -> BEFORE assert 1 requestCount=" + expectedHits[0] + " at (" + System.currentTimeMillis() + ")");
+        assertThat( "Remote hits count fail after first request at (" + System.currentTimeMillis() + ")", ch.getRequestCount(), equalTo( expectedHits[0] ) );
+        getLogger().info(path + " -> AFTER assert 1 requestCount=" + expectedHits[0] + " at (" + System.currentTimeMillis() + ")");
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 2L * A_DAY ) ); i++ )
         {
@@ -377,8 +389,9 @@ public class M2RepositoryTest
 
         // this goes remote depending on age setting
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        assertThat( "Remote hits count fail after second request", ch.getRequestCount(), equalTo( expectedHits[1] ) );
+        getLogger().info(path + " -> BEFORE assert 2 requestCount=" + expectedHits[1] + " at (" + System.currentTimeMillis() + ")");
+        assertThat( "Remote hits count fail after second request at (" + System.currentTimeMillis() + ")", ch.getRequestCount(), equalTo( expectedHits[1] ) );
+        getLogger().info(path + " -> AFTER assert 2 requestCount=" + expectedHits[1] + " at (" + System.currentTimeMillis() + ")");
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 1L * A_DAY ) ); i++ )
         {
@@ -397,8 +410,12 @@ public class M2RepositoryTest
         storage.putAttributes( uid, attributes );
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
+        getLogger().info(path + " -> BEFORE assert 3 requestCount=" + expectedHits[2] + " at (" + System.currentTimeMillis() + ")");
+        assertThat( "Remote hits count fail after third request at (" + System.currentTimeMillis() + ")", ch.getRequestCount(), equalTo( expectedHits[2] ) );
+        getLogger().info(path + " -> AFTER assert 3 requestCount=" + expectedHits[2] + " at (" + System.currentTimeMillis() + ")");
 
-        assertThat( "Remote hits count fail after third request", ch.getRequestCount(), equalTo( expectedHits[2] ) );
+        // cleanup counter listener for next test call to avoid added overhead, logging noise
+        getApplicationEventMulticaster().removeEventListener( ch );
     }
 
     @Test
@@ -504,7 +521,7 @@ public class M2RepositoryTest
             getRepositoryRegistry().getRepositoryWithFacet( "repo1", MavenProxyRepository.class );
         m2Repo.addToNotFoundCache( new ResourceStoreRequest( "/some/path/file.jar" ) );
         m2Repo.addToNotFoundCache( new ResourceStoreRequest( "/some/path/maven-metadata.xml" ) );
-        
+
         // note: above, that is the "standard" way to write item paths! (starting with slash)
         // below, we tamper directly with NFC, so the lack of starting slash should not confuse you!
 
@@ -787,12 +804,20 @@ public class M2RepositoryTest
 
         public void onEvent( Event<?> evt )
         {
-            if ( evt instanceof RepositoryItemEventCache
-                && ( ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) || ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith(
-                    "spoof-1.0.txt" ) ) )
+            if ( evt instanceof RepositoryItemEventCache )
             {
-                requestCount = requestCount + 1;
+                final RepositoryItemEventCache riec = (RepositoryItemEventCache) evt;
+                final String path =  riec.getItem().getPath();
+                if(path.endsWith( "maven-metadata.xml" ) || path.endsWith("spoof-1.0.txt" ))
+                {
+                    // logging to track if listener received message in time for accurate test assertion
+                    if(getLogger().isInfoEnabled()){
+                        getLogger().info(path + " -> CounterListener increments to " + (++requestCount) + " at (" + System.currentTimeMillis() + ")");
+                    } else {
+                        requestCount = requestCount + 1;
+                    }
+                }
             }
         }
-    }
+     }
 }
