@@ -23,10 +23,13 @@ import org.sonatype.security.web.filter.authc.LogoutAuthenticationFilter;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
+import com.google.inject.MembersInjector;
+import com.google.inject.Provider;
+import com.google.inject.Scopes;
 import com.google.inject.name.Names;
 
 /**
- * Sets up Nexus's security filter configuration.
+ * Sets up Nexus's security filter configuration; this is a @Named module so it will be auto-installed by Sisu.
  */
 @Named
 public class NexusSecurityFilterModule
@@ -80,6 +83,27 @@ public class NexusSecurityFilterModule
     private void bindNamedFilter( String name, Filter filter )
     {
         Key<Filter> key = Key.get( Filter.class, Names.named( name ) );
-        bind( key ).toInstance( filter );
+        bind( key ).toProvider( defer( filter ) ).in( Scopes.SINGLETON );
+    }
+
+    /**
+     * Guice injects bound instances eagerly, so to avoid missing dependencies causing eager failures when this module
+     * is auto-installed (such as with Sisu's classpath scanning) we defer injection of the filter as much as possible.
+     */
+    @SuppressWarnings( "unchecked" )
+    private Provider<Filter> defer( final Filter filter )
+    {
+        Class<Filter> impl = (Class<Filter>) filter.getClass();
+        final MembersInjector<Filter> membersInjector = getMembersInjector( impl );
+        bind( impl ); // help with any auto-wiring dependency analysis
+
+        return new Provider<Filter>()
+        {
+            public Filter get()
+            {
+                membersInjector.injectMembers( filter );
+                return filter;
+            }
+        };
     }
 }
