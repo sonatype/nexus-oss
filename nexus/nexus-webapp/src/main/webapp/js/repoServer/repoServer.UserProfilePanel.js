@@ -36,6 +36,8 @@ Sonatype.repoServer.userProfilePanel = function(config) {
     id: 'user-profile-selector',
     x : 30,
     y : 11,
+    editable : false,
+    triggerAction : 'all',
     listeners : {
       'select' : {
         fn : function(combo, record, index) {
