@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Sonatype.repoServer.UserProfile = function(config) {
+Sonatype.repoServer.UserProfileSummaryPanel = function(config) {
   var ht = Sonatype.repoServer.resources.help.users;
 
   var config = config || {};
@@ -155,10 +155,10 @@ Sonatype.repoServer.UserProfile = function(config) {
   // mandatory call
   this.checkPayload();
 
-  Sonatype.repoServer.UserProfile.superclass.constructor.call(this, config);
+  Sonatype.repoServer.UserProfileSummaryPanel.superclass.constructor.call(this, config);
 };
 
-Ext.extend(Sonatype.repoServer.UserProfile, Sonatype.ext.FormPanel, {
+Ext.extend(Sonatype.repoServer.UserProfileSummaryPanel, Sonatype.ext.FormPanel, {
   isValid : function() {
     return this.form.isValid();
   },
@@ -183,7 +183,25 @@ Sonatype.Events.addListener('userProfileInit', function(views) {
 
     // class definition of the panel,
     // constructor will be called with {username:$currentUsername, frame:false, border:false}
-    item : Sonatype.repoServer.UserProfile
+    item : Sonatype.repoServer.UserProfileSummaryPanel
   });
+
+  /* FIXME remove this when UserProfile is stable
+  var testPanel = function(){
+    var config = {
+      html : "This is a panel"
+    };
+    testPanel.superclass.constructor.call(this, config);
+  };
+  Ext.extend(testPanel, Ext.Panel)
+
+  views.push({
+    name : 'test', // name displayed in the combo box selector
+
+    // class definition of the panel,
+    // constructor will be called with {username:$currentUsername, frame:false, border:false}
+    item : testPanel
+  });
+   */
 });
 
