@@ -32,6 +32,9 @@ Ext.apply(Sonatype.headLinks.prototype, {
 
       updateRightWhenLoggedIn : function(linkEl) {
         linkEl.update(Sonatype.user.curr.username);
+        linkEl.setStyle({
+          background : null
+        });
         linkEl.un('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer)
         linkEl.on('click', Sonatype.repoServer.RepoServer.showProfileMenu);
       },
@@ -41,8 +44,7 @@ Ext.apply(Sonatype.headLinks.prototype, {
 
         this.setClickLink(linkEl);
         linkEl.setStyle({
-              'cursor' : 'pointer',
-              'text-align' : 'right'
+              'background' : 'none'
             });
       },
       setClickLink : function(el) {

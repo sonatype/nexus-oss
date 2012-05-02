@@ -41,7 +41,7 @@ body {
   color: white;
   font-size: 9px;
   position: absolute;
-  top: 30px;
+  top: 22px;
   right: 10px;
 }
 
@@ -66,22 +66,22 @@ a:link, a:visited, a:hover, a:active {
 }
 
 #head-link-r {
-     color: #FAC500;
+  background: url("../images/icons/btn-arrow-headlink.gif") no-repeat scroll right 0 transparent;
+  padding-right: 10px;
+  cursor: pointer;
+  text-align: right;
 }
 
-#head-link-logged-in button {
-    color: #FAC500;
-}
-
+/* default styling for the menu */
 .user-profile-menu {
-    background-color: black;
-    background-image: url("../images/header_bg.gif");
+    /*background-color: black;*/
+    /*background-image: url("../images/header_bg.gif");*/
 }
 
 .user-profile-menu a.x-menu-item {
-    color: #FAC500;
-    background-color: black;
-    background-image: url("../images/header_bg.gif");
+    /*color: #FAC500;*/
+    /*background-color: black;*/
+    /*background-image: url("../images/header_bg.gif");*/
 }
 
 .user-profile-menu a.x-menu-item :hover {
