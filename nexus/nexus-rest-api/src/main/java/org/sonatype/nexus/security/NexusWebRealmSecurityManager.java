@@ -29,24 +29,20 @@ import org.sonatype.security.web.WebRealmSecurityManager;
 
 /**
  * An extension of WebRealmSecurityManager used because we have a mix of POJO's and @Inject objects.
- * @deprecated use shiro-guice with @{link org.sonatype.security.web.guice.SecurityWebModule} instead.
+ * @deprecated replaced by applying the noSessionCreation filter from Shiro 1.2 to non-login services.
  */
 @Singleton
 @Typed( value = RealmSecurityManager.class )
-@Named( value = "nexus" )
+@Named( value = "stateless-and-stateful" )
 @Deprecated
 public class NexusWebRealmSecurityManager
     extends WebRealmSecurityManager
     implements org.apache.shiro.util.Initializable
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
-
     @Inject
     public NexusWebRealmSecurityManager( Map<String, RolePermissionResolver> rolePermissionResolverMap )
     {
         super( rolePermissionResolverMap );
-
-        logger.info( "@Deprecated use shiro-guice with org.sonatype.security.web.guice.SecurityWebModule instead" );
     }    
 
     public void init()
