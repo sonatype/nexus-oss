@@ -168,15 +168,17 @@ Ext.extend(Sonatype.repoServer.UserProfileSummaryPanel, Sonatype.ext.FormPanel, 
   }
 });
 
-// add this view to the admin tabs in security/users
+/* don't add this view to the admin tabs in security/users, but it would work like this:
 Sonatype.Events.addListener('userAdminViewInit', function(views) {
   views.push({
     name : 'Summary', // title of the tab
 
     // class definition of the panel, constructor will be called with {username:$selectedUsername}
-    item : Sonatype.repoServer.UserProfile
+    item : Sonatype.repoServer.UserProfileSummaryPanel
   });
 });
+*/
+
 Sonatype.Events.addListener('userProfileInit', function(views) {
   views.push({
     name : 'Summary', // name displayed in the combo box selector
