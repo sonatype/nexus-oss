@@ -84,13 +84,13 @@ public class InternalFactory
         // interpolate what we have
         final Interpolator interpolator = new RegexBasedInterpolator();
 
+        interpolator.addValueSource( new MapBasedValueSource( rawContext ) );
+
         if ( request.getParent() != null )
         {
             interpolator.addValueSource( new RawAppContextValueSource( request.getParent() ) );
             interpolator.addValueSource( new MapBasedValueSource( request.getParent() ) );
         }
-
-        interpolator.addValueSource( new MapBasedValueSource( rawContext ) );
 
         if ( request.isUseSystemPropertiesFallback() )
         {
