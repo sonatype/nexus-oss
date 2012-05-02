@@ -78,19 +78,25 @@ Ext.extend(Sonatype.repoServer.userProfilePanel, Ext.Panel);
 Sonatype.repoServer.userProfilePanel.contentClass = function(config)
 {
   Ext.apply(this, config || {}, {
-    layout : 'fit'
+    plain : true,
+    autoScroll : true,
+    border : true,
+    listeners : {
+      'tabchange' : function() {
+        // hide tabStrip
+        this.header.hide();
+      },
+      scope : this
+    }
   });
+
   Sonatype.repoServer.userProfilePanel.contentClass.superclass.constructor.call(this);
+
   this.display = function(panel)
   {
-    var cmp = this.getComponent(0);
-    if ( panel === cmp ) {
-      return;
-    }
-    this.remove(cmp);
     this.add(panel);
-    this.doLayout();
+    this.setActiveTab(panel);
   }
 }
-Ext.extend(Sonatype.repoServer.userProfilePanel.contentClass, Ext.Panel);
+Ext.extend(Sonatype.repoServer.userProfilePanel.contentClass, Ext.TabPanel);
 

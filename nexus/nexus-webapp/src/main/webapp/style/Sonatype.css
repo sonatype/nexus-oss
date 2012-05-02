@@ -90,11 +90,11 @@ a:link, a:visited, a:hover, a:active {
 }
 
 .user-profile-dynamic-content {
-    /*border-style: solid;*/
-    /*border-color: black;*/
-    border-width: 1px;
+    border: 1px solid #B5B8C8;
     /* padding == fieldset offset */
     padding: 21px;
+    /* adjust for hidden tab bar */
+    padding-top: 10px;
 }
 
 #user-profile-summary-form .x-panel-footer {
