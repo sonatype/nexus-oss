@@ -34,9 +34,9 @@ import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
 import org.sonatype.appcontext.lifecycle.Stoppable;
-import org.sonatype.appcontext.source.MapEntrySource;
 import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
+import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.Module;
 
@@ -87,7 +87,8 @@ public class PlexusContainerContextListener
                         plexusXmlFile.toURI().toURL() ).setContext( (Map) appContext ).setAutoWiring( true ).setClassPathScanning(
                         PlexusConstants.SCANNING_INDEX ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
 
-                final ArrayList<Module> modules = new ArrayList<Module>( 1 );
+                final ArrayList<Module> modules = new ArrayList<Module>( 2 );
+                modules.add( new SecurityWebModule( sce.getServletContext(), true ) );
                 modules.add( new AppContextModule( appContext ) );
 
                 final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );

@@ -15,6 +15,7 @@ package org.sonatype.nexus.security.filter.authz;
 import java.io.IOException;
 import java.util.regex.Matcher;
 
+import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
  * A filter that maps the targetId from the Request.
@@ -34,6 +36,8 @@ import org.sonatype.nexus.proxy.access.Action;
 public class NexusTargetMappingAuthorizationFilter
     extends AbstractNexusAuthorizationFilter
 {
+    @Inject
+    private RepositoryRouter rootRouter;
 
     private String pathReplacement;
 
@@ -107,7 +111,7 @@ public class NexusTargetMappingAuthorizationFilter
             // doing a LOCAL ONLY request to check is this exists?
             try
             {
-                getNexus().getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
+                rootRouter.retrieveItem( getResourceStoreRequest( request, true ) );
             }
             catch ( ItemNotFoundException e )
             {
@@ -160,6 +164,6 @@ public class NexusTargetMappingAuthorizationFilter
             return false;
         }
 
-        return getNexus().getRootRouter().authorizePath( getResourceStoreRequest( request, false ), action );
+        return rootRouter.authorizePath( getResourceStoreRequest( request, false ), action );
     }
 }

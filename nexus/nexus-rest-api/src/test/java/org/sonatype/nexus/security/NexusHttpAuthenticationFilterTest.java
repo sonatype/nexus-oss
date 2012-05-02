@@ -22,16 +22,14 @@ import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.DelegatingSubject;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
+import org.sonatype.security.SecuritySystem;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -41,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.*;
 
@@ -63,7 +60,7 @@ public class NexusHttpAuthenticationFilterTest
 
     private HttpServletResponse response;
 
-    private NexusConfiguration nexusConfiguration;
+    private SecuritySystem securitySystem;
 
     @Before
     public void bindSubjectToThread()
@@ -73,6 +70,8 @@ public class NexusHttpAuthenticationFilterTest
         simpleAccountRealm.addAccount( "anonymous", "anonymous" );
         DefaultSecurityManager securityManager = new DefaultSecurityManager();
         securityManager.setRealm( simpleAccountRealm );
+
+        SecurityUtils.setSecurityManager( securityManager );
 
         DefaultSessionManager sessionManager = (DefaultSessionManager) securityManager.getSessionManager();
         sessionDAO = new EnterpriseCacheSessionDAO();
@@ -110,11 +109,11 @@ public class NexusHttpAuthenticationFilterTest
     }
 
     @Before
-    public void setupNexusConfig()
+    public void setupSecuritySystem()
     {
-        nexusConfiguration = Mockito.mock( NexusConfiguration.class );
-        Mockito.when( nexusConfiguration.getAnonymousUsername() ).thenReturn( "anonymous" );
-        Mockito.when( nexusConfiguration.getAnonymousPassword() ).thenReturn( "anonymous" );
+        securitySystem = mock( SecuritySystem.class );
+        when( securitySystem.getAnonymousUsername() ).thenReturn( "anonymous" );
+        when( securitySystem.getAnonymousPassword() ).thenReturn( "anonymous" );
     }
 
     @After
@@ -168,9 +167,9 @@ public class NexusHttpAuthenticationFilterTest
             }
 
             @Override
-            protected NexusConfiguration getNexusConfiguration()
+            protected SecuritySystem getSecuritySystem()
             {
-                return nexusConfiguration;
+                return securitySystem;
             }
         }.executeAnonymousLogin( request, response );
         // what a hack... just to call a protected method

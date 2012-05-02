@@ -12,32 +12,17 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
+import javax.inject.Inject;
+
 import org.apache.shiro.authc.AuthenticationToken;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.sonatype.inject.Nullable;
 
 public class NexusSecureHttpAuthenticationFilter
     extends NexusHttpAuthenticationFilter
 {
+    @Inject
+    @Nullable
     private PasswordDecryptor passwordDecryptor;
-
-    protected void onFilterConfigSet()
-        throws Exception
-    {
-        super.onFilterConfigSet();
-
-        // set pwdDecryptor if we have it
-        if ( passwordDecryptor == null && getPlexusContainer().hasComponent( PasswordDecryptor.class ) )
-        {
-            try
-            {
-                passwordDecryptor = getPlexusContainer().lookup( PasswordDecryptor.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                // ignore it? There is none set
-            }
-        }
-    }
 
     protected PasswordDecryptor getPasswordDecryptor()
     {
