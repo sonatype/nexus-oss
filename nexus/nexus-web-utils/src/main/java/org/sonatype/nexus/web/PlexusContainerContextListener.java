@@ -13,7 +13,7 @@
 package org.sonatype.nexus.web;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -111,7 +111,7 @@ public class PlexusContainerContextListener
 
                 throw new IllegalStateException( "Could not start Plexus container!", e );
             }
-            catch ( MalformedURLException e )
+            catch ( IOException e )
             {
                 sce.getServletContext().log( "Could not start Plexus container!", e );
 
@@ -135,7 +135,7 @@ public class PlexusContainerContextListener
     // ==
 
     protected AppContext createContainerContext( final ServletContext context, final AppContext parent )
-        throws AppContextException
+        throws AppContextException, IOException
     {
         if ( parent == null )
         {
@@ -153,7 +153,7 @@ public class PlexusContainerContextListener
 
         if ( !StringUtils.isEmpty( baseDirProperty ) )
         {
-            basedirFile = new File( baseDirProperty ).getAbsoluteFile();
+            basedirFile = new File( baseDirProperty ).getCanonicalFile();
             // Nexus as bundle case
             context.log( "Setting Plexus basedir context variable to (pre-set in System properties): "
                 + basedirFile.getAbsolutePath() );
@@ -163,7 +163,7 @@ public class PlexusContainerContextListener
 
         if ( !StringUtils.isEmpty( warWebInfFilePath ) )
         {
-            warWebInfFile = new File( warWebInfFilePath ).getAbsoluteFile();
+            warWebInfFile = new File( warWebInfFilePath ).getCanonicalFile();
 
             if ( basedirFile == null )
             {

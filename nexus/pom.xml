@@ -239,7 +239,7 @@
       <dependency>
         <groupId>org.sonatype.appcontext</groupId>
         <artifactId>appcontext</artifactId>
-        <version>3.1</version>
+        <version>3.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
