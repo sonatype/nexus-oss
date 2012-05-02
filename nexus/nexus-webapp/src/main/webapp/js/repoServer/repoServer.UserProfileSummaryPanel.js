@@ -31,21 +31,6 @@ Sonatype.repoServer.UserProfileSummaryPanel = function(config) {
       },
       items : [
         {
-          xtype : 'box',
-          style : 'position: absolute; left: 500px; top: 33px;',
-          hideLabel : true,
-          autoEl : {
-            tag : 'div',
-            children : [
-              {
-                tag : 'img',
-                qtip : 'Profile picture from gravatar (http://www.gravatar.com/)',
-                id : 'user-picture-' + config.username
-              }
-            ]
-          }
-        },
-        {
           xtype : 'textfield',
           fieldLabel : 'User ID',
           itemCls : 'required-field',
@@ -119,16 +104,6 @@ Sonatype.repoServer.UserProfileSummaryPanel = function(config) {
   var defaultConfig = {
     minWidth : 650,
     labelWidth : 50,
-    listeners : {
-      submit : {
-        fn : this.loadGravatarPicture,
-        scope : this
-      },
-      load : {
-        fn : this.loadGravatarPicture,
-        scope : this
-      }
-    },
     items : items
   };
 
@@ -161,10 +136,6 @@ Sonatype.repoServer.UserProfileSummaryPanel = function(config) {
 Ext.extend(Sonatype.repoServer.UserProfileSummaryPanel, Sonatype.ext.FormPanel, {
   isValid : function() {
     return this.form.isValid();
-  },
-
-  loadGravatarPicture : function(form, action, receivedData) {
-    Ext.getDom('user-picture-' + receivedData.userId).src = 'http://www.gravatar.com/avatar/' + Ext.util.MD5(Sonatype.utils.lowercase(receivedData.email.trim()));
   }
 });
 
