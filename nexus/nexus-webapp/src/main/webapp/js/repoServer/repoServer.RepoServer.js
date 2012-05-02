@@ -388,6 +388,7 @@
       },
       profileMenu : new Ext.menu.Menu({
         cls : 'user-profile-menu',
+        shadow: false,
         items : [
           {
             text : 'Profile',
@@ -401,7 +402,15 @@
               Sonatype.repoServer.RepoServer.loginHandler();
             }
           }
-        ]
+        ],
+        listeners : {
+          show : function() {
+            Ext.get('head-link-r').addClass('profile-menu-visible')
+          },
+          hide : function() {
+            Ext.get('head-link-r').removeClass('profile-menu-visible')
+          }
+        }
       }),
 
       /**

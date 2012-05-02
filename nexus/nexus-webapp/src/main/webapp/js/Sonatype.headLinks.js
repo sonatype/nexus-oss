@@ -32,9 +32,7 @@ Ext.apply(Sonatype.headLinks.prototype, {
 
       updateRightWhenLoggedIn : function(linkEl) {
         linkEl.update(Sonatype.user.curr.username);
-        linkEl.setStyle({
-          background : null
-        });
+        linkEl.addClass('head-link-logged-in');
         linkEl.un('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer)
         linkEl.on('click', Sonatype.repoServer.RepoServer.showProfileMenu);
       },
@@ -43,9 +41,7 @@ Ext.apply(Sonatype.headLinks.prototype, {
         linkEl.update('Log In');
 
         this.setClickLink(linkEl);
-        linkEl.setStyle({
-              'background' : 'none'
-            });
+        linkEl.removeClass('head-link-logged-in');
       },
       setClickLink : function(el) {
         el.removeAllListeners();

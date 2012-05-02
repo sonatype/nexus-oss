@@ -62,31 +62,45 @@ a:link, a:visited, a:hover, a:active {
 }
 
 .head-link {
-    color: #FAC500;
+    color: #FFCC00;
 }
 
 #head-link-r {
-  background: url("../images/icons/btn-arrow-headlink.gif") no-repeat scroll right 0 transparent;
-  padding-right: 10px;
   cursor: pointer;
   text-align: right;
 }
 
-/* default styling for the menu */
+.head-link-logged-in {
+    padding-right: 10px;
+    background: url("../images/icons/btn-arrow-headlink.gif") no-repeat scroll 88% -30% transparent;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+.profile-menu-visible {
+    background-color: #444444;
+}
+
 .user-profile-menu {
-    /*background-color: black;*/
-    /*background-image: url("../images/header_bg.gif");*/
+    background-color: black;
+    background-image: none;
+    border-color: #444444;
 }
 
 .user-profile-menu a.x-menu-item {
-    /*color: #FAC500;*/
-    /*background-color: black;*/
-    /*background-image: url("../images/header_bg.gif");*/
+    color: #FFCC00;
+    background-color: black;
 }
 
-.user-profile-menu a.x-menu-item :hover {
-    background-color: darkgray;
-    background-image: url("../images/header_bg.gif");
+.user-profile-menu .x-menu-item img {
+    background: black;
+    border: none;
+}
+
+.user-profile-menu .x-menu-item-active {
+    border: solid 1px #444444;
+    background-color: black;
+    background-image: none;
 }
 
 .user-profile-dynamic-content {
