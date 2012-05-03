@@ -81,6 +81,7 @@ Sonatype.repoServer.userProfilePanel.contentClass = function(config)
     plain : true,
     autoScroll : true,
     border : true,
+    layoutOnTabChange: true,
     listeners : {
       'tabchange' : function() {
         // hide tabStrip
