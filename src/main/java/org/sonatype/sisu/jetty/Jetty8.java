@@ -32,26 +32,36 @@ public class Jetty8
 
     private final ClassLoader classloader;
 
-    private final Map<?, ?>[] contexts;
-
     private final AppContext appContext;
 
     private volatile JettyWrapperThread serverThread;
 
-    public Jetty8( final File jettyXml, final Map<?, ?>... contexts )
+    public Jetty8( final File jettyXml )
         throws IOException
     {
-        this( jettyXml, Thread.currentThread().getContextClassLoader(), contexts );
+        this( jettyXml, null );
     }
 
-    public Jetty8( final File jettyXml, final ClassLoader classloader, final Map<?, ?>... contexts )
+    public Jetty8( final File jettyXml, final AppContext parent )
+        throws IOException
+    {
+        this( jettyXml, Thread.currentThread().getContextClassLoader(), parent );
+    }
+
+    public Jetty8( final File jettyXml, final AppContext parent, final Map<?, ?>... overrides )
+        throws IOException
+    {
+        this( jettyXml, Thread.currentThread().getContextClassLoader(), parent, overrides );
+    }
+
+    public Jetty8( final File jettyXml, final ClassLoader classloader, final AppContext parent,
+                   final Map<?, ?>... overrides )
         throws IOException
     {
         this.jettyXml = jettyXml;
         this.classloader = classloader;
-        this.contexts = contexts;
         this.server = new Server();
-        this.appContext = JettyUtils.configureServer( this.server, this.jettyXml, this.contexts );
+        this.appContext = JettyUtils.configureServer( this.server, this.jettyXml, parent, overrides );
         mangleServer( new ContextAttributeSetterMangler( AppContext.APPCONTEXT_KEY, appContext ) );
     }
 

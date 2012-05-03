@@ -66,7 +66,8 @@ public final class JettyUtils
     {
     }
 
-    public static AppContext configureServer( final Server server, final File jettyXml, final Map<?, ?>... contexts )
+    public static AppContext configureServer( final Server server, final File jettyXml, final AppContext parent,
+                                              final Map<?, ?>... overrides )
         throws IOException
     {
         final FileInputStream fis = new FileInputStream( jettyXml );
@@ -86,11 +87,11 @@ public final class JettyUtils
 
         if ( Boolean.getBoolean( PLEXUS_COMPATIBILITY_KEY ) )
         {
-            appContextReq = Factory.getDefaultRequest( "jetty", null, Arrays.asList( "plexus" ) );
+            appContextReq = Factory.getDefaultRequest( "jetty", parent, Arrays.asList( "plexus" ) );
         }
         else
         {
-            appContextReq = Factory.getDefaultRequest( "jetty" );
+            appContextReq = Factory.getDefaultRequest( "jetty", parent );
         }
 
         if ( !Boolean.valueOf( System.getProperty( JETTY_CONTEXT_DUMP ) ) )
@@ -99,11 +100,11 @@ public final class JettyUtils
             appContextReq.getPublishers().clear();
         }
 
-        // fill in passed in contexts too
+        // fill in passed in overrides
         int ctxNo = 1;
-        for ( Map<?, ?> context : contexts )
+        for ( Map<?, ?> override : overrides )
         {
-            appContextReq.getSources().add( 0, new MapEntrySource( "ctx" + ( ctxNo++ ), context ) );
+            appContextReq.getSources().add( 0, new MapEntrySource( "ctx" + ( ctxNo++ ), override ) );
         }
 
         // fill in inclusions if any

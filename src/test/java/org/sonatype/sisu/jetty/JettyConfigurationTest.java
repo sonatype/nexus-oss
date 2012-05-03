@@ -21,6 +21,7 @@ import java.util.Map;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.sonatype.appcontext.internal.ContextStringDumper;
 import org.sonatype.sisu.jetty.mangler.ContextAttributeGetterMangler;
 import org.sonatype.sisu.jetty.mangler.ContextGetterMangler;
 import org.sonatype.sisu.jetty.mangler.JettyGetterMangler;
@@ -56,7 +57,7 @@ public class JettyConfigurationTest
 
         final HashMap<String, Object> ctx = new HashMap<String, Object>();
         ctx.put( "foo", "override" );
-        Jetty8 subject = new Jetty8( new File( getJettyXmlPath( "jetty-two-war-context.xml" ) ), ctx );
+        Jetty8 subject = new Jetty8( new File( getJettyXmlPath( "jetty-two-war-context.xml" ) ), null, ctx );
 
         Assert.assertTrue( subject.getAppContext().containsKey( "foo" ) );
         Assert.assertEquals( "override", subject.getAppContext().get( "foo" ) );
@@ -143,7 +144,7 @@ public class JettyConfigurationTest
         ctx1.put( "one", "1" );
         final Map<String, String> ctx2 = new HashMap<String, String>();
         ctx2.put( "two", "2" );
-        Jetty8 subject = new Jetty8( new File( getJettyXmlPath( "jetty-two-war-context.xml" ) ), ctx1, ctx2 );
+        Jetty8 subject = new Jetty8( new File( getJettyXmlPath( "jetty-two-war-context.xml" ) ), null, ctx1, ctx2 );
 
         subject.startJetty();
 
@@ -162,7 +163,7 @@ public class JettyConfigurationTest
 
         subject.stopJetty();
 
-        subject.getAppContext().dump();
+        System.out.println( ContextStringDumper.dumpToString( subject.getAppContext() ) );
         // we have 4 in props file, and 2 in extra contexts
         Assert.assertEquals( "Context is not correctly set!", 6, subject.getAppContext().size() );
     }
