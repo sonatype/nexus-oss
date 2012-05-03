@@ -393,7 +393,7 @@
           {
             text : 'Profile',
             handler : function() {
-              Sonatype.view.mainTabPanel.addOrShowTab('user-profile-tab', Sonatype.repoServer.userProfilePanel)
+              Sonatype.view.mainTabPanel.addOrShowTab('profile', Sonatype.repoServer.userProfilePanel)
             }
           },
           {
