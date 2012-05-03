@@ -85,7 +85,10 @@ Sonatype.repoServer.userProfilePanel.contentClass = function(config)
     listeners : {
       'tabchange' : function() {
         // hide tabStrip
-        this.header.hide();
+        if (!this.headerAlreadyHidden) {
+          this.header.hide();
+          this.headerAlreadyHidden = true;
+        }
       },
       scope : this
     }
