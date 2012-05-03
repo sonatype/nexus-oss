@@ -19,6 +19,7 @@ import org.sonatype.appcontext.publisher.PrintStreamEntryPublisher;
 import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 import org.sonatype.appcontext.source.EntrySourceMarker;
+import org.sonatype.appcontext.source.MapEntrySource;
 import org.sonatype.appcontext.source.Sources;
 
 public class InternalFactory
@@ -143,6 +144,18 @@ public class InternalFactory
 
         return result;
     }
+
+    public static AppContext create( final String id, final AppContext parent, final Map<String, Object> map )
+        throws AppContextException
+    {
+        final AppContextRequest request = getDefaultAppContextRequest( id, parent, new ArrayList<String>() );
+        request.getPublishers().clear();
+        request.getSources().clear();
+        request.getSources().add( new MapEntrySource( id, map ) );
+        return create( request );
+    }
+
+    // ==
 
     public static boolean isSlf4jPresentOnClasspath()
     {

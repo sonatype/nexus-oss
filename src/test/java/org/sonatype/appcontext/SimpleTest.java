@@ -2,10 +2,12 @@ package org.sonatype.appcontext;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.sonatype.appcontext.internal.ContextStringDumper;
 import org.sonatype.appcontext.source.LegacyBasedirEntrySource;
 import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.SystemEnvironmentEntrySource;
@@ -122,36 +124,44 @@ public class SimpleTest
             new FilteredEntrySource( new SystemEnvironmentEntrySource(), new KeyEqualityEntryFilter( "HOME" ) ) );
 
         AppContext appContext = Factory.create( request );
-        
+
         assertEquals( 14, appContext.size() );
 
         final long created = appContext.getCreated();
         long modified = appContext.getModified();
         Thread.sleep( 5 ); // resolution is millis, so to be sure we have diff on fast HW
-        
+
         Assert.assertEquals( created, modified );
-        
+
         appContext.remove( "included" );
         Assert.assertEquals( 13, appContext.size() );
-        
+
         Assert.assertTrue( modified < appContext.getModified() );
         modified = appContext.getModified();
         Thread.sleep( 5 ); // resolution is millis, so to be sure we have diff on fast HW
-        
+
         appContext.put( "foo1", "bar1" );
         Assert.assertEquals( 14, appContext.size() );
-        
+
         Assert.assertTrue( modified < appContext.getModified() );
         modified = appContext.getModified();
         Thread.sleep( 5 ); // resolution is millis, so to be sure we have diff on fast HW
 
         appContext.clear();
         Assert.assertEquals( 0, appContext.size() );
-        
+
         Assert.assertTrue( modified < appContext.getModified() );
         modified = appContext.getModified();
         Thread.sleep( 5 ); // resolution is millis, so to be sure we have diff on fast HW
+    }
 
-       
+    public void testFromMap()
+    {
+        final HashMap<String, Object> aMap = new HashMap<String, Object>();
+        aMap.put( "foo", "fooValue" );
+        aMap.put( "bar", "barValue" );
+        final AppContext appContext = Factory.create( "test", null, aMap );
+        assertEquals( 2, appContext.size() );
+        System.out.println(ContextStringDumper.dumpToString( appContext ));
     }
 }

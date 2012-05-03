@@ -2,6 +2,7 @@ package org.sonatype.appcontext;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.appcontext.internal.InternalFactory;
 import org.sonatype.appcontext.publisher.PrintStreamEntryPublisher;
@@ -74,5 +75,22 @@ public class Factory
         throws AppContextException
     {
         return InternalFactory.create( request );
+    }
+
+    /**
+     * Creates AppContext instance out of the supplied map. This method is usable in tests or any other places where
+     * quickly an AppContext is needed without all the fuss about sourcing and publishing the entries. This method will
+     * NOT interpolate anything, it will just create a context from supplied map as is.
+     * 
+     * @param id the ID of the app context
+     * @param parent the parent of the appcontext or {@code null}
+     * @param map the map to use as source for app context.
+     * @return
+     * @throws AppContextException
+     */
+    public static AppContext create( final String id, final AppContext parent, final Map<String, Object> map )
+        throws AppContextException
+    {
+        return InternalFactory.create( id, parent, map );
     }
 }
