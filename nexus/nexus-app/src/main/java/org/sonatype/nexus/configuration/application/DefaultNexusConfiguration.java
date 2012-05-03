@@ -29,6 +29,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -174,6 +175,35 @@ public class DefaultNexusConfiguration
         }
         catch ( IOException e )
         {
+            final String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not canonicalize file [ "
+                    + file
+                    + "]!!!! *\r\n"
+                    + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
+            getLogger().error( message );
+            throw Throwables.propagate( e );
+        }
+    }
+
+    private File forceMkdir( final File directory )
+    {
+        try
+        {
+            FileUtils.forceMkdir( directory );
+            return directory;
+        }
+        catch ( IOException e )
+        {
+            final String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not create directory [ "
+                    + directory
+                    + "]!!!! *\r\n"
+                    + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
+            getLogger().error( message );
             throw Throwables.propagate( e );
         }
     }
@@ -183,6 +213,10 @@ public class DefaultNexusConfiguration
         throws InitializationException
     {
         workingDirectory = canonicalize( workingDirectory );
+        if ( !workingDirectory.isDirectory() )
+        {
+            forceMkdir( workingDirectory );
+        }
     }
 
     public void loadConfiguration()
@@ -418,19 +452,6 @@ public class DefaultNexusConfiguration
 
     public File getWorkingDirectory()
     {
-        // Create the dir if doesn't exist, throw runtime exception on failure
-        // bad bad bad
-        if ( !workingDirectory.exists() && !workingDirectory.mkdirs() )
-        {
-            String message =
-                "\r\n******************************************************************************\r\n"
-                    + "* Could not create work directory [ " + workingDirectory.toString() + "]!!!! *\r\n"
-                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                    + "******************************************************************************";
-
-            getLogger().error( message );
-        }
-
         return workingDirectory;
     }
 
@@ -442,23 +463,10 @@ public class DefaultNexusConfiguration
     public File getWorkingDirectory( final String key, final boolean createIfNeeded )
     {
         final File keyedDirectory = new File( getWorkingDirectory(), key );
-
         if ( createIfNeeded )
         {
-            if ( !keyedDirectory.isDirectory() && !keyedDirectory.mkdirs() )
-            {
-                String message =
-                    "\r\n******************************************************************************\r\n"
-                        + "* Could not create work directory [ "
-                        + keyedDirectory.toString()
-                        + "]!!!! *\r\n"
-                        + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                        + "******************************************************************************";
-
-                getLogger().error( message );
-            }
+            forceMkdir( keyedDirectory );
         }
-
         return canonicalize( keyedDirectory );
     }
 
@@ -467,10 +475,7 @@ public class DefaultNexusConfiguration
         if ( temporaryDirectory == null )
         {
             final File file = new File( System.getProperty( "java.io.tmpdir" ) );
-            if ( !file.exists() )
-            {
-                file.mkdirs();
-            }
+            forceMkdir( file );
             temporaryDirectory = canonicalize( file );
         }
         return temporaryDirectory;
@@ -481,10 +486,7 @@ public class DefaultNexusConfiguration
         if ( configurationDirectory == null )
         {
             final File file = new File( getWorkingDirectory(), "conf" );
-            if ( !file.exists() )
-            {
-                file.mkdirs();
-            }
+            forceMkdir( file );
             configurationDirectory = canonicalize( file );
         }
         return configurationDirectory;

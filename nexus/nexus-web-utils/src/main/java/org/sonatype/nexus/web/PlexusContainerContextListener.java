@@ -33,6 +33,7 @@ import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
+import org.sonatype.appcontext.lifecycle.Startable;
 import org.sonatype.appcontext.lifecycle.Stoppable;
 import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
@@ -117,6 +118,9 @@ public class PlexusContainerContextListener
 
                 throw new IllegalStateException( "Could not start Plexus container!", e );
             }
+
+            // fire startable
+            appContext.getLifecycleManager().invokeHandler( Startable.class );
         }
     }
 
