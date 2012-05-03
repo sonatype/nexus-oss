@@ -37,7 +37,7 @@ public abstract class AbstractMapEntrySource
 
     public String getDescription()
     {
-        return String.format( "%s(%s, size:%s)", getType(), getName(), getSource().size() );
+        return String.format( "%s(%s)", getType(), getName() );
     }
 
     public final EntrySourceMarker getEntrySourceMarker()

@@ -18,7 +18,6 @@ public class PropertiesEntrySource
     public PropertiesEntrySource( final String name, final Properties source )
     {
         super( name, "props" );
-
         this.source = Preconditions.checkNotNull( source );
     }
 

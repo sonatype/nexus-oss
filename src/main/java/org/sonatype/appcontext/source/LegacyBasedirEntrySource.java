@@ -1,6 +1,7 @@
 package org.sonatype.appcontext.source;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,6 @@ public class LegacyBasedirEntrySource
     public LegacyBasedirEntrySource( final String basedirKey, final boolean failIfNotFound )
     {
         this.basedirKey = Preconditions.checkNotNull( basedirKey );
-
         this.failIfNotFound = failIfNotFound;
     }
 
@@ -57,20 +57,23 @@ public class LegacyBasedirEntrySource
     public Map<String, Object> getEntries( AppContextRequest request )
         throws AppContextException
     {
-        final File baseDir = discoverBasedir( basedirKey );
-
-        if ( failIfNotFound && !baseDir.isDirectory() )
+        try
         {
-            throw new AppContextException(
-                "LegacyBasedirEntrySource was not able to find existing basedir! It discovered \""
-                    + baseDir.getAbsolutePath() + "\", but it does not exists or is not a directory!" );
+            final File baseDir = discoverBasedir( basedirKey );
+            if ( failIfNotFound && !baseDir.isDirectory() )
+            {
+                throw new AppContextException(
+                    "LegacyBasedirEntrySource was not able to find existing basedir! It discovered \""
+                        + baseDir.getAbsolutePath() + "\", but it does not exists or is not a directory!" );
+            }
+            final HashMap<String, Object> result = new HashMap<String, Object>();
+            result.put( basedirKey, baseDir );
+            return result;
         }
-
-        final HashMap<String, Object> result = new HashMap<String, Object>();
-
-        result.put( basedirKey, baseDir.getAbsolutePath() );
-
-        return result;
+        catch ( IOException e )
+        {
+            throw new AppContextException( "Could not discover base dir!", e );
+        }
     }
 
     // ==
@@ -81,18 +84,20 @@ public class LegacyBasedirEntrySource
      * 
      * @param basedirKey
      * @return
+     * @throws IOException
      */
     public File discoverBasedir( final String basedirKey )
+        throws IOException
     {
-        String basedirPath = System.getProperty( basedirKey );
+        final String basedirPath = System.getProperty( basedirKey );
 
         if ( basedirPath == null )
         {
-            return new File( "" ).getAbsoluteFile();
+            return new File( "" ).getCanonicalFile();
         }
         else
         {
-            return new File( basedirPath ).getAbsoluteFile();
+            return new File( basedirPath ).getCanonicalFile();
         }
     }
 }

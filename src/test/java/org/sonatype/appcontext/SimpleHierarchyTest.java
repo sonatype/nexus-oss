@@ -5,6 +5,7 @@ import java.io.File;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.sonatype.appcontext.internal.ContextStringDumper;
 import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 
 public class SimpleHierarchyTest
@@ -68,7 +69,7 @@ public class SimpleHierarchyTest
         System.out.println( grandchild.get( "basedir" ) );
         System.out.println( " *** " );
 
-        grandchild.dump();
+        System.out.println( ContextStringDumper.dumpToString( grandchild ) );
     }
 
 }

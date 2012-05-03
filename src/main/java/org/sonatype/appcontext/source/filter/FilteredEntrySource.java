@@ -26,9 +26,7 @@ public class FilteredEntrySource
     public FilteredEntrySource( final EntrySource source, final EntryFilter filter )
     {
         this.source = Preconditions.checkNotNull( source );
-
         this.filter = Preconditions.checkNotNull( filter );
-
         this.sourceMarker = filter.getFilteredEntrySourceMarker( source.getEntrySourceMarker() );
     }
 
@@ -41,7 +39,6 @@ public class FilteredEntrySource
         throws AppContextException
     {
         final Map<String, Object> result = new HashMap<String, Object>();
-
         for ( Map.Entry<String, Object> entry : source.getEntries( request ).entrySet() )
         {
             if ( filter.accept( entry.getKey(), entry.getValue() ) )
@@ -49,7 +46,6 @@ public class FilteredEntrySource
                 result.put( entry.getKey(), entry.getValue() );
             }
         }
-
         return result;
     }
 }

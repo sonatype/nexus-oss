@@ -17,7 +17,6 @@ public class MapEntrySource
     public MapEntrySource( final String name, final Map<?, ?> source )
     {
         super( name, "map" );
-
         this.source = Preconditions.checkNotNull( source );
     }
 

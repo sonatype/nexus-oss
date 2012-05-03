@@ -1,6 +1,5 @@
 package org.sonatype.appcontext.internal;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +20,8 @@ public class AppContextImpl
 
     private long modified;
 
+    private int generation;
+
     private final String id;
 
     private final AppContext parent;
@@ -34,6 +35,7 @@ public class AppContextImpl
     {
         this.created = created;
         this.modified = this.created;
+        this.generation = 0;
         this.id = Preconditions.checkNotNull( id );
 
         this.parent = parent;
@@ -61,6 +63,11 @@ public class AppContextImpl
         return modified;
     }
 
+    public int getGeneration()
+    {
+        return generation;
+    }
+
     public String getId()
     {
         return id;
@@ -84,23 +91,18 @@ public class AppContextImpl
     public Map<String, Object> flatten()
     {
         final Map<String, AppContextEntry> flattenEntries = flattenAppContextEntries();
-
         final HashMap<String, Object> result = new HashMap<String, Object>( flattenEntries.size() );
-
         for ( AppContextEntry entry : flattenEntries.values() )
         {
             result.put( entry.getKey(), entry.getValue() );
         }
-
         return Collections.unmodifiableMap( result );
     }
 
     public Map<String, AppContextEntry> flattenAppContextEntries()
     {
         final HashMap<String, AppContextEntry> result = new HashMap<String, AppContextEntry>();
-
         result.putAll( entries.flatten() );
-
         return Collections.unmodifiableMap( result );
     }
 
@@ -117,27 +119,6 @@ public class AppContextImpl
         }
     }
 
-    public void dump()
-    {
-        dump( System.out );
-    }
-
-    public void dump( final PrintStream ps )
-    {
-        if ( parent != null )
-        {
-            parent.dump( ps );
-        }
-
-        // now dump me
-        ps.println( "AppContext: " + getId() );
-        for ( AppContextEntry entry : entries.values() )
-        {
-            ps.println( entry.toString() );
-        }
-        ps.println();
-    }
-
     // ==
 
     protected HierarchicalMap<String, AppContextEntry> getEntries()
@@ -145,23 +126,10 @@ public class AppContextImpl
         return entries;
     }
 
-    public AppContextEntry put( AppContextEntry entry )
+    protected void markContextModified()
     {
-        final AppContextEntry oldEntry = entries.put( Preconditions.checkNotNull( entry ).getKey(), entry );
-
-        if ( oldEntry != null )
-        {
-            return oldEntry;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    protected void markContextModified( final long timestamp )
-    {
-        this.modified = timestamp;
+        this.generation++;
+        this.modified = System.currentTimeMillis();
     }
 
     // ==
@@ -189,7 +157,6 @@ public class AppContextImpl
     public Object get( Object key )
     {
         final AppContextEntry entry = entries.get( key );
-
         if ( entry != null )
         {
             return entry.getValue();
@@ -202,13 +169,10 @@ public class AppContextImpl
 
     public Object put( String key, Object value )
     {
-        final long created = System.currentTimeMillis();
-
         final AppContextEntry oldEntry =
-            put( new AppContextEntryImpl( created, key, value, value, new ProgrammaticallySetSourceMarker() ) );
-
-        markContextModified( created );
-
+            entries.put( Preconditions.checkNotNull( key ), new AppContextEntryImpl( created, key, value, value,
+                new ProgrammaticallySetSourceMarker() ) );
+        markContextModified();
         if ( oldEntry != null )
         {
             return oldEntry.getValue();
@@ -222,9 +186,7 @@ public class AppContextImpl
     public Object remove( Object key )
     {
         final AppContextEntry oldEntry = entries.remove( key );
-
-        markContextModified( System.currentTimeMillis() );
-
+        markContextModified();
         if ( oldEntry != null )
         {
             return oldEntry.getValue();
@@ -246,7 +208,7 @@ public class AppContextImpl
     public void clear()
     {
         entries.clear();
-        markContextModified( System.currentTimeMillis() );
+        markContextModified();
     }
 
     public Set<String> keySet()
@@ -257,24 +219,20 @@ public class AppContextImpl
     public Collection<Object> values()
     {
         final ArrayList<Object> result = new ArrayList<Object>( entries.size() );
-
         for ( Map.Entry<String, AppContextEntry> entry : entries.entrySet() )
         {
             result.add( entry.getValue().getValue() );
         }
-
         return Collections.unmodifiableList( result );
     }
 
     public Set<java.util.Map.Entry<String, Object>> entrySet()
     {
         final Map<String, Object> result = new HashMap<String, Object>( entries.size() );
-
         for ( Map.Entry<String, AppContextEntry> entry : entries.entrySet() )
         {
             result.put( entry.getKey(), entry.getValue().getValue() );
         }
-
         return Collections.unmodifiableSet( result.entrySet() );
     }
 

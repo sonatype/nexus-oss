@@ -1,6 +1,5 @@
 package org.sonatype.appcontext;
 
-import java.io.PrintStream;
 import java.util.Map;
 
 import org.sonatype.appcontext.lifecycle.AppContextLifecycleManager;
@@ -34,6 +33,18 @@ public interface AppContext
      * @return the creation time in milliseconds.
      */
     long getModified();
+
+    /**
+     * Returns the "generation" of the app context, usable for change detection. It is guaranteed, that when a change
+     * happens against this context ({@link #put(String, Object)}, {@link #putAll(Map)}, {@link #remove(Object)} methods
+     * are invoked), the integer returned by this method will be different than it was returned before the invocations
+     * of changing methods. This method is better suited for change detection, as the {@link #getModified()} might
+     * "oversee" changes happening in same millisecond.
+     * 
+     * @return
+     * @since 3.2
+     */
+    int getGeneration();
 
     /**
      * Returns the id of this context.
@@ -89,14 +100,4 @@ public interface AppContext
      * @return
      */
     Map<String, AppContextEntry> flattenAppContextEntries();
-
-    /**
-     * Dumps the complete AppContext (with hierarchy, sources) to default {@code System.out}. Low level method!
-     */
-    void dump();
-
-    /**
-     * Dumps the complete AppContext (with hierarchy, sources) to given PrintStream. Low level method!
-     */
-    void dump( PrintStream ps );
 }

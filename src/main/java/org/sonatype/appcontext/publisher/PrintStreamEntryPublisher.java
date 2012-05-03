@@ -3,7 +3,6 @@ package org.sonatype.appcontext.publisher;
 import java.io.PrintStream;
 
 import org.sonatype.appcontext.AppContext;
-import org.sonatype.appcontext.internal.ContextStringDumper;
 import org.sonatype.appcontext.internal.Preconditions;
 
 /**
@@ -12,6 +11,7 @@ import org.sonatype.appcontext.internal.Preconditions;
  * @author cstamas
  */
 public class PrintStreamEntryPublisher
+    extends AbstractStringDumpingEntryPublisher
     implements EntryPublisher
 {
     /**
@@ -38,14 +38,8 @@ public class PrintStreamEntryPublisher
         this.printStream = Preconditions.checkNotNull( printStream );
     }
 
-    public void publishEntries( AppContext context )
+    public void publishEntries( final AppContext context )
     {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append( "===================================\n" );
-        sb.append( ContextStringDumper.dumpToString( context ) );
-        sb.append( "===================================\n" );
-
-        printStream.println( sb.toString() );
+        printStream.println( getDumpAsString( context ) );
     }
 }

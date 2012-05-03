@@ -29,14 +29,11 @@ public class SystemPropertiesEntrySource
         throws AppContextException
     {
         final Properties sysprops = System.getProperties();
-
         final Map<String, Object> result = new HashMap<String, Object>();
-
         for ( Map.Entry<Object, Object> entry : sysprops.entrySet() )
         {
             result.put( String.valueOf( entry.getKey() ), entry.getValue() );
         }
-
         return result;
     }
 }

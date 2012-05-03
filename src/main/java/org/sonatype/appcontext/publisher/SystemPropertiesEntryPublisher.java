@@ -32,7 +32,6 @@ public class SystemPropertiesEntryPublisher
     public SystemPropertiesEntryPublisher( final boolean override )
     {
         this.keyPrefix = null;
-
         this.override = override;
     }
 
@@ -46,16 +45,14 @@ public class SystemPropertiesEntryPublisher
     public SystemPropertiesEntryPublisher( final String keyPrefix, final boolean override )
     {
         this.keyPrefix = Preconditions.checkNotNull( keyPrefix );
-
         this.override = override;
     }
 
-    public void publishEntries( AppContext context )
+    public void publishEntries( final AppContext context )
     {
         for ( Entry<String, Object> entry : context.entrySet() )
         {
             String key = entry.getKey();
-
             String value = String.valueOf( entry.getValue() );
 
             // adjust the key name and put it back to System properties

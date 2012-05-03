@@ -34,14 +34,11 @@ public class SystemEnvironmentEntrySource
         throws AppContextException
     {
         final Map<String, String> envMap = System.getenv();
-
         final Map<String, Object> result = new HashMap<String, Object>();
-
         for ( Map.Entry<String, String> entry : envMap.entrySet() )
         {
             result.put( entry.getKey(), entry.getValue() );
         }
-
         return result;
     }
 }
