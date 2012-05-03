@@ -23,81 +23,71 @@ Sonatype.repoServer.UserProfileSummaryPanel = function(config) {
 
   var items = [
     {
-      xtype : 'fieldset',
-      title : 'Details',
-      autoHeight : true,
-      layoutConfig : {
-        labelSeparator : ''
-      },
-      items : [
-        {
-          xtype : 'textfield',
-          fieldLabel : 'User ID',
-          itemCls : 'required-field',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : ht.userId,
-          name : 'userId',
-          disabled : true,
-          allowBlank : false,
-          width : this.FIELD_WIDTH
-        },
-        {
-          xtype : 'textfield',
-          fieldLabel : 'First Name',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : ht.firstName,
-          name : 'firstName',
-          allowBlank : true,
-          width : this.FIELD_WIDTH,
-          validator : function(v) {
-            if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
-              return true;
-            }
-            else {
-              return 'First Name cannot start with whitespace.';
-            }
-          }
-        },
-        {
-          xtype : 'textfield',
-          fieldLabel : 'Last Name',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : ht.lastName,
-          name : 'lastName',
-          allowBlank : true,
-          width : this.FIELD_WIDTH,
-          validator : function(v) {
-            if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
-              return true;
-            }
-            else {
-              return 'Last Name cannot start with whitespace.';
-            }
-          }
-        },
-        {
-          xtype : 'textfield',
-          fieldLabel : 'Email',
-          itemCls : 'required-field',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : ht.email,
-          name : 'email',
-          allowBlank : false,
-          width : this.FIELD_WIDTH
-        },
-        {
-          xtype : 'label',
-          // make this label's font look like the others
-          cls : 'x-form-item',
-          text : 'Change Password',
-          style : 'text-decoration: underline; color: blue; cursor: pointer;',
-          listeners : {
-            'render' : function(component) {
-              component.getEl().on('click', function() {Sonatype.utils.changePassword()});
-            }
-          }
+      xtype : 'textfield',
+      fieldLabel : 'User ID',
+      itemCls : 'required-field',
+      labelStyle : 'margin-left: 15px; width: 185px;',
+      helpText : ht.userId,
+      name : 'userId',
+      disabled : true,
+      allowBlank : false,
+      width : this.FIELD_WIDTH
+    },
+    {
+      xtype : 'textfield',
+      fieldLabel : 'First Name',
+      labelStyle : 'margin-left: 15px; width: 185px;',
+      helpText : ht.firstName,
+      name : 'firstName',
+      allowBlank : true,
+      width : this.FIELD_WIDTH,
+      validator : function(v) {
+        if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
+          return true;
         }
-      ]
+        else {
+          return 'First Name cannot start with whitespace.';
+        }
+      }
+    },
+    {
+      xtype : 'textfield',
+      fieldLabel : 'Last Name',
+      labelStyle : 'margin-left: 15px; width: 185px;',
+      helpText : ht.lastName,
+      name : 'lastName',
+      allowBlank : true,
+      width : this.FIELD_WIDTH,
+      validator : function(v) {
+        if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
+          return true;
+        }
+        else {
+          return 'Last Name cannot start with whitespace.';
+        }
+      }
+    },
+    {
+      xtype : 'textfield',
+      fieldLabel : 'Email',
+      itemCls : 'required-field',
+      labelStyle : 'margin-left: 15px; width: 185px;',
+      helpText : ht.email,
+      name : 'email',
+      allowBlank : false,
+      width : this.FIELD_WIDTH
+    },
+    {
+      xtype : 'label',
+      // make this label's font look like the others
+      cls : 'x-form-item',
+      text : 'Change Password',
+      style : 'text-decoration: underline; color: blue; cursor: pointer;',
+      listeners : {
+        'render' : function(component) {
+          component.getEl().on('click', function() {Sonatype.utils.changePassword()});
+        }
+      }
     }
   ];
 
