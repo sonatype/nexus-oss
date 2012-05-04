@@ -189,7 +189,8 @@ Ext.ux.TabCloseMenu = function () {
     }
 
     function onContextMenu(ts, item, e) {
-        if (!menu) { // create context menu on first right click
+        // create context menu on first right click
+        if (!menu) {
             menu = new Ext.menu.Menu([
                 {
                     id: tabs.id + '-close',
@@ -214,14 +215,25 @@ Ext.ux.TabCloseMenu = function () {
         ctxItem = item;
         var items = menu.items;
         items.get(tabs.id + '-close').setDisabled(!item.closable);
-        var disableOthers = true;
+
+        // Disable close others options if there are no tabs which can be closed
+        var disableCloseOthers = true;
         tabs.items.each(function () {
             if (this != item && this.closable) {
-                disableOthers = false;
+                disableCloseOthers = false;
                 return false;
             }
         });
-        items.get(tabs.id + '-close-others').setDisabled(disableOthers);
+        items.get(tabs.id + '-close-others').setDisabled(disableCloseOthers);
+
+        // If there is only one tab, then disable close (close others will also be disabled by ^^^)
+        // FIXME: This is partially faulty since all tabs are closeable but really should disable closable for the last tab
+        var disableClose = false;
+        if (tabs.items.length === 1) {
+            disableClose = true;
+        }
+        items.get(tabs.id + '-close').setDisabled(disableClose);
+
         menu.showAt(e.getPoint());
     }
 };
