@@ -394,6 +394,11 @@
             text : 'Profile',
             handler : function() {
               Sonatype.view.mainTabPanel.addOrShowTab('profile', Nexus.profile.UserProfile);
+            },
+            listeners : {
+              render : function(cmp) {
+                cmp.setVisible(Sonatype.utils.editionShort === "OSS" || ( Sonatype.utils.licenseInstalled && !Sonatype.utils.licenseExpired));
+              }
             }
           },
           {
