@@ -156,7 +156,11 @@ Sonatype.Events.addListener('userProfileInit', function(views) {
     };
     testPanel.superclass.constructor.call(this, config);
   };
-  Ext.extend(testPanel, Ext.Panel)
+  Ext.extend(testPanel, Ext.Panel, {
+    refreshContent : function() {
+      alert('refreshing');
+    }
+  })
 
   views.push({
     name : 'test', // name displayed in the combo box selector

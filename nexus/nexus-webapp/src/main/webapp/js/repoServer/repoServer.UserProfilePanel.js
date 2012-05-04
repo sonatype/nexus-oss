@@ -41,7 +41,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
     listeners : {
       'select' : {
         fn : function(combo, record, index) {
-          this.content.display(record.get('value'));
+          this.content.display(record.get('value'), this);
         },
         scope : this
       },
@@ -49,7 +49,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
         fn : function(combo) {
           var rec = combo.store.getAt(0);
           combo.setValue(rec.get('text'));
-          this.content.display(rec.get('value'));
+          this.content.display(rec.get('value'), this);
         },
         scope : this
       }
@@ -64,11 +64,30 @@ Sonatype.repoServer.userProfilePanel = function(config) {
     })()
   });
 
+  this.refreshContent = function() {
+    var tab = this.content.getActiveTab();
+    if (tab.refreshContent) {
+      tab.refreshContent();
+      this.content.doLayout();
+    }
+  }
+
+  this.refreshButton = new Ext.Button({
+    tooltip : 'Refresh',
+    style : 'position: absolute; right:25px; top:25px;',
+    icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+    cls : 'x-btn-icon',
+    scope : this,
+    handler : this.refreshContent,
+    noExtraClass : true
+  });
+
   Sonatype.repoServer.userProfilePanel.superclass.constructor.call(this, {
     title : 'Profile',
     items : [
       this.content,
-      this.selector
+      this.selector,
+      this.refreshButton
     ]
   });
 
@@ -96,10 +115,11 @@ Sonatype.repoServer.userProfilePanel.contentClass = function(config)
 
   Sonatype.repoServer.userProfilePanel.contentClass.superclass.constructor.call(this);
 
-  this.display = function(panel)
+  this.display = function(panel, profile)
   {
     this.add(panel);
     this.setActiveTab(panel);
+    profile.refreshButton.setVisible(panel.refreshContent !== undefined);
   }
 }
 Ext.extend(Sonatype.repoServer.userProfilePanel.contentClass, Ext.TabPanel);

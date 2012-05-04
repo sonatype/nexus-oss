@@ -1266,3 +1266,16 @@ Ext.tree.TreeLoader.override({
       }
     });
 
+/**
+ * Override the absolute layout to optionally omit the defined extraCls (x-abs-layout-item).
+ * The class forces the 'left' CSS position property, which will disable positioning items
+ * from the right side.
+ */
+Ext.layout.AbsoluteLayout.override({
+  renderItem : function(c, position, target) {
+    Ext.layout.AbsoluteLayout.superclass.renderItem.call(this, c, position, target);
+    if (c.noExtraClass) {
+      c.removeClass(this.extraCls);
+    }
+  }
+});
