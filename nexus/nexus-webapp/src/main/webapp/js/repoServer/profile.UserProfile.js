@@ -129,7 +129,7 @@ Ext.extend(Nexus.profile.UserProfile.contentClass, Ext.TabPanel);
 
 /**
  * @param {string} name The name displayed in the combo box selector.
- * @param {Object} panelCls The class definition of the panel to show as content. The constructor will be called with {username:$currentUsername, frame:false, border:false}.
+ * @param {Object} panelCls The class definition of the panel to show as content. The constructor will be called with {username:$currentUsername} and may override frame and border settings.
  * @param {Array} views (optional) List of profile views to add the panel to. Currently 'user' and 'admin' are support. If omitted, the panel will be added to all views.
  *
  * @static
