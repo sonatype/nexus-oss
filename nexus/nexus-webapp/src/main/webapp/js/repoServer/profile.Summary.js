@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Sonatype.repoServer.UserProfileSummaryPanel = function(config) {
+Nexus.profile.Summary = function(config) {
   var ht = Sonatype.repoServer.resources.help.users;
 
   var config = config || {};
@@ -120,10 +120,10 @@ Sonatype.repoServer.UserProfileSummaryPanel = function(config) {
   // mandatory call
   this.checkPayload();
 
-  Sonatype.repoServer.UserProfileSummaryPanel.superclass.constructor.call(this, config);
+  Nexus.profile.Summary.superclass.constructor.call(this, config);
 };
 
-Ext.extend(Sonatype.repoServer.UserProfileSummaryPanel, Sonatype.ext.FormPanel, {
+Ext.extend(Nexus.profile.Summary, Sonatype.ext.FormPanel, {
   isValid : function() {
     return this.form.isValid();
   }
@@ -135,19 +135,12 @@ Sonatype.Events.addListener('userAdminViewInit', function(views) {
     name : 'Summary', // title of the tab
 
     // class definition of the panel, constructor will be called with {username:$selectedUsername}
-    item : Sonatype.repoServer.UserProfileSummaryPanel
+    item : Nexus.profile.Summary
   });
 });
 */
 
-Sonatype.Events.addListener('userProfileInit', function(views) {
-  views.push({
-    name : 'Summary', // name displayed in the combo box selector
-
-    // class definition of the panel,
-    // constructor will be called with {username:$currentUsername, frame:false, border:false}
-    item : Sonatype.repoServer.UserProfileSummaryPanel
-  });
+Nexus.profile.register('Summary', Nexus.profile.Summary, ['user']);
 
   /* FIXME remove this when UserProfile is stable
   var testPanel = function(){
@@ -170,5 +163,4 @@ Sonatype.Events.addListener('userProfileInit', function(views) {
     item : testPanel
   });
    */
-});
 

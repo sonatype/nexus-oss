@@ -10,7 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Sonatype.repoServer.userProfilePanel = function(config) {
+
+Ext.namespace('Nexus.profile');
+
+Nexus.profile.UserProfile = function(config) {
 
   var config = config || {};
   var defaultConfig = {
@@ -24,7 +27,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
 
   Sonatype.Events.fireEvent('userProfileInit', views);
 
-  this.content = new Sonatype.repoServer.userProfilePanel.contentClass({
+  this.content = new Nexus.profile.UserProfile.contentClass({
     cls : 'user-profile-dynamic-content',
     border : false,
     x : 20,
@@ -82,7 +85,7 @@ Sonatype.repoServer.userProfilePanel = function(config) {
     noExtraClass : true
   });
 
-  Sonatype.repoServer.userProfilePanel.superclass.constructor.call(this, {
+  Nexus.profile.UserProfile.superclass.constructor.call(this, {
     title : 'Profile',
     items : [
       this.content,
@@ -92,9 +95,9 @@ Sonatype.repoServer.userProfilePanel = function(config) {
   });
 
 }
-Ext.extend(Sonatype.repoServer.userProfilePanel, Ext.Panel);
+Ext.extend(Nexus.profile.UserProfile, Ext.Panel);
 
-Sonatype.repoServer.userProfilePanel.contentClass = function(config)
+Nexus.profile.UserProfile.contentClass = function(config)
 {
   Ext.apply(this, config || {}, {
     plain : true,
@@ -113,7 +116,7 @@ Sonatype.repoServer.userProfilePanel.contentClass = function(config)
     }
   });
 
-  Sonatype.repoServer.userProfilePanel.contentClass.superclass.constructor.call(this);
+  Nexus.profile.UserProfile.contentClass.superclass.constructor.call(this);
 
   this.display = function(panel, profile)
   {
@@ -122,5 +125,33 @@ Sonatype.repoServer.userProfilePanel.contentClass = function(config)
     profile.refreshButton.setVisible(panel.refreshContent !== undefined);
   }
 }
-Ext.extend(Sonatype.repoServer.userProfilePanel.contentClass, Ext.TabPanel);
+Ext.extend(Nexus.profile.UserProfile.contentClass, Ext.TabPanel);
+
+/**
+ * @param {string} name The name displayed in the combo box selector.
+ * @param {Object} panelCls The class definition of the panel to show as content. The constructor will be called with {username:$currentUsername, frame:false, border:false}.
+ * @param {Array} views (optional) List of profile views to add the panel to. Currently 'user' and 'admin' are support. If omitted, the panel will be added to all views.
+ *
+ * @static
+ * @member Nexus.profile
+ */
+Nexus.profile.register = function(name, panelCls, views) {
+  if (views === null || views.indexOf('user') !== -1) {
+    Sonatype.Events.addListener('userProfileInit', function(views) {
+      views.push({
+        name : name,
+        item : panelCls
+      });
+    });
+  }
+
+  if (views === null || views.indexOf('admin') !== -1) {
+    Sonatype.Events.addListener('userAdminViewInit', function(views) {
+      views.push({
+        name : name,
+        item : panelCls
+      });
+    });
+  }
+}
 
