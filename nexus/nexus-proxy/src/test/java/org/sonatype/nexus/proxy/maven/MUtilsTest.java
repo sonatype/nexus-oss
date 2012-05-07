@@ -70,7 +70,7 @@ public class MUtilsTest
     }
 
     /**
-     * NEXUS-4984: Test that reading digest from a zero length file will not crash and digest is ampty string ("").
+     * NEXUS-4984: Test that reading digest from a zero length file will not crash and digest is empty string ("").
      *
      * @throws IOException unexpected
      */
