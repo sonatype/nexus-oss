@@ -60,6 +60,9 @@ public class NexusApplication
     @Requirement( hint = "licenseTemplate", optional = true )
     private ManagedPlexusResource licenseTemplateResource;
 
+    @Requirement( hint = "enterLicenseTemplate", optional = true )
+    private ManagedPlexusResource enterLicenseTemplateResource;
+
     @Requirement( hint = "IndexRedirectingPlexusResource" )
     private ManagedPlexusResource indexRedirectingResource;
 
@@ -183,6 +186,10 @@ public class NexusApplication
         if( licenseTemplateResource != null )
         {
             attach( root, false, licenseTemplateResource );
+        }
+        if( enterLicenseTemplateResource != null )
+        {
+            attach( root, false, enterLicenseTemplateResource );
         }
 
         // publish the WAR contents
