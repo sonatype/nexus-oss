@@ -1139,7 +1139,9 @@ Sonatype.Events.addListener('userViewInit', function(cardPanel, rec) {
 
       var content = new view.item({username:username});
       content.tabTitle = view.name;
-      cardPanel.add(content);
+      if ( !content.shouldShow || content.shouldShow() ) {
+        cardPanel.add(content);
+      }
     }
   });
 })();

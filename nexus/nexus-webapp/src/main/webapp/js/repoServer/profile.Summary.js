@@ -149,18 +149,18 @@ Nexus.profile.register('Summary', Nexus.profile.Summary, ['user']);
     };
     testPanel.superclass.constructor.call(this, config);
   };
+
+  Nexus.profile.show = true;
+
   Ext.extend(testPanel, Ext.Panel, {
     refreshContent : function() {
       alert('refreshing');
+    },
+    shouldShow : function() {
+      return Nexus.profile.show;
     }
   })
 
-  views.push({
-    name : 'test', // name displayed in the combo box selector
-
-    // class definition of the panel,
-    // constructor will be called with {username:$currentUsername, frame:false, border:false}
-    item : testPanel
-  });
+  Nexus.profile.register('test', testPanel);
    */
 

@@ -61,7 +61,10 @@ Nexus.profile.UserProfile = function(config) {
       // [ (v.item,v.name) for v in views]
       var viewArray = [];
       Ext.each(views, function(v) {
-        viewArray.push([new v.item({username:Sonatype.user.curr.username, border : false,frame : false}), v.name])
+        var content = new v.item({username : Sonatype.user.curr.username, border : false, frame : false});
+        if (!content.shouldShow || content.shouldShow()) {
+          viewArray.push([content, v.name])
+        }
       });
       return viewArray;
     })()
@@ -136,7 +139,7 @@ Ext.extend(Nexus.profile.UserProfile.contentClass, Ext.TabPanel);
  * @member Nexus.profile
  */
 Nexus.profile.register = function(name, panelCls, views) {
-  if (views === null || views.indexOf('user') !== -1) {
+  if (views === undefined || views.indexOf('user') !== -1) {
     Sonatype.Events.addListener('userProfileInit', function(views) {
       views.push({
         name : name,
@@ -145,7 +148,7 @@ Nexus.profile.register = function(name, panelCls, views) {
     });
   }
 
-  if (views === null || views.indexOf('admin') !== -1) {
+  if (views === undefined || views.indexOf('admin') !== -1) {
     Sonatype.Events.addListener('userAdminViewInit', function(views) {
       views.push({
         name : name,
