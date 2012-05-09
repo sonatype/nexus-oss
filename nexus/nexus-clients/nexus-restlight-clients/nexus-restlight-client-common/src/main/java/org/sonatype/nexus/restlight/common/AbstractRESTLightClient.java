@@ -41,7 +41,6 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.codehaus.plexus.util.IOUtil;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
@@ -479,7 +478,6 @@ public abstract class AbstractRESTLightClient
      * GET method.
      * </p>
      */
-    @SuppressWarnings( "unchecked" )
     protected Document get( final String url, final Map<String, ? extends Object> requestParams,
                             final boolean urlIsAbsolute )
         throws RESTLightClientException
@@ -584,10 +582,10 @@ public abstract class AbstractRESTLightClient
      * Submit a POST request to the relative URL-path given (relative to the base-URL used to construct the client),
      * ignore the response body. Use the given requestParams map to inject into the HTTP POST method.
      */
-    protected void post( final String path, final Map<String, ? extends Object> requestParams, final Document body )
+    protected Document post( final String path, final Map<String, ? extends Object> requestParams, final Document body )
         throws RESTLightClientException
     {
-        doPost( path, requestParams, body, false );
+        return doPost( path, requestParams, body, false );
     }
 
     /**
@@ -898,8 +896,6 @@ public abstract class AbstractRESTLightClient
         }
 
         int status = method.getStatusCode();
-
-        String statusText = method.getStatusText();
 
         if ( status != 200 )
         {
