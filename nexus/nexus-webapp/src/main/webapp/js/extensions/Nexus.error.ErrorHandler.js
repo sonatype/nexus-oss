@@ -59,10 +59,10 @@ Nexus.error.ErrorHandler = function() {
       try {
         this.displayError(args);
       } catch(e) {
-        // if the errorHandler is broken, let the user see the browser's error handler
-        return false;
+        // don't introduce even more errors when displaying errors
       }
-      return true;
+      // let handling continue to bubble up to firebug console etc.
+      return false;
     }
   };
 }();
