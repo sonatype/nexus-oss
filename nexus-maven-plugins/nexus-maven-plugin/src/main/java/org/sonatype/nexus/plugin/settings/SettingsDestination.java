@@ -10,19 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.settings;
 
 /**
- * Promote a finished Nexus staging repository into a permanent Nexus repository for general consumption.
- * 
- * @goal staging-promote
- * @requiresProject false
- * @aggregator
- * @deprecated Replaced by: staging-release.
+ * Enumeration defining possible standard destinations for a Maven settings.xml file.
  */
-@Deprecated
-public class PromoteStageRepositoryMojo
-    extends ReleaseStageRepositoryMojo
+public enum SettingsDestination
 {
+    /**
+     * Equivalent to ${maven.home}/conf
+     */
+    global,
 
+    /**
+     * Equivalent to ${user.home}/~m2
+     */
+    user;
 }

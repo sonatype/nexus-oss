@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.staging;
 
 import java.util.List;
 
@@ -20,8 +20,8 @@ import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
 
 /**
- * Drop a closed Nexus staging repository.
- *
+ * Drops a Nexus staging repository that is either open or closed.
+ * 
  * @goal staging-drop
  * @requiresProject false
  * @aggregator
@@ -35,7 +35,7 @@ public class DropStageRepositoryMojo
      * If set to <code>true</code>, allow auto-selection of the repository to drop in cases where no repositoryId has
      * been specified during execution, and only one staged repository is available. <br/>
      * <b>NOTE:</b> Use with care! This can be dangerous!
-     *
+     * 
      * @parameter expression="${nexus.drop.autoSelectOverride}" default-value="false"
      */
     private boolean dropAutoSelectOverride;

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.staging;
 
 import java.util.List;
 
@@ -21,8 +21,8 @@ import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
 
 /**
- * Release a finished Nexus staging repository into a permanent Nexus repository for general consumption.
- *
+ * Releases a single closed Nexus staging repository into a permanent Nexus repository for general consumption.
+ * 
  * @goal staging-release
  * @requiresProject false
  * @aggregator
@@ -36,7 +36,7 @@ public class ReleaseStageRepositoryMojo
      * If set to <code>true</code>, allow auto-selection of the repository to promote in cases where no repositoryId has
      * been specified during execution, and only one staged repository is available. <br/>
      * <b>NOTE:</b> Use with care! This can be dangerous!
-     *
+     * 
      * @parameter expression="${nexus.promote.autoSelectOverride}" default-value="false"
      */
     private boolean promoteAutoSelectOverride;

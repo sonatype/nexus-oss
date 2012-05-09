@@ -10,26 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.staging;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.jdom.JDOMException;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasSize;
 import org.junit.Test;
+import org.sonatype.nexus.plugin.NexusMojoTestSupport;
 import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.POSTFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 
 /**
  * @author plynch

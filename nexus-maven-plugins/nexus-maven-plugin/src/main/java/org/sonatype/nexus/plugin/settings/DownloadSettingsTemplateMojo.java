@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.settings;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,6 +33,7 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.sonatype.nexus.plugin.AbstractNexusMojo;
 import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
@@ -262,7 +263,6 @@ public class DownloadSettingsTemplateMojo
         getLog().info( "Settings saved to: " + f.getAbsolutePath() );
     }
 
-    @Override
     protected synchronized M2SettingsClient connect()
         throws RESTLightClientException, MojoExecutionException
     {

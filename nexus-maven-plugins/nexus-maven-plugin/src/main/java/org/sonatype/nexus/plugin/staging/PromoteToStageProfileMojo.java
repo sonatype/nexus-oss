@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.staging;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,9 +29,9 @@ import org.sonatype.nexus.restlight.stage.StageProfile;
 import org.sonatype.nexus.restlight.stage.StageRepository;
 
 /**
- * Promote a finished Nexus staging repository into a permanent Nexus repository for general consumption.
+ * Promotes a set of closed Nexus staging repositories into a Nexus Build Promotion Profile.
  *
- * @goal staging-build-promotion
+ * @goal staging-promote
  * @requiresProject false
  * @aggregator
  */

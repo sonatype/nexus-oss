@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.staging;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +23,8 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.jdom.JDOMException;
 import org.junit.Test;
+import org.sonatype.nexus.plugin.NexusMojoTestSupport;
+import org.sonatype.nexus.plugin.StringBuilderLog;
 import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;

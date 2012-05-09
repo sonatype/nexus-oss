@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.staging;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -25,6 +25,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.sonatype.nexus.plugin.AbstractNexusMojo;
 import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
@@ -56,7 +57,6 @@ public abstract class AbstractStagingMojo
         super();
     }
 
-    @Override
     protected final synchronized StageClient connect()
         throws RESTLightClientException
     {

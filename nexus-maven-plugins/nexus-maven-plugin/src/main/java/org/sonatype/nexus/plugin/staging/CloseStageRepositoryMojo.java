@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin;
+package org.sonatype.nexus.plugin.staging;
 
 import java.util.List;
 
@@ -21,7 +21,8 @@ import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
 
 /**
- * Close a Nexus staging repository so it's available for use by Maven.
+ * Closes a Nexus staging repository so it's become "frozen" and not receive deploys anymore. Optionally, it becomes
+ * available for use by Maven.
  * 
  * @goal staging-close
  * @requiresProject false
