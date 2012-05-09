@@ -296,6 +296,7 @@
                   <includes>
                     <include>${basedir}/src/main/webapp/ext-2.3/adapter/ext/ext-base.js</include>
                     <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
+                    <include>${basedir}/src/main/webapp/js/extensions/Nexus.error.ErrorHandler.js</include>
                     <include>${compressed-dir}/js/extensions/ext-override.js</include>
                     <include>${compressed-dir}/js/filetree/js/Ext.ux.form.BrowseButton.js</include>
                     <include>${compressed-dir}/js/groupcombo/groupcombo.js</include>
