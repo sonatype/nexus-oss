@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.basic.StringConverter;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
@@ -24,7 +23,9 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequest;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequestDTO;
-import org.sonatype.plexus.rest.xstream.AliasingListConverter;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
 
 public class XStreamInitalizer
 {

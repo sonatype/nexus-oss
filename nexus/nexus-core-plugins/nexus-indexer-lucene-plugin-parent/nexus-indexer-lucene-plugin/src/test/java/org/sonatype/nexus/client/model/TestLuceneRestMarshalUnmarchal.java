@@ -13,9 +13,9 @@
 package org.sonatype.nexus.client.model;
 
 import org.junit.Test;
+import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 public class TestLuceneRestMarshalUnmarchal
     extends TestMarshalUnmarchal
