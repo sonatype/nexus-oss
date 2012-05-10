@@ -59,6 +59,7 @@ public class AliasingListConverter
      * (non-Javadoc)
      * @see com.thoughtworks.xstream.converters.ConverterMatcher#canConvert(java.lang.Class)
      */
+    @SuppressWarnings( "rawtypes" )
     public boolean canConvert( Class type )
     {
         return List.class.isAssignableFrom( type );

@@ -16,7 +16,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import com.thoughtworks.xstream.converters.basic.StringConverter;
 
-public class HtmlEscapeStringConverter
+public class HtmlUnescapeStringConverter
     extends StringConverter
 {
     /**
@@ -24,12 +24,12 @@ public class HtmlEscapeStringConverter
      */
     private final boolean nullResilient;
 
-    public HtmlEscapeStringConverter()
+    public HtmlUnescapeStringConverter()
     {
         this( false );
     }
 
-    public HtmlEscapeStringConverter( boolean nullResilient )
+    public HtmlUnescapeStringConverter( boolean nullResilient )
     {
         this.nullResilient = nullResilient;
     }
@@ -48,6 +48,6 @@ public class HtmlEscapeStringConverter
     @Override
     public Object fromString( String str )
     {
-        return StringEscapeUtils.escapeHtml( str );
+        return StringEscapeUtils.unescapeHtml( str );
     }
 }

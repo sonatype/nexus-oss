@@ -13,7 +13,7 @@
 package org.sonatype.nexus.security.ldap.realms.api;
 
 import org.sonatype.nexus.rest.model.AliasingListConverter;
-import org.sonatype.nexus.rest.model.HtmlEscapeStringConverter;
+import org.sonatype.nexus.rest.model.HtmlUnescapeStringConverter;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
@@ -43,15 +43,7 @@ public class LdapXStreamConfigurator
 
         // NXCM-2974 unescape html entities like "o=org&amp;org", they get escaped by nexus-rest-api json->DTO
         // conversion
-        final HtmlEscapeStringConverter converter = new HtmlEscapeStringConverter()
-        {
-            // UI sends null for some fields, super class does NOT like that.
-            @Override
-            public boolean canConvert( Class type )
-            {
-                return type == null || super.canConvert( type );
-            }
-        };
+        final HtmlUnescapeStringConverter converter = new HtmlUnescapeStringConverter( true );
 
         xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "systemUsername", converter );
         xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "systemPassword", converter );
