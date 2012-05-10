@@ -37,8 +37,7 @@ public abstract class AbstractIndexerNexusPlexusResource
     public void configureXStream( XStream xstream )
     {
         super.configureXStream( xstream );
-
-        XStreamInitializer.init( xstream );
+        MIndexerXStreamConfigurator.configureXStream( xstream );
     }
 
     /**

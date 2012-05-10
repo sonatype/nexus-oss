@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.sonatype.nexus.rest.model.AliasingListConverter;
+import org.sonatype.nexus.rest.model.HtmlEscapeStringConverter;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
@@ -25,14 +25,16 @@ import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConf
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequestDTO;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.basic.StringConverter;
 
-public class XStreamInitalizer
+/**
+ * XStream configurator for LDAP.
+ * 
+ * @author cstamas
+ */
+public class LdapXStreamConfigurator
 {
-
-    public static XStream initXStream( XStream xstream )
+    public static XStream configureXStream( XStream xstream )
     {
-        
         xstream.processAnnotations( LdapConnectionInfoResponse.class );
         xstream.processAnnotations( LdapUserAndGroupConfigurationResponse.class );
         xstream.processAnnotations( LdapUserListResponse.class );
@@ -41,19 +43,13 @@ public class XStreamInitalizer
 
         // NXCM-2974 unescape html entities like "o=org&amp;org", they get escaped by nexus-rest-api json->DTO
         // conversion
-        final StringConverter converter = new StringConverter()
+        final HtmlEscapeStringConverter converter = new HtmlEscapeStringConverter()
         {
             // UI sends null for some fields, super class does NOT like that.
             @Override
             public boolean canConvert( Class type )
             {
                 return type == null || super.canConvert( type );
-            }
-
-            @Override
-            public Object fromString( String str )
-            {
-                return StringEscapeUtils.unescapeHtml( str );
             }
         };
 
@@ -70,7 +66,7 @@ public class XStreamInitalizer
         xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "searchBase", converter );
 
         xstream.registerLocalConverter( LdapUserListResponse.class, "data", new AliasingListConverter(
-          LdapUserResponseDTO.class, "user" ) );
+            LdapUserResponseDTO.class, "user" ) );
 
         return xstream;
     }

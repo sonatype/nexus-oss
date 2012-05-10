@@ -33,9 +33,9 @@ import com.thoughtworks.xstream.XStream;
  * @author cstamas
  * @since 2.1
  */
-public class XStreamInitializerLightweight
+public class MIndexerXStreamConfiguratorLightweight
 {
-    public static void init( final XStream xstream )
+    public static XStream configureXStream( final XStream xstream )
     {
         xstream.processAnnotations( SearchResponse.class );
         xstream.registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
@@ -52,5 +52,6 @@ public class XStreamInitializerLightweight
             NexusNGArtifactHit.class, "artifactHit" ) );
         xstream.registerLocalConverter( NexusNGArtifactHit.class, "artifactLinks", new AliasingListConverter(
             NexusNGArtifactLink.class, "artifactLink" ) );
+        return xstream;
     }
 }

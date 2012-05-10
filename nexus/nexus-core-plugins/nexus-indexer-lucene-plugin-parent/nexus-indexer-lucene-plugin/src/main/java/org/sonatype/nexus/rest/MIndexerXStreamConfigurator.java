@@ -18,17 +18,18 @@ import org.sonatype.nexus.rest.model.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
 
-public class XStreamInitializer
+public class MIndexerXStreamConfigurator
 {
-    public static void init( final XStream xstream )
+    public static XStream configureXStream( final XStream xstream )
     {
         // do "lightweight"
-        XStreamInitializerLightweight.init( xstream );
+        MIndexerXStreamConfiguratorLightweight.configureXStream( xstream );
 
         // Tree (DTO classes extends classes from Maven Indexer, it is hence needed on classpath)
         xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
         xstream.processAnnotations( IndexBrowserTreeNode.class );
         xstream.registerLocalConverter( IndexBrowserTreeNode.class, "children", new AliasingListConverter(
             IndexBrowserTreeNode.class, "child" ) );
+        return xstream;
     }
 }

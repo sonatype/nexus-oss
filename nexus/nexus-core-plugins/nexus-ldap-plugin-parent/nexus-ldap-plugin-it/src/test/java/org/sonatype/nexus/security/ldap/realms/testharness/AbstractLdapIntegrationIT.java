@@ -21,7 +21,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.security.ldap.realms.api.XStreamInitalizer;
+import org.sonatype.nexus.security.ldap.realms.api.LdapXStreamConfigurator;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -124,12 +124,12 @@ public abstract class AbstractLdapIntegrationIT
     @Override
     public XStream getXMLXStream()
     {
-        return XStreamInitalizer.initXStream( super.getXMLXStream() );
+        return LdapXStreamConfigurator.configureXStream( super.getXMLXStream() );
     }
 
     @Override
     public XStream getJsonXStream()
     {
-        return XStreamInitalizer.initXStream( super.getJsonXStream() );
+        return LdapXStreamConfigurator.configureXStream( super.getJsonXStream() );
     }
 }
