@@ -19,7 +19,7 @@ Nexus.error.ErrorHandler = function() {
       window.onerror = !window.onerror ? Nexus.error.handle : window.onerror.createSequence(Nexus.error.handle);
     },
     getFormattedMessage: function(args) {
-      var lines = ["The following error has occured:"];
+      var lines = ["The following error has occurred:"];
       if (args[0] instanceof Error) { // Error object thrown in try...catch
         var err = args[0];
         lines[lines.length] = "Message: (" + err.name + ") " + err.message;
@@ -30,7 +30,7 @@ Nexus.error.ErrorHandler = function() {
         lines[lines.length] = "URL: " + args[1];
         lines[lines.length] = "Line Number: " + args[2];
       } else {
-        lines = ["An unknown error has occured."]; // purposely rebuild lines
+        lines = ["An unknown error has occurred."]; // purposely rebuild lines
         lines[lines.length] = "The following information may be useful:"
         for (var x = 0; x < args.length; x++) {
           lines[lines.length] = Ext.encode(args[x]);
