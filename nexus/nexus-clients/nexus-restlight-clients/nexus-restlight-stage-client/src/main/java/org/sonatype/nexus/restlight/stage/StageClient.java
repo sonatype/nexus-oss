@@ -42,6 +42,8 @@ public class StageClient
 
     public static final String PROFILE_REPOS_PATH_PREFIX = SVC_BASE + "/staging/profile_repositories/";
 
+    public static final String STAGE_REPO_START_ACTION = "/start";
+
     public static final String STAGE_REPO_FINISH_ACTION = "/finish";
 
     public static final String STAGE_REPO_DROP_ACTION = "/drop";
@@ -204,6 +206,19 @@ public class StageClient
         StageRepository repo = getOpenStageRepositoryForUser( groupId, artifactId, version );
 
         finishRepository( repo, description );
+    }
+
+    /**
+     * Assuming the user has already queried Nexus for a valid {@link StageRepository} instance (details for an open
+     * staging repository), submit those details to Nexus to convert the open repository to closed (finished) status.
+     * This will make the artifacts in the repository available for use in Maven, etc.
+     */
+    public void startRepository( final StageRepository repo, final String description )
+        throws RESTLightClientException
+    {
+        Element extras = processDescription( description );
+
+        performStagingAction( repo, STAGE_REPO_START_ACTION, Arrays.asList( extras ) );
     }
 
     /**

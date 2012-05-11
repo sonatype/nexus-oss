@@ -33,10 +33,9 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugin.discovery.NexusConnectionInfo;
 import org.sonatype.nexus.plugin.discovery.NexusDiscoveryException;
 import org.sonatype.nexus.plugin.discovery.NexusInstanceDiscoverer;
-import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
-import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 
@@ -269,9 +268,6 @@ public abstract class AbstractNexusMojo
     {
         this.proxyUsername = proxyUsername;
     }
-
-    protected abstract AbstractRESTLightClient connect()
-        throws RESTLightClientException, MojoExecutionException;
 
     protected String formatUrl( final String url )
     {

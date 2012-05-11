@@ -16,13 +16,13 @@ import java.net.MalformedURLException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.security.ldap.realms.DefaultLdapContextFactory;
 import org.restlet.data.Status;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.sonatype.security.ldap.realms.DefaultLdapContextFactory;
 import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.ValidationMessage;
@@ -57,9 +57,7 @@ public abstract class AbstractLdapRealmPlexusResource
             {
                 nexusErrorResponse.addError( createNexusError( vm.getKey(), vm.getShortMessage() ) );
             }
-            throw new PlexusResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "Configuration error.",
+            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.",
                 nexusErrorResponse );
         }
     }
@@ -202,21 +200,19 @@ public abstract class AbstractLdapRealmPlexusResource
     public void configureXStream( XStream xstream )
     {
         super.configureXStream( xstream );
-        XStreamInitalizer.initXStream( xstream );
+        LdapXStreamConfigurator.configureXStream( xstream );
     }
 
-    protected DefaultLdapContextFactory buildDefaultLdapContextFactory( CConnectionInfo connectionInfo ) throws MalformedURLException
+    protected DefaultLdapContextFactory buildDefaultLdapContextFactory( CConnectionInfo connectionInfo )
+        throws MalformedURLException
     {
         DefaultLdapContextFactory ldapContextFactory = new DefaultLdapContextFactory();
         ldapContextFactory.setAuthentication( connectionInfo.getAuthScheme() );
         ldapContextFactory.setSearchBase( connectionInfo.getSearchBase() );
         ldapContextFactory.setSystemPassword( connectionInfo.getSystemPassword() );
         ldapContextFactory.setSystemUsername( connectionInfo.getSystemUsername() );
-            ldapContextFactory.setUrl( new LdapURL(
-                connectionInfo.getProtocol(),
-                connectionInfo.getHost(),
-                connectionInfo.getPort(),
-                connectionInfo.getSearchBase() ).toString() );
+        ldapContextFactory.setUrl( new LdapURL( connectionInfo.getProtocol(), connectionInfo.getHost(),
+            connectionInfo.getPort(), connectionInfo.getSearchBase() ).toString() );
 
         return ldapContextFactory;
     }
