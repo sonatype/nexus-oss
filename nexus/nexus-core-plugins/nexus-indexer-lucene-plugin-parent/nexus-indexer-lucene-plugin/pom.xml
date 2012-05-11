@@ -145,6 +145,7 @@
             <id>default-generate-metadata</id>
             <configuration>
               <sharedDependencies>
+                <sharedDependencies>org.sonatype.nexus.plugins:nexus-indexer-lucene-plugin-model</sharedDependencies>
                 <sharedDependencies>org.apache.maven.indexer:indexer-core</sharedDependencies>
                 <sharedDependencies>org.apache.lucene:lucene-core</sharedDependencies>
                 <sharedDependencies>org.apache.lucene:lucene-highlighter</sharedDependencies>
