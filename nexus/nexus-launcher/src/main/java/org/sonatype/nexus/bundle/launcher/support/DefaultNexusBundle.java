@@ -161,7 +161,6 @@ public class DefaultNexusBundle
     @Override
     protected void startApplication()
     {
-        CommandMonitorTalker.installStopShutdownHook( jswMonitorPort );
         try
         {
             keepAliveThread = new KeepAliveThread( jswKeepAlivePort, new Slf4jLogProxy( log() ) );
@@ -225,7 +224,7 @@ public class DefaultNexusBundle
     {
         if ( jswExec == null )
         {
-            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus" );
+            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus", jswMonitorPort );
         }
         return jswExec;
     }
