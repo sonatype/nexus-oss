@@ -1116,3 +1116,32 @@ Sonatype.Events.addListener('userViewInit', function(cardPanel, rec) {
       };
       cardPanel.add(rec.data.source == 'default' ? new Sonatype.repoServer.DefaultUserEditor(config) : new Sonatype.repoServer.UserMappingEditor(config));
     });
+
+(function(){
+  var views = [];
+  var viewsCollected = false;
+
+  // NXCM-4099 plugin-contributed tabs
+  Sonatype.Events.addListener('userViewInit', function(cardPanel, rec) {
+    if (!viewsCollected) {
+      Sonatype.Events.fireEvent('userAdminViewInit', views);
+      viewsCollected = true;
+    }
+
+    for( var i = 0; i < views.length; i++ ) {
+      var view = views[i];
+      var username = rec.get('userId');
+
+      // don't add views for 'new user'
+      if ( !username ) {
+        return;
+      }
+
+      var content = new view.item({username:username});
+      content.tabTitle = view.name;
+      if ( !content.shouldShow || content.shouldShow() ) {
+        cardPanel.add(content);
+      }
+    }
+  });
+})();

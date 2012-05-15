@@ -3115,6 +3115,27 @@
           <required>true</required>
           <description>The base url of the nexus instance.</description>
         </field>
+        <field>
+          <name>licenseInstalled</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that states if currently there is a license installed.</description>
+        </field>
+        <field>
+          <name>licenseExpired</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that states if current installed license is expired.</description>
+        </field>
+        <field>
+          <name>trialLicense</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that states if current installed license is a trial license.</description>
+        </field>
       </fields>
     </class>
 
@@ -4398,6 +4419,67 @@
           <type>String</type>
           <required>true</required>
           <description>regex validation that will validate the field.</description>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>UserAccount</name>
+      <version>1.0.0+</version>
+      <description>User account details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "userAccount" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>userId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The user id.</description>
+        </field>
+        <field>
+          <name>firstName</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The name of the user.</description>
+        </field>
+        <field>
+          <name>lastName</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The name of the user.</description>
+        </field>
+        <field>
+          <name>email</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The email address of the user.</description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>UserAccountRequestResponseWrapper</name>
+      <version>1.0.0+</version>
+      <description>REST request object to retrieve a user account.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "user-account-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "user-account-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>UserAccount</type>
+          </association>
+          <required>true</required>
+          <description>The requested user account.</description>
         </field>
       </fields>
     </class>

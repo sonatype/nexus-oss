@@ -321,6 +321,9 @@ public class XStreamConfiguratorLightweight
             "data", new AliasingListConverter( org.sonatype.security.rest.model.PlexusComponentListResource.class,
                 "component" ) );
 
+        xstream.processAnnotations( UserAccount.class );
+        xstream.processAnnotations( UserAccountRequestResponseWrapper.class );
+
         return xstream;
     }
 }

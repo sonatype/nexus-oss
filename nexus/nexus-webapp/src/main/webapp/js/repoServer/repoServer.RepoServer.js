@@ -278,12 +278,8 @@
               title : 'Security',
               id : 'st-nexus-security',
               collapsed : true,
-              items : [{
-                    enabled : Sonatype.user.curr.isLoggedIn && Sonatype.user.curr.loggedInUserSource == 'default' && sp.checkPermission('security:userschangepw', sp.CREATE),
-                    title : 'Change Password',
-                    handler : Sonatype.utils.changePassword,
-                    tabId : 'change-password'
-                  }, {
+              items : [
+                  {
                     enabled : sp.checkPermission('security:users', sp.READ) && (sp.checkPermission('security:users', sp.CREATE) || sp.checkPermission('security:users', sp.DELETE) || sp.checkPermission('security:users', sp.EDIT)),
                     title : 'Users',
                     tabId : 'security-users',
@@ -389,6 +385,44 @@
           }
           this.loginWindow.show();
         }
+      },
+      profileMenu : new Ext.menu.Menu({
+        cls : 'user-profile-menu',
+        shadow: false,
+        items : [
+          {
+            text : 'Profile',
+            handler : function() {
+              Sonatype.view.mainTabPanel.addOrShowTab('profile', Nexus.profile.UserProfile);
+            },
+            listeners : {
+              render : function(cmp) {
+                cmp.setVisible(Sonatype.utils.editionShort === "OSS" || ( Sonatype.utils.licenseInstalled && !Sonatype.utils.licenseExpired));
+              }
+            }
+          },
+          {
+            text : 'Logout',
+            handler : function() {
+              Sonatype.repoServer.RepoServer.loginHandler();
+            }
+          }
+        ],
+        listeners : {
+          show : function() {
+            Ext.get('head-link-r').addClass('profile-menu-visible')
+          },
+          hide : function() {
+            Ext.get('head-link-r').removeClass('profile-menu-visible')
+          }
+        }
+      }),
+
+      /**
+       * Shows the profile menu at the position of the scope of this function.
+       */
+      showProfileMenu : function() {
+        Sonatype.repoServer.RepoServer.profileMenu.show(this);
       },
 
       resetMainTabPanel : function() {

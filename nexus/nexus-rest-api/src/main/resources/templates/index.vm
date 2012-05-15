@@ -58,7 +58,7 @@
     <image src="images/header_branding.png"/>
   </div>
   <div class="right-side">
-    <div><span id="head-link-l"></span><span id="head-link-m"></span><span id="head-link-r"></span></div>
+    <div><span id="head-link-l" class="head-link"></span><span id="head-link-m" class="head-link"></span><span id="head-link-r" class="head-link"></span></div>
     <div id="logo">
       <span>
         $formattedAppName

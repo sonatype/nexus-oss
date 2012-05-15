@@ -17,6 +17,14 @@
  */
 
 Ext.override(Ext.form.BasicForm, {
+      clearInvalid : function() {
+        // same as before, but ignore items without clearInvalid (== non-form-items)
+        this.items.each(function(f) {
+          if (f.clearInvalid) {
+            f.clearInvalid();
+          }
+        })
+      },
       /**
        * Override findField to look for enabled field and return that, otherwise
        * return first found
@@ -595,6 +603,7 @@ Sonatype.ext.FormPanel = function(config) {
       });
   this.form.on('actioncomplete', this.actionCompleteHandler, this);
   this.form.on('actionfailed', this.actionFailedHandler, this);
+
   this.addEvents({
         cancel : true,
         load : true,
@@ -702,7 +711,7 @@ Ext.extend(Sonatype.ext.FormPanel, Ext.FormPanel, {
                 url : this.getActionURL(),
                 method : 'GET',
                 fpanel : this,
-                dataModifiers : this.dataModifiers.load,
+                dataModifiers : this.dataModifiers ? this.dataModifiers.load : {},
                 scope : this
               });
         }
@@ -721,7 +730,7 @@ Ext.extend(Sonatype.ext.FormPanel, Ext.FormPanel, {
             waitMsg : this.isNew ? 'Creating a new record...' : 'Updating records...',
             fpanel : this,
             validationModifiers : this.validationModifiers,
-            dataModifiers : this.dataModifiers.submit,
+            dataModifiers : this.dataModifiers ? this.dataModifiers.submit : {},
             serviceDataObj : this.referenceData,
             isNew : this.isNew
               // extra option to send to callback, instead of conditioning on
@@ -792,7 +801,7 @@ Ext.extend(Sonatype.ext.FormPanel, Ext.FormPanel, {
 
       getActionURL : function() {
         return this.isNew ? this.uri : // if new, return the uri
-            (this.payload.data.resourceURI ? // if resouceURI is supplied,
+            (this.payload.data && this.payload.data.resourceURI ? // if resouceURI is supplied,
                 // return it
                 this.payload.data.resourceURI
                 : this.uri + '/' + this.payload.id); // otherwise construct a
