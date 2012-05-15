@@ -15,10 +15,10 @@ package org.sonatype.nexus.timeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.nexus.security.AbstractNexusTestCase;
 
 public abstract class AbstractTimelineTest
-    extends NexusTestSupport
+    extends AbstractNexusTestCase
 {
     /**
      * Handy method that does what was done before: keeps all in memory, but this is usable for small amount of data,

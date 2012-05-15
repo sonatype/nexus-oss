@@ -27,7 +27,7 @@
   <name>Nexus : Core Plugins</name>
 
   <modules>
-    <module>nexus-indexer-lucene-plugin</module>
+    <module>nexus-indexer-lucene-plugin-parent</module>
     <module>nexus-timeline-plugin</module>
     <module>nexus-lvo-plugin</module>
     <module>nexus-plugin-console-plugin</module>

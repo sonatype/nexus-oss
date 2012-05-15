@@ -217,11 +217,11 @@ public class NexusApplication
         // protecting the content service manually
         this.protectedPathManager.addProtectedResource( "/content"
             + contentResource.getResourceProtection().getPathPattern(),
-            contentResource.getResourceProtection().getFilterExpression() );
+            "noSessionCreation," + contentResource.getResourceProtection().getFilterExpression() );
 
         // protecting service resources with "wall" permission
         this.protectedPathManager.addProtectedResource( "/service/**",
-            "authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
+            "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
     }
 
     @Override
@@ -234,8 +234,14 @@ public class NexusApplication
             return;
         }
 
-        this.protectedPathManager.addProtectedResource( "/service/*" + descriptor.getPathPattern(),
-            descriptor.getFilterExpression() );
+        String filterExpression = descriptor.getFilterExpression();
+        if ( filterExpression != null && !filterExpression.contains( "authcNxBasic" ) )
+        {
+            // don't create session unless the user logs in from the UI
+            filterExpression = "noSessionCreation," + filterExpression;
+        }
+        
+        this.protectedPathManager.addProtectedResource( "/service/*" + descriptor.getPathPattern(), filterExpression );
     }
 
     @Override

@@ -19,7 +19,10 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.nexus.configuration.application.DefaultNexusConfiguration;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
+
+import com.google.inject.Module;
 
 /**
  * Abstract class for "realm" related tests that uses EHCache, and that does not bring up Nexus component only Security
@@ -50,6 +53,12 @@ public abstract class AbstractRealmWithSecuritySystemTest
         super.customizeContext( ctx );
         ctx.put( "application-conf", getConfDir().getAbsolutePath() );
         ctx.put( "security-xml-file", getConfDir().getAbsolutePath() + "/security.xml" );
+    }
+
+    @Override
+    protected Module[] getTestCustomModules()
+    {
+        return new Module[] { new SecurityModule() };
     }
 
     @Override

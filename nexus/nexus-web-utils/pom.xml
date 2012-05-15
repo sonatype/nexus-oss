@@ -77,9 +77,9 @@
     </dependency>
     
     <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-servlet</artifactId>
-    </dependency>    
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-web</artifactId>
+    </dependency>
 
     <!-- Testing -->
     <dependency>

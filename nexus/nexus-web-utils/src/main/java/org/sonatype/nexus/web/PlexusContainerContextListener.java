@@ -13,7 +13,7 @@
 package org.sonatype.nexus.web;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -33,8 +33,8 @@ import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
+import org.sonatype.appcontext.lifecycle.Startable;
 import org.sonatype.appcontext.lifecycle.Stoppable;
-import org.sonatype.appcontext.source.MapEntrySource;
 import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
 
@@ -87,7 +87,8 @@ public class PlexusContainerContextListener
                         plexusXmlFile.toURI().toURL() ).setContext( (Map) appContext ).setAutoWiring( true ).setClassPathScanning(
                         PlexusConstants.SCANNING_INDEX ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
 
-                final ArrayList<Module> modules = new ArrayList<Module>( 1 );
+                final ArrayList<Module> modules = new ArrayList<Module>( 2 );
+                modules.add( new NexusWebModule( sce.getServletContext() ) );
                 modules.add( new AppContextModule( appContext ) );
 
                 final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );
@@ -110,12 +111,15 @@ public class PlexusContainerContextListener
 
                 throw new IllegalStateException( "Could not start Plexus container!", e );
             }
-            catch ( MalformedURLException e )
+            catch ( IOException e )
             {
                 sce.getServletContext().log( "Could not start Plexus container!", e );
 
                 throw new IllegalStateException( "Could not start Plexus container!", e );
             }
+
+            // fire startable
+            appContext.getLifecycleManager().invokeHandler( Startable.class );
         }
     }
 
@@ -134,7 +138,7 @@ public class PlexusContainerContextListener
     // ==
 
     protected AppContext createContainerContext( final ServletContext context, final AppContext parent )
-        throws AppContextException
+        throws AppContextException, IOException
     {
         if ( parent == null )
         {
@@ -152,7 +156,7 @@ public class PlexusContainerContextListener
 
         if ( !StringUtils.isEmpty( baseDirProperty ) )
         {
-            basedirFile = new File( baseDirProperty ).getAbsoluteFile();
+            basedirFile = new File( baseDirProperty ).getCanonicalFile();
             // Nexus as bundle case
             context.log( "Setting Plexus basedir context variable to (pre-set in System properties): "
                 + basedirFile.getAbsolutePath() );
@@ -162,7 +166,7 @@ public class PlexusContainerContextListener
 
         if ( !StringUtils.isEmpty( warWebInfFilePath ) )
         {
-            warWebInfFile = new File( warWebInfFilePath ).getAbsoluteFile();
+            warWebInfFile = new File( warWebInfFilePath ).getCanonicalFile();
 
             if ( basedirFile == null )
             {

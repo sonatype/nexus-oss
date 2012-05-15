@@ -62,6 +62,11 @@ public class Nexus4257CookieVerificationIT
         HttpClient httpClient = new HttpClient();
         httpClient.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( username, password ) );
 
+        // stateful clients must login first, since other rest urls create no sessions
+        String loginUrl = this.getBaseNexusUrl() + "service/local/authentication/login";
+        httpClient.getParams().setAuthenticationPreemptive( true ); // go straight to basic auth
+        assertThat( executeAndRelease( httpClient, new GetMethod( loginUrl ) ), equalTo( 200 ) );
+
         GetMethod getMethod = new GetMethod( url );
         assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );

@@ -12,7 +12,8 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import org.sonatype.nexus.rest.XStreamInitializer;
+import org.sonatype.nexus.rest.MIndexerXStreamConfigurator;
+import org.sonatype.nexus.rest.model.XStreamConfigurator;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
@@ -49,9 +50,8 @@ public class XStreamFactory
 
     private static void initXStream( XStream xstream )
     {
-        org.sonatype.nexus.rest.model.XStreamConfigurator.configureXStream( xstream );
-
-        XStreamInitializer.init( xstream );
+        XStreamConfigurator.configureXStream( xstream );
+        MIndexerXStreamConfigurator.configureXStream( xstream );
 
         // Nexus replaces the String converter with one that escape HTML, we do NOT want that on the IT client.
         xstream.registerConverter( new StringConverter() );

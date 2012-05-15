@@ -79,6 +79,9 @@ public class DefaultRepositoryRegistryTest
         expect( repoA.getId() ).andReturn( "A" ).anyTimes();
         expect( repoB.getId() ).andReturn( "B" ).anyTimes();
         expect( repoC.getId() ).andReturn( "C" ).anyTimes();
+        expect( repoA.getName() ).andReturn( "AName" ).anyTimes();
+        expect( repoB.getName() ).andReturn( "BName" ).anyTimes();
+        expect( repoC.getName() ).andReturn( "CName" ).anyTimes();
 
         expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();

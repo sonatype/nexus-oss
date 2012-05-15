@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
+import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -28,31 +30,18 @@ import org.apache.shiro.web.util.WebUtils;
 public class NexusApiKeyAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
-    private Collection<String> apiKeys;
-
-    @Override
-    protected void onFilterConfigSet()
-        throws Exception
-    {
-        super.onFilterConfigSet();
-        if ( null == apiKeys )
-        {
-            apiKeys = getPlexusContainer().lookupMap( NexusApiKey.class ).keySet();
-        }
-    }
+    @Inject
+    private Map<String, NexusApiKey> apiKeys = Collections.emptyMap();
 
     @Override
     protected boolean isLoginAttempt( ServletRequest request, ServletResponse response )
     {
-        if ( null != apiKeys )
+        final HttpServletRequest http = WebUtils.toHttp( request );
+        for ( final String key : apiKeys.keySet() )
         {
-            final HttpServletRequest http = WebUtils.toHttp( request );
-            for ( final String key : apiKeys )
+            if ( null != http.getHeader( key ) )
             {
-                if ( null != http.getHeader( key ) )
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return super.isLoginAttempt( request, response );
@@ -61,16 +50,13 @@ public class NexusApiKeyAuthenticationFilter
     @Override
     protected AuthenticationToken createToken( final ServletRequest request, final ServletResponse response )
     {
-        if ( null != apiKeys )
+        final HttpServletRequest http = WebUtils.toHttp( request );
+        for ( final String key : apiKeys.keySet() )
         {
-            final HttpServletRequest http = WebUtils.toHttp( request );
-            for ( final String key : apiKeys )
+            final String token = http.getHeader( key );
+            if ( null != token )
             {
-                final String token = http.getHeader( key );
-                if ( null != token )
-                {
-                    return new NexusApiKeyAuthenticationToken( key, token.toCharArray(), request.getRemoteHost() );
-                }
+                return new NexusApiKeyAuthenticationToken( key, token.toCharArray(), request.getRemoteHost() );
             }
         }
         return super.createToken( request, response );

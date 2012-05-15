@@ -22,17 +22,25 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 /**
  * Maven specific "static" utilities.
- * 
+ *
  * @author cstamas
  */
 public class MUtils
 {
+
     /**
-     * This method will read up a stream usually created from .sha1/.md5. The method CLOSES the passed in stream!
-     * 
-     * @param inputStream
-     * @return
-     * @throws IOException
+     * This method will read up an entire stream usually created from .sha1/.md5.
+     * <p/>
+     * The method CLOSES the passed in stream!
+     * <b>Important:</b> it is entirely possible this method will return an invalid digest in certain cases, therefore it
+     * is up to the caller to ensure the resulting value is in the format they expect.
+     *
+     * @param inputStream the stream to read the digest from
+     * @return never null but the first recognized digest pattern or empty string if inputstream is zero bytes or if the stream does
+     *         not contain a recognized digest pattern, a fallback value that includes the start of the read stream to the first
+     *         space or end of line marker
+     * @throws IOException if there was a problem reading the inputStream as UTF-8 encoded text
+     * @see #isDigest(String)
      */
     public static String readDigestFromStream( final InputStream inputStream )
         throws IOException
@@ -40,6 +48,11 @@ public class MUtils
         try
         {
             String raw = StringUtils.chomp( IOUtil.toString( inputStream, "UTF-8" ) ).trim();
+
+            if ( StringUtils.isEmpty( raw ) )
+            {
+                return "";
+            }
 
             String digest;
             // digest string at end with separator, e.g.:
@@ -97,6 +110,13 @@ public class MUtils
         return digest;
     }
 
+    /**
+     * Validates a string meets the minimum requirements of being a potential digest value, namely a length greater than
+     * or equal to 32 characters and the entire string matches the regex {@code ^[a-z0-9]+$}.
+     *
+     * @param digest the text to validate as a digest
+     * @return true if digest passes validation
+     */
     public static boolean isDigest( String digest )
     {
         return digest.length() >= 32 && digest.matches( "^[a-z0-9]+$" );
@@ -104,7 +124,7 @@ public class MUtils
 
     /**
      * Reads up a hash as string from StorageFileItem pointing to .sha1/.md5 files.
-     * 
+     *
      * @param inputFileItem
      * @return
      * @throws IOException

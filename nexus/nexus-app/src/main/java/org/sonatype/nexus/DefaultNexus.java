@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -29,6 +30,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -72,7 +74,7 @@ import org.sonatype.security.SecuritySystem;
 
 /**
  * The default Nexus implementation.
- * 
+ *
  * @author Jason van Zyl
  * @author cstamas
  */
@@ -81,6 +83,7 @@ public class DefaultNexus
     extends AbstractLoggingComponent
     implements Nexus, Initializable, Startable
 {
+
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
@@ -360,21 +363,7 @@ public class DefaultNexus
     public void initialize()
         throws InitializationException
     {
-        StringBuffer sysInfoLog = new StringBuffer();
-
-        sysInfoLog.append( "\n" );
-        sysInfoLog.append( "-------------------------------------------------\n" );
-        sysInfoLog.append( "\n" );
-        sysInfoLog.append( "Initializing Nexus (" );
-        if( !StringUtils.isEmpty( applicationStatusSource.getSystemStatus().getEditionLong() ) )
-        {
-            sysInfoLog.append( applicationStatusSource.getSystemStatus().getEditionLong() ).append( "), ");
-        }
-        sysInfoLog.append( "Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
-        sysInfoLog.append( "\n" );
-        sysInfoLog.append( "-------------------------------------------------" );
-
-        getLogger().info( sysInfoLog.toString() );
+        logInitialize();
 
         artifactPackagingMapper.setPropertiesFile( new File( nexusConfiguration.getConfigurationDirectory(),
                                                              MAPPING_PROPERTIES_FILE ) );
@@ -406,6 +395,29 @@ public class DefaultNexus
         applicationStatusSource.getSystemStatus().setInitializedAt( new Date() );
 
         applicationEventMulticaster.notifyEventListeners( new NexusInitializedEvent( this ) );
+    }
+
+    /**
+     * Logs a message indicating initialization of this component
+     */
+    @VisibleForTesting
+    protected void logInitialize(){
+        final StringBuilder sysInfoLog = new StringBuilder();
+        sysInfoLog.append( "\n-------------------------------------------------\n\n" );
+        sysInfoLog.append( "Initializing " ).append(getNexusNameForLogs());
+        sysInfoLog.append( "\n\n-------------------------------------------------" );
+        getLogger().info( sysInfoLog.toString() );
+    }
+
+    /**
+     * @return the full name of this Nexus to use in logs including App name, version and long edition if defined
+     */
+    @VisibleForTesting
+    protected final String getNexusNameForLogs(){
+        final StringBuilder msg = new StringBuilder();
+        msg.append(getSystemStatus().getAppName());
+        msg.append( " " ).append( getSystemStatus().getVersion() );
+        return msg.toString();
     }
 
     public void start()
@@ -487,14 +499,24 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setStartedAt( new Date() );
 
-            getLogger().info( "Nexus Work Directory : "
-                                  + nexusConfiguration.getWorkingDirectory().getAbsolutePath().toString() );
-
-            getLogger().info( "Started Nexus (version " + getSystemStatus().getVersion()
-                                  + (StringUtils.isEmpty( getSystemStatus().getEditionLong() )
-                                        ? ""
-                                        : " " + getSystemStatus().getEditionLong() )
-                                    + ")" );
+            if(getLogger().isInfoEnabled())
+            {
+                final File workDir = nexusConfiguration.getWorkingDirectory();
+                String workDirPath = null;
+                if(workDir != null)
+                {
+                    try
+                    {
+                        workDirPath = workDir.getCanonicalPath();
+                    }
+                    catch (IOException ioe)
+                    {
+                        workDirPath = workDir.getAbsolutePath();
+                    }
+                }
+                getLogger().info( "Nexus Work Directory : {}", workDirPath );
+                getLogger().info( "Started {}", getNexusNameForLogs() );
+            }
 
             applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( this ) );
         }
@@ -527,7 +549,7 @@ public class DefaultNexus
 
         // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
         applicationEventMulticaster.notifyEventListeners( new NexusStoppingEvent( this ) );
-        
+
         nexusScheduler.shutdown();
 
         applicationEventMulticaster.notifyEventListeners( new NexusStoppedEvent( this ) );
@@ -537,15 +559,11 @@ public class DefaultNexus
         securitySystem.stop();
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
-        
+
         // Now a cleanup, to kill dangling thread of HttpClients
         CustomMultiThreadedHttpConnectionManager.shutdownAll();
 
-        getLogger().info( "Stopped Nexus (version " + getSystemStatus().getVersion()
-                              + (StringUtils.isEmpty( getSystemStatus().getEditionLong() )
-                                    ? ""
-                                    : " " + getSystemStatus().getEditionLong() )
-                              + ")" );
+        getLogger().info( "Stopped {}", getNexusNameForLogs());
     }
 
     private void synchronizeShadowsAtStartup()
@@ -579,5 +597,11 @@ public class DefaultNexus
         throws NoSuchTemplateIdException
     {
         return (RepositoryTemplate) templateManager.getTemplate( RepositoryTemplate.class, id );
+    }
+
+    @Override
+    @VisibleForTesting
+    protected Logger getLogger() {
+        return super.getLogger();
     }
 }

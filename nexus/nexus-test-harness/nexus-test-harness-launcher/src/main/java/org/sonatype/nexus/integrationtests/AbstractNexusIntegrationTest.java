@@ -71,6 +71,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.WagonDeployer;
 import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.sonatype.security.guice.SecurityModule;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -309,7 +310,7 @@ public abstract class AbstractNexusIntegrationTest
     public void startITPlexusContainer()
     {
         // start per-IT plexus container
-        TestContainer.getInstance().startPlexusContainer( getClass() );
+        TestContainer.getInstance().startPlexusContainer( getClass(), new SecurityModule() );
     }
 
     /**

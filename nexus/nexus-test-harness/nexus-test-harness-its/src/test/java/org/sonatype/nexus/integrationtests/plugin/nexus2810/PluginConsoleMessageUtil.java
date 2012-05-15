@@ -24,10 +24,10 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.RestInfoDTO;
+import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.nexus.test.utils.XStreamConfigurator;
 import org.sonatype.nexus.test.utils.plugin.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
 
