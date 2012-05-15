@@ -12,7 +12,8 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
-import org.sonatype.sisu.bl.BundleConfiguration;
+import org.sonatype.sisu.bl.WebBundleConfiguration;
+import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
 
 import java.io.File;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
  * @since 2.0
  */
 public interface NexusBundleConfiguration
-    extends BundleConfiguration<NexusBundleConfiguration>
+    extends WebBundleConfiguration<NexusBundleConfiguration>
 {
 
     /**
