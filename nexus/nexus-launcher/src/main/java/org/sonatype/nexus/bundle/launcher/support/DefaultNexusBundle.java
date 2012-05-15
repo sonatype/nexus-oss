@@ -118,6 +118,7 @@ public class DefaultNexusBundle
      */
     @Override
     protected void configure()
+        throws Exception
     {
         super.configure();
 
@@ -163,7 +164,7 @@ public class DefaultNexusBundle
     {
         try
         {
-            keepAliveThread = new KeepAliveThread( jswKeepAlivePort, new Slf4jLogProxy( log() ) );
+            keepAliveThread = new KeepAliveThread( jswKeepAlivePort, new Slf4jLogProxy( log ) );
             keepAliveThread.start();
         }
         catch ( IOException e )
