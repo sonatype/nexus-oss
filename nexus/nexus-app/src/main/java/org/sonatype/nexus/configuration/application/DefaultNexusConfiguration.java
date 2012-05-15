@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.component.annotations.Component;
@@ -72,6 +73,12 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserStatus;
+import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
@@ -542,6 +549,101 @@ public class DefaultNexusConfiguration
         return getSecuritySystem() != null && getSecuritySystem().isAnonymousAccessEnabled();
     }
 
+    public void setAnonymousAccess( final boolean enabled, final String username, final String password )
+        throws InvalidConfigurationException
+    {
+        if ( enabled )
+        {
+            if ( StringUtils.isBlank( username ) || StringUtils.isBlank( password ) )
+            {
+                throw new InvalidConfigurationException(
+                    "Anonymous access is getting enabled without valid username and/or password!" );
+            }
+
+            final String oldUsername = getSecuritySystem().getAnonymousUsername();
+            final String oldPassword = getSecuritySystem().getAnonymousPassword();
+
+            // detect change
+            if ( !StringUtils.equals( oldUsername, username ) || !StringUtils.equals( oldPassword, password ) )
+            {
+                // test authc with changed credentials
+                try
+                {
+                    // try to "log in" with supplied credentials
+                    // the anon user a) should exists
+                    securitySystem.getUser( username );
+                    // b) the pwd must work
+                    securitySystem.authenticate( new UsernamePasswordToken( username, password ) );
+                }
+                catch ( UserNotFoundException e )
+                {
+                    final String msg = "User \"" + username + "'\" does not exist.";
+                    getLogger().warn(
+                        "Nexus refused to apply configuration, the supplied anonymous information is wrong: " + msg, e );
+                    throw new InvalidConfigurationException( msg, e );
+                }
+                catch ( AuthenticationException e )
+                {
+                    final String msg = "The password of user \"" + username + "\" is incorrect.";
+                    getLogger().warn(
+                        "Nexus refused to apply configuration, the supplied anonymous information is wrong: " + msg, e );
+                    throw new InvalidConfigurationException( msg, e );
+                }
+            }
+
+            getSecuritySystem().setAnonymousAccessEnabled( true );
+            getSecuritySystem().setAnonymousUsername( username );
+            getSecuritySystem().setAnonymousPassword( password );
+        }
+        else
+        {
+            // get existing username from XML realm, if we can (if security config about to be disabled still holds this
+            // info)
+            final String existingUsername = getSecuritySystem().getAnonymousUsername();
+
+            if ( !StringUtils.isBlank( existingUsername ) )
+            {
+                // try to disable the "anonymous" user defined in XML realm, but ignore any problem (users might delete
+                // or already disabled it, or completely removed XML realm)
+                try
+                {
+                    final User anonymousUser =
+                        getSecuritySystem().getUser( existingUsername, SecurityXmlUserManager.SOURCE );
+                    anonymousUser.setStatus( UserStatus.disabled );
+                    getSecuritySystem().updateUser( anonymousUser );
+                }
+                catch ( UserNotFoundException e )
+                {
+                    // ignore, anon user maybe manually deleted from XML realm by Nexus admin, is okay (kinda expected)
+                    getLogger().debug(
+                        "Anonymous user not found while trying to disable it (as part of disabling anonymous access)!",
+                        e );
+                }
+                catch ( NoSuchUserManagerException e )
+                {
+                    // ignore, XML realm removed from configuration by Nexus admin, is okay (kinda expected)
+                    getLogger().debug(
+                        "XML Realm not found while trying to disable Anonymous user (as part of disabling anonymous access)!",
+                        e );
+                }
+                catch ( InvalidConfigurationException e )
+                {
+                    // do not ignore, and report, as this jeopardizes whole security functionality
+                    // we did not perform any _change_ against security sofar (we just did reading from it),
+                    // so it is okay to bail out at this point
+                    getLogger().warn(
+                        "XML Realm reported invalid configuration while trying to disable Anonymous user (as part of disabling anonymous access)!",
+                        e );
+                    throw e;
+                }
+            }
+
+            getSecuritySystem().setAnonymousAccessEnabled( false );
+        }
+
+    }
+
+    @Deprecated
     public void setAnonymousAccessEnabled( boolean enabled )
     {
         getSecuritySystem().setAnonymousAccessEnabled( enabled );
@@ -552,6 +654,7 @@ public class DefaultNexusConfiguration
         return getSecuritySystem().getAnonymousUsername();
     }
 
+    @Deprecated
     public void setAnonymousUsername( String val )
         throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
@@ -563,6 +666,7 @@ public class DefaultNexusConfiguration
         return getSecuritySystem().getAnonymousPassword();
     }
 
+    @Deprecated
     public void setAnonymousPassword( String val )
         throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
