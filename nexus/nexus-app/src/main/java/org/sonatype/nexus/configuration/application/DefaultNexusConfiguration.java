@@ -589,11 +589,13 @@ public class DefaultNexusConfiguration
                         "Nexus refused to apply configuration, the supplied anonymous information is wrong: " + msg, e );
                     throw new InvalidConfigurationException( msg, e );
                 }
+
+                // set the changed username/pw
+                getSecuritySystem().setAnonymousUsername( username );
+                getSecuritySystem().setAnonymousPassword( password );
             }
 
             getSecuritySystem().setAnonymousAccessEnabled( true );
-            getSecuritySystem().setAnonymousUsername( username );
-            getSecuritySystem().setAnonymousPassword( password );
         }
         else
         {
