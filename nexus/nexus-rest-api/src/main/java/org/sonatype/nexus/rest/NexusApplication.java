@@ -18,6 +18,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Directory;
+import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.service.StatusService;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
@@ -95,6 +96,7 @@ public class NexusApplication
         if ( NexusStartedEvent.class.isAssignableFrom( evt.getClass() ) )
         {
             recreateRoot( true );
+            afterCreateRoot( (RetargetableRestlet) getRoot() );
         }
         else if ( NexusStoppedEvent.class.isAssignableFrom( evt.getClass() ) )
         {
@@ -162,7 +164,7 @@ public class NexusApplication
         {
             return;
         }
-        
+
         // set our StatusService
         setStatusService( statusService );
 
