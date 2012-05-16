@@ -144,7 +144,7 @@ public class PlexusRestletApplicationBridge
 
         afterCreateRoot( root );
 
-        return root;
+        return getRoot();
     }
 
     protected void afterCreateRoot( RetargetableRestlet root )
@@ -367,4 +367,9 @@ public class PlexusRestletApplicationBridge
         // empty implementation, left for subclasses to do something meaningful
     }
 
+    public synchronized void setRoot( final RetargetableRestlet root )
+    {
+        this.root = root;
+        super.setRoot( root );
+    }
 }
