@@ -297,22 +297,22 @@ public class StageClientTest
 
         assertNotNull( repositories );
 
-        assertThat( repositories, hasSize(4) );
+        assertThat( repositories, hasSize( 4 ) );
 
         assertEquals( "tp1-001", repositories.get( 0 ).getRepositoryId() );
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-001", repositories.get( 0 ).getUrl() );
-        assertThat( repositories.get( 0 ), hasProperty( "createdDate", is("n/a") ) );
-        assertThat( repositories.get( 0 ), hasProperty( "closedDate", is("n/a") ) );
+        assertThat( repositories.get( 0 ), hasProperty( "createdDate", is( "n/a" ) ) );
+        assertThat( repositories.get( 0 ), hasProperty( "closedDate", is( "n/a" ) ) );
 
         assertEquals( "tp1-002", repositories.get( 1 ).getRepositoryId() );
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-002", repositories.get( 1 ).getUrl() );
-        assertThat( repositories.get( 1 ), hasProperty( "createdDate", is("n/a") ) );
-        assertThat( repositories.get( 1 ), hasProperty( "closedDate", is("n/a") ) );
+        assertThat( repositories.get( 1 ), hasProperty( "createdDate", is( "n/a" ) ) );
+        assertThat( repositories.get( 1 ), hasProperty( "closedDate", is( "n/a" ) ) );
 
         assertEquals( "tp1-003", repositories.get( 2 ).getRepositoryId() );
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repositories.get( 2 ).getUrl() );
         assertThat( repositories.get( 2 ), hasProperty( "createdDate", is( "arbitraryDateString" ) ) );
-        assertThat( repositories.get( 2 ), hasProperty( "closedDate", is("n/a") ) );
+        assertThat( repositories.get( 2 ), hasProperty( "closedDate", is( "n/a" ) ) );
 
         assertEquals( "tp1-004", repositories.get( 3 ).getRepositoryId() );
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repositories.get( 2 ).getUrl() );
@@ -443,4 +443,44 @@ public class StageClientTest
         return fixture;
     }
 
+    // V2
+
+    @Test
+    public void startStaging()
+        throws JDOMException, IOException, RESTLightClientException
+    {
+        setupStartStagingConversation();
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
+        String profileId = client.getStageProfileForUser( "group", "artifact", "version" );
+        assertNotNull( profileId );
+        assertEquals( "112cc490b91265a1", profileId );
+
+        String repositoryId = client.startRepository( profileId, "woohoo" );
+        assertNotNull( repositoryId );
+        assertEquals( "tp1-002", repositoryId );
+
+        failOnUnfinishedConversation();
+    }
+
+    private void setupStartStagingConversation()
+        throws JDOMException, IOException
+    {
+        final List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
+
+        conversation.add( getVersionCheckFixture() );
+
+        GETFixture profileList = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        profileList.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
+        profileList.setResponseDocument( readTestDocumentResource( "profile-list-closed.xml" ) );
+        conversation.add( profileList );
+
+        POSTFixture startStaging = new POSTFixture( getExpectedUser(), getExpectedPassword() );
+        startStaging.setExactURI( "/service/local/staging/profiles/112cc490b91265a1/start" );
+        startStaging.setRequestDocument( readTestDocumentResource( "start-repo-new-req.xml" ) );
+        startStaging.setResponseStatus( 201 );
+        startStaging.setResponseDocument( readTestDocumentResource( "start-repo-new.xml" ) );
+        conversation.add( startStaging );
+
+        fixture.setConversation( conversation );
+    }
 }
