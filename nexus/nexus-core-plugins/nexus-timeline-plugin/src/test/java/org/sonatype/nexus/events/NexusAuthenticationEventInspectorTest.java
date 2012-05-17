@@ -17,6 +17,8 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.sonatype.guice.plexus.config.Hints;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -32,17 +34,16 @@ public class NexusAuthenticationEventInspectorTest
     public void manglePlexus()
         throws Exception
     {
+        // this is "our" feed recorder
         final ComponentDescriptor<DummyFeedRecorder> fakeFeedRecorder =
             new ComponentDescriptor<DummyFeedRecorder>( DummyFeedRecorder.class, getContainer().getLookupRealm() );
         fakeFeedRecorder.setRoleClass( FeedRecorder.class );
-
-        final ComponentDescriptor<DummyNexusConfiguration> fakeNexusConfiguration =
-            new ComponentDescriptor<DummyNexusConfiguration>( DummyNexusConfiguration.class,
-                getContainer().getLookupRealm() );
-        fakeNexusConfiguration.setRoleClass( NexusConfiguration.class );
-
         getContainer().addComponentDescriptor( fakeFeedRecorder );
-        getContainer().addComponentDescriptor( fakeNexusConfiguration );
+
+        // mocking configuration
+        final NexusConfiguration fakeNexusConfiguration = Mockito.mock( NexusConfiguration.class );
+        Mockito.when( fakeNexusConfiguration.getAnonymousUsername() ).thenReturn( "anonymous" );
+        getContainer().addComponent( fakeNexusConfiguration, NexusConfiguration.class, Hints.DEFAULT_HINT );
     }
 
     public void perform( final String username, final int expected )
