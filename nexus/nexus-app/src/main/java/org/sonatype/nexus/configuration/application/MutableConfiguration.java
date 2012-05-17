@@ -38,16 +38,54 @@ public interface MutableConfiguration
 
     boolean isAnonymousAccessEnabled();
 
-    void setAnonymousAccessEnabled( boolean enabled )
-        throws IOException;
+    /**
+     * Configures anonymous access in atomic way.
+     * 
+     * @param enabled {@code true} to enable and {@code false} to disable it.
+     * @param username the username of the user to be used as "anonymous" user. If {@code enabled} parameter is
+     *            {@code true}, this value must be non-null.
+     * @param password the password of the user to be used as "anonymous" user. If {@code enabled} parameter is
+     *            {@code true}, this value must be non-null.
+     * @throws InvalidConfigurationException if {@code enabled} parameter is {@code true}, but passed in username or
+     *             password parameters are empty ({@code null} or empty string).
+     */
+    void setAnonymousAccess( boolean enabled, String username, String password )
+        throws InvalidConfigurationException;
 
     String getAnonymousUsername();
 
+    String getAnonymousPassword();
+
+    /**
+     * Set anonymous access.
+     * 
+     * @param val
+     * @throws IOException
+     * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
+     */
+    @Deprecated
+    void setAnonymousAccessEnabled( boolean enabled )
+        throws IOException;
+
+    /**
+     * Set anonymous username.
+     * 
+     * @param val
+     * @throws InvalidConfigurationException
+     * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
+     */
+    @Deprecated
     void setAnonymousUsername( String val )
         throws InvalidConfigurationException;
 
-    String getAnonymousPassword();
-
+    /**
+     * Set anonymous password.
+     * 
+     * @param val
+     * @throws InvalidConfigurationException
+     * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
+     */
+    @Deprecated
     void setAnonymousPassword( String val )
         throws InvalidConfigurationException;
 
@@ -67,7 +105,7 @@ public interface MutableConfiguration
     // ----------------------------------------------------------------------------------------------------------
     // Repositories
     // ----------------------------------------------------------------------------------------------------------
-    
+
     /**
      * Sets the default (applied to all that has no exceptions set with {
      * {@link #setRepositoryMaxInstanceCount(RepositoryTypeDescriptor, int)} method) maxInstanceCount. Any positive
