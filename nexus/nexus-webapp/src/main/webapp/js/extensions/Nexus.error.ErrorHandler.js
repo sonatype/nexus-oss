@@ -57,7 +57,9 @@ Nexus.error.ErrorHandler = function() {
         args[x] = arguments[x];
       }
       try {
-        this.displayError(args);
+        if ( '?debug' === windows.location.search )  {
+          this.displayError(args);
+        }
       } catch(e) {
         // don't introduce even more errors when displaying errors
       }
