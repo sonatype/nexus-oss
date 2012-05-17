@@ -1130,11 +1130,18 @@ Sonatype.Events.addListener('userViewInit', function(cardPanel, rec) {
 
     for( var i = 0; i < views.length; i++ ) {
       var view = views[i];
-      var username = rec.get('userId');
 
-      // don't add views for 'new user'
-      if ( !username ) {
-        return;
+      // don't add views for 'new user':
+      // if you add a Nexus user, you get a record without username
+      // if you add a role mapping, you get a js object (without even #get(string)
+      var username = undefined;
+
+      if ( rec.get ) {
+        username = rec.get("userId");
+      }
+
+      if (username === undefined) {
+        return
       }
 
       var content = new view.item({username:username});
