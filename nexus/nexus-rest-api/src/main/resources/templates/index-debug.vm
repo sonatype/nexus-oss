@@ -22,11 +22,11 @@
   <link rel="shortcut icon" href="favicon.ico" type="image/gif" />
   <link rel="search" type="application/opensearchdescription+xml" href="$serviceBase/opensearch" title="Nexus" />
 
-  <!-- Plugin pre HEAD contributions start here -->
+  ## Plugin pre HEAD contributions start here
   #foreach( $pluginPreHeadContribution in $pluginPreHeadContributions )
     $pluginPreHeadContribution
   #end
-  <!-- Plugin pre HEAD contributions ends here -->
+  ## Plugin pre HEAD contributions ends here
 
   <link rel="stylesheet" href="ext-2.3/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="ext-2.3/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
@@ -97,11 +97,11 @@
   <script src="js/repoServer/repoServer.RepoSummaryPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.Maven2InformationPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
-  <!-- Plugin post HEAD contributions start here -->
+  ## Plugin post HEAD contributions start here
   #foreach( $pluginPostHeadContribution in $pluginPostHeadContributions )
     $pluginPostHeadContribution
   #end
-  <!-- Plugin post HEAD contributions ends here -->
+  ## Plugin post HEAD contributions ends here
 
   <script type="text/javascript" charset="utf-8">
     Ext.onReady(Sonatype.init);
@@ -110,11 +110,11 @@
 
 <body>
 
-<!-- Plugin pre BODY contributions start here -->
+## Plugin pre BODY contributions start here
 #foreach( $pluginPreBodyContribution in $pluginPreBodyContributions )
     $pluginPreBodyContribution
 #end
-<!-- Plugin pre BODY contributions ends here -->
+## Plugin pre BODY contributions ends here
 
 <div id="header">
   <div id="branding" class="left-side">
@@ -135,13 +135,13 @@
   <br/>
 </div>
 
-<!-- Plugin post BODY contributions start here -->
+## Plugin post BODY contributions start here
 #foreach( $pluginPostBodyContribution in $pluginPostBodyContributions )
     $pluginPostBodyContribution
 #end
-<!-- Plugin post BODY contributions ends here -->
+## Plugin post BODY contributions ends here
 
-<!-- Fields required for history management -->
+## Fields required for history management
 <form id="history-form" class="x-hidden">
     <input type="hidden" id="x-history-field" />
     <iframe id="x-history-frame"></iframe>
