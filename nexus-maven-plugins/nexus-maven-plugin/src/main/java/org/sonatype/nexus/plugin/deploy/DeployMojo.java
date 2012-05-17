@@ -164,7 +164,7 @@ public class DeployMojo
 
                 try
                 {
-                    deployStagedArtifacts();
+                    uploadStagedArtifacts();
                 }
                 catch ( ArtifactDeploymentException e )
                 {

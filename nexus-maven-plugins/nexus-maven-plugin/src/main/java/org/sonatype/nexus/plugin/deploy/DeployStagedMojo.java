@@ -36,7 +36,7 @@ public class DeployStagedMojo
 
             try
             {
-                deployStagedArtifacts();
+                uploadStagedArtifacts();
             }
             catch ( ArtifactDeploymentException e )
             {

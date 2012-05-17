@@ -37,7 +37,7 @@ public class ZapperRequest
     public ZapperRequest( File stageRepository, String remoteUrl )
     {
         this.stageRepository = stageRepository;
-        this.remoteUrl = remoteUrl;
+        this.remoteUrl = remoteUrl.endsWith( "/" ) ? remoteUrl : remoteUrl + "/";
     }
 
     protected String getRemoteUsername()
