@@ -14,18 +14,18 @@ package org.sonatype.nexus.plugin.deploy;
 
 import java.io.IOException;
 
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.spice.zapper.Client;
 import org.sonatype.spice.zapper.IOSourceListable;
 import org.sonatype.spice.zapper.Parameters;
 import org.sonatype.spice.zapper.ParametersBuilder;
-import org.sonatype.spice.zapper.client.ahc.AhcClientBuilder;
+import org.sonatype.spice.zapper.client.hc4.Hc4ClientBuilder;
 import org.sonatype.spice.zapper.fs.DirectoryIOSource;
-
-import com.ning.http.client.ProxyServer;
-import com.ning.http.client.ProxyServer.Protocol;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Realm.AuthScheme;
 
 @Component( role = Zapper.class )
 public class ZapperImpl
@@ -38,58 +38,45 @@ public class ZapperImpl
     {
         try
         {
-            final ProxyServer proxyServer;
-            if ( zapperRequest.getProxyProtocol() != null )
+            HttpHost proxyServer = null;
+            BasicCredentialsProvider credentialsProvider = null;
+            if ( !StringUtils.isBlank( zapperRequest.getProxyProtocol() ) )
             {
-                Protocol protocol;
-                if ( "http".equalsIgnoreCase( zapperRequest.getProxyProtocol() ) )
-                {
-                    protocol = Protocol.HTTP;
-                }
-                else if ( "https".equalsIgnoreCase( zapperRequest.getProxyProtocol() ) )
-                {
-                    protocol = Protocol.HTTPS;
-                }
-                else
-                {
-                    throw new IllegalArgumentException( "Unsupported HTTP proxy protocol: "
-                        + zapperRequest.getProxyProtocol() );
-                }
+                proxyServer =
+                    new HttpHost( zapperRequest.getProxyHost(), zapperRequest.getProxyPort(),
+                        zapperRequest.getProxyProtocol() );
 
-                if ( zapperRequest.getProxyUsername() != null )
+                if ( !StringUtils.isBlank( zapperRequest.getProxyUsername() ) )
                 {
-                    proxyServer =
-                        new ProxyServer( protocol, zapperRequest.getProxyHost(), zapperRequest.getProxyPort(),
-                            zapperRequest.getProxyUsername(), zapperRequest.getProxyPassword() );
+                    UsernamePasswordCredentials proxyCredentials =
+                        new UsernamePasswordCredentials( zapperRequest.getProxyUsername(),
+                            zapperRequest.getProxyPassword() );
+
+                    credentialsProvider = new BasicCredentialsProvider();
+                    credentialsProvider.setCredentials( new AuthScope( proxyServer.getHostName(),
+                        proxyServer.getPort(), AuthScope.ANY_REALM, proxyServer.getSchemeName() ), proxyCredentials );
                 }
-                else
-                {
-                    proxyServer =
-                        new ProxyServer( protocol, zapperRequest.getProxyHost(), zapperRequest.getProxyPort() );
-                }
-            }
-            else
-            {
-                proxyServer = null;
             }
 
-            final Realm realm;
-            if ( zapperRequest.getRemoteUsername() != null )
+            if ( !StringUtils.isBlank( zapperRequest.getRemoteUsername() ) )
             {
-                realm =
-                    new Realm.RealmBuilder().setPrincipal( zapperRequest.getRemoteUsername() ).setPassword(
-                        zapperRequest.getRemotePassword() ).setUsePreemptiveAuth( true ).setScheme( AuthScheme.BASIC ).build();
-            }
-            else
-            {
-                realm = null;
+                UsernamePasswordCredentials remoteCredentials =
+                    new UsernamePasswordCredentials( zapperRequest.getRemoteUsername(),
+                        zapperRequest.getRemotePassword() );
+
+                if ( credentialsProvider == null )
+                {
+                    credentialsProvider = new BasicCredentialsProvider();
+                }
+
+                credentialsProvider.setCredentials( AuthScope.ANY, remoteCredentials );
             }
 
             final Parameters parameters = ParametersBuilder.defaults().build();
-            final AhcClientBuilder clientBuilder = new AhcClientBuilder( parameters, zapperRequest.getRemoteUrl() );
-            if ( realm != null )
+            final Hc4ClientBuilder clientBuilder = new Hc4ClientBuilder( parameters, zapperRequest.getRemoteUrl() );
+            if ( credentialsProvider != null )
             {
-                clientBuilder.withRealm( realm );
+                clientBuilder.withRealm( credentialsProvider );
             }
             if ( proxyServer != null )
             {
