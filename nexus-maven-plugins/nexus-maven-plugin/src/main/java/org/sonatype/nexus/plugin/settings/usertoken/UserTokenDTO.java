@@ -8,7 +8,7 @@
 package org.sonatype.nexus.plugin.settings.usertoken;
 
 /**
- * Basic container for details usertoken/current REST end-ponit returns.
+ * Basic container for details usertoken/current REST end-point returns.
  *
  * @since 2.1
  */
