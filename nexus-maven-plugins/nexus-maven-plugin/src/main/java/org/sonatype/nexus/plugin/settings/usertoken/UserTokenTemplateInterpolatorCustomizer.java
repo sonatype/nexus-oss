@@ -12,11 +12,6 @@ import com.google.common.base.Throwables;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
-import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -35,7 +30,7 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 2.1
  */
-@Component(role=TemplateInterpolatorCustomizer.class, hint="usertoken", instantiationStrategy ="per-lookup")
+@Component(role=TemplateInterpolatorCustomizer.class, hint="usertoken", instantiationStrategy="per-lookup")
 public class UserTokenTemplateInterpolatorCustomizer
     implements TemplateInterpolatorCustomizer
 {
@@ -52,6 +47,9 @@ public class UserTokenTemplateInterpolatorCustomizer
 
     //@NonNls
     private static final String ENCRYPTED_SUFFIX = ".encrypted";
+
+    @Requirement
+    private ClientFactory clientFactory;
 
     @Requirement
     private MasterPasswordEncryption encryption;
@@ -101,39 +99,6 @@ public class UserTokenTemplateInterpolatorCustomizer
         });
     }
 
-    private Client createClient() {
-        checkState(owner != null);
-
-        ApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
-        config.getClasses().add(JacksonJsonProvider.class);
-        ApacheHttpClient4 client = ApacheHttpClient4.create(config);
-
-        // Configure BASIC auth
-        String userName = owner.getUsername();
-        String password = owner.getPassword();
-        if (userName != null && password != null) {
-            client.addFilter(new HTTPBasicAuthFilter(userName, password));
-        }
-
-        // Configure proxy muck
-        String proxyHost = owner.getProxyHost();
-        int proxyPort = owner.getProxyPort();
-        String proxyUser = owner.getProxyUsername();
-        String proxyPassword = owner.getProxyPassword();
-
-        if (proxyHost != null && proxyPort != -1) {
-            config.getProperties().put(DefaultApacheHttpClient4Config.PROPERTY_PROXY_URI, "http://" + proxyHost + ":" + proxyPort);
-        }
-        if (proxyUser != null) {
-            config.getProperties().put(DefaultApacheHttpClient4Config.PROPERTY_PROXY_USERNAME, proxyUser);
-        }
-        if (proxyPassword != null) {
-            config.getProperties().put(DefaultApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD, proxyPassword);
-        }
-
-        return client;
-    }
-
     private URI serviceUri() {
         checkState(owner != null);
         try {
@@ -144,11 +109,16 @@ public class UserTokenTemplateInterpolatorCustomizer
         }
     }
 
+    /**
+     * Cached user-token details, as more than one interpolation key may need to use this data.
+     *
+     * Component using instantiationStrategy="per-lookup" to try and avoid holding on to this for too long.
+     */
     private UserTokenDTO userToken;
 
     private UserTokenDTO getUserToken() {
         if (userToken == null) {
-            Client client = createClient();
+            Client client = clientFactory.create(owner);
 
             ClientResponse response = client.resource(serviceUri())
                 .accept(MediaType.APPLICATION_JSON) // for now force use of JSON so we'll expect our jackson provider to be used
