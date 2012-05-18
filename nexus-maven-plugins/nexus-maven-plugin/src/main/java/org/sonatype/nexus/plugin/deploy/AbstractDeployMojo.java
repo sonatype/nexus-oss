@@ -163,7 +163,7 @@ public abstract class AbstractDeployMojo
     /**
      * The base URL for a Nexus Professional instance that includes the nexus-staging-plugin.
      * 
-     * @parameter expression="${nexus.url}"
+     * @parameter expression="${nexusUrl}"
      */
     private String nexusUrl;
 
@@ -403,7 +403,7 @@ public abstract class AbstractDeployMojo
 
                 stagingRepositoryId = stageClient.startRepository( stagingProfileId, "Started by nexus-maven-plugin" );
                 getLog().info( "Using staging repository \"" + stagingRepositoryId + "\"." );
-                return nexusUrl + "/service/local/staging/deployByRepositoryId/" + stagingRepositoryId;
+                return concat( nexusUrl, "/service/local/staging/deployByRepositoryId", stagingRepositoryId );
             }
             catch ( RESTLightClientException e )
             {
@@ -414,6 +414,26 @@ public abstract class AbstractDeployMojo
         {
             throw new ArtifactDeploymentException( "No deploy URL set, nor Nexus BaseURL given!" );
         }
+    }
+
+    protected String concat( String... paths )
+    {
+        StringBuilder result = new StringBuilder();
+
+        for ( String path : paths )
+        {
+            while ( path.endsWith( "/" ) )
+            {
+                path = path.substring( 0, path.length() - 1 );
+            }
+            if ( result.length() > 0 && !path.startsWith( "/" ) )
+            {
+                result.append( "/" );
+            }
+            result.append( path );
+        }
+
+        return result.toString();
     }
 
     protected void afterUpload( final boolean successful )
@@ -439,7 +459,9 @@ public abstract class AbstractDeployMojo
             }
             catch ( RESTLightClientException e )
             {
-                throw new ArtifactDeploymentException( "Error after upload while managing staging repository!", e );
+                throw new ArtifactDeploymentException(
+                    "Error after upload while managing staging repository! Staging repository in question is "
+                        + stagingRepositoryId, e );
             }
         }
     }

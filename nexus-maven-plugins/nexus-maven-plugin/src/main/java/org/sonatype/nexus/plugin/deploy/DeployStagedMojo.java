@@ -21,7 +21,6 @@ import org.apache.maven.plugin.MojoFailureException;
  * 
  * @author cstamas
  * @goal deploy-staged
- * @requiresProject false
  */
 public class DeployStagedMojo
     extends AbstractDeployMojo
