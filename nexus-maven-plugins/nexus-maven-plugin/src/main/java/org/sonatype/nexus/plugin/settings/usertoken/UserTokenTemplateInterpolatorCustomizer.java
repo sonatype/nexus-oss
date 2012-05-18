@@ -8,6 +8,7 @@
 
 package org.sonatype.nexus.plugin.settings.usertoken;
 
+import com.google.common.base.Throwables;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
@@ -91,7 +92,7 @@ public class UserTokenTemplateInterpolatorCustomizer
                         return encryption.encrypt(result);
                     }
                     catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw Throwables.propagate(e);
                     }
                 }
 
@@ -139,7 +140,7 @@ public class UserTokenTemplateInterpolatorCustomizer
             return new URI(owner.getNexusUrl() + "/service/local/usertoken/current");
         }
         catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw Throwables.propagate(e);
         }
     }
 
