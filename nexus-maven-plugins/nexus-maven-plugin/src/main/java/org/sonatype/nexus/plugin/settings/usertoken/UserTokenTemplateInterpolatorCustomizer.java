@@ -59,7 +59,7 @@ public class UserTokenTemplateInterpolatorCustomizer
             // FIXME: Or perhaps just $[userToken.encryptedPassCode] ?
 
             @Override
-            public Object getValue(String expression) {
+            public Object getValue(final String expression) {
                 if (expression.equalsIgnoreCase(USER_TOKEN)) {
                     return renderUserToken();
                 }
