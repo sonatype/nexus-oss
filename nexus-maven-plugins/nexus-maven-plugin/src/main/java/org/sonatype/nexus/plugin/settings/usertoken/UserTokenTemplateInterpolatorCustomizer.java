@@ -17,6 +17,7 @@ import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.sonatype.nexus.plugin.settings.DownloadSettingsTemplateMojo;
@@ -46,6 +47,11 @@ public class UserTokenTemplateInterpolatorCustomizer
     //@NonNls
     public static final String USER_TOKEN_PASS_CODE = USER_TOKEN + ".passCode";
 
+    private static final String ENCRYPTED_SUFFIX = ".encrypted";
+
+    @Requirement
+    private MasterPasswordEncryption encryption;
+
     private DownloadSettingsTemplateMojo owner;
 
     @Override
@@ -59,17 +65,38 @@ public class UserTokenTemplateInterpolatorCustomizer
             // FIXME: Or perhaps just $[userToken.encryptedPassCode] ?
 
             @Override
-            public Object getValue(final String expression) {
+            public Object getValue(String expression) {
+                boolean encrypt = false;
+                if (expression.toLowerCase().endsWith(ENCRYPTED_SUFFIX)) {
+                    encrypt = true;
+
+                    // Strip off suffix and continue
+                    expression = expression.substring(0, expression.length() - ENCRYPTED_SUFFIX.length());
+                }
+
+                String result = null;
+
                 if (expression.equalsIgnoreCase(USER_TOKEN)) {
-                    return renderUserToken();
+                    result = renderUserToken();
                 }
-                if (expression.equalsIgnoreCase(USER_TOKEN_NAME_CODE)) {
-                    return getNameCode();
+                else if (expression.equalsIgnoreCase(USER_TOKEN_NAME_CODE)) {
+                    result = getNameCode();
                 }
-                if (expression.equalsIgnoreCase(USER_TOKEN_PASS_CODE)) {
-                    return getPassCode();
+                else if (expression.equalsIgnoreCase(USER_TOKEN_PASS_CODE)) {
+                    result = getPassCode();
                 }
-                return null;
+
+                // Attempt to encrypt
+                if (encrypt && result != null) {
+                    try {
+                        return encryption.encrypt(result);
+                    }
+                    catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                return result;
             }
         });
     }
