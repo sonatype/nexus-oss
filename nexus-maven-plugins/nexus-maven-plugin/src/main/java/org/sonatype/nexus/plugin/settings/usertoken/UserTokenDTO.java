@@ -18,7 +18,7 @@ public class UserTokenDTO
 
     protected String passCode;
 
-    protected String created;
+    protected String created; // NOTE: Ignore date bits here for simplicity
 
     public String getNameCode() {
         return nameCode;
