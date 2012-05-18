@@ -102,7 +102,11 @@ public class UserTokenTemplateInterpolatorCustomizer
     private URI serviceUri() {
         checkState(owner != null);
         try {
-            return new URI(owner.getNexusUrl() + "/service/local/usertoken/current");
+            String tmp = owner.getNexusUrl();
+            if (!tmp.endsWith("/")) {
+                tmp = tmp + "/";
+            }
+            return new URI(tmp + "service/local/usertoken/current");
         }
         catch (URISyntaxException e) {
             throw Throwables.propagate(e);
