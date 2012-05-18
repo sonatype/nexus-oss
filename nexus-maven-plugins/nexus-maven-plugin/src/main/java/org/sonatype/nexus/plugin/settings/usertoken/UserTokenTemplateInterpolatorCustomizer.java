@@ -54,6 +54,8 @@ public class UserTokenTemplateInterpolatorCustomizer
 
         interpolator.addValueSource(new AbstractValueSource(false)
         {
+            // FIXME: Sort out how to hook up encryption using master-password muck
+
             @Override
             public Object getValue(String expression) {
                 if (expression.equalsIgnoreCase(USER_TOKEN)) {
