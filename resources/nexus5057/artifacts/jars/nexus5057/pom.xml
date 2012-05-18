@@ -1,0 +1,17 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>test</groupId>
+  <artifactId>nexus5057</artifactId>
+  <packaging>jar</packaging>
+  <name>Nexus 5057 Plug-in</name>
+  <version>1.0.0</version>
+  <description>Jar file for Nexus 5057 issue</description>
+
+  <distributionManagement>
+    <repository>
+      <id>nexus-test-harness-repo</id>
+      <url>${nexus-base-url}content/repositories/nexus5057</url>
+    </repository>
+  </distributionManagement>
+
+</project>
