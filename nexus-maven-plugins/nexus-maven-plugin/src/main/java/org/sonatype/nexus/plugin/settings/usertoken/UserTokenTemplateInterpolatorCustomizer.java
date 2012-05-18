@@ -121,7 +121,7 @@ public class UserTokenTemplateInterpolatorCustomizer
             Client client = clientFactory.create(owner);
 
             ClientResponse response = client.resource(serviceUri())
-                .accept(MediaType.APPLICATION_JSON) // for now force use of JSON so we'll expect our jackson provider to be used
+                .accept(MediaType.APPLICATION_JSON) // for now force use of JSON so we'll expect the jackson provider to be used
                 .get(ClientResponse.class);
 
             Status status = response.getClientResponseStatus();
