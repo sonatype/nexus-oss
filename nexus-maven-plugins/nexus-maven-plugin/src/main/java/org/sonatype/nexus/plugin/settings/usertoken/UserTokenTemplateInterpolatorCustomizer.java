@@ -48,6 +48,9 @@ public class UserTokenTemplateInterpolatorCustomizer
     //@NonNls
     private static final String ENCRYPTED_SUFFIX = ".encrypted";
 
+    //@NonNls
+    private static final String SERVICE_PATH = "service/local/usertoken/current";
+
     @Requirement
     private ClientFactory clientFactory;
 
@@ -106,7 +109,7 @@ public class UserTokenTemplateInterpolatorCustomizer
             if (!tmp.endsWith("/")) {
                 tmp = tmp + "/";
             }
-            return new URI(tmp + "service/local/usertoken/current");
+            return new URI(tmp + SERVICE_PATH);
         }
         catch (URISyntaxException e) {
             throw Throwables.propagate(e);
