@@ -27,6 +27,8 @@ import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * User-token {@link TemplateInterpolatorCustomizer}.
  *
@@ -47,6 +49,7 @@ public class UserTokenTemplateInterpolatorCustomizer
     //@NonNls
     public static final String USER_TOKEN_PASS_CODE = USER_TOKEN + ".passCode";
 
+    //@NonNls
     private static final String ENCRYPTED_SUFFIX = ".encrypted";
 
     @Requirement
@@ -102,6 +105,8 @@ public class UserTokenTemplateInterpolatorCustomizer
     }
 
     private Client createClient() {
+        checkState(owner != null);
+
         ApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
         config.getClasses().add(JacksonJsonProvider.class);
         ApacheHttpClient4 client = ApacheHttpClient4.create(config);
@@ -133,6 +138,7 @@ public class UserTokenTemplateInterpolatorCustomizer
     }
 
     private URI serviceUri() {
+        checkState(owner != null);
         try {
             return new URI(owner.getNexusUrl() + "/service/local/usertoken/current");
         }
