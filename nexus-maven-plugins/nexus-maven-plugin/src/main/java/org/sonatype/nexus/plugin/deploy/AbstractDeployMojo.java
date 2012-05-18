@@ -44,6 +44,8 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 public abstract class AbstractDeployMojo
     extends AbstractMojo
 {
+    // Maven sourced stuff
+
     /**
      * Maven Session.
      * 
@@ -52,15 +54,6 @@ public abstract class AbstractDeployMojo
      * @readonly
      */
     protected MavenSession mavenSession;
-
-    /**
-     * Base working directory.
-     * 
-     * @parameter default-value="${project.basedir}"
-     * @required
-     * @readonly
-     */
-    protected File basedir;
 
     /**
      * @parameter default-value="${plugin.groupId}"
@@ -73,6 +66,8 @@ public abstract class AbstractDeployMojo
      * @readonly
      */
     private String pluginArtifactId;
+
+    // Components
 
     /**
      * @component
@@ -121,6 +116,8 @@ public abstract class AbstractDeployMojo
      */
     private ArtifactRepository localRepository;
 
+    // User configurable parameters
+
     /**
      * Flag whether Maven is currently in online/offline mode.
      * 
@@ -154,12 +151,20 @@ public abstract class AbstractDeployMojo
     private String deployUrl;
 
     /**
-     * Specifies the profile ID of remote Nexus where staging should happen. If not given, Nexus will be asked to
-     * perform a "match" and that profile will be used.
+     * Specifies the profile ID on remote Nexus against which staging should happen. If not given, Nexus will be asked
+     * to perform a "match" and that profile will be used.
      * 
      * @parameter expression="${stagingProfileId}"
      */
     private String stagingProfileId;
+
+    /**
+     * Specifies the (opened) staging repository ID on remote Nexus against which staging should happen. If not given,
+     * Nexus will be asked to create one for us and that will be used.
+     * 
+     * @parameter expression="${stagingRepositoryId}"
+     */
+    private String stagingRepositoryId;
 
     /**
      * The base URL for a Nexus Professional instance that includes the nexus-staging-plugin.
@@ -172,9 +177,9 @@ public abstract class AbstractDeployMojo
      * The ID of the server entry in the Maven settings.xml from which to pick credentials to contact the Insight
      * service.
      * 
-     * @parameter expression="${serverId}" default-value="nexus"
+     * @parameter expression="${serverId}"
      */
-    private String serverId;
+    private String serverId = "nexus";
 
     /**
      * The key-value pairs to "tag" the staging repository.
@@ -191,14 +196,16 @@ public abstract class AbstractDeployMojo
      */
     private String description = "Closed by nexus-maven-plugin";
 
+    /**
+     * If true, the Mojo will try to remove the staging repository it was not able to close.
+     * 
+     * @parameter expression="${nexus.deploy.keepOnFailure}" default-value="false"
+     */
+    private boolean keepOnFailure;
+
     protected MavenSession getMavenSession()
     {
         return mavenSession;
-    }
-
-    protected File getBasedir()
-    {
-        return basedir;
     }
 
     protected ArtifactDeployer getDeployer()
@@ -312,8 +319,6 @@ public abstract class AbstractDeployMojo
 
     private StageClient stageClient;
 
-    private String stagingRepositoryId;
-
     protected void createStageClient()
         throws ArtifactDeploymentException
     {
@@ -387,6 +392,8 @@ public abstract class AbstractDeployMojo
         }
     }
 
+    private String createdStagingRepositoryId;
+
     protected String beforeUpload()
         throws ArtifactDeploymentException
     {
@@ -417,18 +424,33 @@ public abstract class AbstractDeployMojo
                     getLog().info( "Using staging profile ID \"" + stagingProfileId + "\" (configured by user)." );
                 }
 
-                stagingRepositoryId =
-                    stageClient.startRepository( stagingProfileId, "Started by nexus-maven-plugin", tags );
-                if ( tags != null && !tags.isEmpty() )
+                if ( StringUtils.isBlank( stagingRepositoryId ) )
                 {
-                    getLog().info(
-                        "Staging repository with ID \"" + stagingRepositoryId
-                            + "\" created and tagged with key-values: " + tags );
+                    stagingRepositoryId =
+                        stageClient.startRepository( stagingProfileId, "Started by nexus-maven-plugin", tags );
+                    // store the one just created for us, as it means we need to "babysit" it (close or drop, depending
+                    // on outcome)
+                    createdStagingRepositoryId = stagingRepositoryId;
+                    if ( tags != null && !tags.isEmpty() )
+                    {
+                        getLog().info(
+                            "Created staging repository with ID \"" + stagingRepositoryId + "\", applied tags: " + tags );
+                    }
+                    else
+                    {
+                        getLog().info( "Created staging repository with ID \"" + stagingRepositoryId + "\"." );
+                    }
+
                 }
                 else
                 {
-                    getLog().info( "Staging repository with ID \"" + stagingRepositoryId + "\" created." );
+                    createdStagingRepositoryId = null;
+                    getLog().info(
+                        "Using preconfigured staging repository with ID \"" + stagingRepositoryId
+                            + "\" (we are NOT managing it)." ); // we will not close it! This might be created by some
+                                                                // other automated component
                 }
+
                 return concat( nexusUrl, "/service/local/staging/deployByRepositoryId", stagingRepositoryId );
             }
             catch ( RESTLightClientException e )
@@ -439,6 +461,43 @@ public abstract class AbstractDeployMojo
         else
         {
             throw new ArtifactDeploymentException( "No deploy URL set, nor Nexus BaseURL given!" );
+        }
+    }
+
+    protected void afterUpload( final boolean successful )
+        throws ArtifactDeploymentException
+    {
+        // in any other case nothing happens
+        // by having stagingRepositoryId string non-empty, it means we created it, hence, we are managing it too
+        if ( createdStagingRepositoryId != null )
+        {
+            try
+            {
+                final StageRepository repo = new StageRepository( stagingProfileId, createdStagingRepositoryId, true );
+                if ( successful )
+                {
+                    getLog().info( "Closing staging repository." );
+                    stageClient.finishRepository( repo, description );
+                }
+                else
+                {
+                    if ( !keepOnFailure )
+                    {
+                        getLog().info( "Dropping staging repository (due to unsuccesful upload)." );
+                        stageClient.dropRepository( repo, "Dropped by nexus-maven-plugin (due to unsuccesful upload)." );
+                    }
+                    else
+                    {
+                        getLog().info( "Not dropping staging repository (due to unsuccesful upload)." );
+                    }
+                }
+            }
+            catch ( RESTLightClientException e )
+            {
+                throw new ArtifactDeploymentException(
+                    "Error after upload while managing staging repository! Staging repository in question is "
+                        + createdStagingRepositoryId, e );
+            }
         }
     }
 
@@ -460,36 +519,6 @@ public abstract class AbstractDeployMojo
         }
 
         return result.toString();
-    }
-
-    protected void afterUpload( final boolean successful )
-        throws ArtifactDeploymentException
-    {
-        // in any other case nothing happens
-        // by having stagingRepositoryId string non-empty, it means open of it was successful
-        if ( stagingRepositoryId != null )
-        {
-            try
-            {
-                final StageRepository repo = new StageRepository( stagingProfileId, stagingRepositoryId, true );
-                if ( successful )
-                {
-                    getLog().info( "Closing staging repository." );
-                    stageClient.finishRepository( repo, description );
-                }
-                else
-                {
-                    getLog().info( "Dropping staging repository (due to unsuccesful upload)." );
-                    stageClient.dropRepository( repo, "Dropped by nexus-maven-plugin (due to unsuccesful upload)." );
-                }
-            }
-            catch ( RESTLightClientException e )
-            {
-                throw new ArtifactDeploymentException(
-                    "Error after upload while managing staging repository! Staging repository in question is "
-                        + stagingRepositoryId, e );
-            }
-        }
     }
 
     protected File getStagingDirectory()
