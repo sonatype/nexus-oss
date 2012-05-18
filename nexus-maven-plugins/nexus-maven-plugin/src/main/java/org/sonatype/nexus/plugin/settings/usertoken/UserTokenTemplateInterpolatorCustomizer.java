@@ -87,7 +87,7 @@ public class UserTokenTemplateInterpolatorCustomizer
                 // Attempt to encrypt
                 if (encrypt && result != null) {
                     try {
-                        return encryption.encrypt(result);
+                        result = encryption.encrypt(result);
                     }
                     catch (Exception e) {
                         throw Throwables.propagate(e);
