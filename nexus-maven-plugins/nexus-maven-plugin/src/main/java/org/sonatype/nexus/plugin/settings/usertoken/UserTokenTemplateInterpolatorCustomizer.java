@@ -63,12 +63,9 @@ public class UserTokenTemplateInterpolatorCustomizer
 
         interpolator.addValueSource(new AbstractValueSource(false)
         {
-            // FIXME: Sort out how to hook up encryption using master-password muck
-            // FIXME: Maybe something like $[encrypt.userToken.passCode] to wrap $[userToken.passCode] in encrypted envelope?
-            // FIXME: Or perhaps just $[userToken.encryptedPassCode] ?
-
             @Override
             public Object getValue(String expression) {
+                // Check for encryption flag
                 boolean encrypt = false;
                 if (expression.toLowerCase().endsWith(ENCRYPTED_SUFFIX)) {
                     encrypt = true;
@@ -78,7 +75,6 @@ public class UserTokenTemplateInterpolatorCustomizer
                 }
 
                 String result = null;
-
                 if (expression.equalsIgnoreCase(USER_TOKEN)) {
                     result = renderUserToken();
                 }
