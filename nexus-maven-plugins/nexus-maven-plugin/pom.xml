@@ -241,7 +241,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.5.8</version>
+      <version>1.5.15</version> <!-- FIXME: latest version is 3.0.1 -->
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -358,7 +358,13 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
-      <version>1.13</version>
+      <version>1.15</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-client</artifactId>
+      <version>1.1-SNAPSHOT</version>
     </dependency>
 
     <!-- Zapper and it's transport -->

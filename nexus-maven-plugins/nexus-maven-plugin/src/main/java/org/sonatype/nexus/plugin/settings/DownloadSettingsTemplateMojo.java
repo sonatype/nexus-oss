@@ -21,15 +21,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.codehaus.plexus.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.InterpolationFilterReader;
+import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -60,6 +65,9 @@ import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
 public class DownloadSettingsTemplateMojo
     extends AbstractNexusMojo
 {
+    public static final String START_EXPR = "$[";
+
+    public static final String END_EXPR = "]";
 
     /**
      * The ID of the template to download. For instance, a templateId of 'sonatype' will download from
@@ -138,6 +146,11 @@ public class DownloadSettingsTemplateMojo
      * @parameter expression="${settings.defaults}" default-value="${user.home}/.m2/settings-defaults.properties"
      */
     private File settingsDefaults;
+
+    /**
+     * @component
+     */
+    private List<TemplateInterpolatorCustomizer> customizers;
 
     private M2SettingsClient client;
 
@@ -233,9 +246,27 @@ public class DownloadSettingsTemplateMojo
                                                   + e.getMessage(), e );
         }
 
-        InterpolationFilterReader r =
-            new InterpolationFilterReader( new InputStreamReader( new ByteArrayInputStream( bos.toByteArray() ) ),
-                                           new SettingsMap( p ), "$[", "]" );
+        Interpolator interpolator = new StringSearchInterpolator( START_EXPR, END_EXPR );
+        interpolator.addValueSource( new MapBasedValueSource( new SettingsMap( p ) ) );
+
+        if (customizers != null) {
+            boolean debug = getLog().isDebugEnabled();
+
+            for  (TemplateInterpolatorCustomizer customizer : customizers ) {
+                try {
+                    if ( debug ) {
+                        getLog().debug( "Applying customizer: " + customizer );
+                    }
+                    customizer.customize( this, interpolator );
+                }
+                catch ( Exception e ) {
+                    getLog().warn( "Template customization failed; ignoring", e );
+                }
+            }
+        }
+
+        Reader content = new InputStreamReader( new ByteArrayInputStream( bos.toByteArray() ) );
+        InterpolatorFilterReader r = new InterpolatorFilterReader( content, interpolator, START_EXPR, END_EXPR );
 
         Writer w = null;
         try
