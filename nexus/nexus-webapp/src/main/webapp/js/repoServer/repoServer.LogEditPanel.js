@@ -116,7 +116,7 @@ Ext.extend(Sonatype.repoServer.LogEditPanel, Ext.Panel, {
         if (allValid)
         {
           this.save();
-          this.formPanel.loadLogConfig();
+          this.loadLogConfig();
         }
       },
 
