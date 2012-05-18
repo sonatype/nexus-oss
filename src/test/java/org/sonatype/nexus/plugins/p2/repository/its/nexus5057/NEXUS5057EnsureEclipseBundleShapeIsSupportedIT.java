@@ -75,14 +75,6 @@ public class NEXUS5057EnsureEclipseBundleShapeIsSupportedIT
         final File p2Content = downloadP2ContentFor( "test", "nexus5057", "1.0.0" );
         assertThat( "p2Content has been downloaded", p2Content, is( notNullValue() ) );
         assertThat( "p2Content exists", p2Content.exists(), is( true ) );
-        // ensure https://issues.sonatype.org/browse/NEXUS-5057 includes "zipped" instruction
-        StringBuilder expected = new StringBuilder();
-        expected.append( "          <instruction key='zipped'>" );
-        expected.append( IOUtils.LINE_SEPARATOR );
-        expected.append( "            true" );
-        expected.append( IOUtils.LINE_SEPARATOR );
-        expected.append( "          </instruction>" );
-        assertThat( p2Content, contains( expected.toString() ) );
 
         // ensure repositories are valid
         final File installDir = new File( "target/eclipse/nexus5057" );
