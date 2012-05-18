@@ -245,12 +245,23 @@ public class StageClient
      * 
      * @return The newly created staging repository ID.
      */
-    public String startRepository( final String profileId, final String description )
+    public String startRepository( final String profileId, final String description, Map<String, String> tags )
         throws RESTLightClientException
     {
         final StageRepository repo = new StageRepository( profileId, null, false );
         Element extras = processDescription( description );
-        final Document doc = performStagingAction( repo, STAGE_REPO_START_ACTION, Arrays.asList( extras ), true );
+
+        String repoStartUri = STAGE_REPO_START_ACTION;
+        if ( tags != null && !tags.isEmpty() )
+        {
+            repoStartUri = repoStartUri + "?stagingTags";
+            for ( Map.Entry<String, String> tag : tags.entrySet() )
+            {
+                String key = "&tag_" + tag.getKey();
+                repoStartUri = repoStartUri + key + "=" + tag.getValue();
+            }
+        }
+        final Document doc = performStagingAction( repo, repoStartUri, Arrays.asList( extras ), true );
 
         // heavy lifting is done with xpath
         XPath profileXp = newXPath( "/promoteResponse/data/stagedRepositoryId" );

@@ -12,15 +12,13 @@
  */
 package org.sonatype.nexus.restlight.stage;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.jdom.JDOMException;
-import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
@@ -29,21 +27,20 @@ import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.POSTFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
-import junit.framework.Assert;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class StageClientTest
     extends AbstractRESTTest
 {
 
     private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
-
-    private long before;
-
-    @Before
-    public void before()
-    {
-        this.before = System.currentTimeMillis();
-    }
 
     @Test
     public void queryAllOpenRepositories()
@@ -455,7 +452,7 @@ public class StageClientTest
         assertNotNull( profileId );
         assertEquals( "112cc490b91265a1", profileId );
 
-        String repositoryId = client.startRepository( profileId, "woohoo" );
+        String repositoryId = client.startRepository( profileId, "woohoo", null );
         assertNotNull( repositoryId );
         assertEquals( "tp1-002", repositoryId );
 

@@ -15,6 +15,7 @@ package org.sonatype.nexus.plugin.deploy;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
@@ -175,6 +176,21 @@ public abstract class AbstractDeployMojo
      */
     private String serverId;
 
+    /**
+     * The key-value pairs to "tag" the staging repository.
+     * 
+     * @parameter
+     */
+    private Map<String, String> tags;
+
+    /**
+     * The repository "description" to pass to Nexus when repository is closed. If none passed a default
+     * "Closed by nexus-maven-plugin." description will be used.
+     * 
+     * @parameter expression="${description}"
+     */
+    private String description = "Closed by nexus-maven-plugin";
+
     protected MavenSession getMavenSession()
     {
         return mavenSession;
@@ -319,8 +335,8 @@ public abstract class AbstractDeployMojo
                 }
                 else
                 {
-                    getLog().warn(
-                        "Server credentials with ID \"" + serverId + "\" to communicate with Nexus are not found!" );
+                    throw new ArtifactDeploymentException( "Server credentials with ID \"" + serverId
+                        + "\" to communicate with Nexus are not found!" );
                 }
             }
             else
@@ -394,15 +410,25 @@ public abstract class AbstractDeployMojo
                     stagingProfileId =
                         stageClient.getStageProfileForUser( currentProject.getGroupId(),
                             currentProject.getArtifactId(), currentProject.getVersion() );
-                    getLog().info( "Using staging profile \"" + stagingProfileId + "\" (matched by Nexus)." );
+                    getLog().info( "Using staging profile ID \"" + stagingProfileId + "\" (matched by Nexus)." );
                 }
                 else
                 {
-                    getLog().info( "Using staging profile \"" + stagingProfileId + "\" (configured by user)." );
+                    getLog().info( "Using staging profile ID \"" + stagingProfileId + "\" (configured by user)." );
                 }
 
-                stagingRepositoryId = stageClient.startRepository( stagingProfileId, "Started by nexus-maven-plugin" );
-                getLog().info( "Using staging repository \"" + stagingRepositoryId + "\"." );
+                stagingRepositoryId =
+                    stageClient.startRepository( stagingProfileId, "Started by nexus-maven-plugin", tags );
+                if ( tags != null && !tags.isEmpty() )
+                {
+                    getLog().info(
+                        "Staging repository with ID \"" + stagingRepositoryId
+                            + "\" created and tagged with key-values: " + tags );
+                }
+                else
+                {
+                    getLog().info( "Staging repository with ID \"" + stagingRepositoryId + "\" created." );
+                }
                 return concat( nexusUrl, "/service/local/staging/deployByRepositoryId", stagingRepositoryId );
             }
             catch ( RESTLightClientException e )
@@ -449,7 +475,7 @@ public abstract class AbstractDeployMojo
                 if ( successful )
                 {
                     getLog().info( "Closing staging repository." );
-                    stageClient.finishRepository( repo, "Finished by nexus-maven-plugin." );
+                    stageClient.finishRepository( repo, description );
                 }
                 else
                 {
