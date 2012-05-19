@@ -112,7 +112,7 @@
               <exclude>**/sandbox/**</exclude>
             </excludes>
             <mapping>
-              <vm>XML_STYLE</vm>
+              <vm>SHARPSTAR_STYLE</vm>
               <groovy>JAVADOC_STYLE</groovy>
               <aj>JAVADOC_STYLE</aj>
             </mapping>
