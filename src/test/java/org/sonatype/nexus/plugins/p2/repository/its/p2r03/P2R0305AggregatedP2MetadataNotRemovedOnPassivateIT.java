@@ -20,16 +20,17 @@ import java.io.File;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
 import org.testng.annotations.Test;
 
-public class Nexus5012AggregatedP2MetadataOnPassivateIT
+public class P2R0305AggregatedP2MetadataNotRemovedOnPassivateIT
     extends AbstractNexusP2GeneratorIT
 {
 
-    public Nexus5012AggregatedP2MetadataOnPassivateIT()
+    public P2R0305AggregatedP2MetadataNotRemovedOnPassivateIT()
     {
         super( "p2r03" );
     }
 
     /**
+     * [NEXUS-5012]
      * When Nexus is stopped (p2 aggregated capability passivated) the p2 metadata files should still exist.
      */
     @Test
