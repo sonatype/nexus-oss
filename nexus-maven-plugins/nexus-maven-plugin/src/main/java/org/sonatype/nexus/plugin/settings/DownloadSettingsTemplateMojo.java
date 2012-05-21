@@ -247,7 +247,6 @@ public class DownloadSettingsTemplateMojo
         }
 
         Interpolator interpolator = new StringSearchInterpolator( START_EXPR, END_EXPR );
-        interpolator.addValueSource( new MapBasedValueSource( new SettingsMap( p ) ) );
 
         if (customizers != null) {
             boolean debug = getLog().isDebugEnabled();
@@ -264,6 +263,9 @@ public class DownloadSettingsTemplateMojo
                 }
             }
         }
+
+        // Add settings source last so that customizations above will take precedence
+        interpolator.addValueSource( new MapBasedValueSource( new SettingsMap( p ) ) );
 
         Reader content = new InputStreamReader( new ByteArrayInputStream( bos.toByteArray() ) );
         InterpolatorFilterReader r = new InterpolatorFilterReader( content, interpolator, START_EXPR, END_EXPR );
