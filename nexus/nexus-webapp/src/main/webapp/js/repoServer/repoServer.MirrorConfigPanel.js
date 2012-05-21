@@ -273,7 +273,11 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
       },
 
       activateHandler : function(panel) {
-        this.predefinedMirrorDataStore.load();
+        // HACK: this.predefinedMirrorDataStore is only defined in ProxyMirrorEditor class, only attempt to call load() if the field exists
+        // HACK: Fix for NEXUS-5060, probably better way to fix however.
+        if (this.predefinedMirrorDataStore) {
+            this.predefinedMirrorDataStore.load();
+        }
 
         if (panel.payload.data.repoType == 'proxy')
         {
