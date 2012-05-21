@@ -10,28 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.p2.repository.its.nexus5012;
+package org.sonatype.nexus.plugins.p2.repository.its.p2r03;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import java.io.File;
 
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
 import org.testng.annotations.Test;
 
-public class Nexus5012IT
+public class Nexus5012AggregatedP2MetadataOnPassivateIT
     extends AbstractNexusP2GeneratorIT
 {
 
-    public Nexus5012IT()
+    public Nexus5012AggregatedP2MetadataOnPassivateIT()
     {
         super( "p2r03" );
     }
 
     /**
-     * When Nexus is stopped the p2 capability should still exist
+     * When Nexus is stopped (p2 aggregated capability passivated) the p2 metadata files should still exist.
      */
     @Test
     public void test()
@@ -45,21 +44,10 @@ public class Nexus5012IT
         assertThat( "P2 artifacts.xml does exist", artifactsXML, exists() );
         assertThat( "P2 content.xml does exist", contentXML, exists() );
 
-        /*
-         * Calling stopNexus() will mean that there is an error during 
-         * testing when AbstractNexusIntegrationTest.oncePerClassTearDown() 
-         * is called, but there is no infrastructure available to avoid this.
-         */
-        stopNexus();
+        passivateP2RepositoryAggregatorCapability();
 
         assertThat( "P2 artifacts.xml does exist", artifactsXML, exists() );
         assertThat( "P2 content.xml does exist", contentXML, exists() );
-    }
-
-    @Override
-    protected String getTestId()
-    {
-        return testRepositoryId;
     }
 
 }

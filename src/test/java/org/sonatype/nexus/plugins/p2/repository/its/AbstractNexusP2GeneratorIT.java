@@ -93,6 +93,14 @@ public abstract class AbstractNexusP2GeneratorIT
         getCapabilitiesNRC().delete( p2RepositoryAggregatorCapabilityId );
     }
 
+    protected void passivateP2RepositoryAggregatorCapability()
+        throws Exception
+    {
+        final CapabilityResource capabilityResource = getCapabilitiesNRC().read( p2RepositoryAggregatorCapabilityId );
+        capabilityResource.setEnabled( false );
+        getCapabilitiesNRC().update( capabilityResource );
+    }
+
     protected void deployArtifact( final String repoId, final File fileToDeploy, final String path )
         throws Exception
     {
