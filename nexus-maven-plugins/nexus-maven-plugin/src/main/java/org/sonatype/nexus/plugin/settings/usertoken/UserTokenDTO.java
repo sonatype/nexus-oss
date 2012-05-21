@@ -30,7 +30,7 @@ public class UserTokenDTO
         return nameCode;
     }
 
-    public void setNameCode(String value) {
+    public void setNameCode(final String value) {
         this.nameCode = value;
     }
 
@@ -38,7 +38,7 @@ public class UserTokenDTO
         return passCode;
     }
 
-    public void setPassCode(String value) {
+    public void setPassCode(final String value) {
         this.passCode = value;
     }
 
@@ -46,7 +46,7 @@ public class UserTokenDTO
         return created;
     }
 
-    public void setCreated(String value) {
+    public void setCreated(final String value) {
         this.created = value;
     }
 }
