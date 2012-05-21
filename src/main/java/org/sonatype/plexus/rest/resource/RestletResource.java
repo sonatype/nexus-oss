@@ -230,6 +230,17 @@ public class RestletResource
         }
     }
 
+    private Representation doRepresent( Object payload, Variant variant, Response response )
+        throws ResourceException
+    {
+        final Representation representation = doRepresent( payload, variant );
+        if ( representation != null && representation instanceof RestletResponseCustomizer )
+        {
+            ( (RestletResponseCustomizer) representation ).customize( response );
+        }
+        return representation;
+    }
+
     // == mkcol
 
     public boolean allowMkcol()
@@ -256,7 +267,7 @@ public class RestletResource
             result = e.getResultObject();
         }
 
-        return ( result != null ) ? doRepresent( result, variant ) : null;
+        return ( result != null ) ? doRepresent( result, variant, getResponse() ) : null;
     }
 
     @Override
@@ -299,7 +310,7 @@ public class RestletResource
 
             if ( result != null )
             {
-                getResponse().setEntity( doRepresent( result, representation ) );
+                getResponse().setEntity( doRepresent( result, representation, getResponse() ) );
             }
         }
     }
@@ -337,7 +348,7 @@ public class RestletResource
 
             if ( result != null )
             {
-                getResponse().setEntity( doRepresent( result, representation ) );
+                getResponse().setEntity( doRepresent( result, representation, getResponse() ) );
             }
         }
     }
@@ -399,7 +410,7 @@ public class RestletResource
         if ( result != null )
         {
             // TODO: representation cannot be returned as multipart! (representation above is possibly multipart)
-            getResponse().setEntity( doRepresent( result, getPreferredVariant() ) );
+            getResponse().setEntity( doRepresent( result, getPreferredVariant(), getResponse() ) );
         }
     }
 
