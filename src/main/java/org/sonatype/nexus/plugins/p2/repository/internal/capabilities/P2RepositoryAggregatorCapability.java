@@ -93,6 +93,7 @@ public class P2RepositoryAggregatorCapability
     public void onRemove()
         throws Exception
     {
+        service.removeConfiguration( configuration );
         configuration = null;
     }
 
@@ -100,12 +101,6 @@ public class P2RepositoryAggregatorCapability
     public void onActivate()
     {
         service.addConfiguration( configuration );
-    }
-
-    @Override
-    public void onPassivate()
-    {
-        service.removeConfiguration( configuration );
     }
 
     @Override
