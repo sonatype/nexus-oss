@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sonatype.appcontext.internal.Preconditions;
 import org.sonatype.appcontext.publisher.EntryPublisher;
+import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 
 public class AppContextRequest
@@ -42,31 +43,81 @@ public class AppContextRequest
         }
     }
 
+    /**
+     * Returns the AppContext ID, never {@code null}.
+     * 
+     * @return
+     */
     public String getId()
     {
         return id;
     }
 
+    /**
+     * Returns a reference to parent {@link AppContext} if any.
+     * 
+     * @return parent context or {@code null}.
+     */
     public AppContext getParent()
     {
         return parent;
     }
 
+    /**
+     * Maintains the list of {@link EntrySource} to be used when creating {@link AppContext}. The order of the source
+     * list is from "least important" to "most important" (ascending by importance). If you used some factory method
+     * that returned some predefined source(s) already, you usually want to do something like this:
+     * 
+     * <pre>
+     * req.getSources().add( 0, new PropertiesFileEntrySource( new File( &quot;mostimportant.properties&quot; ) ) );
+     * req.getSources().add( 0, new PropertiesFileEntrySource( new File( &quot;leastimportant.properties&quot; ) ) );
+     * </pre>
+     * 
+     * By using approach like this above, you always ensure that "least" important is the 1st element of the list, while
+     * the "bit more" important sources are moved forward (to list index greater than 0), while you do not disturb the
+     * order of the list "tail", where other important sources are (doing the prefix and key inclusion is handled).
+     * Still, if you know what you do, you can still invoke {@link List#clear()} and set the ordering you want from the
+     * scratch.
+     * 
+     * @return
+     */
     public List<EntrySource> getSources()
     {
         return sources;
     }
 
+    /**
+     * Maintains the list of {@link EntryPublisher} to be used when creating {@link AppContext}. If you don't want any
+     * publishing to happen (default is simple "console" publishing, writing {@link AppContext} out to
+     * {@link PrintStreamEntryPublisher} or {@link Slf4jLoggerEntryPublisher} if SLF4J on classpath). You can safely to
+     * {@link List#clear()} if you don't need any publishing.
+     * 
+     * @return
+     */
     public List<EntryPublisher> getPublishers()
     {
         return publishers;
     }
 
+    /**
+     * A flag denoting will {@link System.getProperties()} be used in interpolation or not when creating
+     * {@link AppContext}. If {@code true}, system properties source will be added as "least important" source, but it
+     * will NOT get into {@link AppContext} map. It will be used in interpolation only. By default, this is {@code true}
+     * when request created over some {@link Factory} method.
+     * 
+     * @return
+     */
     public boolean isUseSystemPropertiesFallback()
     {
         return useSystemPropertiesFallback;
     }
 
+    /**
+     * Returns the "key inclusions" for this request. If there are key inclusions, same sources will be created for them
+     * as for "prefixed" inclusions based on {@link AppContext} ID.
+     * 
+     * @return
+     */
     public List<String> getKeyInclusions()
     {
         return keyInclusions;
