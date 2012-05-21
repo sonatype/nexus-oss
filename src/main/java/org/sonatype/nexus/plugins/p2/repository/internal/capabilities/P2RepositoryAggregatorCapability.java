@@ -73,20 +73,22 @@ public class P2RepositoryAggregatorCapability
         throws Exception
     {
         configuration = createConfiguration( context().properties() );
+        service.addConfiguration( configuration );
     }
 
     @Override
     public void onLoad()
         throws Exception
     {
-        configuration = createConfiguration( context().properties() );
+        onCreate();
     }
 
     @Override
     public void onUpdate()
         throws Exception
     {
-        configuration = createConfiguration( context().properties() );
+        onRemove();
+        onCreate();
     }
 
     @Override
@@ -95,12 +97,6 @@ public class P2RepositoryAggregatorCapability
     {
         service.removeConfiguration( configuration );
         configuration = null;
-    }
-
-    @Override
-    public void onActivate()
-    {
-        service.addConfiguration( configuration );
     }
 
     @Override
