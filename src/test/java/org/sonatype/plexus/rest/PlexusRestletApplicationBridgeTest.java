@@ -15,7 +15,10 @@ package org.sonatype.plexus.rest;
 import org.codehaus.plexus.PlexusTestCase;
 import org.restlet.Application;
 import org.restlet.Component;
+import org.restlet.data.Form;
+import org.restlet.data.Parameter;
 import org.restlet.data.Protocol;
+import org.restlet.data.Response;
 
 public class PlexusRestletApplicationBridgeTest
     extends PlexusTestCase
@@ -35,6 +38,14 @@ public class PlexusRestletApplicationBridgeTest
 
         assertEquals( "manual", client.request( "http://localhost:8182/manual" ) );
 
+        // test that for tokenC an custom header is added to response
+        assertEquals( "tokenC", client.request( "http://localhost:8182/tokenC" ) );
+        final Response lastResponse = client.getLastResponse();
+        final Form form = (Form) lastResponse.getAttributes().get( "org.restlet.http.headers" );
+        assertNotNull( form );
+        final Parameter xCustomHeader = form.getFirst( "X-Custom" );
+        assertNotNull( xCustomHeader );
+        assertEquals( "foo", xCustomHeader.getValue() );
     }
 
     @Override

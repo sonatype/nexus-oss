@@ -31,5 +31,13 @@
         <token>tokenB</token>
       </configuration>
     </component>
+    <component>
+      <role>org.sonatype.plexus.rest.resource.PlexusResource</role>
+      <role-hint>tokenC</role-hint>
+      <implementation>org.sonatype.plexus.rest.ResponseCustomizerPlexusResource</implementation>
+      <configuration>
+        <token>tokenC</token>
+      </configuration>
+    </component>
   </components>
 </plexus>

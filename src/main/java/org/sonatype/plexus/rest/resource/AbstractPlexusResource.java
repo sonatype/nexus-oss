@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.commons.fileupload.FileItem;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -147,4 +148,25 @@ public abstract class AbstractPlexusResource
     {
         return getPayloadInstance();
     }
+
+    /**
+     * Adds an HTTP header to restlet response.
+     *
+     * @param response Restlet response to add the HTTP header to
+     * @param name     HTTP header name
+     * @param value    HTTP header value
+     */
+    public static void addHttpResponseHeader( final Response response, final String name, final String value )
+    {
+        Form responseHeaders = (Form) response.getAttributes().get( "org.restlet.http.headers" );
+
+        if ( responseHeaders == null )
+        {
+            responseHeaders = new Form();
+            response.getAttributes().put( "org.restlet.http.headers", responseHeaders );
+        }
+
+        responseHeaders.add( name, value );
+    }
+
 }
