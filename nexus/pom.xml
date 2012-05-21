@@ -2058,7 +2058,17 @@
             </executions>
             <configuration>
               <serverId>local-nexus</serverId>
-              <deployUrl>http://localhost:8081/nexus/content/repositories/snapshots/</deployUrl>
+              <nexusUrl>http://localhost:8081/nexus/</nexusUrl>
+              <!-- Deploy URL overrides all, so not Staging happens at all -->
+              <!--deployUrl>http://localhost:8081/nexus/content/repositories/snapshots/</deployUrl-->
+              <!-- Profile Id override profile matching -->
+              <!--stagingProfileId></stagingProfileId-->
+              <!-- By having none of those above, we actually use Staging V2 in "auto" mode, profile will be matched server side -->
+              <!-- Tags -->
+              <tags>
+                <localUsername>${env.USER}</localUsername>
+                <javaVersion>${java.version}</javaVersion>
+              </tags>
             </configuration>
           </plugin>
         </plugins>
