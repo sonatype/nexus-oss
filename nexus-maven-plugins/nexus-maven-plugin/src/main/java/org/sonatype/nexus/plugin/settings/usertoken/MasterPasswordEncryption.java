@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugin.settings.usertoken;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
@@ -19,6 +20,8 @@ import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helper to deal with master-password encryption.
@@ -30,6 +33,16 @@ public class MasterPasswordEncryption
 {
     @Requirement
     private SecDispatcher dispatcher;
+
+    // Constructor for Plexus
+    public MasterPasswordEncryption() {
+        super();
+    }
+
+    @VisibleForTesting
+    public MasterPasswordEncryption(final SecDispatcher dispatcher) {
+        this.dispatcher = checkNotNull(dispatcher);
+    }
 
     // NOTE: This is copied from MavenCli as there is no other component which exposes this functionality :-(
 

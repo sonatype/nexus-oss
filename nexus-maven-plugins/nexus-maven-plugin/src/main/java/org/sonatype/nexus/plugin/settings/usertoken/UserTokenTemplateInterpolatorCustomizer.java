@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugin.settings.usertoken;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -27,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -62,6 +64,19 @@ public class UserTokenTemplateInterpolatorCustomizer
     private MasterPasswordEncryption encryption;
 
     private DownloadSettingsTemplateMojo owner;
+
+    // Constructor for Plexus
+    public UserTokenTemplateInterpolatorCustomizer() {
+        super();
+    }
+
+    @VisibleForTesting
+    public UserTokenTemplateInterpolatorCustomizer(final ClientFactory clientFactory,
+                                                   final MasterPasswordEncryption encryption)
+    {
+        this.clientFactory = checkNotNull(clientFactory);
+        this.encryption = checkNotNull(encryption);
+    }
 
     @Override
     public void customize(final DownloadSettingsTemplateMojo owner, final Interpolator interpolator) {
