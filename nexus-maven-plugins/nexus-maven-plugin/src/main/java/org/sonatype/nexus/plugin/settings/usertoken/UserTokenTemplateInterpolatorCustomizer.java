@@ -80,7 +80,8 @@ public class UserTokenTemplateInterpolatorCustomizer
 
     @Override
     public void customize(final DownloadSettingsTemplateMojo owner, final Interpolator interpolator) {
-        this.owner = owner;
+        this.owner = checkNotNull(owner);
+        checkNotNull(interpolator);
 
         interpolator.addValueSource(new AbstractValueSource(false)
         {
