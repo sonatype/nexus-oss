@@ -52,6 +52,7 @@ public class ClientFactory
         String proxyPassword = owner.getProxyPassword();
 
         if (proxyHost != null && proxyPort != -1) {
+            // FIXME: Probably should have the proxy protocol exposed for configuration vs. hardcoded here
             config.getProperties().put(DefaultApacheHttpClient4Config.PROPERTY_PROXY_URI, "http://" + proxyHost + ":" + proxyPort);
         }
         if (proxyUser != null) {
