@@ -55,14 +55,14 @@ public class UserTokenTemplateInterpolatorCustomizerTest
 
     @Test
     public void interpolate_userToken() throws Exception {
-        String result = interpolator.interpolate("$[" + USER_TOKEN + "]");
+        String result = interpolator.interpolate(START_EXPR + USER_TOKEN + END_EXPR);
         assertEquals("nc:pc", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
     }
 
     @Test
     public void interpolate_userToken_encrypted() throws Exception {
-        String result = interpolator.interpolate("$[" + USER_TOKEN + ENCRYPTED_SUFFIX + "]");
+        String result = interpolator.interpolate(START_EXPR + USER_TOKEN + ENCRYPTED_SUFFIX + END_EXPR);
         assertEquals("{foo}", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
         verify(encryption, times(1)).encrypt(any(String.class));
@@ -70,14 +70,14 @@ public class UserTokenTemplateInterpolatorCustomizerTest
 
     @Test
     public void interpolate_userToken_nameCode() throws Exception {
-        String result = interpolator.interpolate("$[" + USER_TOKEN_NAME_CODE + "]");
+        String result = interpolator.interpolate(START_EXPR + USER_TOKEN_NAME_CODE + END_EXPR);
         assertEquals("nc", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
     }
 
     @Test
     public void interpolate_userToken_nameCode_encrypted() throws Exception {
-        String result = interpolator.interpolate("$[" + USER_TOKEN_NAME_CODE + ENCRYPTED_SUFFIX + "]");
+        String result = interpolator.interpolate(START_EXPR + USER_TOKEN_NAME_CODE + ENCRYPTED_SUFFIX + END_EXPR);
         assertEquals("{foo}", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
         verify(encryption, times(1)).encrypt(any(String.class));
@@ -85,14 +85,14 @@ public class UserTokenTemplateInterpolatorCustomizerTest
 
     @Test
     public void interpolate_userToken_passCode() throws Exception {
-        String result = interpolator.interpolate("$[" + USER_TOKEN_PASS_CODE + "]");
+        String result = interpolator.interpolate(START_EXPR + USER_TOKEN_PASS_CODE + END_EXPR);
         assertEquals("pc", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
     }
 
     @Test
     public void interpolate_userToken_passCode_encrypted() throws Exception {
-        String result = interpolator.interpolate("$[" + USER_TOKEN_PASS_CODE + ENCRYPTED_SUFFIX + "]");
+        String result = interpolator.interpolate(START_EXPR + USER_TOKEN_PASS_CODE + ENCRYPTED_SUFFIX + END_EXPR);
         assertEquals("{foo}", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
         verify(encryption, times(1)).encrypt(any(String.class));
