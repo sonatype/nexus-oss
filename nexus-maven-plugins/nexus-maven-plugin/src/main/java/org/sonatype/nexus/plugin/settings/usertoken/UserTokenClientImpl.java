@@ -19,7 +19,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.plugin.settings.DownloadSettingsTemplateMojo;
+import org.sonatype.nexus.plugin.settings.ClientConfiguration;
+import org.sonatype.nexus.plugin.settings.ClientFactory;
 
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
@@ -52,7 +53,7 @@ public class UserTokenClientImpl
         this.clientFactory = checkNotNull(clientFactory);
     }
 
-    public UserTokenDTO getCurrent(final DownloadSettingsTemplateMojo config) {
+    public UserTokenDTO getCurrent(final ClientConfiguration config) {
         checkNotNull(config);
         Client client = clientFactory.create(config);
 
@@ -69,7 +70,7 @@ public class UserTokenClientImpl
         return response.getEntity(UserTokenDTO.class);
     }
 
-    private URI serviceUri(final DownloadSettingsTemplateMojo config) {
+    private URI serviceUri(final ClientConfiguration config) {
         try {
             String tmp = config.getNexusUrl();
             if (!tmp.endsWith("/")) {

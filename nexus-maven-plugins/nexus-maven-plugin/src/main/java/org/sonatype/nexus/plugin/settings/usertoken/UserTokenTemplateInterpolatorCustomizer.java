@@ -18,7 +18,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.Interpolator;
-import org.sonatype.nexus.plugin.settings.DownloadSettingsTemplateMojo;
+import org.sonatype.nexus.plugin.settings.ClientConfiguration;
 import org.sonatype.nexus.plugin.settings.TemplateInterpolatorCustomizer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -52,7 +52,7 @@ public class UserTokenTemplateInterpolatorCustomizer
     @Requirement
     private MasterPasswordEncryption encryption;
 
-    private DownloadSettingsTemplateMojo owner;
+    private ClientConfiguration owner;
 
     // Constructor for Plexus
     public UserTokenTemplateInterpolatorCustomizer() {
@@ -68,8 +68,8 @@ public class UserTokenTemplateInterpolatorCustomizer
     }
 
     @Override
-    public void customize(final DownloadSettingsTemplateMojo owner, final Interpolator interpolator) {
-        this.owner = checkNotNull(owner);
+    public void customize(final ClientConfiguration config, final Interpolator interpolator) {
+        this.owner = checkNotNull(config);
         checkNotNull(interpolator);
 
         interpolator.addValueSource(new AbstractValueSource(false)

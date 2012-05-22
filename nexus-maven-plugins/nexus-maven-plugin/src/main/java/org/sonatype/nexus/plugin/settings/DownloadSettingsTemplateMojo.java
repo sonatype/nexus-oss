@@ -64,6 +64,7 @@ import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
 // TODO: Remove aggregator annotation once we have a better solution, but we should only run this once per build.
 public class DownloadSettingsTemplateMojo
     extends AbstractNexusMojo
+    implements ClientConfiguration
 {
     public static final String START_EXPR = "$[";
 
