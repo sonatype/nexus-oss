@@ -14,9 +14,6 @@ package org.sonatype.nexus.plugin.settings.usertoken;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -24,12 +21,7 @@ import org.codehaus.plexus.interpolation.Interpolator;
 import org.sonatype.nexus.plugin.settings.DownloadSettingsTemplateMojo;
 import org.sonatype.nexus.plugin.settings.TemplateInterpolatorCustomizer;
 
-import javax.ws.rs.core.MediaType;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * User-token {@link TemplateInterpolatorCustomizer}.
@@ -54,11 +46,8 @@ public class UserTokenTemplateInterpolatorCustomizer
     //@NonNls
     private static final String ENCRYPTED_SUFFIX = ".encrypted";
 
-    //@NonNls
-    private static final String SERVICE_PATH = "service/local/usertoken/current";
-
     @Requirement
-    private ClientFactory clientFactory;
+    private UserTokenClient userTokens;
 
     @Requirement
     private MasterPasswordEncryption encryption;
@@ -71,10 +60,10 @@ public class UserTokenTemplateInterpolatorCustomizer
     }
 
     @VisibleForTesting
-    public UserTokenTemplateInterpolatorCustomizer(final ClientFactory clientFactory,
+    public UserTokenTemplateInterpolatorCustomizer(final UserTokenClient userTokens,
                                                    final MasterPasswordEncryption encryption)
     {
-        this.clientFactory = checkNotNull(clientFactory);
+        this.userTokens = checkNotNull(userTokens);
         this.encryption = checkNotNull(encryption);
     }
 
@@ -122,20 +111,6 @@ public class UserTokenTemplateInterpolatorCustomizer
         });
     }
 
-    private URI serviceUri() {
-        checkState(owner != null);
-        try {
-            String tmp = owner.getNexusUrl();
-            if (!tmp.endsWith("/")) {
-                tmp = tmp + "/";
-            }
-            return new URI(tmp + SERVICE_PATH);
-        }
-        catch (URISyntaxException e) {
-            throw Throwables.propagate(e);
-        }
-    }
-
     /**
      * Cached user-token details, as more than one interpolation key may need to use this data.
      *
@@ -145,19 +120,7 @@ public class UserTokenTemplateInterpolatorCustomizer
 
     private UserTokenDTO getUserToken() {
         if (userToken == null) {
-            Client client = clientFactory.create(owner);
-
-            ClientResponse response = client.resource(serviceUri())
-                // FIXME: for now force use of JSON so we'll expect the jackson provider to be used
-                .accept(MediaType.APPLICATION_JSON)
-                .get(ClientResponse.class);
-
-            Status status = response.getClientResponseStatus();
-            if (status != Status.OK) {
-                throw new RuntimeException("Failed to fetch user-token, status: " + status);
-            }
-
-            userToken = response.getEntity(UserTokenDTO.class);
+            userToken = userTokens.getCurrent(owner);
         }
         return userToken;
     }
