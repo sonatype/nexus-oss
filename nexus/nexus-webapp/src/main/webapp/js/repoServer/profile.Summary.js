@@ -31,6 +31,7 @@ Nexus.profile.Summary = function(config) {
       name : 'userId',
       disabled : true,
       allowBlank : false,
+      disabled : Sonatype.user.curr.loggedInUserSource !== 'default',
       width : this.FIELD_WIDTH
     },
     {
@@ -41,6 +42,7 @@ Nexus.profile.Summary = function(config) {
       name : 'firstName',
       allowBlank : true,
       width : this.FIELD_WIDTH,
+      disabled : Sonatype.user.curr.loggedInUserSource !== 'default',
       validator : function(v) {
         if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
           return true;
@@ -58,6 +60,7 @@ Nexus.profile.Summary = function(config) {
       name : 'lastName',
       allowBlank : true,
       width : this.FIELD_WIDTH,
+      disabled : Sonatype.user.curr.loggedInUserSource !== 'default',
       validator : function(v) {
         if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
           return true;
@@ -75,6 +78,7 @@ Nexus.profile.Summary = function(config) {
       helpText : ht.email,
       name : 'email',
       allowBlank : false,
+      disabled : Sonatype.user.curr.loggedInUserSource !== 'default',
       width : this.FIELD_WIDTH
     },
     {
@@ -83,6 +87,7 @@ Nexus.profile.Summary = function(config) {
       cls : 'x-form-item',
       text : 'Change Password',
       style : 'text-decoration: underline; color: blue; cursor: pointer;',
+      hidden : Sonatype.user.curr.loggedInUserSource !== 'default',
       listeners : {
         'render' : function(component) {
           component.getEl().on('click', function() {Sonatype.utils.changePassword()});
