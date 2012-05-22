@@ -12,72 +12,14 @@
  */
 package org.sonatype.nexus.plugin.settings.usertoken;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugin.settings.DownloadSettingsTemplateMojo;
-
-import javax.ws.rs.core.MediaType;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helper to access a user's user-token.
  *
  * @since 2.1
  */
-@Component(role=UserTokenClient.class)
-public class UserTokenClient
+public interface UserTokenClient
 {
-    //@NonNls
-    private static final String SERVICE_PATH = "service/local/usertoken/current";
-
-    @Requirement
-    private ClientFactory clientFactory;
-
-    // Constructor for Plexus
-    public UserTokenClient() {
-        super();
-    }
-
-    @VisibleForTesting
-    public UserTokenClient(final ClientFactory clientFactory) {
-        this.clientFactory = checkNotNull(clientFactory);
-    }
-
-    public UserTokenDTO getCurrent(final DownloadSettingsTemplateMojo config) {
-        checkNotNull(config);
-        Client client = clientFactory.create(config);
-
-        ClientResponse response = client.resource(serviceUri(config))
-            // FIXME: for now force use of JSON so we'll expect the jackson provider to be used
-            .accept(MediaType.APPLICATION_JSON)
-            .get(ClientResponse.class);
-
-        Status status = response.getClientResponseStatus();
-        if (status != Status.OK) {
-            throw new RuntimeException("Failed to fetch user-token, status: " + status);
-        }
-
-        return response.getEntity(UserTokenDTO.class);
-    }
-
-    private URI serviceUri(final DownloadSettingsTemplateMojo config) {
-        try {
-            String tmp = config.getNexusUrl();
-            if (!tmp.endsWith("/")) {
-                tmp = tmp + "/";
-            }
-            return new URI(tmp + SERVICE_PATH);
-        }
-        catch (URISyntaxException e) {
-            throw Throwables.propagate(e);
-        }
-    }
+    UserTokenDTO getCurrent(DownloadSettingsTemplateMojo config);
 }
