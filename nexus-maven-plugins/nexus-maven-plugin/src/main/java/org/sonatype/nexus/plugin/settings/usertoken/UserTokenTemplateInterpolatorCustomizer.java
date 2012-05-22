@@ -44,7 +44,7 @@ public class UserTokenTemplateInterpolatorCustomizer
     public static final String USER_TOKEN_PASS_CODE = USER_TOKEN + ".passCode";
 
     //@NonNls
-    private static final String ENCRYPTED_SUFFIX = ".encrypted";
+    public static final String ENCRYPTED_SUFFIX = ".encrypted";
 
     @Requirement
     private UserTokenClient userTokens;
