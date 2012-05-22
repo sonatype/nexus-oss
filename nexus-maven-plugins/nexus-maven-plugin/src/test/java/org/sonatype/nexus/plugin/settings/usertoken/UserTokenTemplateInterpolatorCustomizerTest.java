@@ -37,8 +37,8 @@ public class UserTokenTemplateInterpolatorCustomizerTest
     @Before
     public void setUp() throws Exception {
         UserTokenDTO userToken = new UserTokenDTO();
-        userToken.setNameCode("a");
-        userToken.setPassCode("b");
+        userToken.setNameCode("nc");
+        userToken.setPassCode("pc");
         userToken.setCreated("c");
 
         when(userTokens.getCurrent(any(ClientConfiguration.class))).thenReturn(userToken);
@@ -54,7 +54,7 @@ public class UserTokenTemplateInterpolatorCustomizerTest
     @Test
     public void interpolate_userToken() throws Exception {
         String result = interpolator.interpolate("$[" + USER_TOKEN + "]");
-        assertEquals("a:b", result);
+        assertEquals("nc:pc", result);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class UserTokenTemplateInterpolatorCustomizerTest
     @Test
     public void interpolate_userToken_nameCode() throws Exception {
         String result = interpolator.interpolate("$[" + USER_TOKEN_NAME_CODE + "]");
-        assertEquals("a", result);
+        assertEquals("nc", result);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class UserTokenTemplateInterpolatorCustomizerTest
     @Test
     public void interpolate_userToken_passCode() throws Exception {
         String result = interpolator.interpolate("$[" + USER_TOKEN_PASS_CODE + "]");
-        assertEquals("b", result);
+        assertEquals("pc", result);
     }
 
     @Test
