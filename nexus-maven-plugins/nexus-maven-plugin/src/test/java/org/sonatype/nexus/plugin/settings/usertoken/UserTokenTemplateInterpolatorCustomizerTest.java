@@ -1,5 +1,6 @@
 package org.sonatype.nexus.plugin.settings.usertoken;
 
+import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,16 +54,20 @@ public class UserTokenTemplateInterpolatorCustomizerTest
         customizer.customize(config, interpolator);
     }
 
+    private String interpolate(final String expr) throws InterpolationException {
+        return interpolator.interpolate(START_EXPR + expr + END_EXPR);
+    }
+
     @Test
     public void interpolate_userToken() throws Exception {
-        String result = interpolator.interpolate(START_EXPR + USER_TOKEN + END_EXPR);
+        String result = interpolate(USER_TOKEN);
         assertEquals("nc:pc", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
     }
 
     @Test
     public void interpolate_userToken_encrypted() throws Exception {
-        String result = interpolator.interpolate(START_EXPR + USER_TOKEN + ENCRYPTED_SUFFIX + END_EXPR);
+        String result = interpolate(USER_TOKEN + ENCRYPTED_SUFFIX);
         assertEquals("{foo}", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
         verify(encryption, times(1)).encrypt(any(String.class));
@@ -70,14 +75,14 @@ public class UserTokenTemplateInterpolatorCustomizerTest
 
     @Test
     public void interpolate_userToken_nameCode() throws Exception {
-        String result = interpolator.interpolate(START_EXPR + USER_TOKEN_NAME_CODE + END_EXPR);
+        String result = interpolate(USER_TOKEN_NAME_CODE);
         assertEquals("nc", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
     }
 
     @Test
     public void interpolate_userToken_nameCode_encrypted() throws Exception {
-        String result = interpolator.interpolate(START_EXPR + USER_TOKEN_NAME_CODE + ENCRYPTED_SUFFIX + END_EXPR);
+        String result = interpolate(USER_TOKEN_NAME_CODE + ENCRYPTED_SUFFIX);
         assertEquals("{foo}", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
         verify(encryption, times(1)).encrypt(any(String.class));
@@ -85,14 +90,14 @@ public class UserTokenTemplateInterpolatorCustomizerTest
 
     @Test
     public void interpolate_userToken_passCode() throws Exception {
-        String result = interpolator.interpolate(START_EXPR + USER_TOKEN_PASS_CODE + END_EXPR);
+        String result = interpolate(USER_TOKEN_PASS_CODE);
         assertEquals("pc", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
     }
 
     @Test
     public void interpolate_userToken_passCode_encrypted() throws Exception {
-        String result = interpolator.interpolate(START_EXPR + USER_TOKEN_PASS_CODE + ENCRYPTED_SUFFIX + END_EXPR);
+        String result = interpolate(USER_TOKEN_PASS_CODE + ENCRYPTED_SUFFIX);
         assertEquals("{foo}", result);
         verify(userTokens, times(1)).getCurrent(any(ClientConfiguration.class));
         verify(encryption, times(1)).encrypt(any(String.class));
