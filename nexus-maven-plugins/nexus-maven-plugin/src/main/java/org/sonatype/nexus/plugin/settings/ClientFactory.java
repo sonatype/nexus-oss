@@ -13,54 +13,13 @@
 package org.sonatype.nexus.plugin.settings;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
-import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
-import org.codehaus.plexus.component.annotations.Component;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * REST client factory helper.
  *
  * @since 2.1
  */
-@Component(role=ClientFactory.class)
-public class ClientFactory
+public interface ClientFactory
 {
-    public Client create(final ClientConfiguration config) {
-        checkNotNull(config != null);
-
-        ApacheHttpClient4Config cc = new DefaultApacheHttpClient4Config();
-        cc.getClasses().add(JacksonJsonProvider.class);
-        ApacheHttpClient4 client = ApacheHttpClient4.create(cc);
-
-        // Configure BASIC auth
-        String userName = config.getUsername();
-        String password = config.getPassword();
-        if (userName != null && password != null) {
-            client.addFilter(new HTTPBasicAuthFilter(userName, password));
-        }
-
-        // Configure proxy muck
-        String proxyHost = config.getProxyHost();
-        int proxyPort = config.getProxyPort();
-        String proxyUser = config.getProxyUsername();
-        String proxyPassword = config.getProxyPassword();
-
-        if (proxyHost != null && proxyPort != -1) {
-            // FIXME: Probably should have the proxy protocol exposed for configuration vs. hardcoded here
-            cc.getProperties().put(DefaultApacheHttpClient4Config.PROPERTY_PROXY_URI, "http://" + proxyHost + ":" + proxyPort);
-        }
-        if (proxyUser != null) {
-            cc.getProperties().put(DefaultApacheHttpClient4Config.PROPERTY_PROXY_USERNAME, proxyUser);
-        }
-        if (proxyPassword != null) {
-            cc.getProperties().put(DefaultApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD, proxyPassword);
-        }
-
-        return client;
-    }
+    Client create(final ClientConfiguration config);
 }
