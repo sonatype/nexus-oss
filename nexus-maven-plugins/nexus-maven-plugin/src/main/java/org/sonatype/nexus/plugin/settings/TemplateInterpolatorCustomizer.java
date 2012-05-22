@@ -21,5 +21,7 @@ import org.codehaus.plexus.interpolation.Interpolator;
  */
 public interface TemplateInterpolatorCustomizer
 {
+    // TODO: Should expose an interface for the 'owner' bits here to abstract the configuration details available
+
     void customize(DownloadSettingsTemplateMojo owner, Interpolator interpolator);
 }
