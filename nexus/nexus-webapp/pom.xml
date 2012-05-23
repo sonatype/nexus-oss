@@ -317,6 +317,7 @@
                     <include>${compressed-dir}/js/extensions/Ext.ux.form.LovCombo.js</include>
                     <include>${compressed-dir}/js/extensions/Ext.ux.ThemeCombo.js</include>
                     <include>${compressed-dir}/js/extensions/RoleSelector.js</include>
+                    <include>${compressed-dir}/js/extensions/Nexus.form.LabelField.js</include>
                     <include>${compressed-dir}/js/Sonatype.utils.js</include>
                     <include>${compressed-dir}/js/Sonatype.config.js</include>
                     <include>${compressed-dir}/js/Sonatype.lib.js</include>

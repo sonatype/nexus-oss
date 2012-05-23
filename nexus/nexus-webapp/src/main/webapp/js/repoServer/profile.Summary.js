@@ -85,15 +85,18 @@ Nexus.profile.Summary = function(config) {
       width : this.FIELD_WIDTH
     },
     {
-      xtype : 'label',
-      // make this label's font look like the others
-      cls : 'x-form-item',
-      text : 'Change Password',
+      xtype : 'labelfield',
+      labelStyle : 'margin-left: 15px; width: 185px;',
+      fieldLabel : 'Password',
+      value : 'Change Password',
+      width : this.FIELD_WIDTH,
       style : 'text-decoration: underline; color: blue; cursor: pointer;',
       hidden : isExternalUser,
       listeners : {
         'render' : function(component) {
-          component.getEl().on('click', function() {Sonatype.utils.changePassword()});
+          component.getEl().on('click', function() {
+            Sonatype.utils.changePassword();
+          });
         }
       }
     }
