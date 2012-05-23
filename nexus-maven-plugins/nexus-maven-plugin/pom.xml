@@ -176,7 +176,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.5.8</version>
+      <version>1.5.15</version> <!-- FIXME: latest version is 3.0.1 -->
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
