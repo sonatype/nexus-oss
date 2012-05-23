@@ -21,6 +21,9 @@ Nexus.profile.Summary = function(config) {
 
   this.FIELD_WIDTH = 250;
 
+  // user is not from XML realm but LDAP, Crowd, ...
+  var isExternalUser = Sonatype.user.curr.loggedInUserSource !== 'default';
+
   var items = [
     {
       xtype : 'textfield',
@@ -31,6 +34,7 @@ Nexus.profile.Summary = function(config) {
       name : 'userId',
       disabled : true,
       allowBlank : false,
+      disabled : isExternalUser,
       width : this.FIELD_WIDTH
     },
     {
@@ -41,6 +45,7 @@ Nexus.profile.Summary = function(config) {
       name : 'firstName',
       allowBlank : true,
       width : this.FIELD_WIDTH,
+      disabled : isExternalUser,
       validator : function(v) {
         if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
           return true;
@@ -58,6 +63,7 @@ Nexus.profile.Summary = function(config) {
       name : 'lastName',
       allowBlank : true,
       width : this.FIELD_WIDTH,
+      disabled : isExternalUser,
       validator : function(v) {
         if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
           return true;
@@ -75,6 +81,7 @@ Nexus.profile.Summary = function(config) {
       helpText : ht.email,
       name : 'email',
       allowBlank : false,
+      disabled : isExternalUser,
       width : this.FIELD_WIDTH
     },
     {
@@ -83,6 +90,7 @@ Nexus.profile.Summary = function(config) {
       cls : 'x-form-item',
       text : 'Change Password',
       style : 'text-decoration: underline; color: blue; cursor: pointer;',
+      hidden : isExternalUser,
       listeners : {
         'render' : function(component) {
           component.getEl().on('click', function() {Sonatype.utils.changePassword()});
