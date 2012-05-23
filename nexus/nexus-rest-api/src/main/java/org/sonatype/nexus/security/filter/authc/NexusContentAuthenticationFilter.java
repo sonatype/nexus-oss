@@ -58,12 +58,12 @@ public class NexusContentAuthenticationFilter
      * Determine if content restriction is enabled, by asking each constituent.
      * If any constituent reports a restriction then returns true.
      */
-    private boolean isRestricted()
+    private boolean isRestricted( final ServletRequest request )
     {
         //noinspection ConstantConditions
         if ( constituents != null ) {
-            for ( NexusContentRestrictionConstituent constituent : constituents) {
-                if ( constituent.isContentRestricted() ) {
+            for ( NexusContentRestrictionConstituent constituent : constituents ) {
+                if ( constituent.isContentRestricted( request ) ) {
                     return true;
                 }
             }
@@ -74,8 +74,8 @@ public class NexusContentAuthenticationFilter
     @Override
     protected AuthenticationToken createToken( final ServletRequest request, final ServletResponse response )
     {
-        if ( isRestricted() ) {
-            getLogger().debug( "Content authentication is restricted" );
+        if ( isRestricted( request ) ) {
+            getLogger().debug( "Content authentication for request is restricted" );
 
             // We know our super-class makes UsernamePasswordTokens, ask super to pull out the relevant details
             UsernamePasswordToken basis = ( UsernamePasswordToken ) super.createToken( request, response );

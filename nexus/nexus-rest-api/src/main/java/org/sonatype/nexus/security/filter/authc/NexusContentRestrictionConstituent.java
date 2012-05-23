@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.security.filter.authc;
 
+import javax.servlet.ServletRequest;
+
 /**
  * Allows components to configure {code}/content{code} restriction to be enabled or not.
  *
@@ -24,5 +26,8 @@ package org.sonatype.nexus.security.filter.authc;
  */
 public interface NexusContentRestrictionConstituent
 {
-    boolean isContentRestricted();
+    /**
+     * Determine if content restriction is required for the given request.
+     */
+    boolean isContentRestricted( final ServletRequest request );
 }
