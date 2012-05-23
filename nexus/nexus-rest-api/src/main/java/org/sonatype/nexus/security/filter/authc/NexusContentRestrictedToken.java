@@ -19,6 +19,7 @@ import org.apache.shiro.authc.RememberMeAuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -88,6 +89,19 @@ public class NexusContentRestrictedToken
     public ServletRequest getRequest()
     {
         return request;
+    }
+
+    /**
+     * Helper to get HTTP header from request.
+     */
+    public String getHeader( String name )
+    {
+        if ( request instanceof HttpServletRequest)
+        {
+            return ( (HttpServletRequest) request ).getHeader( name );
+        }
+
+        return null;
     }
 
     @Override
