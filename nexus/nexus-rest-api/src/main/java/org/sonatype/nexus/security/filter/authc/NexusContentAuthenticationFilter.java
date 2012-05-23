@@ -28,8 +28,7 @@ import java.util.List;
 /**
  * Nexus {code}/content{code} {@link AuthenticationFilter}.
  *
- * When {@link NexusContentAuthenticationConfiguration#isRestricted()} creates {@link NexusContentRestrictedToken}
- * otherwise uses the default {@link UsernamePasswordToken}.
+ * @see NexusContentRestrictionAware
  *
  * @since 2.1
  */
