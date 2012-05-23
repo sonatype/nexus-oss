@@ -41,7 +41,7 @@ public class NexusContentAuthenticationFilter
 
     @Inject
     @Nullable
-    private List<NexusContentRestrictionConstituent> restrictionConstituents;
+    private List<NexusContentRestrictionConstituent> constituents;
 
     public NexusContentAuthenticationFilter()
     {
@@ -49,9 +49,9 @@ public class NexusContentAuthenticationFilter
     }
 
     @VisibleForTesting
-    public NexusContentAuthenticationFilter( final List<NexusContentRestrictionConstituent> restrictionConstituents )
+    public NexusContentAuthenticationFilter( final List<NexusContentRestrictionConstituent> constituents)
     {
-        this.restrictionConstituents = restrictionConstituents;
+        this.constituents = constituents;
     }
 
     /**
@@ -61,8 +61,8 @@ public class NexusContentAuthenticationFilter
     private boolean isRestricted()
     {
         //noinspection ConstantConditions
-        if ( restrictionConstituents != null ) {
-            for ( NexusContentRestrictionConstituent constituent : restrictionConstituents ) {
+        if ( constituents != null ) {
+            for ( NexusContentRestrictionConstituent constituent : constituents) {
                 if ( constituent.isContentRestricted() ) {
                     return true;
                 }
