@@ -41,6 +41,12 @@ import org.sonatype.nexus.restlight.stage.StageRepository;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
+/**
+ * Abstract class for deploy related mojos.
+ * 
+ * @author cstamas
+ * @since 2.1
+ */
 public abstract class AbstractDeployMojo
     extends AbstractMojo
 {

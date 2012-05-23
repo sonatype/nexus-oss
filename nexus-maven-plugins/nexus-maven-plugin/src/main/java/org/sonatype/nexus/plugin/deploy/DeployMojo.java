@@ -29,6 +29,7 @@ import org.apache.maven.project.artifact.ProjectArtifactMetadata;
  * module does the actual deploy.
  * 
  * @author cstamas
+ * @since 2.1
  * @goal deploy
  * @phase deploy
  */

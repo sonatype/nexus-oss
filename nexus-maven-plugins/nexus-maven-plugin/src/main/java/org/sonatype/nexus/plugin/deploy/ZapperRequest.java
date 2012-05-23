@@ -14,6 +14,12 @@ package org.sonatype.nexus.plugin.deploy;
 
 import java.io.File;
 
+/**
+ * A "zap" request.
+ * 
+ * @author cstamas
+ * @since 2.1
+ */
 public class ZapperRequest
 {
     private final File stageRepository;

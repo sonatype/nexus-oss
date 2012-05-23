@@ -27,6 +27,12 @@ import org.sonatype.spice.zapper.ParametersBuilder;
 import org.sonatype.spice.zapper.client.hc4.Hc4ClientBuilder;
 import org.sonatype.spice.zapper.fs.DirectoryIOSource;
 
+/**
+ * Default imple of Zapper encapsulating component.
+ * 
+ * @author cstamas
+ * @since 2.1
+ */
 @Component( role = Zapper.class )
 public class ZapperImpl
     implements Zapper

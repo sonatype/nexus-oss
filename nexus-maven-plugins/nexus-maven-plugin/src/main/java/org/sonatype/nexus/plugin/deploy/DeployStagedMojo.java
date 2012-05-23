@@ -20,6 +20,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * Deploys the (previously) locally staged artifacts.
  * 
  * @author cstamas
+ * @since 2.1
  * @goal deploy-staged
  */
 public class DeployStagedMojo
