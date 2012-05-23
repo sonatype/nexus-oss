@@ -27,6 +27,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * {@link AuthenticationToken} used when access to {code}/content{code} is restricted.
  *
+ * @see NexusContentAuthenticationFilter
+ *
  * @since 2.1
  */
 public class NexusContentRestrictedToken

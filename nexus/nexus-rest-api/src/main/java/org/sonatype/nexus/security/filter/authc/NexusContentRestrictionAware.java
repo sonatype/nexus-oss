@@ -16,7 +16,9 @@ package org.sonatype.nexus.security.filter.authc;
 /**
  * Allows components to configure {code}/content{code} restriction to be enabled or not.
  *
- * If one or more components has content restriction enabled, then the content access is restricted.
+ * If one or more components has content restriction enabled, then the content authentication is restricted.
+ *
+ * @see NexusContentAuthenticationFilter
  *
  * @since 2.1
  */

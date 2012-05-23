@@ -29,6 +29,7 @@ import java.util.List;
  * Nexus {code}/content{code} {@link AuthenticationFilter}.
  *
  * @see NexusContentRestrictionAware
+ * @see NexusContentRestrictedToken
  *
  * @since 2.1
  */
