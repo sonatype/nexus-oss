@@ -81,7 +81,7 @@ Nexus.profile.Summary = function(config) {
       xtype : 'labelfield',
       labelStyle : 'margin-left: 15px; width: 185px;',
       fieldLabel : 'Password',
-      text : 'Change Password',
+      value : 'Change Password',
       width : this.FIELD_WIDTH,
       style : 'text-decoration: underline; color: blue; cursor: pointer;',
       listeners : {

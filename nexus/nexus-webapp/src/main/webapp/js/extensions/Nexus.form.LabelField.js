@@ -12,14 +12,37 @@
  */
 Ext.namespace('Nexus.form');
 
+/**
+ * A field using a label to display the value.
+ */
 Nexus.form.LabelField = Ext.extend( Ext.form.Field, {
   onRender : function(ct, position){
     this.defaultAutoCreate = {
       tag : 'label',
+      // a label inside a form element inherits 'clear: left' -> broken layout
       style : 'clear: none;',
-      html : this.text
+      html : this.value
     };
     Nexus.form.LabelField.superclass.onRender.call(this, ct, position);
+  },
+
+  // overriding value getter and setter to make this behave more like a field
+  // (a label's el.dom has no 'value' attribute which is what the superclass tries
+  // to manipulate)
+  getValue : function() {
+    return this.getRawValue();
+  },
+  setValue : function(value) {
+    this.setRawValue(value);
+  },
+  getRawValue : function() {
+    return this.value;
+  },
+  setRawValue : function(value) {
+    this.value = value;
+    if (this.rendered) {
+      this.el.dom.innerHTML = this.value;
+    }
   }
 });
 
