@@ -22,7 +22,7 @@ package org.sonatype.nexus.security.filter.authc;
  *
  * @since 2.1
  */
-public interface NexusContentRestrictionAware
+public interface NexusContentRestrictionConstituent
 {
     boolean isContentRestricted();
 }

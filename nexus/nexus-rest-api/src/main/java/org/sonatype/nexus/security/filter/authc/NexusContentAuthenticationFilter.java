@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Nexus {code}/content{code} {@link AuthenticationFilter}.
  *
- * @see NexusContentRestrictionAware
+ * @see NexusContentRestrictionConstituent
  * @see NexusContentRestrictedToken
  *
  * @since 2.1
@@ -41,7 +41,7 @@ public class NexusContentAuthenticationFilter
 
     @Inject
     @Nullable
-    private List<NexusContentRestrictionAware> restrictionConstituents;
+    private List<NexusContentRestrictionConstituent> restrictionConstituents;
 
     public NexusContentAuthenticationFilter()
     {
@@ -49,7 +49,7 @@ public class NexusContentAuthenticationFilter
     }
 
     @VisibleForTesting
-    public NexusContentAuthenticationFilter( final List<NexusContentRestrictionAware> restrictionConstituents )
+    public NexusContentAuthenticationFilter( final List<NexusContentRestrictionConstituent> restrictionConstituents )
     {
         this.restrictionConstituents = restrictionConstituents;
     }
@@ -62,7 +62,7 @@ public class NexusContentAuthenticationFilter
     {
         //noinspection ConstantConditions
         if ( restrictionConstituents != null ) {
-            for ( NexusContentRestrictionAware constituent : restrictionConstituents ) {
+            for ( NexusContentRestrictionConstituent constituent : restrictionConstituents ) {
                 if ( constituent.isContentRestricted() ) {
                     return true;
                 }
