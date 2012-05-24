@@ -14,6 +14,12 @@ package org.sonatype.nexus.plugin.deploy;
 
 import java.io.IOException;
 
+/**
+ * Zapper encapsulating component.
+ * 
+ * @author cstamas
+ * @since 2.1
+ */
 public interface Zapper
 {
     void deployDirectory( ZapperRequest zapperRequest )

@@ -29,6 +29,7 @@ import org.apache.maven.project.artifact.ProjectArtifactMetadata;
  * module does the actual deploy.
  * 
  * @author cstamas
+ * @since 2.1
  * @goal deploy
  * @phase deploy
  */
@@ -73,9 +74,9 @@ public class DeployMojo
     /**
      * Set this to {@code true} to bypass artifact deploy that would happen once last project is being staged.
      * 
-     * @parameter expression="${nexus.deploy.skipDeploy}" default-value="false"
+     * @parameter expression="${nexus.deploy.skipUpload}" default-value="false"
      */
-    private boolean skipDeploy;
+    private boolean skipUpload;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -158,13 +159,13 @@ public class DeployMojo
 
         if ( isThisLastProjectWithThisMojoInExecution() )
         {
-            if ( !skipDeploy )
+            if ( !skipUpload )
             {
                 failIfOffline();
 
                 try
                 {
-                    deployStagedArtifacts();
+                    uploadStagedArtifacts();
                 }
                 catch ( ArtifactDeploymentException e )
                 {

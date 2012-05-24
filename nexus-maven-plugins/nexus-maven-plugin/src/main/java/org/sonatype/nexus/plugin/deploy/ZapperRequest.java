@@ -14,6 +14,12 @@ package org.sonatype.nexus.plugin.deploy;
 
 import java.io.File;
 
+/**
+ * A "zap" request.
+ * 
+ * @author cstamas
+ * @since 2.1
+ */
 public class ZapperRequest
 {
     private final File stageRepository;
@@ -37,7 +43,7 @@ public class ZapperRequest
     public ZapperRequest( File stageRepository, String remoteUrl )
     {
         this.stageRepository = stageRepository;
-        this.remoteUrl = remoteUrl;
+        this.remoteUrl = remoteUrl.endsWith( "/" ) ? remoteUrl : remoteUrl + "/";
     }
 
     protected String getRemoteUsername()

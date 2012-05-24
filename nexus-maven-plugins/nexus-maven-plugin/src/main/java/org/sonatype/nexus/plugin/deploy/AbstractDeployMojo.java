@@ -14,6 +14,8 @@ package org.sonatype.nexus.plugin.deploy;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
@@ -28,14 +30,28 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.maven.mojo.execution.MojoExecution;
 import org.sonatype.maven.mojo.logback.LogbackUtils;
 import org.sonatype.maven.mojo.settings.MavenSettings;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
+import org.sonatype.nexus.restlight.common.RESTLightClientException;
+import org.sonatype.nexus.restlight.stage.StageClient;
+import org.sonatype.nexus.restlight.stage.StageRepository;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
+/**
+ * Abstract class for deploy related mojos.
+ * 
+ * @author cstamas
+ * @since 2.1
+ */
 public abstract class AbstractDeployMojo
     extends AbstractMojo
 {
+    // Maven sourced stuff
+
     /**
      * Maven Session.
      * 
@@ -44,15 +60,6 @@ public abstract class AbstractDeployMojo
      * @readonly
      */
     protected MavenSession mavenSession;
-
-    /**
-     * Base working directory.
-     * 
-     * @parameter default-value="${project.basedir}"
-     * @required
-     * @readonly
-     */
-    protected File basedir;
 
     /**
      * @parameter default-value="${plugin.groupId}"
@@ -65,6 +72,8 @@ public abstract class AbstractDeployMojo
      * @readonly
      */
     private String pluginArtifactId;
+
+    // Components
 
     /**
      * @component
@@ -100,11 +109,20 @@ public abstract class AbstractDeployMojo
     private Zapper zapper;
 
     /**
+     * Sec Dispatcher.
+     * 
+     * @component role="org.sonatype.plexus.components.sec.dispatcher.SecDispatcher" hint="default"
+     */
+    private SecDispatcher secDispatcher;
+
+    /**
      * @parameter default-value="${localRepository}"
      * @required
      * @readonly
      */
     private ArtifactRepository localRepository;
+
+    // User configurable parameters
 
     /**
      * Flag whether Maven is currently in online/offline mode.
@@ -130,28 +148,70 @@ public abstract class AbstractDeployMojo
     private File altStagingDirectory;
 
     /**
-     * Specifies the URL of remote Nexus to deploy to.
+     * Specifies the URL of remote Nexus to deploy to. If specified, no Staging V2 kicks in, just an "ordinary" deploy
+     * will happen, deploying the locally staged artifacts (still, deferred deploy happens, they will be uploaded
+     * together).
      * 
      * @parameter expression="${deployUrl}"
      */
     private String deployUrl;
 
     /**
+     * Specifies the profile ID on remote Nexus against which staging should happen. If not given, Nexus will be asked
+     * to perform a "match" and that profile will be used.
+     * 
+     * @parameter expression="${stagingProfileId}"
+     */
+    private String stagingProfileId;
+
+    /**
+     * Specifies the (opened) staging repository ID on remote Nexus against which staging should happen. If not given,
+     * Nexus will be asked to create one for us and that will be used.
+     * 
+     * @parameter expression="${stagingRepositoryId}"
+     */
+    private String stagingRepositoryId;
+
+    /**
+     * The base URL for a Nexus Professional instance that includes the nexus-staging-plugin.
+     * 
+     * @parameter expression="${nexusUrl}"
+     */
+    private String nexusUrl;
+
+    /**
      * The ID of the server entry in the Maven settings.xml from which to pick credentials to contact the Insight
      * service.
      * 
-     * @parameter expression="${serverId}" default-value="nexus"
+     * @parameter expression="${serverId}"
      */
-    private String serverId;
+    private String serverId = "nexus";
+
+    /**
+     * The key-value pairs to "tag" the staging repository.
+     * 
+     * @parameter
+     */
+    private Map<String, String> tags;
+
+    /**
+     * The repository "description" to pass to Nexus when repository is closed. If none passed a default
+     * "Closed by nexus-maven-plugin." description will be used.
+     * 
+     * @parameter expression="${description}"
+     */
+    private String description = "Closed by nexus-maven-plugin";
+
+    /**
+     * If true, the Mojo will try to remove the staging repository it was not able to close.
+     * 
+     * @parameter expression="${nexus.deploy.keepOnFailure}" default-value="false"
+     */
+    private boolean keepOnFailure;
 
     protected MavenSession getMavenSession()
     {
         return mavenSession;
-    }
-
-    protected File getBasedir()
-    {
-        return basedir;
     }
 
     protected ArtifactDeployer getDeployer()
@@ -206,7 +266,7 @@ public abstract class AbstractDeployMojo
     }
 
     /**
-     * Deploys staged artifacts.
+     * Uploads staged artifacts.
      * 
      * @param source the file to stage
      * @param artifact the artifact definition
@@ -214,18 +274,19 @@ public abstract class AbstractDeployMojo
      * @param localRepository the local repository to install into
      * @throws ArtifactDeploymentException if an error occurred deploying the artifact
      */
-    protected void deployStagedArtifacts()
+    protected void uploadStagedArtifacts()
         throws ArtifactDeploymentException
     {
+        boolean successful = false;
         try
         {
+            final String deployUrl = beforeUpload();
             final ZapperRequest request = new ZapperRequest( getStagingDirectory(), deployUrl );
 
             final Server server = MavenSettings.selectServer( mavenSession.getSettings(), serverId );
             if ( server != null )
             {
-                // TODO: secDispatcher
-                final Server dServer = MavenSettings.decrypt( null, server );
+                final Server dServer = MavenSettings.decrypt( secDispatcher, server );
                 request.setRemoteUsername( dServer.getUsername() );
                 request.setRemotePassword( dServer.getPassword() );
             }
@@ -233,8 +294,7 @@ public abstract class AbstractDeployMojo
             final Proxy proxy = MavenSettings.selectProxy( mavenSession.getSettings(), deployUrl );
             if ( proxy != null )
             {
-                // TODO: secDispatcher
-                final Proxy dProxy = MavenSettings.decrypt( null, proxy );
+                final Proxy dProxy = MavenSettings.decrypt( secDispatcher, proxy );
                 request.setProxyProtocol( dProxy.getProtocol() );
                 request.setProxyHost( dProxy.getHost() );
                 request.setProxyPort( dProxy.getPort() );
@@ -245,6 +305,7 @@ public abstract class AbstractDeployMojo
             LogbackUtils.syncLogLevelWithMaven( getLog() );
             getLog().info( "Deploying staged artifacts to: " + deployUrl );
             zapper.deployDirectory( request );
+            successful = true;
         }
         catch ( IOException e )
         {
@@ -252,11 +313,219 @@ public abstract class AbstractDeployMojo
         }
         catch ( SecDispatcherException e )
         {
-            throw new ArtifactDeploymentException( "Cannot decipher passwords for deploy!", e );
+            throw new ArtifactDeploymentException( "Cannot decipher credentials for deploy!", e );
+        }
+        finally
+        {
+            afterUpload( successful );
         }
     }
 
     // ==
+
+    private StageClient stageClient;
+
+    protected void createStageClient()
+        throws ArtifactDeploymentException
+    {
+        try
+        {
+            // defaults
+            String username = "deployment";
+            String password = "deployment123";
+
+            if ( serverId != null )
+            {
+                final Server server = MavenSettings.selectServer( mavenSession.getSettings(), serverId );
+                if ( server != null )
+                {
+                    getLog().info( "Using server credentials with ID \"" + serverId + "\" to communicate with Nexus." );
+                    final Server dServer = MavenSettings.decrypt( secDispatcher, server );
+                    username = dServer.getUsername();
+                    password = dServer.getPassword();
+                }
+                else
+                {
+                    throw new ArtifactDeploymentException( "Server credentials with ID \"" + serverId
+                        + "\" to communicate with Nexus are not found!" );
+                }
+            }
+            else
+            {
+                getLog().info(
+                    "Using Nexus default credentials, as no \"serverId\" parameter is supplied to get credentials from!" );
+            }
+
+            final Proxy proxy = MavenSettings.selectProxy( mavenSession.getSettings(), nexusUrl );
+            ProxyConfig proxyConfig = null;
+            if ( proxy != null )
+            {
+                final Proxy dProxy = MavenSettings.decrypt( secDispatcher, proxy );
+                if ( dProxy.getHost() != null && dProxy.getUsername() != null )
+                {
+                    proxyConfig =
+                        new ProxyConfig( dProxy.getHost(), dProxy.getPort(), dProxy.getUsername(), dProxy.getPassword() );
+                }
+                else if ( dProxy.getHost() != null )
+                {
+                    proxyConfig = new ProxyConfig( dProxy.getHost(), dProxy.getPort() );
+                }
+            }
+
+            LogbackUtils.syncLogLevelWithMaven( getLog() );
+            if ( proxyConfig != null )
+            {
+                stageClient = new StageClient( nexusUrl, username, password, proxyConfig );
+                getLog().info( "Nexus RESTLight client created (configured with HTTP proxy)." );
+            }
+            else
+            {
+                stageClient = new StageClient( nexusUrl, username, password );
+                getLog().info( "Nexus RESTLight client created." );
+            }
+        }
+        catch ( RESTLightClientException e )
+        {
+            throw new ArtifactDeploymentException( "Cannot create RESTLight Nexus client!", e );
+        }
+        catch ( SecDispatcherException e )
+        {
+            throw new ArtifactDeploymentException( "Cannot decipher credentials for deploy!", e );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new ArtifactDeploymentException( "Malformed Nexus base URL!", e );
+        }
+    }
+
+    private String createdStagingRepositoryId;
+
+    protected String beforeUpload()
+        throws ArtifactDeploymentException
+    {
+        if ( deployUrl != null )
+        {
+            getLog().info( "Performing normal upload against URL: " + deployUrl );
+            return deployUrl;
+        }
+        else if ( nexusUrl != null )
+        {
+            try
+            {
+                getLog().info( "Initiating staging against Nexus on URL " + nexusUrl );
+                createStageClient();
+
+                final MavenProject currentProject = mavenSession.getCurrentProject();
+
+                // if profile is not "targeted", perform a match and save the result
+                if ( StringUtils.isBlank( stagingProfileId ) )
+                {
+                    stagingProfileId =
+                        stageClient.getStageProfileForUser( currentProject.getGroupId(),
+                            currentProject.getArtifactId(), currentProject.getVersion() );
+                    getLog().info( "Using staging profile ID \"" + stagingProfileId + "\" (matched by Nexus)." );
+                }
+                else
+                {
+                    getLog().info( "Using staging profile ID \"" + stagingProfileId + "\" (configured by user)." );
+                }
+
+                if ( StringUtils.isBlank( stagingRepositoryId ) )
+                {
+                    stagingRepositoryId =
+                        stageClient.startRepository( stagingProfileId, "Started by nexus-maven-plugin", tags );
+                    // store the one just created for us, as it means we need to "babysit" it (close or drop, depending
+                    // on outcome)
+                    createdStagingRepositoryId = stagingRepositoryId;
+                    if ( tags != null && !tags.isEmpty() )
+                    {
+                        getLog().info(
+                            "Created staging repository with ID \"" + stagingRepositoryId + "\", applied tags: " + tags );
+                    }
+                    else
+                    {
+                        getLog().info( "Created staging repository with ID \"" + stagingRepositoryId + "\"." );
+                    }
+
+                }
+                else
+                {
+                    createdStagingRepositoryId = null;
+                    getLog().info(
+                        "Using preconfigured staging repository with ID \"" + stagingRepositoryId
+                            + "\" (we are NOT managing it)." ); // we will not close it! This might be created by some
+                                                                // other automated component
+                }
+
+                return concat( nexusUrl, "/service/local/staging/deployByRepositoryId", stagingRepositoryId );
+            }
+            catch ( RESTLightClientException e )
+            {
+                throw new ArtifactDeploymentException( "Error before upload while managing staging repository!", e );
+            }
+        }
+        else
+        {
+            throw new ArtifactDeploymentException( "No deploy URL set, nor Nexus BaseURL given!" );
+        }
+    }
+
+    protected void afterUpload( final boolean successful )
+        throws ArtifactDeploymentException
+    {
+        // in any other case nothing happens
+        // by having stagingRepositoryId string non-empty, it means we created it, hence, we are managing it too
+        if ( createdStagingRepositoryId != null )
+        {
+            try
+            {
+                final StageRepository repo = new StageRepository( stagingProfileId, createdStagingRepositoryId, true );
+                if ( successful )
+                {
+                    getLog().info( "Closing staging repository." );
+                    stageClient.finishRepository( repo, description );
+                }
+                else
+                {
+                    if ( !keepOnFailure )
+                    {
+                        getLog().info( "Dropping staging repository (due to unsuccesful upload)." );
+                        stageClient.dropRepository( repo, "Dropped by nexus-maven-plugin (due to unsuccesful upload)." );
+                    }
+                    else
+                    {
+                        getLog().info( "Not dropping staging repository (due to unsuccesful upload)." );
+                    }
+                }
+            }
+            catch ( RESTLightClientException e )
+            {
+                throw new ArtifactDeploymentException(
+                    "Error after upload while managing staging repository! Staging repository in question is "
+                        + createdStagingRepositoryId, e );
+            }
+        }
+    }
+
+    protected String concat( String... paths )
+    {
+        StringBuilder result = new StringBuilder();
+
+        for ( String path : paths )
+        {
+            while ( path.endsWith( "/" ) )
+            {
+                path = path.substring( 0, path.length() - 1 );
+            }
+            if ( result.length() > 0 && !path.startsWith( "/" ) )
+            {
+                result.append( "/" );
+            }
+            result.append( path );
+        }
+
+        return result.toString();
+    }
 
     protected File getStagingDirectory()
     {
