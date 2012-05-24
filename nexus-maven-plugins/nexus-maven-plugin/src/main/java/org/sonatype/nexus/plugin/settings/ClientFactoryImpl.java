@@ -35,7 +35,10 @@ public class ClientFactoryImpl
         checkNotNull(config != null);
 
         ApacheHttpClient4Config cc = new DefaultApacheHttpClient4Config();
+
+        // FIXME: Update to latest siesta and use XStreamXmlProvider here instead
         cc.getClasses().add(JacksonJsonProvider.class);
+
         ApacheHttpClient4 client = ApacheHttpClient4.create(cc);
 
         // Configure BASIC auth
