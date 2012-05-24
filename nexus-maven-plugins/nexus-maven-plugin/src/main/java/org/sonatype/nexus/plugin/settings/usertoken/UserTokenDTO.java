@@ -13,11 +13,14 @@
 
 package org.sonatype.nexus.plugin.settings.usertoken;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * Basic container for details usertoken/current REST end-point returns.
  *
  * @since 2.1
  */
+@XStreamAlias("userToken")
 public class UserTokenDTO
 {
     protected String nameCode;

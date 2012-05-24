@@ -17,8 +17,8 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.sisu.siesta.xstream.XStreamXmlProvider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,8 +36,8 @@ public class ClientFactoryImpl
 
         ApacheHttpClient4Config cc = new DefaultApacheHttpClient4Config();
 
-        // FIXME: Update to latest siesta and use XStreamXmlProvider here instead
-        cc.getClasses().add(JacksonJsonProvider.class);
+        // Use NX-XStream compatible XML readers/writers
+        cc.getClasses().add(XStreamXmlProvider.class);
 
         ApacheHttpClient4 client = ApacheHttpClient4.create(cc);
 
