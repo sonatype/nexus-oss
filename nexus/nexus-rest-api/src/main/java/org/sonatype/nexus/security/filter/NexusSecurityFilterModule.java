@@ -16,6 +16,7 @@ import javax.inject.Named;
 import javax.servlet.Filter;
 
 import org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter;
+import org.sonatype.nexus.security.filter.authc.NexusContentAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authz.FailureLoggingHttpMethodPermissionFilter;
 import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
@@ -50,7 +51,7 @@ public class NexusSecurityFilterModule
         bindTargetMappingFilter( "tgperms", "/service/local/repo_groups/(.*)/content(.*)", "/groups/@1@2" );
         bindTargetMappingFilter( "tgiperms", "/service/local/repo_groups/(.*)/index_content(.*)", "/groups/@1@2" );
 
-        bindAuthcFilter( "contentAuthcBasic", false, "Sonatype Nexus Repository Manager" );
+        bindContentAuthcFilter( "contentAuthcBasic", "Sonatype Nexus Repository Manager" );
 
         bindTargetMappingFilter( "contentTperms", "/content(.*)", "@1" );
 
@@ -70,6 +71,16 @@ public class NexusSecurityFilterModule
         NexusTargetMappingAuthorizationFilter filter = new NexusTargetMappingAuthorizationFilter();
         filter.setPathPrefix( pathPrefix );
         filter.setPathReplacement( pathReplacement );
+        bindNamedFilter( name, filter );
+    }
+
+    /**
+     * Binds special authc filter to be used for {code}/content{code} resources to handle authentication restrictions.
+     */
+    private void bindContentAuthcFilter( String name, String applicationName )
+    {
+        NexusContentAuthenticationFilter filter = new NexusContentAuthenticationFilter();
+        filter.setApplicationName( applicationName );
         bindNamedFilter( name, filter );
     }
 
