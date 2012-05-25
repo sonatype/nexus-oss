@@ -866,12 +866,9 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   this.sp = Sonatype.lib.Permissions;
 
   this.schedulesGridPanel = new Ext.grid.GridPanel({
-        title : 'Scheduled Tasks',
         id : 'st-schedules-grid',
-
         region : 'north',
         layout : 'fit',
-        collapsible : true,
         split : true,
         height : 200,
         minHeight : 150,
