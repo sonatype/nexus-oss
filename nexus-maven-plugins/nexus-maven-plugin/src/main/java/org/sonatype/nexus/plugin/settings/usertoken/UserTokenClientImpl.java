@@ -58,8 +58,7 @@ public class UserTokenClientImpl
         Client client = clientFactory.create(config);
 
         ClientResponse response = client.resource(serviceUri(config))
-            // FIXME: for now force use of JSON so we'll expect the jackson provider to be used
-            .accept(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_XML)
             .get(ClientResponse.class);
 
         Status status = response.getClientResponseStatus();
