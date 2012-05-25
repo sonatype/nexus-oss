@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -106,4 +107,22 @@ public class Nexus3699CapabilityIT
         capabilitiesNRC.delete( r.getId() );
     }
 
+    @Override
+    protected File methodSpecificDirectory( final String path )
+    {
+        return
+            new File(
+                new File(
+                    new File(
+                        new File(
+                            util.getTargetDir(),
+                            "its"
+                        ),
+                        getClass().getSimpleName()
+                    ),
+                    testName.getMethodName()
+                ),
+                path
+            );
+    }
 }
