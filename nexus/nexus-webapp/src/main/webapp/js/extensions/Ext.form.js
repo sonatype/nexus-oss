@@ -72,6 +72,7 @@ Ext.override(Ext.form.BasicForm, {
  * question mark rendered after field label.
  */
 Ext.override(Ext.form.Field, {
+      afterRenderOrig : Ext.form.Field.prototype.afterRender,
       afterRender : function() {
         var helpClass = null;
         var wrapDiv = null;
@@ -125,8 +126,7 @@ Ext.override(Ext.form.Field, {
         }
 
         // original method
-        Ext.form.Field.superclass.afterRender.call(this);
-        this.initEvents();
+        this.afterRenderOrig(arguments);
       }
 
     });
@@ -1009,23 +1009,28 @@ Ext.override(Ext.form.TextField, {
    * will encode the string again.
    */
   htmlConvert : false,
+  
+  setRawValueOrig : Ext.form.TextField.prototype.setRawValue,
+  setValueOrig : Ext.form.TextField.prototype.setValue,
+  getRawValueOrig : Ext.form.TextField.prototype.getRawValue,
+  getValueOrig : Ext.form.TextField.prototype.getValue,
 
   setRawValue : function(value) {
     if ( this.htmlDecode || this.htmlConvert )
     {
       value = Ext.util.Format.htmlDecode(value);
     }
-    Ext.form.TextField.superclass.setRawValue.call(this, value);
+    this.setRawValueOrig(value);
   },
   setValue : function(value) {
     if ( this.htmlDecode || this.htmlConvert )
     {
       value = Ext.util.Format.htmlDecode(value);
     }
-    Ext.form.TextField.superclass.setValue.call(this, value);
+    this.setValueOrig(value);
   },
   getRawValue : function() {
-    var value = Ext.form.TextField.superclass.getRawValue.call(this);
+    var value = this.getRawValueOrig();
     if ( this.htmlConvert )
     {
       value = Ext.util.Format.htmlEncode(value);
@@ -1033,7 +1038,7 @@ Ext.override(Ext.form.TextField, {
     return value;
   },
   getValue : function() {
-    var value = Ext.form.TextField.superclass.getValue.call(this);
+    var value = this.getValueOrig();
     if ( this.htmlConvert )
     {
       value = Ext.util.Format.htmlEncode(value);
