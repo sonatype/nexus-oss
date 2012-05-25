@@ -246,12 +246,9 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
   this.sp = Sonatype.lib.Permissions;
 
   this.repoTargetsGridPanel = new Ext.grid.GridPanel({
-        title : 'Targets',
         id : 'st-repoTargets-grid',
-
         region : 'north',
         layout : 'fit',
-        collapsible : true,
         split : true,
         height : 200,
         minHeight : 150,
