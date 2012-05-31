@@ -249,8 +249,6 @@ public class DownloadSettingsTemplateMojo
 
         Interpolator interpolator = new StringSearchInterpolator( START_EXPR, END_EXPR );
 
-        System.out.println("\n\n\nCUSTOMIZERS: " + customizers);
-
         if (customizers != null) {
             boolean debug = getLog().isDebugEnabled();
 
