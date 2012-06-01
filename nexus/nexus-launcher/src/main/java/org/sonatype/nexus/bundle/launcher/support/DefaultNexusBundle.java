@@ -32,7 +32,6 @@ import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.jsw.exec.JSWExec;
 import org.sonatype.sisu.jsw.exec.JSWExecFactory;
-import org.sonatype.sisu.jsw.monitor.CommandMonitorTalker;
 import org.sonatype.sisu.jsw.monitor.KeepAliveThread;
 import org.sonatype.sisu.jsw.monitor.internal.log.Slf4jLogProxy;
 import org.sonatype.sisu.jsw.util.JSWConfig;
@@ -331,4 +330,9 @@ public class DefaultNexusBundle
         return new File( getConfiguration().getTargetDirectory(), "sonatype-work/nexus" );
     }
 
+    @Override
+    protected String generateId()
+    {
+        return getName() + "-" + System.currentTimeMillis();
+    }
 }
