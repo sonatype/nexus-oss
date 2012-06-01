@@ -107,22 +107,4 @@ public class Nexus3699CapabilityIT
         capabilitiesNRC.delete( r.getId() );
     }
 
-    @Override
-    protected File methodSpecificDirectory( final String path )
-    {
-        return
-            new File(
-                new File(
-                    new File(
-                        new File(
-                            util.getTargetDir(),
-                            "its"
-                        ),
-                        getClass().getSimpleName()
-                    ),
-                    testName.getMethodName()
-                ),
-                path
-            );
-    }
 }
