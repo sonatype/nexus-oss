@@ -63,6 +63,7 @@
       <Arg>${nexus-webapp}</Arg>
       <Arg>${nexus-webapp-context-path}</Arg>
       <Set name="extractWAR">false</Set>
+      <Set name="throwUnavailableOnStartupException">true</Set>
     </New>
 
     <!--
