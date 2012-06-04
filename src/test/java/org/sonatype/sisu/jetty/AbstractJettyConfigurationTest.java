@@ -17,7 +17,7 @@ import java.net.URL;
 
 import junit.framework.TestCase;
 
-public class AbstractJettyConfigurationTest
+public abstract class AbstractJettyConfigurationTest
     extends TestCase
 {
     protected String getJettyXmlPath( String jettyXmlName )
