@@ -167,7 +167,7 @@
     <micromailer.version>1.1.1</micromailer.version>
     <nexus.repository.metadata.version>1.2</nexus.repository.metadata.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
-    <plexus-app-events.version>1.0.1</plexus-app-events.version>
+    <plexus-app-events.version>1.2-SNAPSHOT</plexus-app-events.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-digest.version>1.1</plexus-digest.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
