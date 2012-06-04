@@ -174,7 +174,7 @@
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2.1</plexus-jetty7.version>
-    <sisu-jetty8.version>1.1</sisu-jetty8.version>
+    <sisu-jetty8.version>1.2-SNAPSHOT</sisu-jetty8.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.20</plexus.restlet.bridge.version>
     <plexus-security.version>2.7</plexus-security.version>
