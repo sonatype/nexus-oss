@@ -55,6 +55,7 @@
         </Array>
       </Set>
       <Set name="extractWAR">false</Set>
+      <Set name="throwUnavailableOnStartupException">true</Set>
     </New>
     
     <Set name="stopAtShutdown">true</Set>
