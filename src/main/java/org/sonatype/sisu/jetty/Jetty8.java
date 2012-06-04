@@ -13,6 +13,7 @@ import org.eclipse.jetty.server.Server;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.sisu.jetty.mangler.ContextAttributeSetterMangler;
 import org.sonatype.sisu.jetty.mangler.ServerMangler;
+import org.sonatype.sisu.jetty.mangler.UnavailableOnStartupExceptionContextMangler;
 import org.sonatype.sisu.jetty.util.JettyUtils;
 
 /**
@@ -63,6 +64,7 @@ public class Jetty8
         this.server = new Server();
         this.appContext = JettyUtils.configureServer( this.server, this.jettyXml, parent, overrides );
         mangleServer( new ContextAttributeSetterMangler( AppContext.APPCONTEXT_KEY, appContext ) );
+        mangleServer( new UnavailableOnStartupExceptionContextMangler() );
     }
 
     public AppContext getAppContext()

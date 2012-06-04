@@ -28,7 +28,7 @@ import org.sonatype.sisu.jetty.mangler.JettyGetterMangler;
 import org.sonatype.sisu.jetty.util.JettyUtils;
 
 public class JettyConfigurationTest
-    extends TestCase
+    extends AbstractJettyConfigurationTest
 {
     public void testKeyInclusion()
         throws Exception
@@ -269,33 +269,5 @@ public class JettyConfigurationTest
                 // expected
             }
         }
-    }
-
-    private String getJettyXmlPath( String jettyXmlName )
-    {
-        String result = null;
-
-        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-        URL res = cloader.getResource( "jetty-xmls/" + jettyXmlName );
-        if ( res == null )
-        {
-            System.out.println( "Can't find jetty-xml: " + jettyXmlName + " on classpath; trying filesystem." );
-            File f = new File( "src/test/resources/jetty-xmls/", jettyXmlName );
-
-            if ( !f.isFile() )
-            {
-                fail( "Cannot find Jetty configuration file: " + jettyXmlName
-                    + " (tried classpath and base-path src/test/resources/jetty-xmls)" );
-            }
-
-            result = f.getAbsolutePath();
-        }
-        else
-        {
-            result = res.getPath();
-        }
-
-        System.out.println( "Jetty configuration path is: '" + result + "'" );
-        return result;
     }
 }
