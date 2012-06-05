@@ -48,7 +48,7 @@ public class VelocityRepresentation
      * @param templateName
      * @param dataModel
      * @param mediaType
-     * @since 1.3
+     * @since 1.21
      */
     public VelocityRepresentation( Context context, Template template, Map<String, Object> dataModel,
                                    MediaType mediaType )
