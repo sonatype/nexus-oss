@@ -25,8 +25,7 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.security.configuration.model.SecurityConfiguration;
-import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.Configuration;
@@ -44,8 +43,8 @@ public class SecurityUpgradeEventInspector
     @Requirement( hint = "file" )
     private SecurityModelConfigurationSource realmConfigSource;
 
-    @Requirement( hint = "file" )
-    private SecurityConfigurationSource systemConfigSource;
+    @Requirement
+    private SecurityConfigurationManager systemConfigManager;
 
     /**
      * Reuse the previous versions upgrader, this is normally run after the module upgrade of 2.0.1, so the module is
@@ -86,16 +85,15 @@ public class SecurityUpgradeEventInspector
 
             // NEXUS-5049: but this time, we need to perform this _not_ against SecuritySystem API (is still not up)
             // but by directly "tampering" with it's configuration(s).
-            final SecurityConfiguration securitySystemConfiguration = systemConfigSource.loadConfiguration();
-            if ( !securitySystemConfiguration.isAnonymousAccessEnabled()
-                && !StringUtils.isBlank( securitySystemConfiguration.getAnonymousUsername() ) )
+            if ( !systemConfigManager.isAnonymousAccessEnabled()
+                && !StringUtils.isBlank( systemConfigManager.getAnonymousUsername() ) )
             {
                 // get the probably _changed_ one again
                 securityRealmConfig = realmConfigSource.getConfiguration();
                 
                 for ( CUser user : securityRealmConfig.getUsers() )
                 {
-                    if ( StringUtils.equals( securitySystemConfiguration.getAnonymousUsername(), user.getId() ) )
+                    if ( StringUtils.equals( systemConfigManager.getAnonymousUsername(), user.getId() ) )
                     {
                         user.setStatus( CUser.STATUS_DISABLED );
                         changed = true;
