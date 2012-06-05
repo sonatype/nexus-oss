@@ -97,6 +97,6 @@ public class VelocityRepresentation
 
     private static VelocityEngine getEngine( final Context context )
     {
-        return (VelocityEngine) context.getAttributes().get( Velocity.class.getName() );
+        return ( (Velocity) context.getAttributes().get( Velocity.class.getName() ) ).getEngine();
     }
 }
