@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.rest;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
