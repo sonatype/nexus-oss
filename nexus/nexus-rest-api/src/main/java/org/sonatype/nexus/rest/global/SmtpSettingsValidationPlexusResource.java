@@ -47,7 +47,7 @@ public class SmtpSettingsValidationPlexusResource
 {
     public static final String RESOURCE_URI = "/check_smtp_settings";
         
-    private static final Pattern EMAIL_PATTERN = Pattern.compile( ".+@.+\\.[a-z]+" );
+    private static final Pattern EMAIL_PATTERN = Pattern.compile( ".+@.+\\.[a-zA-Z]+" );
 
     @Requirement
     private SmtpSettingsValidator emailer;
@@ -90,10 +90,7 @@ public class SmtpSettingsValidationPlexusResource
 
         String email = settings.getTestEmail();
 
-        if ( !EMAIL_PATTERN.matcher( email ).matches() )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid e-mail address: " + email );
-        }
+        validateEmail( email );
 
         CSmtpConfiguration config = new CSmtpConfiguration();
 
@@ -129,6 +126,15 @@ public class SmtpSettingsValidationPlexusResource
         }
 
         return null;
+    }
+
+    static void validateEmail( final String email )
+        throws ResourceException
+    {
+        if ( !EMAIL_PATTERN.matcher( email ).matches() )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid e-mail address: " + email );
+        }
     }
 
 }
