@@ -265,10 +265,6 @@ public class DefaultNexusConfiguration
                 configurationSource.storeConfiguration();
             }
 
-            configurationDirectory = null;
-
-            temporaryDirectory = null;
-
             globalLocalStorageContext = new DefaultLocalStorageContext( null );
 
             // create global remote ctx
@@ -379,10 +375,6 @@ public class DefaultNexusConfiguration
         if ( !prepare.isVetoed() )
         {
             logApplyConfiguration( prepare.getChanges() );
-
-            configurationDirectory = null;
-
-            temporaryDirectory = null;
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
