@@ -62,7 +62,7 @@ public class IndexRedirectingPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        response.redirectTemporary(
+        response.redirectPermanent(
             createRootReference(
                 request, indexTemplateResource.getResourceUri().replaceFirst( "/", "" )
             )
