@@ -1,5 +1,7 @@
 package org.sonatype.plexus.rest.xstream.xml;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.restlet.Application;
 import org.restlet.Client;
@@ -22,6 +24,14 @@ public class InvalidXMLTest
     private static final String VALID = "<simple><data>something</data></simple>";
 
     private static final String INVALID = "<simple><invalid/><data>something</data></simple>";
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        super.customizeContainerConfiguration( configuration );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
+    }
 
     public void testXML()
         throws Exception

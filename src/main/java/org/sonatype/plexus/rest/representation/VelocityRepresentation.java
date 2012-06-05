@@ -14,40 +14,89 @@ package org.sonatype.plexus.rest.representation;
 
 import java.util.Map;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.ext.velocity.TemplateRepresentation;
-import org.sonatype.logging.Slf4jLogChute;
 
 public class VelocityRepresentation
     extends TemplateRepresentation
 {
+    private final VelocityEngine velocityEngine;
+
+    /**
+     * Constructor when template is on core classpath (will be loaded using VelocityEngine).
+     * 
+     * @param context
+     * @param templateName
+     * @param dataModel
+     * @param mediaType
+     */
     public VelocityRepresentation( Context context, String templateName, Map<String, Object> dataModel,
-        MediaType mediaType )
+                                   MediaType mediaType )
     {
-        super( templateName, dataModel, mediaType );
-        configureEngine( context );
+        super( getTemplate( context, templateName ), dataModel, mediaType );
+        this.velocityEngine = getEngine( context );
     }
 
+    /**
+     * Constructor when template is got from somewhere else then core (ie, from a template NOT on core classpath).
+     * 
+     * @param context
+     * @param templateName
+     * @param dataModel
+     * @param mediaType
+     * @since 1.3
+     */
+    public VelocityRepresentation( Context context, Template template, Map<String, Object> dataModel,
+                                   MediaType mediaType )
+    {
+        super( template, dataModel, mediaType );
+        this.velocityEngine = getEngine( context );
+    }
+
+    /**
+     * Nonsense constructor... Velocity template without data model?
+     * 
+     * @param context
+     * @param templateName
+     * @param mediaType
+     * @deprecated use other constructors.
+     */
+    @Deprecated
     public VelocityRepresentation( Context context, String templateName, MediaType mediaType )
     {
-        super( templateName, mediaType );
-        configureEngine( context );
+        super( getTemplate( context, templateName ), mediaType );
+        this.velocityEngine = getEngine( context );
     }
 
-    protected void configureEngine( Context context )
+    // ==
+
+    @Override
+    public VelocityEngine getEngine()
     {
-        VelocityEngine engine = getEngine();
-
-        engine.setProperty( RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new Slf4jLogChute() );
-
-        engine.setProperty( RuntimeConstants.RESOURCE_LOADER, "class" );
-
-        engine.setProperty(
-            "class.resource.loader.class",
-            "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader" );
+        return velocityEngine;
     }
 
+    // ==
+
+    private static Template getTemplate( final Context context, final String templateName )
+    {
+        try
+        {
+            return getEngine( context ).getTemplate( templateName );
+        }
+        catch ( Exception e )
+        {
+            throw new IllegalArgumentException( "Cannot get the template with name " + String.valueOf( templateName ),
+                e );
+        }
+    }
+
+    private static VelocityEngine getEngine( final Context context )
+    {
+        return (VelocityEngine) context.getAttributes().get( Velocity.class.getName() );
+    }
 }

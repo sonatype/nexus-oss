@@ -34,6 +34,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
+import org.sonatype.sisu.velocity.Velocity;
 
 import com.noelios.restlet.application.Encoder;
 import com.thoughtworks.xstream.XStream;
@@ -63,12 +64,15 @@ public class PlexusRestletApplicationBridge
     public static final String PLEXUS_DISCOVER_RESOURCES = "plexus.discoverResources";
 
     private static final String ENABLE_ENCODER_KEY = "enable-restlet-encoder";
-    
+
     @Requirement
     private PlexusContainer plexusContainer;
 
     @Requirement( role = PlexusResource.class )
     private Map<String, PlexusResource> plexusResources;
+
+    @Requirement
+    private Velocity velocity;
 
     /** Date of creation of this application */
     private final Date createdOn;
@@ -88,7 +92,7 @@ public class PlexusRestletApplicationBridge
     public PlexusRestletApplicationBridge()
     {
         super();
-        
+
         this.createdOn = new Date();
     }
 
@@ -170,9 +174,9 @@ public class PlexusRestletApplicationBridge
     {
         // sorting out the resources, collecting them
         boolean shouldCollectPlexusResources =
-            getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null ? Boolean
-                .parseBoolean( (String) getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) )
-                            : true; // the default if not set
+            getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue(
+                PLEXUS_DISCOVER_RESOURCES ) )
+                : true; // the default if not set
 
         if ( shouldCollectPlexusResources )
         {
@@ -209,6 +213,9 @@ public class PlexusRestletApplicationBridge
         // put fileItemFactory into context
         getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
 
+        // put velocity into context
+        getContext().getAttributes().put( Velocity.class.getName(), velocity );
+
         doConfigure();
     }
 
@@ -232,13 +239,13 @@ public class PlexusRestletApplicationBridge
             }
 
             doCreateRoot( rootRouter, isStarted );
-            
+
             // check if we want to compress stuff
             boolean enableCompression = false;
             try
             {
-                if( this.plexusContainer.getContext().contains( ENABLE_ENCODER_KEY ) && 
-                    Boolean.parseBoolean( this.plexusContainer.getContext().get( ENABLE_ENCODER_KEY ).toString() ) )
+                if ( this.plexusContainer.getContext().contains( ENABLE_ENCODER_KEY )
+                    && Boolean.parseBoolean( this.plexusContainer.getContext().get( ENABLE_ENCODER_KEY ).toString() ) )
                 {
                     enableCompression = true;
                     getLogger().fine( "Restlet Encoder will compress output." );
@@ -246,29 +253,31 @@ public class PlexusRestletApplicationBridge
             }
             catch ( ContextException e )
             {
-                getLogger().log( Level.WARNING, "Failed to get plexus property: "+ ENABLE_ENCODER_KEY + ", this property was found in the context.", e );
+                getLogger().log(
+                    Level.WARNING,
+                    "Failed to get plexus property: " + ENABLE_ENCODER_KEY
+                        + ", this property was found in the context.", e );
             }
-            
+
             // encoding support
-            ArrayList<MediaType> ignoredMediaTypes = new ArrayList<MediaType>(Encoder.getDefaultIgnoredMediaTypes());
+            ArrayList<MediaType> ignoredMediaTypes = new ArrayList<MediaType>( Encoder.getDefaultIgnoredMediaTypes() );
             ignoredMediaTypes.add( MediaType.APPLICATION_COMPRESS ); // anything compressed
             ignoredMediaTypes.add( new MediaType( "application/x-bzip2" ) );
             ignoredMediaTypes.add( new MediaType( "application/x-bzip" ) );
             ignoredMediaTypes.add( new MediaType( "application/x-compressed" ) );
             ignoredMediaTypes.add( new MediaType( "application/x-shockwave-flash" ) );
-            
-            Encoder encoder = new Encoder( getContext(), false, enableCompression, Encoder.ENCODE_ALL_SIZES,
-                Encoder.getDefaultAcceptedMediaTypes(), ignoredMediaTypes);
-            
+
+            Encoder encoder =
+                new Encoder( getContext(), false, enableCompression, Encoder.ENCODE_ALL_SIZES,
+                    Encoder.getDefaultAcceptedMediaTypes(), ignoredMediaTypes );
+
             encoder.setNext( rootRouter );
-            
+
             // set it
             root.setNext( encoder );
-            
+
         }
     }
-    
-    
 
     protected final XStream createAndConfigureXstream( HierarchicalStreamDriver driver )
     {
@@ -294,9 +303,9 @@ public class PlexusRestletApplicationBridge
         if ( getLogger().isLoggable( Level.FINE ) )
         {
             getLogger().log(
-                             Level.FINE,
-                             "Attaching Restlet of class '" + target.getClass().getName() + "' to URI='" + uriPattern
-                                 + "' (strict='" + strict + "')" );
+                Level.FINE,
+                "Attaching Restlet of class '" + target.getClass().getName() + "' to URI='" + uriPattern
+                    + "' (strict='" + strict + "')" );
         }
 
         Route route = router.attach( uriPattern, target );
