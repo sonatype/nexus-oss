@@ -15,11 +15,11 @@ package org.sonatype.plexus.rest.representation;
 import java.util.Map;
 
 import org.apache.velocity.Template;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.ext.velocity.TemplateRepresentation;
+import org.sonatype.sisu.velocity.Velocity;
 
 public class VelocityRepresentation
     extends TemplateRepresentation
