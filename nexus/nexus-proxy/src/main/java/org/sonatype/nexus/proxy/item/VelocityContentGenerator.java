@@ -19,12 +19,11 @@ import org.apache.velocity.VelocityContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.velocity.VelocityComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.velocity.Velocity;
 
 @Component( role = ContentGenerator.class, hint = VelocityContentGenerator.ID )
 public class VelocityContentGenerator
@@ -33,7 +32,7 @@ public class VelocityContentGenerator
     public static final String ID = "velocity";
 
     @Requirement
-    private VelocityComponent velocityComponent;
+    private Velocity velocityComponent;
 
     @Override
     public String getGeneratorId()
@@ -43,20 +42,16 @@ public class VelocityContentGenerator
 
     @Override
     public ContentLocator generateContent( Repository repository, String path, StorageFileItem item )
-        throws IllegalOperationException, ItemNotFoundException, StorageException
+        throws IllegalOperationException, ItemNotFoundException, LocalStorageException
     {
         InputStreamReader isr = null;
 
         try
         {
             StringWriter sw = new StringWriter();
-
             VelocityContext vctx = new VelocityContext( item.getItemContext() );
-
             isr = new InputStreamReader( item.getInputStream(), "UTF-8" );
-
             velocityComponent.getEngine().evaluate( vctx, sw, item.getRepositoryItemUid().toString(), isr );
-
             return new StringContentLocator( sw.toString() );
         }
         catch ( Exception e )
