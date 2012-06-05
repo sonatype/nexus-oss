@@ -79,7 +79,7 @@ public class AbstractEnvironmentMojo
 
     public final static List<String> DEFAULT_PORT_NAMES = Collections.unmodifiableList( Arrays.asList( new String[] {
         "proxy-repo-port", "proxy-repo-control-port", "nexus-application-port", "nexus-proxy-port",
-        "nexus-control-port", "email-server-port", "webproxy-server-port" } ) );
+        "nexus-control-port", "email-server-port", "webproxy-server-port", "jira-server-port" } ) );
 
     /**
      * Max times to try and allocate unique port values
