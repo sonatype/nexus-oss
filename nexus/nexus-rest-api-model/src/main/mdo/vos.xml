@@ -2296,6 +2296,13 @@
           <description>A name of the content item.</description>
         </field>
         <field>
+          <name>description</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>A (possibly longer) description of the content item.</description>
+        </field>
+        <field>
           <name>leaf</name>
           <version>1.0.0+</version>
           <type>boolean</type>
