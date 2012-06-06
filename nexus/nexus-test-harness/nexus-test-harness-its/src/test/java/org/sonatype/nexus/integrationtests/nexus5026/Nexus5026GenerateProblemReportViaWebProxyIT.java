@@ -10,19 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.integrationtests.nexus3082;
+package org.sonatype.nexus.integrationtests.nexus5026;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.io.Files;
 import org.sonatype.jira.AttachmentHandler;
 import org.sonatype.jira.mock.MockAttachmentHandler;
 import org.sonatype.jira.mock.StubJira;
 import org.sonatype.jira.test.JiraXmlRpcTestServlet;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -31,12 +34,13 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import com.google.common.io.Files;
 
-public class Nexus3082GenerateProblemReportIT
-    extends AbstractNexusIntegrationTest
+public class Nexus5026GenerateProblemReportViaWebProxyIT
+    extends AbstractNexusWebProxyIntegrationTest
 {
 
-    private JettyServerProvider server;
+    private JettyServerProvider jettyServer;
 
     @BeforeMethod
     public void setupJiraMock()
@@ -49,9 +53,9 @@ public class Nexus3082GenerateProblemReportIT
     public void shutdownJiraMock()
         throws Exception
     {
-        if ( server != null )
+        if ( jettyServer != null )
         {
-            server.stop();
+            jettyServer.stop();
         }
     }
 
@@ -62,8 +66,10 @@ public class Nexus3082GenerateProblemReportIT
         ErrorReportResponse response = ErrorReportUtil.generateProblemReport( "sometitle", "somedescription" );
 
         Assert.assertNotNull( response );
-
         Assert.assertNotNull( response.getData().getJiraUrl() );
+
+        assertThat( "proxy was used", server.getAccessedUris(), hasSize( 1 ) );
+        assertThat( server.getAccessedUris().get( 0 ), containsString( jettyServer.getUrl().toExternalForm() ) );
     }
 
     private void setupMockJira()
@@ -85,17 +91,10 @@ public class Nexus3082GenerateProblemReportIT
 
         handler.setMock( mock );
         List<AttachmentHandler> handlers = Arrays.<AttachmentHandler>asList( handler );
-        server = new JettyServerProvider();
-        server.setPort( port );
-        server.addServlet( new JiraXmlRpcTestServlet( mock, server.getUrl(), handlers ) );
-        server.start();
-    }
-
-    @Test
-    public void generateReportWithFailure()
-        throws Exception
-    {
-        ErrorReportUtil.generateProblemReport( null, "somedescription" );
+        jettyServer = new JettyServerProvider();
+        jettyServer.setPort( port );
+        jettyServer.addServlet( new JiraXmlRpcTestServlet( mock, jettyServer.getUrl(), handlers ) );
+        jettyServer.start();
     }
 
 }

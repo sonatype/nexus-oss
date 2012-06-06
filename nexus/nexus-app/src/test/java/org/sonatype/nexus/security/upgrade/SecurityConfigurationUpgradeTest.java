@@ -16,12 +16,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
-import org.junit.Test;
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -33,11 +31,17 @@ public class SecurityConfigurationUpgradeTest
     protected void copySecurityConfigToPlace()
         throws IOException
     {
+        // some old nexus.xml to trigger "real" upgrade
+        this.copyResource( "/org/sonatype/nexus/security/upgrade/nexus.xml", getNexusConfiguration() );
+        // the security we want upgraded
+        // since https://github.com/sonatype/nexus/commit/d1a5e6fdb79527f19ea5c744bafafd0ccd45f373 nexus.xml triggers
+        // security upgrade too
         this.copyResource( "/org/sonatype/nexus/security/upgrade/security.xml", getNexusSecurityConfiguration() );
     }
 
     @Test
-    public void testLoadComponent() throws Exception
+    public void testLoadComponent()
+        throws Exception
     {
         Assert.assertNotNull( this.lookup( EventInspector.class, "SecurityUpgradeEventInspector" ) );
     }

@@ -612,4 +612,14 @@ public abstract class AbstractDeployMojo
     {
         return MojoExecution.isCurrentTheLastProjectWithMojoInExecution( mavenSession, pluginGroupId, pluginArtifactId );
     }
+
+    /**
+     * Returns true if the current project is the last one being executed in this build.
+     * 
+     * @return true if last project is being built.
+     */
+    protected boolean isThisLastProject()
+    {
+        return MojoExecution.isCurrentTheLastProjectInExecution( mavenSession );
+    }
 }

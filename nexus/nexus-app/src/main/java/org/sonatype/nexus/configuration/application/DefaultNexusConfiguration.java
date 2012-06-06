@@ -224,6 +224,18 @@ public class DefaultNexusConfiguration
         {
             forceMkdir( workingDirectory );
         }
+
+        temporaryDirectory = canonicalize( new File( System.getProperty( "java.io.tmpdir" ) ) );
+        if ( !temporaryDirectory.isDirectory() )
+        {
+            forceMkdir( temporaryDirectory );
+        }
+
+        configurationDirectory = canonicalize( new File( getWorkingDirectory(), "conf" ) );
+        if ( !configurationDirectory.isDirectory() )
+        {
+            forceMkdir( configurationDirectory );
+        }
     }
 
     public void loadConfiguration()
@@ -252,10 +264,6 @@ public class DefaultNexusConfiguration
                 configurationSource.backupConfiguration();
                 configurationSource.storeConfiguration();
             }
-
-            configurationDirectory = null;
-
-            temporaryDirectory = null;
 
             globalLocalStorageContext = new DefaultLocalStorageContext( null );
 
@@ -368,10 +376,6 @@ public class DefaultNexusConfiguration
         {
             logApplyConfiguration( prepare.getChanges() );
 
-            configurationDirectory = null;
-
-            temporaryDirectory = null;
-
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
@@ -477,25 +481,13 @@ public class DefaultNexusConfiguration
         return canonicalize( keyedDirectory );
     }
 
-    public synchronized File getTemporaryDirectory()
+    public File getTemporaryDirectory()
     {
-        if ( temporaryDirectory == null )
-        {
-            final File file = new File( System.getProperty( "java.io.tmpdir" ) );
-            forceMkdir( file );
-            temporaryDirectory = canonicalize( file );
-        }
         return temporaryDirectory;
     }
 
-    public synchronized File getConfigurationDirectory()
+    public File getConfigurationDirectory()
     {
-        if ( configurationDirectory == null )
-        {
-            final File file = new File( getWorkingDirectory(), "conf" );
-            forceMkdir( file );
-            configurationDirectory = canonicalize( file );
-        }
         return configurationDirectory;
     }
 

@@ -459,6 +459,8 @@ public class DefaultNexus
 
             // essential service
             securitySystem.start();
+            // "ping" it to load configuration (as it is lazy)
+            securitySystem.getAnonymousUsername();
 
             // create internals
             nexusConfiguration.createInternals();

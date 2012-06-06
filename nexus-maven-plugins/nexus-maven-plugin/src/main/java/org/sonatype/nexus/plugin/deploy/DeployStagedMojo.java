@@ -30,7 +30,7 @@ public class DeployStagedMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if ( isThisLastProjectWithThisMojoInExecution() )
+        if ( isThisLastProject() )
         {
             failIfOffline();
 
