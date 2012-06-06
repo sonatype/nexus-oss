@@ -21,6 +21,7 @@ import javax.ws.rs.Path;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -131,6 +132,10 @@ public class SmtpSettingsValidationPlexusResource
     static void validateEmail( final String email )
         throws ResourceException
     {
+        if ( StringUtils.isEmpty( email ) )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "E-mail address cannot be empty" );
+        }
         if ( !EMAIL_PATTERN.matcher( email ).matches() )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid e-mail address: " + email );

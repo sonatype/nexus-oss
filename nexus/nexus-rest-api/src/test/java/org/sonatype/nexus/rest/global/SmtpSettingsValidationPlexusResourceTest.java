@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.rest.global;
 
+import static org.sonatype.nexus.rest.global.SmtpSettingsValidationPlexusResource.validateEmail;
+
 import org.junit.Test;
 import org.restlet.resource.ResourceException;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -20,25 +22,39 @@ public class SmtpSettingsValidationPlexusResourceTest
     extends TestSupport
 {
 
+    @Test( expected = ResourceException.class )
+    public void nullEmailShouldNotBeAccepted()
+        throws ResourceException
+    {
+        validateEmail( null );
+    }
+
+    @Test( expected = ResourceException.class )
+    public void emptyEmailShouldNotBeAccepted()
+        throws ResourceException
+    {
+        validateEmail( " " );
+    }
+
     @Test
     public void tldWithUpperCase()
         throws ResourceException
     {
-        SmtpSettingsValidationPlexusResource.validateEmail( "me@foo.COM" );
+        validateEmail( "me@foo.COM" );
     }
 
     @Test
     public void tldWithLowerCase()
         throws ResourceException
     {
-        SmtpSettingsValidationPlexusResource.validateEmail( "me@foo.com" );
+        validateEmail( "me@foo.com" );
     }
 
     @Test
     public void tldWithMixCase()
         throws ResourceException
     {
-        SmtpSettingsValidationPlexusResource.validateEmail( "me@foo.CoM" );
+        validateEmail( "me@foo.CoM" );
     }
 
 }
