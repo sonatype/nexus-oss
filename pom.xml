@@ -10,7 +10,7 @@
 
   <groupId>org.sonatype.sisu</groupId>
   <artifactId>sisu-jetty8</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
 
   <name>SISU Jetty8 Component</name>
 
