@@ -296,7 +296,8 @@
                   <includes>
                     <include>${basedir}/src/main/webapp/ext-2.3/adapter/ext/ext-base.js</include>
                     <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
-                    <include>${basedir}/src/main/webapp/js/extensions/Nexus.error.ErrorHandler.js</include>
+                    <include>${compressed-dir}/js/nexus/error/common.js</include>
+                    <include>${compressed-dir}/js/nexus/error/ErrorHandler.js</include>
                     <include>${compressed-dir}/js/extensions/ext-override.js</include>
                     <include>${compressed-dir}/js/filetree/js/Ext.ux.form.BrowseButton.js</include>
                     <include>${compressed-dir}/js/groupcombo/groupcombo.js</include>
@@ -317,7 +318,8 @@
                     <include>${compressed-dir}/js/extensions/Ext.ux.form.LovCombo.js</include>
                     <include>${compressed-dir}/js/extensions/Ext.ux.ThemeCombo.js</include>
                     <include>${compressed-dir}/js/extensions/RoleSelector.js</include>
-                    <include>${compressed-dir}/js/extensions/Nexus.form.LabelField.js</include>
+                    <include>${compressed-dir}/js/nexus/form/common.js</include>
+                    <include>${compressed-dir}/js/nexus/form/LabelField.js</include>
                     <include>${compressed-dir}/js/Sonatype.utils.js</include>
                     <include>${compressed-dir}/js/Sonatype.config.js</include>
                     <include>${compressed-dir}/js/Sonatype.lib.js</include>
@@ -353,8 +355,9 @@
                     <include>${compressed-dir}/js/repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoSummaryPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.Maven2InformationPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/profile.UserProfile.js</include>
-                    <include>${compressed-dir}/js/repoServer/profile.Summary.js</include>
+                    <include>${compressed-dir}/js/nexus/profile/common.js</include>
+                    <include>${compressed-dir}/js/nexus/profile/UserProfile.js</include>
+                    <include>${compressed-dir}/js/nexus/profile/Summary.js</include>
                   </includes>
                 </aggregation>
               </aggregations>
