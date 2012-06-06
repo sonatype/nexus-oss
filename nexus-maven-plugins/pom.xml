@@ -147,6 +147,7 @@
       </activation>
       <modules>
         <module>nexus-maven-plugin</module>
+        <module>nexus-plugin-archetype</module>
       </modules>
     </profile>
     <profile>
