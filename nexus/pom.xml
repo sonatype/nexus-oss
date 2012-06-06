@@ -164,7 +164,7 @@
     <jetty.version>8.1.3.v20120416</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <maven.version>3.0.4</maven.version>
-    <micromailer.version>1.1.1</micromailer.version>
+    <micromailer.version>1.5-SNAPSHOT</micromailer.version>
     <nexus.repository.metadata.version>1.2</nexus.repository.metadata.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <plexus-app-events.version>1.2-SNAPSHOT</plexus-app-events.version>
@@ -175,12 +175,12 @@
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2.1</plexus-jetty7.version>
     <sisu-jetty8.version>1.2-SNAPSHOT</sisu-jetty8.version>
+    <sisu-velocity.version>1.0-SNAPSHOT</sisu-velocity.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
-    <plexus.restlet.bridge.version>1.20</plexus.restlet.bridge.version>
+    <plexus.restlet.bridge.version>1.21-SNAPSHOT</plexus.restlet.bridge.version>
     <plexus-security.version>2.7</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
-    <plexus-velocity.version>1.1.7</plexus-velocity.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <shiro.version>1.2.0</shiro.version>
     <spice-timeline.version>2.1</spice-timeline.version>
@@ -490,45 +490,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-mailer</artifactId>
-        <version>${micromailer.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-velocity</artifactId>
-        <version>${plexus-velocity.version}</version>
-        <type>jar</type>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-component-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>velocity</groupId>
-            <artifactId>velocity</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.sonatype.spice</groupId>
         <artifactId>spice-timeline</artifactId>
         <version>${spice-timeline.version}</version>
@@ -556,6 +517,33 @@
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-charger</artifactId>
         <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-mailer</artifactId>
+        <version>${micromailer.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-velocity</artifactId>
+        <version>${sisu-velocity.version}</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.velocity</groupId>
+        <artifactId>velocity</artifactId>
+        <version>1.5</version>
+        <type>jar</type>
       </dependency>
 
       <!-- locks -->
@@ -802,12 +790,6 @@
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
         <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity</artifactId>
-        <version>1.5</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>rome</groupId>

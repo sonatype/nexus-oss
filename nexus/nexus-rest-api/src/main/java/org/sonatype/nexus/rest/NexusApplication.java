@@ -232,8 +232,8 @@ public class NexusApplication
 
         // protecting the content service manually
         this.protectedPathManager.addProtectedResource( "/content"
-            + contentResource.getResourceProtection().getPathPattern(),
-            "noSessionCreation," + contentResource.getResourceProtection().getFilterExpression() );
+            + contentResource.getResourceProtection().getPathPattern(), "noSessionCreation,"
+            + contentResource.getResourceProtection().getFilterExpression() );
 
         // protecting service resources with "wall" permission
         this.protectedPathManager.addProtectedResource( "/service/**",
@@ -256,7 +256,7 @@ public class NexusApplication
             // don't create session unless the user logs in from the UI
             filterExpression = "noSessionCreation," + filterExpression;
         }
-        
+
         this.protectedPathManager.addProtectedResource( "/service/*" + descriptor.getPathPattern(), filterExpression );
     }
 

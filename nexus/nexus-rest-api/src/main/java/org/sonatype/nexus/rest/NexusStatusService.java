@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -43,7 +44,7 @@ public class NexusStatusService
 
     @Requirement
     private Nexus nexus;
-
+    
     public Representation getRepresentation( final Status status, final Request request, final Response response )
     {
         final HashMap<String, Object> dataModel = new HashMap<String, Object>();
@@ -61,10 +62,10 @@ public class NexusStatusService
             dataModel.put( "errorStackTrace",
                 StringEscapeUtils.escapeHtml( ExceptionUtils.getStackTrace( status.getThrowable() ) ) );
         }
-
+        
         // Load up the template, and pass in the data
         VelocityRepresentation representation =
-            new VelocityRepresentation( null, "/templates/errorPageContentHtml.vm", dataModel, MediaType.TEXT_HTML );
+            new VelocityRepresentation( Context.getCurrent(), "/templates/errorPageContentHtml.vm", dataModel, MediaType.TEXT_HTML );
 
         return representation;
     }

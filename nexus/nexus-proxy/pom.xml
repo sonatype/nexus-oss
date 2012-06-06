@@ -47,16 +47,12 @@
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-velocity</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-velocity</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus.appevents</groupId>
