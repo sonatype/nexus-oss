@@ -11,7 +11,7 @@
 
   <groupId>org.sonatype.appcontext</groupId>
   <artifactId>appcontext</artifactId>
-  <version>3.2</version>
+  <version>3.3-SNAPSHOT</version>
 
   <name>Sonatype AppContext</name>
   <description>A small utility useful in various use cases, like "booting" an application. All it does is simply creates a plain Map, with it's values sourced from different places and applies different strategies (override order).</description>
