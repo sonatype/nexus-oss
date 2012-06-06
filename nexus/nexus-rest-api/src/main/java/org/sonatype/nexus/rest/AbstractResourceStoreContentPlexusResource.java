@@ -13,6 +13,8 @@
 package org.sonatype.nexus.rest;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -116,7 +118,21 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     protected String getResourceStorePath( Request request )
     {
-        return parsePathFromUri( request.getResourceRef().getRemainingPart( true, true ) );
+        try
+        {
+            // #getRemainingPart(true, true) would use Restlet decoding, that relies 
+            // on same URLDecoder as below, but without this "trick" below
+            // source: http://stackoverflow.com/questions/2632175/java-decoding-uri-query-string
+            final String remainingPart = request.getResourceRef().getRemainingPart( false, false );
+            final String remainingDecodedPart =
+                URLDecoder.decode( remainingPart.replace( "+", "%2B" ), "UTF-8" ).replace( "%2B", "+" );
+            return parsePathFromUri( remainingDecodedPart );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new IllegalStateException(
+                "Nexus cannot operate on platform not supporting UTF-8 character encoding!", e );
+        }
     }
 
     protected boolean isDescribe( Request request )
