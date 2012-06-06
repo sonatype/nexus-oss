@@ -23,9 +23,6 @@
       <id>fake-central</id>
       <name>fake-central</name>
       <allowWrite>false</allowWrite>
-      <localStorage>
-      	<url>http://repo1.maven.org/maven2/</url>
-      </localStorage>
     </repository>
     <repository>
       <id>nexus-test-harness-repo</id>
