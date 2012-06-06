@@ -1,8 +1,0 @@
-<plexus>
-  <components>
-    <component>
-      <role>org.sonatype.sisu.maven.bridge.internal.ModelResolverFactory</role>
-      <implementation>org.sonatype.nexus.plugins.mavenbridge.internal.guice.NexusModelResolverFactory</implementation>
-    </component>
-  </components>
-</plexus>
