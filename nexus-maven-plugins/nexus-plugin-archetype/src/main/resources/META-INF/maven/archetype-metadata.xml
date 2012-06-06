@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor name="nexus-archetype-plugin">
+  <fileSets>
+    <fileSet filtered="true" packaged="true" encoding="UTF-8">
+      <directory>src/main/java</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  
+  <requiredProperties>
+    <requiredProperty key="nexusVersion">
+      <defaultValue>2.0.5</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
+  
+</archetype-descriptor>
