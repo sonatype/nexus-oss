@@ -353,8 +353,9 @@
                     <include>${compressed-dir}/js/repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoSummaryPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.Maven2InformationPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/profile.UserProfile.js</include>
-                    <include>${compressed-dir}/js/repoServer/profile.Summary.js</include>
+                    <include>${compressed-dir}/js/nexus/profile/nexus.profile.common.js</include>
+                    <include>${compressed-dir}/js/nexus/profile/nexus.profile.UserProfile.js</include>
+                    <include>${compressed-dir}/js/nexus/profile/nexus.profile.Summary.js</include>
                   </includes>
                 </aggregation>
               </aggregations>

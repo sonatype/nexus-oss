@@ -11,8 +11,11 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-Ext.namespace('Nexus.profile');
-
+/**
+ * The user profile tab.
+ *
+ * @constructor
+ */
 Nexus.profile.UserProfile = function(config) {
 
   var config = config || {};
@@ -27,7 +30,7 @@ Nexus.profile.UserProfile = function(config) {
 
   Sonatype.Events.fireEvent('userProfileInit', views);
 
-  this.content = new Nexus.profile.UserProfile.contentClass({
+  this.content = new Nexus.profile.UserProfile.Content({
     cls : 'user-profile-dynamic-content',
     border : false,
     x : 20,
@@ -100,7 +103,13 @@ Nexus.profile.UserProfile = function(config) {
 }
 Ext.extend(Nexus.profile.UserProfile, Ext.Panel);
 
-Nexus.profile.UserProfile.contentClass = function(config)
+/**
+ * The inner content panel of the user profile tab.
+ * This is what changes on combo box selection.
+ *
+ * @constructor
+ */
+Nexus.profile.UserProfile.Content = function(config)
 {
   Ext.apply(this, config || {}, {
     plain : true,
@@ -119,7 +128,7 @@ Nexus.profile.UserProfile.contentClass = function(config)
     }
   });
 
-  Nexus.profile.UserProfile.contentClass.superclass.constructor.call(this);
+  Nexus.profile.UserProfile.Content.superclass.constructor.call(this);
 
   this.display = function(panel, profile)
   {
@@ -128,7 +137,7 @@ Nexus.profile.UserProfile.contentClass = function(config)
     profile.refreshButton.setVisible(panel.refreshContent !== undefined);
   }
 }
-Ext.extend(Nexus.profile.UserProfile.contentClass, Ext.TabPanel);
+Ext.extend(Nexus.profile.UserProfile.Content, Ext.TabPanel);
 
 /**
  * @param {string} name The name displayed in the combo box selector.
