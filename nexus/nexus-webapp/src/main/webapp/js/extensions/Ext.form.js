@@ -984,7 +984,7 @@ Ext.override(Ext.form.TextField, {
   /**
    * @cfg {Boolean} htmlDecode
    * <tt>true</tt> to decode html entities in the value given to
-   * Ext.form.ByteDisplayField.setValue and Ext.form.ByteDisplayField.setRawValue
+   * Ext.form.TextField.setValue and Ext.form.TextField.setRawValue
    * before setting the actual value.
    * <p/>
    * This is needed for displaying the 'literal' value in the text field when it was received by the server,
@@ -1018,14 +1018,14 @@ Ext.override(Ext.form.TextField, {
   setRawValue : function(value) {
     if ( this.htmlDecode || this.htmlConvert )
     {
-      value = Ext.util.Format.htmlDecode(value);
+      value = Nexus.util.Format.htmlDecode(value);
     }
     this.setRawValueOrig(value);
   },
   setValue : function(value) {
     if ( this.htmlDecode || this.htmlConvert )
     {
-      value = Ext.util.Format.htmlDecode(value);
+      value = Nexus.util.Format.htmlDecode(value);
     }
     this.setValueOrig(value);
   },
@@ -1033,7 +1033,7 @@ Ext.override(Ext.form.TextField, {
     var value = this.getRawValueOrig();
     if ( this.htmlConvert )
     {
-      value = Ext.util.Format.htmlEncode(value);
+      value = Nexus.util.Format.htmlEncode(value);
     }
     return value;
   },
@@ -1041,7 +1041,7 @@ Ext.override(Ext.form.TextField, {
     var value = this.getValueOrig();
     if ( this.htmlConvert )
     {
-      value = Ext.util.Format.htmlEncode(value);
+      value = Nexus.util.Format.htmlEncode(value);
     }
     return value;
   }

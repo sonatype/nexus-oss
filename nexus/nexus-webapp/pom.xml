@@ -298,6 +298,8 @@
                     <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
                     <include>${compressed-dir}/js/nexus/error/common.js</include>
                     <include>${compressed-dir}/js/nexus/error/ErrorHandler.js</include>
+                    <include>${compressed-dir}/js/nexus/util/common.js</include>
+                    <include>${compressed-dir}/js/nexus/util/Format.js</include>
                     <include>${compressed-dir}/js/extensions/ext-override.js</include>
                     <include>${compressed-dir}/js/filetree/js/Ext.ux.form.BrowseButton.js</include>
                     <include>${compressed-dir}/js/groupcombo/groupcombo.js</include>
