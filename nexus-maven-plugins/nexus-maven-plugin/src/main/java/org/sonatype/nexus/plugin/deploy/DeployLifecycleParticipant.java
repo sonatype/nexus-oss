@@ -1,0 +1,222 @@
+package org.sonatype.nexus.plugin.deploy;
+
+import java.util.List;
+
+import org.apache.maven.AbstractMavenLifecycleParticipant;
+import org.apache.maven.MavenExecutionException;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+/**
+ * Lifecycle participant that is meant to kick in Maven3 to lessen the needed POM changes. It will silently "scan" the
+ * projects, disable all executions of maven-deploy-plugin, and "install" itself instead. It will NOT kick in if detects
+ * and <b>bounded execution</b> of himself anywhere in the projects being built, assuming the "Maven2 way" is applied
+ * then (by manual editing of POMs, and configuring all by hand).
+ * 
+ * @author cstamas
+ */
+@Component( role = AbstractMavenLifecycleParticipant.class, hint = "nexus-maven-plugin-deploy-swapper" )
+public class DeployLifecycleParticipant
+    extends AbstractMavenLifecycleParticipant
+    implements LogEnabled
+{
+    private Logger logger;
+
+    @Override
+    public void enableLogging( final Logger logger )
+    {
+        this.logger = logger;
+    }
+
+    public void afterProjectsRead( final MavenSession session )
+        throws MavenExecutionException
+    {
+        // check do we need to do anything at all?
+        // should not find any nexus-maven-plugin deploy goal executions in any project
+        // otherwise, assume it's "manually done"
+        for ( MavenProject project : session.getProjects() )
+        {
+            final Plugin nexusMavenPlugin = getBuildPluginsNexusMavenPlugin( project.getModel() );
+            if ( nexusMavenPlugin != null )
+            {
+                if ( !nexusMavenPlugin.getExecutions().isEmpty() )
+                {
+                    for ( PluginExecution pluginExecution : nexusMavenPlugin.getExecutions() )
+                    {
+                        final List<String> goals = pluginExecution.getGoals();
+                        if ( goals.contains( "deploy" ) || goals.contains( "deploy-staged" )
+                            || goals.contains( "staging-close" ) || goals.contains( "staging-release" )
+                            || goals.contains( "staging-promote" ) )
+                        {
+                            logger.info( "Not installing Nexus Staging features, some Staging related goal bindings already present." );
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        logger.info( "Installing Nexus Staging features:" );
+
+        // make maven-deploy-plugin to be skipped and install us instead
+        int skipped = 0;
+        for ( MavenProject project : session.getProjects() )
+        {
+            final Plugin nexusMavenPlugin = getBuildPluginsNexusMavenPlugin( project.getModel() );
+            if ( nexusMavenPlugin != null )
+            {
+                // skip the maven-deploy-plugin
+                final Plugin mavenDeployPlugin = getBuildPluginsMavenDeployPlugin( project.getModel() );
+                if ( mavenDeployPlugin != null )
+                {
+                    // TODO: better would be to remove them targeted?
+                    // But this mojo has only 3 goals, but only one of them is usable in builds ("deploy")
+                    mavenDeployPlugin.getExecutions().clear();
+
+                    // add executions to nexus-maven-plugin
+                    final PluginExecution execution = new PluginExecution();
+                    execution.setId( "injected-nexus-deploy" );
+                    execution.getGoals().add( "deploy" );
+                    execution.setPhase( "deploy" );
+                    execution.setConfiguration( nexusMavenPlugin.getConfiguration() );
+                    nexusMavenPlugin.getExecutions().add( execution );
+
+                    // count this in
+                    skipped++;
+                }
+            }
+        }
+        if ( skipped > 0 )
+        {
+            logger.info( "  ... total of " + skipped
+                + " executions of maven-deploy-plugin replaced with nexus-maven-plugin." );
+        }
+    }
+
+    /**
+     * Returns the nexus-maven-plugin from build/plugins section of model or {@code null} if not present.
+     * 
+     * @param model
+     * @return
+     */
+    protected Plugin getBuildPluginsNexusMavenPlugin( final Model model )
+    {
+        if ( model.getBuild() != null )
+        {
+            return getNexusMavenPluginFromContainer( model.getBuild() );
+        }
+        return null;
+    }
+
+    /**
+     * Returns the maven-deploy-plugin from build/plugins section of model or {@code null} if not present.
+     * 
+     * @param model
+     * @return
+     */
+    protected Plugin getBuildPluginsMavenDeployPlugin( final Model model )
+    {
+        if ( model.getBuild() != null )
+        {
+            return getMavenDeployPluginFromContainer( model.getBuild() );
+        }
+        return null;
+    }
+
+    /**
+     * Returns the nexus-maven-plugin from pluginContainer or {@code null} if not present.
+     * 
+     * @param pluginContainer
+     * @return
+     */
+    protected Plugin getNexusMavenPluginFromContainer( final PluginContainer pluginContainer )
+    {
+        // TODO: GA is wired in, should be discovered!
+        return getPluginByGAFromContainer( "org.sonatype.plugins", "nexus-maven-plugin", pluginContainer );
+    }
+
+    /**
+     * Returns the maven-deploy-plugin from pluginContainer or {@code null} if not present.
+     * 
+     * @param pluginContainer
+     * @return
+     */
+    protected Plugin getMavenDeployPluginFromContainer( final PluginContainer pluginContainer )
+    {
+        return getPluginByGAFromContainer( "org.apache.maven.plugins", "maven-deploy-plugin", pluginContainer );
+    }
+
+    // ==
+
+    protected void setPluginScalarConfigurationValueEverywhere( final String key, final String value,
+                                                                final boolean override, final Plugin plugin )
+    {
+        setPluginScalarConfigurationValueInAllExecutions( key, value, override, plugin );
+        Xpp3Dom pluginConfiguration =
+            setPluginScalarConfigurationValue( key, value, override, (Xpp3Dom) plugin.getConfiguration() );
+        plugin.setConfiguration( pluginConfiguration );
+    }
+
+    protected void setPluginScalarConfigurationValueInAllExecutions( final String key, final String value,
+                                                                     final boolean override, final Plugin plugin )
+    {
+        for ( PluginExecution execution : plugin.getExecutions() )
+        {
+            Xpp3Dom executionConfiguration =
+                setPluginScalarConfigurationValue( key, value, override, (Xpp3Dom) execution.getConfiguration() );
+            execution.setConfiguration( executionConfiguration );
+        }
+    }
+
+    protected Xpp3Dom setPluginScalarConfigurationValue( final String key, final String value, final boolean override,
+                                                         final Xpp3Dom originalConfiguration )
+    {
+        Xpp3Dom configuration = originalConfiguration;
+        if ( configuration == null )
+        {
+            configuration = new Xpp3Dom( "configuration" );
+        }
+        Xpp3Dom changed = configuration.getChild( key );
+        if ( changed != null && !override )
+        {
+            return originalConfiguration; // is present, we do not override it
+        }
+        if ( changed == null )
+        {
+            changed = new Xpp3Dom( key );
+            configuration.addChild( changed );
+        }
+        changed.setValue( value );
+        return configuration;
+    }
+
+    protected Plugin getPluginByGAFromContainer( final String groupId, final String artifactId,
+                                                 final PluginContainer pluginContainer )
+    {
+        Plugin result = null;
+        for ( Plugin plugin : pluginContainer.getPlugins() )
+        {
+            if ( StringUtils.equals( groupId, plugin.getGroupId() )
+                && StringUtils.equals( artifactId, plugin.getArtifactId() ) )
+            {
+                if ( result != null )
+                {
+                    throw new IllegalStateException( "The build contains multiple versions of plugin " + groupId + ":"
+                        + artifactId );
+                }
+                result = plugin;
+            }
+
+        }
+        return result;
+    }
+}
