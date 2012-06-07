@@ -640,6 +640,7 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
         helpText : ht.firstName,
         name : 'firstName',
         allowBlank : true,
+        htmlDecode : true,
         width : this.COMBO_WIDTH,
         validator : function(v) {
           if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX))
@@ -658,6 +659,7 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
         helpText : ht.lastName,
         name : 'lastName',
         allowBlank : true,
+        htmlDecode : true,
         width : this.COMBO_WIDTH,
         validator : function(v) {
           if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX))
