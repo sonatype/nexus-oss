@@ -41,6 +41,7 @@
     <module>nexus-runtime-platform</module>
     <module>nexus</module>
     <module>nexus-maven-plugins</module>
+    <module>nexus-plugin-archetype</module>
   </modules>
 
   <build>
