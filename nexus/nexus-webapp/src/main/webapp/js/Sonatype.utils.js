@@ -725,7 +725,7 @@
                                   }
                                 },
                                 failure : function(response, options) {
-                                  Sonatype.utils.connectionError(response, 'There is a problem changing your password.')
+                                  Sonatype.utils.connectionError(response, 'There is a problem changing your password.', false, { hideErrorStatus: true })
                                 }
                               });
                         }
