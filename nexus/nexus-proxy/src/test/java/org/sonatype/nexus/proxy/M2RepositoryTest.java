@@ -373,6 +373,8 @@ public class M2RepositoryTest
         assertThat( "File timestamp did not change, first pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
         fileTimestamp = mdFile.lastModified();
 
+        // We need to wait a bit to avoid the check that last remote check = current time
+        Thread.sleep( 500 );
         final StorageItem item = repository.retrieveItem( new ResourceStoreRequest( path, false ) );
         getLogger().info(path + " -> BEFORE assert 1 requestCount=" + expectedHits[0] + " at (" + System.currentTimeMillis() + ")");
         assertThat( "Remote hits count fail after first request at (" + System.currentTimeMillis() + ")", ch.getRequestCount(), equalTo( expectedHits[0] ) );
@@ -387,6 +389,8 @@ public class M2RepositoryTest
         assertThat( "File timestamp did not change, second pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
         fileTimestamp = mdFile.lastModified();
 
+        // We need to wait a bit to avoid the check that last remote check = current time
+        Thread.sleep( 500 );
         // this goes remote depending on age setting
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
         getLogger().info(path + " -> BEFORE assert 2 requestCount=" + expectedHits[1] + " at (" + System.currentTimeMillis() + ")");
@@ -409,6 +413,8 @@ public class M2RepositoryTest
         attributes.setCheckedRemotely( System.currentTimeMillis() - ( ( Math.abs( age ) + 1 ) * 60 * 1000 ) );
         storage.putAttributes( uid, attributes );
 
+        // We need to wait a bit to avoid the check that last remote check = current time
+        Thread.sleep( 500 );
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
         getLogger().info(path + " -> BEFORE assert 3 requestCount=" + expectedHits[2] + " at (" + System.currentTimeMillis() + ")");
         assertThat( "Remote hits count fail after third request at (" + System.currentTimeMillis() + ")", ch.getRequestCount(), equalTo( expectedHits[2] ) );
