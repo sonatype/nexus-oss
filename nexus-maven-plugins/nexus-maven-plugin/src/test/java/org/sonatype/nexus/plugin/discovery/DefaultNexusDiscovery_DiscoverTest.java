@@ -349,7 +349,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        project.setArtifact( factory.create( project ) );
+        project.setArtifact( createArtifactFromProject( project ) );
 
         discovery.discover( settings, project, "blah", true );
     }
@@ -394,7 +394,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        project.setArtifact( factory.create( project ) );
+        project.setArtifact( createArtifactFromProject( project ) );
 
         discovery.discover( settings, project, "blah", true );
     }

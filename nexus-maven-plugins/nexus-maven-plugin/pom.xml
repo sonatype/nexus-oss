@@ -38,8 +38,6 @@
 
   <properties>
     <forgeSiteUrl>dav:https://sites.sonatype.com/plugins/nexus-maven-plugin</forgeSiteUrl>
-    <mavenVersion>2.2.1</mavenVersion>
-    <log4jVersion>1.2.14</log4jVersion>
   </properties>
 
   <mailingLists>
@@ -81,19 +79,6 @@
     </mailingList>
   </mailingLists>
 
-  <developers>
-    <developer>
-      <id>jdcasey</id>
-      <name>John Casey</name>
-      <email>jdcasey@sonatype.com</email>
-      <organization>Sonatype</organization>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>-5</timezone>
-    </developer>
-  </developers>
-
   <dependencies>
     <!-- NOTE: These MUST BE at the top, or we get NoSuchFieldException in the Xerces bundled with the JDK during testing... -->
     <dependency>
@@ -119,7 +104,7 @@
     <dependency>
       <groupId>org.sonatype.maven</groupId>
       <artifactId>mojo-commons</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
     
     <!-- Logging -->
@@ -146,17 +131,23 @@
     <dependency>
       <groupId>org.sonatype.spice.zapper</groupId>
       <artifactId>spice-zapper</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>4.1.3</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-charger</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1</version>
     </dependency>
 
     <!-- Plexus container -->
@@ -176,7 +167,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.5.15</version> <!-- FIXME: latest version is 3.0.1 -->
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -240,18 +230,7 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>${mavenVersion}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>${mavenVersion}</version>
+      <version>${maven.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
@@ -262,7 +241,8 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>${mavenVersion}</version>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>org.apache.maven.wagon</groupId>
@@ -288,8 +268,9 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-      <version>${mavenVersion}</version>
+      <artifactId>maven-compat</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
@@ -298,41 +279,29 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-      <version>${mavenVersion}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings</artifactId>
-      <version>${mavenVersion}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>1.13.1</version>
+      <scope>runtime</scope>
     </dependency>
     
     <!-- Restlight client -->
     <dependency>
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-stage-client</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-m2-settings-client</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-client-common</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
+    
     <!-- We don't want to use a "nexus only" patched HttpClient 3.1 that is not in Central -->
     <dependency>
       <groupId>commons-httpclient</groupId>
@@ -350,22 +319,37 @@
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
+      <version>2.3</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-core</artifactId>
+      <version>1.7.0</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-bean-collections</artifactId>
+      <version>1.7.0</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
 
+    <!-- Siesta/Jersey Usertoken -->
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-client</artifactId>
       <version>1.2-SNAPSHOT</version>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-xstream</artifactId>
@@ -374,12 +358,30 @@
 
     <!-- Test -->
     <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
-      <version>1.2</version>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-jetty-testsuite</artifactId>

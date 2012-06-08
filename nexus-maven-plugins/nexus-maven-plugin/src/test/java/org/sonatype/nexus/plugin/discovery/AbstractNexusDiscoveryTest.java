@@ -18,7 +18,12 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
 
-import org.apache.maven.project.artifact.ProjectArtifactFactory;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -41,7 +46,6 @@ import org.sonatype.plexus.components.sec.dispatcher.model.io.xpp3.SecurityConfi
 
 public class AbstractNexusDiscoveryTest
 {
-
     protected DefaultNexusDiscovery discovery;
 
     protected ClientManagerFixture testClientManager;
@@ -50,7 +54,7 @@ public class AbstractNexusDiscoveryTest
 
     protected SecDispatcher secDispatcher;
 
-    protected ProjectArtifactFactory factory;
+    private ArtifactHandlerManager artifactHandlerManager;
 
     protected ExpectPrompter prompter;
 
@@ -126,7 +130,7 @@ public class AbstractNexusDiscoveryTest
         testClientManager = new ClientManagerFixture();
 
         secDispatcher = (SecDispatcher) container.lookup( SecDispatcher.class.getName(), "maven" );
-        factory = (ProjectArtifactFactory) container.lookup( ProjectArtifactFactory.class.getName() );
+        artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
 
         prompter = new ExpectPrompter();
 
@@ -138,8 +142,15 @@ public class AbstractNexusDiscoveryTest
         throws ComponentLifecycleException
     {
         container.release( secDispatcher );
-        container.release( factory );
+        container.release( artifactHandlerManager );
         container.dispose();
     }
 
+    public Artifact createArtifactFromProject( MavenProject project )
+    {
+        ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
+
+        return new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+            VersionRange.createFromVersion( project.getVersion() ), null, project.getPackaging(), null, handler, false );
+    }
 }
