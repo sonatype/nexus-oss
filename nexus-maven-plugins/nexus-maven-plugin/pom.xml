@@ -281,7 +281,7 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>
-      <version>1.13.1</version>
+      <version>1.13</version>
       <scope>runtime</scope>
     </dependency>
     
