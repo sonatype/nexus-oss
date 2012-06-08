@@ -36,11 +36,19 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * 
  * @author cstamas
  */
-@Component( role = AbstractMavenLifecycleParticipant.class, hint = "nexus-maven-plugin-deploy-swapper" )
+@Component( role = AbstractMavenLifecycleParticipant.class, hint = "org.sonatype.nexus.plugin.deploy.DeployLifecycleParticipant" )
 public class DeployLifecycleParticipant
     extends AbstractMavenLifecycleParticipant
     implements LogEnabled
 {
+    public static String THIS_GROUP_ID = "org.sonatype.plugins";
+
+    public static String THIS_ARTIFACT_ID = "nexus-maven-plugin";
+
+    public static String MAVEN_DEPLOY_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
+
+    public static String MAVEN_DEPLOY_PLUGIN_ARTIFACT_ID = "maven-deploy-plugin";
+
     private Logger logger;
 
     @Override
@@ -52,65 +60,73 @@ public class DeployLifecycleParticipant
     public void afterProjectsRead( final MavenSession session )
         throws MavenExecutionException
     {
-        // check do we need to do anything at all?
-        // should not find any nexus-maven-plugin deploy goal executions in any project
-        // otherwise, assume it's "manually done"
-        for ( MavenProject project : session.getProjects() )
+        try
         {
-            final Plugin nexusMavenPlugin = getBuildPluginsNexusMavenPlugin( project.getModel() );
-            if ( nexusMavenPlugin != null )
+            // check do we need to do anything at all?
+            // should not find any nexus-maven-plugin deploy goal executions in any project
+            // otherwise, assume it's "manually done"
+            for ( MavenProject project : session.getProjects() )
             {
-                if ( !nexusMavenPlugin.getExecutions().isEmpty() )
+                final Plugin nexusMavenPlugin = getBuildPluginsNexusMavenPlugin( project.getModel() );
+                if ( nexusMavenPlugin != null )
                 {
-                    for ( PluginExecution pluginExecution : nexusMavenPlugin.getExecutions() )
+                    if ( !nexusMavenPlugin.getExecutions().isEmpty() )
                     {
-                        final List<String> goals = pluginExecution.getGoals();
-                        if ( goals.contains( "deploy" ) || goals.contains( "deploy-staged" )
-                            || goals.contains( "staging-close" ) || goals.contains( "staging-release" )
-                            || goals.contains( "staging-promote" ) )
+                        for ( PluginExecution pluginExecution : nexusMavenPlugin.getExecutions() )
                         {
-                            logger.info( "Not installing Nexus Staging features, some Staging related goal bindings already present." );
-                            return;
+                            final List<String> goals = pluginExecution.getGoals();
+                            if ( goals.contains( "deploy" ) || goals.contains( "deploy-staged" )
+                                || goals.contains( "staging-close" ) || goals.contains( "staging-release" )
+                                || goals.contains( "staging-promote" ) )
+                            {
+                                logger.info( "Not installing Nexus Staging features, some Staging related goal bindings already present." );
+                                return;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        logger.info( "Installing Nexus Staging features:" );
+            logger.info( "Installing Nexus Staging features:" );
 
-        // make maven-deploy-plugin to be skipped and install us instead
-        int skipped = 0;
-        for ( MavenProject project : session.getProjects() )
-        {
-            final Plugin nexusMavenPlugin = getBuildPluginsNexusMavenPlugin( project.getModel() );
-            if ( nexusMavenPlugin != null )
+            // make maven-deploy-plugin to be skipped and install us instead
+            int skipped = 0;
+            for ( MavenProject project : session.getProjects() )
             {
-                // skip the maven-deploy-plugin
-                final Plugin mavenDeployPlugin = getBuildPluginsMavenDeployPlugin( project.getModel() );
-                if ( mavenDeployPlugin != null )
+                final Plugin nexusMavenPlugin = getBuildPluginsNexusMavenPlugin( project.getModel() );
+                if ( nexusMavenPlugin != null )
                 {
-                    // TODO: better would be to remove them targeted?
-                    // But this mojo has only 3 goals, but only one of them is usable in builds ("deploy")
-                    mavenDeployPlugin.getExecutions().clear();
+                    // skip the maven-deploy-plugin
+                    final Plugin mavenDeployPlugin = getBuildPluginsMavenDeployPlugin( project.getModel() );
+                    if ( mavenDeployPlugin != null )
+                    {
+                        // TODO: better would be to remove them targeted?
+                        // But this mojo has only 3 goals, but only one of them is usable in builds ("deploy")
+                        mavenDeployPlugin.getExecutions().clear();
 
-                    // add executions to nexus-maven-plugin
-                    final PluginExecution execution = new PluginExecution();
-                    execution.setId( "injected-nexus-deploy" );
-                    execution.getGoals().add( "deploy" );
-                    execution.setPhase( "deploy" );
-                    execution.setConfiguration( nexusMavenPlugin.getConfiguration() );
-                    nexusMavenPlugin.getExecutions().add( execution );
+                        // add executions to nexus-maven-plugin
+                        final PluginExecution execution = new PluginExecution();
+                        execution.setId( "injected-nexus-deploy" );
+                        execution.getGoals().add( "deploy" );
+                        execution.setPhase( "deploy" );
+                        execution.setConfiguration( nexusMavenPlugin.getConfiguration() );
+                        nexusMavenPlugin.getExecutions().add( execution );
 
-                    // count this in
-                    skipped++;
+                        // count this in
+                        skipped++;
+                    }
                 }
             }
+            if ( skipped > 0 )
+            {
+                logger.info( "  ... total of " + skipped
+                    + " executions of maven-deploy-plugin replaced with nexus-maven-plugin." );
+            }
         }
-        if ( skipped > 0 )
+        catch ( IllegalStateException e )
         {
-            logger.info( "  ... total of " + skipped
-                + " executions of maven-deploy-plugin replaced with nexus-maven-plugin." );
+            // thrown by getPluginByGAFromContainer
+            throw new MavenExecutionException( e.getMessage(), e );
         }
     }
 
@@ -153,7 +169,7 @@ public class DeployLifecycleParticipant
     protected Plugin getNexusMavenPluginFromContainer( final PluginContainer pluginContainer )
     {
         // TODO: GA is wired in, should be discovered!
-        return getPluginByGAFromContainer( "org.sonatype.plugins", "nexus-maven-plugin", pluginContainer );
+        return getPluginByGAFromContainer( THIS_GROUP_ID, THIS_ARTIFACT_ID, pluginContainer );
     }
 
     /**
@@ -164,7 +180,8 @@ public class DeployLifecycleParticipant
      */
     protected Plugin getMavenDeployPluginFromContainer( final PluginContainer pluginContainer )
     {
-        return getPluginByGAFromContainer( "org.apache.maven.plugins", "maven-deploy-plugin", pluginContainer );
+        return getPluginByGAFromContainer( MAVEN_DEPLOY_PLUGIN_GROUP_ID, MAVEN_DEPLOY_PLUGIN_ARTIFACT_ID,
+            pluginContainer );
     }
 
     // ==
