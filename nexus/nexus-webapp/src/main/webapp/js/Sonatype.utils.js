@@ -198,8 +198,8 @@
         }
         else
         {
-          var n1 = r.toLowerCase().indexOf('<h3>') + 4;
-          var n2 = r.toLowerCase().indexOf('</h3>');
+          var n1 = r.toLowerCase().indexOf('<p>') + 3;
+          var n2 = r.toLowerCase().indexOf('</p>');
           if (n2 > n1)
           {
             serverMessage += '<br /><br />'
