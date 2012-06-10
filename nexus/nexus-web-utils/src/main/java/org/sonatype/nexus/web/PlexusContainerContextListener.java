@@ -178,9 +178,10 @@ public class PlexusContainerContextListener
         }
         else
         {
-            context.log( "CANNOT set Plexus basedir, Nexus cannot run from non-upacked WAR!" );
+            String message = "Could not set Plexus basedir, Nexus cannot run from non-unpacked WAR!";
+            context.log( message );
 
-            throw new IllegalStateException( "Could not set Plexus basedir, Nexus cannot run from non-upacked WAR!" );
+            throw new IllegalStateException( message );
         }
 
         // plexus files are always here
