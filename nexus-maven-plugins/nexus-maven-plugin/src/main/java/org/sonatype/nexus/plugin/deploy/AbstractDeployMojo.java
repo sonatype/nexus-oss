@@ -203,7 +203,9 @@ public abstract class AbstractDeployMojo
     private String description = "Closed by nexus-maven-plugin";
 
     /**
-     * If true, the Mojo will try to remove the staging repository it was not able to close.
+     * Controls whether the plugin remove or keep the staging repository that performed an IO exception during upload,
+     * hence, it's contents are partial Defaults to {{false}}. If {{true}}, even in case of upload failure, the
+     * staging repository (with partial content) will be left as is, left to the user to do whatever he wants.
      * 
      * @parameter expression="${nexus.deploy.keepOnFailure}" default-value="false"
      */
