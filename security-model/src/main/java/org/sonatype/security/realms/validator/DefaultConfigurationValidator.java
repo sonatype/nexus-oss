@@ -359,7 +359,7 @@ public class DefaultConfigurationValidator
                     ValidationMessage message =
                         new ValidationMessage( "privileges", "Role ID '" + role.getId() + "' Invalid privilege id '"
                             + privId + "' found.", "Role cannot contain invalid privilege ID '" + privId + "'." );
-                    response.addValidationError( message );
+                    response.addValidationWarning( message );
                 }
             }
         }

@@ -23,6 +23,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
@@ -49,6 +51,9 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 public class DefaultConfigurationManager
     extends AbstractConfigurationManager
 {
+
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final SecurityModelConfigurationSource configurationSource;
 
     private final SecurityConfigurationValidator validator;
@@ -107,6 +112,7 @@ public class DefaultConfigurationManager
         if ( vr.isValid() )
         {
             getConfiguration().addPrivilege( privilege );
+            logValidationWarnings( vr );
         }
         else
         {
@@ -133,6 +139,7 @@ public class DefaultConfigurationManager
         if ( vr.isValid() )
         {
             getConfiguration().addRole( role );
+            logValidationWarnings( vr );
         }
         else
         {
@@ -178,7 +185,7 @@ public class DefaultConfigurationManager
         {
             getConfiguration().addUser( user );
             createOrUpdateUserRoleMapping( buildUserRoleMapping( user.getId(), roles ) );
-
+            logValidationWarnings( vr );
         }
         else
         {
@@ -348,6 +355,7 @@ public class DefaultConfigurationManager
         {
             deletePrivilege( privilege.getId(), false );
             getConfiguration().addPrivilege( privilege );
+            logValidationWarnings( vr );
         }
         else
         {
@@ -375,6 +383,7 @@ public class DefaultConfigurationManager
         {
             deleteRole( role.getId(), false );
             getConfiguration().addRole( role );
+            logValidationWarnings( vr );
         }
         else
         {
@@ -403,6 +412,7 @@ public class DefaultConfigurationManager
             deleteUser( user.getId() );
             getConfiguration().addUser( user );
             this.createOrUpdateUserRoleMapping( this.buildUserRoleMapping( user.getId(), roles ) );
+            logValidationWarnings( vr );
         }
         else
         {
@@ -464,6 +474,20 @@ public class DefaultConfigurationManager
         }
 
         getConfiguration().addUserRoleMapping( userRoleMapping );
+        logValidationWarnings( vr );
+    }
+
+    private void logValidationWarnings( final ValidationResponse vr )
+    {
+        final List<ValidationMessage> validationWarnings = vr.getValidationWarnings();
+        if ( validationWarnings !=null && validationWarnings.size() > 0 )
+        {
+            logger.warn( "Security configuration has validation warnings" );
+            for ( ValidationMessage msg : validationWarnings )
+            {
+                logger.warn( msg.toString() );
+            }
+        }
     }
 
     private CUserRoleMapping readCUserRoleMapping( String userId, String source )
