@@ -157,7 +157,7 @@
     <logback.version>1.0.0</logback.version>
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
 
-    <aether.version>1.13</aether.version>
+    <aether.version>1.13.1</aether.version>
     <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
