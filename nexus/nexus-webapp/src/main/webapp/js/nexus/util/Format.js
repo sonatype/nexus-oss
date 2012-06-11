@@ -21,6 +21,9 @@ Nexus.util.Format = {
    * @return {string} The string as rendered in a browser, with all tags stripped.
    */
   htmlDecode : function(input) {
+    if (input === null || input === '') {
+      return input;
+    }
     var el = document.createElement('div');
     el.innerHTML = Ext.util.Format.stripTags(input);
     return el.childNodes[0].nodeValue;
