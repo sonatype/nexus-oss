@@ -182,11 +182,15 @@
           });
     },
     connectionError : function(response, message, offerRestart, options, showResponseText) {
+      // prime options object if necessary
+      options = options || {};
+
       var serverMessage = '';
       var r = response.responseText;
+
       if (r)
       {
-        if (options && options.decodeErrorResponse && r.toLowerCase().indexOf('"errors"') > -1)
+        if (options.decodeErrorResponse && r.toLowerCase().indexOf('"errors"') > -1)
         {
           var errorResponse = Ext.decode(response.responseText);
 
@@ -255,21 +259,28 @@
         //
         // <retry message> (optional)
 
-        Sonatype.MessageBox.show({
-              title : "Error",
-              msg : ((message && (responseStatus != -1) ? message : '')
-                  + (responseStatus == 400 && showResponseText ?
-                      ('<br /><br />' + response.responseText) :
-                      (options && options.hideErrorStatus ? '' :
-                              ( (responseStatus && responseStatus != -1 ) ? // hide the "-1 status"
-                                      '<br /><br />Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText :
-                                      '<br /><br />There was an error communicating with the server: request timed out.')
+        var displayMessage =
+                    // caller provided message + serverMessage
+                    // status == -1 is request timed out (?), don't show message then
+                    (message && (responseStatus != -1) ? message : '') + (
+                          // show response text if requested (and makes sense, status 400)
+                          responseStatus == 400 && showResponseText ?  ('<br /><br />' + response.responseText) :
+                          // otherwise show statusLine if not requested to hide and we have a serverMessage
+                          // (we want to always provide some kind of server message, either error msg or status line)
+                          (
+                            (options.hideErrorStatus && serverMessage ) ? '' :
+                              (
+                                (responseStatus && responseStatus != -1 ) ? // hide the "-1 status"
+                                '<br/><br/>Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText :
+                                '<br/><br/>There was an error communicating with the server: request timed out.'
                               )
-                      )
-                  + (offerRestart ?
-                      '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' :
-                      '')
-              ),
+                            )
+                          )
+                          // FIXME offerRestart is never used (?)
+                          + (offerRestart ? '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' : '');
+        Sonatype.MessageBox.show({
+          title : "Error",
+          msg : displayMessage,
               buttons : offerRestart ? Sonatype.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
               icon : Sonatype.MessageBox.ERROR,
               animEl : 'mb3',
