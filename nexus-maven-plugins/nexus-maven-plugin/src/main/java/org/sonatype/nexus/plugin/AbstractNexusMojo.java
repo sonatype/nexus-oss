@@ -70,7 +70,7 @@ public abstract class AbstractNexusMojo
     private String nexusUrl;
 
     /**
-     * @component
+     * @component role="org.codehaus.plexus.components.interactivity.Prompter" hint="jline"
      */
     private Prompter prompter;
 

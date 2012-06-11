@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Throwables;
-import jline.ConsoleReader;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Profile;
@@ -92,7 +91,7 @@ public class DefaultNexusDiscovery
     @Requirement
     private SecDispatcher secDispatcher;
 
-    @Requirement
+    @Requirement(role=Prompter.class, hint="jline")
     private Prompter prompter;
 
     public DefaultNexusDiscovery()
@@ -420,14 +419,11 @@ public class DefaultNexusDiscovery
 
     private String passwordPrompt(final CharSequence prompt)
     {
-        // Avoid using Plexus Prompter muck, this component is way to complex to do something very very simple
-        // (which it isn't even doing properly, so call jline directly)
         try
         {
-            ConsoleReader reader = new ConsoleReader();
-            return reader.readLine( prompt.toString(), '*' );
+            return prompter.promptForPassword( prompt.toString() );
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
             throw Throwables.propagate( e );
         }
