@@ -32,38 +32,52 @@ public class JlinePrompter
     private Prompter delegate;
 
     @Override
-    public String promptForPassword(final String message) throws PrompterException {
-        try {
+    public String promptForPassword( final String message )
+        throws PrompterException
+    {
+        try
+        {
             ConsoleReader reader = new ConsoleReader();
-            return reader.readLine(message, '*');
+            return reader.readLine( message, '*' );
         }
-        catch (Exception e) {
-            throw new PrompterException(e.getMessage(), e);
+        catch ( Exception e )
+        {
+            throw new PrompterException( e.getMessage(), e );
         }
     }
 
     @Override
-    public String prompt(String message) throws PrompterException {
-        return delegate.prompt(message);
+    public String prompt( String message )
+        throws PrompterException
+    {
+        return delegate.prompt( message );
     }
 
     @Override
-    public String prompt(String message, String defaultReply) throws PrompterException {
-        return delegate.prompt(message, defaultReply);
+    public String prompt( String message, String defaultReply )
+        throws PrompterException
+    {
+        return delegate.prompt( message, defaultReply );
     }
 
     @Override
-    public String prompt(String message, List possibleValues) throws PrompterException {
-        return delegate.prompt(message, possibleValues);
+    public String prompt( String message, List possibleValues )
+        throws PrompterException
+    {
+        return delegate.prompt( message, possibleValues );
     }
 
     @Override
-    public String prompt(String message, List possibleValues, String defaultReply) throws PrompterException {
-        return delegate.prompt(message, possibleValues, defaultReply);
+    public String prompt( String message, List possibleValues, String defaultReply )
+        throws PrompterException
+    {
+        return delegate.prompt( message, possibleValues, defaultReply );
     }
 
     @Override
-    public void showMessage(String message) throws PrompterException {
-        delegate.showMessage(message);
+    public void showMessage( String message )
+        throws PrompterException
+    {
+        delegate.showMessage( message );
     }
 }
