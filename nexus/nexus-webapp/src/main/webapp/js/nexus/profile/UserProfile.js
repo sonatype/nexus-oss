@@ -122,6 +122,8 @@ Nexus.profile.UserProfile = function(config) {
     var rec;
     var combo = this.selector;
 
+    token = decodeURIComponent(token);
+
     var idx = combo.store.find('text', token);
 
     if (idx != -1) {
