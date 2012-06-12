@@ -50,6 +50,7 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
      * to enable LDAP connection pooling.
      */
     protected static final String SUN_CONNECTION_POOLING_PROPERTY = "com.sun.jndi.ldap.connect.pool";
+    protected static final String SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY = "com.sun.jndi.ldap.connect.pool.protocol";
 
     /*--------------------------------------------
     |    I N S T A N C E   V A R I A B L E S    |
@@ -245,6 +246,8 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
         if (usePooling && username != null && systemContext) {
             // Enable connection pooling
             env.put(SUN_CONNECTION_POOLING_PROPERTY, "true");
+            // Enable pooling for plain and ssl connections
+            env.put( SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY, "plain ssl" );
         }
 
         if (additionalEnvironment != null) {
