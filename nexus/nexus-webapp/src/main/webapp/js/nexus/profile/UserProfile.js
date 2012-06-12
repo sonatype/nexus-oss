@@ -17,6 +17,11 @@
  * @constructor
  */
 Nexus.profile.UserProfile = function(config) {
+  // this may happen on opening a bookmark
+  if (!Sonatype.user.curr || !Sonatype.user.curr.isLoggedIn) {
+    Sonatype.repoServer.RepoServer.loginHandler();
+    return
+  }
 
   var config = config || {};
   var defaultConfig = {
@@ -47,13 +52,19 @@ Nexus.profile.UserProfile = function(config) {
     listeners : {
       'select' : {
         fn : function(combo, record, index) {
+          this.bookmark = record.get('text');
           this.content.display(record.get('value'), this);
         },
         scope : this
       },
       'render' : {
         fn : function(combo) {
+          if ( this.bookmark !== null ) {
+            return;
+          }
           var rec = combo.store.getAt(0);
+          this.bookmark = rec.get('text');
+
           combo.setValue(rec.get('text'));
           this.content.display(rec.get('value'), this);
         },
@@ -100,6 +111,26 @@ Nexus.profile.UserProfile = function(config) {
     ]
   });
 
+  this.bookmark = null;
+
+  this.getBookmark = function() {
+    return this.bookmark;
+  }
+
+  this.applyBookmark = function(token) {
+    var rec;
+    var combo = this.selector;
+
+    var idx = combo.store.find('text', token);
+
+    if (idx != -1) {
+      this.bookmark = token;
+      rec = combo.store.getAt(idx);
+      combo.setValue(rec.get('text'));
+      this.content.display(rec.get('value'), this);
+    }
+  }
+
 }
 Ext.extend(Nexus.profile.UserProfile, Ext.Panel);
 
@@ -136,8 +167,26 @@ Nexus.profile.UserProfile.Content = function(config)
     this.setActiveTab(panel);
     profile.refreshButton.setVisible(panel.refreshContent !== undefined);
   }
-}
+};
 Ext.extend(Nexus.profile.UserProfile.Content, Ext.TabPanel);
+
+/**
+ * Weirdo hack to get bookmarking to work. navigation-* is usually the link in the left nav panel,
+ * but the user profile menu does not have that.
+ */
+Nexus.profile.OpenAction = function(config) {
+  config.initialConfigNavigation = {
+    tabId : 'profile',
+    tabCode : Nexus.profile.UserProfile,
+    title : 'Profile'
+  };
+  Nexus.profile.OpenAction.superclass.constructor.call(this, config);
+};
+Ext.extend(Nexus.profile.OpenAction, Ext.Panel);
+
+Nexus.profile.OpenAction.registered = new Nexus.profile.OpenAction({
+  id : 'navigation-profile'
+});
 
 /**
  * @param {string} name The name displayed in the combo box selector.
@@ -166,4 +215,5 @@ Nexus.profile.register = function(name, panelCls, views) {
     });
   }
 }
+
 
