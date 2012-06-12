@@ -480,13 +480,18 @@ public class DefaultConfigurationManager
     private void logValidationWarnings( final ValidationResponse vr )
     {
         final List<ValidationMessage> validationWarnings = vr.getValidationWarnings();
-        if ( validationWarnings !=null && validationWarnings.size() > 0 )
+        if ( validationWarnings != null && validationWarnings.size() > 0 )
         {
-            logger.warn( "Security configuration has validation warnings" );
+            final StringBuilder sb = new StringBuilder();
             for ( ValidationMessage msg : validationWarnings )
             {
-                logger.warn( msg.toString() );
+                if ( sb.length() >= 0 )
+                {
+                    sb.append( "," );
+                }
+                sb.append( " " ).append( msg.toString() );
             }
+            logger.warn( "Security configuration has validation warnings:" + sb.toString() );
         }
     }
 
