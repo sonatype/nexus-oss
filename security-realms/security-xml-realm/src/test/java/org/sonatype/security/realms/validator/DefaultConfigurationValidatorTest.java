@@ -154,4 +154,40 @@ public class DefaultConfigurationValidatorTest
         assertEquals( vr.getValidationErrors().size(), 3 );
 
     }
+
+    /**
+     * NEXUS-5040: Creating a role with an unknown privilege should not result in a validation error, just a warning.
+     */
+    public void testValidationOfRoleWithUnknownPrivilege()
+    {
+        SecurityValidationContext context = new SecurityValidationContext();
+
+        CPrivilege priv = new CPrivilege();
+        priv.setId( "priv" );
+        priv.setName( "priv" );
+        priv.setType( "invalid" );
+        context.addExistingPrivilegeIds();
+        context.getExistingPrivilegeIds().add( "priv" );
+
+        CRole role1 = new CRole();
+        role1.setId( "role1" );
+        role1.setName( "role1" );
+        role1.setDescription( "desc" );
+        role1.setSessionTimeout( 50 );
+        role1.addPrivilege( priv.getId() );
+        role1.addPrivilege( "foo" );
+
+        context.addExistingRoleIds();
+        context.getExistingRoleIds().add( "role1" );
+
+        ValidationResponse vr = configurationValidator.validateRole( context, role1, true );
+
+        assertTrue( vr.isValid() );
+        assertEquals( vr.getValidationErrors().size(), 0 );
+        assertEquals( vr.getValidationWarnings().size(), 1 );
+        assertEquals(
+            vr.getValidationWarnings().get( 0 ).getMessage(),
+            "Role ID 'role1' Invalid privilege id 'foo' found."
+        );
+    }
 }
