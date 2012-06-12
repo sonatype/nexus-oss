@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugin.discovery;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Throwables;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Profile;
@@ -89,7 +91,7 @@ public class DefaultNexusDiscovery
     @Requirement
     private SecDispatcher secDispatcher;
 
-    @Requirement
+    @Requirement(role=Prompter.class, hint="jline")
     private Prompter prompter;
 
     public DefaultNexusDiscovery()
@@ -351,7 +353,7 @@ public class DefaultNexusDiscovery
 
         svr.setId( MANUAL_ENTRY_SERVER_ID );
         svr.setUsername( stringPrompt( "Enter Username [" + defaultUser + "]: ", defaultUser ) );
-        svr.setPassword( stringPrompt( "Enter Password: " ) );
+        svr.setPassword( passwordPrompt("Enter Password: ") );
 
         return svr;
     }
@@ -413,6 +415,18 @@ public class DefaultNexusDiscovery
         while ( result == null || result.length() < 1 );
 
         return result;
+    }
+
+    private String passwordPrompt(final CharSequence prompt)
+    {
+        try
+        {
+            return prompter.promptForPassword( prompt.toString() );
+        }
+        catch ( Exception e )
+        {
+            throw Throwables.propagate( e );
+        }
     }
 
     private Server selectAuthentication( final String url, final Map<String, Server> serversById,

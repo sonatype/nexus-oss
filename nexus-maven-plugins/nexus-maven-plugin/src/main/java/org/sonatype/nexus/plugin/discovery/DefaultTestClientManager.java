@@ -40,8 +40,7 @@ public class DefaultTestClientManager
                 logger.debug( "Failed to connect: " + e.getMessage(), e );
             }
 
-            // System.out.println( "Invalid Nexus URL and/or authentication for: " + url + " (user: " + user + ")" );
-            logger.info( "Invalid Nexus URL and/or authentication for: " + url + " (user: " + user + ")" );
+            logger.error( "Invalid Nexus URL and/or authentication for: " + url + " (user: " + user + ")" );
         }
 
         return false;
