@@ -20,6 +20,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -106,8 +107,9 @@ public class ErrorReportingPlexusResource
                                              "Jira settings must be provided when set to save as default." );
             }
 
-            manager.setJIRAUsername( settings.getJiraUsername() );
-            manager.setJIRAPassword( getActualPassword( settings.getJiraPassword(), manager.getJIRAPassword() ) );
+            // NXCM-4044 username/password were escaped on their way in through the REST layer
+            manager.setJIRAUsername( StringEscapeUtils.unescapeHtml( settings.getJiraUsername() ) );
+            manager.setJIRAPassword( StringEscapeUtils.unescapeHtml( getActualPassword( settings.getJiraPassword(), manager.getJIRAPassword() ) ) );
 
             try
             {
@@ -137,8 +139,11 @@ public class ErrorReportingPlexusResource
             if ( settings != null && !dto.isSaveErrorReportingSettings()
                 && !StringUtils.isEmpty( settings.getJiraUsername() ) )
             {
+                // NXCM-4044 username/password were escaped on their way in through the REST layer
                 genRes =
-                    manager.handleError( genReq, settings.getJiraUsername(), settings.getJiraPassword()
+                    manager.handleError( genReq,
+                                         StringEscapeUtils.unescapeHtml( settings.getJiraUsername() ),
+                                         StringEscapeUtils.unescapeHtml( settings.getJiraPassword() )
                     );
             }
             else
