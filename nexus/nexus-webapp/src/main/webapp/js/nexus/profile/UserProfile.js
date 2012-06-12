@@ -54,6 +54,7 @@ Nexus.profile.UserProfile = function(config) {
         fn : function(combo, record, index) {
           this.bookmark = record.get('text');
           this.content.display(record.get('value'), this);
+          Sonatype.utils.updateHistory(this);
         },
         scope : this
       },
