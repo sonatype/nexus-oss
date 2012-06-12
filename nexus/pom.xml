@@ -783,6 +783,11 @@
         <artifactId>aether-connector-wagon</artifactId>
         <version>${aether.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-connector-asynchttpclient</artifactId>
+        <version>${aether.version}</version>
+      </dependency>
 
       <!-- Various commonly used deps -->
       <dependency>
