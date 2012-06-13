@@ -248,7 +248,7 @@ public class DefaultConfigurationValidator
                             + "' contains an invalid role", "Role cannot contain invalid role '"
                             + getRoleTextForDisplay( roleId, ctx ) + "'." );
 
-                    response.addValidationError( message );
+                    response.addValidationWarning( message );
                 }
             }
 
@@ -278,7 +278,7 @@ public class DefaultConfigurationValidator
                                            "Role cannot contain invalid role '"
                                                + getRoleTextForDisplay( containedRoleId, ctx ) + "'." );
 
-                response.addValidationError( message );
+                response.addValidationWarning( message );
             }
         }
 
