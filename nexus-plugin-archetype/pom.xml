@@ -19,6 +19,7 @@
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
     <version>2.1-SNAPSHOT</version>
+    <relativePath>../nexus</relativePath>
   </parent>
   
   <groupId>org.sonatype.nexus.archetypes</groupId>
