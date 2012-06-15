@@ -2,6 +2,7 @@ package org.sonatype.security.authorization;
 
 import java.util.concurrent.ConcurrentMap;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,6 +23,7 @@ import com.google.common.collect.MapMaker;
  */
 @Named( "caching" )
 @Singleton
+@Typed( PermissionFactory.class )
 public class InstanceCachingPermissionFactory
     implements PermissionFactory
 {
@@ -30,7 +32,7 @@ public class InstanceCachingPermissionFactory
     private final PermissionFactory delegate;
 
     @Inject
-    public InstanceCachingPermissionFactory( final PermissionFactory delegate )
+    public InstanceCachingPermissionFactory( @Named( "wildcard" ) final PermissionFactory delegate )
     {
         this.instances = new MapMaker().weakValues().makeMap();
         this.delegate = delegate;

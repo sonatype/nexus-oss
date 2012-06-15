@@ -1,5 +1,6 @@
 package org.sonatype.security.authorization;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -14,8 +15,9 @@ import org.apache.shiro.authz.permission.WildcardPermission;
  * @author cstamas
  * @since 2.8
  */
-@Named
+@Named( "wildcard" )
 @Singleton
+@Typed( PermissionFactory.class )
 public class WildcardPermissionFactory
     implements PermissionFactory
 {
