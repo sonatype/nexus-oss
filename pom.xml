@@ -12,7 +12,8 @@
     See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.spice</groupId>
@@ -42,7 +43,7 @@
   <properties>
     <shiro.version>1.2.0</shiro.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
-    <plexus-events.version>1.1.1</plexus-events.version>
+    <plexus-events.version>1.2</plexus-events.version>
     <base-configuration.version>1.0</base-configuration.version>
     <plexus-cipher.version>1.6</plexus-cipher.version>
     <plugin-host-api.version>1.0.0</plugin-host-api.version>
@@ -72,12 +73,24 @@
         <artifactId>sisu-inject-bean</artifactId>
         <version>${sisu-inject.version}</version>
         <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu.inject</groupId>
+            <artifactId>guice-bean-containers</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-inject-plexus</artifactId>
         <version>${sisu-inject.version}</version>
         <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu.inject</groupId>
+            <artifactId>guice-plexus-shim</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
@@ -173,7 +186,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.5.8</version>
+        <version>3.0</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
@@ -324,7 +337,8 @@
                   <excludes>
                     <exclude>*:jsecurity</exclude>
                   </excludes>
-                  <message>Nexus has being updated to use apache shiro instead,
+                  <message>Nexus has being updated to use apache shiro
+                    instead,
                     please remove jsecurity dependency</message>
                 </bannedDependencies>
               </rules>
@@ -419,9 +433,12 @@
             <configuration>
               <mappingId>customizable</mappingId>
               <configurators>
-                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
-                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
-                <configurator id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
+                <configurator
+                  id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator
+                  id="org.maven.ide.eclipse.modello.modelloConfigurator" />
+                <configurator
+                  id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
