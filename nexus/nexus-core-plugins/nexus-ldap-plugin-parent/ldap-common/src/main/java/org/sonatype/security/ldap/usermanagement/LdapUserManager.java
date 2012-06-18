@@ -28,6 +28,8 @@ import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
@@ -46,6 +48,7 @@ public class LdapUserManager
     private Logger logger;
 
     public User getUser( String userId )
+        throws UserNotFoundException
     {
         if ( this.isEnabled() )
         {
@@ -60,9 +63,10 @@ public class LdapUserManager
             catch ( LdapDAOException e )
             {
                 this.logger.debug( "User: " + userId + " not found, cause: " + e.getMessage(), e );
+                throw new UserNotFoundTransientException( userId, e.getMessage(), e );
             }
         }
-        return null;
+        throw new UserNotFoundException( userId );
     }
 
 
