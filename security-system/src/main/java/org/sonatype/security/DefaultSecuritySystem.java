@@ -58,6 +58,7 @@ import org.sonatype.security.email.NullSecurityEmailer;
 import org.sonatype.security.email.SecurityEmailer;
 import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
 import org.sonatype.security.events.SecurityConfigurationChangedEvent;
+import org.sonatype.security.events.UserPrincipalsExpiredEvent;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.PasswordGenerator;
@@ -422,6 +423,8 @@ public class DefaultSecuritySystem
     {
         UserManager userManager = userManagerFacade.getUserManager( source );
         userManager.deleteUser( userId );
+
+        this.eventMulticaster.notifyEventListeners( new UserPrincipalsExpiredEvent( null, userId, source ) );
     }
 
     public Set<RoleIdentifier> getUsersRoles( String userId, String source )

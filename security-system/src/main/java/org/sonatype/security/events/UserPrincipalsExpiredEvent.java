@@ -10,31 +10,42 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.usermanagement;
+package org.sonatype.security.events;
+
+import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
- * Thrown when a user could not be found due to a temporary condition, for example when an LDAP server is unavailable.
- * Repeating the operation may succeed in the future without any intervention by the application.
+ * An event fired when a user is removed from the system.
  * 
  * @since 2.8
  */
-public class UserNotFoundTransientException
-    extends UserNotFoundException
+public class UserPrincipalsExpiredEvent
+    extends AbstractEvent<Object>
 {
-    private static final long serialVersionUID = 7565547428483146620L;
+    private final String userId;
 
-    public UserNotFoundTransientException( String userId, String message, Throwable cause )
+    private final String source;
+
+    /**
+     * @param component The sending component
+     * @param userId The removed user's id
+     * @param source The UserManager source
+     */
+    public UserPrincipalsExpiredEvent( Object component, String userId, String source )
     {
-        super( userId, message, cause );
+        super( component );
+
+        this.userId = userId;
+        this.source = source;
     }
 
-    public UserNotFoundTransientException( String userId, String message )
+    public String getUserId()
     {
-        super( userId, message );
+        return userId;
     }
 
-    public UserNotFoundTransientException( String userId )
+    public String getSource()
     {
-        super( userId );
+        return source;
     }
 }
