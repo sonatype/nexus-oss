@@ -25,6 +25,7 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskInterruptedException;
@@ -57,6 +58,11 @@ public abstract class AbstractNexusTask<T>
         }
     }
 
+    protected void notifyEventListeners( final Event<?> event )
+    {
+        applicationEventMulticaster.notifyEventListeners( event );
+    }
+    
     // TODO: finish this thread!
     public RepositoryTaskActivityDescriptor getTaskActivityDescriptor()
     {
