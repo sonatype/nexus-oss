@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -58,8 +59,7 @@ public class AttributeUpgraderThread
         this.legacyAttributesDirectory = legacyAttributesDirectory;
         this.repositoryRegistry = repositoryRegistry;
         // set throttle controller
-        this.throttleController =
-            new FixedRateWalkerThrottleController( limiterTps, numberSequence, this );
+        this.throttleController = new FixedRateWalkerThrottleController( limiterTps, numberSequence, this );
         // to have it clearly in thread dumps
         setName( "LegacyAttributesUpgrader" );
         // to not prevent sudden reboots (by user, if upgrading, and rebooting)
@@ -96,7 +96,9 @@ public class AttributeUpgraderThread
                 List<Repository> reposes = repositoryRegistry.getRepositories();
                 for ( Repository repo : reposes )
                 {
-                    if ( !repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                    // NEXUS-5099: Skipping shadows too for now
+                    if ( !repo.getRepositoryKind().isFacetAvailable( GroupRepository.class )
+                        && !repo.getRepositoryKind().isFacetAvailable( MavenShadowRepository.class ) )
                     {
                         if ( LocalStatus.IN_SERVICE.equals( repo.getLocalStatus() ) )
                         {
