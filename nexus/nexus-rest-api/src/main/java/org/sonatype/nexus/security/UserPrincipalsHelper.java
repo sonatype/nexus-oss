@@ -21,7 +21,6 @@ import javax.inject.Singleton;
 
 import org.apache.shiro.subject.PrincipalCollection;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
-import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -48,46 +47,25 @@ public class UserPrincipalsHelper
     public UserStatus getUserStatus( final PrincipalCollection principals )
         throws UserNotFoundException
     {
-        String userId = null, source = null;
-        try
+        String userId = null;
+        if ( principals != null )
         {
             userId = principals.getPrimaryPrincipal().toString();
-            final UserManager manager = findUserManager( principals );
-            source = manager.getSource();
-
-            final User user = manager.getUser( userId );
-            if ( user != null )
+            try
             {
-                return user.getStatus();
-            }
-        }
-        catch ( final UserNotFoundTransientException e )
-        {
-            return UserStatus.disabled;
-        }
-        catch ( final Exception e )
-        {
-            // fall through and check mappings for non-default sources...
-        }
-        if ( userId != null && source != null && !"default".equals( source ) )
-        {
-            for ( final UserManager userManager : userManagers )
-            {
-                if ( userManager instanceof RoleMappingUserManager )
+                final User user = findUserManager( principals ).getUser( userId );
+                if ( user != null )
                 {
-                    try
-                    {
-                        // look for leftover role mappings which suggest user has only been temporarily disabled
-                        if ( !( (RoleMappingUserManager) userManager ).getUsersRoles( userId, source ).isEmpty() )
-                        {
-                            return UserStatus.disabled;
-                        }
-                    }
-                    catch ( final Exception e )
-                    {
-                        // check next set of mappings...
-                    }
+                    return user.getStatus();
                 }
+            }
+            catch ( final UserNotFoundTransientException e )
+            {
+                return UserStatus.disabled;
+            }
+            catch ( final Exception e )
+            {
+                // treat all other errors as UserNotFoundException
             }
         }
         throw new UserNotFoundException( userId );

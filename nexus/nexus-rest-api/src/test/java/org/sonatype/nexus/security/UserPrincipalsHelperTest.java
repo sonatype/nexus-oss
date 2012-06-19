@@ -43,13 +43,11 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -245,16 +243,7 @@ public class UserPrincipalsHelperTest
             TestUserManager.status = UserStatus.active;
             assertThat( helper().getUserStatus( principals ), is( UserStatus.active ) );
 
-            final Set<RoleIdentifier> roles = Collections.singleton( new RoleIdentifier( "default", "nx-developer" ) );
-
-            // leftover mapping keeps user around from our perspective...
-            lookup( SecurityXmlUserManager.class ).setUsersRoles( "tempUser", "TestPrincipalsUserManager", roles );
-
             TestUserManager.userDeleted = true;
-            assertThat( helper().getUserStatus( principals ), is( UserStatus.disabled ) );
-
-            // remove mapping so user is now gone from our perspective...
-            lookup( SecurityXmlUserManager.class ).setUsersRoles( "tempUser", "TestPrincipalsUserManager", null );
 
             try
             {
