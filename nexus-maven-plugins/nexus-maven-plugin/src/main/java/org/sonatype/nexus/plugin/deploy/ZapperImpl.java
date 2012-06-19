@@ -33,7 +33,7 @@ import org.sonatype.spice.zapper.fs.DirectoryIOSource;
  * @author cstamas
  * @since 2.1
  */
-@Component( role = Zapper.class )
+//@Component( role = Zapper.class )
 public class ZapperImpl
     implements Zapper
 {

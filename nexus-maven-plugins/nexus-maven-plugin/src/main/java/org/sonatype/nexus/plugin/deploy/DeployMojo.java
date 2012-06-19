@@ -30,8 +30,8 @@ import org.apache.maven.project.artifact.ProjectArtifactMetadata;
  * 
  * @author cstamas
  * @since 2.1
- * @goal deploy
- * @phase deploy
+ * goal deploy
+ * phase deploy
  */
 public class DeployMojo
     extends AbstractDeployMojo
