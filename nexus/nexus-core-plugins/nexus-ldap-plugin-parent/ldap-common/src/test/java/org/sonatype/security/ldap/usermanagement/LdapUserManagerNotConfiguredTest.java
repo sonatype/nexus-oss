@@ -20,6 +20,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
 import org.sonatype.security.ldap.AbstractLdapTest;
 import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 
 public class LdapUserManagerNotConfiguredTest
     extends AbstractLdapTest
@@ -48,6 +49,15 @@ public class LdapUserManagerNotConfiguredTest
         throws Exception
     {
         UserManager userManager = this.lookup( UserManager.class, "LDAP" );
-        Assert.assertNull( userManager.getUser( "cstamas" ) );
+        try
+        {
+            userManager.getUser( "cstamas" );
+
+            Assert.fail( "Expected UserNotFoundTransientException" );
+        }
+        catch ( UserNotFoundTransientException e )
+        {
+            // expect transient error due to misconfiguration
+        }
     }
 }
