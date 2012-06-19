@@ -35,7 +35,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * Component that handles upgrade of "legacy attribute storage". It does it by detecting it's presence, and firing the
  * rebuild attributes background task if needed. Finally, it leaves "marker" file to mark the fact upgrade did happen,
  * to not kick in on any subsequent reboot.
- * 
+ *
  * @since 2.0
  */
 @Component( role = AttributeUpgrader.class )
@@ -318,7 +318,16 @@ public class DefaultAttributeUpgrader
     private static final String MARKER_TEXT =
         "Migration of legacy attributes finished.\nPlease delete, remove or rename this directory!";
 
-    protected static boolean isUpgradeDone( final File attributesDirectory, final String repoId )
+    /**
+     * Check if the repository with the given id has been marked as upgrade complete.
+     *
+     * @param attributesDirectory a directory where the marker file may be located
+     * @param repoId the repo id to check if upgrade is done, or blank ( null )
+     * @return true if upgrade is done for specified repo or all repos if repoid is blank
+     * @throws IOException problem detecting if upgrade is done
+     * @todo make not static for better testability
+     */
+     protected static boolean isUpgradeDone( final File attributesDirectory, final String repoId )
         throws IOException
     {
         if ( StringUtils.isBlank( repoId ) )
@@ -347,6 +356,13 @@ public class DefaultAttributeUpgrader
         }
     }
 
+    /**
+     * Mark a repo, or all repos if repoid is blank, as upgrade done.
+     *
+     * @param attributesDirectory directory where a marker file is written
+     * @param repoId the repo id to mark as upgrade done or blank (null)
+     * @throws IOException  problem recording if upgrade is done
+     */
     protected static void markUpgradeDone( final File attributesDirectory, final String repoId )
         throws IOException
     {

@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -36,7 +37,7 @@ import org.sonatype.nexus.util.NumberSequence;
 
 /**
  * The background thread doing the actual attribute upgrades (moving them from legacy to LS attribute storage).
- * 
+ *
  * @author cstamas
  * @since 2.0
  */
@@ -44,6 +45,9 @@ public class AttributeUpgraderThread
     extends Thread
     implements FixedRateWalkerThrottleControllerCallback
 {
+
+    protected static final int RUN_SLEEP_SECONDS = 5;
+
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final File legacyAttributesDirectory;
@@ -58,8 +62,7 @@ public class AttributeUpgraderThread
         this.legacyAttributesDirectory = legacyAttributesDirectory;
         this.repositoryRegistry = repositoryRegistry;
         // set throttle controller
-        this.throttleController =
-            new FixedRateWalkerThrottleController( limiterTps, numberSequence, this );
+        this.throttleController = new FixedRateWalkerThrottleController( limiterTps, numberSequence, this );
         // to have it clearly in thread dumps
         setName( "LegacyAttributesUpgrader" );
         // to not prevent sudden reboots (by user, if upgrading, and rebooting)
@@ -73,13 +76,55 @@ public class AttributeUpgraderThread
         return throttleController;
     }
 
+    /**
+     * Determine if a repository should be upgraded.
+     * <br/>
+     * A repo should not be upgraded if it is Group or Shadow faceted
+     * @param repo The repo to check for upgrade
+     * @return true if repo should be upgraded
+     */
+    protected boolean shouldUpgradeRepository(Repository repo){
+        // NEXUS-5099: Skipping shadows
+        return !repo.getRepositoryKind().isFacetAvailable( GroupRepository.class )
+            && !repo.getRepositoryKind().isFacetAvailable( MavenShadowRepository.class );
+    }
+
+    /**
+     * @see DefaultAttributeUpgrader#isUpgradeDone(java.io.File, String)
+     */
+    protected boolean isUpgradeDone(final String repoId)
+        throws IOException
+    {
+        return DefaultAttributeUpgrader.isUpgradeDone( legacyAttributesDirectory, repoId );
+    }
+
+    /**
+     * @see DefaultAttributeUpgrader#markUpgradeDone(java.io.File, String)
+     */
+    protected void markUpgradeDone(final String repoId)
+        throws IOException
+    {
+        DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, repoId );
+    }
+
+    /**
+     * Sleeps the calling thread {@link #RUN_SLEEP_SECONDS}
+     *
+     * @throws InterruptedException
+     */
+    protected void throttleRun()
+        throws InterruptedException
+    {
+        TimeUnit.SECONDS.sleep( RUN_SLEEP_SECONDS );
+    }
+
     @Override
     public void run()
     {
-        // defer actual start a bit to not start prematurely (ie. nexus boot not done yet, let it "calm down")
         try
         {
-            TimeUnit.SECONDS.sleep( 5 );
+            // defer actual start a bit to not start prematurely (ie. nexus boot not done yet, let it "calm down")
+            throttleRun();
         }
         catch ( InterruptedException e )
         {
@@ -89,18 +134,18 @@ public class AttributeUpgraderThread
 
         try
         {
-            if ( !DefaultAttributeUpgrader.isUpgradeDone( legacyAttributesDirectory, null ) )
+            if ( !isUpgradeDone( null ) )
             {
                 boolean weHadSkippedRepositories = false;
                 final long started = System.currentTimeMillis();
                 List<Repository> reposes = repositoryRegistry.getRepositories();
                 for ( Repository repo : reposes )
                 {
-                    if ( !repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                    if( shouldUpgradeRepository( repo ) )
                     {
                         if ( LocalStatus.IN_SERVICE.equals( repo.getLocalStatus() ) )
                         {
-                            if ( !DefaultAttributeUpgrader.isUpgradeDone( legacyAttributesDirectory, repo.getId() ) )
+                            if ( !isUpgradeDone( repo.getId() ) )
                             {
                                 try
                                 {
@@ -115,7 +160,7 @@ public class AttributeUpgraderThread
                                     req.getRequestContext().put( RecreateAttributesWalker.LEGACY_ATTRIBUTES_ONLY,
                                         Boolean.TRUE );
                                     repo.recreateAttributes( req, null );
-                                    DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, repo.getId() );
+                                    markUpgradeDone( repo.getId() );
                                     logger.info( "Upgrade of legacy attributes of repository {} done.",
                                         RepositoryStringUtils.getHumanizedNameString( repo ) );
                                 }
@@ -159,7 +204,7 @@ public class AttributeUpgraderThread
                     try
                     {
                         // mark instance as upgraded
-                        DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, null );
+                        markUpgradeDone( null );
                     }
                     catch ( IOException e )
                     {
@@ -183,9 +228,8 @@ public class AttributeUpgraderThread
         }
         catch ( IOException e )
         {
-            // if we are here, that means that one of the DefaultAttributeUpgrader.isUpgradeDone or
-            // DefaultAttributeUpgrader.markUpgradeDone puked.
-            // Write failures are already noted above (see catches around DefaultAttributeUpgrader.markUpgradeDone).
+            // if we are here, that means that one of the isUpgradeDone or markUpgradeDone puked.
+            // Write failures are already noted above (see catches around markUpgradeDone).
             logger.error(
                 "Stopping legacy attributes upgrade because of file read/write related problems. Please fix the problems and retry the upgrade.",
                 e );
