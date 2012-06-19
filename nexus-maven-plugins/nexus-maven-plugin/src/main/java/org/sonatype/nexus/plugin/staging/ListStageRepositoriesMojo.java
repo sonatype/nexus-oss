@@ -23,7 +23,7 @@ import org.sonatype.nexus.restlight.stage.StageRepository;
  * Lists all Nexus staging repositories available for a user. This goal lists both, "opened" and "closed" staging
  * repositories.
  * 
- * @goal staging-repositories-list
+ * @goal staging-list
  * @requiresProject false
  * @aggregator
  */
