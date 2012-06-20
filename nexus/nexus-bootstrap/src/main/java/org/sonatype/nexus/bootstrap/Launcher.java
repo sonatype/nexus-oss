@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.jetty.util.resource.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
@@ -29,9 +31,6 @@ import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
 import org.sonatype.sisu.jetty.Jetty8;
-import org.tanukisoftware.wrapper.WrapperManager;
-
-import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVENT;
 
 /**
  * Nexus bootstrap launcher.
@@ -39,26 +38,16 @@ import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVEN
  * @since 2.1
  */
 public class Launcher
-    extends WrapperListenerSupport
 {
+    protected final Logger log = LoggerFactory.getLogger(getClass());
+
     private static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
 
     private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
     private Jetty8 server;
 
-    // FIXME: Remove JSW-specifics
-
-    @Override
-    protected Integer doStart(final String[] args) throws Exception {
-        if (WrapperManager.isControlledByNativeWrapper()) {
-            log.info("JVM ID: {}, JVM PID: {}, Wrapper PID: {}, User: {}",
-                new Object[]{
-                    WrapperManager.getJVMId(), WrapperManager.getJavaPID(), WrapperManager.getWrapperPID(),
-                    WrapperManager.getUser(false).getUser()
-                });
-        }
-
+    public Integer start(final String[] args) throws Exception {
         if (args.length != 1) {
             log.error("Missing Jetty configuration file parameter");
             return 1; // exit
@@ -183,23 +172,24 @@ public class Launcher
     protected void ensureTmpDirSanity() throws IOException {
         // Make sure that java.io.tmpdir points to a real directory
         String tmp = System.getProperty(JAVA_IO_TMPDIR, "tmp");
-        File file = new File(tmp);
-        if (!file.exists()) {
-            if (file.mkdirs()) {
-                log.info("Created tmp dir: {}", file);
+        File dir = new File(tmp).getCanonicalFile();
+        log.info("Temp directory: {}", dir);
+
+        if (!dir.exists()) {
+            if (dir.mkdirs()) {
+                log.debug("Created tmp dir: {}", dir);
             }
         }
-        else if (!file.isDirectory()) {
-            log.warn("Tmp dir is configured to a location which is not a directory: {}", file);
+        else if (!dir.isDirectory()) {
+            log.warn("Tmp dir is configured to a location which is not a directory: {}", dir);
         }
 
         // Ensure we can actually create a new tmp file
-        file = File.createTempFile(getClass().getSimpleName(), ".tmp");
+        File file = File.createTempFile(getClass().getSimpleName(), ".tmp");
         file.createNewFile();
-        File tmpDir = file.getCanonicalFile().getParentFile();
-        log.info("Temp directory: {}", tmpDir);
-        System.setProperty(JAVA_IO_TMPDIR, tmpDir.getAbsolutePath());
         file.delete();
+
+        System.setProperty(JAVA_IO_TMPDIR, dir.getAbsolutePath());
     }
 
     protected void maybeEnableCommandMonitor() throws IOException {
@@ -209,28 +199,11 @@ public class Launcher
         }
     }
 
-    @Override
-    protected int doStop(final int code) throws Exception {
+    public void stop() throws Exception {
         server.stopJetty();
-        return code;
     }
 
-    @Override
-    protected void doControlEvent(final int code) {
-        if (WRAPPER_CTRL_LOGOFF_EVENT == code && WrapperManager.isLaunchedAsService()) {
-            log.debug("Launched as a service; ignoring event: {}", code);
-        }
-        else {
-            log.debug("Stopping");
-            WrapperManager.stop(0);
-            throw new Error("unreachable");
-        }
-    }
-
-    /**
-     * Bridges standard Java entry-point into JSW.
-     */
     public static void main(final String[] args) throws Exception {
-        WrapperManager.start(new Launcher(), args);
+        new Launcher().start(args);
     }
 }
