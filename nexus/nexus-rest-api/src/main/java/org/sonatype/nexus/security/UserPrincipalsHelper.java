@@ -20,10 +20,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.shiro.subject.PrincipalCollection;
-import org.sonatype.security.usermanagement.RoleMappingUserManager;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 import org.sonatype.security.usermanagement.UserStatus;
 
 /**
@@ -46,41 +47,25 @@ public class UserPrincipalsHelper
     public UserStatus getUserStatus( final PrincipalCollection principals )
         throws UserNotFoundException
     {
-        final String userId = principals.getPrimaryPrincipal().toString();
-        final UserManager associatedManager = findUserManager( principals );
-        if ( associatedManager == null )
+        String userId = null;
+        if ( principals != null )
         {
-            throw new UserNotFoundException( userId );
-        }
-        try
-        {
-            final User user = associatedManager.getUser( userId );
-            if ( user != null )
-            {
-                return user.getStatus();
-            }
-        }
-        catch ( final Exception e )
-        {
-            // fall through and check mappings...
-        }
-        final String source = associatedManager.getSource();
-        for ( final UserManager userManager : userManagers )
-        {
+            userId = principals.getPrimaryPrincipal().toString();
             try
             {
-                // look for leftover role mappings which suggest user has only been temporarily disabled
-                if ( userManager != associatedManager && userManager instanceof RoleMappingUserManager )
+                final User user = findUserManager( principals ).getUser( userId );
+                if ( user != null )
                 {
-                    if ( !( (RoleMappingUserManager) userManager ).getUsersRoles( userId, source ).isEmpty() )
-                    {
-                        return UserStatus.disabled;
-                    }
+                    return user.getStatus();
                 }
+            }
+            catch ( final UserNotFoundTransientException e )
+            {
+                return UserStatus.disabled;
             }
             catch ( final Exception e )
             {
-                // check next set of mappings
+                // treat all other errors as UserNotFoundException
             }
         }
         throw new UserNotFoundException( userId );
@@ -91,21 +76,26 @@ public class UserPrincipalsHelper
      * 
      * @param principals Identifying principals
      * @return UserManager component
+     * @throws NoSuchUserManagerException
      */
     public UserManager findUserManager( final PrincipalCollection principals )
+        throws NoSuchUserManagerException
     {
-        final Iterator<String> itr = principals.getRealmNames().iterator();
-        if ( itr.hasNext() )
+        if ( principals != null )
         {
-            final String primaryRealmName = itr.next();
-            for ( final UserManager userManager : userManagers )
+            final Iterator<String> itr = principals.getRealmNames().iterator();
+            if ( itr.hasNext() )
             {
-                if ( primaryRealmName.equals( userManager.getAuthenticationRealmName() ) )
+                final String primaryRealmName = itr.next();
+                for ( final UserManager userManager : userManagers )
                 {
-                    return userManager;
+                    if ( primaryRealmName.equals( userManager.getAuthenticationRealmName() ) )
+                    {
+                        return userManager;
+                    }
                 }
             }
         }
-        return null;
+        throw new NoSuchUserManagerException();
     }
 }
