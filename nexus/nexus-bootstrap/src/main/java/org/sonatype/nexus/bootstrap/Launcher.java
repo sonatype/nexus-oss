@@ -43,6 +43,8 @@ public class Launcher
 {
     private static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
 
+    private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
+
     private Jetty8 server;
 
     // FIXME: Remove JSW-specifics
@@ -180,7 +182,7 @@ public class Launcher
 
     protected void ensureTmpDirSanity() throws IOException {
         // Make sure that java.io.tmpdir points to a real directory
-        String tmp = System.getProperty("java.io.tmpdir", "tmp");
+        String tmp = System.getProperty(JAVA_IO_TMPDIR, "tmp");
         File file = new File(tmp);
         if (!file.exists()) {
             if (file.mkdirs()) {
@@ -196,7 +198,7 @@ public class Launcher
         file.createNewFile();
         File tmpDir = file.getCanonicalFile().getParentFile();
         log.info("Temp directory: {}", tmpDir);
-        System.setProperty("java.io.tmpdir", tmpDir.getAbsolutePath());
+        System.setProperty(JAVA_IO_TMPDIR, tmpDir.getAbsolutePath());
         file.delete();
     }
 
