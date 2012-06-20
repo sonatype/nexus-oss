@@ -57,13 +57,24 @@ public class Launcher
                 });
         }
 
-        File cwd = new File(".").getCanonicalFile();
-        log.info("Current directory: {}", cwd);
-
         if (args.length != 1) {
             log.error("Missing Jetty configuration file parameter");
             return 1; // exit
         }
+
+        AppContext context = createAppContext();
+        server = new Jetty8(new File(args[0]), context);
+
+        ensureTmpDirSanity();
+        maybeEnableCommandMonitor();
+
+        server.startJetty();
+        return null; // continue running
+    }
+
+    private AppContext createAppContext() throws Exception {
+        File cwd = new File(".").getCanonicalFile();
+        log.info("Current directory: {}", cwd);
 
         // we have three properties file:
         // default.properties -- embedded in this jar (not user editable)
@@ -121,15 +132,7 @@ public class Launcher
 
         // create the context and use it as "parent" for Jetty8
         // when context created, the context is built and all publisher were invoked (system props set for example)
-        final AppContext context = Factory.create(request);
-
-        server = new Jetty8(new File(args[0]), context);
-
-        ensureTmpDirSanity();
-        maybeEnableCommandMonitor();
-
-        server.startJetty();
-        return null; // continue running
+        return Factory.create(request);
     }
 
     private Properties loadProperties(final Resource resource) throws IOException {
