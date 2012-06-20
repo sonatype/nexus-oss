@@ -27,7 +27,6 @@ import org.sonatype.appcontext.Factory;
 import org.sonatype.appcontext.publisher.EntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
-import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
 import org.sonatype.sisu.jetty.Jetty8;
 import org.tanukisoftware.wrapper.WrapperManager;
