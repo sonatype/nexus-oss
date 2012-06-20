@@ -38,6 +38,10 @@
 
     <!-- The "runtime bundle" -->
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-bootstrap</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.appcontext</groupId>
       <artifactId>appcontext</artifactId>
     </dependency>

@@ -1091,6 +1091,11 @@
       <!-- The modules -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-bootstrap</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-api</artifactId>
         <version>${nexus.repository.metadata.version}</version>
       </dependency>
@@ -1779,6 +1784,7 @@
   </distributionManagement>
 
   <modules>
+    <module>nexus-bootstrap</module>
     <module>nexus-plugins</module>
     <module>nexus-mock</module>
     <module>nexus-utils</module>
