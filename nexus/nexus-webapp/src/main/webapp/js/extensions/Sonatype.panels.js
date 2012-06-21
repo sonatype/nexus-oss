@@ -102,10 +102,13 @@ Ext.extend(Sonatype.panels.AutoTabPanel, Ext.Panel, {
               hideMode : 'offsets',
               listeners : {
                 tabchange : function(panel, tab) {
-                  if ( tab.refreshContent ) {
-                    this.tools['refresh'].show();
-                  } else {
-                    this.tools['refresh'].hide();
+                  var tool = this.tools && this.tools['refresh'];
+                  if ( tool ) {
+                    if ( tab.refreshContent ) {
+                      tool.show();
+                    } else {
+                      tool.hide();
+                    }
                   }
                 },
                 scope : this
