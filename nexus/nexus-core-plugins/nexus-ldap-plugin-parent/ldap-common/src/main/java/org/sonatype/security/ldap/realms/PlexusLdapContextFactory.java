@@ -54,7 +54,7 @@ public class PlexusLdapContextFactory
     public LdapContext getSystemLdapContext()
         throws NamingException
     {   
-        // if we do not have a connectionInfo objcet in the config we are in an unconfigured state. A naming exception
+        // if we do not have a connectionInfo object in the config we are in an unconfigured state. A naming exception
         // is the best we can do.
         if ( ldapConfig.readConnectionInfo() == null )
         {

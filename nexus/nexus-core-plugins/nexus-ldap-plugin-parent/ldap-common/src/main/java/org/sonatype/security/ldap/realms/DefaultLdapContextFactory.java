@@ -169,7 +169,8 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
     /**
      * Determines whether or not LdapContext pooling is enabled for connections made using the system
      * user account.  In the default implementation, this simply
-     * sets the <tt>com.sun.jndi.ldap.connect.pool</tt> property in the LDAP context environment.  If you use an
+     * sets the <tt>com.sun.jndi.ldap.connect.pool</tt> property to true and
+     * <tt>com.sun.jndi.ldap.connect.pool.protocol</tt> to "plain ssl" in the LDAP context environment.  If you use a
      * LDAP Context Factory that is not Sun's default implementation, you will need to override the
      * default behavior to use this setting in whatever way your underlying LDAP ContextFactory
      * supports.  By default, pooling is enabled.
