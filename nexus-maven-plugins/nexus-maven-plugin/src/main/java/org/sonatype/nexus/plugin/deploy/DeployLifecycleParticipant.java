@@ -36,7 +36,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * 
  * @author cstamas
  */
-@Component( role = AbstractMavenLifecycleParticipant.class, hint = "org.sonatype.nexus.plugin.deploy.DeployLifecycleParticipant" )
+// @Component( role = AbstractMavenLifecycleParticipant.class, hint = "org.sonatype.nexus.plugin.deploy.DeployLifecycleParticipant" )
 public class DeployLifecycleParticipant
     extends AbstractMavenLifecycleParticipant
     implements LogEnabled
