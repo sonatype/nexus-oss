@@ -248,6 +248,18 @@ public abstract class AbstractRepository
     }
 
     // ==
+    
+    public void dispose()
+    {
+        super.dispose();
+        // remove "my" elements from NFC, as this is a shared one
+        // if following steps done with reusing same repo ID (add-fill NFC-remove-add new with same ID)
+        // then the new repo "inherits" the entries of old repo, all because of shared caches that
+        // was a mistake, btw
+        getNotFoundCache().purge();
+    }
+    
+    // ==
 
     public RepositoryTaskFilter getRepositoryTaskFilter()
     {
