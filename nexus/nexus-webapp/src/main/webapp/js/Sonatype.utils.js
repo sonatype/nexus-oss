@@ -760,6 +760,53 @@
       Sonatype.utils.authToken = Sonatype.utils.base64.encode(username + ':' + password);
     },
 
+    refreshTask : (function() {
+      var config, running;
+
+      running = null;
+
+      config = {
+        run : function() {
+          Ext.Ajax.request({
+            method : 'GET',
+            options : {
+              ignore401 : true
+            },
+            url : Sonatype.config.repos.urls.status,
+            callback : function(options, success, response) {
+              // do nothing, we only request to refresh session
+              // but stop the task if something goes wrong (forbidden, not found, connection refused etc.)
+              if (!success) {
+                Sonatype.utils.refreshTask.stop();
+              }
+            }
+          });
+        },
+        interval : 15 * 60 * 1000
+      };
+
+      // catch the case of page reload, which will leave the user logged in but not go through the login handler
+      Sonatype.Events.addListener('nexusStatus', function() {
+        if (Sonatype.user.curr && Sonatype.user.curr.isLoggedIn) {
+          Sonatype.utils.refreshTask.start();
+        }
+      }, this, {single: true});
+
+      // public API
+      return {
+        stop : function() {
+          if (running !== null) {
+            Ext.TaskMgr.stop(running);
+            running = null;
+          }
+        },
+        start : function() {
+          if (running === null) {
+            running = Ext.TaskMgr.start(config);
+          }
+        }};
+    })(),
+
     doLogin : function(activeWindow, username, password) {
       if (activeWindow)
       {
@@ -790,33 +837,13 @@
                 Sonatype.repoServer.RepoServer.loginForm.getForm().reset();
               }
 
-              if (  Sonatype.repoServer.RepoServer.sessionRefreshTask )
-              {
-                Ext.TaskMgr.stop(Sonatype.repoServer.RepoServer.sessionRefreshTask);
-              }
-
-              Sonatype.repoServer.RepoServer.sessionRefreshTask = {
-                run: function()
-                {
-                  Ext.Ajax.request({
-                    method : 'GET',
-                    options : {
-                      ignore401 : true
-                    },
-                    url : Sonatype.config.repos.urls.status,
-                    callback : function(options, success, response) {
-                      // do nothing, we only request to refresh session
-                    }
-                  });
-                },
-                interval: 15*60*1000
-              };
-              Ext.TaskMgr.start(Sonatype.repoServer.RepoServer.sessionRefreshTask);
-
               var respObj = Ext.decode(response.responseText);
               Sonatype.utils.loadNexusStatus(respObj.data.clientPermissions.loggedInUserSource);
+
+              Sonatype.utils.refreshTask.start();
             },
             failure : function(response, options) {
+              Sonatype.utils.refreshTask.stop();
               Sonatype.utils.clearCookie('JSESSIONID');
               Sonatype.utils.authToken = null;
               if (activeWindow)
@@ -834,7 +861,7 @@
                   method : 'GET',
                   url : Sonatype.config.repos.urls.logout,
                   callback : function(options, success, response) {
-                	Sonatype.utils.clearCookie('JSESSIONID');
+                    Sonatype.utils.clearCookie('JSESSIONID');
                     Sonatype.utils.authToken = null;
                     Sonatype.view.justLoggedOut = true;
                   }

@@ -361,33 +361,35 @@
             });
       },
 
+      logout : function() {
+        Sonatype.utils.refreshTask.stop()
+
+        // do logout
+        Ext.Ajax.request({
+          scope : this,
+          method : 'GET',
+          url : Sonatype.config.repos.urls.logout,
+          callback : function(options, success, response) {
+            Sonatype.utils.authToken = null;
+            Sonatype.view.justLoggedOut = true;
+            Sonatype.utils.loadNexusStatus();
+            window.location = 'index.html#welcome';
+          }
+        });
+      },
+
       loginHandler : function() {
+        var cp, username;
+
         if (Sonatype.user.curr.isLoggedIn)
         {
-          if ( Sonatype.repoServer.RepoServer.sessionRefreshTask )
-          {
-            Ext.TaskMgr.stop(Sonatype.repoServer.RepoServer.sessionRefreshTask);
-          }
-
-          // do logout
-          Ext.Ajax.request({
-                scope : this,
-                method : 'GET',
-                url : Sonatype.config.repos.urls.logout,
-                callback : function(options, success, response) {
-                  Sonatype.utils.authToken = null;
-                  Sonatype.view.justLoggedOut = true;
-                  Sonatype.utils.loadNexusStatus();
-                  window.location = 'index.html#welcome';
-                }
-              });
-
+          this.logout();
         }
         else
         {
           this.loginForm.getForm().clearInvalid();
-          var cp = Sonatype.state.CookieProvider;
-          var username = cp.get('username', null);
+          cp = Sonatype.state.CookieProvider;
+          username = cp.get('username', null);
           if (username)
           {
             this.loginForm.find('name', 'username')[0].setValue(username);
