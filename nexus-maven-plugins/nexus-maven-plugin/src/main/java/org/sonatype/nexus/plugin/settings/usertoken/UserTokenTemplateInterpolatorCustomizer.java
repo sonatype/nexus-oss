@@ -102,7 +102,7 @@ public class UserTokenTemplateInterpolatorCustomizer
                         result = encryption.encrypt(result);
                     }
                     catch (Exception e) {
-                        throw Throwables.propagate(e);
+                        throw new RuntimeException("Failed to encrypt result; Master-password encryption configuration may be missing or invalid", e);
                     }
                 }
 
