@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-(function() {
+
+/*global Sonatype, Ext, Nexus*/
+(function () {
 
   // Repository main Controller(conglomerate) Singleton
-  Sonatype.repoServer.RepoServer = function() {
-    var cfg = Sonatype.config.repos;
-    var sp = Sonatype.lib.Permissions;
+  Sonatype.repoServer.RepoServer = (function() {
+    var cfg = Sonatype.config.repos,
+        sp = Sonatype.lib.Permissions;
 
     // ************************************
     return {
@@ -54,7 +56,7 @@
 
         if (sp.checkPermission('security:usersforgotid', sp.CREATE))
         {
-          htmlString = 'Forgot your <a id="recover-username" href="#">username</a>'
+          htmlString = 'Forgot your <a id="recover-username" href="#">username</a>';
         }
         if (sp.checkPermission('security:usersforgotpw', sp.CREATE))
         {
@@ -81,9 +83,9 @@
 
         this.createSubComponents(); // update left panel
 
-        var htmlString = this.buildRecoveryText();
+        var htmlString = this.buildRecoveryText(),
+            recoveryPanel = this.loginForm.findById('recovery-panel');
 
-        var recoveryPanel = this.loginForm.findById('recovery-panel');
         if (recoveryPanel)
         {
           this.loginForm.remove(recoveryPanel);
@@ -133,8 +135,8 @@
               formBind : true,
               scope : this,
               handler : function() {
-                var usernameField = this.loginForm.find('name', 'username')[0];
-                var passwordField = this.loginForm.find('name', 'password')[0];
+                var usernameField = this.loginForm.find('name', 'username')[0],
+                    passwordField = this.loginForm.find('name', 'password')[0];
 
                 if (usernameField.isValid() && passwordField.isValid())
                 {
@@ -167,7 +169,9 @@
             });
 
         this.loginWindow.on('show', function() {
-              var panel = this.loginWindow.findById('recovery-panel');
+              var panel, field;
+
+              panel = this.loginWindow.findById('recovery-panel');
               if (panel && !panel.clickListenerAdded)
               {
                 // these listeners only work if added after the window is
@@ -182,10 +186,10 @@
                 panel.clickListenerAdded = true;
               }
 
-              var field = this.loginForm.find('name', 'username')[0];
+              field = this.loginForm.find('name', 'username')[0];
               if (field.getRawValue())
               {
-                field = this.loginForm.find('name', 'password')[0]
+                field = this.loginForm.find('name', 'password')[0];
               }
               field.focus(true, 100);
             }, this);
@@ -506,12 +510,13 @@
         }
 
         Sonatype.view.welcomePanel = function(config) {
-          var config = config || {};
-          var defaultConfig = {};
-          Ext.apply(this, config, defaultConfig);
+          var cfg = config || {},
+              defaultConfig = {};
+
+          Ext.apply(this, cfg, defaultConfig);
 
           Sonatype.view.welcomePanel.superclass.constructor.call(this, welcomeTabConfig );
-        }
+        };
 
         Ext.extend(Sonatype.view.welcomePanel, Ext.Panel);
 
@@ -539,6 +544,6 @@
       }
 
     };
-  }();
+  })();
 
 })();
