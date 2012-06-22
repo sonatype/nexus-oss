@@ -368,7 +368,7 @@
           <version>2.3.2</version>
           <configuration>
             <autoVersionSubmodules>true</autoVersionSubmodules>
-            <tagNameFormat>security-@{version}<tagNameFormat>
+            <tagNameFormat>security-@{version}</tagNameFormat>
           </configuration>
         </plugin>
 
