@@ -37,7 +37,7 @@ public class Nexus4372InvalidSearchStringYields400BadRequestIT
     private static String[][] toTest = {
         {"!", "!*"},
         {"]]", "]]*"},
-        {"<!", "<!*"}, // html special chars will be rendered by javascript, payload is expected to be represented as 'plain text'
+        {"<!", "&lt;!*"}, // html special chars will be rendered by javascript, payload is expected to be represented as 'plain text', HTML escaped
     };
 
     @Test

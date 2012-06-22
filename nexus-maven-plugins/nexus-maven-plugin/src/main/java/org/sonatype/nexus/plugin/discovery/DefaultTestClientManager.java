@@ -16,6 +16,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 
 @Component( role = NexusTestClientManager.class )
@@ -25,11 +26,11 @@ public class DefaultTestClientManager
 
     private Logger logger;
 
-    public boolean testConnection( final String url, final String user, final String password )
+    public boolean testConnection( final String url, final String user, final String password, ProxyConfig proxyConfig )
     {
         try
         {
-            new NexusTestClient( url, user, password );
+            new NexusTestClient( url, user, password, proxyConfig );
             return true;
         }
         catch ( RESTLightClientException e )
@@ -39,8 +40,7 @@ public class DefaultTestClientManager
                 logger.debug( "Failed to connect: " + e.getMessage(), e );
             }
 
-            // System.out.println( "Invalid Nexus URL and/or authentication for: " + url + " (user: " + user + ")" );
-            logger.info( "Invalid Nexus URL and/or authentication for: " + url + " (user: " + user + ")" );
+            logger.error( "Invalid Nexus URL and/or authentication for: " + url + " (user: " + user + ")" );
         }
 
         return false;
@@ -49,10 +49,11 @@ public class DefaultTestClientManager
     private static final class NexusTestClient
         extends AbstractRESTLightClient
     {
-        protected NexusTestClient( final String baseUrl, final String user, final String password )
+        protected NexusTestClient( final String baseUrl, final String user, final String password,
+                                   ProxyConfig proxyConfig )
             throws RESTLightClientException
         {
-            super( baseUrl, user, password, "connectionTest" );
+            super( baseUrl, user, password, "connectionTest", proxyConfig );
         }
     }
 

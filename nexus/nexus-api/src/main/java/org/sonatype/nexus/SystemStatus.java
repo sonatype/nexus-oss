@@ -45,7 +45,7 @@ public class SystemStatus
     /**
      * The Nexus Application edition for display in UI.
      */
-    private String editionLong = "Open Source";
+    private String editionLong = "";
 
     /**
      * The Nexus Application edition for user agent
@@ -111,6 +111,21 @@ public class SystemStatus
      * Other error cause that blocked startup.
      */
     private Throwable errorCause;
+
+    /**
+     * True if a license is installed, false otherwise. For OSS always return false.
+     */
+    private boolean licenseInstalled = false;
+
+    /**
+     * True if license is expired, false otherwise. For OSS always return false.
+     */
+    private boolean licenseExpired = false;
+
+    /**
+     * True if installed license is a trial license, false otherwise. For OSS always return false.
+     */
+    private boolean trialLicense = false;
 
     public String getAppName()
     {
@@ -295,4 +310,35 @@ public class SystemStatus
     {
         return SystemState.STARTED.equals( getState() );
     }
+
+    public boolean isLicenseInstalled()
+    {
+        return licenseInstalled;
+    }
+
+    public void setLicenseInstalled( final boolean licenseInstalled )
+    {
+        this.licenseInstalled = licenseInstalled;
+    }
+
+    public boolean isLicenseExpired()
+    {
+        return licenseExpired;
+    }
+
+    public void setLicenseExpired( final boolean licenseExpired )
+    {
+        this.licenseExpired = licenseExpired;
+    }
+
+    public boolean isTrialLicense()
+    {
+        return trialLicense;
+    }
+
+    public void setTrialLicense( final boolean trialLicense )
+    {
+        this.trialLicense = trialLicense;
+    }
+
 }

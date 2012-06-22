@@ -136,8 +136,7 @@ public class ArtifactResolvePlexusResource
 
             if ( resolvedGav == null )
             {
-                throw new ItemNotFoundException( "GAV: " + gavRequest.getGroupId() + " : " + gavRequest.getArtifactId()
-                    + " : " + gavRequest.getVersion(), gavRequest, mavenRepository );
+                throw new ItemNotFoundException( gavRequest, mavenRepository );
             }
 
             String repositoryPath = mavenRepository.getGavCalculator().gavToPath( resolvedGav );

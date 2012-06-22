@@ -41,6 +41,7 @@
     <module>nexus-runtime-platform</module>
     <module>nexus</module>
     <module>nexus-maven-plugins</module>
+    <module>nexus-plugin-archetype</module>
   </modules>
 
   <build>
@@ -104,14 +105,16 @@
               <!-- netbeans adds these -->
               <exclude>**/nbactions*.xml</exclude>
               <exclude>**/nb-configuration.xml</exclude>
-              <!-- IntelliJ IDEA project directory-->
+              <!-- IntelliJ IDEA files-->
               <exclude>**/.idea/**</exclude>
+              <exclude>**/atlassian-ide-plugin.xml</exclude>
               <!-- The classes in guava package are copied over from com.google.common.eventbus in order to make then extensible (they are package protected) -->
               <exclude>**/org/sonatype/nexus/eventbus/internal/guava/**</exclude>
               <exclude>**/sandbox/**</exclude>
+              <exclude>nexus-plugin-archetype/src/main/resources/archetype-resources/**</exclude>
             </excludes>
             <mapping>
-              <vm>XML_STYLE</vm>
+              <vm>SHARPSTAR_STYLE</vm>
               <groovy>JAVADOC_STYLE</groovy>
               <aj>JAVADOC_STYLE</aj>
             </mapping>

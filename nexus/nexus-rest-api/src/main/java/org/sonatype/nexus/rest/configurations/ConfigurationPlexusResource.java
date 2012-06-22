@@ -85,6 +85,7 @@ public class ConfigurationPlexusResource
 
     /**
      * Returns the requested Nexus configuration. The keys for various configurations should be discovered by querying
+     *
      * the "/configs" resource first. This resource emits the raw configuration file used by Nexus as response body.
      * 
      * @param configKey The configuration key for which we want to get the configuration.

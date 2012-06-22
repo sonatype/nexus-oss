@@ -13,7 +13,6 @@
 package org.sonatype.nexus.proxy.repository.charger;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -39,22 +38,15 @@ import com.google.common.base.Preconditions;
  * @author cstamas
  */
 public class GroupItemRetrieveCallable
-implements Callable<StorageItem>, ExceptionHandler
+    extends AbstractRetrieveCallable<StorageItem>
+    implements ExceptionHandler
 {
-    private final Logger logger;
-
-    private final Repository repository;
-
-    private final ResourceStoreRequest request;
-
     private final GroupRepository groupRepository;
 
     public GroupItemRetrieveCallable( final Logger logger, final Repository repository,
                                       final ResourceStoreRequest request, final GroupRepository groupRepository )
     {
-        this.logger = Preconditions.checkNotNull( logger );
-        this.repository = Preconditions.checkNotNull( repository );
-        this.request = Preconditions.checkNotNull( request );
+        super( logger, repository, request );
         this.groupRepository = Preconditions.checkNotNull( groupRepository );
     }
 
@@ -62,13 +54,13 @@ implements Callable<StorageItem>, ExceptionHandler
     public StorageItem call()
         throws ItemNotFoundException, IllegalOperationException, IOException, AccessDeniedException
     {
-        final ResourceStoreRequest newreq = new ResourceStoreRequest( request );
-        newreq.setRequestLocalOnly( request.isRequestLocalOnly() );
-        newreq.setRequestRemoteOnly( request.isRequestRemoteOnly() );
+        final ResourceStoreRequest newreq = new ResourceStoreRequest( getRequest() );
+        newreq.setRequestLocalOnly( getRequest().isRequestLocalOnly() );
+        newreq.setRequestRemoteOnly( getRequest().isRequestRemoteOnly() );
 
-        StorageItem item = repository.retrieveItem( newreq );
+        StorageItem item = getRepository().retrieveItem( newreq );
 
-        request.addProcessedRepository( repository );
+        getRequest().addProcessedRepository( getRepository() );
 
         if ( item instanceof StorageCollectionItem )
         {
@@ -84,35 +76,39 @@ implements Callable<StorageItem>, ExceptionHandler
         if ( ex instanceof IOException )
         {
             // just ignore it
+            setProcessingException( ex );
             return true;
         }
         else if ( ex instanceof AccessDeniedException )
         {
             // just ignore it
+            setProcessingException( ex );
             return true;
         }
         else if ( ex instanceof ItemNotFoundException )
         {
             // just ignore it
+            setProcessingException( ex );
             return true;
         }
         else if ( ex instanceof RepositoryNotAvailableException )
         {
             // just log and ignore it
-            if ( logger.isDebugEnabled() )
+            if ( getLogger().isDebugEnabled() )
             {
-                logger.debug( RepositoryStringUtils.getFormattedMessage(
+                getLogger().debug( RepositoryStringUtils.getFormattedMessage(
                     "Member repository %s is not available, request failed.",
                     ( (RepositoryNotAvailableException) ex ).getRepository() ) );
             }
 
+            setProcessingException( ex );
             return true;
         }
         else if ( ex instanceof IllegalOperationException )
         {
             // just log and ignore it
-            logger.warn( "Member repository request failed", ex );
-
+            getLogger().warn( "Member repository request failed", ex );
+            setProcessingException( ex );
             return true;
         }
 

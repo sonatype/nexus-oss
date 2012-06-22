@@ -23,10 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -52,6 +56,7 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
 import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -68,8 +73,15 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserStatus;
+import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 import com.google.common.base.Function;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
 
 /**
@@ -82,10 +94,20 @@ import com.google.common.collect.Collections2;
 @Component( role = NexusConfiguration.class )
 public class DefaultNexusConfiguration
     extends AbstractLoggingComponent
-    implements NexusConfiguration
+    implements NexusConfiguration, Initializable
 {
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
+
+    /**
+     * The path cache is referenced here only for UTs sake. At deploy/runtime, this does not matter, as CacheManager is
+     * already part of component dependency graph. This reference here is merely for UTs, as almost all of them (from
+     * nexus-app module onwards) does "awake" this component, and hence, by having this reference here, we actually pull
+     * and have Plexus manage the "lifecycle" of CacheManager component (and indirectly, EhCacheManager lifecycle).
+     */
+    @Requirement
+    @SuppressWarnings( "unused" )
+    private CacheManager pathCache;
 
     @Requirement( hint = "file" )
     private ApplicationConfigurationSource configurationSource;
@@ -152,6 +174,70 @@ public class DefaultNexusConfiguration
 
     // ==
 
+    private File canonicalize( final File file )
+    {
+        try
+        {
+            return file.getCanonicalFile();
+        }
+        catch ( IOException e )
+        {
+            final String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not canonicalize file [ "
+                    + file
+                    + "]!!!! *\r\n"
+                    + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
+            getLogger().error( message );
+            throw Throwables.propagate( e );
+        }
+    }
+
+    private File forceMkdir( final File directory )
+    {
+        try
+        {
+            FileUtils.forceMkdir( directory );
+            return directory;
+        }
+        catch ( IOException e )
+        {
+            final String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not create directory [ "
+                    + directory
+                    + "]!!!! *\r\n"
+                    + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
+            getLogger().error( message );
+            throw Throwables.propagate( e );
+        }
+    }
+
+    @Override
+    public void initialize()
+        throws InitializationException
+    {
+        workingDirectory = canonicalize( workingDirectory );
+        if ( !workingDirectory.isDirectory() )
+        {
+            forceMkdir( workingDirectory );
+        }
+
+        temporaryDirectory = canonicalize( new File( System.getProperty( "java.io.tmpdir" ) ) );
+        if ( !temporaryDirectory.isDirectory() )
+        {
+            forceMkdir( temporaryDirectory );
+        }
+
+        configurationDirectory = canonicalize( new File( getWorkingDirectory(), "conf" ) );
+        if ( !configurationDirectory.isDirectory() )
+        {
+            forceMkdir( configurationDirectory );
+        }
+    }
+
     public void loadConfiguration()
         throws ConfigurationException, IOException
     {
@@ -178,10 +264,6 @@ public class DefaultNexusConfiguration
                 configurationSource.backupConfiguration();
                 configurationSource.storeConfiguration();
             }
-
-            configurationDirectory = null;
-
-            temporaryDirectory = null;
 
             globalLocalStorageContext = new DefaultLocalStorageContext( null );
 
@@ -294,10 +376,6 @@ public class DefaultNexusConfiguration
         {
             logApplyConfiguration( prepare.getChanges() );
 
-            configurationDirectory = null;
-
-            temporaryDirectory = null;
-
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
@@ -385,19 +463,6 @@ public class DefaultNexusConfiguration
 
     public File getWorkingDirectory()
     {
-        // Create the dir if doesn't exist, throw runtime exception on failure
-        // bad bad bad
-        if ( !workingDirectory.exists() && !workingDirectory.mkdirs() )
-        {
-            String message =
-                "\r\n******************************************************************************\r\n"
-                    + "* Could not create work directory [ " + workingDirectory.toString() + "]!!!! *\r\n"
-                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                    + "******************************************************************************";
-
-            getLogger().error( message );
-        }
-
         return workingDirectory;
     }
 
@@ -408,53 +473,21 @@ public class DefaultNexusConfiguration
 
     public File getWorkingDirectory( final String key, final boolean createIfNeeded )
     {
-        File keyedDirectory = new File( getWorkingDirectory(), key );
-
+        final File keyedDirectory = new File( getWorkingDirectory(), key );
         if ( createIfNeeded )
         {
-            if ( !keyedDirectory.isDirectory() && !keyedDirectory.mkdirs() )
-            {
-                String message =
-                    "\r\n******************************************************************************\r\n"
-                        + "* Could not create work directory [ "
-                        + keyedDirectory.toString()
-                        + "]!!!! *\r\n"
-                        + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                        + "******************************************************************************";
-
-                getLogger().error( message );
-            }
+            forceMkdir( keyedDirectory );
         }
-
-        return keyedDirectory;
+        return canonicalize( keyedDirectory );
     }
 
     public File getTemporaryDirectory()
     {
-        if ( temporaryDirectory == null )
-        {
-            temporaryDirectory = new File( System.getProperty( "java.io.tmpdir" ) );
-
-            if ( !temporaryDirectory.exists() )
-            {
-                temporaryDirectory.mkdirs();
-            }
-        }
         return temporaryDirectory;
     }
 
     public File getConfigurationDirectory()
     {
-        if ( configurationDirectory == null )
-        {
-            configurationDirectory = new File( getWorkingDirectory(), "conf" );
-
-            if ( !configurationDirectory.exists() )
-            {
-                configurationDirectory.mkdirs();
-            }
-
-        }
         return configurationDirectory;
     }
 
@@ -508,6 +541,137 @@ public class DefaultNexusConfiguration
         return getSecuritySystem() != null && getSecuritySystem().isAnonymousAccessEnabled();
     }
 
+    public void setAnonymousAccess( final boolean enabled, final String username, final String password )
+        throws InvalidConfigurationException
+    {
+        if ( enabled )
+        {
+            if ( StringUtils.isBlank( username ) || StringUtils.isBlank( password ) )
+            {
+                throw new InvalidConfigurationException(
+                    "Anonymous access is getting enabled without valid username and/or password!" );
+            }
+
+            final String oldUsername = getSecuritySystem().getAnonymousUsername();
+            final String oldPassword = getSecuritySystem().getAnonymousPassword();
+
+            // try to enable the "anonymous" user defined in XML realm, but ignore any problem (users might
+            // delete
+            // or already disabled it, or completely removed XML realm)
+            // this is needed as below we will try a login
+            final boolean statusChanged = setAnonymousUserEnabled( username, true );
+
+            // detect change
+            if ( !StringUtils.equals( oldUsername, username ) || !StringUtils.equals( oldPassword, password ) )
+            {
+                try
+                {
+                    // test authc with changed credentials
+                    try
+                    {
+                        // try to "log in" with supplied credentials
+                        // the anon user a) should exists
+                        securitySystem.getUser( username );
+                        // b) the pwd must work
+                        securitySystem.authenticate( new UsernamePasswordToken( username, password ) );
+                    }
+                    catch ( UserNotFoundException e )
+                    {
+                        final String msg = "User \"" + username + "'\" does not exist.";
+                        getLogger().warn(
+                            "Nexus refused to apply configuration, the supplied anonymous information is wrong: " + msg,
+                            e );
+                        throw new InvalidConfigurationException( msg, e );
+                    }
+                    catch ( AuthenticationException e )
+                    {
+                        final String msg = "The password of user \"" + username + "\" is incorrect.";
+                        getLogger().warn(
+                            "Nexus refused to apply configuration, the supplied anonymous information is wrong: " + msg,
+                            e );
+                        throw new InvalidConfigurationException( msg, e );
+                    }
+                }
+                catch ( InvalidConfigurationException e )
+                {
+                    if ( statusChanged )
+                    {
+                        setAnonymousUserEnabled( username, false );
+                    }
+                    throw e;
+                }
+
+                // set the changed username/pw
+                getSecuritySystem().setAnonymousUsername( username );
+                getSecuritySystem().setAnonymousPassword( password );
+            }
+
+            getSecuritySystem().setAnonymousAccessEnabled( true );
+        }
+        else
+        {
+            // get existing username from XML realm, if we can (if security config about to be disabled still holds this
+            // info)
+            final String existingUsername = getSecuritySystem().getAnonymousUsername();
+
+            if ( !StringUtils.isBlank( existingUsername ) )
+            {
+                // try to disable the "anonymous" user defined in XML realm, but ignore any problem (users might delete
+                // or already disabled it, or completely removed XML realm)
+                setAnonymousUserEnabled( existingUsername, false );
+            }
+
+            getSecuritySystem().setAnonymousAccessEnabled( false );
+        }
+
+    }
+
+    protected boolean setAnonymousUserEnabled( final String anonymousUsername, final boolean enabled )
+        throws InvalidConfigurationException
+    {
+        try
+        {
+            final User anonymousUser = getSecuritySystem().getUser( anonymousUsername, SecurityXmlUserManager.SOURCE );
+            final UserStatus oldStatus = anonymousUser.getStatus();
+            if ( enabled )
+            {
+                anonymousUser.setStatus( UserStatus.active );
+            }
+            else
+            {
+                anonymousUser.setStatus( UserStatus.disabled );
+            }
+            getSecuritySystem().updateUser( anonymousUser );
+            return !oldStatus.equals( anonymousUser.getStatus() );
+        }
+        catch ( UserNotFoundException e )
+        {
+            // ignore, anon user maybe manually deleted from XML realm by Nexus admin, is okay (kinda expected)
+            getLogger().debug(
+                "Anonymous user not found while trying to disable it (as part of disabling anonymous access)!", e );
+            return false;
+        }
+        catch ( NoSuchUserManagerException e )
+        {
+            // ignore, XML realm removed from configuration by Nexus admin, is okay (kinda expected)
+            getLogger().debug(
+                "XML Realm not found while trying to disable Anonymous user (as part of disabling anonymous access)!",
+                e );
+            return false;
+        }
+        catch ( InvalidConfigurationException e )
+        {
+            // do not ignore, and report, as this jeopardizes whole security functionality
+            // we did not perform any _change_ against security sofar (we just did reading from it),
+            // so it is okay to bail out at this point
+            getLogger().warn(
+                "XML Realm reported invalid configuration while trying to disable Anonymous user (as part of disabling anonymous access)!",
+                e );
+            throw e;
+        }
+    }
+
+    @Deprecated
     public void setAnonymousAccessEnabled( boolean enabled )
     {
         getSecuritySystem().setAnonymousAccessEnabled( enabled );
@@ -518,6 +682,7 @@ public class DefaultNexusConfiguration
         return getSecuritySystem().getAnonymousUsername();
     }
 
+    @Deprecated
     public void setAnonymousUsername( String val )
         throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
@@ -529,6 +694,7 @@ public class DefaultNexusConfiguration
         return getSecuritySystem().getAnonymousPassword();
     }
 
+    @Deprecated
     public void setAnonymousPassword( String val )
         throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
@@ -811,8 +977,7 @@ public class DefaultNexusConfiguration
 
             if ( repository.getId().equals( shadow.getMasterRepository().getId() ) )
             {
-                throw new ConfigurationException( "The repository with ID " + id
-                    + " is not deletable, it has dependant repositories!" );
+                throw new RepositoryDependentException( repository, shadow );
             }
         }
 

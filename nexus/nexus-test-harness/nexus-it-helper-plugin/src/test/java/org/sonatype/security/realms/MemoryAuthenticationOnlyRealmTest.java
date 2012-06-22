@@ -17,10 +17,9 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.junit.Test;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class MemoryAuthenticationOnlyRealmTest
-    extends PlexusTestCaseSupport
+    extends AbstractRealmTest
 {
     private MemoryAuthenticationOnlyRealm realm;
 

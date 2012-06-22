@@ -13,7 +13,6 @@
 package org.sonatype.nexus.proxy.repository.charger;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -25,8 +24,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.sisu.charger.ExceptionHandler;
 
-import com.google.common.base.Preconditions;
-
 /**
  * Callable that retrieves an item from a repository, for example as part of a group request. Used in
  * org.sonatype.nexus.proxy.repository.AbstractGroupRepository.doRetrieveItems(ResourceStoreRequest)
@@ -34,36 +31,29 @@ import com.google.common.base.Preconditions;
  * @author cstamas
  */
 public class ItemRetrieveCallable
-    implements Callable<StorageItem>, ExceptionHandler
+   extends AbstractRetrieveCallable<StorageItem>
+    implements ExceptionHandler
 {
-    private final Logger logger;
-
-    private final Repository repository;
-
-    private final ResourceStoreRequest request;
-
     public ItemRetrieveCallable( final Logger logger, final Repository repository, final ResourceStoreRequest request )
     {
-        this.logger = Preconditions.checkNotNull( logger );
-        this.repository = Preconditions.checkNotNull( repository );
-        this.request = Preconditions.checkNotNull( request );
+        super(logger, repository ,request);
     }
 
     @Override
     public StorageItem call()
         throws IllegalOperationException, ItemNotFoundException, IOException
     {
-        final ResourceStoreRequest newreq = new ResourceStoreRequest( request );
-        newreq.setRequestLocalOnly( request.isRequestLocalOnly() );
-        newreq.setRequestRemoteOnly( request.isRequestRemoteOnly() );
+        final ResourceStoreRequest newreq = new ResourceStoreRequest( getRequest() );
+        newreq.setRequestLocalOnly( getRequest().isRequestLocalOnly() );
+        newreq.setRequestRemoteOnly( getRequest().isRequestRemoteOnly() );
 
         try
         {
-            return repository.retrieveItem( false, newreq );
+            return getRepository().retrieveItem( false, newreq );
         }
         finally
         {
-            request.addProcessedRepository( repository );
+            getRequest().addProcessedRepository( getRepository() );
         }
     }
 
@@ -73,25 +63,28 @@ public class ItemRetrieveCallable
         if ( ex instanceof ItemNotFoundException )
         {
             // just ignore it
+            setProcessingException( ex );
             return true;
         }
         else if ( ex instanceof RepositoryNotAvailableException )
         {
             // just log and ignore it
-            if ( logger.isDebugEnabled() )
+            if ( getLogger().isDebugEnabled() )
             {
-                logger.debug( RepositoryStringUtils.getFormattedMessage(
+                getLogger().debug( RepositoryStringUtils.getFormattedMessage(
                     "Member repository %s is not available, request failed.",
                     ( (RepositoryNotAvailableException) ex ).getRepository() ) );
             }
 
+            setProcessingException( ex );
             return true;
         }
         else if ( ex instanceof IllegalOperationException )
         {
             // just log and ignore it
-            logger.warn( "Member repository request failed", ex );
+            getLogger().warn( "Member repository request failed", ex );
 
+            setProcessingException( ex );
             return true;
         }
 

@@ -13,6 +13,8 @@
 package org.sonatype.nexus.rest;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,7 +55,6 @@ import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageCompositeItem;
@@ -62,6 +63,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.item.uid.IsRemotelyAccessibleAttribute;
+import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
@@ -70,6 +72,7 @@ import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
 import org.sonatype.nexus.rest.model.ContentListDescribeResponseResource;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
+import org.sonatype.nexus.rest.model.NotFoundReasoning;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
@@ -115,7 +118,21 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     protected String getResourceStorePath( Request request )
     {
-        return parsePathFromUri( request.getResourceRef().getRemainingPart() );
+        try
+        {
+            // #getRemainingPart(true, true) would use Restlet decoding, that relies 
+            // on same URLDecoder as below, but without this "trick" below
+            // source: http://stackoverflow.com/questions/2632175/java-decoding-uri-query-string
+            final String remainingPart = request.getResourceRef().getRemainingPart( false, false );
+            final String remainingDecodedPart =
+                URLDecoder.decode( remainingPart.replace( "+", "%2B" ), "UTF-8" ).replace( "%2B", "+" );
+            return parsePathFromUri( remainingDecodedPart );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new IllegalStateException(
+                "Nexus cannot operate on platform not supporting UTF-8 character encoding!", e );
+        }
     }
 
     protected boolean isDescribe( Request request )
@@ -144,7 +161,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             {
                 if ( isDescribe( request ) )
                 {
-                    return renderDescribeItem( context, request, response, variant, store, req, null );
+                    return renderDescribeItem( context, request, response, variant, store, req, null, e );
                 }
                 else
                 {
@@ -339,7 +356,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         if ( isDescribe( req ) )
         {
-            return renderDescribeItem( context, req, res, variant, store, item.getResourceStoreRequest(), item );
+            return renderDescribeItem( context, req, res, variant, store, item.getResourceStoreRequest(), item, null );
         }
 
         if ( !item.isVirtual() )
@@ -564,7 +581,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected Object renderDescribeItem( Context context, Request req, Response res, Variant variant,
-                                         ResourceStore store, ResourceStoreRequest request, StorageItem item )
+                                         ResourceStore store, ResourceStoreRequest request, StorageItem item,
+                                         Throwable t )
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
@@ -613,7 +631,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         resource.setRequest( describeRequest( context, req, res, variant, request ) );
 
-        resource.setResponse( describeResponse( context, req, res, variant, request, item ) );
+        resource.setResponse( describeResponse( context, req, res, variant, request, item, t ) );
 
         result.setData( resource );
 
@@ -637,9 +655,34 @@ public abstract class AbstractResourceStoreContentPlexusResource
         return result;
     }
 
+    protected NotFoundReasoning buildNotFoundReasoning( final Repository repository, final Throwable t )
+    {
+        final NotFoundReasoning reasoning = new NotFoundReasoning();
+
+        reasoning.setReasonMessage( t.getMessage() );
+        reasoning.setThrowableType( t.getClass().getName() );
+        if ( repository != null )
+        {
+            reasoning.setRepositoryId( repository.getId() );
+        }
+
+        if ( t instanceof GroupItemNotFoundException )
+        {
+            final GroupItemNotFoundException ginf = (GroupItemNotFoundException) t;
+            reasoning.setRepositoryId( ginf.getRepository().getId() );
+
+            for ( Map.Entry<Repository, Throwable> r : ginf.getMemberReasons().entrySet() )
+            {
+                reasoning.addNotFoundReasoning( buildNotFoundReasoning( r.getKey(), r.getValue() ) );
+            }
+        }
+
+        return reasoning;
+    }
+
     protected ContentListDescribeResponseResource describeResponse( Context context, Request req, Response res,
                                                                     Variant variant, ResourceStoreRequest request,
-                                                                    StorageItem item )
+                                                                    StorageItem item, Throwable e )
     {
         ContentListDescribeResponseResource result = new ContentListDescribeResponseResource();
 
@@ -654,6 +697,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
         if ( item == null )
         {
             result.setResponseType( "NOT_FOUND" );
+
+            if ( e != null )
+            {
+                result.addNotFoundReasoning( buildNotFoundReasoning( null, e ) );
+            }
 
             return result;
         }
@@ -795,10 +843,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
             else if ( t instanceof IllegalArgumentException )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
-            }
-            else if ( t instanceof StorageException )
-            {
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t );
             }
             else if ( t instanceof RepositoryNotAvailableException )
             {

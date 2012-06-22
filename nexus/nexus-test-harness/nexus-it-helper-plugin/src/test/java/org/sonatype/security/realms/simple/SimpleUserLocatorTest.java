@@ -17,28 +17,28 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.security.realms.AbstractRealmTest;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public class SimpleUserLocatorTest
-    extends PlexusTestCaseSupport
+    extends AbstractRealmTest
 {
 
     @Test
     public void testLocatorLookup()
         throws Exception
     {
-        // a bit of plexus back ground, this is how you can look up a component from a test class
-        this.lookup( UserManager.class, "Simple" );
+        // a bit of Plexus background, this is how you can look up a component from a test class
+        lookup( UserManager.class, "Simple" );
     }
 
     @Test
     public void testSearch()
         throws Exception
     {
-        UserManager userLocator = this.lookup( UserManager.class, "Simple" );
+        UserManager userLocator = lookup( UserManager.class, "Simple" );
 
         Set<User> result = userLocator.searchUsers( new UserSearchCriteria( "adm" ) );
         Assert.assertEquals( 1, result.size() );
@@ -50,7 +50,7 @@ public class SimpleUserLocatorTest
     public void testIdList()
         throws Exception
     {
-        UserManager userLocator = this.lookup( UserManager.class, "Simple" );
+        UserManager userLocator = lookup( UserManager.class, "Simple" );
 
         Set<String> ids = userLocator.listUserIds();
 

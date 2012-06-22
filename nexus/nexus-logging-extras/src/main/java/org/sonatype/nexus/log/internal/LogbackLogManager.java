@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,8 +30,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -41,10 +46,11 @@ import org.sonatype.nexus.LimitedInputStream;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.log.DefaultLogConfiguration;
+import org.sonatype.nexus.log.DefaultLogManagerMBean;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
-import com.google.inject.Injector;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -52,8 +58,9 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
-import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.util.StatusPrinter;
+
+import com.google.inject.Injector;
 
 //TODO configuration operations should be locking
 
@@ -64,8 +71,9 @@ import ch.qos.logback.core.util.StatusPrinter;
  */
 @Component( role = LogManager.class )
 public class LogbackLogManager
-    implements LogManager
+    implements LogManager, Disposable
 {
+    private static final String JMX_DOMAIN = "org.sonatype.nexus.log";
 
     private static final String KEY_APPENDER_FILE = "appender.file";
 
@@ -92,6 +100,41 @@ public class LogbackLogManager
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
+
+    private ObjectName jmxName;
+
+    public LogbackLogManager()
+    {
+        try
+        {
+            jmxName = ObjectName.getInstance( JMX_DOMAIN, "name", LogManager.class.getSimpleName() );
+            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            server.registerMBean( new DefaultLogManagerMBean( this ), jmxName );
+        }
+        catch ( Exception e )
+        {
+            jmxName = null;
+            // FIXME: when switched over SISU, this will be a non issue
+            // sadly, plexus does field injection and logger not yet avail
+            // getLogger().warn( "Problem registering MBean for: " + getClass().getName(), e );
+        }
+    }
+
+    @Override
+    public void dispose()
+    {
+        if ( null != jmxName )
+        {
+            try
+            {
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean( jmxName );
+            }
+            catch ( final Exception e )
+            {
+                logger.warn( "Problem unregistering MBean for: " + getClass().getName(), e );
+            }
+        }
+    }
 
     public Set<File> getLogFiles()
     {
@@ -217,7 +260,7 @@ public class LogbackLogManager
     /**
      * Retrieves a stream to the requested log file. This method ensures that the file is rooted in the log folder to
      * prevent browsing of the file system.
-     *
+     * 
      * @param logFile path of the file to retrieve
      * @returns InputStream to the file or null if the file is not allowed or doesn't exist.
      */
@@ -339,7 +382,7 @@ public class LogbackLogManager
             catch ( IOException e )
             {
                 throw new IllegalStateException( "Could not create logback.properties as "
-                                                     + logConfigPropsFile.getAbsolutePath() );
+                    + logConfigPropsFile.getAbsolutePath() );
             }
         }
 
@@ -361,7 +404,7 @@ public class LogbackLogManager
                     catch ( IOException e )
                     {
                         throw new IllegalStateException( String.format( "Could not create %s as %s", name,
-                                                                        logConfigFile.getAbsolutePath() ), e );
+                            logConfigFile.getAbsolutePath() ), e );
                     }
                     finally
                     {
@@ -388,8 +431,7 @@ public class LogbackLogManager
             {
                 for ( LogConfigurationParticipant participant : logConfigurationParticipants )
                 {
-                    out.println(
-                        String.format( "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName() ) );
+                    out.println( String.format( "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName() ) );
                 }
             }
             out.write( "</configuration>" );

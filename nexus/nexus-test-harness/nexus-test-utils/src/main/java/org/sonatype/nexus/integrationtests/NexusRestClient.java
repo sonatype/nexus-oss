@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +25,6 @@ import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -55,6 +50,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * HTTP Request helper (trying to hide any mention of the actual request implementation.)
@@ -650,8 +650,8 @@ public class NexusRestClient
         throws IOException
     {
         HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
-        httpClient.getHttpConnectionManager().getParams().setSoTimeout( 5000 );
+        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( 10000 );
+        httpClient.getHttpConnectionManager().getParams().setSoTimeout( 10000 );
 
         if ( useTestContext )
         {

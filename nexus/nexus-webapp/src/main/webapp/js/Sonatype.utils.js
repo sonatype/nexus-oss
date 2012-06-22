@@ -182,11 +182,15 @@
           });
     },
     connectionError : function(response, message, offerRestart, options, showResponseText) {
+      // prime options object if necessary
+      options = options || {};
+
       var serverMessage = '';
       var r = response.responseText;
+
       if (r)
       {
-        if (options && options.decodeErrorResponse && r.toLowerCase().indexOf('"errors"') > -1)
+        if (options.decodeErrorResponse && r.toLowerCase().indexOf('"errors"') > -1)
         {
           var errorResponse = Ext.decode(response.responseText);
 
@@ -198,8 +202,8 @@
         }
         else
         {
-          var n1 = r.toLowerCase().indexOf('<h3>') + 4;
-          var n2 = r.toLowerCase().indexOf('</h3>');
+          var n1 = r.toLowerCase().indexOf('<p>') + 3;
+          var n2 = r.toLowerCase().indexOf('</p>');
           if (n2 > n1)
           {
             serverMessage += '<br /><br />'
@@ -255,21 +259,28 @@
         //
         // <retry message> (optional)
 
-        Sonatype.MessageBox.show({
-              title : "Error",
-              msg : ((message && (responseStatus != -1) ? message : '')
-                  + (responseStatus == 400 && showResponseText ?
-                      ('<br /><br />' + response.responseText) :
-                      (options && options.hideErrorStatus ? '' :
-                              ( (responseStatus && responseStatus != -1 ) ? // hide the "-1 status"
-                                      '<br /><br />Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText :
-                                      '<br /><br />There was an error communicating with the server: request timed out.')
+        var displayMessage =
+                    // caller provided message + serverMessage
+                    // status == -1 is request timed out (?), don't show message then
+                    (message && (responseStatus != -1) ? message : '') + (
+                          // show response text if requested (and makes sense, status 400)
+                          responseStatus == 400 && showResponseText ?  ('<br /><br />' + response.responseText) :
+                          // otherwise show statusLine if not requested to hide and we have a serverMessage
+                          // (we want to always provide some kind of server message, either error msg or status line)
+                          (
+                            (options.hideErrorStatus && serverMessage ) ? '' :
+                              (
+                                (responseStatus && responseStatus != -1 ) ? // hide the "-1 status"
+                                '<br/><br/>Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText :
+                                '<br/><br/>There was an error communicating with the server: request timed out.'
                               )
-                      )
-                  + (offerRestart ?
-                      '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' :
-                      '')
-              ),
+                            )
+                          )
+                          // FIXME offerRestart is never used (?)
+                          + (offerRestart ? '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' : '');
+        Sonatype.MessageBox.show({
+          title : "Error",
+          msg : displayMessage,
               buttons : offerRestart ? Sonatype.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
               icon : Sonatype.MessageBox.ERROR,
               animEl : 'mb3',
@@ -725,7 +736,7 @@
                                   }
                                 },
                                 failure : function(response, options) {
-                                  Sonatype.utils.connectionError(response, 'There is a problem changing your password.')
+                                  Sonatype.utils.connectionError(response, 'There is a problem changing your password.', false, { hideErrorStatus: true })
                                 }
                               });
                         }
@@ -863,6 +874,9 @@
                 Sonatype.utils.attributionsURL = respObj.data.attributionsURL;
                 Sonatype.utils.purchaseURL = respObj.data.purchaseURL;
                 Sonatype.utils.userLicenseURL = respObj.data.userLicenseURL;
+                Sonatype.utils.licenseInstalled = respObj.data.licenseInstalled;
+                Sonatype.utils.licenseExpired = respObj.data.licenseExpired;
+                Sonatype.utils.trialLicense = respObj.data.trialLicense;
 
                 Sonatype.utils.formattedAppName = Sonatype.utils.parseFormattedAppName(respObj.data.formattedAppName);
 
@@ -881,6 +895,9 @@
               else
               {
                 Sonatype.utils.edition = '';
+                Sonatype.utils.licenseInstalled = null;
+                Sonatype.utils.licenseExpired = null;
+                Sonatype.utils.trialLicense = null;
 
                 Sonatype.user.curr.repoServer = null;
                 Sonatype.user.curr.isLoggedIn = null;

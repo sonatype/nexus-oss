@@ -14,15 +14,20 @@ package org.sonatype.nexus.proxy.maven;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class MUtilsTest
+    extends TestSupport
 {
 
     private String[][] validDigests =
@@ -62,6 +67,20 @@ public class MUtilsTest
             assertThat( "MUtils did not accept " + test, digest, notNullValue() );
             assertThat( "MUtils did not accept " + test, digest, equalTo( expected ) );
         }
+    }
+
+    /**
+     * NEXUS-4984: Test that reading digest from a zero length file will not crash and digest is empty string ("").
+     *
+     * @throws IOException unexpected
+     */
+    @Test
+    public void zeroLengthSha1()
+        throws IOException
+    {
+        final File sha1 = util.resolveFile( "target/test-classes/nexus-4984/zero-bytes-length.sha1" );
+        final String digest = MUtils.readDigestFromStream( new FileInputStream( sha1 ) );
+        assertThat( "Zero bites checksum file", digest, is( equalTo( "" ) ) );
     }
 
 }

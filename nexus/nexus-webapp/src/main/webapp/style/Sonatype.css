@@ -40,8 +40,9 @@ body {
 #logo {
   color: white;
   font-size: 9px;
-  padding-top: 1px;
-  text-align: right;
+  position: absolute;
+  top: 22px;
+  right: 10px;
 }
 
 #logo a {
@@ -60,8 +61,58 @@ a:link, a:visited, a:hover, a:active {
   padding: 5px;
 }
 
+.head-link {
+    color: #FFCC00;
+}
+
 #head-link-r {
-     color: #FAC500;
+  cursor: pointer;
+  text-align: right;
+}
+
+.head-link-logged-in {
+    padding-right: 10px;
+    background: url("../images/icons/btn-arrow-headlink.gif") no-repeat scroll 88% -30% transparent;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+.profile-menu-visible {
+    background-color: #444444;
+}
+
+.user-profile-menu {
+    background-color: black;
+    background-image: none;
+    border-color: #444444;
+}
+
+.user-profile-menu a.x-menu-item {
+    color: #FFCC00;
+    background-color: black;
+}
+
+.user-profile-menu .x-menu-item img {
+    background: black;
+    border: none;
+}
+
+.user-profile-menu .x-menu-item-active {
+    border: solid 1px #444444;
+    background-color: black;
+    background-image: none;
+}
+
+.user-profile-dynamic-content {
+    border: 1px solid #B5B8C8;
+    /* padding == fieldset offset */
+    padding: 21px;
+    /* adjust for hidden tab bar */
+    padding-top: 10px;
+}
+
+#user-profile-summary-form .x-panel-footer {
+    background: none white;
 }
 
 #header div.left-side {

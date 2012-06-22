@@ -139,11 +139,6 @@ public class ScheduledServiceListPlexusResource
 
                 if ( allTasks || isExposed )
                 {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "Building task '" + task.getName() + "' of type '" + task.getType() + "'." );
-                    }
-
                     ScheduledServiceListResource item = new ScheduledServiceListResource();
                     item.setResourceURI( createChildReference( request, this, task.getId() ).toString() );
                     item.setLastRunResult( getLastRunResult( task ) );
@@ -206,18 +201,26 @@ public class ScheduledServiceListPlexusResource
                 Schedule schedule = getModelSchedule( serviceRequest.getData() );
                 ScheduledTask<?> task = null;
 
+                final NexusTask<?> nexusTask = getModelNexusTask( serviceResource, request );
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Creating task with type '" + nexusTask.getClass() + "': " + nexusTask.getName() + " (" + nexusTask.getId() + ")");
+                }
+
                 if ( schedule != null )
                 {
                     task =
                         getNexusScheduler().schedule( getModelName( serviceResource ),
-                            getModelNexusTask( serviceResource, request ), schedule );
+                                                      nexusTask, schedule );
                 }
                 else
                 {
                     task =
                         getNexusScheduler().schedule( getModelName( serviceResource ),
-                            getModelNexusTask( serviceResource, request ), new ManualRunSchedule() );
+                                                      nexusTask, new ManualRunSchedule() );
                 }
+                
 
                 task.setEnabled( serviceResource.isEnabled() );
 

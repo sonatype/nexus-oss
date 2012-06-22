@@ -39,7 +39,7 @@
 
       if (arguments.length > 2)
       {
-        var perms = Array.slice(arguments, 2);
+        var perms = [].slice.call(arguments, 2);
         Ext.each(perms, function(item, i, arr) {
               p = p | item;
             });

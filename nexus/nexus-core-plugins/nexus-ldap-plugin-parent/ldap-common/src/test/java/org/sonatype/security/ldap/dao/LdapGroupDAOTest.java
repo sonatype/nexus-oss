@@ -21,10 +21,10 @@ import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
 import org.junit.Test;
-import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
+import org.sonatype.security.ldap.AbstractLdapTest;
 
 public class LdapGroupDAOTest
-    extends AbstractLdapTestEnvironment
+    extends AbstractLdapTest
 {
 
     @Test
@@ -47,7 +47,7 @@ public class LdapGroupDAOTest
         Map<String, Object> env = new HashMap<String, Object>();
         // Create a new context pointing to the overseas partition
         env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );
-        env.put( Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype" );
+        env.put( Context.PROVIDER_URL, "ldap://localhost:" + getLdapServer().getPort() + "/o=sonatype" );
         env.put( Context.SECURITY_PRINCIPAL, "uid=admin,ou=system" );
         env.put( Context.SECURITY_CREDENTIALS, "secret" );
         env.put( Context.SECURITY_AUTHENTICATION, "simple" );

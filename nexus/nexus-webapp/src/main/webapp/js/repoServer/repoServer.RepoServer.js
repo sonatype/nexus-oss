@@ -278,12 +278,8 @@
               title : 'Security',
               id : 'st-nexus-security',
               collapsed : true,
-              items : [{
-                    enabled : Sonatype.user.curr.isLoggedIn && Sonatype.user.curr.loggedInUserSource == 'default' && sp.checkPermission('security:userschangepw', sp.CREATE),
-                    title : 'Change Password',
-                    handler : Sonatype.utils.changePassword,
-                    tabId : 'change-password'
-                  }, {
+              items : [
+                  {
                     enabled : sp.checkPermission('security:users', sp.READ) && (sp.checkPermission('security:users', sp.CREATE) || sp.checkPermission('security:users', sp.DELETE) || sp.checkPermission('security:users', sp.EDIT)),
                     title : 'Users',
                     tabId : 'security-users',
@@ -337,6 +333,11 @@
               collapsible : true,
               collapsed : true,
               items : [{
+                    title : 'Welcome',
+                    tabId : 'welcome',
+                    tabCode : Sonatype.view.welcomePanel
+                  },
+                  {
                     title : 'About Nexus',
                     tabId : 'AboutNexus',
                     tabCode : Sonatype.repoServer.HelpAboutPanel
@@ -389,6 +390,44 @@
           }
           this.loginWindow.show();
         }
+      },
+      profileMenu : new Ext.menu.Menu({
+        cls : 'user-profile-menu',
+        shadow: false,
+        items : [
+          {
+            text : 'Profile',
+            handler : function() {
+              Sonatype.view.mainTabPanel.addOrShowTab('profile', Nexus.profile.UserProfile);
+            },
+            listeners : {
+              render : function(cmp) {
+                cmp.setVisible(Sonatype.utils.editionShort === "OSS" || ( Sonatype.utils.licenseInstalled && !Sonatype.utils.licenseExpired));
+              }
+            }
+          },
+          {
+            text : 'Logout',
+            handler : function() {
+              Sonatype.repoServer.RepoServer.loginHandler();
+            }
+          }
+        ],
+        listeners : {
+          show : function() {
+            Ext.get('head-link-r').addClass('profile-menu-visible')
+          },
+          hide : function() {
+            Ext.get('head-link-r').removeClass('profile-menu-visible')
+          }
+        }
+      }),
+
+      /**
+       * Shows the profile menu at the position of the scope of this function.
+       */
+      showProfileMenu : function() {
+        Sonatype.repoServer.RepoServer.profileMenu.show(this);
       },
 
       resetMainTabPanel : function() {
@@ -449,6 +488,7 @@
         var itemCount = welcomePanelConfig.items.length;
 
         Sonatype.Events.fireEvent('welcomePanelInit', this, welcomePanelConfig);
+        Sonatype.Events.fireEvent('welcomeTabInit', this, welcomeTabConfig);
 
         // If nothing was added, then add the default blurb, if perm'd of course
         if (welcomePanelConfig.items.length <= itemCount && sp.checkPermission('nexus:repostatus', sp.READ))
@@ -465,7 +505,17 @@
               });
         }
 
-        Sonatype.view.welcomeTab = new Ext.Panel(welcomeTabConfig);
+        Sonatype.view.welcomePanel = function(config) {
+          var config = config || {};
+          var defaultConfig = {};
+          Ext.apply(this, config, defaultConfig);
+
+          Sonatype.view.welcomePanel.superclass.constructor.call(this, welcomeTabConfig );
+        }
+
+        Ext.extend(Sonatype.view.welcomePanel, Ext.Panel);
+
+        Sonatype.view.welcomeTab = new Sonatype.view.welcomePanel(welcomeTabConfig);
         Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
         Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
       },

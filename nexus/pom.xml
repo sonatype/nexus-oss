@@ -157,32 +157,32 @@
     <logback.version>1.0.0</logback.version>
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
 
-    <aether.version>1.13</aether.version>
+    <aether.version>1.13.1</aether.version>
     <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
-    <jetty.version>8.1.1.v20120215</jetty.version>
+    <jetty.version>8.1.3.v20120416</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <maven.version>3.0.4</maven.version>
-    <micromailer.version>1.1.1</micromailer.version>
+    <micromailer.version>1.5</micromailer.version>
     <nexus.repository.metadata.version>1.2</nexus.repository.metadata.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
-    <plexus-app-events.version>1.0.1</plexus-app-events.version>
+    <plexus-app-events.version>1.2</plexus-app-events.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-digest.version>1.1</plexus-digest.version>
-    <sisu-ehcache.version>1.0</sisu-ehcache.version>
+    <sisu-ehcache.version>1.1</sisu-ehcache.version>
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2.1</plexus-jetty7.version>
-    <sisu-jetty8.version>1.0.1</sisu-jetty8.version>
+    <sisu-jetty8.version>1.2</sisu-jetty8.version>
+    <sisu-velocity.version>1.1-SNAPSHOT</sisu-velocity.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
-    <plexus.restlet.bridge.version>1.18</plexus.restlet.bridge.version>
-    <plexus-security.version>2.4</plexus-security.version>
+    <plexus.restlet.bridge.version>1.21</plexus.restlet.bridge.version>
+    <plexus-security.version>2.8-SNAPSHOT</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
-    <plexus-velocity.version>1.1.7</plexus-velocity.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
-    <shiro.version>1.1.0</shiro.version>
+    <shiro.version>1.2.0</shiro.version>
     <spice-timeline.version>2.1</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
     <surefire.version>2.10</surefire.version>
@@ -239,7 +239,7 @@
       <dependency>
         <groupId>org.sonatype.appcontext</groupId>
         <artifactId>appcontext</artifactId>
-        <version>3.0</version>
+        <version>3.2</version>
       </dependency>
 
       <dependency>
@@ -341,6 +341,11 @@
         <artifactId>jetty-util</artifactId>
         <version>${jetty.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlets</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
 
       <!-- Plexus et al -->
       <dependency>
@@ -362,6 +367,21 @@
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-archiver</artifactId>
+        <version>2.1.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-component-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -470,45 +490,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-mailer</artifactId>
-        <version>${micromailer.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-velocity</artifactId>
-        <version>${plexus-velocity.version}</version>
-        <type>jar</type>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-component-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>velocity</groupId>
-            <artifactId>velocity</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.sonatype.spice</groupId>
         <artifactId>spice-timeline</artifactId>
         <version>${spice-timeline.version}</version>
@@ -535,7 +516,34 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-charger</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-mailer</artifactId>
+        <version>${micromailer.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-velocity</artifactId>
+        <version>${sisu-velocity.version}</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.velocity</groupId>
+        <artifactId>velocity</artifactId>
+        <version>1.5</version>
+        <type>jar</type>
       </dependency>
 
       <!-- locks -->
@@ -667,6 +675,13 @@
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${logback.version}</version>
+        <type>jar</type>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>${logback.version}</version>
         <type>jar</type>
@@ -775,12 +790,6 @@
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
         <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity</artifactId>
-        <version>1.5</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>rome</groupId>
@@ -988,6 +997,18 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>6.1.1</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-library</artifactId>
         <version>1.3.RC2</version>
@@ -1013,6 +1034,14 @@
         <version>1.9.0-rc1</version>
         <type>jar</type>
         <scope>test</scope>
+      </dependency>
+      <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
+      <dependency>
+        <groupId>org.objenesis</groupId>
+        <artifactId>objenesis</artifactId>
+        <version>1.2</version>
+        <type>jar</type>
+        <!-- scope>test</scope -->
       </dependency>
       <dependency>
         <groupId>org.uncommons</groupId>
@@ -1137,6 +1166,12 @@
         <version>${project.version}</version>
         <classifier>tests</classifier>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-indexer-lucene-plugin-model</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
@@ -1312,11 +1347,11 @@
             </configuration>
           </execution>
           <execution>
+            <id>enforce-dependencies</id>
             <goals>
               <goal>enforce</goal>
             </goals>
             <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. <phase>compile</phase> -->
-            <id>enforce-dependencies</id>
             <configuration>
               <rules>
                 <bannedDependencies>
@@ -1334,6 +1369,18 @@
                   </excludes>
                   <message>commons-logging conflicts with slf4j. You probably added a dependency that is missing the exclusions.
                   </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>commons-vfs:commons-vfs</exclude>
+                  </excludes>
+                  <message>commons-vfs 1.0 has a potential security vulnerability (osvdb-58760). Use org.apache.commons:commons-vfs2:2.0 or greater</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>xmlrpc:*</exclude>
+                  </excludes>
+                  <message>Apache commons xmlrpc with versions less than 3.1.3 expose a potential security vulnerability (osvdb-68314). Use org.apache.commons:xmlrpc-* 3.1.3 or greater</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>

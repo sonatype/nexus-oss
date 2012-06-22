@@ -22,16 +22,35 @@ public abstract class NoSuchResourceStoreException
 {
     private static final long serialVersionUID = 299346983704055394L;
 
-    public NoSuchResourceStoreException( String msg )
+    /**
+     * Constructs a new exception with the specified detail message.
+     * 
+     * @param msg message
+     */
+    public NoSuchResourceStoreException( final String msg )
     {
         super( msg );
     }
 
-    public NoSuchResourceStoreException( String msg, Throwable t )
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     * 
+     * @param msg message
+     * @param t the cause
+     */
+    public NoSuchResourceStoreException( final String msg, final Throwable t )
     {
         super( msg, t );
     }
 
+    /**
+     * Deprecated constructor that pre-assembles a message that does not make sense in some cases.
+     * 
+     * @param type
+     * @param id
+     * @deprecated Use any other "usual" exception constructor instead.
+     */
+    @Deprecated
     public NoSuchResourceStoreException( String type, String id )
     {
         super( "ResourceStore of type " + type + " with id='" + id + "' not found!" );

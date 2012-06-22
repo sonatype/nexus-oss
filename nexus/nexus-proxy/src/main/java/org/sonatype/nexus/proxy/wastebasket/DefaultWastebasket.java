@@ -17,9 +17,8 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -36,19 +35,12 @@ import org.sonatype.sisu.resource.scanner.Scanner;
 
 @Component( role = Wastebasket.class )
 public class DefaultWastebasket
+    extends AbstractLoggingComponent
     implements SmartWastebasket
 {
-
     private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
-    static final long ALL = -1L;
-
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
+    protected static final long ALL = -1L;
 
     // ==
 
@@ -65,12 +57,19 @@ public class DefaultWastebasket
     @Requirement
     private Walker walker;
 
-    @Requirement( hint = "serial" )
-    private Scanner scanner;
-
     protected Walker getWalker()
     {
         return walker;
+    }
+
+    // ==
+
+    @Requirement( hint = "serial" )
+    private Scanner scanner;
+
+    protected Scanner getScanner()
+    {
+        return scanner;
     }
 
     // ==
@@ -113,7 +112,7 @@ public class DefaultWastebasket
                 totalSize += repoWBSize;
             }
         }
-        
+
         return totalSize;
     }
 
@@ -140,8 +139,7 @@ public class DefaultWastebasket
         if ( basketFile.isDirectory() )
         {
             final long limitDate = System.currentTimeMillis() - age;
-
-            scanner.scan( basketFile, new Listener()
+            getScanner().scan( basketFile, new Listener()
             {
                 @Override
                 public void onFile( File file )
@@ -161,9 +159,17 @@ public class DefaultWastebasket
                     }
                 }
 
-                public void onEnterDirectory( File directory ) {}
-                public void onEnd() {}
-                public void onBegin() {}
+                public void onEnterDirectory( File directory )
+                {
+                }
+
+                public void onEnd()
+                {
+                }
+
+                public void onBegin()
+                {
+                }
             } );
         }
     }
@@ -183,30 +189,24 @@ public class DefaultWastebasket
         throws IOException
     {
         ResourceStoreRequest req = new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
-
         // NEXUS-4642 shall not delete the directory, since causes a problem if this has been symlinked to another
         // directory.
-            // walker and walk and changes for age
-            if ( repository.getLocalStorage().containsItem( repository, req ) )
-            {
-                req.setRequestGroupLocalOnly( true );
-
-                req.setRequestLocalOnly( true );
-
-                DefaultWalkerContext ctx =
-                    new DefaultWalkerContext( repository, req, new AffirmativeStoreWalkerFilter() );
-
-                ctx.getProcessors().add( new WastebasketWalker( age ) );
-
-                getWalker().walk( ctx );
-            }
+        // walker and walk and changes for age
+        if ( repository.getLocalStorage().containsItem( repository, req ) )
+        {
+            req.setRequestGroupLocalOnly( true );
+            req.setRequestLocalOnly( true );
+            DefaultWalkerContext ctx = new DefaultWalkerContext( repository, req, new AffirmativeStoreWalkerFilter() );
+            ctx.getProcessors().add( new WastebasketWalker( age ) );
+            getWalker().walk( ctx );
+        }
     }
 
     @Override
-    public void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
+    public void delete( final LocalRepositoryStorage ls, final Repository repository, final ResourceStoreRequest request )
         throws LocalStorageException
     {
-        DeleteOperation operation;
+        final DeleteOperation operation;
         if ( request.getRequestContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
         {
             operation = (DeleteOperation) request.getRequestContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY );
@@ -219,7 +219,8 @@ public class DefaultWastebasket
         delete( ls, repository, request, operation );
     }
 
-    private void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request, DeleteOperation type)
+    private void delete( final LocalRepositoryStorage ls, final Repository repository,
+                         final ResourceStoreRequest request, final DeleteOperation type )
         throws LocalStorageException
     {
         try
@@ -228,7 +229,6 @@ public class DefaultWastebasket
             {
                 ResourceStoreRequest trashed =
                     new ResourceStoreRequest( getTrashPath( repository, request.getRequestPath() ) );
-
                 ls.moveItem( repository, request, trashed );
             }
 
@@ -245,21 +245,20 @@ public class DefaultWastebasket
         }
     }
 
-    public boolean undelete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
+    public boolean undelete( final LocalRepositoryStorage ls, final Repository repository,
+                             final ResourceStoreRequest request )
         throws LocalStorageException
     {
         try
         {
             ResourceStoreRequest trashed =
                 new ResourceStoreRequest( getTrashPath( repository, request.getRequestPath() ) );
-
             ResourceStoreRequest untrashed =
                 new ResourceStoreRequest( getUnTrashPath( repository, request.getRequestPath() ) );
 
             if ( !ls.containsItem( repository, untrashed ) )
             {
                 ls.moveItem( repository, trashed, untrashed );
-
                 return true;
             }
         }
@@ -279,10 +278,9 @@ public class DefaultWastebasket
     // ==============================
     // SmartWastebasket iface
 
-    public void setMaximumSizeConstraint( MaximumSizeConstraint constraint )
+    public void setMaximumSizeConstraint( final MaximumSizeConstraint constraint )
     {
-        // TODO Auto-generated method stub
-
+        // TODO Implement this
     }
 
     // ==
@@ -306,7 +304,6 @@ public class DefaultWastebasket
     protected String getUnTrashPath( final Repository repository, final String path )
     {
         String result = path;
-
         if ( result.startsWith( TRASH_PATH_PREFIX ) )
         {
             result = result.substring( TRASH_PATH_PREFIX.length(), result.length() );

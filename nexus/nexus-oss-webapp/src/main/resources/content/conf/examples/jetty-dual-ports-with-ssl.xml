@@ -13,7 +13,7 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <!-- ============================================================ -->
 <!--                                                              -->
@@ -63,6 +63,7 @@
       <Arg>${nexus-webapp}</Arg>
       <Arg>${nexus-webapp-context-path}</Arg>
       <Set name="extractWAR">false</Set>
+      <Set name="throwUnavailableOnStartupException">true</Set>
     </New>
 
     <!--

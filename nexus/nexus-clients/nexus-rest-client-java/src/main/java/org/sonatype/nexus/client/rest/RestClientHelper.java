@@ -37,8 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
-import org.sonatype.nexus.rest.XStreamInitializer;
+import org.sonatype.nexus.rest.MIndexerXStreamConfigurator;
 import org.sonatype.nexus.rest.model.NexusResponse;
+import org.sonatype.nexus.rest.model.XStreamConfigurator;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
@@ -71,9 +72,8 @@ public class RestClientHelper
         this.restContext = new Context();
         this.restClient = new Client( restContext, Protocol.HTTP );
 
-        xstream = org.sonatype.nexus.rest.model.XStreamConfigurator.configureXStream( new XStream( new LookAheadXppDriver() ) );
-
-        XStreamInitializer.init( xstream );
+        xstream = XStreamConfigurator.configureXStream( new XStream( new LookAheadXppDriver() ) );
+        MIndexerXStreamConfigurator.configureXStream( xstream );
     }
 
     private String buildUrl( String service, String id )
@@ -106,7 +106,7 @@ public class RestClientHelper
         {
             Entry<String, String> entry = iter.next();
             params.append( entry.getKey() ).append( "=" ).append( URLEncoder.encode( entry.getValue(), "UTF-8" ) ).append(
-                                                                                                                           "&" );
+                "&" );
         }
         return params.toString();
     }
@@ -170,8 +170,8 @@ public class RestClientHelper
     public Object sendCommand( String service, String command )
         throws NexusConnectionException
     {
-        return this.sendMessage( Method.PUT, this.buildUrl( service, "command" ),
-                                 new StringRepresentation( command, MediaType.TEXT_ALL ) );
+        return this.sendMessage( Method.PUT, this.buildUrl( service, "command" ), new StringRepresentation( command,
+            MediaType.TEXT_ALL ) );
     }
 
     public Response sendRequest( Method method, String url, Representation representation )

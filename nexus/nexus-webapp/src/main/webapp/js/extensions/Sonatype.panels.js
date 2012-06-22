@@ -26,7 +26,19 @@ Sonatype.panels.AutoTabPanel = function(config) {
     frame : false,
     border : false,
     activeTab : 0,
-    hideMode : 'offsets'
+    hideMode : 'offsets',
+    tools : [{
+      id : 'refresh',
+      qtip : 'Refresh data',
+      handler : function(evt, toolEl, panel) {
+        if ( panel.tabPanel ) {
+          var active = panel.tabPanel.getActiveTab();
+        } else {
+          var active = panel.getComponent(0);
+        }
+        active && active.refreshContent && active.refreshContent();
+      }
+    }]
   };
   Ext.apply(this, config, defaultConfig);
   Sonatype.panels.AutoTabPanel.superclass.constructor.call(this, {
@@ -87,7 +99,20 @@ Ext.extend(Sonatype.panels.AutoTabPanel, Ext.Panel, {
               border : false,
               layoutOnTabChange : true,
               items : [first],
-              hideMode : 'offsets'
+              hideMode : 'offsets',
+              listeners : {
+                tabchange : function(panel, tab) {
+                  var tool = this.tools && this.tools['refresh'];
+                  if ( tool ) {
+                    if ( tab.refreshContent ) {
+                      tool.show();
+                    } else {
+                      tool.hide();
+                    }
+                  }
+                },
+                scope : this
+              }
             });
 
         Sonatype.panels.AutoTabPanel.superclass.add.call(this, this.tabPanel);

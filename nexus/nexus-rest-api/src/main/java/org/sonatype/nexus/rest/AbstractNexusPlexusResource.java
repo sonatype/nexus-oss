@@ -13,6 +13,7 @@
 package org.sonatype.nexus.rest;
 
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -274,7 +275,7 @@ public abstract class AbstractNexusPlexusResource
         ErrorResponse ner = new ErrorResponse();
         ErrorMessage ne = new ErrorMessage();
         ne.setId( id );
-        ne.setMsg( msg );
+        ne.setMsg( StringEscapeUtils.escapeHtml( msg ) );
         ner.addError( ne );
         return ner;
     }

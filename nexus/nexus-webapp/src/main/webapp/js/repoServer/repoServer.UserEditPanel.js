@@ -640,6 +640,7 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
         helpText : ht.firstName,
         name : 'firstName',
         allowBlank : true,
+        htmlDecode : true,
         width : this.COMBO_WIDTH,
         validator : function(v) {
           if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX))
@@ -658,6 +659,7 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
         helpText : ht.lastName,
         name : 'lastName',
         allowBlank : true,
+        htmlDecode : true,
         width : this.COMBO_WIDTH,
         validator : function(v) {
           if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX))
@@ -1113,6 +1115,42 @@ Sonatype.Events.addListener('userViewInit', function(cardPanel, rec) {
       var config = {
         payload : rec,
         tabTitle : 'Config'
-      };
+      }
       cardPanel.add(rec.data.source == 'default' ? new Sonatype.repoServer.DefaultUserEditor(config) : new Sonatype.repoServer.UserMappingEditor(config));
     });
+
+(function(){
+  var views = [];
+  var viewsCollected = false;
+
+  // NXCM-4099 plugin-contributed tabs
+  Sonatype.Events.addListener('userViewInit', function(cardPanel, rec) {
+    if (!viewsCollected) {
+      Sonatype.Events.fireEvent('userAdminViewInit', views);
+      viewsCollected = true;
+    }
+
+    for( var i = 0; i < views.length; i++ ) {
+      var view = views[i];
+
+      // don't add views for 'new user':
+      // if you add a Nexus user, you get a record without username
+      // if you add a role mapping, you get a js object (without even #get(string)
+      var username = undefined;
+
+      if ( rec.get ) {
+        username = rec.get("userId");
+      }
+
+      if (username === undefined) {
+        return
+      }
+
+      var content = new view.item({username:username});
+      content.tabTitle = view.name;
+      if ( !content.shouldShow || content.shouldShow() ) {
+        cardPanel.add(content);
+      }
+    }
+  });
+})();

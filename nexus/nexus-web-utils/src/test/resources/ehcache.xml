@@ -1,4 +1,4 @@
-<ehcache>
+<ehcache updateCheck="false">
 
     <!-- Only ${basedir} is replaced by plexus! -->
     <diskStore path="${basedir}/target/ehcache"/>

@@ -116,14 +116,7 @@ public class RemoteStorageSettingsInheritanceTest
     public void testNEXUS3064PerRepo()
         throws Exception
     {
-        long rscChangeTs = aProxyRepository.getRemoteStorageContext().getLastChanged();
-        try
-        {
-            Thread.sleep( 2 );
-        }
-        catch ( InterruptedException ignore )
-        {
-        }
+        int rscChange = aProxyRepository.getRemoteStorageContext().getGeneration();
 
         RemoteProxySettings proxy = aProxyRepository.getRemoteProxySettings();
 
@@ -140,21 +133,14 @@ public class RemoteStorageSettingsInheritanceTest
         applicationConfiguration.saveConfiguration();
 
         assertTrue( "The change should be detected",
-            aProxyRepository.getRemoteStorageContext().getLastChanged() > rscChangeTs );
+            aProxyRepository.getRemoteStorageContext().getGeneration() > rscChange );
     }
 
     @Test
     public void testNEXUS3064Global()
         throws Exception
     {
-        long rscChangeTs = aProxyRepository.getRemoteStorageContext().getLastChanged();
-        try
-        {
-            Thread.sleep( 2 );
-        }
-        catch ( InterruptedException ignore )
-        {
-        }
+        int rscChange = aProxyRepository.getRemoteStorageContext().getGeneration();
 
         // and the problem now
         // change the global proxy
@@ -172,7 +158,7 @@ public class RemoteStorageSettingsInheritanceTest
         applicationConfiguration.getGlobalRemoteStorageContext().setRemoteProxySettings( proxy );
 
         assertTrue( "The change should be detected",
-            aProxyRepository.getRemoteStorageContext().getLastChanged() > rscChangeTs );
+            aProxyRepository.getRemoteStorageContext().getGeneration() > rscChange );
 
     }
 

@@ -14,6 +14,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 public class ArtifactStoreRequest
     extends ResourceStoreRequest
@@ -88,7 +89,9 @@ public class ArtifactStoreRequest
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer( getGroupId() );
+        StringBuilder sb = new StringBuilder( super.toString() );
+        sb.append( "(GAVCE=" );
+        sb.append( getGroupId() );
         sb.append( ":" );
         sb.append( getArtifactId() );
         sb.append( ":" );
@@ -97,6 +100,9 @@ public class ArtifactStoreRequest
         sb.append( getClassifier() );
         sb.append( ":e=" );
         sb.append( getExtension() );
+        sb.append( ", for " );
+        sb.append( RepositoryStringUtils.getHumanizedNameString( getMavenRepository() ) );
+        sb.append( ") " );
 
         return sb.toString();
     }

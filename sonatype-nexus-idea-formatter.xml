@@ -13,7 +13,7 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<code_scheme name="Maven">
+<code_scheme name="Sonatype Nexus">
   <option name="JAVA_INDENT_OPTIONS">
     <value>
       <option name="INDENT_SIZE" value="4" />

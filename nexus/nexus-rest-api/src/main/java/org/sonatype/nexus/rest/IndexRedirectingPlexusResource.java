@@ -19,8 +19,11 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * Resource to redirect to the absolute URI to the index.html.
@@ -30,6 +33,10 @@ public class IndexRedirectingPlexusResource
     extends AbstractNexusPlexusResource
     implements ManagedPlexusResource
 {
+
+    @Requirement
+    private Nexus nexus;
+
     @Requirement( hint = "indexTemplate" )
     private ManagedPlexusResource indexTemplateResource;
 
@@ -55,9 +62,11 @@ public class IndexRedirectingPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        response.redirectPermanent( createRootReference( request, indexTemplateResource.getResourceUri().replaceFirst(
-            "/",
-            "" ) ) );
+        response.redirectPermanent(
+            createRootReference(
+                request, indexTemplateResource.getResourceUri().replaceFirst( "/", "" )
+            )
+        );
 
         return null;
     }

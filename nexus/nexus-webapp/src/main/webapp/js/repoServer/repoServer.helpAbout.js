@@ -45,7 +45,7 @@ Sonatype.repoServer.HelpAboutPanel = function(config) {
 Ext.extend(Sonatype.repoServer.HelpAboutPanel, Ext.Panel, {
   getHelpText : function() {
     return '<div class="little-padding">'
-        + 'Sonatype Nexus&trade; ' + Sonatype.utils.edition + ' Version'
+        + 'Sonatype Nexus&trade; ' + Sonatype.utils.edition + (Sonatype.utils.edition ? ' Edition' : '')
         + '<br/>Copyright &copy; 2008-2012 Sonatype, Inc.'
 		+ '<br/>All rights reserved. Includes the third-party code listed at <a href="' + Sonatype.utils.attributionsURL + '" target="_new">' + Sonatype.utils.attributionsURL + '</a>.'
 		+ '<br/>'

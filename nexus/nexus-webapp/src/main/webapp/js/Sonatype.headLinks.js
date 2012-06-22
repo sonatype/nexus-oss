@@ -13,70 +13,38 @@
 Sonatype.headLinks = Ext.emptyFn;
 
 Ext.apply(Sonatype.headLinks.prototype, {
-      linkEventApplied : false,
       /**
        * Update the head links based on the current status of Nexus
-       * 
-       * @param {Ext.Element}
-       *          linksEl parent of all the links' parent
        */
       updateLinks : function() {
-        var left = Ext.get('head-link-l');
-        var middle = Ext.get('head-link-m');
         var right = Ext.get('head-link-r');
 
         var loggedIn = Sonatype.user.curr.isLoggedIn;
         if (loggedIn)
         {
-          this.updateLeftWhenLoggedIn(left);
-          this.updateMiddleWhenLoggedIn(middle);
           this.updateRightWhenLoggedIn(right);
         }
         else
         {
-          this.updateLeftWhenLoggedOut(left);
-          this.updateMiddleWhenLoggedOut(middle);
           this.updateRightWhenLoggedOut(right);
         }
       },
 
-      updateLeftWhenLoggedIn : function(linkEl) {
-        linkEl.update(Sonatype.user.curr.username);
-      },
-
-      updateMiddleWhenLoggedIn : function(linkEl) {
-        linkEl.update(' | ');
-      },
-
       updateRightWhenLoggedIn : function(linkEl) {
-        linkEl.update('Log Out');
-        this.setClickLink(linkEl);
-        linkEl.setStyle({
-              'cursor' : 'pointer',
-              'text-align' : 'right'
-            });
+        linkEl.update(Sonatype.user.curr.username);
+        linkEl.addClass('head-link-logged-in');
+        linkEl.un('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer)
+        linkEl.on('click', Sonatype.repoServer.RepoServer.showProfileMenu);
       },
-      updateLeftWhenLoggedOut : function(linkEl) {
-        linkEl.update('');
-      },
-
-      updateMiddleWhenLoggedOut : function(linkEl) {
-        linkEl.update('');
-      },
-
       updateRightWhenLoggedOut : function(linkEl) {
+        linkEl.un('click', Sonatype.repoServer.RepoServer.showProfileMenu);
         linkEl.update('Log In');
+
         this.setClickLink(linkEl);
-        linkEl.setStyle({
-              'cursor' : 'pointer',
-              'text-align' : 'right'
-            });
+        linkEl.removeClass('head-link-logged-in');
       },
       setClickLink : function(el) {
-        if (!this.linkEventApplied)
-        {
-          el.on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
-          this.linkEventApplied = true;
-        }
+        el.removeAllListeners();
+        el.on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
       }
     });

@@ -68,7 +68,9 @@ import java.util.Stack;
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
  * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  * @version $Id: ComparableVersion.java 958295 2010-06-26 23:16:18Z hboutemy $
+ * @deprecated Use class {@link org.sonatype.nexus.proxy.maven.version.Version} and related ones instead of this one.
  */
+@Deprecated
 public class ComparableVersion
     implements Comparable<ComparableVersion>
 {

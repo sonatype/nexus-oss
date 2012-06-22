@@ -24,22 +24,25 @@ import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.web.WebRealmSecurityManager;
 
 /**
- * An extension of WebRealmSecurityManager used because we have a mix of POJO's and @Inject ojbects
+ * An extension of WebRealmSecurityManager used because we have a mix of POJO's and @Inject objects.
+ * @deprecated replaced by applying the noSessionCreation filter from Shiro 1.2 to non-login services.
  */
 @Singleton
 @Typed( value = RealmSecurityManager.class )
-@Named( value = "nexus" )
+@Named( value = "stateless-and-stateful" )
+@Deprecated
 public class NexusWebRealmSecurityManager
     extends WebRealmSecurityManager
     implements org.apache.shiro.util.Initializable
 {
     @Inject
-    public NexusWebRealmSecurityManager( Logger logger, Map<String, RolePermissionResolver> rolePermissionResolverMap )
+    public NexusWebRealmSecurityManager( Map<String, RolePermissionResolver> rolePermissionResolverMap )
     {
-        super( logger, rolePermissionResolverMap );
+        super( rolePermissionResolverMap );
     }    
 
     public void init()

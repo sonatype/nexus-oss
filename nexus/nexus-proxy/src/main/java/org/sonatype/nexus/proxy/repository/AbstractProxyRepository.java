@@ -196,9 +196,15 @@ public abstract class AbstractProxyRepository
     @Override
     public void expireProxyCaches( final ResourceStoreRequest request )
     {
+        expireProxyCaches( request, null );
+    }
+
+    @Override
+    public boolean expireProxyCaches( final ResourceStoreRequest request, final WalkerFilter filter )
+    {
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            return;
+            return false;
         }
 
         // do this only if we ARE a proxy
@@ -217,7 +223,7 @@ public abstract class AbstractProxyRepository
                     RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
             // 1st, expire all the files below path
-            final DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
+            final DefaultWalkerContext ctx = new DefaultWalkerContext( this, request, filter );
             final ExpireCacheWalker expireCacheWalkerProcessor = new ExpireCacheWalker( this );
             ctx.getProcessors().add( expireCacheWalkerProcessor );
 
@@ -234,10 +240,10 @@ public abstract class AbstractProxyRepository
                     throw e;
                 }
             }
-            
-            if( getLogger().isDebugEnabled() )
+
+            if ( getLogger().isDebugEnabled() )
             {
-                if( expireCacheWalkerProcessor.isCacheAltered() )
+                if ( expireCacheWalkerProcessor.isCacheAltered() )
                 {
                     getLogger().info(
                         String.format( "Proxy cache was expired for repository %s from path=\"%s\"",
@@ -255,6 +261,12 @@ public abstract class AbstractProxyRepository
             getApplicationEventMulticaster().notifyEventListeners(
                 new RepositoryEventExpireProxyCaches( this, request.getRequestPath(),
                     request.getRequestContext().flatten(), expireCacheWalkerProcessor.isCacheAltered() ) );
+
+            return expireCacheWalkerProcessor.isCacheAltered();
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -270,6 +282,22 @@ public abstract class AbstractProxyRepository
         expireProxyCaches( request );
         // do the stuff we inherited
         super.expireCaches( request );
+    }
+
+    @Override
+    public boolean expireCaches( final ResourceStoreRequest request, final WalkerFilter filter )
+    {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return false;
+        }
+
+        // expire proxy cache
+        boolean v1 = expireProxyCaches( request, filter );
+        // do the stuff we inherited
+        boolean v2 = super.expireCaches( request, filter );
+
+        return v1 || v2;
     }
 
     @Override
@@ -1726,7 +1754,8 @@ public abstract class AbstractProxyRepository
                 {
                     if ( !getProxyMode().shouldCheckRemoteStatus() )
                     {
-                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request ) );
+                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request,
+                            AbstractProxyRepository.this ) );
                     }
                     else
                     {
@@ -1736,7 +1765,7 @@ public abstract class AbstractProxyRepository
                         }
                         else
                         {
-                            autoBlockProxying( new ItemNotFoundException( request ) );
+                            autoBlockProxying( new ItemNotFoundException( request, AbstractProxyRepository.this ) );
                         }
                     }
                 }

@@ -33,10 +33,9 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugin.discovery.NexusConnectionInfo;
 import org.sonatype.nexus.plugin.discovery.NexusDiscoveryException;
 import org.sonatype.nexus.plugin.discovery.NexusInstanceDiscoverer;
-import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
-import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 
@@ -47,7 +46,7 @@ public abstract class AbstractNexusMojo
 
     /**
      * NOT REQUIRED IN ALL CASES. If this is available, the current project will be used in the Nexus discovery process.
-     *
+     * 
      * @parameter default-value="${project}"
      * @readonly
      */
@@ -57,7 +56,7 @@ public abstract class AbstractNexusMojo
      * If false, the Nexus discovery process will prompt the user to accept any Nexus connection information it finds
      * before using it. <br/>
      * <b>NOTE:</b> Batch-mode executions will override this parameter with an effective value of 'true'.
-     *
+     * 
      * @parameter expression="${nexus.automaticDiscovery}" default-value="false"
      */
     private boolean automatic;
@@ -65,33 +64,33 @@ public abstract class AbstractNexusMojo
     /**
      * The base URL for a Nexus Professional instance that includes the nexus-staging-plugin. If missing, the mojo will
      * prompt for this value.
-     *
+     * 
      * @parameter expression="${nexus.url}"
      */
     private String nexusUrl;
 
     /**
-     * @component
+     * @component role="org.codehaus.plexus.components.interactivity.Prompter" hint="jline"
      */
     private Prompter prompter;
 
     /**
      * The username that should be used to log into Nexus.
-     *
+     * 
      * @parameter expression="${nexus.username}" default-value="${user.name}"
      */
     private String username;
 
     /**
      * If provided, lookup username/password from this server entry in the current Maven settings.
-     *
+     * 
      * @parameter expression="${nexus.serverAuthId}"
      */
     private String serverAuthId;
 
     /**
      * The password that should be used to log into Nexus. If missing, the mojo will prompt for this value.
-     *
+     * 
      * @parameter expression="${nexus.password}"
      */
     private String password;
@@ -114,6 +113,17 @@ public abstract class AbstractNexusMojo
     private NexusInstanceDiscoverer discoverer;
 
     // ==
+
+    protected AbstractNexusMojo()
+    {
+        getLog().warn( "" );
+        getLog().warn( "DEPRECATION WARNING" );
+        getLog().warn( "===================" );
+        getLog().warn( "This whole plugin has been deprecated in favor of a new set of Maven Plugins." );
+        getLog().warn( "Please update your build, and stop using this plugin altogether,");
+        getLog().warn( "as this plugin is about to be dropped in near future." );
+        getLog().warn( "" );
+    }
 
     public final void execute()
         throws MojoExecutionException
@@ -140,8 +150,7 @@ public abstract class AbstractNexusMojo
             ch.qos.logback.classic.Logger logger = null;
             if ( factory instanceof LoggerContext )
             {
-                logger =
-                    ( (LoggerContext) factory ).getLogger( ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME );
+                logger = ( (LoggerContext) factory ).getLogger( ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME );
             }
 
             if ( logger != null )
@@ -270,9 +279,6 @@ public abstract class AbstractNexusMojo
         this.proxyUsername = proxyUsername;
     }
 
-    protected abstract AbstractRESTLightClient connect()
-        throws RESTLightClientException, MojoExecutionException;
-
     protected String formatUrl( final String url )
     {
         if ( url == null )
@@ -328,7 +334,7 @@ public abstract class AbstractNexusMojo
                     if ( info == null )
                     {
                         throw new MojoExecutionException( "Cannot determine login credentials for Nexus instance: "
-                                                              + getNexusUrl() );
+                            + getNexusUrl() );
                     }
 
                     setUsername( info.getUser() );
@@ -338,7 +344,7 @@ public abstract class AbstractNexusMojo
                 catch ( NexusDiscoveryException e )
                 {
                     throw new MojoExecutionException( "Failed to determine authentication information for Nexus at: "
-                                                          + getNexusUrl(), e );
+                        + getNexusUrl(), e );
                 }
                 catch ( SecDispatcherException e )
                 {
@@ -393,7 +399,7 @@ public abstract class AbstractNexusMojo
 
     /**
      * Configures the proxy information based on the configured settings and Nexus URL.
-     *
+     * 
      * @since 1.9.2
      */
     protected void setAndValidateProxy()

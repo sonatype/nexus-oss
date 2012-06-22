@@ -18,7 +18,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Directory;
+import org.restlet.Restlet;
 import org.restlet.Router;
+import org.restlet.service.StatusService;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
@@ -56,6 +58,12 @@ public class NexusApplication
     @Requirement( hint = "indexTemplate" )
     private ManagedPlexusResource indexTemplateResource;
 
+    @Requirement( hint = "licenseTemplate", optional = true )
+    private ManagedPlexusResource licenseTemplateResource;
+
+    @Requirement( hint = "enterLicenseTemplate", optional = true )
+    private ManagedPlexusResource enterLicenseTemplateResource;
+
     @Requirement( hint = "IndexRedirectingPlexusResource" )
     private ManagedPlexusResource indexRedirectingResource;
 
@@ -77,6 +85,9 @@ public class NexusApplication
     @Requirement( role = ErrorReportingManager.class )
     private ErrorReportingManager errorManager;
 
+    @Requirement( role = StatusService.class )
+    private StatusService statusService;
+
     /**
      * Listener.
      */
@@ -85,6 +96,7 @@ public class NexusApplication
         if ( NexusStartedEvent.class.isAssignableFrom( evt.getClass() ) )
         {
             recreateRoot( true );
+            afterCreateRoot( (RetargetableRestlet) getRoot() );
         }
         else if ( NexusStoppedEvent.class.isAssignableFrom( evt.getClass() ) )
         {
@@ -152,7 +164,10 @@ public class NexusApplication
         {
             return;
         }
-        
+
+        // set our StatusService
+        setStatusService( statusService );
+
         // Add error manager to context
         getContext().getAttributes().put( ErrorReportingManager.class.getName(), errorManager );
 
@@ -170,6 +185,14 @@ public class NexusApplication
 
         // the indexTemplateResource
         attach( root, false, indexTemplateResource );
+        if( licenseTemplateResource != null )
+        {
+            attach( root, false, licenseTemplateResource );
+        }
+        if( enterLicenseTemplateResource != null )
+        {
+            attach( root, false, enterLicenseTemplateResource );
+        }
 
         // publish the WAR contents
         Directory rootDir = new NexusDirectory( getContext(), "war:///" );
@@ -209,11 +232,13 @@ public class NexusApplication
 
         // protecting the content service manually
         this.protectedPathManager.addProtectedResource( "/content"
-                    + contentResource.getResourceProtection().getPathPattern(), contentResource.getResourceProtection().getFilterExpression() );
+            + contentResource.getResourceProtection().getPathPattern(), "noSessionCreation,"
+            + contentResource.getResourceProtection().getFilterExpression() );
 
         // protecting service resources with "wall" permission
         this.protectedPathManager.addProtectedResource( "/service/**",
-                                                        "authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );    }
+            "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
+    }
 
     @Override
     protected void handlePlexusResourceSecurity( PlexusResource resource )
@@ -225,8 +250,14 @@ public class NexusApplication
             return;
         }
 
-        this.protectedPathManager.addProtectedResource( "/service/*"
-                                                        + descriptor.getPathPattern(), descriptor.getFilterExpression() );
+        String filterExpression = descriptor.getFilterExpression();
+        if ( filterExpression != null && !filterExpression.contains( "authcNxBasic" ) )
+        {
+            // don't create session unless the user logs in from the UI
+            filterExpression = "noSessionCreation," + filterExpression;
+        }
+
+        this.protectedPathManager.addProtectedResource( "/service/*" + descriptor.getPathPattern(), filterExpression );
     }
 
     @Override

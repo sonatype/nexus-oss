@@ -53,18 +53,21 @@ public class DefaultMetadataManager
     @Requirement
     private MetadataLocator metadataLocator;
 
+    @Override
     public void deployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
         metadataUpdater.deployArtifact( request );
     }
 
+    @Override
     public void undeployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
         metadataUpdater.undeployArtifact( request );
     }
 
+    @Override
     public Gav resolveArtifact( ArtifactStoreRequest gavRequest )
         throws IOException
     {
@@ -242,6 +245,7 @@ public class DefaultMetadataManager
         }
     }
 
+    @Override
     public Gav resolveSnapshot( ArtifactStoreRequest gavRequest, Gav gav )
         throws IOException
     {
@@ -279,7 +283,7 @@ public class DefaultMetadataManager
         }
     }
 
-    public Gav resolveSnapshotFromM2Metadata( final ArtifactStoreRequest gavRequest, final Gav gav, final Metadata gavMd )
+    protected Gav resolveSnapshotFromM2Metadata( final ArtifactStoreRequest gavRequest, final Gav gav, final Metadata gavMd )
         throws IOException
     {
         String latest = null;
@@ -323,7 +327,7 @@ public class DefaultMetadataManager
         }
     }
 
-    public Gav resolveSnapshotFromM3Metadata( final ArtifactStoreRequest gavRequest, final Gav gav, final Metadata gavMd )
+    protected Gav resolveSnapshotFromM3Metadata( final ArtifactStoreRequest gavRequest, final Gav gav, final Metadata gavMd )
         throws IOException
     {
         for ( SnapshotVersion sv : gavMd.getVersioning().getSnapshotVersions() )

@@ -13,7 +13,7 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<ehcache>
+<ehcache updateCheck="false">
 
     <!-- All ${...} is replaced by plexus if know to it! -->
     <!-- NO MORE DISK CACHE !!! 

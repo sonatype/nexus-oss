@@ -15,6 +15,7 @@ package org.sonatype.nexus.bundle.launcher.support;
 import org.sonatype.inject.Nullable;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultBundleConfiguration;
+import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 
@@ -32,7 +33,7 @@ import java.util.List;
  */
 @Named
 public class DefaultNexusBundleConfiguration
-    extends DefaultBundleConfiguration<NexusBundleConfiguration>
+    extends DefaultWebBundleConfiguration<NexusBundleConfiguration>
     implements NexusBundleConfiguration
 {
 

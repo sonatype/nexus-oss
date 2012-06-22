@@ -17,7 +17,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStateChangeEvent;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.plexus.appevents.Event;
 
 @Component( role = EventInspector.class, hint = "RepositoryItemUidAttributeEventInspector" )
@@ -34,9 +34,9 @@ public class RepositoryItemUidAttributeEventInspector
         final String simpleName = evt.getClass().getName();
 
         // TODO: nexus-proxy module does not reference plugin manager, so this is a quick'n'dirty workaround for now
-        return evt instanceof NexusStateChangeEvent
-            || StringUtils.equals( simpleName, "org.sonatype.nexus.plugins.events.PluginActivatedEvent" )
-            || StringUtils.equals( simpleName, "org.sonatype.nexus.plugins.events.PluginDeactivatedEvent" );
+        return evt instanceof NexusInitializedEvent // for core
+            || StringUtils.equals( simpleName, "org.sonatype.nexus.plugins.events.PluginActivatedEvent" ) // for plugin loaded
+            || StringUtils.equals( simpleName, "org.sonatype.nexus.plugins.events.PluginDeactivatedEvent" ); // for plugin unloaded
     }
 
     @Override

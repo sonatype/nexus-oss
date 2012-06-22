@@ -17,8 +17,8 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
-  <display-name>Nexus Application</display-name>
-
+  <display-name>Sonatype Nexus</display-name>
+  
   <!-- Booter -->
   <!--
     TODO: we have a chicken and egg problem: this produces WARNINGs in
@@ -38,70 +38,11 @@
     <listener-class>org.sonatype.nexus.web.NexusBooterListener</listener-class>
   </listener>
   
-  <!-- Security filter -->
-  <filter>
-    <filter-name>nexusFilter</filter-name>
-    <filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
-    <init-param>
-      <param-name>config</param-name>
-      <param-value>
-      [filters]
-        authcBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
-        authcBasic.applicationName = Sonatype Nexus Repository Manager API
-        authcBasic.fakeAuthScheme = false
-      
-        authcNxBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
-        authcNxBasic.applicationName = Sonatype Nexus Repository Manager API (specialized auth)
-        authcNxBasic.fakeAuthScheme = true
-
-        logout = org.sonatype.security.web.filter.authc.LogoutAuthenticationFilter
-
-        perms = org.sonatype.nexus.security.filter.authz.FailureLoggingHttpMethodPermissionFilter
-
-        trperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-        trperms.pathPrefix = /service/local/repositories/(.*)/content(.*)
-        trperms.pathReplacement = /repositories/@1@2
-
-        tiperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-        tiperms.pathPrefix = /service/local/repositories/(.*)/index_content(.*)
-        tiperms.pathReplacement = /repositories/@1@2
-
-        tgperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-        tgperms.pathPrefix = /service/local/repo_groups/(.*)/content(.*)
-        tgperms.pathReplacement = /groups/@1@2
-
-        tgiperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-        tgiperms.pathPrefix = /service/local/repo_groups/(.*)/index_content(.*)
-        tgiperms.pathReplacement = /groups/@1@2
-
-        contentAuthcBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
-        contentAuthcBasic.applicationName = Sonatype Nexus Repository Manager
-        contentAuthcBasic.fakeAuthScheme = false
-
-        contentTperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-        contentTperms.pathPrefix = /content(.*)
-        contentTperms.pathReplacement = @1
-
-        authcApiKey = org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter
-        authcApiKey.applicationName = Sonatype Nexus Repository Manager API (X-...-ApiKey auth)
-        authcApiKey.fakeAuthScheme = false
-      </param-value>
-    </init-param>
-  </filter>
-  
   <filter>
     <filter-name>guiceFilter</filter-name>
     <filter-class>org.sonatype.nexus.web.NexusGuiceFilter</filter-class>
   </filter>  
   
-  <filter-mapping>
-    <filter-name>nexusFilter</filter-name>
-    <url-pattern>/service/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>nexusFilter</filter-name>
-    <url-pattern>/content/*</url-pattern>
-  </filter-mapping>
   <filter-mapping>
     <filter-name>guiceFilter</filter-name>
     <url-pattern>/*</url-pattern>

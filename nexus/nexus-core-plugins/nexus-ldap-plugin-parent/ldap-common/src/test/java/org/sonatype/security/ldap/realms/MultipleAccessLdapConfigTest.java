@@ -21,13 +21,13 @@ import junit.framework.Assert;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.context.Context;
 import org.junit.Test;
-import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
+import org.sonatype.security.ldap.AbstractLdapTest;
 import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
 public class MultipleAccessLdapConfigTest
-    extends AbstractLdapTestEnvironment
+    extends AbstractLdapTest
 {
 
     private LdapContextFactory ldapContextFactory;
@@ -45,8 +45,20 @@ public class MultipleAccessLdapConfigTest
     }
 
     @Override
+    public void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+
+        // delete the ldap.xml file
+        File confFile = new File( getBasedir() + "/target/test-classes/not-configured/", "ldap.xml" );
+        confFile.delete();
+    }
+
+    @Override
     protected void customizeContext( Context context )
     {
+        super.customizeContext( context );
         context.put( "application-conf", getBasedir() + "/target/test-classes/not-configured/" );
     }
 
@@ -78,17 +90,6 @@ public class MultipleAccessLdapConfigTest
         // now we should be able to get a valid configuration
         ldapContextFactory.getSystemLdapContext();
 
-    }
-
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-
-        // delete the ldap.xml file
-        File confFile = new File( getBasedir() + "/target/test-classes/not-configured/", "ldap.xml" );
-        confFile.delete();
     }
 
 }

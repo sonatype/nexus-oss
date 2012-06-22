@@ -54,4 +54,20 @@ public class CGlobalRemoteConnectionSettingsCoreConfiguration
     {
         return new ValidationResponse();
     }
+
+    @Override
+    protected void copyTransients( final Object source, final Object destination )
+    {
+        super.copyTransients( source, destination );
+
+        if ( ( (CRemoteConnectionSettings) source ).getQueryString() == null )
+        {
+            ( (CRemoteConnectionSettings) destination ).setQueryString( null );
+        }
+        if ( ( (CRemoteConnectionSettings) source ).getUserAgentCustomizationString() == null )
+        {
+            ( (CRemoteConnectionSettings) destination ).setUserAgentCustomizationString( null );
+        }
+    }
+
 }

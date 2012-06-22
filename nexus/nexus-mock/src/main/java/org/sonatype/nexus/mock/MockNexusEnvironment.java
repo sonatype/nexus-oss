@@ -97,7 +97,7 @@ public class MockNexusEnvironment
         // tamper the port
         tamperJettyConfiguration( bundleBasedir, port );
 
-        this.jetty8 = new Jetty8( new File( bundleBasedir, "conf/jetty.xml" ), contexts );
+        this.jetty8 = new Jetty8( new File( bundleBasedir, "conf/jetty.xml" ), null, contexts );
 
         // override stop at shutdown
         this.jetty8.mangleServer( new DisableShutdownHookMangler() );

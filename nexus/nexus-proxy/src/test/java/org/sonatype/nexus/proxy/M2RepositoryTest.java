@@ -13,8 +13,10 @@
 package org.sonatype.nexus.proxy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import java.io.File;
@@ -34,12 +36,17 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
+import org.sonatype.nexus.proxy.maven.gav.Gav.HashType;
+import org.sonatype.nexus.proxy.maven.gav.Gav.SignatureType;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -296,31 +303,38 @@ public class M2RepositoryTest
     public void testExpirationAlwaysUpdate()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", 0, 1,2,3 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 1,2,3 );
+        getLogger().info("Start testExpirationAlwaysUpdate() for '/spoof/maven-metadata.xml' at (" + System.currentTimeMillis() + ")");
+        doTestExpiration( "/spoof/maven-metadata.xml", 0, 1, 2, 3 );
+        getLogger().info("Start testExpirationAlwaysUpdate() for '/spoof/spoof/1.0/spoof-1.0.txt' at (" + System.currentTimeMillis() + ")");
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 1, 2, 3 );
     }
 
     @Test
     public void testExpirationNeverUpdate()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", -1, 1,1,1 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1,1,1 );
+        getLogger().info("Start testExpirationNeverUpdate() for '/spoof/maven-metadata.xml' at (" + System.currentTimeMillis() + ")");
+        doTestExpiration( "/spoof/maven-metadata.xml", -1, 1, 1, 1 );
+        getLogger().info("Start testExpirationNeverUpdate() for '/spoof/spoof/1.0/spoof-1.0.txt' at (" + System.currentTimeMillis() + ")");
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1, 1, 1 );
     }
 
     @Test
     public void testExpiration()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", 1, 1,1,2 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 1,1,2 );
+        getLogger().info("Start testExpiration() for '/spoof/maven-metadata.xml' at (" + System.currentTimeMillis() + ")");
+        doTestExpiration( "/spoof/maven-metadata.xml", 1, 1, 1, 2 );
+        getLogger().info("Start testExpiration() for '/spoof/spoof/1.0/spoof-1.0.txt' at (" + System.currentTimeMillis() + ")");
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 1, 1, 2 );
     }
 
     /**
-     * For expiration-related issues and stories see:
-     * NEXUS-1675
-     * NEXUS-3065
-     * NEXUS-4099
+     * For expiration-related issues and stories see: NEXUS-1675 NEXUS-3065 NEXUS-4099
+     * <p />
+     *
+     * Note: This test is somewhat fragile on Windows in the past if IO is slow or
+     * CPU is thrashing at time of test run.
      */
     private void doTestExpiration( String path, final int age, final int... expectedHits )
         throws Exception
@@ -332,6 +346,7 @@ public class M2RepositoryTest
         getApplicationEventMulticaster().addEventListener( ch );
 
         File mdFile = new File( new File( getBasedir() ), "target/test-classes/repo1" + path );
+        long fileTimestamp = mdFile.lastModified();
 
         assertThat( mdFile, exists() );
 
@@ -354,9 +369,16 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
-        final StorageItem item = repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
-        assertThat( "Remote hits count fail after first request", ch.getRequestCount(), equalTo( expectedHits[0] ) );
+        assertThat( "File timestamp did not change, first pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
+        fileTimestamp = mdFile.lastModified();
+
+        // We need to wait a bit to avoid the check that last remote check = current time
+        Thread.sleep( 500 );
+        final StorageItem item = repository.retrieveItem( new ResourceStoreRequest( path, false ) );
+        getLogger().info(path + " -> BEFORE assert 1 requestCount=" + expectedHits[0] + " at (" + System.currentTimeMillis() + ")");
+        assertThat( "Remote hits count fail after first request at (" + System.currentTimeMillis() + ")", ch.getRequestCount(), equalTo( expectedHits[0] ) );
+        getLogger().info(path + " -> AFTER assert 1 requestCount=" + expectedHits[0] + " at (" + System.currentTimeMillis() + ")");
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 2L * A_DAY ) ); i++ )
         {
@@ -364,10 +386,16 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
+        assertThat( "File timestamp did not change, second pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
+        fileTimestamp = mdFile.lastModified();
+
+        // We need to wait a bit to avoid the check that last remote check = current time
+        Thread.sleep( 500 );
         // this goes remote depending on age setting
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        assertThat( "Remote hits count fail after second request", ch.getRequestCount(), equalTo( expectedHits[1] ) );
+        getLogger().info(path + " -> BEFORE assert 2 requestCount=" + expectedHits[1] + " at (" + System.currentTimeMillis() + ")");
+        assertThat( "Remote hits count fail after second request at (" + System.currentTimeMillis() + ")", ch.getRequestCount(), equalTo( expectedHits[1] ) );
+        getLogger().info(path + " -> AFTER assert 2 requestCount=" + expectedHits[1] + " at (" + System.currentTimeMillis() + ")");
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 1L * A_DAY ) ); i++ )
         {
@@ -375,16 +403,25 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
+        assertThat( "File timestamp did not change, third pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
+        fileTimestamp = mdFile.lastModified();
+
         // set up last checked timestamp so that nexus should go remote
         final RepositoryItemUid uid = item.getRepositoryItemUid();
         final AttributeStorage storage = uid.getRepository().getAttributesHandler().getAttributeStorage();
         final Attributes attributes = item.getRepositoryItemAttributes();
-        attributes.setCheckedRemotely( System.currentTimeMillis() - ( ( Math.abs(age) + 1 ) * 60 * 1000) );
+        attributes.setCheckedRemotely( System.currentTimeMillis() - ( ( Math.abs( age ) + 1 ) * 60 * 1000 ) );
         storage.putAttributes( uid, attributes );
 
+        // We need to wait a bit to avoid the check that last remote check = current time
+        Thread.sleep( 500 );
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
+        getLogger().info(path + " -> BEFORE assert 3 requestCount=" + expectedHits[2] + " at (" + System.currentTimeMillis() + ")");
+        assertThat( "Remote hits count fail after third request at (" + System.currentTimeMillis() + ")", ch.getRequestCount(), equalTo( expectedHits[2] ) );
+        getLogger().info(path + " -> AFTER assert 3 requestCount=" + expectedHits[2] + " at (" + System.currentTimeMillis() + ")");
 
-        assertThat( "Remote hits count fail after third request", ch.getRequestCount(), equalTo( expectedHits[2] ) );
+        // cleanup counter listener for next test call to avoid added overhead, logging noise
+        getApplicationEventMulticaster().removeEventListener( ch );
     }
 
     @Test
@@ -479,6 +516,71 @@ public class M2RepositoryTest
             repository.getAttributesHandler().getAttributeStorage().getAttributes(
                 repository.createUid( request.getRequestPath() ) );
         assertThat( shadowStorageItem.getLastRequested(), is( resultItem.getLastRequested() ) );
+    }
+
+    @Test
+    public void testNEXUS4943RepositoryMetadataManager_expireNotFoundMetadataCaches()
+        throws Exception
+    {
+        // hosted reposes has NFC shut down (see NEXUS-4798)
+        MavenProxyRepository m2Repo =
+            getRepositoryRegistry().getRepositoryWithFacet( "repo1", MavenProxyRepository.class );
+        m2Repo.addToNotFoundCache( new ResourceStoreRequest( "/some/path/file.jar" ) );
+        m2Repo.addToNotFoundCache( new ResourceStoreRequest( "/some/path/maven-metadata.xml" ) );
+
+        // note: above, that is the "standard" way to write item paths! (starting with slash)
+        // below, we tamper directly with NFC, so the lack of starting slash should not confuse you!
+
+        // we have two known entries in NFC
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache().size(), equalTo( 2 ) );
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache(),
+            contains( "some/path/file.jar", "some/path/maven-metadata.xml" ) );
+
+        m2Repo.getRepositoryMetadataManager().expireNotFoundMetadataCaches( new ResourceStoreRequest( "/" ) );
+
+        // M2 metadata should be removed, so we have one known entry in NFC
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache().size(), equalTo( 1 ) );
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache(), contains( "some/path/file.jar" ) );
+    }
+
+    @Test
+    public void testNEXUS4943RepositoryMetadataManager_expireMetadataCaches()
+        throws Exception
+    {
+        // hosted reposes has NFC shut down (see NEXUS-4798)
+        MavenProxyRepository m2Repo =
+            getRepositoryRegistry().getRepositoryWithFacet( "repo1", MavenProxyRepository.class );
+
+        // put some proxied content
+        // we need GavBuilder-like class, this below is hilarious!
+        final Gav gav =
+            new Gav( "org.slf4j", "slf4j-api", "1.4.3", null, "jar", null, null, null, false, null, false, null );
+        m2Repo.getArtifactStoreHelper().retrieveArtifact( new ArtifactStoreRequest( m2Repo, gav, false ) );
+        // get GAV metadata (is present)
+        m2Repo.retrieveItem( new ResourceStoreRequest( "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml" ) );
+        // get GA metadat (not present, will go into NFC
+        try
+        {
+            m2Repo.retrieveItem( new ResourceStoreRequest( "/org/slf4j/slf4j-api/maven-metadata.xml" ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good, we expected this
+        }
+
+        m2Repo.getRepositoryMetadataManager().expireMetadataCaches( new ResourceStoreRequest( "/" ) );
+
+        // the GA metadata should be removed from NFC, so we have no known entry in NFC
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache().size(), equalTo( 0 ) );
+
+        // the GAV metadata should be expired
+        assertThat(
+            m2Repo.retrieveItem( new ResourceStoreRequest( "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml" ) ).isExpired(),
+            is( true ) );
+        // but the JAR should not be expired
+        assertThat(
+            m2Repo.retrieveItem( new ResourceStoreRequest( "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar" ) ).isExpired(),
+            is( false ) );
     }
 
     // NEXUS-4218 BEGIN
@@ -681,7 +783,7 @@ public class M2RepositoryTest
             if ( !M2ArtifactRecognizer.isChecksum( path ) )
             {
                 File artifactMainFile =
-                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() ) +".sha1" );
+                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() ) + ".sha1" );
                 Assert.assertTrue( artifactMainFile.exists() );
             }
         }
@@ -708,12 +810,20 @@ public class M2RepositoryTest
 
         public void onEvent( Event<?> evt )
         {
-            if ( evt instanceof RepositoryItemEventCache
-                && ( ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) || ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith(
-                    "spoof-1.0.txt" ) ) )
+            if ( evt instanceof RepositoryItemEventCache )
             {
-                requestCount = requestCount + 1;
+                final RepositoryItemEventCache riec = (RepositoryItemEventCache) evt;
+                final String path =  riec.getItem().getPath();
+                if(path.endsWith( "maven-metadata.xml" ) || path.endsWith("spoof-1.0.txt" ))
+                {
+                    // logging to track if listener received message in time for accurate test assertion
+                    if(getLogger().isInfoEnabled()){
+                        getLogger().info(path + " -> CounterListener increments to " + (++requestCount) + " at (" + System.currentTimeMillis() + ")");
+                    } else {
+                        requestCount = requestCount + 1;
+                    }
+                }
             }
         }
-    }
+     }
 }

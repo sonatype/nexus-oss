@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -89,11 +90,11 @@ public abstract class AbstractGroupRepository
     public void onEvent( Event<?> evt )
     {
         // we must do this before the super.onEvent() call!
+        // members changed if config was dirty AND the "old" and "new" member ID list (List<String>) are NOT equal
         boolean membersChanged =
             getCurrentCoreConfiguration().isDirty()
-                && ( getExternalConfiguration( false ).getMemberRepositoryIds().size() != getExternalConfiguration(
-                    true ).getMemberRepositoryIds().size() || !getExternalConfiguration( false ).getMemberRepositoryIds().containsAll(
-                    getExternalConfiguration( true ).getMemberRepositoryIds() ) );
+                && !getExternalConfiguration( false ).getMemberRepositoryIds().equals(
+                    getExternalConfiguration( true ).getMemberRepositoryIds() );
 
         List<String> currentMemberIds = Collections.emptyList();
         List<String> newMemberIds = Collections.emptyList();
@@ -197,6 +198,7 @@ public abstract class AbstractGroupRepository
 
         final boolean isRequestGroupLocalOnly =
             request.isRequestGroupLocalOnly() || uid.getBooleanAttributeValue( IsGroupLocalOnlyAttribute.class );
+        final HashMap<Repository, Throwable> memberThrowables = new HashMap<Repository, Throwable>();
 
         if ( !isRequestGroupLocalOnly )
         {
@@ -207,20 +209,22 @@ public abstract class AbstractGroupRepository
                     try
                     {
                         addItems( names, result, repo.list( false, request ) );
-
                         found = true;
                     }
                     catch ( ItemNotFoundException e )
                     {
-                        // ignored
+                        // ignored, but bookkeeping happens now
+                        memberThrowables.put( repo, e );
                     }
                     catch ( IllegalOperationException e )
                     {
-                        // ignored
+                        // ignored, but bookkeeping happens now
+                        memberThrowables.put( repo, e );
                     }
                     catch ( StorageException e )
                     {
-                        // ignored
+                        // ignored, but bookkeeping happens now
+                        memberThrowables.put( repo, e );
                     }
                 }
                 else
@@ -239,7 +243,7 @@ public abstract class AbstractGroupRepository
 
         if ( !found )
         {
-            throw new ItemNotFoundException( request, this );
+            throw new GroupItemNotFoundException( request, this, memberThrowables );
         }
 
         return result;
@@ -277,6 +281,8 @@ public abstract class AbstractGroupRepository
         {
             request.getRequestContext().put( AccessManager.REQUEST_AUTHORIZED, Boolean.TRUE );
         }
+
+        final HashMap<Repository, Throwable> memberThrowables = new HashMap<Repository, Throwable>();
 
         try
         {
@@ -351,19 +357,24 @@ public abstract class AbstractGroupRepository
                             }
                             catch ( IllegalOperationException e )
                             {
-                                // ignored
+                                // ignored, but bookkeeping happens now
+                                memberThrowables.put( repo, e );
                             }
                             catch ( ItemNotFoundException e )
                             {
-                                // ignored
+                                // ignored, but bookkeeping happens now
+                                memberThrowables.put( repo, e );
                             }
                             catch ( StorageException e )
                             {
-                                // ignored
+                                // ignored, but bookkeeping happens now
+                                memberThrowables.put( repo, e );
                             }
                             catch ( AccessDeniedException e )
                             {
                                 // cannot happen, since we add/check for AccessManager.REQUEST_AUTHORIZED flag
+                                // ignored, but bookkeeping happens now
+                                memberThrowables.put( repo, e );
                             }
                         }
                         else
@@ -389,7 +400,7 @@ public abstract class AbstractGroupRepository
             }
         }
 
-        throw new ItemNotFoundException( request, this );
+        throw new GroupItemNotFoundException( request, this, memberThrowables );
     }
 
     public List<String> getMemberRepositoryIds()
@@ -502,7 +513,7 @@ public abstract class AbstractGroupRepository
     }
 
     public List<StorageItem> doRetrieveItems( ResourceStoreRequest request )
-        throws StorageException
+        throws GroupItemNotFoundException, StorageException
     {
         ArrayList<StorageItem> items = new ArrayList<StorageItem>();
 
@@ -510,6 +521,8 @@ public abstract class AbstractGroupRepository
 
         final boolean isRequestGroupLocalOnly =
             request.isRequestGroupLocalOnly() || uid.getBooleanAttributeValue( IsGroupLocalOnlyAttribute.class );
+        
+        final HashMap<Repository, Throwable> memberThrowables = new HashMap<Repository, Throwable>();
 
         if ( !isRequestGroupLocalOnly )
         {
@@ -570,7 +583,8 @@ public abstract class AbstractGroupRepository
                         }
                         catch ( ItemNotFoundException e )
                         {
-                            // that's okay
+                            // ignored, but bookkeeping happens now
+                            memberThrowables.put( repository, e );
                         }
                         catch ( RepositoryNotAvailableException e )
                         {
@@ -580,6 +594,8 @@ public abstract class AbstractGroupRepository
                                     RepositoryStringUtils.getFormattedMessage(
                                         "Member repository %s is not available, request failed.", e.getRepository() ) );
                             }
+                            // ignored, but bookkeeping happens now
+                            memberThrowables.put( repository, e );
                         }
                         catch ( StorageException e )
                         {
@@ -588,6 +604,8 @@ public abstract class AbstractGroupRepository
                         catch ( IllegalOperationException e )
                         {
                             getLogger().warn( "Member repository request failed", e );
+                            // ignored, but bookkeeping happens now
+                            memberThrowables.put( repository, e );
                         }
                     }
                     else
@@ -603,6 +621,11 @@ public abstract class AbstractGroupRepository
                     }
                 }
             }
+        }
+
+        if ( items.isEmpty() )
+        {
+            throw new GroupItemNotFoundException( request, this, memberThrowables );
         }
 
         return items;

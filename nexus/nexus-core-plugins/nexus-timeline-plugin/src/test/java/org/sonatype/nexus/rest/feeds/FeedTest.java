@@ -22,13 +22,13 @@ import org.junit.Test;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.sonatype.nexus.rest.feeds.sources.FeedSource;
-import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.nexus.security.AbstractNexusTestCase;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 
 public class FeedTest
-    extends NexusTestSupport
+    extends AbstractNexusTestCase
 {
 
     @Test

@@ -184,14 +184,14 @@ public class Jetty8NexusBooter
         try
         {
             Thread.currentThread().setContextClassLoader( sharedClassloader );
-            // Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
 
+            // we have to get it from shared, as it is present here too, but by mistake it seems
+            final Class<?> appContextClass = sharedClassloader.loadClass( "org.sonatype.appcontext.AppContext" );
             final Class<?> jetty8Class = sharedClassloader.loadClass( "org.sonatype.sisu.jetty.Jetty8" );
-            // final Class<?> jetty7Class = jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
 
             jetty8 =
-                jetty8Class.getConstructor( File.class, ClassLoader.class, Map[].class ).newInstance(
-                    new File( bundleBasedir, "conf/jetty.xml" ), nexusClassloader,
+                jetty8Class.getConstructor( File.class, ClassLoader.class, appContextClass, Map[].class ).newInstance(
+                    new File( bundleBasedir, "conf/jetty.xml" ), nexusClassloader, null,
                     new Map[] { defaultContext( bundleBasedir ) } );
         }
         finally

@@ -91,6 +91,7 @@
         <excludes>
           <exclude>META-INF/**</exclude>
           <exclude>WEB-INF/lib/appcontext*.jar</exclude>
+          <exclude>WEB-INF/classes/logback.xml</exclude>
         </excludes>
       </unpackOptions>
       <useTransitiveDependencies>false</useTransitiveDependencies>
@@ -104,6 +105,8 @@
         <include>org.codehaus.plexus:*</include>
         <include>org.sonatype.sisu:*</include>
         <include>org.sonatype.appcontext:*</include>
+        <include>org.slf4j:*</include>
+        <include>ch.qos.logback:*</include>
       </includes>
       <useProjectArtifact>false</useProjectArtifact>
       <unpack>false</unpack>

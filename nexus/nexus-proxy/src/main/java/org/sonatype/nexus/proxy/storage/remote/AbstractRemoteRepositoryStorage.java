@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +49,7 @@ public abstract class AbstractRemoteRepositoryStorage
     /**
      * Since storage are shared, we are tracking the last changes from each of them.
      */
-    private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
+    private final Map<String, Integer> repositoryContexts;
 
     protected AbstractRemoteRepositoryStorage( final UserAgentBuilder userAgentBuilder,
                                                final ApplicationStatusSource applicationStatusSource,
@@ -59,6 +58,7 @@ public abstract class AbstractRemoteRepositoryStorage
         this.userAgentBuilder = checkNotNull( userAgentBuilder );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
         this.mimeSupport = checkNotNull( mimeSupport );
+        this.repositoryContexts = new HashMap<String, Integer>();
     }
 
     protected MimeSupport getMimeSupport()
@@ -112,7 +112,7 @@ public abstract class AbstractRemoteRepositoryStorage
             // we have repo specific settings
             // if contextContains key and is newer, or does not contain yet
             if ( !repositoryContexts.containsKey( repository.getId() )
-                || ctx.getLastChanged() > repositoryContexts.get( repository.getId() ) )
+                || ctx.getGeneration() > repositoryContexts.get( repository.getId() ) )
             {
                 if ( getLogger().isDebugEnabled() )
                 {
@@ -122,10 +122,8 @@ public abstract class AbstractRemoteRepositoryStorage
                     }
                     else
                     {
-                        getLogger().debug(
-                            "Remote context {} has been changed at {}. Previous change {}",
-                            new Object[] { ctx, new Date( ctx.getLastChanged() ),
-                                new Date( repositoryContexts.get( repository.getId() ) ) } );
+                        getLogger().debug( "Remote context {} has been changed. Previous generation {}",
+                            new Object[] { ctx, repositoryContexts.get( repository.getId() ) } );
                     }
                 }
 
@@ -145,7 +143,7 @@ public abstract class AbstractRemoteRepositoryStorage
                 }
 
                 updateContext( repository, ctx );
-                repositoryContexts.put( repository.getId(), ctx.getLastChanged() );
+                repositoryContexts.put( repository.getId(), ctx.getGeneration() );
             }
         }
         return ctx;

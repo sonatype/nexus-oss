@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
-import java.text.SimpleDateFormat;
-
 import org.codehaus.plexus.util.StringUtils;
-import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +33,6 @@ import com.thoughtworks.xstream.XStream;
 
 public class MarshalUnmarchalTest
 {
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat( "MM/dd/yyyy" );
-
     private XStream xstreamXML;
 
     private XStream xstreamJSON;
@@ -49,15 +43,16 @@ public class MarshalUnmarchalTest
     {
         xstreamXML = new XStream( new LookAheadXppDriver() );
         XStreamConfigurator.configureXStream( xstreamXML );
-        XStreamInitalizer.initXStream( xstreamXML );
+        LdapXStreamConfigurator.configureXStream( xstreamXML );
 
         xstreamJSON = new XStream( new JsonOrgHierarchicalStreamDriver() );
         XStreamConfigurator.configureXStream( xstreamJSON );
-        XStreamInitalizer.initXStream( xstreamJSON );
+        LdapXStreamConfigurator.configureXStream( xstreamJSON );
     }
 
     @Test
-    public void testLdapConnectionInfoResponse() throws Exception
+    public void testLdapConnectionInfoResponse()
+        throws Exception
     {
         LdapConnectionInfoResponse resource = new LdapConnectionInfoResponse();
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
@@ -76,10 +71,9 @@ public class MarshalUnmarchalTest
         validateXmlHasNoPackageNames( resource );
     }
 
-
-
     @Test
-    public void testLdapUserAndGroupConfigurationResponse() throws Exception
+    public void testLdapUserAndGroupConfigurationResponse()
+        throws Exception
     {
         LdapUserAndGroupConfigurationResponse resource = new LdapUserAndGroupConfigurationResponse();
         LdapUserAndGroupConfigurationDTO dto = new LdapUserAndGroupConfigurationDTO();
@@ -105,7 +99,8 @@ public class MarshalUnmarchalTest
     }
 
     @Test
-    public void testLdapUserListResponse() throws Exception
+    public void testLdapUserListResponse()
+        throws Exception
     {
         LdapUserListResponse resource = new LdapUserListResponse();
         LdapUserResponseDTO dto1 = new LdapUserResponseDTO();
@@ -129,9 +124,9 @@ public class MarshalUnmarchalTest
         validateXmlHasNoPackageNames( resource );
     }
 
-
     @Test
-    public void testLdapUserAndGroupConfigTestRequest() throws Exception
+    public void testLdapUserAndGroupConfigTestRequest()
+        throws Exception
     {
         LdapUserAndGroupConfigTestRequest resource = new LdapUserAndGroupConfigTestRequest();
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
@@ -165,7 +160,8 @@ public class MarshalUnmarchalTest
     }
 
     @Test
-    public void testLdapUserAndGroupConfigTestRequestWithEscape() throws Exception
+    public void testLdapUserAndGroupConfigTestRequestWithEscape()
+        throws Exception
     {
         LdapUserAndGroupConfigTestRequest resource = new LdapUserAndGroupConfigTestRequest();
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
@@ -199,8 +195,8 @@ public class MarshalUnmarchalTest
         validateXmlHasNoPackageNames( resource );
 
         String xml = this.xstreamXML.toXML( resource );
-        LdapUserAndGroupConfigTestRequestDTO result = ((LdapUserAndGroupConfigTestRequest) this.xstreamXML.fromXML( xml )).getData();
-
+        LdapUserAndGroupConfigTestRequestDTO result =
+            ( (LdapUserAndGroupConfigTestRequest) this.xstreamXML.fromXML( xml ) ).getData();
 
         Assert.assertEquals( result.getSearchBase(), "searchBase&" );
         Assert.assertEquals( result.getSystemPassword(), "systemPassword&" );
@@ -238,7 +234,8 @@ public class MarshalUnmarchalTest
         dto.setLdapFilter( null ); // already null, but more clear for the test
 
         String xml = this.xstreamXML.toXML( resource );
-        LdapUserAndGroupConfigTestRequestDTO result = ((LdapUserAndGroupConfigTestRequest) this.xstreamXML.fromXML( xml )).getData();
+        LdapUserAndGroupConfigTestRequestDTO result =
+            ( (LdapUserAndGroupConfigTestRequest) this.xstreamXML.fromXML( xml ) ).getData();
 
         Assert.assertNull( result.getLdapFilter() );
 
@@ -246,15 +243,16 @@ public class MarshalUnmarchalTest
         String payload = "{\"data\":{\"ldapFilter\":null}}";
 
         StringBuffer sb =
-                new StringBuffer( "{ \"" ).append( LdapUserAndGroupConfigTestRequest.class.getName() ).append( "\" : " ).append( payload ).append(
-                                                                                                                             " }" );
+            new StringBuffer( "{ \"" ).append( LdapUserAndGroupConfigTestRequest.class.getName() ).append( "\" : " ).append(
+                payload ).append( " }" );
         // validate this parses without error
         xstreamJSON.fromXML( sb.toString() );
 
     }
 
     @Test
-    public void testLdapAuthenticationTestRequest() throws Exception
+    public void testLdapAuthenticationTestRequest()
+        throws Exception
     {
         LdapAuthenticationTestRequest resource = new LdapAuthenticationTestRequest();
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
@@ -273,7 +271,6 @@ public class MarshalUnmarchalTest
         validateXmlHasNoPackageNames( resource );
     }
 
-
     private void validateXmlHasNoPackageNames( Object obj )
     {
         String xml = this.xstreamXML.toXML( obj );
@@ -288,12 +285,11 @@ public class MarshalUnmarchalTest
         Assert.assertFalse( "Found package name in XML:\n" + xml, totalCount > 0 );
 
         // // print out each type of method, so i can rafb it
-        System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
-        System.out.println( xml+"\n" );
+        System.out.println( "\n\nClass: " + obj.getClass() + "\n" );
+        System.out.println( xml + "\n" );
         //
         // Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
 
     }
-
 
 }

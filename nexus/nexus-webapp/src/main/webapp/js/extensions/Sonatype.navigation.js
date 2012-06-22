@@ -185,7 +185,9 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
             return {
               sortable_title : c.title,
               autoHeight : true,
-              html : '<ul class="group-links"><li><a href="' + c.href + '" target="' + c.href + '">' + c.title + '</a></li></ul>'
+              html : '<ul class="group-links"><li><a href="' + c.href + '" target="' + c.href + '"' +
+                    (c.style ? ' style="' + c.style + '"' : '') +
+                    '>' + c.title + '</a></li></ul>'
             }
           }
           else if (c.tabCode || c.handler)

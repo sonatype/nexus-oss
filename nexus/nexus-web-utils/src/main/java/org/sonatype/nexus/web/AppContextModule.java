@@ -18,7 +18,9 @@ import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 
 /**
- * Module exposing AppContext as component.
+ * Module exposing AppContext as component. We intentionally directly reimplement the class to be found in appcontext
+ * 3.1+ as in Nexus bundle, we have appcontext at Jetty cloassloader level, and would explode as at that level there is
+ * no Guice available. Anyway, this class is a trivial one.
  * 
  * @author cstamas
  * @since 2.1

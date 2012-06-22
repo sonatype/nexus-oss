@@ -280,11 +280,10 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
 
         response = this.messageUtil.sendMessage( Method.PUT, resource );
 
-        if ( response.getStatus().isSuccess() )
+        if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Role should not have been updated: " + response.getStatus() );
+            Assert.fail( "Role should have been updated: " + response.getStatus() );
         }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
 
         /*
          * Update Id

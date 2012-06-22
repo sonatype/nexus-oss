@@ -127,7 +127,7 @@ public class DefaultWastebasketTest
         outOfServiceRepo.commitChanges();
 
         Wastebasket wastebasket = this.lookup( Wastebasket.class );
-        wastebasket.purgeAll( 1L );
+        wastebasket.purgeAll( DefaultWastebasket.ALL );
 
         assertThat( basketDir, FileMatchers.isDirectory() );
         assertThat( basketDir, FileMatchers.isEmpty() );

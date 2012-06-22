@@ -15,22 +15,29 @@ package org.sonatype.nexus.security.filter;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.web.ShiroSecurityFilter;
 
 /**
  * This filter simply behaves according Nexus configuration.
  * 
  * @author cstamas
+ * @deprecated replaced with {@link org.sonatype.security.web.guice.SecurityWebFilter}.
  */
+@Deprecated
 public class NexusJSecurityFilter
     extends ShiroSecurityFilter
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     public static final String REQUEST_IS_AUTHZ_REJECTED = "request.is.authz.rejected";
 
     public NexusJSecurityFilter()
     {
+        logger.info( "@Deprecated replaced with org.sonatype.security.web.guice.SecurityWebFilter" );
+
         // not setting configClassName explicitly, so we can use either configRole or configClassName
     }
 

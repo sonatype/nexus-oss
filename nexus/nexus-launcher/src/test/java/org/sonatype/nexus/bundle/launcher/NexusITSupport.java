@@ -221,7 +221,7 @@ public abstract class NexusITSupport
                             util.getTargetDir(),
                             "its"
                         ),
-                        getClass().getCanonicalName().replace( ".", "/" )
+                        getClass().getSimpleName()
                     ),
                     testName.getMethodName()
                 ),

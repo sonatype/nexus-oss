@@ -140,6 +140,12 @@ public class StatusPlexusResource
 
         resource.setBaseUrl( getContextRoot( request ).toString() );
 
+        resource.setLicenseInstalled( status.isLicenseInstalled() );
+
+        resource.setLicenseExpired( status.isLicenseExpired() );
+
+        resource.setTrialLicense( status.isTrialLicense() );
+
         StatusResourceResponse result = new StatusResourceResponse();
 
         result.setData( resource );

@@ -27,6 +27,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.sonatype.nexus.test.utils.TestProperties;
 
+import com.google.inject.Module;
+
 public class TestContainer
 {
     private static TestContainer SELF = null;
@@ -76,11 +78,11 @@ public class TestContainer
         return plexusContainer;
     }
 
-    public synchronized void startPlexusContainer( final Class<?> clazz )
+    public synchronized void startPlexusContainer( final Class<?> clazz, final Module... modules )
     {
         if ( plexusContainer == null )
         {
-            plexusContainer = setupContainer( clazz );
+            plexusContainer = setupContainer( clazz, modules );
         }
     }
 
@@ -122,7 +124,7 @@ public class TestContainer
 
     // ==
 
-    protected PlexusContainer setupContainer( Class<?> baseClass )
+    protected PlexusContainer setupContainer( Class<?> baseClass, Module... modules )
     {
         // ----------------------------------------------------------------------------
         // Context Setup
@@ -160,7 +162,7 @@ public class TestContainer
 
         try
         {
-            return new DefaultPlexusContainer( containerConfiguration );
+            return new DefaultPlexusContainer( containerConfiguration, modules );
         }
         catch ( PlexusContainerException e )
         {

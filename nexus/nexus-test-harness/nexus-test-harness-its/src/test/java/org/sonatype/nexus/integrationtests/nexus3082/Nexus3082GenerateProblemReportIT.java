@@ -70,7 +70,7 @@ public class Nexus3082GenerateProblemReportIT
         throws Exception
     {
 
-        final int port = Integer.parseInt( TestProperties.getString( "webproxy-server-port" ) );
+        final int port = Integer.parseInt( TestProperties.getString( "jira-server-port" ) );
 
         final File mockDb = getTestFile( "jira-mock.db" );
 

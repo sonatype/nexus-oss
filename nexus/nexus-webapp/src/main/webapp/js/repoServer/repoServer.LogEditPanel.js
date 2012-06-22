@@ -40,17 +40,6 @@ Sonatype.repoServer.LogEditPanel = function(config) {
           labelSeparator : ''
         },
 
-        items : [{
-              xtype : 'fieldset',
-              collapsible : false,
-              collapsed : false,
-              id : formId + '_' + 'logConfig',
-              title : 'Configuration',
-              anchor : Sonatype.view.FIELDSET_OFFSET,
-              autoHeight : true,
-              layoutConfig : {
-                labelSeparator : ''
-              },
               items : [{
                     xtype : 'combo',
                     fieldLabel : 'Root Logger Level',
@@ -66,39 +55,7 @@ Sonatype.repoServer.LogEditPanel = function(config) {
                     triggerAction : 'all',
                     forceSelection : true,
                     selectOnFocus : true
-                  }, {
-                    xtype : 'textfield',
-                    fieldLabel : 'Root Logger Appenders',
-                    itemCls : 'required-field',
-                    allowBlank : true,
-                    helpText : ht.rootLoggerAppenders,
-                    name : 'rootLoggerAppenders',
-                    anchor : Sonatype.view.FIELD_OFFSET,
-                    disabled : true,
-                    required: false
-                  }, {
-                    xtype : 'textfield',
-                    fieldLabel : 'File Appender Pattern',
-                    itemCls : 'required-field',
-                    allowBlank : false,
-                    required : true,
-                    regex : /\S/,
-                    regexText : 'This field is required',
-                    helpText : ht.fileAppenderPattern,
-                    name : 'fileAppenderPattern',
-                    anchor : Sonatype.view.FIELD_OFFSET
-                  }, {
-                    xtype : 'textfield',
-                    fieldLabel : 'File Appender Location',
-                    itemCls : 'required-field',
-                    allowBlank : true,
-                    name : 'fileAppenderLocation',
-                    helpText : ht.fileAppenderLocation,
-                    anchor : Sonatype.view.FIELD_OFFSET,
-                    disabled : true,
-                    required: false
-                  }]
-            }],
+                  }],
 
         buttons : [{
               id : 'savebutton',
@@ -159,7 +116,7 @@ Ext.extend(Sonatype.repoServer.LogEditPanel, Ext.Panel, {
         if (allValid)
         {
           this.save();
-          this.formPanel.loadLogConfig();
+          this.loadLogConfig();
         }
       },
 

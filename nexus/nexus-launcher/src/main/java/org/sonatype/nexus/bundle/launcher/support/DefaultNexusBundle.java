@@ -32,7 +32,6 @@ import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.jsw.exec.JSWExec;
 import org.sonatype.sisu.jsw.exec.JSWExecFactory;
-import org.sonatype.sisu.jsw.monitor.CommandMonitorTalker;
 import org.sonatype.sisu.jsw.monitor.KeepAliveThread;
 import org.sonatype.sisu.jsw.monitor.internal.log.Slf4jLogProxy;
 import org.sonatype.sisu.jsw.util.JSWConfig;
@@ -118,6 +117,7 @@ public class DefaultNexusBundle
      */
     @Override
     protected void configure()
+        throws Exception
     {
         super.configure();
 
@@ -161,10 +161,9 @@ public class DefaultNexusBundle
     @Override
     protected void startApplication()
     {
-        CommandMonitorTalker.installStopShutdownHook( jswMonitorPort );
         try
         {
-            keepAliveThread = new KeepAliveThread( jswKeepAlivePort, new Slf4jLogProxy( log() ) );
+            keepAliveThread = new KeepAliveThread( jswKeepAlivePort, new Slf4jLogProxy( log ) );
             keepAliveThread.start();
         }
         catch ( IOException e )
@@ -225,7 +224,7 @@ public class DefaultNexusBundle
     {
         if ( jswExec == null )
         {
-            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus" );
+            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus", jswMonitorPort );
         }
         return jswExec;
     }
@@ -331,4 +330,9 @@ public class DefaultNexusBundle
         return new File( getConfiguration().getTargetDirectory(), "sonatype-work/nexus" );
     }
 
+    @Override
+    protected String generateId()
+    {
+        return getName() + "-" + System.currentTimeMillis();
+    }
 }

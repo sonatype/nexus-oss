@@ -12,9 +12,11 @@
  */
 package org.sonatype.nexus.plugin.discovery;
 
+import org.sonatype.nexus.restlight.common.ProxyConfig;
+
 public interface NexusTestClientManager
 {
 
-    boolean testConnection( String url, String user, String password );
+    boolean testConnection( String url, String user, String password, ProxyConfig proxyConfig );
 
 }

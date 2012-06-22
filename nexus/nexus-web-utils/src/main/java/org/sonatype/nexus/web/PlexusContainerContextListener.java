@@ -13,7 +13,7 @@
 package org.sonatype.nexus.web;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -33,7 +33,8 @@ import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
-import org.sonatype.appcontext.source.MapEntrySource;
+import org.sonatype.appcontext.lifecycle.Startable;
+import org.sonatype.appcontext.lifecycle.Stoppable;
 import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
 
@@ -49,6 +50,8 @@ public class PlexusContainerContextListener
     implements ServletContextListener
 {
     public static final String CUSTOM_MODULES = "customModules";
+
+    private AppContext appContext;
 
     private PlexusContainer plexusContainer;
 
@@ -76,17 +79,17 @@ public class PlexusContainerContextListener
         {
             try
             {
-                final AppContext plexusContext =
-                    createContainerContext( context,
-                        (Map<String, Object>) context.getAttribute( AppContext.class.getName() ) );
+                appContext =
+                    createContainerContext( context, (AppContext) context.getAttribute( AppContext.APPCONTEXT_KEY ) );
 
                 final ContainerConfiguration plexusConfiguration =
                     new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
-                        plexusXmlFile.toURI().toURL() ).setContext( (Map) plexusContext ).setAutoWiring( true ).setClassPathScanning(
+                        plexusXmlFile.toURI().toURL() ).setContext( (Map) appContext ).setAutoWiring( true ).setClassPathScanning(
                         PlexusConstants.SCANNING_INDEX ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
 
-                final ArrayList<Module> modules = new ArrayList<Module>( 1 );
-                modules.add( new AppContextModule( plexusContext ) );
+                final ArrayList<Module> modules = new ArrayList<Module>( 2 );
+                modules.add( new NexusWebModule( sce.getServletContext() ) );
+                modules.add( new AppContextModule( appContext ) );
 
                 final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );
 
@@ -100,7 +103,7 @@ public class PlexusContainerContextListener
 
                 context.setAttribute( PlexusConstants.PLEXUS_KEY, plexusContainer );
 
-                context.setAttribute( AppContext.class.getName(), plexusContext );
+                context.setAttribute( AppContext.APPCONTEXT_KEY, appContext );
             }
             catch ( PlexusContainerException e )
             {
@@ -108,12 +111,15 @@ public class PlexusContainerContextListener
 
                 throw new IllegalStateException( "Could not start Plexus container!", e );
             }
-            catch ( MalformedURLException e )
+            catch ( IOException e )
             {
                 sce.getServletContext().log( "Could not start Plexus container!", e );
 
                 throw new IllegalStateException( "Could not start Plexus container!", e );
             }
+
+            // fire startable
+            appContext.getLifecycleManager().invokeHandler( Startable.class );
         }
     }
 
@@ -123,12 +129,16 @@ public class PlexusContainerContextListener
         {
             plexusContainer.dispose();
         }
+        if ( appContext != null )
+        {
+            appContext.getLifecycleManager().invokeHandler( Stoppable.class );
+        }
     }
 
     // ==
 
-    protected AppContext createContainerContext( final ServletContext context, final Map<String, Object> parent )
-        throws AppContextException
+    protected AppContext createContainerContext( final ServletContext context, final AppContext parent )
+        throws AppContextException, IOException
     {
         if ( parent == null )
         {
@@ -146,18 +156,17 @@ public class PlexusContainerContextListener
 
         if ( !StringUtils.isEmpty( baseDirProperty ) )
         {
+            basedirFile = new File( baseDirProperty ).getCanonicalFile();
             // Nexus as bundle case
             context.log( "Setting Plexus basedir context variable to (pre-set in System properties): "
-                + baseDirProperty );
-
-            basedirFile = new File( baseDirProperty ).getAbsoluteFile();
+                + basedirFile.getAbsolutePath() );
         }
 
         String warWebInfFilePath = context.getRealPath( "/WEB-INF" );
 
         if ( !StringUtils.isEmpty( warWebInfFilePath ) )
         {
-            warWebInfFile = new File( warWebInfFilePath ).getAbsoluteFile();
+            warWebInfFile = new File( warWebInfFilePath ).getCanonicalFile();
 
             if ( basedirFile == null )
             {
@@ -169,9 +178,10 @@ public class PlexusContainerContextListener
         }
         else
         {
-            context.log( "CANNOT set Plexus basedir, Nexus cannot run from non-upacked WAR!" );
+            String message = "Could not set Plexus basedir, Nexus cannot run from non-unpacked WAR!";
+            context.log( message );
 
-            throw new IllegalStateException( "Could not set Plexus basedir, Nexus cannot run from non-upacked WAR!" );
+            throw new IllegalStateException( message );
         }
 
         // plexus files are always here
@@ -180,7 +190,7 @@ public class PlexusContainerContextListener
 
         // no "real" parenting for now
         // for historical reasons, honor the "plexus" prefix too
-        AppContextRequest request = Factory.getDefaultRequest( "nexus", null, Arrays.asList( "plexus" ) );
+        AppContextRequest request = Factory.getDefaultRequest( "nexus", parent, Arrays.asList( "plexus" ) );
 
         // if in bundle only
         if ( parent != null && basedirFile != null )
@@ -193,13 +203,6 @@ public class PlexusContainerContextListener
 
         // add the "defaults" properties files, must be present
         request.getSources().add( 0, new PropertiesFileEntrySource( nexusDefaultPropertiesFile, true ) );
-
-        // add parent if found
-        if ( parent != null )
-        {
-            // for now, once we resolve classloading issues....
-            request.getSources().add( 0, new MapEntrySource( "quasiParent", parent ) );
-        }
 
         // set basedir as LAST, no overrides for it
         request.getSources().add( new StaticEntrySource( "bundleBasedir", basedirFile.getAbsolutePath() ) );

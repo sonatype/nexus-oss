@@ -18,10 +18,9 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
 import org.junit.Test;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class MemoryRealmTest
-    extends PlexusTestCaseSupport
+    extends AbstractRealmTest
 {
     private MemoryRealm realm;
 

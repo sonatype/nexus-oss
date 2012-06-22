@@ -13,8 +13,6 @@
 package org.sonatype.nexus.integrationtests.nexus4257;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -34,7 +32,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 
 public class Nexus4257CookieVerificationIT
@@ -62,6 +63,11 @@ public class Nexus4257CookieVerificationIT
         HttpClient httpClient = new HttpClient();
         httpClient.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( username, password ) );
 
+        // stateful clients must login first, since other rest urls create no sessions
+        String loginUrl = this.getBaseNexusUrl() + "service/local/authentication/login";
+        httpClient.getParams().setAuthenticationPreemptive( true ); // go straight to basic auth
+        assertThat( executeAndRelease( httpClient, new GetMethod( loginUrl ) ), equalTo( 200 ) );
+
         GetMethod getMethod = new GetMethod( url );
         assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
@@ -70,7 +76,7 @@ public class Nexus4257CookieVerificationIT
 
         // do not set the cookie, expect failure
         GetMethod failedGetMethod = new GetMethod( url );
-        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 401 ) );
+        assertThat( executeAndRelease( httpClient, failedGetMethod ), equalTo( 401 ) );
 
         // set the cookie expect a 200, If a cookie is set, and cannot be found on the server, the response will fail with a 401
         httpClient.getState().addCookie( sessionCookie );

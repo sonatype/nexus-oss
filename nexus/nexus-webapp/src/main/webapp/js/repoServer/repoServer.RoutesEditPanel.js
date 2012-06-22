@@ -239,12 +239,9 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
   this.sp = Sonatype.lib.Permissions;
 
   this.routesGridPanel = new Ext.grid.GridPanel({
-        title : 'Repository Routes',
         id : 'st-routes-grid',
-
         region : 'north',
         layout : 'fit',
-        collapsible : true,
         split : true,
         height : 200,
         minHeight : 150,
