@@ -319,8 +319,7 @@
             <goals>
               <goal>enforce</goal>
             </goals>
-            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the 
-              way of m2eclipse. -->
+            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. -->
             <phase>package</phase>
             <id>enforce</id>
             <configuration>
@@ -337,8 +336,7 @@
                   <excludes>
                     <exclude>*:jsecurity</exclude>
                   </excludes>
-                  <message>Nexus has being updated to use apache shiro
-                    instead,
+                  <message>Nexus has being updated to use apache shiro instead,
                     please remove jsecurity dependency</message>
                 </bannedDependencies>
               </rules>
@@ -367,9 +365,10 @@
       <plugins>
         <plugin>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.2.1</version>
+          <version>2.3.2</version>
           <configuration>
             <autoVersionSubmodules>true</autoVersionSubmodules>
+            <tagNameFormat>security-@{version}<tagNameFormat>
           </configuration>
         </plugin>
 
@@ -433,12 +432,9 @@
             <configuration>
               <mappingId>customizable</mappingId>
               <configurators>
-                <configurator
-                  id="org.maven.ide.eclipse.jdt.javaConfigurator" />
-                <configurator
-                  id="org.maven.ide.eclipse.modello.modelloConfigurator" />
-                <configurator
-                  id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
+                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
+                <configurator id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
