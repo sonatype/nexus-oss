@@ -10,8 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bootstrap;
+package org.sonatype.nexus.bootstrap.jsw;
 
+import org.sonatype.nexus.bootstrap.Launcher;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVENT;

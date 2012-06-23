@@ -23,6 +23,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+// FIXME: This is presently JSW specific
+
 /**
  * Thread which listens for command messages to control the JVM.
  *
