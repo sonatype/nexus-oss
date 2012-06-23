@@ -14,7 +14,6 @@ package org.sonatype.nexus.bootstrap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tanukisoftware.wrapper.WrapperManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,8 +21,6 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-// FIXME: This is presently JSW specific
 
 /**
  * Thread which listens for command messages to control the JVM.
@@ -39,9 +36,15 @@ public class CommandMonitorThread
 
     private static final String RESTART_COMMAND = "RESTART";
 
+    private final Launcher launcher;
+
     private final ServerSocket socket;
 
-    public CommandMonitorThread(final int port) throws IOException {
+    public CommandMonitorThread(final Launcher launcher, final int port) throws IOException {
+        if (launcher == null) {
+            throw new NullPointerException();
+        }
+        this.launcher = launcher;
         setDaemon(true);
         setName("Bootstrap Command Monitor");
         // Only listen on local interface
@@ -65,12 +68,12 @@ public class CommandMonitorThread
 
                 if (STOP_COMMAND.equals(command)) {
                     log.info("Requesting application stop");
-                    WrapperManager.stopAndReturn(0);
+                    launcher.commandStop();
                     running = false;
                 }
                 else if (RESTART_COMMAND.equals(command)) {
-                    log.info("Requesting applciation restart");
-                    WrapperManager.restartAndReturn();
+                    log.info("Requesting appreciation restart");
+                    launcher.commandRestart();
                 }
                 else {
                     log.error("Unknown command: {}", command);

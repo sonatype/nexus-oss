@@ -195,8 +195,17 @@ public class Launcher
     protected void maybeEnableCommandMonitor() throws IOException {
         String commandMonitorPort = System.getProperty(CommandMonitorThread.class.getName() + ".port");
         if (commandMonitorPort != null) {
-            new CommandMonitorThread(Integer.parseInt(commandMonitorPort)).start();
+            new CommandMonitorThread(this, Integer.parseInt(commandMonitorPort)).start();
         }
+    }
+
+    public void commandStop() {
+        System.exit(0);
+    }
+
+    public void commandRestart() {
+        log.error("Restart not supported, stopping instead");
+        System.exit(0);
     }
 
     public void stop() throws Exception {

@@ -28,7 +28,18 @@ public class JswLauncher
     private final Launcher launcher;
 
     public JswLauncher() {
-        this.launcher = new Launcher();
+        this.launcher = new Launcher()
+        {
+            @Override
+            public void commandStop() {
+                WrapperManager.stopAndReturn(0);
+            }
+
+            @Override
+            public void commandRestart() {
+                WrapperManager.restartAndReturn();
+            }
+        };
     }
 
     @Override
