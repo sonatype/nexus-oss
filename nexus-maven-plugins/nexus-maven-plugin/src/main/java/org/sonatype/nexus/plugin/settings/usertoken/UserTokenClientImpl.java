@@ -67,7 +67,6 @@ public class UserTokenClientImpl
         Status status = response.getClientResponseStatus();
         if (status != Status.OK) {
             String message = "Failed to fetch user-token";
-            System.out.println(response.hasEntity());
             if (response.hasEntity()) {
                 try {
                     InputStream input = response.getEntityInputStream();
