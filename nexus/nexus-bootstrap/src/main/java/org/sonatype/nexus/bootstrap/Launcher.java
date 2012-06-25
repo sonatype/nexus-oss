@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
+import org.sonatype.appcontext.publisher.AbstractStringDumpingEntryPublisher;
 import org.sonatype.appcontext.publisher.EntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
@@ -41,11 +42,13 @@ public class Launcher
 {
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
-    private static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
+    protected static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
 
-    private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
+    protected static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
-    private Jetty8 server;
+    protected static final String NEXUS_WORK = "nexus-work";
+
+    protected Jetty8 server;
 
     public Integer start(final String[] args) throws Exception {
         if (args.length != 1) {
@@ -54,6 +57,10 @@ public class Launcher
         }
 
         AppContext context = createAppContext();
+
+        // Make some entries canonical
+        canonicalizeEntry(context, NEXUS_WORK);
+
         server = new Jetty8(new File(args[0]), context);
 
         ensureTmpDirSanity();
@@ -101,10 +108,20 @@ public class Launcher
         // Now, that will be always overridden by value got from cwd and that seems correct to me
         request.getSources().add(new StaticEntrySource(BUNDLEBASEDIR_KEY, cwd.getAbsolutePath()));
 
-        // by default, publishers list will contain one "dump" publisher and hence, on creation, a dump will be written
-        // out (to System.out or SLF4J logger, depending is latter on classpath or not)
-        // if we dont want to "mute" this dump, just uncomment this below
-        // request.getPublishers().clear();
+        // Kill the default publisher that is installed
+        request.getPublishers().clear();
+
+        // Install a publisher which will only log as DEBUG (default version will log as DEBUG or INFO or WARN)
+        request.getPublishers().add(new AbstractStringDumpingEntryPublisher()
+        {
+            @Override
+            public void publishEntries(final AppContext context) {
+                if (log.isDebugEnabled()) {
+                    String dump = getDumpAsString(context);
+                    log.debug("\n" + dump);
+                }
+            }
+        });
 
         // publishers (order does not matter for us, unlike sources)
         // we need to publish one property: "bundleBasedir"
@@ -116,8 +133,6 @@ public class Launcher
             }
         });
 
-        // TODO: Canonical-ize nexus-work
-
         // we need to publish all entries coming from loaded properties
         request.getPublishers().add(new SystemPropertiesEntryPublisher(true));
 
@@ -126,7 +141,14 @@ public class Launcher
         return Factory.create(request);
     }
 
-    private Properties loadProperties(final Resource resource) throws IOException {
+    protected void canonicalizeEntry(final AppContext context, final String key) throws IOException {
+        String nexusWork = (String) context.get(key);
+        File file = new File(nexusWork).getCanonicalFile();
+        String value = file.getAbsolutePath();
+        context.put(key, value);
+    }
+
+    protected Properties loadProperties(final Resource resource) throws IOException {
         assert resource != null;
         log.debug("Loading properties from: {}", resource);
         Properties props = new Properties();
@@ -145,7 +167,7 @@ public class Launcher
         return props;
     }
 
-    private Properties loadProperties(final String resource, final boolean required) throws IOException {
+    protected Properties loadProperties(final String resource, final boolean required) throws IOException {
         URL url = getClass().getResource(resource);
         if (url == null) {
             if (required) {
@@ -162,7 +184,7 @@ public class Launcher
         }
     }
 
-    private void addProperties(final AppContextRequest request, final String name, final String resource, final boolean required) throws IOException {
+    protected void addProperties(final AppContextRequest request, final String name, final String resource, final boolean required) throws IOException {
         Properties props = loadProperties(resource, required);
         if (props != null) {
             request.getSources().add(new PropertiesEntrySource(name, props));
