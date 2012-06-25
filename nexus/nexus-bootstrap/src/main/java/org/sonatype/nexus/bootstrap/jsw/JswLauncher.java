@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.bootstrap.jsw;
 
+import org.slf4j.Logger;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.tanukisoftware.wrapper.WrapperManager;
 
@@ -30,6 +31,11 @@ public class JswLauncher
     public JswLauncher() {
         this.launcher = new Launcher()
         {
+            @Override
+            protected Logger createLogger() {
+                return JswLauncher.this.log;
+            }
+
             @Override
             public void commandStop() {
                 WrapperManager.stopAndReturn(0);
