@@ -40,7 +40,7 @@ import org.sonatype.sisu.jetty.Jetty8;
  */
 public class Launcher
 {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Logger log;
 
     protected static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
 
@@ -49,6 +49,18 @@ public class Launcher
     protected static final String NEXUS_WORK = "nexus-work";
 
     protected Jetty8 server;
+
+    protected Launcher() {
+        Logger log = createLogger();
+        if (log == null) {
+            throw new NullPointerException();
+        }
+        this.log = log;
+    }
+
+    protected Logger createLogger() {
+        return LoggerFactory.getLogger(getClass());
+    }
 
     public Integer start(final String[] args) throws Exception {
         if (args.length != 1) {
@@ -167,8 +179,13 @@ public class Launcher
         return props;
     }
 
+    protected URL getResource(final String name) {
+        // Now that Launcher is extend-able we'll need to load resources from common package
+        return Launcher.class.getResource(name);
+    }
+
     protected Properties loadProperties(final String resource, final boolean required) throws IOException {
-        URL url = getClass().getResource(resource);
+        URL url = getResource(resource);
         if (url == null) {
             if (required) {
                 log.error("Missing resource: {}", resource);
@@ -207,7 +224,7 @@ public class Launcher
         }
 
         // Ensure we can actually create a new tmp file
-        File file = File.createTempFile(getClass().getSimpleName(), ".tmp");
+        File file = File.createTempFile("nexus-launcher", ".tmp");
         file.createNewFile();
         file.delete();
 
