@@ -114,17 +114,6 @@ public abstract class AbstractNexusMojo
 
     // ==
 
-    protected AbstractNexusMojo()
-    {
-        getLog().warn( "" );
-        getLog().warn( "DEPRECATION WARNING" );
-        getLog().warn( "===================" );
-        getLog().warn( "This whole plugin has been deprecated in favor of a new set of Maven Plugins." );
-        getLog().warn( "Please update your build, and stop using this plugin altogether,");
-        getLog().warn( "as this plugin is about to be dropped in near future." );
-        getLog().warn( "" );
-    }
-
     public final void execute()
         throws MojoExecutionException
     {

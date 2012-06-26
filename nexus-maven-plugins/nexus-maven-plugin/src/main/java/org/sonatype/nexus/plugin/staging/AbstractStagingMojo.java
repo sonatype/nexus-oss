@@ -52,7 +52,10 @@ public abstract class AbstractStagingMojo
 
     public AbstractStagingMojo()
     {
-        super();
+        getLog().warn( "DEPRECATION WARNING" );
+        getLog().warn( "===================" );
+        getLog().warn( "Staging goals have been deprecated." );
+        getLog().warn( "Please use org.sonatype.plugins:nexus-staging-maven-plugin instead." );
     }
 
     protected final synchronized StageClient connect()
