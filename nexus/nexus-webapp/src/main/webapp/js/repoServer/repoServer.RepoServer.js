@@ -309,7 +309,7 @@
                     tabCode : Sonatype.repoServer.ServerEditPanel,
                     tabTitle : 'Nexus'
                   }, {
-                    enabled : sp.checkPermission('nexus:tasks', sp.READ) && (sp.checkPermission('nexus:tasks', sp.CREATE) || sp.checkPermission('nexus:tasks', sp.DELETE) || sp.checkPermission('nexus:tasks', sp.EDIT)),
+                    enabled : sp.checkPermission('nexus:tasks', sp.READ),
                     title : 'Scheduled Tasks',
                     tabId : 'schedules-config',
                     tabCode : Sonatype.repoServer.SchedulesEditPanel
