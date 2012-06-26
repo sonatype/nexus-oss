@@ -76,7 +76,7 @@ public class UserTokenClientImpl
                     message += "; " + detail;
                 }
                 catch (Exception e) {
-                    //ignore
+                    message += "; " + status;
                 }
             }
             throw new RuntimeException(message);
