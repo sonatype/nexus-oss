@@ -188,10 +188,19 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>jline</groupId>
+      <artifactId>jline</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interactivity-jline</artifactId>
       <version>1.0-alpha-6</version>
       <exclusions>
+        <exclusion>
+          <groupId>jline</groupId>
+          <artifactId>jline</artifactId>
+        </exclusion>
         <exclusion>
           <artifactId>plexus-utils</artifactId>
           <groupId>plexus</groupId>
