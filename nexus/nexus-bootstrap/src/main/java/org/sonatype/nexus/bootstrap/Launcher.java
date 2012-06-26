@@ -101,27 +101,27 @@ public class Launcher
         // create app context request, with ID "nexus", without parent, and due to NEXUS-4520 add "plexus" alias too
         final AppContextRequest request = Factory.getDefaultRequest("nexus", null, Arrays.asList("plexus"));
 
+        // Kill the default logging publisher that is installed
+        request.getPublishers().clear();
+
         // NOTE: sources list is "ascending by importance", 1st elem in list is "weakest" and last elem in list is
         // "strongest" (overrides). Factory already created us some sources, so we are just adding to that list without
         // disturbing the order of the list (we add to list head and tail)
 
-        // add the defaults as least important, is mandatory to be present
+        // Add the defaults as least important, is mandatory to be present
         addProperties(request, "defaults", "default.properties", true);
 
         // NOTE: These are loaded as resources, and its expected that <install>/conf is included in the classpath
 
-        // add the nexus.properties, is mandatory to be present
+        // Add the nexus.properties, is mandatory to be present
         addProperties(request, "nexus", "/nexus.properties", true);
 
-        // add the nexus-test.properties, not mandatory to be present
+        // Add the nexus-test.properties, not mandatory to be present
         addProperties(request, "nexus-test", "/nexus-test.properties", false);
 
-        // ultimate source of "bundleBasedir" (hence, is added as last in sources list)
+        // Ultimate source of "bundleBasedir" (hence, is added as last in sources list)
         // Now, that will be always overridden by value got from cwd and that seems correct to me
         request.getSources().add(new StaticEntrySource(BUNDLEBASEDIR_KEY, cwd.getAbsolutePath()));
-
-        // Kill the default logging publisher that is installed
-        request.getPublishers().clear();
 
         // Install a publisher which will only log as TRACE (default version will log as DEBUG or INFO or WARN)
         request.getPublishers().add(new AbstractStringDumpingEntryPublisher()
