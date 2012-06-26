@@ -51,7 +51,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
- 
+
 public abstract class AbstractP2MetadataSource<E extends P2Repository>
     extends AbstractLoggingComponent
     implements P2MetadataSource<E>
@@ -162,19 +162,22 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
         final long start = System.currentTimeMillis();
 
         // because we are outside realm of nexus here, we need to handle locking ourselves...
-        final RepositoryItemUid uid = repository.createUid( P2Constants.METADATA_LOCK_PATH );
-        final RepositoryItemUidLock lock = uid.getLock();
+        final RepositoryItemUid repoUid = repository.createUid( P2Constants.METADATA_LOCK_PATH );
+        final RepositoryItemUidLock repoLock = repoUid.getLock();
+
+        // needed to give away the lock on actual metadata file (content.xml or artifact.xml) as we will regenerate it
+        final RepositoryItemUid itemUid = repository.createUid( request.getRequestPath() );
+        final RepositoryItemUidLock itemLock = itemUid.getLock();
 
         // start with read lock, no need to do a write lock until we find it necessary
-        lock.lock( Action.read );
         try
         {
+            repoLock.lock( Action.read );
             if ( P2Constants.CONTENT_PATH.equals( request.getRequestPath() ) )
             {
                 try
                 {
                     final AbstractStorageItem contentItem = doRetrieveLocalItem( request, repository );
-
                     if ( !isContentOld( contentItem, repository ) )
                     {
                         return contentItem;
@@ -186,19 +189,15 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                 }
 
                 // give away the lock on content.xml as we will regenerate it
-                final RepositoryItemUid contentXmlUid = repository.createUid( request.getRequestPath() );
-                contentXmlUid.getLock().unlock();
-
+                itemLock.unlock();
                 try
                 {
                     // we need to get new file, so update the lock
-                    lock.lock( Action.delete );
-
+                    repoLock.lock( Action.delete );
                     // recheck the condition now that we have an exclusive lock
                     try
                     {
                         final AbstractStorageItem contentItem = doRetrieveLocalItem( request, repository );
-
                         if ( !isContentOld( contentItem, repository ) )
                         {
                             return contentItem;
@@ -219,15 +218,13 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                     {
                         return doRetrieveLocalOnTransferError( request, repository, e );
                     }
-                    finally
-                    {
-                        lock.unlock();
-                    }
                 }
                 finally
                 {
+                    // release repo
+                    repoLock.unlock();
                     // get back the lock we gave in
-                    contentXmlUid.getLock().lock( Action.read );
+                    itemLock.lock( Action.read );
                 }
             }
             else if ( P2Constants.ARTIFACTS_PATH.equals( request.getRequestPath() ) )
@@ -235,7 +232,6 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                 try
                 {
                     final AbstractStorageItem artifactsItem = doRetrieveLocalItem( request, repository );
-
                     if ( !isArtifactsOld( artifactsItem, repository ) )
                     {
                         return artifactsItem;
@@ -247,18 +243,15 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                 }
 
                 // give away the lock on artifacts.xml as we will regenerate it
-                final RepositoryItemUid artifactsXmlUid = repository.createUid( request.getRequestPath() );
-                artifactsXmlUid.getLock().unlock();
-
+                itemLock.unlock();
                 try
                 {
                     // we need to get new file, so update the lock
-                    lock.lock( Action.delete );
-
+                    repoLock.lock( Action.delete );
+                    // recheck the condition now that we have an exclusive lock
                     try
                     {
                         final AbstractStorageItem artifactsItem = doRetrieveLocalItem( request, repository );
-
                         if ( !isArtifactsOld( artifactsItem, repository ) )
                         {
                             return artifactsItem;
@@ -280,15 +273,13 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                         return doRetrieveLocalOnTransferError( request, repository, e );
 
                     }
-                    finally
-                    {
-                        lock.unlock();
-                    }
                 }
                 finally
                 {
+                    // release repo
+                    repoLock.unlock();
                     // get back the lock we gave in
-                    artifactsXmlUid.getLock().lock( Action.read );
+                    itemLock.lock( Action.read );
                 }
             }
 
@@ -297,10 +288,15 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
         }
         finally
         {
-            lock.unlock();
+            // release repo read lock we initially acquired
+            repoLock.unlock();
 
-            getLogger().debug( "Repository " + repository.getId() + ": retrieve item: " + request.getRequestPath()
-                                   + ": took " + ( System.currentTimeMillis() - start ) + " ms." );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Repository " + repository.getId() + ": retrieve item: " + request.getRequestPath() + ": took "
+                        + ( System.currentTimeMillis() - start ) + " ms." );
+            }
         }
     }
 
