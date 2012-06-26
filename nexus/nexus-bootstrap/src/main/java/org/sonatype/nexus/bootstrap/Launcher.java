@@ -27,7 +27,6 @@ import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
 import org.sonatype.appcontext.publisher.AbstractStringDumpingEntryPublisher;
-import org.sonatype.appcontext.publisher.EntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
