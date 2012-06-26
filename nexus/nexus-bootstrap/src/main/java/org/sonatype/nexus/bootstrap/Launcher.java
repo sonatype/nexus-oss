@@ -156,9 +156,13 @@ public class Launcher
     }
 
     protected void canonicalizeEntry(final AppContext context, final String key) throws IOException {
-        String nexusWork = (String) context.get(key);
-        File file = new File(nexusWork).getCanonicalFile();
-        String value = file.getAbsolutePath();
+        if (!context.containsKey(key)) {
+            log.warn("Unable to canonicalize missing entry: {}, key");
+            return;
+        }
+        String value = String.valueOf(context.get(key));
+        File file = new File(value).getCanonicalFile();
+        value = file.getAbsolutePath();
         context.put(key, value);
     }
 
