@@ -77,7 +77,6 @@ public class UserTokenClientImpl
                 }
                 catch (Exception e) {
                     //ignore
-                    e.printStackTrace();
                 }
             }
             throw new RuntimeException(message);
