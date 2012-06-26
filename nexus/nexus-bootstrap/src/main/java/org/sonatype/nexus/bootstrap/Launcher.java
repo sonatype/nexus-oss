@@ -79,21 +79,24 @@ public class Launcher
         return null; // continue running
     }
 
+    /**
+     * We have three properties file:
+     *
+     * default.properties -- embedded in this jar (not user editable)
+     * this is the place to set java.io.tmp and debug options by users
+     *
+     * nexus.properties -- mandatory, will be picked up into context
+     * this is place to set nexus properties like workdir location etc (as today)
+     *
+     * nexus-test.properties -- optional, if present, will override values from those above
+     * this is place to set test properties (like jetty port) etc
+     *
+     * We push the whole app context into system properties, so that nexus[-test].properties
+     * can be used to set any system properties (java.io.tmpdir, etc).
+     */
     private AppContext createAppContext() throws Exception {
         File cwd = new File(".").getCanonicalFile();
         log.info("Current directory: {}", cwd);
-
-        // we have three properties file:
-        // default.properties -- embedded in this jar (not user editable)
-        // this is the place to set java.io.tmp and debug options by users
-
-        // nexus.properties -- mandatory, will be picked up into context
-        // this is place to set nexus properties like workdir location etc (as today)
-
-        // nexus-test.properties -- optional, if present, will override values from those above
-        // this is place to set test properties (like jetty port) etc
-
-        // we "push" whole app context into system properties
 
         // create app context request, with ID "nexus", without parent, and due to NEXUS-4520 add "plexus" alias too
         final AppContextRequest request = Factory.getDefaultRequest("nexus", null, Arrays.asList("plexus"));
