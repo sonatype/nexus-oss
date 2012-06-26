@@ -70,9 +70,6 @@ public class Launcher
 
         AppContext context = createAppContext();
 
-        // Make some entries canonical
-        canonicalizeEntry(context, NEXUS_WORK);
-
         server = new Jetty8(new File(args[0]), context);
 
         ensureTmpDirSanity();
@@ -120,28 +117,18 @@ public class Launcher
         // Now, that will be always overridden by value got from cwd and that seems correct to me
         request.getSources().add(new StaticEntrySource(BUNDLEBASEDIR_KEY, cwd.getAbsolutePath()));
 
-        // Kill the default publisher that is installed
+        // Kill the default logging publisher that is installed
         request.getPublishers().clear();
 
-        // Install a publisher which will only log as DEBUG (default version will log as DEBUG or INFO or WARN)
+        // Install a publisher which will only log as TRACE (default version will log as DEBUG or INFO or WARN)
         request.getPublishers().add(new AbstractStringDumpingEntryPublisher()
         {
             @Override
             public void publishEntries(final AppContext context) {
-                if (log.isDebugEnabled()) {
+                if (log.isTraceEnabled()) {
                     String dump = getDumpAsString(context);
-                    log.debug("\n" + dump);
+                    log.trace("\n" + dump);
                 }
-            }
-        });
-
-        // publishers (order does not matter for us, unlike sources)
-        // we need to publish one property: "bundleBasedir"
-        request.getPublishers().add(new EntryPublisher()
-        {
-            @Override
-            public void publishEntries(final AppContext context) {
-                System.setProperty(BUNDLEBASEDIR_KEY, String.valueOf(context.get(BUNDLEBASEDIR_KEY)));
             }
         });
 
@@ -150,7 +137,19 @@ public class Launcher
 
         // create the context and use it as "parent" for Jetty8
         // when context created, the context is built and all publisher were invoked (system props set for example)
-        return Factory.create(request);
+        AppContext context = Factory.create(request);
+
+        // Make some entries canonical
+        canonicalizeEntry(context, NEXUS_WORK);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Context:");
+            for (Map.Entry<String,Object> entry : context.flatten().entrySet()) {
+                log.debug("  {}='{}'", entry.getKey(), entry.getValue());
+            }
+        }
+
+        return context;
     }
 
     protected void canonicalizeEntry(final AppContext context, final String key) throws IOException {
