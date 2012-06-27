@@ -12,8 +12,15 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
+import static org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_METHOD;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import org.junit.AfterClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.google.common.base.Throwables;
 
 /**
  * Base class for Nexus Integration Tests that starts Nexus before each test and stops it afterwards.
@@ -23,6 +30,8 @@ import javax.inject.Provider;
 public abstract class NexusRunningITSupport
     extends NexusITSupport
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( NexusRunningITSupport.class );
 
     /**
      * Provider used to create Nexus bundles on demand.
@@ -35,53 +44,40 @@ public abstract class NexusRunningITSupport
      */
     private NexusBundle nexus;
 
-    /**
-     * Starts Nexus before each test.
-     * <p/>
-     * {@inheritDoc}
-     *
-     * @since 2.0
-     */
+    private static NexusBundle staticNexus;
+
+    private static NexusStartAndStopStrategy.Strategy startAndStopStrategy = EACH_METHOD;
+
     @Override
     public void setUp()
     {
-
+        final NexusStartAndStopStrategy strategy = getStartAndStopStrategy();
+        if ( strategy != null )
+        {
+            startAndStopStrategy = strategy.value();
+        }
         super.setUp();
-
-        try
-        {
-            nexus().start();
-        }
-        catch ( Exception e )
-        {
-            throw new RuntimeException( e );
-        }
+        startNexus( nexus() );
     }
 
-    /**
-     * Stops Nexus (if running) after each test.
-     * <p/>
-     * {@inheritDoc}
-     *
-     * @since 2.0
-     */
     @Override
     public void tearDown()
     {
-
-        if ( nexus() != null && nexus().isRunning() )
+        if ( EACH_METHOD.equals( startAndStopStrategy ) )
         {
-            try
-            {
-                nexus().stop();
-            }
-            catch ( Exception e )
-            {
-                throw new RuntimeException( e );
-            }
+            stopNexus( nexus );
         }
-
+        else
+        {
+            staticNexus = nexus;
+        }
         super.tearDown();
+    }
+
+    @AfterClass
+    public static void stopNexusIfNecessary()
+    {
+        stopNexus( staticNexus );
     }
 
     /**
@@ -94,11 +90,18 @@ public abstract class NexusRunningITSupport
     {
         if ( nexus == null )
         {
-            nexus = nexusProvider.get();
-            NexusBundleConfiguration config = configureNexus( nexus().getConfiguration() );
-            if ( config != null )
+            if ( staticNexus == null )
             {
-                nexus().setConfiguration( config );
+                nexus = nexusProvider.get();
+                NexusBundleConfiguration config = configureNexus( nexus.getConfiguration() );
+                if ( config != null )
+                {
+                    nexus.setConfiguration( config );
+                }
+            }
+            else
+            {
+                nexus = staticNexus;
             }
         }
         return nexus;
@@ -117,6 +120,49 @@ public abstract class NexusRunningITSupport
     {
         // template method
         return configuration;
+    }
+
+    /**
+     * Determines the start and stop strategy by looking up {@link NexusStartAndStopStrategy} annotation.
+     *
+     * @return start and stop strategy to pe used. If null, nexus will be started and stopped for each test method.
+     * @since 2.1
+     */
+    protected NexusStartAndStopStrategy getStartAndStopStrategy()
+    {
+        return getClass().getAnnotation( NexusStartAndStopStrategy.class );
+    }
+
+    private static void startNexus( final NexusBundle nexusBundle )
+    {
+        if ( nexusBundle != null && !nexusBundle.isRunning() )
+        {
+            try
+            {
+                LOGGER.info( "Starting Nexus ({})", nexusBundle );
+                nexusBundle.start();
+            }
+            catch ( Exception e )
+            {
+                throw Throwables.propagate( e );
+            }
+        }
+    }
+
+    private static void stopNexus( final NexusBundle nexusBundle )
+    {
+        if ( nexusBundle != null && nexusBundle.isRunning() )
+        {
+            try
+            {
+                LOGGER.info( "Stopping Nexus ({})", nexusBundle );
+                nexusBundle.stop();
+            }
+            catch ( Exception e )
+            {
+                throw Throwables.propagate( e );
+            }
+        }
     }
 
 }
