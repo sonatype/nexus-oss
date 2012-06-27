@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.capabilities.test;
 
 import static org.hamcrest.Matchers.not;
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.inError;
 
 import java.io.IOException;
@@ -30,7 +31,6 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRespo
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import com.google.common.base.Preconditions;
 import com.thoughtworks.xstream.XStream;
 
 public class CapabilitiesNexusRestClient
@@ -47,13 +47,19 @@ public class CapabilitiesNexusRestClient
 
     public CapabilitiesNexusRestClient( final NexusRestClient nexusRestClient )
     {
-        this.nexusRestClient = Preconditions.checkNotNull( nexusRestClient );
+        this.nexusRestClient = checkNotNull( nexusRestClient );
     }
 
     public List<CapabilityListItemResource> list()
         throws IOException
     {
-        String entityText = nexusRestClient.doGetForText( "service/local/capabilities", not( inError() ) );
+        return list( false );
+    }
+
+    public List<CapabilityListItemResource> list(boolean hidden)
+        throws IOException
+    {
+        String entityText = nexusRestClient.doGetForText( "service/local/capabilities" + (hidden ? "?includeHidden=true" : ""), not( inError() ) );
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
         CapabilitiesListResponseResource scheduleResponse =
