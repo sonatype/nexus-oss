@@ -215,6 +215,13 @@ public abstract class AbstractDeployMojo
      */
     private boolean keepOnFailure;
 
+    protected AbstractDeployMojo() {
+        getLog().warn( "DEPRECATION WARNING" );
+        getLog().warn( "===================" );
+        getLog().warn( "Deployment goals have been deprecated." );
+        getLog().warn( "Please use org.sonatype.plugins:nexus-staging-maven-plugin instead." );
+    }
+
     protected MavenSession getMavenSession()
     {
         return mavenSession;
