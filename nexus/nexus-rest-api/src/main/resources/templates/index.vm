@@ -31,7 +31,9 @@
   <title>$appName</title>
   
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <link rel="shortcut icon" href="favicon.ico" type="image/gif" />
+  <link rel="icon" type="image/png" href="favicon.png"><!-- Major Browsers -->
+  <!--[if IE]><link rel="SHORTCUT ICON" href="favicon.ico"/><![endif]--><!-- Internet Explorer-->
+
   <link rel="search" type="application/opensearchdescription+xml" href="$serviceBase/opensearch" title="Nexus" />
 
   ## Plugin pre HEAD contributions start here
