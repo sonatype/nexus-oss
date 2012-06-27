@@ -411,9 +411,9 @@ public class P2ProxyRepositoryImpl
         final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
         final RepositoryItemUidLock lock = uid.getLock();
 
-        lock.lock( Action.read );
         try
         {
+            lock.lock( Action.read );
             return super.retrieveItem( fromTask, request );
         }
         finally
@@ -457,9 +457,9 @@ public class P2ProxyRepositoryImpl
         // being deleted/updated while retrieving the remote item, and that is all we need.
 
         // NXCM-2499 temporarily we do put access serialization back here, to avoid all the deadlocks.
-        lock.lock( Action.create );
         try
         {
+            lock.lock( Action.create );
             // note this method can potentially go retrieve new mirrors, but it is using locking, so no
             // need to worry about multiples getting in
             configureMirrors( request );
@@ -511,10 +511,9 @@ public class P2ProxyRepositoryImpl
         final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
         final RepositoryItemUidLock lock = uid.getLock();
 
-        lock.lock( Action.create );
-
         try
         {
+            lock.lock( Action.create );
             if ( !hasArtifactMappings )
             {
                 return null;

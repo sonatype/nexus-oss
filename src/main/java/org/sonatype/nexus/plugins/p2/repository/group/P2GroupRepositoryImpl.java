@@ -120,10 +120,9 @@ public class P2GroupRepositoryImpl
         final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
         final RepositoryItemUidLock lock = uid.getLock();
 
-        lock.lock( Action.read );
         try
         {
-
+            lock.lock( Action.read );
             return super.retrieveItem( fromTask, request );
         }
         finally
