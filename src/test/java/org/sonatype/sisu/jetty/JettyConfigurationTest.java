@@ -14,17 +14,17 @@ package org.sonatype.sisu.jetty;
 
 import java.io.File;
 import java.net.BindException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.eclipse.jetty.server.Server;
 import org.sonatype.appcontext.internal.ContextStringDumper;
 import org.sonatype.sisu.jetty.mangler.ContextAttributeGetterMangler;
 import org.sonatype.sisu.jetty.mangler.ContextGetterMangler;
 import org.sonatype.sisu.jetty.mangler.JettyGetterMangler;
+import org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool;
 import org.sonatype.sisu.jetty.util.JettyUtils;
 
 public class JettyConfigurationTest
@@ -166,6 +166,24 @@ public class JettyConfigurationTest
         System.out.println( ContextStringDumper.dumpToString( subject.getAppContext() ) );
         // we have 4 in props file, and 2 in extra contexts
         Assert.assertEquals( "Context is not correctly set!", 6, subject.getAppContext().size() );
+    }
+
+    public void testSimpleStartWithInstrumentedThreadPool()
+        throws Exception
+    {
+        final Map<String, String> ctx1 = new HashMap<String, String>();
+        ctx1.put( "one", "1" );
+        final Map<String, String> ctx2 = new HashMap<String, String>();
+        ctx2.put( "two", "2" );
+        Jetty8 subject = new Jetty8( new File( getJettyXmlPath( "jetty-instrumented-pool.xml" ) ), null, ctx1, ctx2 );
+
+        subject.startJetty();
+
+        final Server server = subject.mangleServer( new JettyGetterMangler() );
+
+        Assert.assertTrue( "Unexpected pool class!", server.getThreadPool() instanceof InstrumentedQueuedThreadPool );
+
+        subject.stopJetty();
     }
 
     public void testStartStopConsecutively()
