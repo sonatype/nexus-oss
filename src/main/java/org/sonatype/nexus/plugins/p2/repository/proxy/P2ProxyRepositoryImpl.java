@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.proxy;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,6 +39,7 @@ import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2ProxyRepository;
 import org.sonatype.nexus.plugins.p2.repository.mappings.ArtifactMapping;
 import org.sonatype.nexus.plugins.p2.repository.mappings.ArtifactPath;
+import org.sonatype.nexus.plugins.p2.repository.metadata.FileContentLocator;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -50,7 +51,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -352,24 +352,29 @@ public class P2ProxyRepositoryImpl
             }
         }
 
-        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        final FileContentLocator fileContentLocator = new FileContentLocator( "text/xml" );
+        OutputStream buffer = null;
+        try
+        {
+            buffer = fileContentLocator.getOutputStream();
+            final MXSerializer mx = new MXSerializer();
+            mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
+            mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
+            final String encoding = "UTF-8";
+            mx.setOutput( buffer, encoding );
+            mx.startDocument( encoding, null );
+            mirrorsByRepositoryDom.writeToSerializer( null, mx );
+            mx.flush();
+        }
+        finally
+        {
+            IOUtil.close( buffer );
+        }
 
-        final MXSerializer mx = new MXSerializer();
-        mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
-        mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-        final String encoding = "UTF-8";
-        mx.setOutput( buffer, encoding );
-        mx.startDocument( encoding, null );
-        mirrorsByRepositoryDom.writeToSerializer( null, mx );
-        mx.flush();
-
-        final byte[] bytes = buffer.toByteArray();
-
-        final ContentLocator content = new ByteArrayContentLocator( bytes, "text/xml" );
         final DefaultStorageFileItem result =
             new DefaultStorageFileItem( this, new ResourceStoreRequest( PRIVATE_MIRRORS_PATH ), true /* isReadable */,
-                false /* isWritable */, content );
-        result.setLength( bytes.length );
+                false /* isWritable */, fileContentLocator );
+        result.setLength( fileContentLocator.getLength() );
         doCacheItem( result );
         return result;
     }

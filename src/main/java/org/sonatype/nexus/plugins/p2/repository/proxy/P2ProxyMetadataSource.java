@@ -66,7 +66,8 @@ public class P2ProxyMetadataSource
     public static final String CTX_MIRRORS_URL = P2Constants.PROP_MIRRORS_URL;
 
     @Override
-    protected Xpp3Dom doRetrieveArtifactsDom( final Map<String, Object> context, final P2ProxyRepository repository )
+    protected StorageFileItem doRetrieveArtifactsFileItem( final Map<String, Object> context,
+                                                           final P2ProxyRepository repository )
         throws StorageException, ItemNotFoundException
     {
         Xpp3Dom dom;
@@ -140,7 +141,17 @@ public class P2ProxyMetadataSource
         // properties.put( P2Facade.PROP_REPOSITORY_ID, getId( repository ) );
         artifacts.setProperties( properties );
 
-        return artifacts.getDom();
+        try
+        {
+            final StorageFileItem artifactsItem =
+                createMetadataItem( repository, P2Constants.ARTIFACTS_XML, artifacts.getDom(),
+                    P2Constants.XMLPI_ARTIFACTS, context );
+            return artifactsItem;
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( e );
+        }
     }
 
     private String getRemoteUrl( final P2ProxyRepository repository )
@@ -149,7 +160,8 @@ public class P2ProxyMetadataSource
     }
 
     @Override
-    protected Xpp3Dom doRetrieveContentDom( final Map<String, Object> context, final P2ProxyRepository repository )
+    protected StorageFileItem doRetrieveContentFileItem( final Map<String, Object> context,
+                                                         final P2ProxyRepository repository )
         throws StorageException, ItemNotFoundException
     {
         Xpp3Dom dom;
@@ -208,10 +220,19 @@ public class P2ProxyMetadataSource
         // properties.put( P2Facade.PROP_REPOSITORY_ID, getId( repository ) );
         content.setProperties( properties );
 
-        return content.getDom();
+        try
+        {
+            final StorageFileItem contentItem =
+                createMetadataItem( repository, P2Constants.CONTENT_XML, content.getDom(), P2Constants.XMLPI_CONTENT,
+                    context );
+            return contentItem;
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( e );
+        }
     }
 
-    @Override
     protected StorageItem doRetrieveRemoteItem( final Repository repository, final String path,
                                                 final Map<String, Object> context )
         throws ItemNotFoundException, RemoteAccessException, StorageException
