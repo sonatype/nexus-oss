@@ -20,7 +20,9 @@ Ext.namespace('Nexus');
  * @param msg {String} The message to log.
  */
 Nexus.log = function(msg) {
-  if (Sonatype.config.isDebug && console) {
+  // Sonatype.config may be undefined if Nexus.log is called on setup of ext js extensions
+  // it should always be there on runtime for UI components, but better safe than sorry
+  if (Sonatype.config && Sonatype.config.isDebug && console) {
     console.log(msg);
   }
 };
