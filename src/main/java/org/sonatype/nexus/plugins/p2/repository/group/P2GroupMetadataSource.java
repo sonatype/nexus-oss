@@ -30,8 +30,8 @@ import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataMergeException;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -46,13 +46,13 @@ public class P2GroupMetadataSource
     @Override
     protected StorageFileItem doRetrieveArtifactsFileItem( final Map<String, Object> context,
                                                            final P2GroupRepository repository )
-        throws StorageException, ItemNotFoundException
+        throws RemoteStorageException, ItemNotFoundException
     {
-        final List<StorageFileItem> fileItems = doRetrieveItems( P2Constants.ARTIFACTS_XML, context, repository );
-        final ArtifactsMerge m = new ArtifactsMerge();
         try
         {
-            final Artifacts metadata = m.mergeArtifactsMetadata( getName( repository ), fileItems );
+            final List<StorageFileItem> fileItems = doRetrieveItems( P2Constants.ARTIFACTS_XML, context, repository );
+            final ArtifactsMerge m = new ArtifactsMerge();
+            final Artifacts metadata = m.mergeArtifactsMetadata( repository.getName(), fileItems );
 
             final LinkedHashMap<String, String> properties = metadata.getProperties();
             // properties.put( P2Facade.PROP_REPOSITORY_ID, repository.getId() );
@@ -66,24 +66,24 @@ public class P2GroupMetadataSource
         }
         catch ( final P2MetadataMergeException e )
         {
-            throw new StorageException( e );
+            throw new RemoteStorageException( e );
         }
         catch ( IOException e )
         {
-            throw new StorageException( e );
+            throw new RemoteStorageException( e );
         }
     }
 
     @Override
     protected StorageFileItem doRetrieveContentFileItem( final Map<String, Object> context,
                                                          final P2GroupRepository repository )
-        throws StorageException, ItemNotFoundException
+        throws RemoteStorageException, ItemNotFoundException
     {
-        final List<StorageFileItem> fileItems = doRetrieveItems( P2Constants.CONTENT_XML, context, repository );
-        final ArtifactsMerge m = new ArtifactsMerge();
         try
         {
-            final Content metadata = m.mergeContentMetadata( getName( repository ), fileItems );
+            final List<StorageFileItem> fileItems = doRetrieveItems( P2Constants.CONTENT_XML, context, repository );
+            final ArtifactsMerge m = new ArtifactsMerge();
+            final Content metadata = m.mergeContentMetadata( repository.getName(), fileItems );
 
             final LinkedHashMap<String, String> properties = metadata.getProperties();
             // properties.put( P2Facade.PROP_REPOSITORY_ID, repository.getId() );
@@ -97,17 +97,17 @@ public class P2GroupMetadataSource
         }
         catch ( final P2MetadataMergeException e )
         {
-            throw new StorageException( e );
+            throw new RemoteStorageException( e );
         }
         catch ( final IOException e )
         {
-            throw new StorageException( e );
+            throw new RemoteStorageException( e );
         }
     }
 
     private List<StorageFileItem> doRetrieveItems( final String xmlName, final Map<String, Object> context,
                                                    final P2GroupRepository repository )
-        throws StorageException
+        throws IOException
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( xmlName );
         request.getRequestContext().putAll( context );
@@ -126,46 +126,38 @@ public class P2GroupMetadataSource
 
     @Override
     protected boolean isArtifactsOld( final AbstractStorageItem artifactsItem, final P2GroupRepository repository )
-        throws StorageException
     {
         final Map<String, Object> context = new HashMap<String, Object>();
-
         return isOld( artifactsItem, P2Constants.ARTIFACTS_XML, context, repository );
     }
 
     @Override
     protected boolean isContentOld( final AbstractStorageItem contentItem, final P2GroupRepository repository )
-        throws StorageException
     {
         final Map<String, Object> context = new HashMap<String, Object>();
-
         return isOld( contentItem, P2Constants.CONTENT_XML, context, repository );
     }
 
     @Override
     protected void setItemAttributes( final StorageFileItem item, final Map<String, Object> context,
                                       final P2GroupRepository repository )
-        throws StorageException
     {
         if ( P2Constants.ARTIFACTS_JAR.equals( item.getPath() ) || P2Constants.ARTIFACTS_XML.equals( item.getPath() ) )
         {
-            item.getAttributes().putAll( getMemberHash( P2Constants.ARTIFACTS_XML, context, repository ) );
+            item.getRepositoryItemAttributes().putAll( getMemberHash( P2Constants.ARTIFACTS_XML, context, repository ) );
         }
         else if ( P2Constants.CONTENT_JAR.equals( item.getPath() ) || P2Constants.CONTENT_XML.equals( item.getPath() ) )
         {
-            item.getAttributes().putAll( getMemberHash( P2Constants.CONTENT_XML, context, repository ) );
+            item.getRepositoryItemAttributes().putAll( getMemberHash( P2Constants.CONTENT_XML, context, repository ) );
         }
     }
 
     private boolean isOld( final AbstractStorageItem artifactsItem, final String xml,
                            final Map<String, Object> context, final P2GroupRepository repository )
-        throws StorageException
     {
         final TreeMap<String, String> memberHash = getMemberHash( xml, context, repository );
-
         final LinkedHashMap<String, String> hash = new LinkedHashMap<String, String>();
-
-        final Map<String, String> attributes = artifactsItem.getAttributes();
+        final Map<String, String> attributes = artifactsItem.getRepositoryItemAttributes().asMap();
         for ( final Map.Entry<String, String> entry : attributes.entrySet() )
         {
             if ( entry.getKey().startsWith( ATTR_HASH_PREFIX ) )
@@ -173,7 +165,6 @@ public class P2GroupMetadataSource
                 hash.put( entry.getKey(), entry.getValue() );
             }
         }
-
         return !hash.equals( memberHash );
     }
 
@@ -181,9 +172,7 @@ public class P2GroupMetadataSource
                                                    final P2GroupRepository repository )
     {
         final TreeMap<String, String> memberHash = new TreeMap<String, String>();
-
         int count = 0;
-
         List<StorageFileItem> storageItems;
         try
         {
@@ -197,7 +186,8 @@ public class P2GroupMetadataSource
 
         for ( final StorageFileItem storageItem : storageItems )
         {
-            final String hash = storageItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+            final String hash =
+                storageItem.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
             if ( hash != null )
             {
                 memberHash.put( ATTR_HASH_PREFIX + count + "." + storageItem.getRepositoryItemUid().toString(), hash );

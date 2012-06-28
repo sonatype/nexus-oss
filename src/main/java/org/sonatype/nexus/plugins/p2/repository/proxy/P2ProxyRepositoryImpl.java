@@ -43,6 +43,7 @@ import org.sonatype.nexus.plugins.p2.repository.metadata.FileContentLocator;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
@@ -70,7 +71,7 @@ import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.util.StringDigester;
+import org.sonatype.nexus.util.DigesterUtils;
 
 @Component( role = Repository.class, hint = P2ProxyRepositoryImpl.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Proxy Repository" )
 public class P2ProxyRepositoryImpl
@@ -167,7 +168,7 @@ public class P2ProxyRepositoryImpl
             final ResourceStoreRequest request = new ResourceStoreRequest( PRIVATE_MIRRORS_PATH );
             mirrorsItem = getLocalStorage().retrieveItem( this, request );
         }
-        catch ( final StorageException e )
+        catch ( final LocalStorageException e )
         {
             // fall through
         }
@@ -198,7 +199,8 @@ public class P2ProxyRepositoryImpl
                 // is set in the P2ProxyMetadataSource.doRetrieveArtifactsDom().
                 // The attribute is set only if the remote repository is a SimpleArtifactRepository (i.e. it is not set
                 // for CompositeArtifactRepositories)
-                final String mirrorsURL = artifacts.getAttributes().get( P2ProxyMetadataSource.ATTR_MIRRORS_URL );
+                final String mirrorsURL =
+                    artifacts.getRepositoryItemAttributes().get( P2ProxyMetadataSource.ATTR_MIRRORS_URL );
                 if ( mirrorsURL != null )
                 {
                     // The remote repository is a SimpleArtifactRepository with mirrors configured
@@ -249,7 +251,7 @@ public class P2ProxyRepositoryImpl
                     {
                         // TODO: validate that this is valid way to generate id
                         // or if should be pulled from xml
-                        mirrors.add( new Mirror( StringDigester.getSha1Digest( mirrorUrl ), mirrorUrl, getRemoteUrl() ) );
+                        mirrors.add( new Mirror( DigesterUtils.getSha1Digest( mirrorUrl ), mirrorUrl, getRemoteUrl() ) );
                     }
                 }
 
@@ -296,12 +298,12 @@ public class P2ProxyRepositoryImpl
                     // TODO: validate that this is valid way to generate id
                     // or if should be pulled from xml
                     getP2DownloadMirrors().addMirror(
-                        new Mirror( StringDigester.getSha1Digest( mirrorUrl ), mirrorUrl, remoteRepositoryUrl ) );
+                        new Mirror( DigesterUtils.getSha1Digest( mirrorUrl ), mirrorUrl, remoteRepositoryUrl ) );
                 }
             }
         }
         getP2DownloadMirrors().addMirror(
-            new Mirror( StringDigester.getSha1Digest( remoteRepositoryUrl ), remoteRepositoryUrl, remoteRepositoryUrl ) );
+            new Mirror( DigesterUtils.getSha1Digest( remoteRepositoryUrl ), remoteRepositoryUrl, remoteRepositoryUrl ) );
     }
 
     private Xpp3Dom getMirrorsDom( final StorageFileItem mirrorsItem )
@@ -353,42 +355,45 @@ public class P2ProxyRepositoryImpl
         }
 
         final FileContentLocator fileContentLocator = new FileContentLocator( "text/xml" );
-        OutputStream buffer = null;
         try
         {
-            buffer = fileContentLocator.getOutputStream();
-            final MXSerializer mx = new MXSerializer();
-            mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
-            mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-            final String encoding = "UTF-8";
-            mx.setOutput( buffer, encoding );
-            mx.startDocument( encoding, null );
-            mirrorsByRepositoryDom.writeToSerializer( null, mx );
-            mx.flush();
+            OutputStream buffer = null;
+            try
+            {
+                buffer = fileContentLocator.getOutputStream();
+                final MXSerializer mx = new MXSerializer();
+                mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
+                mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
+                final String encoding = "UTF-8";
+                mx.setOutput( buffer, encoding );
+                mx.startDocument( encoding, null );
+                mirrorsByRepositoryDom.writeToSerializer( null, mx );
+                mx.flush();
+            }
+            finally
+            {
+                IOUtil.close( buffer );
+            }
+
+            final DefaultStorageFileItem result =
+                new DefaultStorageFileItem( this, new ResourceStoreRequest( PRIVATE_MIRRORS_PATH ),
+                    true /* isReadable */, false /* isWritable */, fileContentLocator );
+            result.setLength( fileContentLocator.getLength() );
+            return doCacheItem( result );
         }
         finally
         {
-            IOUtil.close( buffer );
+            fileContentLocator.delete();
         }
-
-        final DefaultStorageFileItem result =
-            new DefaultStorageFileItem( this, new ResourceStoreRequest( PRIVATE_MIRRORS_PATH ), true /* isReadable */,
-                false /* isWritable */, fileContentLocator );
-        result.setLength( fileContentLocator.getLength() );
-        doCacheItem( result );
-        return result;
     }
 
     private AbstractStorageItem getMirrorsItemRemote( final String mirrorsURL )
-        throws MalformedURLException, RemoteAccessException, StorageException, ItemNotFoundException
+        throws MalformedURLException, RemoteAccessException, RemoteStorageException, ItemNotFoundException
     {
         final URL url = new URL( mirrorsURL );
-
         final ResourceStoreRequest request = new ResourceStoreRequest( url.getFile() );
-
         final String baseUrl = getBaseMirrorsURL( url );
         final AbstractStorageItem mirrorsItem = getRemoteStorage().retrieveItem( this, request, baseUrl );
-
         return mirrorsItem;
     }
 
@@ -446,7 +451,15 @@ public class P2ProxyRepositoryImpl
             return item;
         }
 
-        final StorageItem item = metadataSource.doRetrieveItem( request, this );
+        final StorageItem item;
+        try
+        {
+            item = metadataSource.doRetrieveItem( request, this );
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( e );
+        }
         if ( item != null )
         {
             return item;
@@ -561,11 +574,11 @@ public class P2ProxyRepositoryImpl
         }
         catch ( final IOException e )
         {
-            throw new StorageException( "Could not load artifact mappings", e );
+            throw new LocalStorageException( "Could not load artifact mappings", e );
         }
         catch ( final XmlPullParserException e )
         {
-            throw new StorageException( "Could not load artifact mappings", e );
+            throw new LocalStorageException( "Could not load artifact mappings", e );
         }
         final Xpp3Dom[] artifactRepositories = dom.getChildren( "repository" );
         for ( final Xpp3Dom artifactRepositoryDom : artifactRepositories )

@@ -21,12 +21,13 @@ import java.io.OutputStream;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.util.WrappingInputStream;
 
 import com.google.common.base.Preconditions;
 
 /**
- * A content locator that is backed by a file. Used as "tmp" storage for metadata manipulation that would otherwise eat
- * up a LOT of heap.
+ * A content locator that is backed by a file. It has ability to create a tmp file for you, and to become "non reusable"
+ * locator, when it cleans up the file after it.
  * 
  * @author cstamas
  * @since 2.2
@@ -38,22 +39,58 @@ public class FileContentLocator
 
     private final String mimeType;
 
+    private final boolean deleteOnCloseInput;
+
+    /**
+     * Creates a temporary file backed instance, that will be not reusable, once file content is consumed (using
+     * {@link #getInputStream()} or {@link #getContent()}).
+     * 
+     * @param mimeType
+     * @throws IOException
+     */
     public FileContentLocator( final String mimeType )
         throws IOException
     {
-        this( File.createTempFile( "p2-tmp-content-locator", "tmp" ), mimeType );
+        this( File.createTempFile( "p2-tmp-content-locator", "tmp" ), mimeType, true );
     }
 
+    /**
+     * Creates a file backed instance that will be backed by passed in File. It will be reusable, the passed in file
+     * should be removed (if needed) by caller.
+     * 
+     * @param file
+     * @param mimeType
+     */
     public FileContentLocator( final File file, final String mimeType )
+    {
+        this( file, mimeType, false );
+    }
+
+    /**
+     * Creates a file backed instance.
+     * 
+     * @param file
+     * @param mimeType
+     * @param deleteOnCloseInput
+     */
+    public FileContentLocator( final File file, final String mimeType, final boolean deleteOnCloseInput )
     {
         this.file = Preconditions.checkNotNull( file );
         this.mimeType = Preconditions.checkNotNull( mimeType );
+        this.deleteOnCloseInput = deleteOnCloseInput;
     }
 
     public InputStream getInputStream()
         throws IOException
     {
-        return new FileInputStream( getFile() );
+        if ( deleteOnCloseInput )
+        {
+            return new DeleteOnCloseFileInputStream( getFile() );
+        }
+        else
+        {
+            return new FileInputStream( getFile() );
+        }
     }
 
     public OutputStream getOutputStream()
@@ -96,6 +133,28 @@ public class FileContentLocator
     @Override
     public boolean isReusable()
     {
-        return true;
+        return !deleteOnCloseInput;
+    }
+
+    // ==
+
+    public static class DeleteOnCloseFileInputStream
+        extends WrappingInputStream
+    {
+        private final File file;
+
+        public DeleteOnCloseFileInputStream( final File file )
+            throws IOException
+        {
+            super( new FileInputStream( file ) );
+            this.file = file;
+        }
+
+        public void close()
+            throws IOException
+        {
+            super.close();
+            FileUtils.forceDelete( file );
+        }
     }
 }
