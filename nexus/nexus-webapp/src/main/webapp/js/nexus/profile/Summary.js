@@ -10,21 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+/*global Ext, Sonatype, Nexus*/
 Nexus.profile.Summary = function(config) {
-  var ht = Sonatype.repoServer.resources.help.users;
+  var
+        cfg = config || {},
+        defaultConfig,
+        items,
+        // external => user is not from XML realm but LDAP, Crowd, ...
+        isExternalUser = Sonatype.user.curr.loggedInUserSource !== 'default',
+        ht = Sonatype.repoServer.resources.help.users,
+        WHITE_SPACE_PREFIX = /^\s/;
 
-  var config = config || {};
-
-  if ( !config.username ){
+  if ( !cfg.username ){
     throw 'No username in config';
   }
 
   this.FIELD_WIDTH = 250;
 
-  // user is not from XML realm but LDAP, Crowd, ...
-  var isExternalUser = Sonatype.user.curr.loggedInUserSource !== 'default';
-
-  var items = [
+  items = [
     {
       xtype : 'textfield',
       fieldLabel : 'User ID',
@@ -47,7 +51,7 @@ Nexus.profile.Summary = function(config) {
       width : this.FIELD_WIDTH,
       disabled : isExternalUser,
       validator : function(v) {
-        if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
+        if (v && v.length !== 0 && (!v.match(WHITE_SPACE_PREFIX))) {
           return true;
         }
         else {
@@ -65,7 +69,7 @@ Nexus.profile.Summary = function(config) {
       width : this.FIELD_WIDTH,
       disabled : isExternalUser,
       validator : function(v) {
-        if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX)) {
+        if (v && v.length !== 0 && (!v.match(WHITE_SPACE_PREFIX))) {
           return true;
         }
         else {
@@ -102,13 +106,13 @@ Nexus.profile.Summary = function(config) {
     }
   ];
 
-  var defaultConfig = {
+  defaultConfig = {
     minWidth : 650,
     labelWidth : 50,
     items : items
   };
 
-  Ext.apply(this, config, defaultConfig);
+  Ext.apply(this, cfg, defaultConfig);
 
   // URI template, payload.id will be appended
   this.uri = Sonatype.config.servicePath + '/user_account';
@@ -126,12 +130,12 @@ Nexus.profile.Summary = function(config) {
   // otherwise, `payload.data.resourceUri` is used as is.
   this.payload = {
     id : this.username
-  }
+  };
 
   // mandatory call
   this.checkPayload();
 
-  Nexus.profile.Summary.superclass.constructor.call(this, config);
+  Nexus.profile.Summary.superclass.constructor.call(this, cfg);
 };
 
 Ext.extend(Nexus.profile.Summary, Sonatype.ext.FormPanel, {
