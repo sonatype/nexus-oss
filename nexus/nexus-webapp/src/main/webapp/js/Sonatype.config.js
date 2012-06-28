@@ -45,8 +45,7 @@
     var groupServicePathSnippet = servicePathSnippet + '/repo_groups';
 
     return {
-      isDebug : false, // set to true to enable Firebug console output
-                        // (getfirebug.com)
+      isDebug : window.location.search === '?debug',
       host : host,
       servicePath : servicePath,
       resourcePath : resourcePath,
