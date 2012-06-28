@@ -177,7 +177,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                 try
                 {
                     final AbstractStorageItem contentItem = doRetrieveLocalItem( request, repository );
-                    if ( !isContentOld( contentItem, repository ) )
+                    if ( request.isRequestLocalOnly() || !isContentOld( contentItem, repository ) )
                     {
                         return contentItem;
                     }
@@ -231,7 +231,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                 try
                 {
                     final AbstractStorageItem artifactsItem = doRetrieveLocalItem( request, repository );
-                    if ( !isArtifactsOld( artifactsItem, repository ) )
+                    if ( request.isRequestLocalOnly() || !isArtifactsOld( artifactsItem, repository ) )
                     {
                         return artifactsItem;
                     }
