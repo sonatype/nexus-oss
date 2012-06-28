@@ -19,10 +19,13 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.IOUtil;
+import org.jsoup.Jsoup;
 import org.sonatype.nexus.plugin.settings.ClientConfiguration;
 import org.sonatype.nexus.plugin.settings.ClientFactory;
 
 import javax.ws.rs.core.MediaType;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -63,7 +66,20 @@ public class UserTokenClientImpl
 
         Status status = response.getClientResponseStatus();
         if (status != Status.OK) {
-            throw new RuntimeException("Failed to fetch user-token, status: " + status);
+            String message = "Failed to fetch user-token";
+            if (response.hasEntity()) {
+                try {
+                    InputStream input = response.getEntityInputStream();
+                    String detail = IOUtil.toString(input);
+                    IOUtil.close(input);
+                    detail = Jsoup.parse(detail).text();
+                    message += "; " + detail;
+                }
+                catch (Exception e) {
+                    message += "; " + status;
+                }
+            }
+            throw new RuntimeException(message);
         }
 
         return response.getEntity(UserTokenDTO.class);
