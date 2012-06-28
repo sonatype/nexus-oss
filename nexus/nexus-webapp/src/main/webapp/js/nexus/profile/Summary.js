@@ -38,7 +38,6 @@ Nexus.profile.Summary = function(config) {
       name : 'userId',
       disabled : true,
       allowBlank : false,
-      disabled : isExternalUser,
       width : this.FIELD_WIDTH
     },
     {
