@@ -24,7 +24,16 @@ public @interface NexusStartAndStopStrategy
 
     public static enum Strategy
     {
-        EACH_TEST, EACH_METHOD;
+        /**
+         * Strategy to be used when you want Nexus to be started before first test method is invoked and stopped after
+         * last test method was executed.
+         */
+        EACH_TEST,
+        /**
+         * Strategy to be used when you want Nexus to be started before each test method and stopped after the method
+         * was executed.
+         */
+        EACH_METHOD;
     }
 
 }
