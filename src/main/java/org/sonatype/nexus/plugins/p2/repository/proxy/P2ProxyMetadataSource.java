@@ -92,8 +92,20 @@ public class P2ProxyMetadataSource
                     password = upras.getPassword();
                 }
 
-                artifactRepository.createProxyRepository( new URI( repository.getRemoteUrl() ), username, password,
-                    artifactRepositoryDir.toURI(), artifactMappingsXmlFile );
+                try
+                {
+                    artifactRepository.createProxyRepository( new URI( repository.getRemoteUrl() ), username, password,
+                        artifactRepositoryDir.toURI(), artifactMappingsXmlFile );
+                }
+                catch ( RuntimeException e )
+                {
+                    // another implementation detail: M2 proxy with bad URL would just bore you with 404s
+                    // while P2 would return HTTP 500 Internal Error
+                    // while the path will not be quite exact (we are NOT asking for XML but P2 engine does multiple
+                    // queries, but the meaning is fine for now
+                    throw new P2RuntimeExceptionMaskedAsINFException( new ResourceStoreRequest( repository.getRemoteUrl()
+                        + "artifacts.xml" ), repository, e );
+                }
 
                 dom = Xpp3DomBuilder.build( new XmlStreamReader( new File( artifactRepositoryDir, "artifacts.xml" ) ) );
                 storeItemFromFile( P2Constants.ARTIFACT_MAPPINGS_XML, artifactMappingsXmlFile, repository );
@@ -177,8 +189,20 @@ public class P2ProxyMetadataSource
                     password = upras.getPassword();
                 }
 
-                metadataRepository.createProxyRepository( new URI( repository.getRemoteUrl() ), username, password,
-                    metadataRepositoryDir.toURI() );
+                try
+                {
+                    metadataRepository.createProxyRepository( new URI( repository.getRemoteUrl() ), username, password,
+                        metadataRepositoryDir.toURI() );
+                }
+                catch ( RuntimeException e )
+                {
+                    // another implementation detail: M2 proxy with bad URL would just bore you with 404s
+                    // while P2 would return HTTP 500 Internal Error
+                    // while the path will not be quite exact (we are NOT asking for XML but P2 engine does multiple
+                    // queries, but the meaning is fine for now
+                    throw new P2RuntimeExceptionMaskedAsINFException( new ResourceStoreRequest( repository.getRemoteUrl()
+                        + "content.xml" ), repository, e );
+                }
 
                 dom = Xpp3DomBuilder.build( new XmlStreamReader( new File( metadataRepositoryDir, "content.xml" ) ) );
             }

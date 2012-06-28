@@ -25,6 +25,7 @@ import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2Repository;
+import org.sonatype.nexus.plugins.p2.repository.proxy.P2RuntimeExceptionMaskedAsINFException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -213,7 +214,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                         doRetrieveArtifactsItem( request.getRequestContext(), repository );
                         return result;
                     }
-                    catch ( final RuntimeException e )
+                    catch ( final P2RuntimeExceptionMaskedAsINFException e )
                     {
                         return doRetrieveLocalOnTransferError( request, repository, e );
                     }
@@ -267,7 +268,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                         doRetrieveContentItem( request.getRequestContext(), repository );
                         return doRetrieveArtifactsItem( request.getRequestContext(), repository );
                     }
-                    catch ( final RuntimeException e )
+                    catch ( final P2RuntimeExceptionMaskedAsINFException e )
                     {
                         return doRetrieveLocalOnTransferError( request, repository, e );
 
@@ -304,10 +305,10 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
      * exception.
      */
     private StorageItem doRetrieveLocalOnTransferError( final ResourceStoreRequest request, final E repository,
-                                                        final RuntimeException e )
+                                                        final P2RuntimeExceptionMaskedAsINFException e )
         throws LocalStorageException, ItemNotFoundException
     {
-        final Throwable cause = e.getCause();
+        final Throwable cause = e.getCause().getCause();
         // TODO This must be possible to be done in some other way
         if ( cause.getMessage().startsWith( "HTTP Server 'Service Unavailable'" )
             || cause.getCause() instanceof ConnectException )
