@@ -230,6 +230,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Deps needed by some ITs (they use classes from these below) -->
 
     <!-- NEXUS-2862 -->
