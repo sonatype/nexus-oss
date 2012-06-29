@@ -42,12 +42,8 @@ public class NXCM4389FavIconIT
         final String text = RequestFacade.doGetForText( "index.html" );
         Document doc = Jsoup.parse( text );
         RequestFacade.doGetForStatus( doc.select( "link[rel=icon]" ).attr( "href" ), NexusRequestMatchers.isSuccess() );
+        doc = extractIELink( doc );
 
-        // assert that IE elements are in there as well
-        final String head = doc.select( "head" ).outerHtml();
-        final int start = head.indexOf( "IE]>" );
-        final int end = head.lastIndexOf( "endif" );
-        doc = Jsoup.parse( head.substring( start + 4, end ) );
         RequestFacade.doGetForStatus( doc.select( "link[rel=shortcut icon]" ).attr( "href" ),
                                       NexusRequestMatchers.isSuccess() );
     }
@@ -56,39 +52,36 @@ public class NXCM4389FavIconIT
     public void testErrorPageFavicons()
         throws IOException
     {
-        // assert that shortcut icon mentioned in the HTML is actually available
-        final String text = RequestFacade.doGetForText( "notfound.html", NexusRequestMatchers.inError() );
-        Document doc = Jsoup.parse( text );
-
-        // favicon is used with absolute url here
-        assertExists( doc.select( "link[rel=icon]" ).attr( "href" ) );
-
-        // assert that IE elements are in there as well
-        final String head = doc.select( "head" ).outerHtml();
-        final int start = head.indexOf( "IE]>" );
-        final int end = head.lastIndexOf( "endif" );
-        doc = Jsoup.parse( head.substring( start + 4, end ) );
-
-        // favicon is used with absolute url here
-        assertExists( doc.select( "link[rel=shortcut icon]" ).attr( "href" ) );
+        assertFavIcons( RequestFacade.doGetForText( "notfound.html", NexusRequestMatchers.inError() ) );
     }
 
     @Test
     public void testContentPageFavicons()
         throws IOException
     {
-        // assert that shortcut icon mentioned in the HTML is actually available
-        final String text = RequestFacade.doGetForText( "content/groups/public/", NexusRequestMatchers.isSuccessful() );
-        Document doc = Jsoup.parse( text );
+        assertFavIcons( RequestFacade.doGetForText( "content/groups/public/", NexusRequestMatchers.isSuccessful() ) );
+    }
 
-        // favicon is used with absolute url here
-        assertExists( doc.select( "link[rel=icon]" ).attr( "href" ) );
-
+    private Document extractIELink( Document doc )
+    {
         // assert that IE elements are in there as well
         final String head = doc.select( "head" ).outerHtml();
         final int start = head.indexOf( "IE]>" );
         final int end = head.lastIndexOf( "endif" );
         doc = Jsoup.parse( head.substring( start + 4, end ) );
+        return doc;
+    }
+
+    private void assertFavIcons( final String text )
+        throws IOException
+    {
+        // assert that shortcut icon mentioned in the HTML is actually available
+        Document doc = Jsoup.parse( text );
+
+        // favicon is used with absolute url here
+        assertExists( doc.select( "link[rel=icon]" ).attr( "href" ) );
+
+        doc = extractIELink(doc);
 
         // favicon is used with absolute url here
         assertExists( doc.select( "link[rel=shortcut icon]" ).attr( "href" ) );
