@@ -12,18 +12,25 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
-import com.google.inject.Binder;
+import static org.sonatype.sisu.maven.bridge.support.ArtifactRequestBuilder.request;
+import static org.sonatype.sisu.maven.bridge.support.ModelBuildingRequestBuilder.model;
+
+import java.io.File;
+import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
-
-import javax.inject.Inject;
-import java.io.File;
-
-import static org.sonatype.sisu.maven.bridge.support.ArtifactRequestBuilder.request;
+import org.sonatype.sisu.maven.bridge.MavenModelResolver;
+import com.google.common.base.Throwables;
+import com.google.inject.Binder;
 
 /**
  * Base class for Nexus Integration Tests.
@@ -43,7 +50,12 @@ public abstract class NexusITSupport
      * Artifact resolver used to resolve artifacts by Maven coordinates.
      */
     @Inject
+    @Named( "remote-artifact-resolver-using-settings" )
     private MavenArtifactResolver artifactResolver;
+
+    @Inject
+    @Named( "remote-model-resolver-using-settings" )
+    private MavenModelResolver modelResolver;
 
     /**
      * Binds a {@link TargetDirectoryResolver} to an implementation that will set the bundle target directory to a
@@ -68,6 +80,7 @@ public abstract class NexusITSupport
         };
         binder.bind( TargetDirectoryResolver.class ).annotatedWith( NexusSpecific.class ).toInstance(
             targetDirectoryResolver );
+
     }
 
     /**
@@ -128,6 +141,105 @@ public abstract class NexusITSupport
         catch ( ArtifactResolutionException e )
         {
             throw new RuntimeException( e.getMessage(), e );
+        }
+    }
+
+    /**
+     * Resolves a Nexus plugin, given its coordinates, by looking it up in dependency management section of POM in which
+     * the test resides.
+     *
+     * @param groupId    Maven group id of Nexus plugin to be resolved
+     * @param artifactId Maven artifact id of Nexus plugin to be resolved
+     * @return resolved artifact file
+     * @since 2.1
+     */
+    protected File resolvePluginFromDependencyManagement( final String groupId, final String artifactId )
+        throws RuntimeException
+    {
+        return resolveFromDependencyManagement( groupId, artifactId, "nexus-plugin", null, "zip", "bundle" );
+    }
+
+    /**
+     * Resolves a Maven artifact, given its coordinates, by looking it up in dependency management section of POM in
+     * which the test resides.
+     *
+     * @param groupId            Maven group id of artifact to be resolved
+     * @param artifactId         Maven artifact id of artifact to be resolved
+     * @param type               Maven type of artifact to be resolved. If not specified (null), type is not considered
+     *                           while finding the dependency in dependency management
+     * @param classifier         Maven classifier of artifact to be resolved. If not specified (null), classifier is not
+     *                           considered while finding the dependency in dependency management
+     * @param overrideType       an optional type to be used to override the type specified in dependency management
+     *                           (e.g nexus-plugin -> zip)
+     * @param overrideClassifier an optional classifier to override the classifier specified in dependency management
+     *                           (e.g (not specified) -> bundle)
+     * @return resolved artifact file
+     * @since 2.1
+     */
+    protected File resolveFromDependencyManagement( final String groupId,
+                                                    final String artifactId,
+                                                    final String type,
+                                                    final String classifier,
+                                                    final String overrideType,
+                                                    final String overrideClassifier )
+    {
+        try
+        {
+            final File thisProjectPom = util.resolveFile( "pom.xml" );
+            final Model model = modelResolver.resolveModel( model().pom( thisProjectPom ) );
+
+            final List<Dependency> dependencies = model.getDependencyManagement().getDependencies();
+
+            for ( Dependency dependency : dependencies )
+            {
+                if ( !dependency.getGroupId().equalsIgnoreCase( groupId ) )
+                {
+                    continue;
+                }
+                if ( !dependency.getArtifactId().equalsIgnoreCase( artifactId ) )
+                {
+                    continue;
+                }
+                if ( type != null && !dependency.getType().equals( type ) )
+                {
+                    continue;
+                }
+                if ( classifier != null && !dependency.getClassifier().equals( classifier ) )
+                {
+                    continue;
+                }
+
+                StringBuilder coordinates = new StringBuilder();
+                coordinates.append( dependency.getGroupId() );
+                coordinates.append( ":" ).append( dependency.getArtifactId() );
+
+                String rExtension = dependency.getType();
+                if ( overrideType != null )
+                {
+                    rExtension = overrideType;
+                }
+                if ( rExtension != null )
+                {
+                    coordinates.append( ":" ).append( rExtension );
+                }
+
+                String rClassifier = dependency.getClassifier();
+                if ( overrideClassifier != null )
+                {
+                    rClassifier = overrideClassifier;
+                }
+                if ( rClassifier != null )
+                {
+                    coordinates.append( ":" ).append( rClassifier );
+                }
+                coordinates.append( ":" ).append( dependency.getVersion() );
+                return resolveArtifact( coordinates.toString() );
+            }
+            throw new RuntimeException( String.format( "Dependency %s:%s was not found", groupId, artifactId ) );
+        }
+        catch ( Exception e )
+        {
+            throw Throwables.propagate( e );
         }
     }
 
