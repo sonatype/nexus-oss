@@ -22,7 +22,8 @@
     </encoder>
   </appender>
 
-  <logger name="org.apache.commons.httpclient.HttpMethodDirector" level="ERROR"/>
+  <logger name="Sisu" level="INFO"/>
+  <logger name="org.apache.commons.httpclient" level="ERROR"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>

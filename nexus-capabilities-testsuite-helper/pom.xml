@@ -23,33 +23,30 @@
     <version>2.0.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-capabilities-model</artifactId>
+  <artifactId>nexus-capabilities-testsuite-helper</artifactId>
 
-  <name>Nexus : Plugins : Capabilities : Model</name>
+  <packaging>nexus-plugin</packaging>
+
+  <name>Nexus : Plugins : Capabilities : Testsuite Helper</name>
 
   <dependencies>
     <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+      <version>2.3.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api-model</artifactId>
+      <artifactId>nexus-api</artifactId>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <version>1.4.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>3.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.3</version>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-plugin</artifactId>
+      <version>2.0.3-SNAPSHOT</version>
+      <type>${nexus.plugin.type}</type>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -57,31 +54,15 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>capabilities-rest</id>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <configuration>
-              <version>2.0.0</version>
-              <models>
-                <model>src/main/mdo/capabilities-rest.xml</model>
-              </models>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-          <useJava5>true</useJava5>
-        </configuration>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>1.5</version>
+        <extensions>true</extensions>
         <dependencies>
           <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>1.5</version>
           </dependency>
         </dependencies>
       </plugin>

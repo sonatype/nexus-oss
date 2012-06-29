@@ -10,13 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.it.nexus3699;
+package org.sonatype.nexus.plugins.capabilities.it;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -24,49 +23,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.NexusRunningITSupport;
-import org.sonatype.nexus.integrationtests.NexusRestClient;
-import org.sonatype.nexus.integrationtests.TestContext;
+import org.sonatype.nexus.client.BaseUrl;
+import org.sonatype.nexus.client.NexusClient;
+import org.sonatype.nexus.client.NexusClientFactory;
+import org.sonatype.nexus.client.UsernamePasswordAuthenticationInfo;
+import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
-import org.sonatype.nexus.plugins.capabilities.test.CapabilitiesNexusRestClient;
 
-public class Nexus3699CapabilityIT
-    extends NexusRunningITSupport
+public class CrudIT
+    extends CapabilitiesITSupport
 {
-
-    @Inject
-    @Named( "${NexusITSupport.capabilitiesPluginCoordinates}" )
-    private String capabilitiesPluginCoordinates;
-
-    @Inject
-    @Named( "${NexusITSupport.capabilitiesPluginITHelperCoordinates}" )
-    private String capabilitiesPluginITHelperCoordinates;
-
-    private static final String TEST_REPOSITORY = "releases";
-
-    private CapabilitiesNexusRestClient capabilitiesNRC;
-
-    @Override
-    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
-    {
-        return configuration.addPlugins(
-            resolveArtifact( capabilitiesPluginCoordinates ),
-            resolveArtifact( capabilitiesPluginITHelperCoordinates )
-        );
-    }
-
-    @Before
-    @Override
-    public void setUp()
-    {
-        super.setUp();
-        capabilitiesNRC = new CapabilitiesNexusRestClient( new NexusRestClient(
-            new TestContext()
-                .setNexusUrl( nexus().getUrl().toExternalForm() )
-                .setSecureTest( true )
-        ) );
-    }
 
     @Test
     public void crud()
@@ -85,12 +53,12 @@ public class Nexus3699CapabilityIT
         prop.setValue( "Testing CRUD" );
         cap.addProperty( prop );
 
-        CapabilityListItemResource r = capabilitiesNRC.create( cap );
+        CapabilityListItemResource r = capabilities().create( cap );
         assertThat( r.getId(), is( notNullValue() ) );
         assertThat( r.getStatus(), is( "<h3>I'm well. Thanx!</h3>" ) );
 
         // read
-        CapabilityResource read = capabilitiesNRC.read( r.getId() );
+        CapabilityResource read = capabilities().get( r.getId() );
         assertThat( read.getId(), is( r.getId() ) );
         assertThat( read.getNotes(), is( cap.getNotes() ) );
         assertThat( read.getTypeId(), is( cap.getTypeId() ) );
@@ -98,13 +66,13 @@ public class Nexus3699CapabilityIT
 
         // update
         read.setNotes( "updateCrudTest" );
-        CapabilityListItemResource updated = capabilitiesNRC.update( read );
+        CapabilityListItemResource updated = capabilities().update( read );
         assertThat( updated.getNotes(), is( "updateCrudTest" ) );
-        read = capabilitiesNRC.read( r.getId() );
+        read = capabilities().get( r.getId() );
         assertThat( read.getNotes(), is( "updateCrudTest" ) );
 
         // delete
-        capabilitiesNRC.delete( r.getId() );
+        capabilities().delete( r.getId() );
     }
 
 }

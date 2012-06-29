@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.model;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
@@ -37,6 +38,19 @@ public class XStreamConfigurator
         xstream.registerLocalConverter(
             CapabilityPropertyResource.class,
             "value",
+            new StringConverter()
+            {
+                @Override
+                public Object fromString( final String str )
+                {
+                    return StringEscapeUtils.unescapeHtml( str );
+                }
+            }
+        );
+
+        xstream.registerLocalConverter(
+            CapabilityListItemResource.class,
+            "status",
             new StringConverter()
             {
                 @Override

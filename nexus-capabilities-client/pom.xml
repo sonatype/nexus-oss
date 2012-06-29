@@ -23,52 +23,28 @@
     <version>2.0.3-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
-  <artifactId>nexus-capabilities-plugin-it-helper</artifactId>
-  <version>2.0.3-SNAPSHOT</version>
+  <artifactId>nexus-capabilities-client</artifactId>
 
-  <packaging>nexus-plugin</packaging>
-
-  <name>Nexus : Plugins : Capabilities : IT Helper</name>
+  <name>Nexus : Plugins : Capabilities : Client</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-      <version>2.3.0</version>
-      <scope>provided</scope>
+      <groupId>org.sonatype.nexus.client</groupId>
+      <artifactId>nexus-client</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-plugin</artifactId>
+      <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
+      <artifactId>nexus-capabilities-model</artifactId>
       <version>2.0.3-SNAPSHOT</version>
-      <type>${nexus.plugin.type}</type>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.5</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.5</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

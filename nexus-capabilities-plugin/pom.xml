@@ -28,7 +28,7 @@
 
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus : Plugins : Capabilities</name>
+  <name>Nexus : Plugins : Capabilities : Plugin</name>
   <description>Allows Nexus to define configurable capabilities</description>
 
   <properties>
