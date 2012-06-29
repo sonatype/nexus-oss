@@ -30,7 +30,7 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus.client</groupId>
-      <artifactId>nexus-client</artifactId>
+      <artifactId>nexus-client-core</artifactId>
       <version>1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
