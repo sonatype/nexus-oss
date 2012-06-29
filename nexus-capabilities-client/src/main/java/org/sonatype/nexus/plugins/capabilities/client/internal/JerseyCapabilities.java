@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.client.internal;
 
 import java.util.List;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.sonatype.nexus.client.internal.JerseyNexusClient;
 import org.sonatype.nexus.client.spi.SubsystemSupport;
@@ -25,6 +26,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResou
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.nexus.plugins.capabilities.model.XStreamConfigurator;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class JerseyCapabilities
     extends SubsystemSupport<JerseyNexusClient>
@@ -40,7 +42,15 @@ public class JerseyCapabilities
     @Override
     public List<CapabilityListItemResource> list()
     {
-        return getNexusClient().resource( "capabilities" )
+        return list( false );
+    }
+
+    @Override
+    public List<CapabilityListItemResource> list( final boolean includeHidden )
+    {
+        final MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
+        queryParams.add( "includeHidden", String.valueOf( includeHidden ) );
+        return getNexusClient().resource( "capabilities", queryParams )
             .accept( MediaType.APPLICATION_XML )
             .get( CapabilitiesListResponseResource.class )
             .getData();

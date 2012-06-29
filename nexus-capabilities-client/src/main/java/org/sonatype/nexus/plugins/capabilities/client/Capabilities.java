@@ -22,6 +22,8 @@ public interface Capabilities
 
     List<CapabilityListItemResource> list();
 
+    List<CapabilityListItemResource> list( boolean includeHidden );
+
     CapabilityResource get( String id );
 
     CapabilityListItemResource create( final CapabilityResource capability );

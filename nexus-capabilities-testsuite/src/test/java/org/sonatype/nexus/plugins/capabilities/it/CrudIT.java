@@ -13,8 +13,12 @@
 package org.sonatype.nexus.plugins.capabilities.it;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+
+import java.util.List;
 
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
@@ -51,6 +55,10 @@ public class CrudIT
         assertThat( read.getNotes(), is( cap.getNotes() ) );
         assertThat( read.getTypeId(), is( cap.getTypeId() ) );
         assertThat( read.getProperties().size(), is( cap.getProperties().size() ) );
+
+        // list
+        final List<CapabilityListItemResource> capabilities = capabilities().list();
+        assertThat( capabilities.size(), is( greaterThan( 1 ) ) );
 
         // update
         read.setNotes( "updateCrudTest" );
