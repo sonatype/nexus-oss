@@ -156,7 +156,7 @@ public abstract class NexusITSupport
     protected File resolvePluginFromDependencyManagement( final String groupId, final String artifactId )
         throws RuntimeException
     {
-        return resolveFromDependencyManagement( groupId, artifactId, "nexus-plugin", "zip", "bundle" );
+        return resolveFromDependencyManagement( groupId, artifactId, "nexus-plugin", null, "zip", "bundle" );
     }
 
     /**
@@ -165,20 +165,23 @@ public abstract class NexusITSupport
      *
      * @param groupId            Maven group id of artifact to be resolved
      * @param artifactId         Maven artifact id of artifact to be resolved
-     * @param type               Maven type of artifact to be resolved. If not specified (null), type is not considered while finding
-     *                           the dependency in dependency management
-     * @param overrideType       an optional type to be used to override the type specified in dependency management (e.g
-     *                           nexus-plugin -> zip)
+     * @param type               Maven type of artifact to be resolved. If not specified (null), type is not considered
+     *                           while finding the dependency in dependency management
+     * @param classifier         Maven classifier of artifact to be resolved. If not specified (null), classifier is not
+     *                           considered while finding the dependency in dependency management
+     * @param overrideType       an optional type to be used to override the type specified in dependency management
+     *                           (e.g nexus-plugin -> zip)
      * @param overrideClassifier an optional classifier to override the classifier specified in dependency management
      *                           (e.g (not specified) -> bundle)
      * @return resolved artifact file
      * @since 2.1
      */
-    private File resolveFromDependencyManagement( final String groupId,
-                                                  final String artifactId,
-                                                  final String type,
-                                                  final String overrideType,
-                                                  final String overrideClassifier )
+    protected File resolveFromDependencyManagement( final String groupId,
+                                                    final String artifactId,
+                                                    final String type,
+                                                    final String classifier,
+                                                    final String overrideType,
+                                                    final String overrideClassifier )
     {
         try
         {
@@ -198,6 +201,10 @@ public abstract class NexusITSupport
                     continue;
                 }
                 if ( type != null && !dependency.getType().equals( type ) )
+                {
+                    continue;
+                }
+                if ( classifier != null && !dependency.getClassifier().equals( classifier ) )
                 {
                     continue;
                 }
