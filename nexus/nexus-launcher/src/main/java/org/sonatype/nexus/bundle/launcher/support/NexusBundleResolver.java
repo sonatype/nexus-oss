@@ -57,7 +57,7 @@ public class NexusBundleResolver
      * @param artifactResolver  artifact resolver to be used to resolve the bundle
      * @param fallbackBR        An optional fallback bundle resolver to be used in case that this bundle resolver does
      *                          not resolve the bundle
-     * @since 2.0
+     * @since 2.1
      */
     @Inject
     public NexusBundleResolver( final @Nullable @Named( "${" + BUNDLE_COORDINATES + "}" ) String bundleCoordinates,

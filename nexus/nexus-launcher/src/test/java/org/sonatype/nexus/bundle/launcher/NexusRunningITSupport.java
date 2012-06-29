@@ -75,7 +75,7 @@ public abstract class NexusRunningITSupport
     }
 
     @AfterClass
-    public static void afterAllTestsWereRunning()
+    public static void afterAllTestsWereRun()
     {
         stopNexus( staticNexus );
     }
