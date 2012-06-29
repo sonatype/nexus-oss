@@ -10,10 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.rest;
+package org.sonatype.nexus.plugins.capabilities.model;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.basic.StringConverter;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
@@ -21,12 +19,14 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityReque
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
-import org.sonatype.plexus.rest.xstream.AliasingListConverter;
+import org.sonatype.nexus.rest.model.AliasingListConverter;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
 
-public class XStreamConfiguration
+public class XStreamConfigurator
 {
 
-    public static XStream applyTo( final XStream xstream )
+    public static XStream configureXStream( final XStream xstream )
     {
         xstream.processAnnotations( CapabilityRequestResource.class );
         xstream.processAnnotations( CapabilityResponseResource.class );
@@ -34,17 +34,26 @@ public class XStreamConfiguration
         xstream.processAnnotations( CapabilityStatusResponseResource.class );
         xstream.processAnnotations( CapabilityPropertyResource.class );
 
-        xstream.registerLocalConverter( CapabilityPropertyResource.class, "value", new StringConverter()
-        {
-            @Override
-            public Object fromString( final String str )
+        xstream.registerLocalConverter(
+            CapabilityPropertyResource.class,
+            "value",
+            new StringConverter()
             {
-                return StringEscapeUtils.unescapeHtml( str );
+                @Override
+                public Object fromString( final String str )
+                {
+                    return StringEscapeUtils.unescapeHtml( str );
+                }
             }
-        } );
+        );
 
-        xstream.registerLocalConverter( CapabilityResource.class, "properties", new AliasingListConverter(
-            CapabilityPropertyResource.class, "feature-property" ) );
+        xstream.registerLocalConverter(
+            CapabilityResource.class,
+            "properties",
+            new AliasingListConverter(
+                CapabilityPropertyResource.class, "feature-property"
+            )
+        );
 
         return xstream;
     }

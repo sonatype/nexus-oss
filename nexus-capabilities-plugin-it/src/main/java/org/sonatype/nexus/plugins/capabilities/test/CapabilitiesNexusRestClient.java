@@ -21,7 +21,7 @@ import java.util.List;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.sonatype.nexus.integrationtests.NexusRestClient;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.XStreamConfiguration;
+import org.sonatype.nexus.plugins.capabilities.model.XStreamConfigurator;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
@@ -42,7 +42,7 @@ public class CapabilitiesNexusRestClient
 
     static
     {
-        xstream = XStreamConfiguration.applyTo( XStreamFactory.getXmlXStream() );
+        xstream = XStreamConfigurator.configureXStream( XStreamFactory.getXmlXStream() );
     }
 
     public CapabilitiesNexusRestClient( final NexusRestClient nexusRestClient )

@@ -38,6 +38,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
+import org.sonatype.nexus.plugins.capabilities.model.XStreamConfigurator;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -66,7 +67,7 @@ public class CapabilitiesPlexusResource
     @Override
     public void configureXStream( final XStream xstream )
     {
-        XStreamConfiguration.applyTo( xstream );
+        XStreamConfigurator.configureXStream( xstream );
     }
 
     @Override

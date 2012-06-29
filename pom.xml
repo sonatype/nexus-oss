@@ -45,6 +45,7 @@
   </scm>
 
   <modules>
+    <module>nexus-capabilities-model</module>
     <module>nexus-capabilities-plugin</module>
     <module>nexus-capabilities-plugin-it</module>
     <module>nexus-capabilities-plugin-it-helper</module>
