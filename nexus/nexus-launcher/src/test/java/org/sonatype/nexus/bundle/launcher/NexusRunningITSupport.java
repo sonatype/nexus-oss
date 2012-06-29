@@ -17,7 +17,9 @@ import static org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strat
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Throwables;
@@ -48,20 +50,19 @@ public abstract class NexusRunningITSupport
 
     private static NexusStartAndStopStrategy.Strategy startAndStopStrategy = EACH_METHOD;
 
-    @Override
-    public void setUp()
+    @Before
+    public void beforeTestIsRunning()
     {
         final NexusStartAndStopStrategy strategy = getStartAndStopStrategy();
         if ( strategy != null )
         {
             startAndStopStrategy = strategy.value();
         }
-        super.setUp();
         startNexus( nexus() );
     }
 
-    @Override
-    public void tearDown()
+    @After
+    public void afterTestWasRunning()
     {
         if ( EACH_METHOD.equals( startAndStopStrategy ) )
         {
@@ -71,11 +72,10 @@ public abstract class NexusRunningITSupport
         {
             staticNexus = nexus;
         }
-        super.tearDown();
     }
 
     @AfterClass
-    public static void stopNexusIfNecessary()
+    public static void afterAllTestsWereRunning()
     {
         stopNexus( staticNexus );
     }
