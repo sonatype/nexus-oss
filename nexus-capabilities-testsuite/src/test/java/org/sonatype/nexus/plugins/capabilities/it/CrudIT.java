@@ -16,18 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.bundle.launcher.NexusRunningITSupport;
-import org.sonatype.nexus.client.BaseUrl;
-import org.sonatype.nexus.client.NexusClient;
-import org.sonatype.nexus.client.NexusClientFactory;
-import org.sonatype.nexus.client.UsernamePasswordAuthenticationInfo;
-import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
@@ -38,7 +27,6 @@ public class CrudIT
 
     @Test
     public void crud()
-        throws Exception
     {
         // create
         CapabilityResource cap = new CapabilityResource();
@@ -73,6 +61,46 @@ public class CrudIT
 
         // delete
         capabilities().delete( r.getId() );
+    }
+
+    @Test
+    public void enable()
+    {
+        final CapabilityListItemResource created = createCapability();
+        final CapabilityListItemResource enabled = capabilities().enable( created.getId() );
+
+        assertThat( enabled.isEnabled(), is( true ) );
+    }
+
+    @Test
+    public void disable()
+    {
+        final CapabilityListItemResource created = createCapability();
+        final CapabilityListItemResource enabled = capabilities().disable( created.getId() );
+
+        assertThat( enabled.isEnabled(), is( false ) );
+    }
+
+    private CapabilityListItemResource createCapability()
+    {
+        final CapabilityResource cap = new CapabilityResource();
+        cap.setNotes( "crud-test" );
+        cap.setTypeId( "TouchTest" );
+
+        {
+            final CapabilityPropertyResource prop = new CapabilityPropertyResource();
+            prop.setKey( "repoOrGroupId" );
+            prop.setValue( TEST_REPOSITORY );
+            cap.addProperty( prop );
+        }
+        {
+            final CapabilityPropertyResource prop = new CapabilityPropertyResource();
+            prop.setKey( "message" );
+            prop.setValue( "Testing CRUD" );
+            cap.addProperty( prop );
+        }
+
+        return capabilities().create( cap );
     }
 
 }

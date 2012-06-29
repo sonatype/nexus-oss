@@ -85,4 +85,20 @@ public class JerseyCapabilities
             .delete();
     }
 
+    @Override
+    public CapabilityListItemResource enable( final String id )
+    {
+        final CapabilityResource capability = get( id );
+        capability.setEnabled( true );
+        return update( capability );
+    }
+
+    @Override
+    public CapabilityListItemResource disable( final String id )
+    {
+        final CapabilityResource capability = get( id );
+        capability.setEnabled( false );
+        return update( capability );
+    }
+
 }

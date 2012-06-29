@@ -12,26 +12,22 @@
  */
 package org.sonatype.nexus.plugins.capabilities.it;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.NexusRunningITSupport;
+import org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy;
 import org.sonatype.nexus.client.BaseUrl;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusClientFactory;
 import org.sonatype.nexus.client.UsernamePasswordAuthenticationInfo;
 import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 
+@NexusStartAndStopStrategy( EACH_TEST )
 public abstract class CapabilitiesITSupport
     extends NexusRunningITSupport
 {

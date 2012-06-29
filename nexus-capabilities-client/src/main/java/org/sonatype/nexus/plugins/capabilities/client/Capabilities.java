@@ -30,4 +30,8 @@ public interface Capabilities
 
     void delete( String id );
 
+    CapabilityListItemResource enable( String id );
+
+    CapabilityListItemResource disable( String id );
+
 }
