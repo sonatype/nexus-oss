@@ -22,8 +22,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
  */
 public class MetadataUtils
 {
-    private static final String XPP3DOM_KEY = "p2.metadata.dom";
-
     private MetadataUtils()
     {
         // static utils here
@@ -42,29 +40,24 @@ public class MetadataUtils
     public static Xpp3Dom getMetadataXpp3Dom( final StorageFileItem item )
         throws IOException, XmlPullParserException
     {
-        if ( item.getItemContext().containsKey( XPP3DOM_KEY ) )
+        // TODO: if we ever want to have the DOM reused, this method could put the parsed DOM
+        // into item context (to not have it reparsed). For now, this call always parses as
+        // currently we'd go rather to P2 "eat CPU" then "eat heap", as P2 metadata DOM
+        // objects might get very large
+        final Xpp3Dom dom;
+        if ( item.getName().endsWith( ".jar" ) )
         {
-            return (Xpp3Dom) item.getItemContext().get( XPP3DOM_KEY );
+            dom = parseJarItem( item, item.getName().replace( ".jar", ".xml" ) );
+        }
+        else if ( item.getName().endsWith( ".xml" ) )
+        {
+            dom = parseXmlItem( item );
         }
         else
         {
-            final Xpp3Dom dom;
-            if ( item.getName().endsWith( ".jar" ) )
-            {
-                dom = parseJarItem( item, item.getName().replace( ".jar", ".xml" ) );
-            }
-            else if ( item.getName().endsWith( ".xml" ) )
-            {
-                dom = parseXmlItem( item );
-            }
-            else
-            {
-                throw new IOException( "Cannot parse the DOM for metadata in item " + item.getRepositoryItemUid() );
-            }
-            // TODO: we do not put it, to get it GCed after consumed
-            // item.getItemContext().put( XPP3DOM_KEY, dom );
-            return dom;
+            throw new IOException( "Cannot parse the DOM for metadata in item " + item.getRepositoryItemUid() );
         }
+        return dom;
     }
 
     // ==
