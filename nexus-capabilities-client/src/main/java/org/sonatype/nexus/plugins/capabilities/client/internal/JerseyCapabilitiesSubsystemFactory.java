@@ -12,14 +12,14 @@
  */
 package org.sonatype.nexus.plugins.capabilities.client.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.client.Condition;
-import org.sonatype.nexus.client.internal.JerseyNexusClient;
+import org.sonatype.nexus.client.core.Condition;
+import org.sonatype.nexus.client.rest.internal.JerseyNexusClient;
 import org.sonatype.nexus.client.spi.SubsystemFactory;
 import org.sonatype.nexus.client.support.condition.NexusStatusConditions;
 import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * TODO
@@ -29,25 +29,21 @@ import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
 @Named
 @Singleton
 public class JerseyCapabilitiesSubsystemFactory
-    implements SubsystemFactory<Capabilities, JerseyNexusClient>
-{
+        implements SubsystemFactory<Capabilities, JerseyNexusClient> {
 
     @Override
-    public Condition availableWhen()
-    {
+    public Condition availableWhen() {
         return NexusStatusConditions.any20AndLater();
     }
 
     @Override
-    public Class<Capabilities> getType()
-    {
+    public Class<Capabilities> getType() {
         return Capabilities.class;
     }
 
     @Override
-    public Capabilities create( final JerseyNexusClient nexusClient )
-    {
-        return new JerseyCapabilities( nexusClient );
+    public Capabilities create(final JerseyNexusClient nexusClient) {
+        return new JerseyCapabilities(nexusClient);
     }
 
 }

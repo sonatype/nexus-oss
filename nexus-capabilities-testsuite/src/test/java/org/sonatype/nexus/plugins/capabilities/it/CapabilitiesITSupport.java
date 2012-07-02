@@ -12,29 +12,28 @@
  */
 package org.sonatype.nexus.plugins.capabilities.it;
 
-import static org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_TEST;
-
-import java.io.File;
-import javax.inject.Inject;
-
+import com.google.inject.Binder;
+import com.google.inject.name.Names;
 import org.junit.Before;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.NexusRunningITSupport;
 import org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
-import org.sonatype.nexus.client.BaseUrl;
-import org.sonatype.nexus.client.NexusClient;
-import org.sonatype.nexus.client.NexusClientFactory;
-import org.sonatype.nexus.client.UsernamePasswordAuthenticationInfo;
+import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.client.rest.NexusClientFactory;
+import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
-import com.google.inject.Binder;
-import com.google.inject.name.Names;
 
-@NexusStartAndStopStrategy( EACH_TEST )
+import javax.inject.Inject;
+import java.io.File;
+
+import static org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_TEST;
+import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
+
+@NexusStartAndStopStrategy(EACH_TEST)
 public abstract class CapabilitiesITSupport
-    extends NexusRunningITSupport
-{
+        extends NexusRunningITSupport {
 
     protected static final String TEST_REPOSITORY = "releases";
 
@@ -44,52 +43,46 @@ public abstract class CapabilitiesITSupport
     private NexusClient nexusClient;
 
     @Override
-    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
-    {
+    protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
         return configuration.addPlugins(
-            resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
-            ),
-            resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins.capabilities",
-                "nexus-capabilities-testsuite-helper"
-            )
+                resolvePluginFromDependencyManagement(
+                        "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
+                ),
+                resolvePluginFromDependencyManagement(
+                        "org.sonatype.nexus.plugins.capabilities",
+                        "nexus-capabilities-testsuite-helper"
+                )
         );
     }
 
     @Override
-    public void configure( final Binder binder )
-    {
-        super.configure( binder );
+    public void configure(final Binder binder) {
+        super.configure(binder);
         binder
-            .bind( BundleResolver.class )
-            .annotatedWith( Names.named( NexusBundleResolver.FALLBACK_NEXUS_BUNDLE_RESOLVER ) )
-            .toInstance(
-                new BundleResolver()
-                {
-                    @Override
-                    public File resolve()
-                    {
-                        return resolveFromDependencyManagement(
-                            "org.sonatype.nexus", "nexus-oss-webapp", null, null, null, null
-                        );
-                    }
-                }
-            );
+                .bind(BundleResolver.class)
+                .annotatedWith(Names.named(NexusBundleResolver.FALLBACK_NEXUS_BUNDLE_RESOLVER))
+                .toInstance(
+                        new BundleResolver() {
+                            @Override
+                            public File resolve() {
+                                return resolveFromDependencyManagement(
+                                        "org.sonatype.nexus", "nexus-oss-webapp", null, null, null, null
+                                );
+                            }
+                        }
+                );
     }
 
     @Before
-    public void createNexusClient()
-    {
+    public void createNexusClient() {
         nexusClient = nexusClientFactory.createFor(
-            BaseUrl.create( nexus().getUrl() ),
-            new UsernamePasswordAuthenticationInfo( "admin", "admin123" )
+                baseUrlFrom(nexus().getUrl()),
+                new UsernamePasswordAuthenticationInfo("admin", "admin123")
         );
     }
 
-    protected Capabilities capabilities()
-    {
-        return nexusClient.getSubsystem( Capabilities.class );
+    protected Capabilities capabilities() {
+        return nexusClient.getSubsystem(Capabilities.class);
     }
 
 }
