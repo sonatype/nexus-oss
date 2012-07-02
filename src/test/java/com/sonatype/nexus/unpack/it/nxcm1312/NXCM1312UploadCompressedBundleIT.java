@@ -30,11 +30,13 @@ import com.sonatype.nexus.unpack.it.AbstractUnpackIT;
 public class NXCM1312UploadCompressedBundleIT
     extends AbstractUnpackIT
 {
-
     @Test
     public void upload()
         throws Exception
     {
+        // this one test DOES depend on indexing, so we must enable it
+        setIndexingEnabled( true );
+
         getDeployUtils().deployWithWagon(
             "http",
             nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO + "/content-compressed",
@@ -131,7 +133,7 @@ public class NXCM1312UploadCompressedBundleIT
     protected void validateBundleUpload( boolean checkForPresence, String... presentRootDirectories )
         throws Exception
     {
-        File repositoryRootDirectory = new File( nexusWorkDir, "storage/nexus-test-harness-repo" );
+        File repositoryRootDirectory = new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO );
 
         for ( String presentRootDirectory : presentRootDirectories )
         {

@@ -42,8 +42,9 @@ public class NXCM1312UploadExpiredLicenseIT
     {
         try
         {
-            getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
-                + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "license" );
+            getDeployUtils().deployWithWagon( "http",
+                nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO + "/content-compressed",
+                getTestFile( "bundle.zip" ), "license" );
             fail( "License should be expired" );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
@@ -51,7 +52,7 @@ public class NXCM1312UploadExpiredLicenseIT
             Assert.assertTrue( e.getMessage().contains( "402" ) );
         }
 
-        File root = new File( nexusWorkDir, "storage/nexus-test-harness-repo/license" );
+        File root = new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO + "/license" );
         Assert.assertFalse( root.exists() );
     }
 

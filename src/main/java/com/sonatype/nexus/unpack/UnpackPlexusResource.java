@@ -88,7 +88,7 @@ public class UnpackPlexusResource
     public PathProtectionDescriptor getResourceProtection()
     {
         return new PathProtectionDescriptor( "/repositories/*/content-compressed/**",
-                                             "contentAuthcBasic,perms[nexus:contentcompressed]" );
+            "contentAuthcBasic,perms[nexus:contentcompressed]" );
     }
 
     @Override
@@ -110,7 +110,8 @@ public class UnpackPlexusResource
     @Override
     @POST
     @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, queryParams = { @QueryParam( DELETE_BEFORE_UNPACK ) } )
-    public Object upload( Context context, Request request, Response response, List<FileItem> files )
+    public Object upload( final Context context, final Request request, final Response response,
+                          final List<FileItem> files )
         throws ResourceException
     {
         try
@@ -124,13 +125,11 @@ public class UnpackPlexusResource
 
         try
         {
-            Repository repository = getResourceStore( request );
+            final Repository repository = getResourceStore( request );
+            final String basePath = getResourceStorePath( request );
 
-            String basePath = getResourceStorePath( request );
-
-            Form form = request.getResourceRef().getQueryAsForm();
-
-            boolean delete = form.getFirst( DELETE_BEFORE_UNPACK ) != null;
+            final Form form = request.getResourceRef().getQueryAsForm();
+            final boolean delete = form.getFirst( DELETE_BEFORE_UNPACK ) != null;
 
             if ( basePath.toLowerCase().endsWith( ".md5" ) || basePath.toLowerCase().endsWith( ".sha1" ) )
             {
@@ -142,8 +141,7 @@ public class UnpackPlexusResource
             {
                 try
                 {
-                    StorageItem item = repository.retrieveItem( getResourceStoreRequest( request, basePath ) );
-
+                    final StorageItem item = repository.retrieveItem( getResourceStoreRequest( request, basePath ) );
                     deleteItem( repository, item );
                 }
                 catch ( ItemNotFoundException e )
@@ -152,32 +150,27 @@ public class UnpackPlexusResource
                 }
             }
 
-            for ( FileItem fileItem : files )
+            for ( final FileItem fileItem : files )
             {
-                File tempFile = File.createTempFile( "unzip", ".zip" );
+                final File tempFile = File.createTempFile( "unzip", ".zip" );
                 try
                 {
                     copyToFile( fileItem, tempFile );
-
-                    ZipFile zip = new ZipFile( tempFile );
+                    final ZipFile zip = new ZipFile( tempFile );
                     try
                     {
-                        Enumeration<? extends ZipEntry> entries = zip.entries();
-
+                        final Enumeration<? extends ZipEntry> entries = zip.entries();
                         while ( entries.hasMoreElements() )
                         {
-                            ZipEntry entry = entries.nextElement();
-
+                            final ZipEntry entry = entries.nextElement();
                             if ( entry.getName().endsWith( "/" ) )
                             {
                                 // must be a folder
                                 continue;
                             }
-
-                            ResourceStoreRequest storeRequest =
+                            final ResourceStoreRequest storeRequest =
                                 getResourceStoreRequest( request, basePath + "/" + entry.getName() );
-
-                            InputStream is = zip.getInputStream( entry );
+                            final InputStream is = zip.getInputStream( entry );
                             try
                             {
                                 repository.storeItem( storeRequest, is, null );
@@ -203,7 +196,6 @@ public class UnpackPlexusResource
         {
             handleException( request, response, t );
         }
-
         return null;
     }
 
@@ -213,7 +205,8 @@ public class UnpackPlexusResource
      */
     @PUT
     @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, queryParams = { @QueryParam( DELETE_BEFORE_UNPACK ) } )
-    public Object uploadPut( Context context, Request request, Response response, List<FileItem> files )
+    public Object uploadPut( final Context context, final Request request, final Response response,
+                             final List<FileItem> files )
         throws ResourceException
     {
         // NOTE: this method is only used to get the annotation processing to work correctly
@@ -221,14 +214,14 @@ public class UnpackPlexusResource
         return this.upload( context, request, response, files );
     }
 
-    private void deleteItem( Repository repository, StorageItem item )
+    private void deleteItem( final Repository repository, final StorageItem item )
         throws AccessDeniedException, StorageException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, UnsupportedStorageOperationException
     {
         repository.deleteItem( item.getResourceStoreRequest() );
     }
 
-    private void close( ZipFile zip )
+    private void close( final ZipFile zip )
     {
         try
         {
@@ -240,7 +233,7 @@ public class UnpackPlexusResource
         }
     }
 
-    private void copyToFile( FileItem source, File target )
+    private void copyToFile( final FileItem source, final File target )
         throws IOException
     {
         InputStream is = source.getInputStream();
@@ -255,13 +248,12 @@ public class UnpackPlexusResource
     }
 
     @Override
-    protected Repository getResourceStore( Request request )
+    protected Repository getResourceStore( final Request request )
         throws NoSuchResourceStoreException, ResourceException
     {
-        String repoId = request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString();
-
-        Repository repository = getUnprotectedRepositoryRegistry().getRepository( repoId );
-
+        final String repoId =
+            request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString();
+        final Repository repository = getUnprotectedRepositoryRegistry().getRepository( repoId );
         return repository;
     }
 }
