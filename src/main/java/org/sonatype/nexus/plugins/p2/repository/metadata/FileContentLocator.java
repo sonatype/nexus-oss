@@ -31,7 +31,11 @@ import com.google.common.base.Preconditions;
  * 
  * @author cstamas
  * @since 2.2
+ * @deprecated Here only to provide solution to memory use problem, but this same class is available in Nexus Core since
+ *             version 2.1! Hence, once the P2 is bumped to 2.1+ version of Nexus Core, this class should be removed,
+ *             but during that period, it's marked as deprecated to stop it's proliferation in codebase.
  */
+@Deprecated
 public class FileContentLocator
     implements ContentLocator
 {
