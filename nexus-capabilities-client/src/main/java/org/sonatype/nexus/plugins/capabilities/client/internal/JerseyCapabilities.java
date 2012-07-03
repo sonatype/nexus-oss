@@ -12,88 +12,103 @@
  */
 package org.sonatype.nexus.plugins.capabilities.client.internal;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import org.sonatype.nexus.client.rest.internal.JerseyNexusClient;
-import org.sonatype.nexus.client.spi.SubsystemSupport;
-import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.*;
-import org.sonatype.nexus.plugins.capabilities.model.XStreamConfigurator;
-
+import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import java.util.List;
+
+import org.sonatype.nexus.client.core.spi.SubsystemSupport;
+import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
+import org.sonatype.nexus.plugins.capabilities.model.XStreamConfigurator;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class JerseyCapabilities
-        extends SubsystemSupport<JerseyNexusClient>
-        implements Capabilities {
+    extends SubsystemSupport<JerseyNexusClient>
+    implements Capabilities
+{
 
-    public JerseyCapabilities(JerseyNexusClient nexusClient) {
-        super(nexusClient);
-        XStreamConfigurator.configureXStream(nexusClient.getXStream());
+    public JerseyCapabilities( JerseyNexusClient nexusClient )
+    {
+        super( nexusClient );
+        XStreamConfigurator.configureXStream( nexusClient.getXStream() );
     }
 
     @Override
-    public List<CapabilityListItemResource> list() {
-        return list(false);
+    public List<CapabilityListItemResource> list()
+    {
+        return list( false );
     }
 
     @Override
-    public List<CapabilityListItemResource> list(final boolean includeHidden) {
+    public List<CapabilityListItemResource> list( final boolean includeHidden )
+    {
         final MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
-        queryParams.add("includeHidden", String.valueOf(includeHidden));
-        return getNexusClient().resource("capabilities", queryParams)
-                .accept(MediaType.APPLICATION_XML)
-                .get(CapabilitiesListResponseResource.class)
-                .getData();
+        queryParams.add( "includeHidden", String.valueOf( includeHidden ) );
+        return getNexusClient().resource( "capabilities", queryParams )
+            .accept( MediaType.APPLICATION_XML )
+            .get( CapabilitiesListResponseResource.class )
+            .getData();
     }
 
     @Override
-    public CapabilityResource get(final String id) {
-        return getNexusClient().resource("capabilities/" + id)
-                .accept(MediaType.APPLICATION_XML)
-                .get(CapabilityResponseResource.class)
-                .getData();
+    public CapabilityResource get( final String id )
+    {
+        return getNexusClient().resource( "capabilities/" + id )
+            .accept( MediaType.APPLICATION_XML )
+            .get( CapabilityResponseResource.class )
+            .getData();
     }
 
     @Override
-    public CapabilityListItemResource create(final CapabilityResource capability) {
+    public CapabilityListItemResource create( final CapabilityResource capability )
+    {
         final CapabilityRequestResource envelope = new CapabilityRequestResource();
-        envelope.setData(capability);
-        return getNexusClient().resource("capabilities")
-                .type(MediaType.APPLICATION_XML)
-                .post(CapabilityStatusResponseResource.class, envelope)
-                .getData();
+        envelope.setData( capability );
+        return getNexusClient().resource( "capabilities" )
+            .type( MediaType.APPLICATION_XML )
+            .post( CapabilityStatusResponseResource.class, envelope )
+            .getData();
     }
 
     @Override
-    public CapabilityListItemResource update(final CapabilityResource capability) {
+    public CapabilityListItemResource update( final CapabilityResource capability )
+    {
         final CapabilityRequestResource envelope = new CapabilityRequestResource();
-        envelope.setData(capability);
-        return getNexusClient().resource("capabilities/" + capability.getId())
-                .type(MediaType.APPLICATION_XML)
-                .put(CapabilityStatusResponseResource.class, envelope)
-                .getData();
+        envelope.setData( capability );
+        return getNexusClient().resource( "capabilities/" + capability.getId() )
+            .type( MediaType.APPLICATION_XML )
+            .put( CapabilityStatusResponseResource.class, envelope )
+            .getData();
     }
 
     @Override
-    public void delete(final String id) {
-        getNexusClient().resource("capabilities/" + id)
-                .accept(MediaType.APPLICATION_XML)
-                .delete();
+    public void delete( final String id )
+    {
+        getNexusClient().resource( "capabilities/" + id )
+            .accept( MediaType.APPLICATION_XML )
+            .delete();
     }
 
     @Override
-    public CapabilityListItemResource enable(final String id) {
-        final CapabilityResource capability = get(id);
-        capability.setEnabled(true);
-        return update(capability);
+    public CapabilityListItemResource enable( final String id )
+    {
+        final CapabilityResource capability = get( id );
+        capability.setEnabled( true );
+        return update( capability );
     }
 
     @Override
-    public CapabilityListItemResource disable(final String id) {
-        final CapabilityResource capability = get(id);
-        capability.setEnabled(false);
-        return update(capability);
+    public CapabilityListItemResource disable( final String id )
+    {
+        final CapabilityResource capability = get( id );
+        capability.setEnabled( false );
+        return update( capability );
     }
 
 }
