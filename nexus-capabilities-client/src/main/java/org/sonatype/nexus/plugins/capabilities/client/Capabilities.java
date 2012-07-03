@@ -17,23 +17,74 @@ import java.util.List;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 
+/**
+ * Capabilities Nexus client.
+ *
+ * @since 2.1
+ */
 public interface Capabilities
 {
 
+    /**
+     * Retrieve all non hidden capabilities.
+     *
+     * @return all non hidden capabilities
+     */
     List<CapabilityListItemResource> list();
 
+    /**
+     * Retrieve all capabilities.
+     *
+     * @param includeHidden whether or not hidden capabilities should be included
+     * @return all capabilities
+     */
     List<CapabilityListItemResource> list( boolean includeHidden );
 
+    /**
+     * Retrieve a capability given its id.
+     *
+     * @param id of capability to be retrieved
+     * @return capability with given id
+     */
     CapabilityResource get( String id );
 
+    /**
+     * Creates a new capability.
+     *
+     * @param capability to be created
+     * @return created capability
+     */
     CapabilityListItemResource create( final CapabilityResource capability );
 
+    /**
+     * Updates a capability.
+     *
+     * @param capability to be updated
+     * @return updated capability
+     */
     CapabilityListItemResource update( CapabilityResource capability );
 
+    /**
+     * Deletes a capability.
+     *
+     * @param id of capability to be deleted
+     */
     void delete( String id );
 
+    /**
+     * Enables a capability.
+     *
+     * @param id of capability to be enabled
+     * @return enabled capability
+     */
     CapabilityListItemResource enable( String id );
 
+    /**
+     * Disables a capability.
+     *
+     * @param id of capability to be disabled
+     * @return disabled capability
+     */
     CapabilityListItemResource disable( String id );
 
 }
