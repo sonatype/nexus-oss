@@ -38,6 +38,7 @@ import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -123,6 +124,7 @@ public abstract class AbstractNexus1923
         repoUtils.createRepository( resource );
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     protected void createProxyRepository()
@@ -143,6 +145,7 @@ public abstract class AbstractNexus1923
         repoUtils.createRepository( resource );
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     protected void createSecondHostedRepository()
@@ -158,6 +161,7 @@ public abstract class AbstractNexus1923
         repoUtils.createRepository( resource );
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     protected void createThirdHostedRepository()
@@ -172,6 +176,7 @@ public abstract class AbstractNexus1923
         repoUtils.createRepository( resource );
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     protected void createGroup( String groupId, String... repoIds )
@@ -194,6 +199,7 @@ public abstract class AbstractNexus1923
         groupUtils.createGroup( group );
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     protected String createReindexTask( String repositoryId, String taskName )
@@ -249,6 +255,7 @@ public abstract class AbstractNexus1923
         TaskScheduleUtil.run( taskId );
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     protected void reindexHostedRepository( String taskId )
