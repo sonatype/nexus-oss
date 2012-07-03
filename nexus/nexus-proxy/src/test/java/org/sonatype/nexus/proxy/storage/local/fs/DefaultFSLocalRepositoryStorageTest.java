@@ -29,6 +29,7 @@ import java.util.List;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -75,11 +76,12 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         List<File> invalidFileCollection = new ArrayList<File>( Arrays.asList( invalidDir.listFiles() ) );
         invalidFileCollection.add( new File( invalidDir, "missing.txt") );
 
-
         // Mocks
         Wastebasket wastebasket = mock( Wastebasket.class );
         LinkPersister linkPersister = mock( LinkPersister.class );
         MimeSupport mimeUtil = mock( MimeSupport.class );
+        when( mimeUtil.guessMimeTypeFromPath( Mockito.any( MimeRulesSource.class ), Mockito.anyString() ) ).thenReturn(
+            "text/plain" );
 
         // Mock FSPeer to return the results created above
         FSPeer fsPeer = mock( FSPeer.class );
