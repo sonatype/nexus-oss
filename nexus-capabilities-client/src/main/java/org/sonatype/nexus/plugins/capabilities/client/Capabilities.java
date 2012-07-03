@@ -49,12 +49,12 @@ public interface Capabilities
     CapabilityResource get( String id );
 
     /**
-     * Creates a new capability.
+     * Adds a new capability.
      *
-     * @param capability to be created
-     * @return created capability
+     * @param capability to be added
+     * @return added capability
      */
-    CapabilityListItemResource create( final CapabilityResource capability );
+    CapabilityListItemResource add( final CapabilityResource capability );
 
     /**
      * Updates a capability.

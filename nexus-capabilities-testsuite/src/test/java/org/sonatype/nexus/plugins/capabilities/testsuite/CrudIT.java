@@ -44,7 +44,7 @@ public class CrudIT
         prop.setValue( "Testing CRUD" );
         cap.addProperty( prop );
 
-        CapabilityListItemResource r = capabilities().create( cap );
+        CapabilityListItemResource r = capabilities().add( cap );
         assertThat( r.getId(), is( notNullValue() ) );
         assertThat( r.getStatus(), is( "<h3>I'm well. Thanx!</h3>" ) );
 
@@ -107,7 +107,7 @@ public class CrudIT
             cap.addProperty( prop );
         }
 
-        return capabilities().create( cap );
+        return capabilities().add( cap );
     }
 
 }

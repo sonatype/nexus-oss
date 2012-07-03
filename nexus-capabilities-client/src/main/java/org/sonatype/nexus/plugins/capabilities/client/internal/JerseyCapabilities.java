@@ -66,7 +66,7 @@ public class JerseyCapabilities
     }
 
     @Override
-    public CapabilityListItemResource create( final CapabilityResource capability )
+    public CapabilityListItemResource add( final CapabilityResource capability )
     {
         final CapabilityRequestResource envelope = new CapabilityRequestResource();
         envelope.setData( capability );
