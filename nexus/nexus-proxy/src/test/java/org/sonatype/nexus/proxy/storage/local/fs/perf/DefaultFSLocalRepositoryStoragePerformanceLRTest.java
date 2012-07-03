@@ -26,7 +26,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.MethodRule;
+import org.mockito.Mockito;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -90,6 +92,8 @@ public class DefaultFSLocalRepositoryStoragePerformanceLRTest
         Wastebasket wastebasket = mock( Wastebasket.class );
         LinkPersister linkPersister = mock( LinkPersister.class );
         MimeSupport mimeSupport = mock( MimeSupport.class );
+        when( mimeSupport.guessMimeTypeFromPath( Mockito.any( MimeRulesSource.class ), Mockito.anyString() ) ).thenReturn(
+            "text/plain" );
 
         // Application Config
         applicationConfiguration = mock( ApplicationConfiguration.class );
