@@ -28,6 +28,11 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatu
 import org.sonatype.nexus.plugins.capabilities.model.XStreamConfigurator;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+/**
+ * Jersey based Capabilities Nexus Client Subsystem implementation.
+ *
+ * @since 2.1
+ */
 public class JerseyCapabilities
     extends SubsystemSupport<JerseyNexusClient>
     implements Capabilities
@@ -50,7 +55,7 @@ public class JerseyCapabilities
     {
         final MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
         queryParams.add( "includeHidden", String.valueOf( includeHidden ) );
-        return getNexusClient().resource( "capabilities", queryParams )
+        return getNexusClient().serviceResource( "capabilities", queryParams )
             .accept( MediaType.APPLICATION_XML )
             .get( CapabilitiesListResponseResource.class )
             .getData();
@@ -59,7 +64,7 @@ public class JerseyCapabilities
     @Override
     public CapabilityResource get( final String id )
     {
-        return getNexusClient().resource( "capabilities/" + id )
+        return getNexusClient().serviceResource( "capabilities/" + id )
             .accept( MediaType.APPLICATION_XML )
             .get( CapabilityResponseResource.class )
             .getData();
@@ -70,7 +75,7 @@ public class JerseyCapabilities
     {
         final CapabilityRequestResource envelope = new CapabilityRequestResource();
         envelope.setData( capability );
-        return getNexusClient().resource( "capabilities" )
+        return getNexusClient().serviceResource( "capabilities" )
             .type( MediaType.APPLICATION_XML )
             .post( CapabilityStatusResponseResource.class, envelope )
             .getData();
@@ -81,7 +86,7 @@ public class JerseyCapabilities
     {
         final CapabilityRequestResource envelope = new CapabilityRequestResource();
         envelope.setData( capability );
-        return getNexusClient().resource( "capabilities/" + capability.getId() )
+        return getNexusClient().serviceResource( "capabilities/" + capability.getId() )
             .type( MediaType.APPLICATION_XML )
             .put( CapabilityStatusResponseResource.class, envelope )
             .getData();
@@ -90,7 +95,7 @@ public class JerseyCapabilities
     @Override
     public void delete( final String id )
     {
-        getNexusClient().resource( "capabilities/" + id )
+        getNexusClient().serviceResource( "capabilities/" + id )
             .accept( MediaType.APPLICATION_XML )
             .delete();
     }

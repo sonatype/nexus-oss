@@ -23,9 +23,9 @@ import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
 import org.sonatype.nexus.plugins.capabilities.client.internal.JerseyCapabilities;
 
 /**
- * TODO
+ * Jersey based Capabilities Nexus Client Subsystem factory.
  *
- * @since 1.0
+ * @since 2.1
  */
 @Named
 @Singleton

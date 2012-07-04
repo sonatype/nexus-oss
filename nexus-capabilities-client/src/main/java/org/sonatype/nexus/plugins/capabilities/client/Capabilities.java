@@ -18,7 +18,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListI
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 
 /**
- * Capabilities Nexus client.
+ * Capabilities Nexus Client Subsystem.
  *
  * @since 2.1
  */
