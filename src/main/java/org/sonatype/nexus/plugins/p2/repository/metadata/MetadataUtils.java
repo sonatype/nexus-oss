@@ -7,6 +7,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -72,7 +73,7 @@ public class MetadataUtils
         }
         finally
         {
-            is.close();
+            IOUtil.close( is );
         }
     }
 
@@ -104,7 +105,7 @@ public class MetadataUtils
             }
             finally
             {
-                is.close();
+                IOUtil.close( is );
             }
         }
         finally

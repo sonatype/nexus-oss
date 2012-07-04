@@ -30,7 +30,6 @@ import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts;
 import org.sonatype.nexus.plugins.p2.repository.metadata.ArtifactsMerge;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataMergeException;
-import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 public class MetadataMergeTest
@@ -42,17 +41,15 @@ public class MetadataMergeTest
         final ArrayList<Artifacts> repos =
             loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2.xml" } );
 
-        final RequestContext context1 = new RequestContext();
-        context1.put( "p2.metadata.dom", repos.get( 0 ).getDom() );
         final StorageFileItem item1 = Mockito.mock( StorageFileItem.class );
         Mockito.when( item1.getName() ).thenReturn( "artifact.xml" );
-        Mockito.when( item1.getItemContext() ).thenReturn( context1 );
+        Mockito.when( item1.getInputStream() ).thenReturn(
+            new FileInputStream( new File( "src/test/resources", "metadata/merge/artifact1.xml" ) ) );
 
-        final RequestContext context2 = new RequestContext();
-        context2.put( "p2.metadata.dom", repos.get( 1 ).getDom() );
         final StorageFileItem item2 = Mockito.mock( StorageFileItem.class );
         Mockito.when( item2.getName() ).thenReturn( "artifact.xml" );
-        Mockito.when( item2.getItemContext() ).thenReturn( context2 );
+        Mockito.when( item2.getInputStream() ).thenReturn(
+            new FileInputStream( new File( "src/test/resources", "metadata/merge/artifact2.xml" ) ) );
 
         // sanity check
         Assert.assertEquals( 2, repos.get( 0 ).getArtifacts().size() );
@@ -73,17 +70,19 @@ public class MetadataMergeTest
         final ArrayList<Artifacts> repos =
             loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2props.xml" } );
 
-        final RequestContext context1 = new RequestContext();
-        context1.put( "p2.metadata.dom", repos.get( 0 ).getDom() );
         final StorageFileItem item1 = Mockito.mock( StorageFileItem.class );
         Mockito.when( item1.getName() ).thenReturn( "artifact.xml" );
-        Mockito.when( item1.getItemContext() ).thenReturn( context1 );
+        Mockito.when( item1.getInputStream() ).thenReturn(
+            new FileInputStream( new File( "src/test/resources", "metadata/merge/artifact1.xml" ) ) );
 
-        final RequestContext context2 = new RequestContext();
-        context2.put( "p2.metadata.dom", repos.get( 1 ).getDom() );
         final StorageFileItem item2 = Mockito.mock( StorageFileItem.class );
         Mockito.when( item2.getName() ).thenReturn( "artifact.xml" );
-        Mockito.when( item2.getItemContext() ).thenReturn( context2 );
+        Mockito.when( item2.getInputStream() ).thenReturn(
+            new FileInputStream( new File( "src/test/resources", "metadata/merge/artifact2props.xml" ) ) );
+
+        // sanity check
+        Assert.assertEquals( 2, repos.get( 0 ).getArtifacts().size() );
+        Assert.assertEquals( 1, repos.get( 1 ).getArtifacts().size() );
 
         final ArtifactsMerge m = new ArtifactsMerge();
 
@@ -105,17 +104,19 @@ public class MetadataMergeTest
         final ArrayList<Artifacts> repos =
             loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2mappins.xml" } );
 
-        final RequestContext context1 = new RequestContext();
-        context1.put( "p2.metadata.dom", repos.get( 0 ).getDom() );
         final StorageFileItem item1 = Mockito.mock( StorageFileItem.class );
         Mockito.when( item1.getName() ).thenReturn( "artifact.xml" );
-        Mockito.when( item1.getItemContext() ).thenReturn( context1 );
+        Mockito.when( item1.getInputStream() ).thenReturn(
+            new FileInputStream( new File( "src/test/resources", "metadata/merge/artifact1.xml" ) ) );
 
-        final RequestContext context2 = new RequestContext();
-        context2.put( "p2.metadata.dom", repos.get( 1 ).getDom() );
         final StorageFileItem item2 = Mockito.mock( StorageFileItem.class );
         Mockito.when( item2.getName() ).thenReturn( "artifact.xml" );
-        Mockito.when( item2.getItemContext() ).thenReturn( context2 );
+        Mockito.when( item2.getInputStream() ).thenReturn(
+            new FileInputStream( new File( "src/test/resources", "metadata/merge/artifact2mappins.xml" ) ) );
+
+        // sanity check
+        Assert.assertEquals( 2, repos.get( 0 ).getArtifacts().size() );
+        Assert.assertEquals( 1, repos.get( 1 ).getArtifacts().size() );
 
         final ArtifactsMerge m = new ArtifactsMerge();
 
@@ -137,20 +138,15 @@ public class MetadataMergeTest
     public void mergeContentMetadata()
         throws Exception
     {
-        final ArrayList<Content> repos =
-            loadContentMetadata( new String[] { "metadata/merge/content1.xml", "metadata/merge/content2.xml" } );
-
-        final RequestContext context1 = new RequestContext();
-        context1.put( "p2.metadata.dom", repos.get( 0 ).getDom() );
         final StorageFileItem item1 = Mockito.mock( StorageFileItem.class );
-        Mockito.when( item1.getName() ).thenReturn( "artifact.xml" );
-        Mockito.when( item1.getItemContext() ).thenReturn( context1 );
+        Mockito.when( item1.getName() ).thenReturn( "content.xml" );
+        Mockito.when( item1.getInputStream() ).thenReturn(
+            new FileInputStream( new File( "src/test/resources", "metadata/merge/content1.xml" ) ) );
 
-        final RequestContext context2 = new RequestContext();
-        context2.put( "p2.metadata.dom", repos.get( 1 ).getDom() );
         final StorageFileItem item2 = Mockito.mock( StorageFileItem.class );
-        Mockito.when( item2.getName() ).thenReturn( "artifact.xml" );
-        Mockito.when( item2.getItemContext() ).thenReturn( context2 );
+        Mockito.when( item2.getName() ).thenReturn( "content.xml" );
+        Mockito.when( item2.getInputStream() ).thenReturn(
+            new FileInputStream( new File( "src/test/resources", "metadata/merge/content2.xml" ) ) );
 
         final ArtifactsMerge m = new ArtifactsMerge();
 
@@ -168,17 +164,6 @@ public class MetadataMergeTest
         for ( final String file : files )
         {
             repos.add( new Artifacts( loadXpp3Dom( file ) ) );
-        }
-        return repos;
-    }
-
-    private ArrayList<Content> loadContentMetadata( final String[] files )
-        throws IOException, XmlPullParserException
-    {
-        final ArrayList<Content> repos = new ArrayList<Content>();
-        for ( final String file : files )
-        {
-            repos.add( new Content( loadXpp3Dom( file ) ) );
         }
         return repos;
     }
