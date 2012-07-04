@@ -15,22 +15,16 @@ package org.sonatype.security.realms.tools;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 
-@SuppressWarnings( "serial" )
 public class EnhancedConfiguration
-    extends Configuration
 {
     private final Configuration delegate;
 
@@ -45,7 +39,6 @@ public class EnhancedConfiguration
 
     // ==
 
-    @Override
     public void addPrivilege( final CPrivilege cPrivilege )
     {
         final CPrivilege cp = cPrivilege.clone();
@@ -53,7 +46,6 @@ public class EnhancedConfiguration
         id2privileges.put( cp.getId(), cp );
     }
 
-    @Override
     public void addRole( final CRole cRole )
     {
         final CRole cr = cRole.clone();
@@ -61,7 +53,6 @@ public class EnhancedConfiguration
         id2roles.put( cr.getId(), cr );
     }
 
-    @Override
     public void addUser( final CUser cUser )
     {
         final CUser cu = cUser.clone();
@@ -69,7 +60,6 @@ public class EnhancedConfiguration
         id2users.put( cu.getId(), cu );
     }
 
-    @Override
     public void addUserRoleMapping( final CUserRoleMapping cUserRoleMapping )
     {
         final CUserRoleMapping curm = cUserRoleMapping.clone();
@@ -77,152 +67,86 @@ public class EnhancedConfiguration
         id2roleMappings.put( getUserRoleMappingKey( curm.getUserId(), curm.getSource() ), curm );
     }
 
-    @Override
-    public String getModelEncoding()
-    {
-        return delegate.getModelEncoding();
-    }
+    // ==
 
-    @Override
     public List<CPrivilege> getPrivileges()
     {
         // we are intentionally breaking code that will try to _modify_ the list
         // as the old config manager was before we fixed it
-        return ImmutableList.copyOf( Collections2.transform( delegate.getPrivileges(),
-            new Function<CPrivilege, CPrivilege>()
-            {
-                @Override
-                public CPrivilege apply( @Nullable CPrivilege input )
-                {
-                    return input.clone();
-                }
-            } ) );
+        return ImmutableList.copyOf( delegate.getPrivileges() );
     }
 
-    @Override
     public List<CRole> getRoles()
     {
         // we are intentionally breaking code that will try to _modify_ the list
         // as the old config manager was before we fixed it
-        return ImmutableList.copyOf( Collections2.transform( delegate.getRoles(), new Function<CRole, CRole>()
-        {
-            @Override
-            public CRole apply( @Nullable CRole input )
-            {
-                return input.clone();
-            }
-        } ) );
+        return ImmutableList.copyOf( delegate.getRoles() );
     }
 
-    @Override
     public List<CUserRoleMapping> getUserRoleMappings()
     {
         // we are intentionally breaking code that will try to _modify_ the list
         // as the old config manager was before we fixed it
-        return ImmutableList.copyOf( Collections2.transform( delegate.getUserRoleMappings(),
-            new Function<CUserRoleMapping, CUserRoleMapping>()
-            {
-                @Override
-                public CUserRoleMapping apply( @Nullable CUserRoleMapping input )
-                {
-                    return input.clone();
-                }
-            } ) );
+        return ImmutableList.copyOf( delegate.getUserRoleMappings() );
     }
 
-    @Override
     public List<CUser> getUsers()
     {
         // we are intentionally breaking code that will try to _modify_ the list
         // as the old config manager was before we fixed it
-        return ImmutableList.copyOf( Collections2.transform( delegate.getUsers(), new Function<CUser, CUser>()
-        {
-            @Override
-            public CUser apply( @Nullable CUser input )
-            {
-                return input.clone();
-            }
-        } ) );
+        return ImmutableList.copyOf( delegate.getUsers() );
     }
 
-    @Override
-    public String getVersion()
-    {
-        return delegate.getVersion();
-    }
+    // ==
 
-    @Override
     public void removePrivilege( final CPrivilege cPrivilege )
     {
         id2privileges.remove( cPrivilege.getId() );
         delegate.removePrivilege( cPrivilege );
     }
 
-    @Override
     public void removeRole( final CRole cRole )
     {
         id2roles.remove( cRole.getId() );
         delegate.removeRole( cRole );
     }
 
-    @Override
     public void removeUser( final CUser cUser )
     {
         id2users.remove( cUser.getId() );
         delegate.removeUser( cUser );
     }
 
-    @Override
     public void removeUserRoleMapping( final CUserRoleMapping cUserRoleMapping )
     {
         id2roleMappings.remove( getUserRoleMappingKey( cUserRoleMapping.getUserId(), cUserRoleMapping.getSource() ) );
         delegate.removeUserRoleMapping( cUserRoleMapping );
     }
 
-    @Override
-    public void setModelEncoding( final String modelEncoding )
-    {
-        delegate.setModelEncoding( modelEncoding );
-    }
+    // ==
 
-    @Override
     public void setPrivileges( final List<CPrivilege> privileges )
     {
         delegate.setPrivileges( privileges );
         rebuildId2PrivilegesLookupMap();
     }
 
-    @Override
     public void setRoles( final List<CRole> roles )
     {
         delegate.setRoles( roles );
         rebuildId2RolesLookupMap();
     }
 
-    @Override
     public void setUserRoleMappings( final List<CUserRoleMapping> userRoleMappings )
     {
         delegate.setUserRoleMappings( userRoleMappings );
         rebuildId2RoleMappingsLookupMap();
     }
 
-    @Override
     public void setUsers( final List<CUser> users )
     {
         delegate.setUsers( users );
         rebuildId2UsersLookupMap();
-    }
-
-    @Override
-    public void setVersion( final String version )
-    {
-        delegate.setVersion( version );
-    }
-
-    @Override
-    public String toString()
-    {
-        return super.toString() + " delegating to " + delegate.toString();
     }
 
     // ==
@@ -233,7 +157,7 @@ public class EnhancedConfiguration
         return getUserById( id, true );
     }
 
-    protected CUser getUserById( final String id, final boolean clone )
+    public CUser getUserById( final String id, final boolean clone )
     {
         final CUser user = id2users.get( id );
         if ( user != null )
@@ -265,7 +189,7 @@ public class EnhancedConfiguration
         return getRoleById( id, true );
     }
 
-    protected CRole getRoleById( final String id, final boolean clone )
+    public CRole getRoleById( final String id, final boolean clone )
     {
         final CRole role = id2roles.get( id );
         if ( role != null )
@@ -297,7 +221,7 @@ public class EnhancedConfiguration
         return getPrivilegeById( id, true );
     }
 
-    protected CPrivilege getPrivilegeById( final String id, final boolean clone )
+    public CPrivilege getPrivilegeById( final String id, final boolean clone )
     {
         final CPrivilege privilege = id2privileges.get( id );
         if ( privilege != null )
@@ -329,7 +253,7 @@ public class EnhancedConfiguration
         return getUserRoleMappingByUserId( id, source, true );
     }
 
-    protected CUserRoleMapping getUserRoleMappingByUserId( final String id, final String source, final boolean clone )
+    public CUserRoleMapping getUserRoleMappingByUserId( final String id, final String source, final boolean clone )
     {
         final CUserRoleMapping mapping = id2roleMappings.get( getUserRoleMappingKey( id, source ) );
         if ( mapping != null )
@@ -354,6 +278,14 @@ public class EnhancedConfiguration
         {
             return false;
         }
+    }
+
+    // ==
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " delegating to " + delegate.toString();
     }
 
     // ==
