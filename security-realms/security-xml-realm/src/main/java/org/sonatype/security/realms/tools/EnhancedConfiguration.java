@@ -12,9 +12,8 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
@@ -22,16 +21,16 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 
-@SuppressWarnings( "serial" )
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+
 public class EnhancedConfiguration
-    extends Configuration
 {
     private final Configuration delegate;
 
     public EnhancedConfiguration( final Configuration configuration )
     {
-        this.delegate = configuration;
-
+        this.delegate = Preconditions.checkNotNull( configuration );
         rebuildId2UsersLookupMap();
         rebuildId2RolesLookupMap();
         rebuildId2PrivilegesLookupMap();
@@ -40,142 +39,114 @@ public class EnhancedConfiguration
 
     // ==
 
-    public void addPrivilege( CPrivilege cPrivilege )
+    public void addPrivilege( final CPrivilege cPrivilege )
     {
-        delegate.addPrivilege( cPrivilege );
-
-        id2privileges.put( cPrivilege.getId(), cPrivilege );
+        final CPrivilege cp = cPrivilege.clone();
+        delegate.addPrivilege( cp );
+        id2privileges.put( cp.getId(), cp );
     }
 
-    public void addRole( CRole cRole )
+    public void addRole( final CRole cRole )
     {
-        delegate.addRole( cRole );
-
-        id2roles.put( cRole.getId(), cRole );
+        final CRole cr = cRole.clone();
+        delegate.addRole( cr );
+        id2roles.put( cr.getId(), cr );
     }
 
-    public void addUser( CUser cUser )
+    public void addUser( final CUser cUser )
     {
-        delegate.addUser( cUser );
-
-        id2users.put( cUser.getId(), cUser );
+        final CUser cu = cUser.clone();
+        delegate.addUser( cu );
+        id2users.put( cu.getId(), cu );
     }
 
-    public void addUserRoleMapping( CUserRoleMapping cUserRoleMapping )
+    public void addUserRoleMapping( final CUserRoleMapping cUserRoleMapping )
     {
-        delegate.addUserRoleMapping( cUserRoleMapping );
-
-        id2roleMappings.put( getUserRoleMappingKey( cUserRoleMapping.getUserId(), cUserRoleMapping.getSource() ),
-                             cUserRoleMapping );
+        final CUserRoleMapping curm = cUserRoleMapping.clone();
+        delegate.addUserRoleMapping( curm );
+        id2roleMappings.put( getUserRoleMappingKey( curm.getUserId(), curm.getSource() ), curm );
     }
 
-    public String getModelEncoding()
-    {
-        return delegate.getModelEncoding();
-    }
+    // ==
 
     public List<CPrivilege> getPrivileges()
     {
         // we are intentionally breaking code that will try to _modify_ the list
         // as the old config manager was before we fixed it
-        return Collections.unmodifiableList( delegate.getPrivileges() );
+        return ImmutableList.copyOf( delegate.getPrivileges() );
     }
 
     public List<CRole> getRoles()
     {
         // we are intentionally breaking code that will try to _modify_ the list
         // as the old config manager was before we fixed it
-        return Collections.unmodifiableList( delegate.getRoles() );
+        return ImmutableList.copyOf( delegate.getRoles() );
     }
 
     public List<CUserRoleMapping> getUserRoleMappings()
     {
         // we are intentionally breaking code that will try to _modify_ the list
         // as the old config manager was before we fixed it
-        return Collections.unmodifiableList( delegate.getUserRoleMappings() );
+        return ImmutableList.copyOf( delegate.getUserRoleMappings() );
     }
 
     public List<CUser> getUsers()
     {
         // we are intentionally breaking code that will try to _modify_ the list
         // as the old config manager was before we fixed it
-        return Collections.unmodifiableList( delegate.getUsers() );
+        return ImmutableList.copyOf( delegate.getUsers() );
     }
 
-    public String getVersion()
-    {
-        return delegate.getVersion();
-    }
+    // ==
 
-    public void removePrivilege( CPrivilege cPrivilege )
+    public void removePrivilege( final CPrivilege cPrivilege )
     {
         id2privileges.remove( cPrivilege.getId() );
-
         delegate.removePrivilege( cPrivilege );
     }
 
-    public void removeRole( CRole cRole )
+    public void removeRole( final CRole cRole )
     {
         id2roles.remove( cRole.getId() );
-
         delegate.removeRole( cRole );
     }
 
-    public void removeUser( CUser cUser )
+    public void removeUser( final CUser cUser )
     {
         id2users.remove( cUser.getId() );
-
         delegate.removeUser( cUser );
     }
 
-    public void removeUserRoleMapping( CUserRoleMapping cUserRoleMapping )
+    public void removeUserRoleMapping( final CUserRoleMapping cUserRoleMapping )
     {
         id2roleMappings.remove( getUserRoleMappingKey( cUserRoleMapping.getUserId(), cUserRoleMapping.getSource() ) );
-
         delegate.removeUserRoleMapping( cUserRoleMapping );
     }
 
-    public void setModelEncoding( String modelEncoding )
-    {
-        delegate.setModelEncoding( modelEncoding );
-    }
+    // ==
 
-    public void setPrivileges( List<CPrivilege> privileges )
+    public void setPrivileges( final List<CPrivilege> privileges )
     {
         delegate.setPrivileges( privileges );
-
         rebuildId2PrivilegesLookupMap();
     }
 
-    public void setRoles( List<CRole> roles )
+    public void setRoles( final List<CRole> roles )
     {
         delegate.setRoles( roles );
-
         rebuildId2RolesLookupMap();
     }
 
-    public void setUserRoleMappings( List<CUserRoleMapping> userRoleMappings )
+    public void setUserRoleMappings( final List<CUserRoleMapping> userRoleMappings )
     {
         delegate.setUserRoleMappings( userRoleMappings );
-
         rebuildId2RoleMappingsLookupMap();
     }
 
-    public void setUsers( List<CUser> users )
+    public void setUsers( final List<CUser> users )
     {
         delegate.setUsers( users );
-
         rebuildId2UsersLookupMap();
-    }
-
-    public void setVersion( String version )
-    {
-        delegate.setVersion( version );
-    }
-
-    public String toString()
-    {
-        return super.toString() + " delegating to " + delegate.toString();
     }
 
     // ==
@@ -183,13 +154,25 @@ public class EnhancedConfiguration
 
     public CUser getUserById( final String id )
     {
-        return id2users.get( id );
+        return getUserById( id, true );
+    }
+
+    public CUser getUserById( final String id, final boolean clone )
+    {
+        final CUser user = id2users.get( id );
+        if ( user != null )
+        {
+            return clone ? user.clone() : user;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public boolean removeUserById( final String id )
     {
-        CUser user = getUserById( id );
-
+        final CUser user = getUserById( id, false );
         if ( user != null )
         {
             delegate.removeUser( user );
@@ -203,13 +186,25 @@ public class EnhancedConfiguration
 
     public CRole getRoleById( final String id )
     {
-        return id2roles.get( id );
+        return getRoleById( id, true );
+    }
+
+    public CRole getRoleById( final String id, final boolean clone )
+    {
+        final CRole role = id2roles.get( id );
+        if ( role != null )
+        {
+            return clone ? role.clone() : role;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public boolean removeRoleById( final String id )
     {
-        CRole role = getRoleById( id );
-
+        final CRole role = getRoleById( id, false );
         if ( role != null )
         {
             delegate.removeRole( role );
@@ -223,13 +218,25 @@ public class EnhancedConfiguration
 
     public CPrivilege getPrivilegeById( final String id )
     {
-        return id2privileges.get( id );
+        return getPrivilegeById( id, true );
+    }
+
+    public CPrivilege getPrivilegeById( final String id, final boolean clone )
+    {
+        final CPrivilege privilege = id2privileges.get( id );
+        if ( privilege != null )
+        {
+            return clone ? privilege.clone() : privilege;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public boolean removePrivilegeById( final String id )
     {
-        CPrivilege privilege = getPrivilegeById( id );
-
+        final CPrivilege privilege = getPrivilegeById( id, false );
         if ( privilege != null )
         {
             delegate.removePrivilege( privilege );
@@ -243,13 +250,25 @@ public class EnhancedConfiguration
 
     public CUserRoleMapping getUserRoleMappingByUserId( final String id, final String source )
     {
-        return id2roleMappings.get( getUserRoleMappingKey( id, source ) );
+        return getUserRoleMappingByUserId( id, source, true );
+    }
+
+    public CUserRoleMapping getUserRoleMappingByUserId( final String id, final String source, final boolean clone )
+    {
+        final CUserRoleMapping mapping = id2roleMappings.get( getUserRoleMappingKey( id, source ) );
+        if ( mapping != null )
+        {
+            return clone ? mapping.clone() : mapping;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public boolean removeUserRoleMappingByUserId( final String id, final String source )
     {
-        CUserRoleMapping mapping = getUserRoleMappingByUserId( id, source );
-
+        final CUserRoleMapping mapping = getUserRoleMappingByUserId( id, source, false );
         if ( mapping != null )
         {
             delegate.removeUserRoleMapping( mapping );
@@ -263,19 +282,27 @@ public class EnhancedConfiguration
 
     // ==
 
-    private HashMap<String, CUser> id2users = new HashMap<String, CUser>();
+    @Override
+    public String toString()
+    {
+        return super.toString() + " delegating to " + delegate.toString();
+    }
 
-    private HashMap<String, CRole> id2roles = new HashMap<String, CRole>();
+    // ==
 
-    private HashMap<String, CPrivilege> id2privileges = new HashMap<String, CPrivilege>();
+    private final ConcurrentHashMap<String, CUser> id2users = new ConcurrentHashMap<String, CUser>();
 
-    private HashMap<String, CUserRoleMapping> id2roleMappings = new HashMap<String, CUserRoleMapping>();
+    private final ConcurrentHashMap<String, CRole> id2roles = new ConcurrentHashMap<String, CRole>();
+
+    private final ConcurrentHashMap<String, CPrivilege> id2privileges = new ConcurrentHashMap<String, CPrivilege>();
+
+    private final ConcurrentHashMap<String, CUserRoleMapping> id2roleMappings =
+        new ConcurrentHashMap<String, CUserRoleMapping>();
 
     protected void rebuildId2UsersLookupMap()
     {
         id2users.clear();
-
-        for ( CUser user : getUsers() )
+        for ( CUser user : delegate.getUsers() )
         {
             id2users.put( user.getId(), user );
         }
@@ -284,8 +311,7 @@ public class EnhancedConfiguration
     protected void rebuildId2RolesLookupMap()
     {
         id2roles.clear();
-
-        for ( CRole role : getRoles() )
+        for ( CRole role : delegate.getRoles() )
         {
             id2roles.put( role.getId(), role );
         }
@@ -294,8 +320,7 @@ public class EnhancedConfiguration
     protected void rebuildId2PrivilegesLookupMap()
     {
         id2privileges.clear();
-
-        for ( CPrivilege privilege : getPrivileges() )
+        for ( CPrivilege privilege : delegate.getPrivileges() )
         {
             id2privileges.put( privilege.getId(), privilege );
         }
@@ -304,8 +329,7 @@ public class EnhancedConfiguration
     protected void rebuildId2RoleMappingsLookupMap()
     {
         id2roleMappings.clear();
-
-        for ( CUserRoleMapping user2role : getUserRoleMappings() )
+        for ( CUserRoleMapping user2role : delegate.getUserRoleMappings() )
         {
             id2roleMappings.put( getUserRoleMappingKey( user2role.getUserId(), user2role.getSource() ), user2role );
         }

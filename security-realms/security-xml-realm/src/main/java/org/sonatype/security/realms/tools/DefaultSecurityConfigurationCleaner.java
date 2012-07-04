@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.model.Configuration;
 
 /**
  * Removes dead references to roles and permissions in the security model. When a permission is removed all roles will
@@ -39,32 +38,36 @@ public class DefaultSecurityConfigurationCleaner
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    public void privilegeRemoved( Configuration configuration, String privilegeId )
+    public void privilegeRemoved( EnhancedConfiguration configuration, String privilegeId )
     {
-        logger.debug( "Cleaning privilege id " + privilegeId + " from roles." );
+        logger.debug( "Cleaning privilege id {} from roles.", privilegeId );
         List<CRole> roles = configuration.getRoles();
 
         for ( CRole role : roles )
         {
             if ( role.getPrivileges().contains( privilegeId ) )
             {
-                logger.debug( "removing from role " + role.getId() );
+                logger.debug( "removing privilege {} from role {}", privilegeId, role.getId() );
                 role.getPrivileges().remove( privilegeId );
+                configuration.removeRoleById( role.getId() );
+                configuration.addRole( role );
             }
         }
     }
 
-    public void roleRemoved( Configuration configuration, String roleId )
+    public void roleRemoved( EnhancedConfiguration configuration, String roleId )
     {
-        logger.debug( "Cleaning role id " + roleId + " from users and roles." );
+        logger.debug( "Cleaning role id {} from users and roles.", roleId );
         List<CRole> roles = configuration.getRoles();
 
         for ( CRole role : roles )
         {
             if ( role.getRoles().contains( roleId ) )
             {
-                logger.debug( "removing from role " + role.getId() );
+                logger.debug( "removing ref to role {} from role {}", roleId, role.getId() );
                 role.getRoles().remove( roleId );
+                configuration.removeRoleById( role.getId() );
+                configuration.addRole( role );
             }
         }
 
@@ -74,8 +77,10 @@ public class DefaultSecurityConfigurationCleaner
         {
             if ( mapping.getRoles().contains( roleId ) )
             {
-                logger.debug( "removing from user " + mapping.getUserId() );
+                logger.debug( "removing ref to role {} from user {}", mapping.getUserId() );
                 mapping.removeRole( roleId );
+                configuration.removeUserRoleMappingByUserId( mapping.getUserId(), mapping.getSource() );
+                configuration.addUserRoleMapping( mapping );
             }
         }
     }

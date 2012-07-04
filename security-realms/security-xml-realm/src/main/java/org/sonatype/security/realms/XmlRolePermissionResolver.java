@@ -64,31 +64,26 @@ public class XmlRolePermissionResolver
         this.permissionFactory = permissionFactory;
     }
 
-    public Collection<Permission> resolvePermissionsInRole( String roleString )
+    public Collection<Permission> resolvePermissionsInRole( final String roleString )
     {
-
-        LinkedList<String> rolesToProcess = new LinkedList<String>();
-
-        rolesToProcess.add( roleString ); // inital role
-
-        Set<String> roleIds = new LinkedHashSet<String>();
-        Set<Permission> permissions = new LinkedHashSet<Permission>();
+        final LinkedList<String> rolesToProcess = new LinkedList<String>();
+        rolesToProcess.add( roleString ); // initial role
+        final Set<String> processedRoleIds = new LinkedHashSet<String>();
+        final Set<Permission> permissions = new LinkedHashSet<Permission>();
         while ( !rolesToProcess.isEmpty() )
         {
-            String roleId = rolesToProcess.removeFirst();
-            if ( !roleIds.contains( roleId ) )
+            final String roleId = rolesToProcess.removeFirst();
+            if ( !processedRoleIds.contains( roleId ) )
             {
-                CRole role;
                 try
                 {
-                    role = configuration.readRole( roleId );
-                    roleIds.add( roleId );
+                    final CRole role = configuration.readRole( roleId );
+                    processedRoleIds.add( roleId );
 
-                    // process the roles this role has
+                    // process the roles this role has recursively
                     rolesToProcess.addAll( role.getRoles() );
-
                     // add the permissions this role has
-                    List<String> privilegeIds = role.getPrivileges();
+                    final List<String> privilegeIds = role.getPrivileges();
                     for ( String privilegeId : privilegeIds )
                     {
                         Set<Permission> set = getPermissions( privilegeId );
@@ -101,36 +96,27 @@ public class XmlRolePermissionResolver
                 }
             }
         }
-
         return permissions;
     }
 
-    protected Set<Permission> getPermissions( String privilegeId )
+    protected Set<Permission> getPermissions( final String privilegeId )
     {
         try
         {
-            CPrivilege privilege = getConfigurationManager().readPrivilege( privilegeId );
-
+            final CPrivilege privilege = configuration.readPrivilege( privilegeId );
             for ( PrivilegeDescriptor descriptor : privilegeDescriptors )
             {
-                String permission = descriptor.buildPermission( privilege );
-
+                final String permission = descriptor.buildPermission( privilege );
                 if ( permission != null )
                 {
                     return Collections.singleton( permissionFactory.create( permission ) );
                 }
             }
-
             return Collections.emptySet();
         }
         catch ( NoSuchPrivilegeException e )
         {
             return Collections.emptySet();
         }
-    }
-
-    protected ConfigurationManager getConfigurationManager()
-    {
-        return configuration;
     }
 }

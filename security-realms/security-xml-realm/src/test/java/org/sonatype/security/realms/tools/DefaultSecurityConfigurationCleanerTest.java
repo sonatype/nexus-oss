@@ -38,13 +38,14 @@ public class DefaultSecurityConfigurationCleanerTest
         throws Exception
     {
         Configuration configuration =
-            getConfigurationFromStream( getClass().getResourceAsStream( "/org/sonatype/security/realms/tools/cleaner-security.xml" ) );
+            getConfigurationFromStream( getClass().getResourceAsStream(
+                "/org/sonatype/security/realms/tools/cleaner-security.xml" ) );
 
         CPrivilege priv = (CPrivilege) configuration.getPrivileges().get( 0 );
 
         configuration.removePrivilege( priv );
 
-        cleaner.privilegeRemoved( configuration, priv.getId() );
+        cleaner.privilegeRemoved( new EnhancedConfiguration( configuration ), priv.getId() );
 
         for ( CRole role : (List<CRole>) configuration.getRoles() )
         {
@@ -56,13 +57,14 @@ public class DefaultSecurityConfigurationCleanerTest
         throws Exception
     {
         Configuration configuration =
-            getConfigurationFromStream( getClass().getResourceAsStream( "/org/sonatype/security/realms/tools/cleaner-security.xml" ) );
+            getConfigurationFromStream( getClass().getResourceAsStream(
+                "/org/sonatype/security/realms/tools/cleaner-security.xml" ) );
 
         CRole role = (CRole) configuration.getRoles().get( 0 );
 
         configuration.removeRole( role );
 
-        cleaner.roleRemoved( configuration, role.getId() );
+        cleaner.roleRemoved( new EnhancedConfiguration( configuration ), role.getId() );
 
         for ( CRole crole : (List<CRole>) configuration.getRoles() )
         {

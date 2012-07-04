@@ -35,7 +35,7 @@
     <classes>
 
         <!-- ROOT -->
-        <class rootElement="true" xml.tagName="security">
+        <class rootElement="true" xml.tagName="security" java.clone="deep">
             <name>Configuration</name>
             <interfaces>
               <interface>org.sonatype.configuration.Configuration</interface>
@@ -141,7 +141,7 @@
         </class>
         
         <!-- Users -->
-        <class>
+        <class java.clone="deep">
             <name>CUser</name>
             <version>2.0.0+</version>
             <description>A User is a security object, where, based upon its role, will have certain privileged access to the system</description>
@@ -226,7 +226,7 @@
         </class>
         
         <!-- Roles -->
-        <class>
+        <class java.clone="deep">
             <name>CRole</name>
             <version>2.0.0+</version>
             <description>A Role is a bucket for privileges, can also contain other roles.</description>
@@ -294,7 +294,7 @@
         </class>
 
         <!-- Privileges -->
-        <class>
+        <class java.clone="deep">
             <name>CPrivilege</name>
             <version>2.0.0+</version>
             <description>Base privilege class contains items common to all types of privileges.</description>
@@ -348,7 +348,7 @@
         </class>
         
         <!-- Properties -->
-        <class>
+        <class java.clone="deep">
             <name>CProperty</name>
             <version>2.0.0+</version>
             <description>A simple key value pair</description>
@@ -374,7 +374,7 @@
         
         <!-- MY NEW STUFF TODO: talk to max, about upgrade -->
 
-		<class>
+		<class java.clone="deep">
             <name>CUserRoleMapping</name>
             <version>2.0.2+</version>
             <description>Defines the mapping between users and roles, if LDAP groups are not used.</description>
