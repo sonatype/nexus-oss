@@ -41,73 +41,45 @@ public class DefaultNexusItemAuthorizer
 
     @Requirement
     private RepositoryRegistry repoRegistry;
-    
-    public boolean authorizePath( Repository repository, ResourceStoreRequest request, Action action )
+
+    public boolean authorizePath( final Repository repository, final ResourceStoreRequest request, final Action action )
     {
         TargetSet matched = repository.getTargetsForRequest( request );
-
         if ( matched == null )
         {
             matched = new TargetSet();
         }
-
         // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
         matched.addTargetSet( this.getGroupsTargetSet( repository, request ) );
-
         return authorizePath( matched, action );
     }
 
-    public boolean authorizePermission( String permission )
+    public boolean authorizePermission( final String permission )
     {
         return isPermitted( Collections.singletonList( permission ) );
     }
 
     // ===
 
-    public TargetSet getGroupsTargetSet( Repository repository, ResourceStoreRequest request )
+    public TargetSet getGroupsTargetSet( final Repository repository, final ResourceStoreRequest request )
     {
-        TargetSet targetSet = new TargetSet();
-
+        final TargetSet targetSet = new TargetSet();
         for ( Repository group : getListOfGroups( repository.getId() ) )
         {
             // are the perms transitively inherited from the groups where it is member?
             // !group.isExposed()
             if ( true )
             {
-                TargetSet groupMatched = group.getTargetsForRequest( request );
-
+                final TargetSet groupMatched = group.getTargetsForRequest( request );
                 targetSet.addTargetSet( groupMatched );
-                
                 // now that we have groups of groups, this needs to be a recursive check
                 targetSet.addTargetSet( getGroupsTargetSet( group, request ) );
             }
         }
-
         return targetSet;
     }
 
-    protected List<Repository> getListOfGroups( String repositoryId )
-    {
-        List<Repository> groups = new ArrayList<Repository>();
-
-        List<String> groupIds = repoRegistry.getGroupsOfRepository( repositoryId );
-
-        for ( String groupId : groupIds )
-        {
-            try
-            {
-                groups.add( repoRegistry.getRepository( groupId ) );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // ignored
-            }
-        }
-
-        return groups;
-    }
-
-    public boolean authorizePath( TargetSet matched, Action action )
+    public boolean authorizePath( final TargetSet matched, final Action action )
     {
         // did we hit repositories at all?
         if ( matched.getMatchedRepositoryIds().size() > 0 )
@@ -123,71 +95,85 @@ public class DefaultNexusItemAuthorizer
         }
     }
 
-    protected List<String> getTargetPerms( TargetSet matched, Action action )
+    public boolean isViewable( final String objectType, final String objectId )
     {
-        List<String> perms = new ArrayList<String>( matched.getMatches().size() );
+        return authorizePermission( "nexus:view:" + objectType + ":" + objectId );
+    }
 
+    // ==
+
+    protected List<Repository> getListOfGroups( final String repositoryId )
+    {
+        final List<Repository> groups = new ArrayList<Repository>();
+        final List<String> groupIds = repoRegistry.getGroupsOfRepository( repositoryId );
+        for ( String groupId : groupIds )
+        {
+            try
+            {
+                groups.add( repoRegistry.getRepository( groupId ) );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // ignored
+            }
+        }
+        return groups;
+    }
+
+    protected List<String> getTargetPerms( final TargetSet matched, final Action action )
+    {
+        final List<String> perms = new ArrayList<String>( matched.getMatches().size() );
         // nexus : 'target' + targetId : repoId : read
         for ( TargetMatch match : matched.getMatches() )
         {
-            perms
-                .add( "nexus:target:" + match.getTarget().getId() + ":" + match.getRepository().getId() + ":" + action );
+            perms.add( "nexus:target:" + match.getTarget().getId() + ":" + match.getRepository().getId() + ":" + action );
         }
-
         return perms;
     }
 
-    protected boolean isPermitted( List<String> perms )
+    protected boolean isPermitted( final List<String> perms )
     {
-        // Get the current user
-        Subject subject = this.securitySystem.getSubject();
-
-        if ( this.securitySystem.isSecurityEnabled() )
+        if ( securitySystem.isSecurityEnabled() )
         {
-            if ( subject != null )
+            // Get the current user
+            final Subject subject = securitySystem.getSubject();
+            if ( subject != null ) // TODO: isn't this missing? "&& subject.isAuthenticated()"
             {
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Checking isPermitted() with perms: " + perms.toString() );
                 }
-
                 // And finally check each of the target permissions and see if the user
                 // has access, all it takes is one
                 for ( String perm : perms )
                 {
                     if ( subject.isPermitted( perm ) )
                     {
+                        // TODO: we should remember/cache these decisions per-thread
+                        // and not re-evaluate it always from Security
                         return true;
                     }
                 }
-
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Subject is authenticated, but has none of the needed permissions, rejecting." );
                 }
-
                 return false;
             }
             else
             {
+                // security is enabled, but we have nobody authenticated? Fail!
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Subject is not authenticated, rejecting." );
                 }
-
-                // security is enabled, but we have nobody authenticated? Fail!
                 return false;
             }
         }
         else
         {
-            // sec is disabled, simply say YES
+            // security is disabled, simply say YES
             return true;
         }
-    }
-
-    public boolean isViewable( String objectType, String objectId )
-    {
-        return authorizePermission( "nexus:view:" + objectType + ":" + objectId );
     }
 }
