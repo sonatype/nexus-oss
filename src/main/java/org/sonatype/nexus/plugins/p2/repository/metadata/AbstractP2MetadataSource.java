@@ -12,37 +12,26 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.metadata;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.io.RawInputStreamFacade;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.MXSerializer;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2Repository;
+import org.sonatype.nexus.plugins.p2.repository.proxy.P2RuntimeExceptionMaskedAsINFException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
-import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
@@ -50,7 +39,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 public abstract class AbstractP2MetadataSource<E extends P2Repository>
     extends AbstractLoggingComponent
@@ -62,87 +51,98 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
         P2Constants.COMPOSITE_CONTENT_XML, P2Constants.COMPOSITE_CONTENT_JAR, P2Constants.COMPOSITE_ARTIFACTS_XML,
         P2Constants.COMPOSITE_ARTIFACTS_JAR, P2Constants.P2_INDEX );
 
-    protected LocalRepositoryStorage getLocalStorage( final E repository )
-    {
-        return repository.getLocalStorage();
-    }
-
-    protected String getName( final E repository )
-    {
-        return repository.getName();
-    }
-
-    protected StorageItem createMetadataItem( final String path, final Xpp3Dom metadata, final String hack,
-                                              final Map<String, Object> context, final E repository )
+    private StorageFileItem cacheMetadataItem( final StorageFileItem result, final Map<String, Object> context,
+                                               final E repository )
         throws IOException
     {
-        getLogger().debug( "Repository " + repository.getId() + ": Creating metadata item " + path );
-        final DefaultStorageFileItem result = createMetadataItem( repository, path, metadata, hack, context );
-
         setItemAttributes( result, context, repository );
-
-        getLogger().debug( "Repository " + repository.getId() + ": Created metadata item " + path );
+        getLogger().debug( "Repository " + repository.getId() + ": Created metadata item " + result.getName() );
         return doCacheItem( result, repository );
     }
 
-    public static DefaultStorageFileItem createMetadataItem( final Repository repository, final String path,
-                                                             final Xpp3Dom metadata, final String hack,
-                                                             final Map<String, Object> context )
+    protected static StorageFileItem createMetadataItem( final Repository repository, final String path,
+                                                         final Xpp3Dom metadata, final String hack,
+                                                         final Map<String, Object> context )
         throws IOException
     {
-        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-        final MXSerializer mx = new MXSerializer();
-        mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
-        mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-        final String encoding = "UTF-8";
-        mx.setOutput( buffer, encoding );
-        mx.startDocument( encoding, null );
-        if ( hack != null )
+        // this is a special one: once cached (hence consumed), temp file get's deleted
+        final FileContentLocator fileContentLocator = new FileContentLocator( "text/xml" );
+        OutputStream buffer = null;
+        try
         {
-            mx.processingInstruction( hack );
+            buffer = fileContentLocator.getOutputStream();
+            final MXSerializer mx = new MXSerializer();
+            mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
+            mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
+            final String encoding = "UTF-8";
+            mx.setOutput( buffer, encoding );
+            mx.startDocument( encoding, null );
+            if ( hack != null )
+            {
+                mx.processingInstruction( hack );
+            }
+            metadata.writeToSerializer( null, mx );
+            mx.flush();
         }
-        metadata.writeToSerializer( null, mx );
-        mx.flush();
+        finally
+        {
+            IOUtil.close( buffer );
+        }
 
-        final byte[] bytes = buffer.toByteArray();
-
-        final ContentLocator content = new ByteArrayContentLocator( bytes, "text/xml" );
         final DefaultStorageFileItem result =
             new DefaultStorageFileItem( repository, new ResourceStoreRequest( path ), true /* isReadable */,
-                false /* isWritable */, content );
+                false /* isWritable */, fileContentLocator );
         result.getItemContext().putAll( context );
-        result.setLength( bytes.length );
+        result.setLength( fileContentLocator.getLength() );
         return result;
     }
 
     protected void setItemAttributes( final StorageFileItem item, final Map<String, Object> context, final E repository )
-        throws StorageException
     {
         // this is a hook, do nothing by default
     }
 
-    protected AbstractStorageItem doCacheItem( final AbstractStorageItem item, final E repository )
-        throws StorageException
+    protected StorageFileItem doCacheItem( final StorageFileItem item, final E repository )
+        throws LocalStorageException
     {
-        AbstractStorageItem result = null;
+        StorageFileItem result = null;
 
         try
         {
-            getLocalStorage( repository ).storeItem( repository, item );
-
-            result =
-                getLocalStorage( repository ).retrieveItem( repository, new ResourceStoreRequest( item.getPath() ) );
+            final RepositoryItemUidLock itemLock = item.getRepositoryItemUid().getLock();
+            itemLock.lock( Action.create );
+            try
+            {
+                repository.getLocalStorage().storeItem( repository, item );
+                repository.removeFromNotFoundCache( item.getResourceStoreRequest() );
+                result =
+                    (StorageFileItem) repository.getLocalStorage().retrieveItem( repository,
+                        new ResourceStoreRequest( item ) );
+            }
+            finally
+            {
+                itemLock.unlock();
+            }
 
             result.getItemContext().putAll( item.getItemContext() );
         }
-        catch ( final ItemNotFoundException ex )
+        catch ( ItemNotFoundException ex )
         {
+            getLogger().warn(
+                "Nexus BUG in "
+                    + RepositoryStringUtils.getHumanizedNameString( repository )
+                    + ", ItemNotFoundException during cache! Please report this issue along with the stack trace below!",
+                ex );
+
             // this is a nonsense, we just stored it!
             result = item;
         }
-        catch ( final UnsupportedStorageOperationException ex )
+        catch ( UnsupportedStorageOperationException ex )
         {
+            getLogger().warn(
+                "LocalStorage or repository " + RepositoryStringUtils.getHumanizedNameString( repository )
+                    + " does not handle STORE operation, not caching remote fetched item.", ex );
+
             result = item;
         }
 
@@ -151,7 +151,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
 
     @Override
     public StorageItem doRetrieveItem( final ResourceStoreRequest request, final E repository )
-        throws StorageException, ItemNotFoundException
+        throws IOException, ItemNotFoundException
     {
         if ( !isP2MetadataItem( request.getRequestPath() ) )
         {
@@ -178,7 +178,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                 try
                 {
                     final AbstractStorageItem contentItem = doRetrieveLocalItem( request, repository );
-                    if ( !isContentOld( contentItem, repository ) )
+                    if ( request.isRequestLocalOnly() || !isContentOld( contentItem, repository ) )
                     {
                         return contentItem;
                     }
@@ -214,7 +214,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                         doRetrieveArtifactsItem( request.getRequestContext(), repository );
                         return result;
                     }
-                    catch ( final RuntimeException e )
+                    catch ( final P2RuntimeExceptionMaskedAsINFException e )
                     {
                         return doRetrieveLocalOnTransferError( request, repository, e );
                     }
@@ -232,7 +232,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                 try
                 {
                     final AbstractStorageItem artifactsItem = doRetrieveLocalItem( request, repository );
-                    if ( !isArtifactsOld( artifactsItem, repository ) )
+                    if ( request.isRequestLocalOnly() || !isArtifactsOld( artifactsItem, repository ) )
                     {
                         return artifactsItem;
                     }
@@ -268,7 +268,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
                         doRetrieveContentItem( request.getRequestContext(), repository );
                         return doRetrieveArtifactsItem( request.getRequestContext(), repository );
                     }
-                    catch ( final RuntimeException e )
+                    catch ( final P2RuntimeExceptionMaskedAsINFException e )
                     {
                         return doRetrieveLocalOnTransferError( request, repository, e );
 
@@ -305,10 +305,10 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
      * exception.
      */
     private StorageItem doRetrieveLocalOnTransferError( final ResourceStoreRequest request, final E repository,
-                                                        final RuntimeException e )
-        throws StorageException, ItemNotFoundException
+                                                        final P2RuntimeExceptionMaskedAsINFException e )
+        throws LocalStorageException, ItemNotFoundException
     {
-        final Throwable cause = e.getCause();
+        final Throwable cause = e.getCause().getCause();
         // TODO This must be possible to be done in some other way
         if ( cause.getMessage().startsWith( "HTTP Server 'Service Unavailable'" )
             || cause.getCause() instanceof ConnectException )
@@ -348,116 +348,21 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     }
 
     protected AbstractStorageItem doRetrieveLocalItem( final ResourceStoreRequest request, final E repository )
-        throws StorageException, ItemNotFoundException
+        throws LocalStorageException, ItemNotFoundException
     {
-        if ( getLocalStorage( repository ) != null )
+        if ( repository.getLocalStorage() != null )
         {
-            final AbstractStorageItem localItem = getLocalStorage( repository ).retrieveItem( repository, request );
-
+            final AbstractStorageItem localItem = repository.getLocalStorage().retrieveItem( repository, request );
             localItem.getItemContext().putAll( request.getRequestContext() );
-
             return localItem;
         }
-
         throw new ItemNotFoundException( request, repository );
     }
 
-    protected Xpp3Dom parseItem( final Repository repo, final String jarName, final String xmlName,
-                                 final Map<String, Object> context )
-        throws StorageException, ItemNotFoundException
-    {
-        try
-        {
-            try
-            {
-                final StorageItem item = doRetrieveRemoteItem( repo, jarName, context );
-
-                return parseJarItem( item, xmlName.substring( 1 ) );
-            }
-            catch ( final ItemNotFoundException e )
-            {
-                final StorageItem item = doRetrieveRemoteItem( repo, xmlName, context );
-
-                return parseXmlItem( item );
-            }
-        }
-        catch ( final RemoteAccessException e )
-        {
-            throw new RemoteStorageException( e.getMessage(), e );
-        }
-        catch ( final IOException e )
-        {
-            throw new LocalStorageException( e.getMessage(), e );
-        }
-        catch ( final XmlPullParserException e )
-        {
-            throw new LocalStorageException( e.getMessage(), e );
-        }
-
-    }
-
-    protected Xpp3Dom parseXmlItem( final StorageItem item )
-        throws IOException, XmlPullParserException
-    {
-        final InputStream is = ( (StorageFileItem) item ).getInputStream();
-
-        try
-        {
-            return Xpp3DomBuilder.build( new XmlStreamReader( is ) );
-        }
-        finally
-        {
-            is.close();
-        }
-    }
-
-    protected Xpp3Dom parseJarItem( final StorageItem item, final String jarPath )
-        throws IOException, XmlPullParserException
-    {
-        final File file = File.createTempFile( "file", "zip" );
-        try
-        {
-            final InputStream is = ( (StorageFileItem) item ).getInputStream();
-
-            try
-            {
-                FileUtils.copyStreamToFile( new RawInputStreamFacade( is ), file );
-
-                final ZipFile z = new ZipFile( file );
-
-                try
-                {
-                    final ZipEntry ze = z.getEntry( jarPath );
-
-                    if ( ze == null )
-                    {
-                        throw new LocalStorageException( "Corrupted P2 metadata jar " + jarPath );
-                    }
-
-                    final InputStream zis = z.getInputStream( ze );
-
-                    return Xpp3DomBuilder.build( new XmlStreamReader( zis ) );
-                }
-                finally
-                {
-                    z.close();
-                }
-            }
-            finally
-            {
-                is.close();
-            }
-        }
-        finally
-        {
-            file.delete();
-        }
-    }
-
     protected StorageItem doRetrieveArtifactsItem( final Map<String, Object> context, final E repository )
-        throws StorageException, ItemNotFoundException
+        throws IOException, ItemNotFoundException
     {
-        final Xpp3Dom dom = doRetrieveArtifactsDom( context, repository );
+        final StorageFileItem fileItem = doRetrieveArtifactsFileItem( context, repository );
         try
         {
             getLogger().debug( "Repository " + repository.getId() + ": Deleting p2 artifacts metadata items." );
@@ -465,8 +370,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
             deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.ARTIFACTS_XML ) );
             getLogger().debug( "Repository " + repository.getId() + ": Deleted p2 artifacts metadata items." );
 
-            return createMetadataItem( P2Constants.ARTIFACTS_PATH, dom, P2Constants.XMLPI_ARTIFACTS, context,
-                repository );
+            return cacheMetadataItem( fileItem, context, repository );
         }
         catch ( final IOException e )
         {
@@ -475,9 +379,9 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     }
 
     protected StorageItem doRetrieveContentItem( final Map<String, Object> context, final E repository )
-        throws StorageException, ItemNotFoundException
+        throws IOException, ItemNotFoundException
     {
-        final Xpp3Dom dom = doRetrieveContentDom( context, repository );
+        final StorageFileItem fileItem = doRetrieveContentFileItem( context, repository );
         try
         {
             getLogger().debug( "Repository " + repository.getId() + ": Deleting p2 content metadata items." );
@@ -485,7 +389,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
             deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.CONTENT_XML ) );
             getLogger().debug( "Repository " + repository.getId() + ": Deleted p2 content metadata items." );
 
-            return createMetadataItem( P2Constants.CONTENT_PATH, dom, P2Constants.XMLPI_CONTENT, context, repository );
+            return cacheMetadataItem( fileItem, context, repository );
         }
         catch ( final IOException e )
         {
@@ -493,19 +397,13 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
         }
     }
 
-    protected abstract StorageItem doRetrieveRemoteItem( Repository repo, String path, Map<String, Object> context )
-        throws ItemNotFoundException, RemoteAccessException, StorageException;
+    protected abstract StorageFileItem doRetrieveArtifactsFileItem( Map<String, Object> context, E repository )
+        throws RemoteStorageException, ItemNotFoundException;
 
-    protected abstract Xpp3Dom doRetrieveArtifactsDom( Map<String, Object> context, E repository )
-        throws StorageException, ItemNotFoundException;
+    protected abstract StorageFileItem doRetrieveContentFileItem( Map<String, Object> context, E repository )
+        throws RemoteStorageException, ItemNotFoundException;
 
-    protected abstract Xpp3Dom doRetrieveContentDom( Map<String, Object> context, E repository )
-        throws StorageException, ItemNotFoundException;
+    protected abstract boolean isArtifactsOld( AbstractStorageItem artifactsItem, E repository );
 
-    protected abstract boolean isArtifactsOld( AbstractStorageItem artifactsItem, E repository )
-        throws StorageException;
-
-    protected abstract boolean isContentOld( AbstractStorageItem contentItem, E repository )
-        throws StorageException;
-
+    protected abstract boolean isContentOld( AbstractStorageItem contentItem, E repository );
 }

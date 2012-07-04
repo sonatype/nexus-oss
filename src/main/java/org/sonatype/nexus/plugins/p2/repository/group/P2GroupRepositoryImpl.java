@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.group;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -103,7 +104,15 @@ public class P2GroupRepositoryImpl
     protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
-        final StorageItem item = metadataSource.doRetrieveItem( request, this );
+        final StorageItem item;
+        try
+        {
+            item = metadataSource.doRetrieveItem( request, this );
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( e );
+        }
 
         if ( item != null )
         {

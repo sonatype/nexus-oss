@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
@@ -24,10 +25,13 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts;
 import org.sonatype.nexus.plugins.p2.repository.metadata.ArtifactsMerge;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataMergeException;
+import org.sonatype.nexus.proxy.RequestContext;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 public class MetadataMergeTest
 {
@@ -38,13 +42,25 @@ public class MetadataMergeTest
         final ArrayList<Artifacts> repos =
             loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2.xml" } );
 
+        final RequestContext context1 = new RequestContext();
+        context1.put( "p2.metadata.dom", repos.get( 0 ).getDom() );
+        final StorageFileItem item1 = Mockito.mock( StorageFileItem.class );
+        Mockito.when( item1.getName() ).thenReturn( "artifact.xml" );
+        Mockito.when( item1.getItemContext() ).thenReturn( context1 );
+
+        final RequestContext context2 = new RequestContext();
+        context2.put( "p2.metadata.dom", repos.get( 1 ).getDom() );
+        final StorageFileItem item2 = Mockito.mock( StorageFileItem.class );
+        Mockito.when( item2.getName() ).thenReturn( "artifact.xml" );
+        Mockito.when( item2.getItemContext() ).thenReturn( context2 );
+
         // sanity check
         Assert.assertEquals( 2, repos.get( 0 ).getArtifacts().size() );
         Assert.assertEquals( 1, repos.get( 1 ).getArtifacts().size() );
 
         final ArtifactsMerge m = new ArtifactsMerge();
 
-        final Artifacts merged = m.mergeArtifactsMetadata( "test", repos );
+        final Artifacts merged = m.mergeArtifactsMetadata( "test", Arrays.asList( item1, item2 ) );
 
         Assert.assertEquals( 3, merged.getArtifacts().size() );
         Assert.assertEquals( 5, merged.getMappings().size() );
@@ -57,11 +73,23 @@ public class MetadataMergeTest
         final ArrayList<Artifacts> repos =
             loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2props.xml" } );
 
+        final RequestContext context1 = new RequestContext();
+        context1.put( "p2.metadata.dom", repos.get( 0 ).getDom() );
+        final StorageFileItem item1 = Mockito.mock( StorageFileItem.class );
+        Mockito.when( item1.getName() ).thenReturn( "artifact.xml" );
+        Mockito.when( item1.getItemContext() ).thenReturn( context1 );
+
+        final RequestContext context2 = new RequestContext();
+        context2.put( "p2.metadata.dom", repos.get( 1 ).getDom() );
+        final StorageFileItem item2 = Mockito.mock( StorageFileItem.class );
+        Mockito.when( item2.getName() ).thenReturn( "artifact.xml" );
+        Mockito.when( item2.getItemContext() ).thenReturn( context2 );
+
         final ArtifactsMerge m = new ArtifactsMerge();
 
         try
         {
-            m.mergeArtifactsMetadata( "test", repos );
+            m.mergeArtifactsMetadata( "test", Arrays.asList( item1, item2 ) );
             Assert.fail( "RepositoryMetadataMergeException expected" );
         }
         catch ( final P2MetadataMergeException e )
@@ -77,11 +105,23 @@ public class MetadataMergeTest
         final ArrayList<Artifacts> repos =
             loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2mappins.xml" } );
 
+        final RequestContext context1 = new RequestContext();
+        context1.put( "p2.metadata.dom", repos.get( 0 ).getDom() );
+        final StorageFileItem item1 = Mockito.mock( StorageFileItem.class );
+        Mockito.when( item1.getName() ).thenReturn( "artifact.xml" );
+        Mockito.when( item1.getItemContext() ).thenReturn( context1 );
+
+        final RequestContext context2 = new RequestContext();
+        context2.put( "p2.metadata.dom", repos.get( 1 ).getDom() );
+        final StorageFileItem item2 = Mockito.mock( StorageFileItem.class );
+        Mockito.when( item2.getName() ).thenReturn( "artifact.xml" );
+        Mockito.when( item2.getItemContext() ).thenReturn( context2 );
+
         final ArtifactsMerge m = new ArtifactsMerge();
 
         try
         {
-            m.mergeArtifactsMetadata( "test", repos );
+            m.mergeArtifactsMetadata( "test", Arrays.asList( item1, item2 ) );
             Assert.fail( "P2MetadataMergeException expected" );
         }
         catch ( final P2MetadataMergeException e )
@@ -100,9 +140,21 @@ public class MetadataMergeTest
         final ArrayList<Content> repos =
             loadContentMetadata( new String[] { "metadata/merge/content1.xml", "metadata/merge/content2.xml" } );
 
+        final RequestContext context1 = new RequestContext();
+        context1.put( "p2.metadata.dom", repos.get( 0 ).getDom() );
+        final StorageFileItem item1 = Mockito.mock( StorageFileItem.class );
+        Mockito.when( item1.getName() ).thenReturn( "artifact.xml" );
+        Mockito.when( item1.getItemContext() ).thenReturn( context1 );
+
+        final RequestContext context2 = new RequestContext();
+        context2.put( "p2.metadata.dom", repos.get( 1 ).getDom() );
+        final StorageFileItem item2 = Mockito.mock( StorageFileItem.class );
+        Mockito.when( item2.getName() ).thenReturn( "artifact.xml" );
+        Mockito.when( item2.getItemContext() ).thenReturn( context2 );
+
         final ArtifactsMerge m = new ArtifactsMerge();
 
-        final Content merged = m.mergeContentMetadata( "test", repos );
+        final Content merged = m.mergeContentMetadata( "test", Arrays.asList( item1, item2 ) );
 
         // repo1: bundle, featureJar, featureGroup, jre, jreConfig
         // repo2: feature2Jar, feature2Group (jre and jreConfig ignored)

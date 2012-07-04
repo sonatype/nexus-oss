@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.metadata;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -20,28 +21,39 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts.Artifact;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content.Unit;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 public class ArtifactsMerge
 {
+    private final Logger logger = LoggerFactory.getLogger( ArtifactsMerge.class );
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     /**
      * Merges artifacts from the other repository. Current implementation requires both repositories to have identical
      * mapping and properties.
      */
-    public Artifacts mergeArtifactsMetadata( final String name, final List<Artifacts> repos )
+    public Artifacts mergeArtifactsMetadata( final String name, final List<StorageFileItem> items )
         throws P2MetadataMergeException
     {
         final Artifacts result = new Artifacts( name );
 
-        if ( repos == null || repos.size() <= 0 )
+        if ( items == null || items.size() <= 0 )
         {
             return result; // nothing to merge
         }
 
-        if ( repos.size() == 1 )
+        if ( items.size() == 1 )
         {
             // TODO do we need/want to handle this specially?
         }
@@ -52,19 +64,38 @@ public class ArtifactsMerge
 
         LinkedHashMap<String, String> mergedMappingsMap = new LinkedHashMap<String, String>();
         final Set<String> keys = new HashSet<String>();
-        for ( final Artifacts repo : repos )
+        for ( StorageFileItem fileItem : items )
         {
-            // mergedProperties = mergeProperties( mergedProperties, repo );
-
-            mergeMappings( mergedMappingsMap, repo );
-
-            for ( final Artifacts.Artifact artifact : repo.getArtifacts() )
+            try
             {
-                if ( keys.add( getArtifactKey( artifact ) ) )
+                final Artifacts repo = new Artifacts( MetadataUtils.getMetadataXpp3Dom( fileItem ) );
+                // mergedProperties = mergeProperties( mergedProperties, repo );
+                mergeMappings( mergedMappingsMap, repo );
+                for ( final Artifacts.Artifact artifact : repo.getArtifacts() )
                 {
-                    mergedArtifacts.add( new Artifacts.Artifact( artifact ) );
+                    if ( keys.add( getArtifactKey( artifact ) ) )
+                    {
+                        mergedArtifacts.add( new Artifacts.Artifact( artifact ) );
+                    }
+                    // first repo wins
                 }
-                // first repo wins
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn(
+                    "Could not retrieve {} from {} due to {}. Skipping it from aggregation into {}",
+                    new Object[] { P2Constants.ARTIFACTS_XML,
+                        RepositoryStringUtils.getHumanizedNameString( fileItem.getRepositoryItemUid().getRepository() ),
+                        e.getMessage(), name } );
+
+            }
+            catch ( XmlPullParserException e )
+            {
+                getLogger().warn(
+                    "Could not retrieve {} from {} due to {}. Skipping it from aggregation into {}",
+                    new Object[] { P2Constants.ARTIFACTS_XML,
+                        RepositoryStringUtils.getHumanizedNameString( fileItem.getRepositoryItemUid().getRepository() ),
+                        e.getMessage(), name } );
             }
         }
 
@@ -265,17 +296,17 @@ public class ArtifactsMerge
         }
     }
 
-    public Content mergeContentMetadata( final String name, final ArrayList<Content> repos )
+    public Content mergeContentMetadata( final String name, final List<StorageFileItem> items )
         throws P2MetadataMergeException
     {
         final Content result = new Content( name );
 
-        if ( repos == null || repos.size() <= 0 )
+        if ( items == null || items.size() <= 0 )
         {
             return result; // nothing to merge
         }
 
-        if ( repos.size() == 1 )
+        if ( items.size() == 1 )
         {
             // TODO do we need/want to handle this specially?
         }
@@ -285,17 +316,39 @@ public class ArtifactsMerge
         final LinkedHashMap<String, String> mergedProperties = new LinkedHashMap<String, String>();
 
         final Set<String> keys = new HashSet<String>();
-        for ( final Content repo : repos )
+        for ( final StorageFileItem fileItem : items )
         {
-            // mergedProperties = mergeProperties( mergedProperties, repo );
-
-            for ( final Content.Unit unit : repo.getUnits() )
+            try
             {
-                if ( keys.add( getUnitKey( unit ) ) )
+                final Content repo = new Content( MetadataUtils.getMetadataXpp3Dom( fileItem ) );
+                // mergedProperties = mergeProperties( mergedProperties, repo );
+                for ( final Content.Unit unit : repo.getUnits() )
                 {
-                    mergedUnits.add( new Content.Unit( unit ) );
+                    if ( keys.add( getUnitKey( unit ) ) )
+                    {
+                        mergedUnits.add( new Content.Unit( unit ) );
+                    }
+                    // first repo wins
                 }
-                // first repo wins
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn(
+                    "Could not retrieve {} from {} due to {}. Skipping it from aggregation into {}",
+                    new Object[] {
+                        P2Constants.CONTENT_XML,
+                        RepositoryStringUtils.getHumanizedNameString( fileItem.getRepositoryItemUid().getRepository() ),
+                        e.getMessage(), name } );
+
+            }
+            catch ( XmlPullParserException e )
+            {
+                getLogger().warn(
+                    "Could not retrieve {} from {} due to {}. Skipping it from aggregation into {}",
+                    new Object[] {
+                        P2Constants.CONTENT_XML,
+                        RepositoryStringUtils.getHumanizedNameString( fileItem.getRepositoryItemUid().getRepository() ),
+                        e.getMessage(), name } );
             }
         }
 
