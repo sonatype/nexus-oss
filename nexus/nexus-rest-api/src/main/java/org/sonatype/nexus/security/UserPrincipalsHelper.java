@@ -20,6 +20,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -34,6 +36,8 @@ import org.sonatype.security.usermanagement.UserStatus;
 @Singleton
 public class UserPrincipalsHelper
 {
+    private final Logger log = LoggerFactory.getLogger( getClass() );
+
     @Inject
     private List<UserManager> userManagers;
 
@@ -59,13 +63,23 @@ public class UserPrincipalsHelper
                     return user.getStatus();
                 }
             }
+            catch ( final NoSuchUserManagerException e )
+            {
+                throw new UserNotFoundException( userId, e.getMessage(), e );
+            }
             catch ( final UserNotFoundTransientException e )
             {
+                log.debug( "Ignoring transient user error: {}", e );
                 return UserStatus.disabled;
             }
-            catch ( final Exception e )
+            catch ( final UserNotFoundException e )
             {
-                // treat all other errors as UserNotFoundException
+                throw e; // pass back original cause unchanged
+            }
+            catch ( final RuntimeException e )
+            {
+                log.debug( "Ignoring transient user error: {}", e );
+                return UserStatus.disabled;
             }
         }
         throw new UserNotFoundException( userId );
@@ -81,12 +95,13 @@ public class UserPrincipalsHelper
     public UserManager findUserManager( final PrincipalCollection principals )
         throws NoSuchUserManagerException
     {
+        String primaryRealmName = null;
         if ( principals != null )
         {
             final Iterator<String> itr = principals.getRealmNames().iterator();
             if ( itr.hasNext() )
             {
-                final String primaryRealmName = itr.next();
+                primaryRealmName = itr.next();
                 for ( final UserManager userManager : userManagers )
                 {
                     if ( primaryRealmName.equals( userManager.getAuthenticationRealmName() ) )
@@ -96,6 +111,6 @@ public class UserPrincipalsHelper
                 }
             }
         }
-        throw new NoSuchUserManagerException();
+        throw new NoSuchUserManagerException( "No UserManager for realm: " + primaryRealmName );
     }
 }
