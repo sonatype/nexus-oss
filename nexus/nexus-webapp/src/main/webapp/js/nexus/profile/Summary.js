@@ -95,6 +95,7 @@ Nexus.profile.Summary = function(config) {
       width : this.FIELD_WIDTH,
       style : 'text-decoration: underline; color: blue; cursor: pointer;',
       hidden : isExternalUser,
+      hideLabel : isExternalUser,
       listeners : {
         'render' : function(component) {
           component.getEl().on('click', function() {
