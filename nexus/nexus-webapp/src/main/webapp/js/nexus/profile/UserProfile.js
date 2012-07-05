@@ -11,27 +11,31 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
+/*global Sonatype, Ext, Nexus*/
+
 /**
  * The user profile tab.
  *
  * @constructor
  */
-Nexus.profile.UserProfile = function(config) {
+Nexus.profile.UserProfile = function(cfg) {
   // this may happen on opening a bookmark
   if (!Sonatype.user.curr || !Sonatype.user.curr.isLoggedIn) {
     Sonatype.repoServer.RepoServer.loginHandler();
-    return
+    return;
   }
 
-  var config = config || {};
-  var defaultConfig = {
-    autoScroll : true,
-    minWidth : 270,
-    layout : 'absolute'
-  };
+  var
+        config = cfg || {},
+        defaultConfig = {
+          autoScroll : true,
+          minWidth : 270,
+          layout : 'absolute'
+        },
+        views = [];
+
   Ext.apply(this, config, defaultConfig);
 
-  var views = [];
 
   Sonatype.Events.fireEvent('userProfileInit', views);
 
@@ -78,7 +82,7 @@ Nexus.profile.UserProfile = function(config) {
       Ext.each(views, function(v) {
         var content = new v.item({username : Sonatype.user.curr.username, border : false, frame : false});
         if (!content.shouldShow || content.shouldShow()) {
-          viewArray.push([content, v.name])
+          viewArray.push([content, v.name]);
         }
       });
       return viewArray;
@@ -91,7 +95,7 @@ Nexus.profile.UserProfile = function(config) {
       tab.refreshContent();
       this.content.doLayout();
     }
-  }
+  };
 
   this.refreshButton = new Ext.Button({
     tooltip : 'Refresh',
@@ -116,25 +120,27 @@ Nexus.profile.UserProfile = function(config) {
 
   this.getBookmark = function() {
     return this.bookmark;
-  }
+  };
 
   this.applyBookmark = function(token) {
-    var rec;
-    var combo = this.selector;
+    var
+          rec, idx,
+          combo = this.selector;
 
     token = decodeURIComponent(token);
 
-    var idx = combo.store.find('text', token);
+    idx = combo.store.find('text', token);
 
-    if (idx != -1) {
+    if (idx !== -1) {
       this.bookmark = token;
       rec = combo.store.getAt(idx);
       combo.setValue(rec.get('text'));
       this.content.display(rec.get('value'), this);
     }
-  }
+  };
 
-}
+};
+
 Ext.extend(Nexus.profile.UserProfile, Ext.Panel);
 
 /**
@@ -164,12 +170,11 @@ Nexus.profile.UserProfile.Content = function(config)
 
   Nexus.profile.UserProfile.Content.superclass.constructor.call(this);
 
-  this.display = function(panel, profile)
-  {
+  this.display = function(panel, profile) {
     this.add(panel);
     this.setActiveTab(panel);
     profile.refreshButton.setVisible(panel.refreshContent !== undefined);
-  }
+  };
 };
 Ext.extend(Nexus.profile.UserProfile.Content, Ext.TabPanel);
 
@@ -217,6 +222,6 @@ Nexus.profile.register = function(name, panelCls, views) {
       });
     });
   }
-}
+};
 
 
