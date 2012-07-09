@@ -23,7 +23,7 @@
     <version>2.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.model</groupId>
+  <groupId>org.sonatype.nexus.capabilities</groupId>
   <artifactId>nexus-capabilities-model</artifactId>
 
   <name>Nexus : Plugins : Capabilities : Model</name>

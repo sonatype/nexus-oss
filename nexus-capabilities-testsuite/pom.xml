@@ -30,7 +30,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus.client</groupId>
+      <groupId>org.sonatype.nexus.capabilities</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
     </dependency>
 
