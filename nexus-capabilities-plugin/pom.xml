@@ -37,7 +37,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
+      <groupId>org.sonatype.nexus.model</groupId>
       <artifactId>nexus-capabilities-model</artifactId>
     </dependency>
     <dependency>
@@ -127,6 +127,7 @@
           <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
           <sharedDependencies>
             <sharedDependency>org.sonatype.sisu.goodies:goodies-eventbus</sharedDependency>
+            <sharedDependencies>org.sonatype.nexus.model:nexus-capabilities-model</sharedDependencies>
           </sharedDependencies>
         </configuration>
       </plugin>
