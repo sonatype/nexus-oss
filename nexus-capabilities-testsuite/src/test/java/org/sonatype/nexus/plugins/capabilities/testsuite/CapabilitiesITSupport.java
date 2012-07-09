@@ -26,7 +26,7 @@ import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
-import org.sonatype.nexus.plugins.capabilities.client.Capabilities;
+import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
