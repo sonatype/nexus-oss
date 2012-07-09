@@ -32,6 +32,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.hamcrest.Matchers.containsString;
 
+/**
+ * This IT checks that previously retrieved P2 metadata is used from cache, even when the proxied P2 repository is unavailable.
+ * (Nexus is configured to always go remote for the P2 proxy repository.)
+ */
 public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
     extends AbstractNexusProxyP2IT
 {
@@ -43,22 +47,37 @@ public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
 
     @Test
     public void test()
-        throws IOException, Exception
+        throws Exception
     {
         final String url = "content/repositories/" + getTestRepositoryId() + "/content.xml";
 
         // init local storage
-        final Response content = RequestFacade.sendMessage( url, Method.GET );
-        assertThat( content.getEntity().getText(), containsString( "<?metadataRepository" ) );
-        installAndVerifyP2Feature();
+        Response content = null;
+        try
+        {
+            content = RequestFacade.sendMessage( url, Method.GET );
+            assertThat( content.getEntity().getText(), containsString( "<?metadataRepository" ) );
+            installAndVerifyP2Feature();
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( content );
+        }
 
         // invalidate remote repo
         replaceProxy();
 
         // check delivery from local storage
-        final Response content2 = RequestFacade.sendMessage( url, Method.GET );
-        assertThat( content2.getEntity().getText(), containsString( "<?metadataRepository" ) );
-        installAndVerifyP2Feature();
+        try
+        {
+            content = RequestFacade.sendMessage( url, Method.GET );
+            assertThat( content.getEntity().getText(), containsString( "<?metadataRepository" ) );
+            installAndVerifyP2Feature();
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( content );
+        }
     }
 
     private void replaceProxy()
