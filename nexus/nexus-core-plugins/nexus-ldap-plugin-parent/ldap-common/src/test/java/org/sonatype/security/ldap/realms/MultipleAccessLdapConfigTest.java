@@ -22,6 +22,8 @@ import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.context.Context;
 import org.junit.Test;
 import org.sonatype.security.ldap.AbstractLdapTest;
+import org.sonatype.security.ldap.dao.LdapDAOException;
+import org.sonatype.security.ldap.dao.LdapUtils;
 import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
@@ -30,7 +32,7 @@ public class MultipleAccessLdapConfigTest
     extends AbstractLdapTest
 {
 
-    private LdapContextFactory ldapContextFactory;
+    private SimpleLdapManager ldapManager;
 
     private LdapConfiguration ldapConfig;
 
@@ -40,7 +42,7 @@ public class MultipleAccessLdapConfigTest
     {
         super.setUp();
 
-        ldapContextFactory = this.lookup( LdapContextFactory.class, "PlexusLdapContextFactory" );
+        ldapManager = (SimpleLdapManager) lookup( LdapManager.class );
         ldapConfig = this.lookup( LdapConfiguration.class );
     }
 
@@ -64,16 +66,16 @@ public class MultipleAccessLdapConfigTest
 
     @Test
     public void testConfigure()
-        throws InvalidConfigurationException, NamingException
+        throws InvalidConfigurationException, NamingException, LdapDAOException
     {
         try
         {
-            ldapContextFactory.getSystemLdapContext();
-            Assert.fail( "Expected NamingException" );
+            ldapManager.getLdapContextFactory().getSystemLdapContext();
+            Assert.fail( "Expected LdapDAOException" );
         }
-        catch ( NamingException e )
+        catch ( LdapDAOException e )
         {
-            // expected
+            // expected, because connection is not configured
         }
 
         // now configure the relam
@@ -88,7 +90,7 @@ public class MultipleAccessLdapConfigTest
         ldapConfig.save();
 
         // now we should be able to get a valid configuration
-        ldapContextFactory.getSystemLdapContext();
+        ldapManager.getLdapContextFactory().getSystemLdapContext();
 
     }
 
