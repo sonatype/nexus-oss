@@ -10,21 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.mindexer;
+package org.sonatype.nexus.mindexer.client;
 
 import org.sonatype.nexus.client.internal.util.Check;
 
-public class KeywordQuery
+public class ClassnameQuery
     extends Query
 {
 
-    public String getKeyword()
+    public String getClassname()
     {
-        return getTerms().get( "q" );
+        return getTerms().get( "cn" );
     }
 
-    public void setKeyword( String q )
+    public void setClassname( String cn )
     {
-        getTerms().put( "q", Check.notBlank( q, "q" ) );
+        getTerms().put( "cn", Check.notBlank( cn, "cn" ) );
     }
 }

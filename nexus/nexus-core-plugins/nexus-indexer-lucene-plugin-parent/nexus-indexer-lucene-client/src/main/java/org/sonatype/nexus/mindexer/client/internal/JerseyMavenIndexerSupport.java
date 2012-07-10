@@ -10,19 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.mindexer.internal;
+package org.sonatype.nexus.mindexer.client.internal;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
-import org.sonatype.nexus.client.mindexer.ClassnameQuery;
-import org.sonatype.nexus.client.mindexer.KeywordQuery;
-import org.sonatype.nexus.client.mindexer.MavenCoordinatesQuery;
-import org.sonatype.nexus.client.mindexer.MavenIndexer;
-import org.sonatype.nexus.client.mindexer.SearchRequest;
-import org.sonatype.nexus.client.mindexer.SearchResponse;
-import org.sonatype.nexus.client.mindexer.Sha1Query;
+import org.sonatype.nexus.mindexer.client.ClassnameQuery;
+import org.sonatype.nexus.mindexer.client.KeywordQuery;
+import org.sonatype.nexus.mindexer.client.MavenCoordinatesQuery;
+import org.sonatype.nexus.mindexer.client.MavenIndexer;
+import org.sonatype.nexus.mindexer.client.SearchRequest;
+import org.sonatype.nexus.mindexer.client.SearchResponse;
+import org.sonatype.nexus.mindexer.client.Sha1Query;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 public abstract class JerseyMavenIndexerSupport

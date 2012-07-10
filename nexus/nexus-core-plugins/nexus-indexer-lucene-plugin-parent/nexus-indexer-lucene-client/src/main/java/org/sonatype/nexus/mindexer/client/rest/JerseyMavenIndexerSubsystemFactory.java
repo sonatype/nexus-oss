@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.mindexer.rest;
+package org.sonatype.nexus.mindexer.client.rest;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -18,8 +18,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
-import org.sonatype.nexus.client.mindexer.MavenIndexer;
-import org.sonatype.nexus.client.mindexer.internal.JerseyMavenIndexer;
+import org.sonatype.nexus.mindexer.client.MavenIndexer;
+import org.sonatype.nexus.mindexer.client.internal.JerseyMavenIndexer;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 @Named

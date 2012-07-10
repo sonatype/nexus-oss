@@ -10,21 +10,47 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.mindexer;
+package org.sonatype.nexus.mindexer.client;
 
 import org.sonatype.nexus.client.internal.util.Check;
 
-public class Sha1Query
-    extends Query
+public class SearchResponseRepository
 {
 
-    public String getSha1()
+    private final String id;
+
+    private final String name;
+
+    private final String contentClass;
+
+    private final String baseUrl;
+
+    public SearchResponseRepository( final String id, final String name, final String contentClass,
+                                     final String baseUrl )
     {
-        return getTerms().get( "sha1" );
+        this.id = Check.notBlank( id, "id" );
+        this.name = name;
+        this.contentClass = Check.notBlank( contentClass, "contentClass" );
+        this.baseUrl = baseUrl;
     }
 
-    public void setSha1( String sha1 )
+    public String getId()
     {
-        getTerms().put( "sha1", Check.notBlank( sha1, "sha1" ) );
+        return id;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getContentClass()
+    {
+        return contentClass;
+    }
+
+    public String getBaseUrl()
+    {
+        return baseUrl;
     }
 }

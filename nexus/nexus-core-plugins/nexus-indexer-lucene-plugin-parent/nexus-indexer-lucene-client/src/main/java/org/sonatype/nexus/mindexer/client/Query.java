@@ -10,21 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.mindexer;
+package org.sonatype.nexus.mindexer.client;
 
-import org.sonatype.nexus.client.internal.util.Check;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ClassnameQuery
-    extends Query
+public abstract class Query
 {
 
-    public String getClassname()
+    private final Map<String, String> terms;
+
+    private Boolean exact;
+
+    protected Query()
     {
-        return getTerms().get( "cn" );
+        this.terms = new HashMap<String, String>();
+        this.exact = null; // not given, server default
     }
 
-    public void setClassname( String cn )
+    protected Map<String, String> getTerms()
     {
-        getTerms().put( "cn", Check.notBlank( cn, "cn" ) );
+        return terms;
+    }
+
+    public Boolean getExact()
+    {
+        return exact;
+    }
+
+    public void setExact( Boolean exact )
+    {
+        this.exact = exact;
+    }
+
+    public Map<String, String> toMap()
+    {
+        return new HashMap<String, String>( terms );
     }
 }

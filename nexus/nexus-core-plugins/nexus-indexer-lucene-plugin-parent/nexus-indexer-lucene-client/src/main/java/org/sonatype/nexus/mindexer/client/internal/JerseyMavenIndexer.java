@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.mindexer.internal;
+package org.sonatype.nexus.mindexer.client.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,10 +21,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.sonatype.nexus.client.core.NexusErrorException;
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
-import org.sonatype.nexus.client.mindexer.SearchRequest;
-import org.sonatype.nexus.client.mindexer.SearchResponse;
-import org.sonatype.nexus.client.mindexer.SearchResponseArtifact;
-import org.sonatype.nexus.client.mindexer.SearchResponseRepository;
+import org.sonatype.nexus.mindexer.client.SearchRequest;
+import org.sonatype.nexus.mindexer.client.SearchResponse;
+import org.sonatype.nexus.mindexer.client.SearchResponseArtifact;
+import org.sonatype.nexus.mindexer.client.SearchResponseRepository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.MIndexerXStreamConfiguratorLightweight;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.mindexer.internal;
+package org.sonatype.nexus.mindexer.client.internal;
 
 import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 
@@ -27,12 +27,12 @@ import org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
-import org.sonatype.nexus.client.mindexer.KeywordQuery;
-import org.sonatype.nexus.client.mindexer.MavenIndexer;
-import org.sonatype.nexus.client.mindexer.SearchRequest;
-import org.sonatype.nexus.client.mindexer.SearchResponse;
-import org.sonatype.nexus.client.mindexer.SearchResponseArtifact;
-import org.sonatype.nexus.client.mindexer.rest.JerseyMavenIndexerSubsystemFactory;
+import org.sonatype.nexus.mindexer.client.KeywordQuery;
+import org.sonatype.nexus.mindexer.client.MavenIndexer;
+import org.sonatype.nexus.mindexer.client.SearchRequest;
+import org.sonatype.nexus.mindexer.client.SearchResponse;
+import org.sonatype.nexus.mindexer.client.SearchResponseArtifact;
+import org.sonatype.nexus.mindexer.client.rest.JerseyMavenIndexerSubsystemFactory;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClientFactory;
