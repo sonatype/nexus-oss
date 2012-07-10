@@ -18,8 +18,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
-    <artifactId>nexus-capabilities-plugin-parent</artifactId>
+    <groupId>org.sonatype.nexus.capabilities</groupId>
+    <artifactId>nexus-capabilities</artifactId>
     <version>2.1-SNAPSHOT</version>
   </parent>
 
@@ -28,11 +28,14 @@
 
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus : Plugins : Capabilities : Plugin</name>
-  <description>Allows Nexus to define configurable capabilities</description>
+  <name>Nexus Capabilities :: Plugin</name>
 
   <properties>
     <debug-js>false</debug-js>
+
+    <pluginName>Nexus Capabilities Plugin</pluginName>
+    <pluginDescription>Allows Nexus to define configurable capabilities</pluginDescription>
+    <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
   </properties>
 
   <dependencies>
@@ -124,7 +127,9 @@
           </dependency>
         </dependencies>
         <configuration>
-          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
+          <pluginName>${pluginName}</pluginName>
+          <pluginDescription>${pluginDescription}</pluginDescription>
+          <pluginSiteUrl>${pluginSiteUrl}</pluginSiteUrl>
           <sharedDependencies>
             <sharedDependency>org.sonatype.sisu.goodies:goodies-eventbus</sharedDependency>
             <sharedDependencies>org.sonatype.nexus.capabilities:nexus-capabilities-model</sharedDependencies>

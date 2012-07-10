@@ -51,7 +51,7 @@ public abstract class CapabilitiesITSupport
                 "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
             ),
             resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins.capabilities", "nexus-capabilities-testsuite-helper"
+                "org.sonatype.nexus.capabilities", "nexus-capabilities-testsuite-helper"
             )
         );
     }

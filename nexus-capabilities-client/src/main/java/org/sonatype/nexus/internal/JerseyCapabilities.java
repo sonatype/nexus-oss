@@ -16,6 +16,7 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.sonatype.nexus.capabilities.client.Capabilities;
+import org.sonatype.nexus.capabilities.model.XStreamConfigurator;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
@@ -24,7 +25,6 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityReque
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
-import org.sonatype.nexus.plugins.capabilities.model.XStreamConfigurator;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**

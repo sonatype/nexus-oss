@@ -18,15 +18,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
-    <artifactId>nexus-capabilities-plugin-parent</artifactId>
+    <groupId>org.sonatype.nexus.capabilities</groupId>
+    <artifactId>nexus-capabilities</artifactId>
     <version>2.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.capabilities</groupId>
   <artifactId>nexus-capabilities-client</artifactId>
 
-  <name>Nexus : Plugins : Capabilities : Client</name>
+  <name>Nexus Capabilities :: Client</name>
 
   <dependencies>
     <dependency>

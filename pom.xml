@@ -23,13 +23,13 @@
     <version>11</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
-  <artifactId>nexus-capabilities-plugin-parent</artifactId>
+  <groupId>org.sonatype.nexus.capabilities</groupId>
+  <artifactId>nexus-capabilities</artifactId>
   <version>2.1-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
-  <name>Nexus : Plugins : Capabilities : Aggregator</name>
+  <name>Nexus Capabilities (Parent)</name>
 
   <licenses>
     <license>
@@ -219,7 +219,7 @@
         <type>${nexus.plugin.type}</type>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
+        <groupId>org.sonatype.nexus.capabilities</groupId>
         <artifactId>nexus-capabilities-testsuite-helper</artifactId>
         <type>${nexus.plugin.type}</type>
         <version>2.1-SNAPSHOT</version>
