@@ -22,14 +22,15 @@
     <version>2.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-indexer-lucene-plugin-parent</artifactId>
+  <groupId>org.sonatype.nexus.indexer-lucene</groupId>  
+  <artifactId>nexus-indexer-lucene</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus : Core Plugins : MavenIndexer</name>
+  <name>Nexus Maven Indexer (Parent)</name>
   <description>Adds search capabilities for repository content.</description>
 
   <modules>
-    <module>nexus-indexer-lucene-plugin-model</module>
+    <module>nexus-indexer-lucene-model</module>
     <module>nexus-indexer-lucene-plugin</module>
   </modules>
 
