@@ -24,8 +24,8 @@
 
   <artifactId>nexus-indexer-lucene-model</artifactId>
   <packaging>jar</packaging>
-    <name>Nexus Maven Indexer :: Model</name>
-  <description>Indexer related REST DTOs.</description>
+
+  <name>Nexus Maven Indexer :: Model</name>
 
   <dependencies>
 
