@@ -1179,6 +1179,11 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.sonatype.nexus.client</groupId>
+        <artifactId>nexus-client-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.sonatype.nexus.indexer-lucene</groupId>
         <artifactId>nexus-indexer-lucene-model</artifactId>
         <version>${project.version}</version>
@@ -1808,6 +1813,7 @@
     <module>nexus-core-plugins</module>
     <module>nexus-webapp</module>
     <module>nexus-launcher</module>
+    <module>nexus-client-core</module>
     <module>nexus-clients</module>
     <module>nexus-oss-webapp</module>
     <module>nexus-oss-webapp-tattletale</module>
