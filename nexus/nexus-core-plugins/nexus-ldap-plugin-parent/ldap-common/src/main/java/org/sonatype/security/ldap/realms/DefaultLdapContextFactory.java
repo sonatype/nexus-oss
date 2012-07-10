@@ -20,6 +20,8 @@ import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.shiro.realm.ldap.AbstractLdapRealm;
@@ -209,19 +211,29 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
         return getLdapContext( principal.toString(), credentials.toString(), false );
     }
 
-    public LdapContext getLdapContext(String username, String password, boolean systemContext) throws NamingException {
-        if (searchBase == null) {
-            throw new IllegalStateException("A search base must be specified.");
-        }
-        if (url == null) {
-            throw new IllegalStateException("An LDAP URL must be specified of the form ldap://<hostname>:<port>");
-        }
+    public LdapContext getLdapContext(String username, String password, boolean systemContext) throws NamingException
+    {
+        return new InitialLdapContext( getSetupEnvironment( username, password, systemContext ), null );
+    }
 
-        if (username != null && principalSuffix != null) {
+    @VisibleForTesting
+    Hashtable<String, String> getSetupEnvironment( String username, final String password,
+                                                   final boolean systemContext )
+    {
+        Preconditions.checkNotNull( url, "No ldap URL specified (ldap://<hostname>:<port>)" );
+        Preconditions.checkArgument( url.startsWith( "ldap://" ), "LDAP URL is not valid (must be 'ldap://<hostname>:<port>')" );
+
+        if ( username != null && principalSuffix != null )
+        {
             username += principalSuffix;
         }
 
         Hashtable<String, String> env = new Hashtable<String, String>();
+
+        if ( additionalEnvironment != null )
+        {
+            env.putAll( additionalEnvironment );
+        }
 
         // if the Authentication scheme is none, and this is not the system ctx we need to set the scheme to 'simple'
         if ( "none".equals( authentication ) && !systemContext )
@@ -233,33 +245,33 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
             env.put( Context.SECURITY_AUTHENTICATION, authentication );
         }
 
-        if (username != null) {
-            env.put(Context.SECURITY_PRINCIPAL, username);
+        if ( username != null )
+        {
+            env.put( Context.SECURITY_PRINCIPAL, username );
         }
-        if (password != null) {
-            env.put(Context.SECURITY_CREDENTIALS, password);
+        if ( password != null )
+        {
+            env.put( Context.SECURITY_CREDENTIALS, password );
         }
-        env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactoryClassName);
-        env.put(Context.PROVIDER_URL, url);
-        env.put(Context.REFERRAL, referral);
+        env.put( Context.INITIAL_CONTEXT_FACTORY, contextFactoryClassName );
+        env.put( Context.PROVIDER_URL, url );
+        env.put( Context.REFERRAL, referral );
 
         // Only pool connections for system contexts
-        if (usePooling && username != null && systemContext) {
+        if ( usePooling && username != null && systemContext )
+        {
             // Enable connection pooling
             env.put(SUN_CONNECTION_POOLING_PROPERTY, "true");
             // Enable pooling for plain and ssl connections
             env.put( SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY, "plain ssl" );
         }
 
-        if (additionalEnvironment != null) {
-            env.putAll(additionalEnvironment);
-        }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Initializing LDAP context using URL [" + url + "] and username [" + systemUsername + "] " +
-                    "with pooling [" + (usePooling ? "enabled" : "disabled") + "]");
+        if ( log.isDebugEnabled() )
+        {
+            log.debug( "Initializing LDAP context using URL [" + url + "] and username [" + systemUsername + "] " +
+                           "with pooling [" + ( usePooling ? "enabled" : "disabled" ) + "]" );
         }
-
-        return new InitialLdapContext(env, null);
+        return env;
     }
 }
