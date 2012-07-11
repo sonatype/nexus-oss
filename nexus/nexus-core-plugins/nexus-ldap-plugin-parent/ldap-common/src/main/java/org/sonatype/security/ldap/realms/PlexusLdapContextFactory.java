@@ -45,6 +45,7 @@ public class PlexusLdapContextFactory
      * LDAP connection pooling.
      */
     protected static final String SUN_CONNECTION_POOLING_PROPERTY = "com.sun.jndi.ldap.connect.pool";
+    protected static final String SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY = "com.sun.jndi.ldap.connect.pool.protocol";
 
     protected String contextFactoryClassName = "com.sun.jndi.ldap.LdapCtxFactory";
 
@@ -53,7 +54,7 @@ public class PlexusLdapContextFactory
     public LdapContext getSystemLdapContext()
         throws NamingException
     {   
-        // if we do not have a connectionInfo objcet in the config we are in an unconfigured state. A naming exception
+        // if we do not have a connectionInfo object in the config we are in an unconfigured state. A naming exception
         // is the best we can do.
         if ( ldapConfig.readConnectionInfo() == null )
         {
@@ -153,6 +154,8 @@ public class PlexusLdapContextFactory
         {
             // Enable connection pooling
             env.put( SUN_CONNECTION_POOLING_PROPERTY, "true" );
+            // Enable pooling for plain and ssl connections
+            env.put( SUN_CONNECTION_POOLING_PROTOCOL_PROPERTY, "plain ssl" );
         }
 
         // if (additionalEnvironment != null) {
