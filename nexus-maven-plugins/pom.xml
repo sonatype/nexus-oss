@@ -41,6 +41,12 @@
     <nexus.version>${project.version}</nexus.version>
   </properties>
 
+  <scm>
+    <connection>scm:git:git://github.com/sonatype/nexus.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/nexus.git</developerConnection>
+    <url>https://github.com/sonatype/nexus</url>
+  </scm>
+  
   <dependencyManagement>
     <dependencies>
 
