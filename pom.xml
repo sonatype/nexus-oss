@@ -172,7 +172,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
         <artifactId>nexus-client-core</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
