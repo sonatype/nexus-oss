@@ -361,12 +361,12 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-client</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-xstream</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2</version>
     </dependency>
 
     <!-- Test -->
