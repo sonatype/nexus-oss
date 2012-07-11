@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
 Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
       initComponent : function() {
         Ext.app.SearchField.superclass.initComponent.call(this);
         this.on('specialkey', function(f, e) {
-              if (e.getKey() == e.ENTER)
+              if (e.getKey() === e.ENTER)
               {
                 this.onTrigger2Click();
               }
@@ -55,6 +56,24 @@ Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
         }
         // var o = {start: 0};
         this.searchPanel.startSearch(this.searchPanel, true);
+      },
+
+      /**
+       * Override TwinTriggerField#afterRender, because position calculation for IE was always off by 1 (or even many)
+       * pixels by default.
+       */
+      afterRender : function(){
+        Ext.form.TriggerField.superclass.afterRender.call(this);
+        var y;
+        if (Ext.isIE && !this.hideTrigger) {
+          if (Ext.isIE8||Ext.isIE6) { // IE6 is also discovered for IE9
+            this.el.position();
+            this.el.setY(this.el.getY()+1);
+          } else if(Ext.isIE7 && this.el.getY() !== (y = this.trigger.getY())){
+            this.el.position();
+            this.el.setY(y);
+          }
+        }
       }
     });
 
