@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_METHOD;
 
 import javax.inject.Inject;
@@ -59,6 +61,7 @@ public abstract class NexusRunningITSupport
             startAndStopStrategy = strategy.value();
         }
         startNexus( nexus() );
+        assertThat( "Nexus is running before test starts", nexus().isRunning(), is( true ) );
     }
 
     @After
