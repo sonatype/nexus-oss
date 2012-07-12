@@ -30,13 +30,17 @@ Sonatype.panels.AutoTabPanel = function(config) {
     tools : [{
       id : 'refresh',
       qtip : 'Refresh data',
+      hidden : true,
       handler : function(evt, toolEl, panel) {
+        var active;
         if ( panel.tabPanel ) {
-          var active = panel.tabPanel.getActiveTab();
+          active = panel.tabPanel.getActiveTab();
         } else {
-          var active = panel.getComponent(0);
+          active = panel.getComponent(0);
         }
-        active && active.refreshContent && active.refreshContent();
+        if (active && active.refreshContent) {
+          active.refreshContent();
+        }
       }
     }]
   };
