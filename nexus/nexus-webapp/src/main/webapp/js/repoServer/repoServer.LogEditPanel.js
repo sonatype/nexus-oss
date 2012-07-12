@@ -122,7 +122,6 @@ Ext.extend(Sonatype.repoServer.LogEditPanel, Ext.Panel, {
         if (allValid)
         {
           this.save();
-          this.loadLogConfig();
         }
       },
 
@@ -133,7 +132,10 @@ Ext.extend(Sonatype.repoServer.LogEditPanel, Ext.Panel, {
               method : 'PUT',
               waitMsg : 'Updating log configuration...',
               fpanel : this.formPanel,
-              serviceDataObj : Sonatype.repoServer.referenceData.logConfig
+              serviceDataObj : Sonatype.repoServer.referenceData.logConfig,
+              success : function(form, action) {
+                form.findField('rootLoggerLevel').setValue(action.result.data.rootLoggerLevel);
+              }
             });
       }
 
