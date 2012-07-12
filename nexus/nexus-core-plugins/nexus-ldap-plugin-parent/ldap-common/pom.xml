@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins.ldap</groupId>
     <artifactId>nexus-ldap-plugin-parent</artifactId>
-    <version>2.1-RC1</version>
+    <version>2.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>ldap-common</artifactId>
