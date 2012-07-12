@@ -43,5 +43,6 @@ public @interface RepositoryType
      * The "hard" limit of maximal instance count for this repository. Default is unlimited. See NexusConfiguration
      * iface for details.
      */
-    int repositoryMaxInstanceCount() default UNLIMITED_INSTANCES;
+    int repositoryMaxInstanceCount() default org.sonatype.nexus.plugins.RepositoryType.UNLIMITED_INSTANCES; // fully qualify for http://bugs.sun.com/view_bug.do?bug_id=6512707
+    
 }

@@ -32,7 +32,8 @@ import java.lang.annotation.Target;
 public @interface NexusStartAndStopStrategy
 {
 
-    Strategy value() default Strategy.EACH_METHOD;
+    // fully qualify due to http://bugs.sun.com/view_bug.do?bug_id=6512707
+    org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy value() default org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_METHOD;
 
     public static enum Strategy
     {
