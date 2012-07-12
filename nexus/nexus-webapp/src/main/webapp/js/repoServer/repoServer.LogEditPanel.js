@@ -10,21 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Sonatype.repoServer.LogEditPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+
+/*global Ext, Sonatype*/
+Sonatype.repoServer.LogEditPanel = function(cfg) {
+  var
+        config = cfg || {},
+        defaultConfig = {},
+        formId = Ext.id(),
+        rootLoggerLevelStore = new Ext.data.SimpleStore({
+          fields : ['value', 'display'],
+          data : [
+            ['DEBUG', 'DEBUG'],
+            ['INFO', 'INFO'],
+            ['ERROR', 'ERROR']
+          ]
+        }),
+        // help text alias
+        ht = Sonatype.repoServer.resources.help.log;
+
   Ext.apply(this, config, defaultConfig);
 
-  // help text alias
-  var ht = Sonatype.repoServer.resources.help.log;
 
-  var formId = Ext.id();
-
-  var rootLoggerLevelStore = new Ext.data.SimpleStore({
-        fields : ['value', 'display'],
-        data : [['DEBUG', 'DEBUG'], ['INFO', 'INFO'], ['ERROR', 'ERROR']]
-
-      });
 
   this.formPanel = new Ext.FormPanel({
         region : 'center',
