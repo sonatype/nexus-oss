@@ -14,13 +14,17 @@ package org.sonatype.nexus.client.rest.jersey;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.sonatype.nexus.client.core.Condition;
+import org.sonatype.nexus.client.core.NexusErrorMessageException;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
+import org.sonatype.nexus.client.internal.msg.ErrorMessage;
+import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.internal.rest.AbstractXStreamNexusClient;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
@@ -176,4 +180,24 @@ public class JerseyNexusClient
         }
     }
 
+    // ==
+
+    /**
+     * Internal method to be used by subsystem implementations to convert Jersey specific exception to
+     * {@link NexusErrorMessageException}.
+     * 
+     * @param e
+     * @return
+     */
+    public NexusErrorMessageException convertErrorResponse( final int statusCode, final String reasonPhrase,
+                                                            final ErrorResponse errorResponse )
+    {
+        final Map<String, String> errors = new LinkedHashMap<String, String>();
+        for ( ErrorMessage errorMessage : errorResponse.getErrors() )
+        {
+            errors.put( errorMessage.getId(), errorMessage.getMsg() );
+        }
+
+        return new NexusErrorMessageException( statusCode, reasonPhrase, errors );
+    }
 }
