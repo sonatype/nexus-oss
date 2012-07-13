@@ -14,31 +14,30 @@ package org.sonatype.nexus.mindexer.client.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.sonatype.nexus.client.core.NexusErrorException;
-import org.sonatype.nexus.client.internal.msg.ErrorMessage;
+import org.sonatype.nexus.client.core.NexusUnexpectedResponseException;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
+import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.mindexer.client.SearchRequest;
 import org.sonatype.nexus.mindexer.client.SearchResponse;
 import org.sonatype.nexus.mindexer.client.SearchResponseArtifact;
 import org.sonatype.nexus.mindexer.client.SearchResponseRepository;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.MIndexerXStreamConfiguratorLightweight;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
 import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
+
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * Provides Maven Indexer REST Client.
- *
+ * 
  * @author cstamas
  */
 public class JerseyMavenIndexer
@@ -96,18 +95,13 @@ public class JerseyMavenIndexer
             else if ( clientResponse.getClientResponseStatus().getStatusCode() == 400 )
             {
                 final ErrorResponse errorResponse = clientResponse.getEntity( ErrorResponse.class );
-                final HashMap<String, String> errors = new HashMap<String, String>();
-                for ( ErrorMessage message : (List<ErrorMessage>) errorResponse.getErrors() )
-                {
-                    errors.put( message.getId(), message.getMsg() );
-                }
-
-                throw new NexusErrorException( clientResponse.getStatus(),
-                                               clientResponse.getClientResponseStatus().getReasonPhrase(), errors );
+                throw getNexusClient().convertErrorResponse( clientResponse.getClientResponseStatus().getStatusCode(),
+                    clientResponse.getClientResponseStatus().getReasonPhrase(), errorResponse );
             }
             else
             {
-                throw new UniformInterfaceException( clientResponse );
+                throw new NexusUnexpectedResponseException( clientResponse.getClientResponseStatus().getStatusCode(),
+                    clientResponse.getClientResponseStatus().getReasonPhrase() );
             }
         }
         finally
@@ -119,7 +113,7 @@ public class JerseyMavenIndexer
     /**
      * The method simple "converts" (or flattens?) the Nexus REST resource response, to make it more usable. The
      * response of resource is structured sadly to mostly fulfill UI needs, and not for programmatic processing.
-     *
+     * 
      * @param searchRequest
      * @param response
      * @return
@@ -130,9 +124,7 @@ public class JerseyMavenIndexer
         for ( NexusNGRepositoryDetail repoDetail : response.getRepoDetails() )
         {
             repositories.put( repoDetail.getRepositoryId(), new SearchResponseRepository( repoDetail.getRepositoryId(),
-                                                                                          repoDetail.getRepositoryName(),
-                                                                                          repoDetail.getRepositoryContentClass(),
-                                                                                          repoDetail.getRepositoryURL() ) );
+                repoDetail.getRepositoryName(), repoDetail.getRepositoryContentClass(), repoDetail.getRepositoryURL() ) );
         }
         final ArrayList<SearchResponseArtifact> hits = new ArrayList<SearchResponseArtifact>();
         for ( NexusNGArtifact responseHit : response.getData() )
@@ -148,14 +140,12 @@ public class JerseyMavenIndexer
                     {
                         SearchResponseArtifact artifact =
                             new SearchResponseArtifact( responseHit.getGroupId(), responseHit.getArtifactId(),
-                                                        responseHit.getVersion(), responseArtifactLink.getClassifier(),
-                                                        responseArtifactLink.getExtension(),
-                                                        repositories.get( responseArtifactHit.getRepositoryId() ),
-                                                        responseHit.getLatestSnapshot(),
-                                                        responseHit.getLatestSnapshotRepositoryId(),
-                                                        responseHit.getLatestRelease(),
-                                                        responseHit.getLatestReleaseRepositoryId(),
-                                                        responseHit.getHighlightedFragment() );
+                                responseHit.getVersion(), responseArtifactLink.getClassifier(),
+                                responseArtifactLink.getExtension(),
+                                repositories.get( responseArtifactHit.getRepositoryId() ),
+                                responseHit.getLatestSnapshot(), responseHit.getLatestSnapshotRepositoryId(),
+                                responseHit.getLatestRelease(), responseHit.getLatestReleaseRepositoryId(),
+                                responseHit.getHighlightedFragment() );
                         hits.add( artifact );
                     }
                 }
@@ -164,6 +154,6 @@ public class JerseyMavenIndexer
         final Integer from = response.getFrom() != -1 ? response.getFrom() : null;
         final Integer count = response.getCount() != -1 ? response.getCount() : null;
         return new SearchResponse( searchRequest, response.getTotalCount(), from, count, response.isTooManyResults(),
-                                   response.isCollapsed(), hits );
+            response.isCollapsed(), hits );
     }
 }

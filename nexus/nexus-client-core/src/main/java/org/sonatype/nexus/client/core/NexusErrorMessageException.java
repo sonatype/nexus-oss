@@ -18,46 +18,30 @@ import java.util.Map;
 
 /**
  * Thrown when Nexus responds with an Client Error status code and (optionally) with an error message.
- *
+ * 
  * @author cstamas
  */
 @SuppressWarnings( "serial" )
-public class NexusErrorException
-    extends RuntimeException
+public class NexusErrorMessageException
+    extends NexusUnexpectedResponseException
 {
-
-    private final int statusCode;
-
-    private final String statusMessage;
-
     private final Map<String, String> errors;
 
-    public NexusErrorException( final int statusCode, final String statusMessage, final Map<String, String> errors )
+    public NexusErrorMessageException( final int statusCode, final String statusMessage,
+                                       final Map<String, String> errors )
     {
-        super( statusMessage );
-        this.statusCode = statusCode;
-        this.statusMessage = statusMessage;
+        super( statusCode, statusMessage );
         this.errors = initErrors( errors );
     }
 
     protected Map<String, String> initErrors( final Map<String, String> errors )
     {
         final Map<String, String> result = new LinkedHashMap<String, String>();
-        if ( errors != null )
+        if ( errors != null && !errors.isEmpty() )
         {
             result.putAll( errors );
         }
         return result;
-    }
-
-    public int getStatusCode()
-    {
-        return statusCode;
-    }
-
-    public String getStatusMessage()
-    {
-        return statusMessage;
     }
 
     public Map<String, String> getErrors()

@@ -25,7 +25,7 @@ public abstract class SubsystemSupport<NC extends NexusClient>
         this.nexusClient = Check.notNull( nexusClient, NexusClient.class );
     }
 
-    protected NC getNexusClient()
+    public NC getNexusClient()
     {
         return nexusClient;
     }
