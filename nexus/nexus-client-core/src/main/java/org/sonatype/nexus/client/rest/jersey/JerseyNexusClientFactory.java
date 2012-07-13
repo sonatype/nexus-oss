@@ -42,6 +42,11 @@ public class JerseyNexusClientFactory
     extends AbstractNexusClientFactory<JerseyNexusClient>
 {
 
+    /**
+     * Modified "content-type" used by Nexus Client: it enforces body encoding too for UTF8.
+     */
+    private static final MediaType APPLICATION_XML_UTF8_TYPE = MediaType.valueOf( "application/xml; charset=UTF-8" );
+
     public JerseyNexusClientFactory( final SubsystemFactory<?, JerseyNexusClient>... subsystemFactories )
     {
         super( subsystemFactories );
@@ -69,7 +74,7 @@ public class JerseyNexusClientFactory
         // we are java2java client, so we use XML instead of JSON, as
         // some current Nexus are one way only! So, we fix for XML
         final XStream xstream = new NexusXStreamFactory().createAndConfigureForXml();
-        config.getSingletons().add( new XStreamXmlProvider( xstream, MediaType.APPLICATION_XML_TYPE ) );
+        config.getSingletons().add( new XStreamXmlProvider( xstream, APPLICATION_XML_UTF8_TYPE ) );
         // set _real_ URL for baseUrl, and not a redirection (typically http instead of https)
         config.getProperties().put( ApacheHttpClient4Config.PROPERTY_FOLLOW_REDIRECTS, Boolean.FALSE );
         applyAuthenticationIfAny( connectionInfo, config );
@@ -81,7 +86,7 @@ public class JerseyNexusClientFactory
                                                                             "Nexus-Client/1.0" );
         // we use XML for communication (unlike web browsers do, for which JSON makes more sense)
         return new JerseyNexusClient( connectionCondition, subsystemFactories, connectionInfo, xstream, client,
-                                      MediaType.APPLICATION_XML_TYPE );
+                                      APPLICATION_XML_UTF8_TYPE );
     }
 
     // ==
@@ -97,16 +102,14 @@ public class JerseyNexusClientFactory
                 final CredentialsProvider credentialsProvider =
                     new org.apache.http.impl.client.BasicCredentialsProvider();
                 credentialsProvider.setCredentials( AuthScope.ANY,
-                                                    new UsernamePasswordCredentials( upinfo.getUsername(),
-                                                                                     upinfo.getPassword() ) );
-                config.getProperties().put( ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
-                                            credentialsProvider );
+                    new UsernamePasswordCredentials( upinfo.getUsername(), upinfo.getPassword() ) );
+                config.getProperties().put( ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER, credentialsProvider );
                 config.getProperties().put( ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true );
             }
             else
             {
                 throw new IllegalArgumentException( Template.of( "AuthenticationInfo of type %s is not supported!",
-                                                                 connectionInfo.getAuthenticationInfo().getClass().getName() ).toString() );
+                    connectionInfo.getAuthenticationInfo().getClass().getName() ).toString() );
             }
         }
     }
@@ -119,7 +122,7 @@ public class JerseyNexusClientFactory
             if ( proxyInfo != null )
             {
                 config.getProperties().put( ApacheHttpClient4Config.PROPERTY_PROXY_URI,
-                                            "http://" + proxyInfo.getProxyHost() + ":" + proxyInfo.getProxyPort() );
+                    "http://" + proxyInfo.getProxyHost() + ":" + proxyInfo.getProxyPort() );
 
                 if ( proxyInfo.getProxyAuthentication() != null )
                 {
@@ -128,9 +131,9 @@ public class JerseyNexusClientFactory
                         final UsernamePasswordAuthenticationInfo upinfo =
                             (UsernamePasswordAuthenticationInfo) connectionInfo.getAuthenticationInfo();
                         config.getProperties().put( ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME,
-                                                    upinfo.getUsername() );
+                            upinfo.getUsername() );
                         config.getProperties().put( ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD,
-                                                    upinfo.getPassword() );
+                            upinfo.getPassword() );
                     }
                     else
                     {

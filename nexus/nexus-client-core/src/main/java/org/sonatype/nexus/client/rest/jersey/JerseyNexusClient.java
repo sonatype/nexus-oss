@@ -88,12 +88,13 @@ public class JerseyNexusClient
 
     public WebResource.Builder serviceResource( final String uri )
     {
-        return getClient().resource( resolveServicePath( uri ) ).accept( getMediaType() );
+        return getClient().resource( resolveServicePath( uri ) ).type( getMediaType() ).accept( getMediaType() );
     }
 
     public WebResource.Builder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).accept( getMediaType() );
+        return getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).type( getMediaType() ).accept(
+            getMediaType() );
     }
 
     public WebResource.Builder uri( final String uri )
