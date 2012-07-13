@@ -82,6 +82,8 @@ public abstract class AbstractNexusP2IT
         verifier.executeGoals( Arrays.asList( "verify" ) );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        FileUtils.deleteDirectory( testDir );
     }
 
     protected void installAndVerifyP2Feature( String repoId )
