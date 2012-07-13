@@ -493,4 +493,13 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
     }
 });
 
+/**
+ * HACK:
+ * Some layouts (e.g. license detail page) expect a BoxComponent (setters for size and position).
+ * The documentation states that Ext.Button is a BoxComponent, but the source actually extends only
+ * Ext.Component! Instead of "fixing" ext js (and potentially breaking a button somewhere in the Nexus UI)
+ * we will add the BoxComponent methods only to the browse button.
+ */
+Ext.applyIf(Ext.ux.form.BrowseButton.prototype, Ext.BoxComponent.prototype);
+
 Ext.reg('browsebutton', Ext.ux.form.BrowseButton);
