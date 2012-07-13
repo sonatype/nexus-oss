@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>11</version>
+    <version>12</version>
   </parent>
 
   <groupId>org.sonatype.nexus.capabilities</groupId>
@@ -56,9 +56,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-
-    <nexus.version>2.1-SNAPSHOT</nexus.version>
+    <nexus.version>2.1-RC1</nexus.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
 
     <arguments/>
