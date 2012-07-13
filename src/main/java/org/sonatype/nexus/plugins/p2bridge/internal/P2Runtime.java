@@ -94,7 +94,7 @@ class P2Runtime
         {
             return;
         }
-        final File pluginDir = getP2RepositoryPluginDir();
+        final File pluginDir = getP2BridgePluginDir();
 
         final File eclipseDir = new File( pluginDir, "p2-runtime/eclipse" );
         if ( !eclipseDir.exists() )
@@ -208,11 +208,11 @@ class P2Runtime
         return bridgedPackages.toString();
     }
 
-    private File getP2RepositoryPluginDir()
+    private File getP2BridgePluginDir()
     {
         try
         {
-            final GAVCoordinate pluginGav = getP2RepositoryPluginGAV();
+            final GAVCoordinate pluginGav = getP2BridgePluginGAV();
             final PluginRepositoryArtifact pluginArtifact = pluginRepositoryManager.resolveArtifact( pluginGav );
             return pluginArtifact.getFile().getParentFile();
         }
@@ -222,7 +222,7 @@ class P2Runtime
         }
     }
 
-    private GAVCoordinate getP2RepositoryPluginGAV()
+    private GAVCoordinate getP2BridgePluginGAV()
     {
         final Properties props = new Properties();
 
