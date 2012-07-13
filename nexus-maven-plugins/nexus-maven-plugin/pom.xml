@@ -84,7 +84,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-test-harness</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
