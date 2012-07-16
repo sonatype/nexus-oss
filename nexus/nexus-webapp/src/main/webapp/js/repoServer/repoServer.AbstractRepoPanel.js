@@ -18,52 +18,166 @@
  * config options: { id: the is of this panel instance [required] title: title
  * of this panel (shows in tab) }
  */
-Sonatype.repoServer.AbstractRepoPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+
+/*global Ext, Sonatype, Nexus*/
+Sonatype.repoServer.AbstractRepoPanel = function(cfg) {
+  var
+        config = cfg || {},
+        defaultConfig = {},
+        sp = Sonatype.lib.Permissions,
+        Action;
+
   Ext.apply(this, config, defaultConfig);
 
-  this.sp = Sonatype.lib.Permissions;
-
   this.ctxRecord = null;
-  this.reposGridPanel == null;
+  this.reposGridPanel = null;
+
+  Action = function(cfg) {
+    var
+          _action = this,
+          conditions = [];
+
+    if ( cfg.condition )
+    {
+      conditions.push(cfg.condition);
+    }
+
+    this.maybeAddToMenu = function(menu, repo, content) {
+      if ( _action.isApplicable(repo, content) ) {
+        menu.add(cfg.action);
+      }
+    };
+
+    this.addCondition = function(condition) {
+      if ( typeof(condition) === 'function' ) {
+        conditions.push(condition);
+      } else {
+        Nexus.log('Tried to add non-function condition, ignoring');
+      }
+    };
+
+    this.isApplicable = function(repo, content) {
+      var i, condition;
+      for( i = 0; i < conditions.length; i = i+1 )
+      {
+        condition = conditions[i];
+        if ( !condition(repo, content) ) {
+          return false;
+        }
+      }
+      return true;
+    };
+  };
 
   this.repoActions = {
-    clearCache : {
-      text : 'Expire Cache',
-      handler : this.clearCacheHandler,
-      scope : this
-    },
-    rebuildMetadata : {
-      text : 'Rebuild Metadata',
-      handler : this.rebuildMetadataHandler,
-      scope : this
-    },
-    putInService : {
-      text : 'Put in Service',
-      scope : this,
-      handler : this.putInServiceHandler
-    },
-    putOutOfService : {
-      text : 'Put Out of Service',
-      scope : this,
-      handler : this.putOutOfServiceHandler
-    },
-    allowProxy : {
-      text : 'Allow Proxy',
-      scope : this,
-      handler : this.allowProxyHandler
-    },
-    blockProxy : {
-      text : 'Block Proxy',
-      scope : this,
-      handler : this.blockProxyHandler
-    },
-    deleteRepoItem : {
-      text : 'Delete',
-      scope : this,
-      handler : this.deleteRepoItemHandler
-    }
+    downloadRemoteItem : new Action({
+      condition : function(repo, content) {
+        return content && content.isLeaf() && repo.repoType === 'proxy';
+      },
+      action : {
+        text : 'Download From Remote',
+        scope : this,
+        handler : this.downloadFromRemoteHandler
+      }}),
+    downloadItem : new Action({
+      condition : function(repo, content) {
+        return content && content.isLeaf();
+      },
+      action : {
+        text : 'Download',
+        scope : this,
+        handler : this.downloadHandler
+      }
+    }),
+    viewRemote : new Action(
+          {
+            condition : function(repo, content) {
+              return content && !content.isRoot && !content.isLeaf() &&
+                    repo.repoType === 'proxy';
+            },
+            action : {
+              text : 'View Remote',
+              scope : this,
+              handler : this.downloadFromRemoteHandler
+            }}),
+    clearCache : new Action({
+      condition : function(repo, content) {
+        return sp.checkPermission('nexus:cache', sp.DELETE) && repo.repoType !== 'virtual' && repo.userManaged;
+      },
+      action : {
+        text : 'Expire Cache',
+        handler : this.clearCacheHandler,
+        scope : this
+      }
+    }),
+    rebuildMetadata : new Action({
+      condition : function(repo) {
+        return sp.checkPermission('nexus:metadata', sp.DELETE) &&
+              (repo.format === 'maven2' || repo.format === 'maven1') &&
+              (repo.repoType === 'hosted' || repo.repoType === 'group') && repo.userManaged;
+      },
+      action : {
+        text : 'Rebuild Metadata',
+        handler : this.rebuildMetadataHandler,
+        scope : this
+      }
+    }),
+    putInService : new Action({
+      condition : function(repo) {
+        return sp.checkPermission('nexus:repostatus', sp.EDIT) &&
+              repo.repoType !== 'group' &&
+              repo.status && repo.status.localStatus !== 'IN_SERVICE';
+      },
+      action : {
+        text : 'Put in Service',
+        scope : this,
+        handler : this.putInServiceHandler
+      }
+    }),
+    putOutOfService : new Action({
+      condition : function(repo) {
+        return sp.checkPermission('nexus:repostatus', sp.EDIT) &&
+              repo.repoType !== 'group' &&
+              repo.status && repo.status.localStatus === 'IN_SERVICE';
+      },
+      action : {
+        text : 'Put Out of Service',
+        scope : this,
+        handler : this.putOutOfServiceHandler
+      }
+    }),
+    allowProxy : new Action({
+      condition : function(repo) {
+        return sp.checkPermission('nexus:repostatus', sp.EDIT) &&
+              repo.repoType === 'proxy' && repo.status && repo.status.proxyMode !== 'ALLOW';
+      },
+      action : {
+        text : 'Allow Proxy',
+        scope : this,
+        handler : this.proxyStatusHandlerFactory('ALLOW', 'ALLOW')
+      }
+    }),
+    blockProxy : new Action({
+      condition : function(repo) {
+        return sp.checkPermission('nexus:repostatus', sp.EDIT) &&
+              repo.repoType === 'proxy' && repo.status && repo.status.proxyMode === 'ALLOW';
+      },
+      action : {
+        text : 'Block Proxy',
+        scope : this,
+        handler : this.proxyStatusHandlerFactory('BLOCKED_MANUAL', 'BLOCKED')
+      }
+    }),
+    deleteRepoItem : new Action({
+      condition : function(repo) {
+        return true;
+      },
+      action : {
+        text : 'Delete',
+        scope : this,
+        handler : this.deleteRepoItemHandler
+      }
+    })
   };
 
   Sonatype.repoServer.AbstractRepoPanel.superclass.constructor.call(this, {});
@@ -82,6 +196,17 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         }
       },
 
+      repoActionAjaxSuccessHandler : function(response, options) {
+        var statusResp = Ext.decode(response.responseText);
+        this.updateRepoStatuses(statusResp.data, options.repoRecord);
+      },
+
+      repoActionAjaxFailureHandlerFactory : function(msg) {
+        return function(response, options) {
+          Sonatype.utils.connectionError(response, msg);
+        };
+      },
+
       clearCacheHandler : function(rec) {
         var url = Sonatype.config.repos.urls.cache + rec.data.resourceURI.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
 
@@ -94,22 +219,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
         Ext.Ajax.request({
               url : url,
-              callback : this.clearCacheCallback,
+              failure : this.repoActionAjaxFailureHandlerFactory('The server did not clear the repository\'s cache.'),
               scope : this,
               method : 'DELETE'
             });
-      },
-
-      clearCacheCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not clear the repository\'s cache.');
-        }
       },
 
       rebuildMetadataHandler : function(rec) {
@@ -124,22 +237,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
         Ext.Ajax.request({
               url : url,
-              callback : this.rebuildMetadataCallback,
+              failure :  this.repoActionAjaxFailureHandlerFactory('The server did not rebuild metadata in the repository.'),
               scope : this,
               method : 'DELETE'
             });
-      },
-
-      rebuildMetadataCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not rebuild metadata in the repository.');
-        }
       },
 
       putInServiceHandler : function(rec) {
@@ -152,24 +253,12 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                   localStatus : 'IN_SERVICE'
                 }
               },
-              callback : this.putInServiceCallback,
+              success : this.repoActionAjaxSuccessHandler,
+              failure : this.repoActionAjaxFailureHandlerFactory('The server did not put the repository into service.'),
               repoRecord : rec,
               scope : this,
               method : 'PUT'
             });
-      },
-
-      putInServiceCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          var statusResp = Ext.decode(response.responseText);
-          this.updateRepoStatuses(statusResp.data, options.repoRecord);
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not put the repository into service.');
-        }
       },
 
       putOutOfServiceHandler : function(rec) {
@@ -182,123 +271,67 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                   localStatus : 'OUT_OF_SERVICE'
                 }
               },
-              callback : this.putOutOfServiceCallback,
+              success : this.repoActionAjaxSuccessHandler,
+              failure : this.repoActionAjaxFailureHandlerFactory('The server did not put the repository out of service.'),
               repoRecord : rec,
               scope : this,
               method : 'PUT'
             });
       },
 
-      allowProxyHandler : function(rec) {
-        if (rec.data.status)
-        {
-          Ext.Ajax.request({
-                url : rec.data.resourceURI + '/status',
-                jsonData : {
-                  data : {
-                    id : rec.data.id,
-                    repoType : rec.data.repoType,
-                    localStatus : rec.data.status.localStatus,
-                    remoteStatus : rec.data.status.remoteStatus,
-                    proxyMode : 'ALLOW'
-                  }
-                },
-                callback : this.allowProxyCallback,
-                scope : this,
-                repoRecord : rec,
-                method : 'PUT'
-              });
-        }
-      },
-
-      allowProxyCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          var statusResp = Ext.decode(response.responseText);
-          this.updateRepoStatuses(statusResp.data, options.repoRecord);
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not update the proxy repository status to allow.');
-        }
-      },
-
-      blockProxyHandler : function(rec) {
-        if (rec.data.status)
-        {
-          Ext.Ajax.request({
-                url : rec.data.resourceURI + '/status',
-                jsonData : {
-                  data : {
-                    id : rec.data.id,
-                    repoType : rec.data.repoType,
-                    localStatus : rec.data.status.localStatus,
-                    remoteStatus : rec.data.status.remoteStatus,
-                    proxyMode : 'BLOCKED_MANUAL'
-                  }
-                },
-                callback : this.blockProxyCallback,
-                repoRecord : rec,
-                scope : this,
-                method : 'PUT'
-              });
-        }
-      },
-
-      blockProxyCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          var statusResp = Ext.decode(response.responseText);
-          this.updateRepoStatuses(statusResp.data, options.repoRecord);
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not update the proxy repository status to blocked.');
-        }
-      },
-
-      putOutOfServiceCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          var statusResp = Ext.decode(response.responseText);
-          this.updateRepoStatuses(statusResp.data, options.repoRecord);
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not put the repository out of service.');
-        }
+      proxyStatusHandlerFactory : function(state, stateName) {
+        return function(rec) {
+          if (rec.data.status) {
+            Ext.Ajax.request({
+              url : rec.data.resourceURI + '/status',
+              jsonData : {
+                data : {
+                  id : rec.data.id,
+                  repoType : rec.data.repoType,
+                  localStatus : rec.data.status.localStatus,
+                  remoteStatus : rec.data.status.remoteStatus,
+                  proxyMode : state
+                }
+              },
+              success : this.repoActionAjaxSuccessHandler,
+              failure : this.repoActionAjaxFailureHandlerFactory('The server did not update the proxy repository status to ' + stateName + '.'),
+              scope : this,
+              repoRecord : rec,
+              method : 'PUT'
+            });
+          }
+        };
       },
 
       statusConverter : function(status, parent) {
-        if (!parent.status)
+        if (!parent.status) {
           return '<I>retrieving...</I>';
+        }
 
-        var remoteStatus = ('' + status.remoteStatus).toLowerCase();
-        var sOut = (status.localStatus == 'IN_SERVICE') ? 'In Service' : 'Out of Service';
+        var
+              remoteStatus = ('' + status.remoteStatus).toLowerCase(),
+              sOut = (status.localStatus === 'IN_SERVICE') ? 'In Service' : 'Out of Service';
 
-        if (parent.repoType == 'proxy')
+        if (parent.repoType === 'proxy')
         {
 
           if (status.proxyMode.search(/BLOCKED/) === 0)
           {
-            sOut += status.proxyMode == 'BLOCKED_AUTO' ? ' - Remote Automatically Blocked' : ' - Remote Manually Blocked';
-            sOut += remoteStatus == 'available' ? ' and Available' : ' and Unavailable';
+            sOut += status.proxyMode === 'BLOCKED_AUTO' ? ' - Remote Automatically Blocked' : ' - Remote Manually Blocked';
+            sOut += remoteStatus === 'available' ? ' and Available' : ' and Unavailable';
           }
           else
           { // allow
-            if (status.localStatus == 'IN_SERVICE')
+            if (status.localStatus === 'IN_SERVICE')
             {
-              if (remoteStatus != 'available')
+              if (remoteStatus !== 'available')
               {
-                sOut += remoteStatus == 'unknown' ? ' - <I>checking remote...</I>' : ' - Attempting to Proxy and Remote Unavailable';
+                sOut += remoteStatus === 'unknown' ? ' - <I>checking remote...</I>' : ' - Attempting to Proxy and Remote Unavailable';
               }
             }
             else
             { // Out of service
-              sOut += remoteStatus == 'available' ? ' - Remote Available' : ' - Remote Unavailable';
+              sOut += remoteStatus === 'available' ? ' - Remote Available' : ' - Remote Unavailable';
             }
           }
         }
@@ -367,11 +400,17 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
               scope : this,
               icon : Sonatype.MessageBox.QUESTION,
               fn : function(btnName) {
-                if (btnName == 'yes' || btnName == 'ok')
+                if (btnName === 'yes' || btnName === 'ok')
                 {
                   Ext.Ajax.request({
                         url : url,
                         callback : this.deleteRepoItemCallback,
+                        success : function(response, options) {
+                          options.contentNode.parentNode.removeChild(options.contentNode);
+                        },
+                        failure : function(response, options) {
+                          Sonatype.MessageBox.alert('Error', response.status === 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
+                        },
                         scope : this,
                         contentNode : node,
                         method : 'DELETE'
@@ -381,126 +420,53 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
             });
       },
 
-      deleteRepoItemCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          options.contentNode.parentNode.removeChild(options.contentNode);
-        }
-        else
-        {
-          Sonatype.MessageBox.alert('Error', response.status == 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
-        }
-      },
-
       onRepositoryMenuInit : function(menu, repoRecord) {
-        if (repoRecord.id.substring(0, 4) == 'new_' || !repoRecord.data.exposed || !repoRecord.data.userManaged)
+        var
+              repo = repoRecord.data,
+              actions = this.repoActions;
+
+        if (repoRecord.id.substring(0, 4) === 'new_' || !repo.userManaged) {
           return;
-
-        var isVirtual = repoRecord.data['repoType'] == 'virtual';
-        var isHosted = repoRecord.data['repoType'] == 'hosted';
-        var isProxy = repoRecord.data['repoType'] == 'proxy';
-        var isGroup = repoRecord.data['repoType'] == 'group';
-        var isMaven = repoRecord.data['format'] == 'maven2' || repoRecord.data['format'] == 'maven1';
-
-        if (this.sp.checkPermission('nexus:cache', this.sp.DELETE) && !isVirtual)
-        {
-          menu.add(this.repoActions.clearCache);
         }
 
-        if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && isMaven && (isHosted || isGroup))
-        {
-          menu.add(this.repoActions.rebuildMetadata);
-        }
+        actions.clearCache.maybeAddToMenu(menu, repo);
+        actions.rebuildMetadata.maybeAddToMenu(menu, repo);
+
         menu.add('-');
 
-        if (this.sp.checkPermission('nexus:repostatus', this.sp.EDIT))
-        {
-          if (isProxy)
-          {
-            if (repoRecord.data.status && repoRecord.data.status.proxyMode == 'ALLOW')
-            {
-              menu.add(this.repoActions.blockProxy);
-            }
-            else
-            {
-              menu.add(this.repoActions.allowProxy);
-            }
-          }
+        actions.blockProxy.maybeAddToMenu(menu, repo);
+        actions.allowProxy.maybeAddToMenu(menu, repo);
+        actions.putOutOfService.maybeAddToMenu(menu, repo);
+        actions.putInService.maybeAddToMenu(menu, repo);
 
-          if (!isGroup)
-          {
-            if (repoRecord.data.status && repoRecord.data.status.localStatus == 'IN_SERVICE')
-            {
-              menu.add(this.repoActions.putOutOfService);
-            }
-            else
-            {
-              menu.add(this.repoActions.putInService);
-            }
-          }
-          menu.add('-');
-        }
+        menu.add('-');
       },
 
       onRepositoryContentMenuInit : function(menu, repoRecord, contentRecord) {
+        var
+              repo = repoRecord.data,
+              actions = this.repoActions;
+
         if (contentRecord.data.resourceURI == null)
         {
           contentRecord.data.resourceURI = contentRecord.data.id;
         }
 
-        var isVirtual = repoRecord.data.repoType == 'virtual';
-        var isProxy = repoRecord.data.repoType == 'proxy';
-        var isHosted = repoRecord.data.repoType == 'hosted';
-        var isGroup = repoRecord.data.repoType == 'group';
-        var isMaven = repoRecord.data['format'] == 'maven2' || repoRecord.data['format'] == 'maven1';
-
-        if (repoRecord.data.userManaged)
-        {
-          if (this.sp.checkPermission('nexus:cache', this.sp.DELETE) && !isVirtual)
-          {
-            menu.add(this.repoActions.clearCache);
-          }
-          if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && isMaven && (isHosted || isGroup))
-          {
-            menu.add(this.repoActions.rebuildMetadata);
-          }
-        }
+        actions.clearCache.maybeAddToMenu(menu, repo, contentRecord);
+        actions.rebuildMetadata.maybeAddToMenu(menu, repo, contentRecord);
 
         if (contentRecord.isLeaf())
         {
           menu.add('-');
-          if (isProxy)
-          {
-            menu.add({
-                  text : 'Download From Remote',
-                  scope : this,
-                  handler : this.downloadFromRemoteHandler,
-                  href : this.restToRemoteUrl(contentRecord, repoRecord)
-                });
-          }
-          menu.add({
-                text : 'Download',
-                scope : this,
-                handler : this.downloadHandler,
-                href : this.restToContentUrl(contentRecord, contentRecord.attributes.repoRecord)
-              });
+          actions.downloadRemoteItem.maybeAddToMenu(menu, repo, contentRecord);
+          actions.downloadItem.maybeAddToMenu(menu, repo, contentRecord);
         }
 
-        if (!contentRecord.isRoot && !isGroup)
+        if (!contentRecord.isRoot && repoRecord.data.repoType !== 'group')
         {
-          if (isProxy && !contentRecord.isLeaf())
-          {
-            menu.add({
-                  text : 'View Remote',
-                  scope : this,
-                  handler : this.downloadFromRemoteHandler,
-                  href : this.restToRemoteUrl(contentRecord, repoRecord)
-                });
-          }
-
+          actions.viewRemote.maybeAddToMenu(menu, repo, contentRecord);
           menu.add('-');
-          menu.add(this.repoActions.deleteRepoItem);
+          actions.deleteRepoItem.maybeAddToMenu(menu, repo, contentRecord);
         }
       }
     });
