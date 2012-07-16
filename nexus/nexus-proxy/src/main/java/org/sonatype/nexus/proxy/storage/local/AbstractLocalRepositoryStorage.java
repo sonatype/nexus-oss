@@ -21,8 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -44,9 +43,14 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
  * @author cstamas
  */
 public abstract class AbstractLocalRepositoryStorage
+    extends AbstractLoggingComponent
     implements LocalRepositoryStorage
 {
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    /**
+     * Key used to mark a repository context as "initialized". This flag and the generation together controls how the
+     * context is about to be updated. See NEXUS-5145.
+     */
+    private static final String CONTEXT_UPDATED_KEY = AbstractLocalRepositoryStorage.class.getName() + ".updated";
 
     /**
      * The wastebasket.
@@ -75,11 +79,6 @@ public abstract class AbstractLocalRepositoryStorage
         this.linkPersister = linkPersister;
         this.mimeSupport = mimeSupport;
         this.repositoryContexts = new HashMap<String, Integer>();
-    }
-
-    protected Logger getLogger()
-    {
-        return logger;
     }
 
     protected Wastebasket getWastebasket()
@@ -113,21 +112,36 @@ public abstract class AbstractLocalRepositoryStorage
     protected synchronized LocalStorageContext getLocalStorageContext( Repository repository )
         throws LocalStorageException
     {
-        if ( repository.getLocalStorageContext() != null )
+        final LocalStorageContext ctx = repository.getLocalStorageContext();
+        if ( ctx != null )
         {
             // we have repo specific settings
-            // if contextContains key and is newer, or does not contain yet
-            if ( ( repositoryContexts.containsKey( repository.getId() ) && ( repository.getLocalStorageContext().getGeneration() > ( repositoryContexts.get( repository.getId() ).intValue() ) ) )
-                || !repositoryContexts.containsKey( repository.getId() ) )
+            // if repositoryContexts does not contain this context ID, or
+            // if localStorageContext does not contain CONTEXT_UPDATED_KEY, or
+            // if repositoryContext generation is less than localStorageContext generation
+            if ( !repositoryContexts.containsKey( repository.getId() ) || !ctx.hasContextObject( CONTEXT_UPDATED_KEY )
+                || ctx.getGeneration() > repositoryContexts.get( repository.getId() ) )
             {
-                updateContext( repository, repository.getLocalStorageContext() );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    if ( !repositoryContexts.containsKey( repository.getId() ) )
+                    {
+                        getLogger().debug( "Local context {} is about to be initialized", ctx );
+                    }
+                    else
+                    {
+                        getLogger().debug( "Local context {} has been changed. Previous generation {}",
+                            new Object[] { ctx, repositoryContexts.get( repository.getId() ) } );
+                    }
+                }
 
+                updateContext( repository, repository.getLocalStorageContext() );
+                ctx.putContextObject( CONTEXT_UPDATED_KEY, Boolean.TRUE );
                 repositoryContexts.put( repository.getId(),
                     Integer.valueOf( repository.getLocalStorageContext().getGeneration() ) );
             }
         }
-
-        return repository.getLocalStorageContext();
+        return ctx;
     }
 
     // ==

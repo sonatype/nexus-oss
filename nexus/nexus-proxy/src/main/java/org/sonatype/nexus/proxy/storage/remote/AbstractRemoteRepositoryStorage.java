@@ -39,6 +39,11 @@ public abstract class AbstractRemoteRepositoryStorage
     extends AbstractLoggingComponent
     implements RemoteRepositoryStorage
 {
+    /**
+     * Key used to mark a repository context as "initialized". This flag and the generation together controls how the
+     * context is about to be updated. See NEXUS-5145.
+     */
+    private static final String CONTEXT_UPDATED_KEY = AbstractRemoteRepositoryStorage.class.getName() + ".updated";
 
     private final MimeSupport mimeSupport;
 
@@ -110,8 +115,10 @@ public abstract class AbstractRemoteRepositoryStorage
         if ( ctx != null )
         {
             // we have repo specific settings
-            // if contextContains key and is newer, or does not contain yet
-            if ( !repositoryContexts.containsKey( repository.getId() )
+            // if repositoryContexts does not contain this context ID, or
+            // if remoteStorageContext does not contain CONTEXT_UPDATED_KEY, or
+            // if repositoryContext generation is less than remoteStorageContext generation
+            if ( !repositoryContexts.containsKey( repository.getId() ) || !ctx.hasContextObject( CONTEXT_UPDATED_KEY )
                 || ctx.getGeneration() > repositoryContexts.get( repository.getId() ) )
             {
                 if ( getLogger().isDebugEnabled() )
@@ -143,6 +150,7 @@ public abstract class AbstractRemoteRepositoryStorage
                 }
 
                 updateContext( repository, ctx );
+                ctx.putContextObject( CONTEXT_UPDATED_KEY, Boolean.TRUE );
                 repositoryContexts.put( repository.getId(), ctx.getGeneration() );
             }
         }
