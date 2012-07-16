@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.client.core;
 
-import org.sonatype.nexus.client.internal.util.Check;
-
 /**
  * Generic runtime exception to be thrown by Subsystems, when some unexpected error is reported by Nexus. This exception
  * here is solely for purpose of not proliferating possible runtime exceptions of underlying implementation. Best to use
@@ -32,9 +30,15 @@ public class NexusUnexpectedResponseException
 
     public NexusUnexpectedResponseException( final int statusCode, final String statusMessage )
     {
-        super( statusMessage );
-        this.statusCode = Check.argument( statusCode > 0, statusCode, "statusCode not positive" );
-        this.statusMessage = Check.notBlank( statusMessage, "statusMessage" );
+        this( statusCode, statusMessage, String.format( "Unexpected response: %s %s", String.valueOf( statusCode ),
+            String.valueOf( statusMessage ) ) );
+    }
+
+    public NexusUnexpectedResponseException( final int statusCode, final String statusMessage, final String message )
+    {
+        super( message );
+        this.statusCode = statusCode;
+        this.statusMessage = statusMessage;
     }
 
     public int getStatusCode()
