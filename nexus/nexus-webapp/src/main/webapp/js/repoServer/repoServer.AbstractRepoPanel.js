@@ -154,7 +154,7 @@ Sonatype.repoServer.AbstractRepoPanel = function(cfg) {
       action : {
         text : 'Allow Proxy',
         scope : this,
-        handler : this.allowProxyHandler
+        handler : this.proxyStatusHandlerFactory('ALLOW', 'ALLOW')
       }
     }),
     blockProxy : new Action({
@@ -165,7 +165,7 @@ Sonatype.repoServer.AbstractRepoPanel = function(cfg) {
       action : {
         text : 'Block Proxy',
         scope : this,
-        handler : this.blockProxyHandler
+        handler : this.proxyStatusHandlerFactory('BLOCKED_MANUAL', 'BLOCKED')
       }
     }),
     deleteRepoItem : new Action({
@@ -196,6 +196,17 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         }
       },
 
+      repoActionAjaxSuccessHandler : function(response, options) {
+        var statusResp = Ext.decode(response.responseText);
+        this.updateRepoStatuses(statusResp.data, options.repoRecord);
+      },
+
+      repoActionAjaxFailureHandlerFactory : function(msg) {
+        return function(response, options) {
+          Sonatype.utils.connectionError(response, msg);
+        };
+      },
+
       clearCacheHandler : function(rec) {
         var url = Sonatype.config.repos.urls.cache + rec.data.resourceURI.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
 
@@ -208,18 +219,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
         Ext.Ajax.request({
               url : url,
-              callback : this.clearCacheCallback,
+              failure : this.repoActionAjaxFailureHandlerFactory('The server did not clear the repository\'s cache.'),
               scope : this,
               method : 'DELETE'
             });
-      },
-
-      clearCacheCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (!isSuccess)
-        {
-          Sonatype.utils.connectionError(response, 'The server did not clear the repository\'s cache.');
-        }
       },
 
       rebuildMetadataHandler : function(rec) {
@@ -234,18 +237,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
         Ext.Ajax.request({
               url : url,
-              callback : this.rebuildMetadataCallback,
+              failure :  this.repoActionAjaxFailureHandlerFactory('The server did not rebuild metadata in the repository.'),
               scope : this,
               method : 'DELETE'
             });
-      },
-
-      rebuildMetadataCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (!isSuccess)
-        {
-          Sonatype.utils.connectionError(response, 'The server did not rebuild metadata in the repository.');
-        }
       },
 
       putInServiceHandler : function(rec) {
@@ -258,24 +253,12 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                   localStatus : 'IN_SERVICE'
                 }
               },
-              callback : this.putInServiceCallback,
+              success : this.repoActionAjaxSuccessHandler,
+              failure : this.repoActionAjaxFailureHandlerFactory('The server did not put the repository into service.'),
               repoRecord : rec,
               scope : this,
               method : 'PUT'
             });
-      },
-
-      putInServiceCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          var statusResp = Ext.decode(response.responseText);
-          this.updateRepoStatuses(statusResp.data, options.repoRecord);
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not put the repository into service.');
-        }
       },
 
       putOutOfServiceHandler : function(rec) {
@@ -288,94 +271,36 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                   localStatus : 'OUT_OF_SERVICE'
                 }
               },
-              callback : this.putOutOfServiceCallback,
+              success : this.repoActionAjaxSuccessHandler,
+              failure : this.repoActionAjaxFailureHandlerFactory('The server did not put the repository out of service.'),
               repoRecord : rec,
               scope : this,
               method : 'PUT'
             });
       },
 
-      allowProxyHandler : function(rec) {
-        if (rec.data.status)
-        {
-          Ext.Ajax.request({
-                url : rec.data.resourceURI + '/status',
-                jsonData : {
-                  data : {
-                    id : rec.data.id,
-                    repoType : rec.data.repoType,
-                    localStatus : rec.data.status.localStatus,
-                    remoteStatus : rec.data.status.remoteStatus,
-                    proxyMode : 'ALLOW'
-                  }
-                },
-                callback : this.allowProxyCallback,
-                scope : this,
-                repoRecord : rec,
-                method : 'PUT'
-              });
-        }
-      },
-
-      allowProxyCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          var statusResp = Ext.decode(response.responseText);
-          this.updateRepoStatuses(statusResp.data, options.repoRecord);
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not update the proxy repository status to allow.');
-        }
-      },
-
-      blockProxyHandler : function(rec) {
-        if (rec.data.status)
-        {
-          Ext.Ajax.request({
-                url : rec.data.resourceURI + '/status',
-                jsonData : {
-                  data : {
-                    id : rec.data.id,
-                    repoType : rec.data.repoType,
-                    localStatus : rec.data.status.localStatus,
-                    remoteStatus : rec.data.status.remoteStatus,
-                    proxyMode : 'BLOCKED_MANUAL'
-                  }
-                },
-                callback : this.blockProxyCallback,
-                repoRecord : rec,
-                scope : this,
-                method : 'PUT'
-              });
-        }
-      },
-
-      blockProxyCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          var statusResp = Ext.decode(response.responseText);
-          this.updateRepoStatuses(statusResp.data, options.repoRecord);
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not update the proxy repository status to blocked.');
-        }
-      },
-
-      putOutOfServiceCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          var statusResp = Ext.decode(response.responseText);
-          this.updateRepoStatuses(statusResp.data, options.repoRecord);
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not put the repository out of service.');
-        }
+      proxyStatusHandlerFactory : function(state, stateName) {
+        return function(rec) {
+          if (rec.data.status) {
+            Ext.Ajax.request({
+              url : rec.data.resourceURI + '/status',
+              jsonData : {
+                data : {
+                  id : rec.data.id,
+                  repoType : rec.data.repoType,
+                  localStatus : rec.data.status.localStatus,
+                  remoteStatus : rec.data.status.remoteStatus,
+                  proxyMode : state
+                }
+              },
+              success : this.repoActionAjaxSuccessHandler,
+              failure : this.repoActionAjaxFailureHandlerFactory('The server did not update the proxy repository status to ' + stateName + '.'),
+              scope : this,
+              repoRecord : rec,
+              method : 'PUT'
+            });
+          }
+        };
       },
 
       statusConverter : function(status, parent) {
@@ -480,6 +405,12 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                   Ext.Ajax.request({
                         url : url,
                         callback : this.deleteRepoItemCallback,
+                        success : function(response, options) {
+                          options.contentNode.parentNode.removeChild(options.contentNode);
+                        },
+                        failure : function(response, options) {
+                          Sonatype.MessageBox.alert('Error', response.status === 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
+                        },
                         scope : this,
                         contentNode : node,
                         method : 'DELETE'
@@ -487,18 +418,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                 }
               }
             });
-      },
-
-      deleteRepoItemCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          options.contentNode.parentNode.removeChild(options.contentNode);
-        }
-        else
-        {
-          Sonatype.MessageBox.alert('Error', response.status === 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
-        }
       },
 
       onRepositoryMenuInit : function(menu, repoRecord) {
