@@ -221,10 +221,18 @@ Sonatype.panels.GridViewer = function(config) {
         url : this.url,
         autoLoad : this.dataAutoLoad && (this.dataStores == null || this.dataStores.length == 0),
         sortInfo : this.dataSortInfo,
+        isLoaded : false,
         listeners : {
           add : this.recordAddHandler,
           remove : this.recordRemoveHandler,
           update : this.recordUpdateHandler,
+          load : {
+            fn : function() {
+              this.dataStore.isLoaded = true;
+            },
+            single : true,
+            scope : this
+          },
           scope : this
         }
       });
