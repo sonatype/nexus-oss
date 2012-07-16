@@ -53,7 +53,12 @@ public abstract class AbstractNexusP2IT
     {
         FileUtils.deleteDirectory( destination );
 
-        final File basedir = ResourceExtractor.simpleExtractResources( getClass(), "/run-p2" );
+        String tempDirPath = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
+        File testDir = new File( tempDirPath, getTestId() + "/run-p2" );
+
+        org.apache.maven.it.util.FileUtils.deleteDirectory( testDir );
+
+        final File basedir = ResourceExtractor.extractResourcePath( getClass(), "/run-p2", testDir, false);
 
         final Verifier verifier = new Verifier( basedir.getAbsolutePath() );
 
@@ -77,6 +82,8 @@ public abstract class AbstractNexusP2IT
         verifier.executeGoals( Arrays.asList( "verify" ) );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        FileUtils.deleteDirectory( testDir );
     }
 
     protected void installAndVerifyP2Feature( String repoId )
