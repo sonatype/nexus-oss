@@ -58,7 +58,7 @@ public class NexusErrorMessageException
         pw.println( String.format( "Nexus Error Response: %s - %s", e.getStatusCode(), e.getStatusMessage() ) );
         for ( Map.Entry<String, String> errorEntry : e.getErrors().entrySet() )
         {
-            pw.println( String.format( " * %s - %s", errorEntry.getKey(), errorEntry.getValue() ) );
+            pw.println( String.format( "  %s - %s", unfick( errorEntry.getKey() ), unfick( errorEntry.getValue() ) ) );
         }
         pw.println();
     }

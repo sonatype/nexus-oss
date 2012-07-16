@@ -50,4 +50,15 @@ public class NexusUnexpectedResponseException
     {
         return statusMessage;
     }
+
+    // ==
+
+    protected static String unfick( final String str )
+    {
+        if ( str != null )
+        {
+            return str.replace( "&quot;", "" ).replace( "&lt;b&gt;", "" ).replace( "&lt;/b&gt;", "" );
+        }
+        return str;
+    }
 }
