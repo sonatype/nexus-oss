@@ -53,7 +53,7 @@ public class InstanceCachingPermissionFactory
     @Override
     public Permission create( final String permission )
     {
-        return getOrCreate( permission.intern() );
+        return getOrCreate( permission );
     }
 
     // ==
