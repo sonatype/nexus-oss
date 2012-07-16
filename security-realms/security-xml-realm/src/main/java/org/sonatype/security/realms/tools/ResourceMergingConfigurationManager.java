@@ -479,7 +479,7 @@ public class ResourceMergingConfigurationManager
 
     // ==
 
-    protected EnhancedConfiguration getConfiguration()
+    protected synchronized EnhancedConfiguration getConfiguration()
     {
         for ( DynamicSecurityResource resource : dynamicResources )
         {
