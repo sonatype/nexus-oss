@@ -111,7 +111,11 @@ public class DefaultUserAgentBuilder
         // plugin customization
         for ( UserAgentContributor contributor : contributors )
         {
-            buf.append( contributor.getUserAgent( ctx, repository ) );
+            final String contribution = contributor.getUserAgent( ctx, repository );
+            if ( !StringUtils.isEmpty( contribution ) )
+            {
+                buf.append( " " ).append( contribution );
+            }
         }
 
         return buf;
