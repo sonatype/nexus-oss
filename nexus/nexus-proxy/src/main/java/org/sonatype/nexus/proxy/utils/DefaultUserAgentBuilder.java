@@ -85,15 +85,15 @@ public class DefaultUserAgentBuilder
 
     // ==
 
-    private StringBuffer ua( final RemoteStorageContext ctx )
+    private StringBuilder ua( final RemoteStorageContext ctx )
     {
         return ua( ctx, null );
     }
 
     @VisibleForTesting
-    StringBuffer ua( final RemoteStorageContext ctx, final ProxyRepository repository )
+    StringBuilder ua( final RemoteStorageContext ctx, final ProxyRepository repository )
     {
-        final StringBuffer buf = new StringBuffer( getUserAgentPlatformInfo() );
+        final StringBuilder buf = new StringBuilder( getUserAgentPlatformInfo() );
 
         if ( repository != null ) {
             final RemoteRepositoryStorage rrs = repository.getRemoteStorage();
@@ -132,7 +132,7 @@ public class DefaultUserAgentBuilder
             platformEditionShort = status.getEditionShort();
 
             userAgentPlatformInfo =
-                new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" ).append(
+                new StringBuilder( "Nexus/" ).append( status.getVersion() ).append( " (" ).append(
                     status.getEditionShort() ).append( "; " ).append( System.getProperty( "os.name" ) ).append( "; " ).append(
                     System.getProperty( "os.version" ) ).append( "; " ).append( System.getProperty( "os.arch" ) ).append(
                     "; " ).append( System.getProperty( "java.version" ) ).append( ")" ).toString();
