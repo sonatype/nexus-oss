@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.client.core;
 
-import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,18 +47,5 @@ public class NexusErrorMessageException
     public Map<String, String> getErrors()
     {
         return Collections.unmodifiableMap( errors );
-    }
-
-    // ==
-
-    public static void dumpErrors( final PrintWriter pw, final NexusErrorMessageException e )
-    {
-        pw.println();
-        pw.println( String.format( "Nexus Error Response: %s - %s", e.getStatusCode(), e.getStatusMessage() ) );
-        for ( Map.Entry<String, String> errorEntry : e.getErrors().entrySet() )
-        {
-            pw.println( String.format( "  %s - %s", unfick( errorEntry.getKey() ), unfick( errorEntry.getValue() ) ) );
-        }
-        pw.println();
     }
 }
