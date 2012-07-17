@@ -310,8 +310,8 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     {
         final Throwable cause = e.getCause().getCause();
         // TODO This must be possible to be done in some other way
-        if ( cause.getMessage().startsWith( "HTTP Server 'Service Unavailable'" )
-            || cause.getCause() instanceof ConnectException )
+        if ( cause != null
+            && ( cause.getMessage().startsWith( "HTTP Server 'Service Unavailable'" ) || cause.getCause() instanceof ConnectException ) )
         {
             // P2.getRemoteRepositoryItem server error
             return doRetrieveLocalItem( request, repository );
