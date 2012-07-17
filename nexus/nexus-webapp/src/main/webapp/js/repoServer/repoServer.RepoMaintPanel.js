@@ -204,7 +204,11 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
     header : 'Repository Path',
     autoExpand : true,
     renderer : function(s) {
-      return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') + '" target="_blank">' + s + '</a>';
+      if (/^http(s)?:/.test(s)) {
+        return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') + '" target="_blank">' + s + '</a>';
+      } else {
+        return '' + s;
+      }
     }
   }];
   
