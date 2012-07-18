@@ -54,7 +54,7 @@ public abstract class AbstractNexusP2IT
         FileUtils.deleteDirectory( destination );
 
         String tempDirPath = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
-        File testDir = new File( tempDirPath, getTestId() + "/run-p2" );
+        File testDir = new File( tempDirPath, getTestId() + "/run-p2/" + System.currentTimeMillis() );
 
         org.apache.maven.it.util.FileUtils.deleteDirectory( testDir );
 
