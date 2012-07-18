@@ -48,6 +48,7 @@ public class DefaultMimeSupportTest
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.tar.bz2" ), equalTo( "application/x-bzip" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.zip" ), equalTo( "application/zip" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.war" ), equalTo( "application/java-archive" ) );
+        assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.rar" ), equalTo( "application/java-archive" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.ear" ), equalTo( "application/java-archive" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.ejb" ), equalTo( "application/java-archive" ) );
     }
