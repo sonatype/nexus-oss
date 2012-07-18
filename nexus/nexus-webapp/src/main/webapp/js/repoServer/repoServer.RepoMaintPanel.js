@@ -556,10 +556,6 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
             break;
         }
         this.refreshHandler(button, e);
-      },
-
-      showRecordContextMenu : function(rec) {
-        return rec.data.exposed;
       }
 
     });
