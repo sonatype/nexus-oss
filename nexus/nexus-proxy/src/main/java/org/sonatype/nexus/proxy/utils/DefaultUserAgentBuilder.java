@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.proxy.utils;
 
+import java.util.List;
+
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -29,6 +32,9 @@ public class DefaultUserAgentBuilder
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
 
+    @Requirement
+    private List<UserAgentContributor> contributors;
+
     /**
      * The edition, that will tell us is there some change happened with installation.
      */
@@ -38,6 +44,24 @@ public class DefaultUserAgentBuilder
      * The lazily calculated invariant part of the UserAgentString.
      */
     private String userAgentPlatformInfo;
+
+    /**
+     * For plexus injection.
+     */
+    public DefaultUserAgentBuilder()
+    {
+    }
+
+    /**
+     * For unit tests.
+     */
+    @VisibleForTesting
+    DefaultUserAgentBuilder( final ApplicationStatusSource applicationStatusSource,
+                                    final List<UserAgentContributor> contributors )
+    {
+        this.applicationStatusSource = applicationStatusSource;
+        this.contributors = contributors;
+    }
 
     @Override
     public String formatGenericUserAgentString()
@@ -49,27 +73,32 @@ public class DefaultUserAgentBuilder
     public String formatRemoteRepositoryStorageUserAgentString( final ProxyRepository repository,
                                                                 final RemoteStorageContext ctx )
     {
-        final StringBuffer buf = new StringBuffer( getUserAgentPlatformInfo() );
 
-        final RemoteRepositoryStorage rrs = repository.getRemoteStorage();
-
-        buf.append( " " ).append( rrs.getProviderId() ).append( "/" ).append( rrs.getVersion() );
-
-        // user customization
-        RemoteConnectionSettings remoteConnectionSettings = ctx.getRemoteConnectionSettings();
-
-        if ( !StringUtils.isEmpty( remoteConnectionSettings.getUserAgentCustomizationString() ) )
-        {
-            buf.append( " " ).append( remoteConnectionSettings.getUserAgentCustomizationString() );
-        }
-
-        return buf.toString();
+        return ua( ctx, repository ).toString();
     }
 
     @Override
     public String formatUserAgentString( final RemoteStorageContext ctx )
     {
-        final StringBuffer buf = new StringBuffer( getUserAgentPlatformInfo() );
+        return ua( ctx ).toString();
+    }
+
+    // ==
+
+    private StringBuilder ua( final RemoteStorageContext ctx )
+    {
+        return ua( ctx, null );
+    }
+
+    @VisibleForTesting
+    StringBuilder ua( final RemoteStorageContext ctx, final ProxyRepository repository )
+    {
+        final StringBuilder buf = new StringBuilder( getUserAgentPlatformInfo() );
+
+        if ( repository != null ) {
+            final RemoteRepositoryStorage rrs = repository.getRemoteStorage();
+            buf.append( " " ).append( rrs.getProviderId() ).append( "/" ).append( rrs.getVersion() );
+        }
 
         // user customization
         RemoteConnectionSettings remoteConnectionSettings = ctx.getRemoteConnectionSettings();
@@ -79,10 +108,18 @@ public class DefaultUserAgentBuilder
             buf.append( " " ).append( remoteConnectionSettings.getUserAgentCustomizationString() );
         }
 
-        return buf.toString();
-    }
+        // plugin customization
+        for ( UserAgentContributor contributor : contributors )
+        {
+            final String contribution = contributor.getUserAgent( ctx, repository );
+            if ( !StringUtils.isEmpty( contribution ) )
+            {
+                buf.append( " " ).append( contribution );
+            }
+        }
 
-    // ==
+        return buf;
+    }
 
     protected synchronized String getUserAgentPlatformInfo()
     {
@@ -95,7 +132,7 @@ public class DefaultUserAgentBuilder
             platformEditionShort = status.getEditionShort();
 
             userAgentPlatformInfo =
-                new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" ).append(
+                new StringBuilder( "Nexus/" ).append( status.getVersion() ).append( " (" ).append(
                     status.getEditionShort() ).append( "; " ).append( System.getProperty( "os.name" ) ).append( "; " ).append(
                     System.getProperty( "os.version" ) ).append( "; " ).append( System.getProperty( "os.arch" ) ).append(
                     "; " ).append( System.getProperty( "java.version" ) ).append( ")" ).toString();
