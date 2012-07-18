@@ -426,22 +426,24 @@
   </build>
 
   <profiles>
+
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
     <profile>
-      <id>quick</id>
+      <id>idea</id>
+      <properties>
+        <nexus.plugin.type>jar</nexus.plugin.type>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>noit</id>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <skip>true</skip>
+              <skipITs>true</skipITs>
             </configuration>
           </plugin>
           <plugin>
@@ -453,14 +455,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
-    <profile>
-      <id>idea</id>
-      <properties>
-        <nexus.plugin.type>jar</nexus.plugin.type>
-      </properties>
     </profile>
   </profiles>
 </project>
