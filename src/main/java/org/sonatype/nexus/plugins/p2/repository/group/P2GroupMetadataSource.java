@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
 
 @Component( role = P2MetadataSource.class, hint = "group" )
 public class P2GroupMetadataSource
@@ -107,7 +108,7 @@ public class P2GroupMetadataSource
 
     private List<StorageFileItem> doRetrieveItems( final String xmlName, final Map<String, Object> context,
                                                    final P2GroupRepository repository )
-        throws IOException
+        throws IOException, GroupItemNotFoundException
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( xmlName );
         request.getRequestContext().putAll( context );
