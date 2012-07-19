@@ -294,6 +294,32 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>apacheHttpClient3x-provider</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>apacheHttpClient3x-provider-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <reportsDirectory>${project.build.directory}/surefire-reports-apacheHttpClient3x-provider</reportsDirectory>
+                  <systemPropertyVariables>
+                    <nexus.default.http.provider>apacheHttpClient3x</nexus.default.http.provider>
+                  </systemPropertyVariables>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 </project>
