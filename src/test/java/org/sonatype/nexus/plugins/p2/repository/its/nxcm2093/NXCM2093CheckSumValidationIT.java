@@ -15,12 +15,13 @@ package org.sonatype.nexus.plugins.p2.repository.its.nxcm2093;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -46,41 +47,42 @@ public class NXCM2093CheckSumValidationIT
         final File installDir = new File( "target/eclipse/nxcm2093" );
 
         // the must work one
-        installUsingP2(
-            getNexusTestRepoUrl( "nxcm2093-ok-checksum" ),
-            "org.mortbay.jetty.util",
-            installDir.getCanonicalPath()
-        );
+        installUsingP2( getNexusTestRepoUrl( "nxcm2093-ok-checksum" ), "org.mortbay.jetty.util",
+            installDir.getCanonicalPath() );
 
         try
         {
             final Map<String, String> sysProps = new HashMap<String, String>();
             sysProps.put( "eclipse.p2.MD5Check", "false" );
 
-            installUsingP2(
-                getNexusTestRepoUrl(),
-                "com.sonatype.nexus.p2.its.feature.feature.group",
-                installDir.getCanonicalPath(), sysProps
-            );
+            installUsingP2( getNexusTestRepoUrl(), "com.sonatype.nexus.p2.its.feature.feature.group",
+                installDir.getCanonicalPath(), sysProps );
             Assert.fail();
         }
         catch ( final Exception e )
         {
+            // NXCM-4501: this IT failed, but strangely, there WAS a checksum-invalid message for "feature" but
+            // this test asserted presence of "plugin" line. Unsure why ordering (might) change, but test one thing sure
+            // Nexus prevented P2 installation, as this assertion happens in a catch block, hence P2 did not install
+            // artifacts with wrong checksums.
+            // Changed to check for both variations of checksum-invalid loglines.
+            final String nexusLogString = FileUtils.fileRead( getNexusLogFile() );
+            final boolean passed =
+                StringUtils.contains( nexusLogString,
+                    "Proxied item nxcm2093-bad-checksum:/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar evaluated as INVALID" )
+                    || StringUtils.contains( nexusLogString,
+                        "Proxied item nxcm2093-bad-checksum:/features/com.sonatype.nexus.p2.its.feature_1.0.0.jar evaluated as INVALID" );
+
             assertThat(
-                getNexusLogFile(),
-                contains(
-                    "Proxied item nxcm2093-bad-checksum:/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar evaluated as INVALID"
-                )
-            );
+                "Nexus log should contain log entry about plugin OR feature having invalid checksum (as both of them are invalid)",
+                passed );
         }
 
-        final RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
-            this, getXMLXStream(), MediaType.APPLICATION_XML
-        );
+        final RepositoryMessageUtil repoUtil =
+            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         final RepositoryStatusResource repoStatusResource = repoUtil.getStatus( getTestRepositoryId() );
 
         assertThat( repoStatusResource.getProxyMode(), is( equalTo( ProxyMode.ALLOW.name() ) ) );
         assertThat( repoStatusResource.getLocalStatus(), is( equalTo( LocalStatus.IN_SERVICE.name() ) ) );
     }
-
 }
