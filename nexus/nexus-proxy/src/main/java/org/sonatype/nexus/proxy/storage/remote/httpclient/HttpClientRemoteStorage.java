@@ -65,7 +65,7 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
  */
 @Named( HttpClientRemoteStorage.PROVIDER_STRING )
 @Singleton
-class HttpClientRemoteStorage
+public class HttpClientRemoteStorage
     extends AbstractHTTPRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {

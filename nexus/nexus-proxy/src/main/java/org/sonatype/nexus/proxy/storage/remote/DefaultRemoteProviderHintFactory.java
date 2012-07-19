@@ -16,7 +16,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
+import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
@@ -101,7 +101,7 @@ public class DefaultRemoteProviderHintFactory
     public String getDefaultHttpRoleHint()
     {
         return SystemPropertiesHelper.getString( DEFAULT_HTTP_PROVIDER_KEY,
-            CommonsHttpClientRemoteStorage.PROVIDER_STRING );
+                                                 HttpClientRemoteStorage.PROVIDER_STRING );
     }
 
     public String getHttpRoleHint( final String hint )

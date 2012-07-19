@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.storage.remote;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
+import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class RemoteProviderHintFactoryTest
@@ -42,7 +42,7 @@ public class RemoteProviderHintFactoryTest
         System.clearProperty( DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY );
 
         // nothing set
-        Assert.assertEquals( CommonsHttpClientRemoteStorage.PROVIDER_STRING, hintFactory.getDefaultHttpRoleHint() );
+        Assert.assertEquals( HttpClientRemoteStorage.PROVIDER_STRING, hintFactory.getDefaultHttpRoleHint() );
 
         System.setProperty( DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY, FAKE_VALUE );
         Assert.assertEquals( FAKE_VALUE, hintFactory.getDefaultHttpRoleHint() );
