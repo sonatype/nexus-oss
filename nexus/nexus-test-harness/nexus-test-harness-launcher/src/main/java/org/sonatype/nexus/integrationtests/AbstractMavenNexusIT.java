@@ -14,18 +14,14 @@ package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
 
 public class AbstractMavenNexusIT
     extends AbstractNexusIntegrationTest
 {
+    private static final MavenVerifierHelper mavenVerifierHelper = new MavenVerifierHelper();
 
     public AbstractMavenNexusIT()
     {
@@ -37,6 +33,17 @@ public class AbstractMavenNexusIT
         super( testRepositoryId );
     }
 
+    protected MavenVerifierHelper getMavenVerifierHelper()
+    {
+        return getStaticMavenVerifierHelper();
+    }
+
+    private static MavenVerifierHelper getStaticMavenVerifierHelper()
+    {
+        return mavenVerifierHelper;
+    }
+
+    @Deprecated
     public Verifier createVerifier( File mavenProject )
         throws VerificationException, IOException
     {
@@ -52,6 +59,7 @@ public class AbstractMavenNexusIT
      * @throws VerificationException
      * @throws IOException
      */
+    @Deprecated
     public Verifier createVerifier( File mavenProject, File settings )
         throws VerificationException, IOException
     {
@@ -62,29 +70,16 @@ public class AbstractMavenNexusIT
         return createMavenVerifier( mavenProject, settings, getTestId() );
     }
 
+    @Deprecated
     public static Verifier createMavenVerifier( File mavenProject, File settings, String testId )
         throws VerificationException, IOException
     {
-        System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
-
-        Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
-
         String logname = "logs/maven-execution/" + testId + "/" + mavenProject.getName() + ".log";
-        new File( verifier.getBasedir(), logname ).getParentFile().mkdirs();
-        verifier.setLogFileName( logname );
-
-        File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
-        verifier.setLocalRepo( mavenRepository.getAbsolutePath() );
-        cleanRepository( mavenRepository, testId );
-
-        verifier.resetStreams();
-
-        List<String> options = new ArrayList<String>();
-        options.add( "-X" );
-        options.add( "-Dmaven.repo.local=" + mavenRepository.getAbsolutePath() );
-        options.add( "-s " + settings.getAbsolutePath() );
-        verifier.setCliOptions( options );
-        return verifier;
+        final File logFile = new File( mavenProject, logname );
+        logFile.getParentFile().mkdirs();
+        final MavenDeployment mavenDeployment = MavenDeployment.defaultDeployment( logFile, settings, mavenProject );
+        cleanRepository( mavenDeployment.getLocalRepositoryFile(), testId );
+        return getStaticMavenVerifierHelper().createMavenVerifier( mavenDeployment );
     }
 
     /**
@@ -93,10 +88,10 @@ public class AbstractMavenNexusIT
      * @param verifier
      * @throws IOException
      */
+    @Deprecated
     public void cleanRepository( File mavenRepo )
         throws IOException
     {
-
         cleanRepository( mavenRepo, getTestId() );
     }
 
@@ -106,13 +101,11 @@ public class AbstractMavenNexusIT
      * @param verifier
      * @throws IOException
      */
+    @Deprecated
     public static void cleanRepository( File mavenRepo, String testId )
         throws IOException
     {
-
-        File testGroupIdFolder = new File( mavenRepo, testId );
-        FileUtils.deleteDirectory( testGroupIdFolder );
-
+        getStaticMavenVerifierHelper().cleanRepository( mavenRepo, testId );
     }
 
     /**
@@ -120,11 +113,10 @@ public class AbstractMavenNexusIT
      * 
      * @throws IOException
      */
+    @Deprecated
     protected void failTest( Verifier verifier )
         throws IOException
     {
-        File logFile = new File( verifier.getBasedir(), verifier.getLogFileName() );
-        String log = FileUtils.fileRead( logFile );
-        Assert.fail( log );
+        getStaticMavenVerifierHelper().failTest( verifier );
     }
 }

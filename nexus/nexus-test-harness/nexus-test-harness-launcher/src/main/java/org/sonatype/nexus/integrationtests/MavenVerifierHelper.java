@@ -1,0 +1,74 @@
+package org.sonatype.nexus.integrationtests;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.maven.it.VerificationException;
+import org.apache.maven.it.Verifier;
+import org.codehaus.plexus.util.FileUtils;
+import org.testng.Assert;
+
+/**
+ * Helper class to create Maven Verifier.
+ * 
+ * @author cstamas
+ * @since 2.1
+ */
+public class MavenVerifierHelper
+{
+    /**
+     * Creates a Verifier against passed in {@link MavenDeployment}.
+     * 
+     * @param mavenDeployment
+     * @return
+     * @throws VerificationException
+     * @throws IOException
+     */
+    public Verifier createMavenVerifier( final MavenDeployment mavenDeployment )
+        throws VerificationException, IOException
+    {
+        System.setProperty( "maven.home", mavenDeployment.getMavenHomeFile().getAbsolutePath() );
+        Verifier verifier = new Verifier( mavenDeployment.getMavenProjectFile().getAbsolutePath(), false );
+        verifier.setLogFileName( mavenDeployment.getLogFile().getAbsolutePath() );
+        verifier.setLocalRepo( mavenDeployment.getLocalRepositoryFile().getAbsolutePath() );
+        verifier.resetStreams();
+        List<String> options = new ArrayList<String>();
+        options.add( "-X" );
+        options.add( "-Dmaven.repo.local=" + mavenDeployment.getLocalRepositoryFile().getAbsolutePath() );
+        options.add( "-s " + mavenDeployment.getSettingsXmlFile().getAbsolutePath() );
+        verifier.setCliOptions( options );
+        return verifier;
+    }
+
+    /**
+     * Removes artifacts from passed in local repository that has groupId of testId.
+     * 
+     * @param mavenRepo
+     * @param testId
+     * @throws IOException
+     */
+    protected void cleanRepository( final File mavenRepo, final String testId )
+        throws IOException
+    {
+        final File testGroupIdFolder = new File( mavenRepo, testId );
+        FileUtils.deleteDirectory( testGroupIdFolder );
+    }
+
+    /**
+     * Creates a "failure" message spitting out the Verifier execution log. This methods does not check any assertion,
+     * but should be rather call when you already checked and assertion, you know it is failed, and all you want to fail
+     * the test with some extra logging.
+     * 
+     * @param verifier
+     * @throws IOException
+     */
+    public void failTest( final Verifier verifier )
+        throws IOException
+    {
+        final File logFile = new File( verifier.getBasedir(), verifier.getLogFileName() );
+        final String log = FileUtils.fileRead( logFile );
+        Assert.fail( log );
+    }
+}
