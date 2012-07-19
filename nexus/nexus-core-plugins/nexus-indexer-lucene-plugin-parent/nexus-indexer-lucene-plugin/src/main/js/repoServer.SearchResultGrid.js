@@ -84,6 +84,8 @@ Sonatype.SearchStore = function(config) {
           'loadexception' : {
         	fn : function (obj, options, response, error) {
         	  try {
+              // The response is already HTML escaped as it's coming through the REST layer, and can be directly used as
+              // a warning
 	        	  var errorResponse = Ext.decode(response.responseText);
 	        	  if ( errorResponse.errors && errorResponse.errors[0] && errorResponse.errors[0].id == "search" ) {
 		              this.grid.setWarningLabel(errorResponse.errors[0].msg);
