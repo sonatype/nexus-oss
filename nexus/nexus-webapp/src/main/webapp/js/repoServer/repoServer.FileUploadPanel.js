@@ -82,7 +82,6 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config) {
                     selectOnFocus : true,
                     emptyText : 'Select...',
                     allowBlank : false,
-                    value : 'pom',
                     listeners : {
                       select : {
                         fn : this.gavDefinitionSelectHandler,
