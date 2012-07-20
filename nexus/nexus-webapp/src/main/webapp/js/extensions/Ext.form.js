@@ -1033,7 +1033,7 @@ Ext.override(Ext.form.TextField, {
     var value = this.getRawValueOrig();
     if ( this.htmlConvert )
     {
-      value = Nexus.util.Format.htmlEncode(value);
+      value = Ext.util.Format.htmlEncode(value);
     }
     return value;
   },
@@ -1041,7 +1041,7 @@ Ext.override(Ext.form.TextField, {
     var value = this.getValueOrig();
     if ( this.htmlConvert )
     {
-      value = Nexus.util.Format.htmlEncode(value);
+      value = Ext.util.Format.htmlEncode(value);
     }
     return value;
   }
