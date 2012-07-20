@@ -77,7 +77,7 @@ public class AbstractMavenNexusIT
         String logname = "logs/maven-execution/" + testId + "/" + mavenProject.getName() + ".log";
         final File logFile = new File( mavenProject, logname );
         logFile.getParentFile().mkdirs();
-        final MavenDeployment mavenDeployment = MavenDeployment.defaultDeployment( logFile, settings, mavenProject );
+        final MavenDeployment mavenDeployment = MavenDeployment.defaultDeployment( logname, settings, mavenProject );
         cleanRepository( mavenDeployment.getLocalRepositoryFile(), testId );
         return getStaticMavenVerifierHelper().createMavenVerifier( mavenDeployment );
     }

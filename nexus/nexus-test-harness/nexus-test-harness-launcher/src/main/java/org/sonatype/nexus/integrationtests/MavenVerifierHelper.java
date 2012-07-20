@@ -43,7 +43,7 @@ public class MavenVerifierHelper
     {
         System.setProperty( "maven.home", mavenDeployment.getMavenHomeFile().getAbsolutePath() );
         Verifier verifier = new Verifier( mavenDeployment.getMavenProjectFile().getAbsolutePath(), false );
-        verifier.setLogFileName( mavenDeployment.getLogFile().getAbsolutePath() );
+        verifier.setLogFileName( mavenDeployment.getLogFileName() );
         verifier.setLocalRepo( mavenDeployment.getLocalRepositoryFile().getAbsolutePath() );
         verifier.resetStreams();
         List<String> options = new ArrayList<String>();
@@ -79,7 +79,7 @@ public class MavenVerifierHelper
     public void failTest( final Verifier verifier )
         throws IOException
     {
-        final File logFile = new File( verifier.getBasedir(), verifier.getLogFileName() );
+        final File logFile = new File( verifier.getLogFileName() );
         final String log = FileUtils.fileRead( logFile );
         Assert.fail( log );
     }

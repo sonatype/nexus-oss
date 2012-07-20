@@ -30,7 +30,7 @@ public class MavenDeployment
 
     private final File localRepositoryFile;
 
-    private final File logFile;
+    private final String logFileName;
 
     private final File settingsXmlFile;
 
@@ -42,16 +42,17 @@ public class MavenDeployment
      * @param testId the test ID, must not be {@code null}.
      * @param mavenHomeFile the maven home, must not be {@code null}.
      * @param localRepositoryFile the local repository, must not be {@code null}.
-     * @param logFile the log file of Verifier, must not be {@code null}.
+     * @param logFileName the log file of Verifier, must not be {@code null}. It is a path relative to
+     *            {@code mavenProjectFile}.
      * @param settingsXmlFile settings.xml file, must not be {@code null}.
      * @param mavenProjectFile directory containing the project (pom.xml), must not be {@code null}.
      */
-    public MavenDeployment( final File mavenHomeFile, final File localRepositoryFile, final File logFile,
+    public MavenDeployment( final File mavenHomeFile, final File localRepositoryFile, final String logFileName,
                             final File settingsXmlFile, final File mavenProjectFile )
     {
         this.mavenHomeFile = Preconditions.checkNotNull( mavenHomeFile );
         this.localRepositoryFile = Preconditions.checkNotNull( localRepositoryFile );
-        this.logFile = Preconditions.checkNotNull( logFile );
+        this.logFileName = Preconditions.checkNotNull( logFileName );
         this.settingsXmlFile = Preconditions.checkNotNull( settingsXmlFile );
         this.mavenProjectFile = Preconditions.checkNotNull( mavenProjectFile );
     }
@@ -77,13 +78,14 @@ public class MavenDeployment
     }
 
     /**
-     * Returns the logfile where you want to have Maven console output saved.
+     * Returns the logfilename where you want to have Maven console output saved. This is a relative path resolved from
+     * {@link #getMavenProjectFile()} as base.
      * 
      * @return
      */
-    public File getLogFile()
+    public String getLogFileName()
     {
-        return logFile;
+        return logFileName;
     }
 
     /**
@@ -112,16 +114,16 @@ public class MavenDeployment
      * Returns the default deployment descriptor used throughout ITs. This is just a "handy" quick method that does
      * things in same was as they happened before (pre 2.1).
      * 
-     * @param testId
-     * @param logFile
-     * @param settingsXmlFile
-     * @param mavenProject
+     * @param logFile the relative path resolved from mavenProject to save console output of Maven.
+     * @param settingsXmlFile the settings.xml file to use with Maven.
+     * @param mavenProject the "basedir" of the project to build. It should point to a directory that contains pom.xml
+     *            and a valid maven project along with it.
      * @return
      */
-    public static MavenDeployment defaultDeployment( final File logFile, final File settingsXmlFile,
+    public static MavenDeployment defaultDeployment( final String logFileName, final File settingsXmlFile,
                                                      final File mavenProject )
     {
         return new MavenDeployment( new File( TestProperties.getString( "maven.instance" ) ), new File(
-            TestProperties.getString( "maven.local.repo" ) ), logFile, settingsXmlFile, mavenProject );
+            TestProperties.getString( "maven.local.repo" ) ), logFileName, settingsXmlFile, mavenProject );
     }
 }
