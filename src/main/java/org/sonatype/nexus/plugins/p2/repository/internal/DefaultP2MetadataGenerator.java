@@ -178,7 +178,7 @@ public class DefaultP2MetadataGenerator
                 tempP2Repository = createTemporaryP2Repository();
 
                 artifactRepository.write( tempP2Repository.toURI(), artifacts, bsn, null /** repository properties */
-                    , new String[][]{ { "(classifier=osgi.bundle)", "${repoUrl}/" + item.getPath() + "}" } } );
+                    , new String[][]{ { "(classifier=osgi.bundle)", "${repoUrl}/" + item.getPath() } } );
 
                 final String p2ArtifactsPath =
                     item.getPath().substring( 0, item.getPath().length() - extension.length() - 1 )
