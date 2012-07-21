@@ -100,6 +100,20 @@ public class P2RepositoryAggregatorCapability
     }
 
     @Override
+    public void onActivate()
+        throws Exception
+    {
+        service.enableAggregationFor( configuration );
+    }
+
+    @Override
+    public void onPassivate()
+        throws Exception
+    {
+        service.disableAggregationFor( configuration );
+    }
+
+    @Override
     public Condition activationCondition()
     {
         return conditions.logical().and(

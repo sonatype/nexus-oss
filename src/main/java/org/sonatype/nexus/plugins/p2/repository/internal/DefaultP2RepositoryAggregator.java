@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
 import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createLink;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
@@ -99,7 +100,6 @@ public class DefaultP2RepositoryAggregator
     @Override
     public void addConfiguration( final P2RepositoryAggregatorConfiguration configuration )
     {
-        configurations.put( configuration.repositoryId(), configuration );
         try
         {
             final Repository repository = repositories.getRepository( configuration.repositoryId() );
@@ -133,7 +133,6 @@ public class DefaultP2RepositoryAggregator
     @Override
     public void removeConfiguration( final P2RepositoryAggregatorConfiguration configuration )
     {
-        configurations.remove( configuration.repositoryId() );
         try
         {
             final Repository repository = repositories.getRepository( configuration.repositoryId() );
@@ -154,6 +153,18 @@ public class DefaultP2RepositoryAggregator
             logger.warn( String.format( "Could not delete P2 repository [%s:%s] due to [%s]",
                                         configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, e.getMessage() ), e );
         }
+    }
+
+    @Override
+    public void enableAggregationFor( final P2RepositoryAggregatorConfiguration configuration )
+    {
+        configurations.put( checkNotNull( configuration ).repositoryId(), configuration );
+    }
+
+    @Override
+    public void disableAggregationFor( final P2RepositoryAggregatorConfiguration configuration )
+    {
+        configurations.remove( checkNotNull( configuration ).repositoryId() );
     }
 
     @Override

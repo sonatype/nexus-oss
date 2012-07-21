@@ -21,6 +21,10 @@ public interface P2RepositoryAggregator
 
     void removeConfiguration( final P2RepositoryAggregatorConfiguration configuration );
 
+    void enableAggregationFor( final P2RepositoryAggregatorConfiguration configuration );
+
+    void disableAggregationFor( final P2RepositoryAggregatorConfiguration configuration );
+
     P2RepositoryAggregatorConfiguration getConfiguration( final String repositoryId );
 
     void updateP2Artifacts( StorageItem item );
