@@ -42,14 +42,14 @@ public class P2R0306AggregatedP2MetadataNotUpdatedWhenNotActiveIT
         final File artifactsXML = storageP2RepositoryArtifactsXML();
         final File contentXML = storageP2RepositoryContentXML();
 
-        final long artifactsXMLTimestamp = artifactsXML.lastModified();
-        final long contentXMLTimestamp = contentXML.lastModified();
-
         createP2RepositoryAggregatorCapability();
         createP2MetadataGeneratorCapability();
 
         assertThat( "P2 artifacts.xml does exist", artifactsXML, exists() );
         assertThat( "P2 content.xml does exist", contentXML, exists() );
+
+        final long artifactsXMLTimestamp = artifactsXML.lastModified();
+        final long contentXMLTimestamp = contentXML.lastModified();
 
         passivateP2RepositoryAggregatorCapability();
 
