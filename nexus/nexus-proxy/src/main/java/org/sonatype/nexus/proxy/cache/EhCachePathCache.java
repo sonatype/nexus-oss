@@ -86,7 +86,7 @@ public class EhCachePathCache
     public void doPut( final String key, final Object element, final int expiration )
     {
         Element el = new Element( key, element );
-        if ( expiration != -1 )
+        if ( expiration > -1 )
         {
             el.setTimeToLive( expiration );
         }
