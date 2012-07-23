@@ -14,6 +14,10 @@
  * Capabilities Edit/Create panel layout and controller
  */
 
+/*global Ext, Sonatype*/
+
+(function() {
+
 var CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities';
 var CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes';
 var CAPABILITY_SETTINGS_PREFIX = '';
@@ -439,7 +443,6 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                     this.capabilitiesDataStore.proxy.conn.url = CAPABILITIES_SERVICE_PATH + '?includeHidden=' + checked;
                     this.capabilityTypeDataStore.proxy.conn.url = CAPABILITY_TYPES_SERVICE_PATH + '?includeHidden=' + checked;
                     this.capabilitiesDataStore.removeAll();
-                    this.capabilitiesDataStore.removeAll();
                     this.formCards.setTitle('Configuration');
                     this.reloadAll();
                   },
@@ -526,6 +529,16 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       reloadAll : function() {
         Ext.getCmp('capability-add-btn').disable();
 
+        this.repoOrGroupDataStore.removeAll();
+        this.repositoryDataStore.removeAll();
+        this.repositoryGroupDataStore.removeAll();
+        this.capabilitiesDataStore.removeAll();
+        this.repositoryDataStore.removeAll();
+        this.repositoryGroupDataStore.removeAll();
+        this.capabilityTypeDataStore.removeAll();
+
+        // repoOrGroupDataStore is created by listeners in repo- and groupDataStore
+        this.repositoryDataStore.reload();
         this.capabilitiesDataStore.reload();
         this.repositoryDataStore.reload();
         this.repositoryGroupDataStore.reload();
@@ -1245,3 +1258,4 @@ A capability descriptor form field with an ID of 'custom-type' will then be mapp
 */
 Sonatype.Events.fireEvent('capabilitiesCustomTypeInit', Sonatype.repoServer.CapabilitiesPanel.prototype.customFieldTypes);
 
+})();
