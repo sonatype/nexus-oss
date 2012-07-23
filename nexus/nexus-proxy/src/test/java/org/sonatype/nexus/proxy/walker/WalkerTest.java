@@ -84,9 +84,9 @@ public class WalkerTest
         wp = new TestWalkerProcessor();
 
         // this is a group
-        wc = new DefaultWalkerContext( getRepositoryRegistry().getRepository( "test" ), new ResourceStoreRequest(
-            RepositoryItemUid.PATH_ROOT,
-            true ) );
+        wc =
+            new DefaultWalkerContext( getRepositoryRegistry().getRepository( "test" ), new ResourceStoreRequest(
+                RepositoryItemUid.PATH_ROOT, true ) );
 
         wc.getProcessors().add( wp );
 
@@ -109,12 +109,49 @@ public class WalkerTest
     }
 
     /**
-     * Tests walking an out of service repo.  The walker should NOT not fail, but also NOT find any items.</BR>
-     * Verifies fix for: NEXUS-4554 (which is more general then just fixing the Trash task)
+     * See NXCM-4516. We are invoking "walker" using a path that points to a non-collection item (a file).
+     * 
      * @throws Exception
      */
     @Test
-    public void testWalkOutOfServiceRepo() throws Exception
+    public void testWalkerRunningAgainstFileItem()
+        throws Exception
+    {
+        // fetch some content to have on walk on something
+        getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        TestWalkerProcessor wp = null;
+        WalkerContext wc = null;
+        wp = new TestWalkerProcessor();
+        // this is a group
+        wc =
+            new DefaultWalkerContext( getRepositoryRegistry().getRepository( "test" ), new ResourceStoreRequest(
+                "/activemq/activemq-core/1.2/activemq-core-1.2.jar", true ) );
+        wc.getProcessors().add( wp );
+        walker.walk( wc );
+        assertThat( "Should not be stopped!", wc.isStopped(), is( false ) );
+        if ( wc.getStopCause() != null )
+        {
+            wc.getStopCause().printStackTrace();
+            fail( "Should be no exception!" );
+        }
+
+        Assert.assertEquals( 0, wp.collEnters );
+        Assert.assertEquals( 0, wp.collExits );
+        Assert.assertEquals( 0, wp.colls );
+        Assert.assertEquals( 1, wp.files );
+        Assert.assertEquals( 0, wp.links );
+    }
+
+    /**
+     * Tests walking an out of service repo. The walker should NOT not fail, but also NOT find any items.</BR> Verifies
+     * fix for: NEXUS-4554 (which is more general then just fixing the Trash task)
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testWalkOutOfServiceRepo()
+        throws Exception
     {
         // put repo2 out of service
         String repoId = "repo2";
@@ -128,9 +165,9 @@ public class WalkerTest
         wp = new TestWalkerProcessor();
 
         // this is a group
-        wc = new DefaultWalkerContext( getRepositoryRegistry().getRepository( repoId ), new ResourceStoreRequest(
-            RepositoryItemUid.PATH_ROOT,
-            true ) );
+        wc =
+            new DefaultWalkerContext( getRepositoryRegistry().getRepository( repoId ), new ResourceStoreRequest(
+                RepositoryItemUid.PATH_ROOT, true ) );
 
         wc.getProcessors().add( wp );
 
@@ -151,8 +188,10 @@ public class WalkerTest
         throws Exception
     {
         // fetch some content to have on walk on something
-        getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar", false ) );
-        getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.pom", false ) );
+        getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar", false ) );
+        getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.pom", false ) );
 
         Comparator<StorageItem> itemComparator = new Comparator<StorageItem>()
         {
@@ -163,11 +202,9 @@ public class WalkerTest
             }
         };
 
-        Matcher<Iterable<? extends String>> matcher = contains(
-            "slf4j-api-1.4.3.jar",
-            "slf4j-api-1.4.3.jar.sha1",
-            "slf4j-api-1.4.3.pom",
-            "slf4j-api-1.4.3.pom.sha1" );
+        Matcher<Iterable<? extends String>> matcher =
+            contains( "slf4j-api-1.4.3.jar", "slf4j-api-1.4.3.jar.sha1", "slf4j-api-1.4.3.pom",
+                "slf4j-api-1.4.3.pom.sha1" );
 
         assertSortedWalk( itemComparator, matcher );
 
@@ -180,12 +217,9 @@ public class WalkerTest
             }
         };
 
-        matcher = contains(
-            "slf4j-api-1.4.3.pom.sha1",
-            "slf4j-api-1.4.3.pom",
-            "slf4j-api-1.4.3.jar.sha1",
-            "slf4j-api-1.4.3.jar"
-        );
+        matcher =
+            contains( "slf4j-api-1.4.3.pom.sha1", "slf4j-api-1.4.3.pom", "slf4j-api-1.4.3.jar.sha1",
+                "slf4j-api-1.4.3.jar" );
 
         assertSortedWalk( itemComparator, matcher );
     }
@@ -195,10 +229,9 @@ public class WalkerTest
         throws NoSuchRepositoryException
     {
 
-        DefaultWalkerContext wc = new DefaultWalkerContext(
-            getRepositoryRegistry().getRepository( "test" ),
-            new ResourceStoreRequest( "/org/slf4j/slf4j-api/1.4.3", true )
-        );
+        DefaultWalkerContext wc =
+            new DefaultWalkerContext( getRepositoryRegistry().getRepository( "test" ), new ResourceStoreRequest(
+                "/org/slf4j/slf4j-api/1.4.3", true ) );
 
         final List<String> seen = Lists.newLinkedList();
         wc.getProcessors().add( new AbstractWalkerProcessor()
