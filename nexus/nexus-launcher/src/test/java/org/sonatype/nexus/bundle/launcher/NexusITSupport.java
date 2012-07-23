@@ -188,52 +188,55 @@ public abstract class NexusITSupport
             final File thisProjectPom = util.resolveFile( "pom.xml" );
             final Model model = modelResolver.resolveModel( model().pom( thisProjectPom ) );
 
-            final List<Dependency> dependencies = model.getDependencyManagement().getDependencies();
-
-            for ( Dependency dependency : dependencies )
+            if ( model.getDependencyManagement() != null )
             {
-                if ( !dependency.getGroupId().equalsIgnoreCase( groupId ) )
-                {
-                    continue;
-                }
-                if ( !dependency.getArtifactId().equalsIgnoreCase( artifactId ) )
-                {
-                    continue;
-                }
-                if ( type != null && !dependency.getType().equals( type ) )
-                {
-                    continue;
-                }
-                if ( classifier != null && !dependency.getClassifier().equals( classifier ) )
-                {
-                    continue;
-                }
+                final List<Dependency> dependencies = model.getDependencyManagement().getDependencies();
 
-                StringBuilder coordinates = new StringBuilder();
-                coordinates.append( dependency.getGroupId() );
-                coordinates.append( ":" ).append( dependency.getArtifactId() );
+                for ( Dependency dependency : dependencies )
+                {
+                    if ( !dependency.getGroupId().equalsIgnoreCase( groupId ) )
+                    {
+                        continue;
+                    }
+                    if ( !dependency.getArtifactId().equalsIgnoreCase( artifactId ) )
+                    {
+                        continue;
+                    }
+                    if ( type != null && !dependency.getType().equals( type ) )
+                    {
+                        continue;
+                    }
+                    if ( classifier != null && !dependency.getClassifier().equals( classifier ) )
+                    {
+                        continue;
+                    }
 
-                String rExtension = dependency.getType();
-                if ( overrideType != null )
-                {
-                    rExtension = overrideType;
-                }
-                if ( rExtension != null )
-                {
-                    coordinates.append( ":" ).append( rExtension );
-                }
+                    StringBuilder coordinates = new StringBuilder();
+                    coordinates.append( dependency.getGroupId() );
+                    coordinates.append( ":" ).append( dependency.getArtifactId() );
 
-                String rClassifier = dependency.getClassifier();
-                if ( overrideClassifier != null )
-                {
-                    rClassifier = overrideClassifier;
+                    String rExtension = dependency.getType();
+                    if ( overrideType != null )
+                    {
+                        rExtension = overrideType;
+                    }
+                    if ( rExtension != null )
+                    {
+                        coordinates.append( ":" ).append( rExtension );
+                    }
+
+                    String rClassifier = dependency.getClassifier();
+                    if ( overrideClassifier != null )
+                    {
+                        rClassifier = overrideClassifier;
+                    }
+                    if ( rClassifier != null )
+                    {
+                        coordinates.append( ":" ).append( rClassifier );
+                    }
+                    coordinates.append( ":" ).append( dependency.getVersion() );
+                    return resolveArtifact( coordinates.toString() );
                 }
-                if ( rClassifier != null )
-                {
-                    coordinates.append( ":" ).append( rClassifier );
-                }
-                coordinates.append( ":" ).append( dependency.getVersion() );
-                return resolveArtifact( coordinates.toString() );
             }
             throw new RuntimeException( String.format( "Dependency %s:%s was not found", groupId, artifactId ) );
         }
