@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.walker;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.TreeSet;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -92,10 +91,22 @@ public class DefaultWalker
                         {
                             WalkerFilter filter =
                                 context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
-
                             collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
-
                             context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
+                        }
+                        catch ( Exception e )
+                        {
+                            context.stop( e );
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            WalkerFilter filter =
+                                context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
+                            walkItem( context, filter, item );
+                            context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, 1 );
                         }
                         catch ( Exception e )
                         {
@@ -156,17 +167,17 @@ public class DefaultWalker
                 {
                     getLogger().debug(
                         "Aborted walking on repository {} from path \"{}\", cause: {}",
-                        new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath,
-                            context.getStopCause().getMessage() } );
+                        new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ),
+                            fromPath, context.getStopCause().getMessage() } );
                 }
                 else
                 {
                     getLogger().info(
                         "Aborted walking on repository {} from path \"{}\", cause: {}",
-                        new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath,
-                            context.getStopCause().getMessage() } );
+                        new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ),
+                            fromPath, context.getStopCause().getMessage() } );
                 }
-                
+
                 throw new WalkerException( context, "Aborted walking on repository ID='"
                     + context.getRepository().getId() + "' from path='" + fromPath + "'." );
             }
@@ -229,13 +240,9 @@ public class DefaultWalker
 
             for ( StorageItem i : ls )
             {
-                if (  !(i instanceof StorageCollectionItem) )
+                if ( !( i instanceof StorageCollectionItem ) )
                 {
-                    if ( filter.shouldProcess( context, i ) )
-                    {
-                        // user may call stop()
-                        processItem( context, i );
-                    }
+                    walkItem( context, filter, i );
 
                     if ( context.isStopped() )
                     {
@@ -263,6 +270,15 @@ public class DefaultWalker
         }
 
         return collCount;
+    }
+
+    protected void walkItem( WalkerContext context, WalkerFilter filter, StorageItem i )
+    {
+        if ( filter.shouldProcess( context, i ) )
+        {
+            // user may call stop()
+            processItem( context, i );
+        }
     }
 
     protected void beforeWalk( WalkerContext context )
@@ -405,6 +421,7 @@ public class DefaultWalker
             context.stop( e );
         }
 
-        context.getThrottleController().walkEnded( context, (DefaultThrottleInfo) context.getContext().get( WALKER_THROTTLE_INFO ) );
+        context.getThrottleController().walkEnded( context,
+            (DefaultThrottleInfo) context.getContext().get( WALKER_THROTTLE_INFO ) );
     }
 }
