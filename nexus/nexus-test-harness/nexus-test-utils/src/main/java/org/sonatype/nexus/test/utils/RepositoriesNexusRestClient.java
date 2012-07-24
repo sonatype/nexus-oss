@@ -59,6 +59,8 @@ public class RepositoriesNexusRestClient
 
     public static final String SERVICE_PART = NexusRestClient.SERVICE_LOCAL + "repositories";
 
+    private static final Integer USE_DEFAULT = null;
+
     private final NexusRestClient nexusRestClient;
 
     private final TasksNexusRestClient taskNRC;
@@ -522,16 +524,38 @@ public class RepositoriesNexusRestClient
     public void createMavenProxyReleaseRepository( final String id, final String url )
         throws IOException
     {
-        createMavenProxyRepository( id, url, RepositoryPolicy.RELEASE );
+        createMavenProxyReleaseRepository( id, url, USE_DEFAULT, USE_DEFAULT );
+    }
+
+    public void createMavenProxyReleaseRepository( final String id,
+                                                   final String url,
+                                                   final Integer artifactMaxAge,
+                                                   final Integer metadataMaxAge )
+        throws IOException
+    {
+        createMavenProxyRepository( id, url, RepositoryPolicy.RELEASE, artifactMaxAge, metadataMaxAge );
     }
 
     public void createMavenProxySnapshotRepository( final String id, final String url )
         throws IOException
     {
-        createMavenProxyRepository( id, url, RepositoryPolicy.SNAPSHOT );
+        createMavenProxySnapshotRepository( id, url, USE_DEFAULT, USE_DEFAULT );
     }
 
-    public void createMavenProxyRepository( final String id, final String url, final RepositoryPolicy repositoryPolicy )
+    public void createMavenProxySnapshotRepository( final String id,
+                                                    final String url,
+                                                    final Integer artifactMaxAge,
+                                                    final Integer metadataMaxAge )
+        throws IOException
+    {
+        createMavenProxyRepository( id, url, RepositoryPolicy.SNAPSHOT, artifactMaxAge, metadataMaxAge );
+    }
+
+    public void createMavenProxyRepository( final String id,
+                                            final String url,
+                                            final RepositoryPolicy repositoryPolicy,
+                                            final Integer artifactMaxAge,
+                                            final Integer metadataMaxAge )
         throws IOException
     {
         final RepositoryProxyResource repository = new RepositoryProxyResource();
@@ -548,6 +572,14 @@ public class RepositoriesNexusRestClient
         repository.setBrowseable( true );
         repository.setIndexable( true );
         repository.setExposed( true );
+        if ( artifactMaxAge != null )
+        {
+            repository.setArtifactMaxAge( artifactMaxAge );
+        }
+        if ( metadataMaxAge != null )
+        {
+            repository.setMetadataMaxAge( metadataMaxAge );
+        }
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( url );
