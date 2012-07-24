@@ -59,7 +59,7 @@ public class RepositoriesNexusRestClient
 
     public static final String SERVICE_PART = NexusRestClient.SERVICE_LOCAL + "repositories";
 
-    private static final Integer USE_DEFAULT = null;
+    private static final Integer DO_NOT_SET = null;
 
     private final NexusRestClient nexusRestClient;
 
@@ -524,7 +524,7 @@ public class RepositoriesNexusRestClient
     public void createMavenProxyReleaseRepository( final String id, final String url )
         throws IOException
     {
-        createMavenProxyReleaseRepository( id, url, USE_DEFAULT, USE_DEFAULT );
+        createMavenProxyReleaseRepository( id, url, DO_NOT_SET, DO_NOT_SET );
     }
 
     public void createMavenProxyReleaseRepository( final String id,
@@ -539,7 +539,7 @@ public class RepositoriesNexusRestClient
     public void createMavenProxySnapshotRepository( final String id, final String url )
         throws IOException
     {
-        createMavenProxySnapshotRepository( id, url, USE_DEFAULT, USE_DEFAULT );
+        createMavenProxySnapshotRepository( id, url, DO_NOT_SET, DO_NOT_SET );
     }
 
     public void createMavenProxySnapshotRepository( final String id,
