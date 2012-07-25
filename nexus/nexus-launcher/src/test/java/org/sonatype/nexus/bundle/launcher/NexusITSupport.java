@@ -12,20 +12,11 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.sisu.maven.bridge.support.ArtifactRequestBuilder.request;
-import static org.sonatype.sisu.maven.bridge.support.ModelBuildingRequestBuilder.model;
-
 import java.io.File;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.junit.Before;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
@@ -33,7 +24,6 @@ import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
-import com.google.common.base.Throwables;
 import com.google.inject.Binder;
 
 /**
@@ -62,6 +52,18 @@ public abstract class NexusITSupport
     private MavenModelResolver modelResolver;
 
     /**
+     * Test specific artifact resolver utility.
+     * Cannot be null.
+     */
+    private final NexusITArtifactResolver testArtifactResolver;
+
+    /**
+     * Test specific file resolver utility.
+     * Cannot be null.
+     */
+    private final NexusITFileResolver testFileResolver;
+
+    /**
      * Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
      * "injected-test.properties".
      */
@@ -72,18 +74,23 @@ public abstract class NexusITSupport
      */
     public NexusITSupport()
     {
-        this.nexusBundleCoordinates = null;
+        this( null );
     }
 
     /**
      * Runs IT by against specified Nexus bundle coordinates.
      *
-     * @param nexusBundleCoordinates nexus bundle coordinates to run the test against. Cannot be null.
+     * @param nexusBundleCoordinates nexus bundle coordinates to run the test against. If null, it will look up the
+     *                               coordinates from "injected-test.properties".
      * @since 2.2
      */
     public NexusITSupport( final String nexusBundleCoordinates )
     {
-        this.nexusBundleCoordinates = checkNotNull( nexusBundleCoordinates );
+        this.nexusBundleCoordinates = nexusBundleCoordinates;
+        testArtifactResolver = new NexusITArtifactResolver(
+            util.resolveFile( "pom.xml" ), artifactResolver, modelResolver
+        );
+        testFileResolver = new NexusITFileResolver( util.getBaseDir(), util.getTargetDir(), testName.getMethodName() );
     }
 
     /**
@@ -104,7 +111,7 @@ public abstract class NexusITSupport
                 @Override
                 public File resolve()
                 {
-                    return methodSpecificDirectory( "bundle" );
+                    return fileResolver().methodSpecificDirectory( "bundle" );
                 }
 
             } );
@@ -129,265 +136,13 @@ public abstract class NexusITSupport
         logger.info( "TEST {} is running against Nexus bundle {}", testName.getMethodName(), nexusBundleCoordinates );
     }
 
-    /**
-     * Resolves a test file by looking up the specified path into test resources.
-     * <p/>
-     * It searches the following path locations:<br/>
-     * {@code <project>/src/test/it-resources/<test class package>/<test class name>/<test method name>/<path>}<br/>
-     * {@code <project>/src/test/it-resources/<test class package>/<test class name>/<path>}<br/>
-     * {@code <project>/src/test/it-resources/<path>}<br/>
-     *
-     * @param path path to look up
-     * @return found file
-     * @throws RuntimeException if path cannot be found in any of above locations
-     * @since 2.0
-     */
-    public File resolveTestFile( final String path )
-        throws RuntimeException
+    public NexusITArtifactResolver artifactResolver()
     {
-        File level1 = testMethodSourceDirectory( path );
-        if ( level1.exists() )
-        {
-            return level1;
-        }
-        File level2 = testClassSourceDirectory( path );
-        if ( level2.exists() )
-        {
-            return level2;
-        }
-        File level3 = testSourceDirectory( path );
-        if ( level3.exists() )
-        {
-            return level3;
-        }
-        throw new RuntimeException(
-            "Path " + path + " not found in any of: " + level1 + ", " + level2 + ", " + level3 );
+        return testArtifactResolver;
     }
 
-    /**
-     * Resolves an artifact given its Maven coordinates.
-     *
-     * @param coordinates Maven artifact coordinates
-     * @return resolved artifact file
-     */
-    protected File resolveArtifact( final String coordinates )
-        throws RuntimeException
+    public NexusITFileResolver fileResolver()
     {
-        try
-        {
-            Artifact artifact = artifactResolver.resolveArtifact(
-                request().artifact( coordinates )
-            );
-            if ( artifact == null || artifact.getFile() == null || !artifact.getFile().exists() )
-            {
-                throw new RuntimeException( String.format( "Artifact %s could not be resolved", coordinates ) );
-            }
-            return artifact.getFile();
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
+        return testFileResolver;
     }
-
-    /**
-     * Resolves a Nexus plugin, given its coordinates, by looking it up in dependency management section of POM in which
-     * the test resides.
-     *
-     * @param groupId    Maven group id of Nexus plugin to be resolved
-     * @param artifactId Maven artifact id of Nexus plugin to be resolved
-     * @return resolved artifact file
-     * @since 2.1
-     */
-    protected File resolvePluginFromDependencyManagement( final String groupId, final String artifactId )
-        throws RuntimeException
-    {
-        return resolveFromDependencyManagement( groupId, artifactId, "nexus-plugin", null, "zip", "bundle" );
-    }
-
-    /**
-     * Resolves a Maven artifact, given its coordinates, by looking it up in dependency management section of POM in
-     * which the test resides.
-     *
-     * @param groupId            Maven group id of artifact to be resolved
-     * @param artifactId         Maven artifact id of artifact to be resolved
-     * @param type               Maven type of artifact to be resolved. If not specified (null), type is not considered
-     *                           while finding the dependency in dependency management
-     * @param classifier         Maven classifier of artifact to be resolved. If not specified (null), classifier is not
-     *                           considered while finding the dependency in dependency management
-     * @param overrideType       an optional type to be used to override the type specified in dependency management
-     *                           (e.g nexus-plugin -> zip)
-     * @param overrideClassifier an optional classifier to override the classifier specified in dependency management
-     *                           (e.g (not specified) -> bundle)
-     * @return resolved artifact file
-     * @since 2.1
-     */
-    protected File resolveFromDependencyManagement( final String groupId,
-                                                    final String artifactId,
-                                                    final String type,
-                                                    final String classifier,
-                                                    final String overrideType,
-                                                    final String overrideClassifier )
-    {
-        try
-        {
-            final File thisProjectPom = util.resolveFile( "pom.xml" );
-            final Model model = modelResolver.resolveModel( model().pom( thisProjectPom ) );
-
-            if ( model.getDependencyManagement() != null )
-            {
-                final List<Dependency> dependencies = model.getDependencyManagement().getDependencies();
-
-                for ( Dependency dependency : dependencies )
-                {
-                    if ( !dependency.getGroupId().equalsIgnoreCase( groupId ) )
-                    {
-                        continue;
-                    }
-                    if ( !dependency.getArtifactId().equalsIgnoreCase( artifactId ) )
-                    {
-                        continue;
-                    }
-                    if ( type != null && !dependency.getType().equals( type ) )
-                    {
-                        continue;
-                    }
-                    if ( classifier != null && !dependency.getClassifier().equals( classifier ) )
-                    {
-                        continue;
-                    }
-
-                    StringBuilder coordinates = new StringBuilder();
-                    coordinates.append( dependency.getGroupId() );
-                    coordinates.append( ":" ).append( dependency.getArtifactId() );
-
-                    String rExtension = dependency.getType();
-                    if ( overrideType != null )
-                    {
-                        rExtension = overrideType;
-                    }
-                    if ( rExtension != null )
-                    {
-                        coordinates.append( ":" ).append( rExtension );
-                    }
-
-                    String rClassifier = dependency.getClassifier();
-                    if ( overrideClassifier != null )
-                    {
-                        rClassifier = overrideClassifier;
-                    }
-                    if ( rClassifier != null )
-                    {
-                        coordinates.append( ":" ).append( rClassifier );
-                    }
-                    coordinates.append( ":" ).append( dependency.getVersion() );
-                    return resolveArtifact( coordinates.toString() );
-                }
-            }
-            throw new RuntimeException( String.format( "Dependency %s:%s was not found", groupId, artifactId ) );
-        }
-        catch ( Exception e )
-        {
-            throw Throwables.propagate( e );
-        }
-    }
-
-    /**
-     * Returns a test source directory specific to running test.
-     * <p/>
-     * Format: {@code <project>/src/test/it-resources/<path>}
-     *
-     * @param path path to be appended
-     * @return test source directory specific to running test + provided path
-     * @since 2.0
-     */
-    private File testSourceDirectory( String path )
-    {
-        return
-            new File(
-                new File(
-                    util.getBaseDir(),
-                    SRC_TEST_IT_RESOURCES
-                ),
-                path
-            );
-    }
-
-    /**
-     * Returns a test source directory specific to running test class.
-     * <p/>
-     * Format: {@code <project>/src/test/it-resources/<test class package>/<test class name>/<path>}
-     *
-     * @param path path to be appended
-     * @return test source directory specific to running test class + provided path
-     * @since 2.0
-     */
-    private File testClassSourceDirectory( String path )
-    {
-        return
-            new File(
-                new File(
-                    new File(
-                        util.getBaseDir(),
-                        SRC_TEST_IT_RESOURCES
-                    ),
-                    getClass().getCanonicalName().replace( ".", "/" )
-                ),
-                path
-            );
-    }
-
-    /**
-     * Returns a test source directory specific to running test method.
-     * <p/>
-     * Format: {@code <project>/src/test/it-resources/<test class package>/<test class name>/<test method name>/<path>}
-     *
-     * @param path path to be appended
-     * @return test source directory specific to running test method + provided path
-     * @since 2.0
-     */
-    private File testMethodSourceDirectory( String path )
-    {
-        return
-            new File(
-                new File(
-                    new File(
-                        new File(
-                            util.getBaseDir(),
-                            SRC_TEST_IT_RESOURCES
-                        ),
-                        getClass().getCanonicalName().replace( ".", "/" )
-                    ),
-                    testName.getMethodName()
-                ),
-                path
-            );
-    }
-
-    /**
-     * Returns a directory specific to running test method.
-     * <p/>
-     * Format: {@code <project>/target/its/<test class package>/<test class name>/<test method name>/<path>}
-     *
-     * @param path path to be appended to test method specific directory
-     * @return directory specific to running test method + provided path
-     */
-    protected File methodSpecificDirectory( String path )
-    {
-        return
-            new File(
-                new File(
-                    new File(
-                        new File(
-                            util.getTargetDir(),
-                            "its"
-                        ),
-                        getClass().getSimpleName()
-                    ),
-                    testName.getMethodName()
-                ),
-                path
-            );
-    }
-
 }

@@ -80,7 +80,7 @@ public class StartAndStopNexusIT
     {
         try
         {
-            nexus().getConfiguration().addPlugins( resolveArtifact( groovyPluginCoordinates ) );
+            nexus().getConfiguration().addPlugins( artifactResolver().resolveArtifact( groovyPluginCoordinates ) );
             nexus().start();
         }
         finally
