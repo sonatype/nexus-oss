@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.sisu.maven.bridge.support.ArtifactRequestBuilder.request;
 import static org.sonatype.sisu.maven.bridge.support.ModelBuildingRequestBuilder.model;
 
@@ -22,9 +23,12 @@ import javax.inject.Named;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.junit.Before;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
+import org.sonatype.sisu.bl.support.resolver.BundleResolver;
+import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
@@ -58,6 +62,31 @@ public abstract class NexusITSupport
     private MavenModelResolver modelResolver;
 
     /**
+     * Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
+     * "injected-test.properties".
+     */
+    protected final String nexusBundleCoordinates;
+
+    /**
+     * Runs IT by against Nexus bundle coordinates specified in "injected-test.properties".
+     */
+    public NexusITSupport()
+    {
+        this.nexusBundleCoordinates = null;
+    }
+
+    /**
+     * Runs IT by against specified Nexus bundle coordinates.
+     *
+     * @param nexusBundleCoordinates nexus bundle coordinates to run the test against. Cannot be null.
+     * @since 2.2
+     */
+    public NexusITSupport( final String nexusBundleCoordinates )
+    {
+        this.nexusBundleCoordinates = checkNotNull( nexusBundleCoordinates );
+    }
+
+    /**
      * Binds a {@link TargetDirectoryResolver} to an implementation that will set the bundle target directory to a
      * directory specific to test method.
      * <p/>
@@ -68,19 +97,36 @@ public abstract class NexusITSupport
     @Override
     public void configure( final Binder binder )
     {
-        TargetDirectoryResolver targetDirectoryResolver = new TargetDirectoryResolver()
-        {
-
-            @Override
-            public File resolve()
-            {
-                return methodSpecificDirectory( "bundle" );
-            }
-
-        };
         binder.bind( TargetDirectoryResolver.class ).annotatedWith( NexusSpecific.class ).toInstance(
-            targetDirectoryResolver );
+            new TargetDirectoryResolver()
+            {
 
+                @Override
+                public File resolve()
+                {
+                    return methodSpecificDirectory( "bundle" );
+                }
+
+            } );
+        if ( nexusBundleCoordinates != null )
+        {
+            binder.bind( BundleResolver.class ).annotatedWith( NexusSpecific.class ).toInstance(
+                new BundleResolver()
+                {
+                    @Override
+                    public File resolve()
+                    {
+                        return new MavenBridgedBundleResolver( nexusBundleCoordinates, artifactResolver ).resolve();
+                    }
+                }
+            );
+        }
+    }
+
+    @Before
+    public void logNexusBundleCoordinates()
+    {
+        logger.info( "TEST {} is running against Nexus bundle {}", testName.getMethodName(), nexusBundleCoordinates );
     }
 
     /**

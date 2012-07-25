@@ -52,6 +52,18 @@ public abstract class NexusRunningITSupport
 
     private static NexusStartAndStopStrategy.Strategy startAndStopStrategy = EACH_METHOD;
 
+    private static String runningNexusBundleCoordinates;
+
+    public NexusRunningITSupport()
+    {
+        super();
+    }
+
+    public NexusRunningITSupport( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
+
     @Before
     public void beforeTestIsRunning()
     {
@@ -59,6 +71,12 @@ public abstract class NexusRunningITSupport
         if ( strategy != null )
         {
             startAndStopStrategy = strategy.value();
+        }
+        if ( !nexusBundleCoordinates.equals( runningNexusBundleCoordinates ) )
+        {
+            stopNexus( staticNexus );
+            staticNexus = null;
+            runningNexusBundleCoordinates = null;
         }
         startNexus( nexus() );
         assertThat( "Nexus is running before test starts", nexus().isRunning(), is( true ) );
@@ -70,10 +88,13 @@ public abstract class NexusRunningITSupport
         if ( EACH_METHOD.equals( startAndStopStrategy ) )
         {
             stopNexus( nexus );
+            staticNexus = null;
+            runningNexusBundleCoordinates = null;
         }
         else
         {
             staticNexus = nexus;
+            runningNexusBundleCoordinates = nexusBundleCoordinates;
         }
     }
 
@@ -81,6 +102,8 @@ public abstract class NexusRunningITSupport
     public static void afterAllTestsWereRun()
     {
         stopNexus( staticNexus );
+        staticNexus = null;
+        runningNexusBundleCoordinates = null;
     }
 
     /**
