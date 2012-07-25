@@ -1723,10 +1723,6 @@
                 <name>reporter</name>
                 <value>org.testng.reporters.JUnitXMLReporter</value>
               </property>
-              <property>
-                <name>listener</name>
-                <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
-              </property>
             </properties>
             <systemPropertyVariables>
               <!-- logging configuration properties, see logback*.xml files -->
