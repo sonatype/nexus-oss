@@ -20,6 +20,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.sisu.goodies.marshal.internal.jackson.JacksonMarshaller;
 import com.google.common.base.Throwables;
 
@@ -31,6 +33,8 @@ import com.google.common.base.Throwables;
 public abstract class ParametersLoader
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( ParametersLoader.class );
+
     /**
      * Load test parameters form specified file. The file should contain a serialized Object[][] in json format.
      *
@@ -39,6 +43,7 @@ public abstract class ParametersLoader
      */
     public static Collection<Object[]> loadTestParameters( final File parametersFile )
     {
+        LOGGER.info( "Loading test parameters from {}", parametersFile.getAbsolutePath() );
         try
         {
             final Object[][] parametersSets = new JacksonMarshaller().unmarshal(
