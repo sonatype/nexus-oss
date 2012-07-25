@@ -28,6 +28,10 @@
 
   <name>Nexus : Launcher</name>
 
+  <properties>
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+  </properties>
+
   <build>
     <resources>
       <resource>
@@ -64,6 +68,14 @@
         </includes>
       </testResource>
     </testResources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+    </plugins>
+
   </build>
 
   <dependencies>
