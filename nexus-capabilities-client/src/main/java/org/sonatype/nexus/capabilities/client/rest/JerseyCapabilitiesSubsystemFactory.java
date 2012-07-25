@@ -20,7 +20,7 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.internal.JerseyCapabilities;
+import org.sonatype.nexus.capabilities.client.internal.JerseyCapabilities;
 
 /**
  * Jersey based Capabilities Nexus Client Subsystem factory.
