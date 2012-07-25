@@ -55,13 +55,13 @@ public abstract class NexusITSupport
      * Test specific artifact resolver utility.
      * Cannot be null.
      */
-    private final NexusITArtifactResolver testArtifactResolver;
+    private NexusITArtifactResolver testArtifactResolver;
 
     /**
      * Test specific file resolver utility.
      * Cannot be null.
      */
-    private final NexusITFileResolver testFileResolver;
+    private NexusITFileResolver testFileResolver;
 
     /**
      * Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
@@ -87,10 +87,6 @@ public abstract class NexusITSupport
     public NexusITSupport( final String nexusBundleCoordinates )
     {
         this.nexusBundleCoordinates = nexusBundleCoordinates;
-        testArtifactResolver = new NexusITArtifactResolver(
-            util.resolveFile( "pom.xml" ), artifactResolver, modelResolver
-        );
-        testFileResolver = new NexusITFileResolver( util.getBaseDir(), util.getTargetDir(), testName.getMethodName() );
     }
 
     /**
@@ -138,11 +134,23 @@ public abstract class NexusITSupport
 
     public NexusITArtifactResolver artifactResolver()
     {
+        if ( testArtifactResolver == null )
+        {
+            testArtifactResolver = new NexusITArtifactResolver(
+                util.resolveFile( "pom.xml" ), artifactResolver, modelResolver
+            );
+        }
         return testArtifactResolver;
     }
 
     public NexusITFileResolver fileResolver()
     {
+        if ( testFileResolver == null )
+        {
+            testFileResolver = new NexusITFileResolver(
+                util.getBaseDir(), util.getTargetDir(), testName.getMethodName()
+            );
+        }
         return testFileResolver;
     }
 }
