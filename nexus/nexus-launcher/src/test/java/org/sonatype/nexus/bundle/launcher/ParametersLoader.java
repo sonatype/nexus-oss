@@ -16,11 +16,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.io.FileUtils.readFileToString;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.sonatype.sisu.goodies.marshal.internal.jackson.JacksonMarshaller;
-import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import com.google.common.base.Throwables;
 
 /**
@@ -64,11 +64,12 @@ public abstract class ParametersLoader
      */
     public static Collection<Object[]> loadDefaultTestParameters()
     {
-        return loadTestParameters(
-            new TestUtil( ParametrizedNexusRunningITSupport.class ).resolveFile(
-                TestUtil.TARGET + "/test-classes/parameters.json"
-            )
-        );
+        final URL resource = ParametersLoader.class.getClassLoader().getResource( "parameters.json" );
+        if ( resource == null )
+        {
+            throw new RuntimeException( "Cannot find a file named 'parameters.jso' in classpath" );
+        }
+        return loadTestParameters( new File( resource.getFile() ) );
     }
 
 }
