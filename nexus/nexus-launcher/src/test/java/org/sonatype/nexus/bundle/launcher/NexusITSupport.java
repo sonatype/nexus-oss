@@ -129,7 +129,11 @@ public abstract class NexusITSupport
     @Before
     public void logNexusBundleCoordinates()
     {
-        logger.info( "TEST {} is running against Nexus bundle {}", testName.getMethodName(), nexusBundleCoordinates );
+        logger.info(
+            "TEST {} is running against Nexus bundle {}",
+            testName.getMethodName(),
+            nexusBundleCoordinates == null ? "resolved from injected-test.properties" : nexusBundleCoordinates
+        );
     }
 
     public NexusITArtifactResolver artifactResolver()
