@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
+import org.sonatype.sisu.bl.support.RunningBundles;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.jsw.exec.JSWExec;
@@ -66,12 +68,6 @@ public class DefaultNexusBundle
     private final FileTaskBuilder fileTaskBuilder;
 
     /**
-     * Used to reserve custom overlord ports.
-     * Cannot be null.
-     */
-    private final PortReservationService portService;
-
-    /**
      * Port on which Nexus JSW Monitor is running. 0 (zero) if application is not running.
      */
     private int jswMonitorPort;
@@ -93,14 +89,15 @@ public class DefaultNexusBundle
      * @since 2.0
      */
     @Inject
-    public DefaultNexusBundle( final JSWExecFactory jswExecFactory,
+    public DefaultNexusBundle( final Provider<NexusBundleConfiguration> configurationProvider,
+                               final RunningBundles runningBundles,
                                final FileTaskBuilder fileTaskBuilder,
-                               final PortReservationService portService )
+                               final PortReservationService portReservationService,
+                               final JSWExecFactory jswExecFactory )
     {
-        super( "nexus" );
+        super( "nexus", configurationProvider, runningBundles, fileTaskBuilder, portReservationService );
         this.fileTaskBuilder = fileTaskBuilder;
         this.jswExecFactory = checkNotNull( jswExecFactory );
-        this.portService = checkNotNull( portService );
     }
 
     /**
@@ -121,8 +118,8 @@ public class DefaultNexusBundle
     {
         super.configure();
 
-        jswMonitorPort = portService.reservePort();
-        jswKeepAlivePort = portService.reservePort();
+        jswMonitorPort = getPortReservationService().reservePort();
+        jswKeepAlivePort = getPortReservationService().reservePort();
 
         configureJSW();
         installPlugins();
@@ -141,12 +138,12 @@ public class DefaultNexusBundle
 
         if ( jswMonitorPort > 0 )
         {
-            portService.cancelPort( jswMonitorPort );
+            getPortReservationService().cancelPort( jswMonitorPort );
             jswMonitorPort = 0;
         }
         if ( jswKeepAlivePort > 0 )
         {
-            portService.cancelPort( jswKeepAlivePort );
+            getPortReservationService().cancelPort( jswKeepAlivePort );
             jswKeepAlivePort = 0;
         }
     }
