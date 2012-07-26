@@ -21,13 +21,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * Base class for parametrized Nexus integration tests that starts Nexus before each test and stops it afterwards.
+ * Base class for parametrized Nexus integration tests.
  *
  * @since 2.2
  */
 @RunWith( Parameterized.class )
-public abstract class ParametrizedNexusRunningITSupport
-    extends NexusRunningITSupport
+public abstract class NexusParametrizedITSupport
+    extends NexusITSupport
 {
 
     @Parameters
@@ -36,7 +36,7 @@ public abstract class ParametrizedNexusRunningITSupport
         return loadDefaultTestParameters();
     }
 
-    public ParametrizedNexusRunningITSupport( final String nexusBundleCoordinates )
+    public NexusParametrizedITSupport( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

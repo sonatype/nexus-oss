@@ -25,7 +25,7 @@ import org.junit.Test;
  * @since 2.0
  */
 public class StartAndStopNexusRunningParametrizedIT
-    extends ParametrizedNexusRunningITSupport
+    extends NexusRunningParametrizedITSupport
 {
 
     public StartAndStopNexusRunningParametrizedIT( final String nexusBundleCoordinates )

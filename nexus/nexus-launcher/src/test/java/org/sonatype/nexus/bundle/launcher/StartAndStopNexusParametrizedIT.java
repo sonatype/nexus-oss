@@ -28,7 +28,7 @@ import org.junit.Test;
  * @since 2.0
  */
 public class StartAndStopNexusParametrizedIT
-    extends ParametrizedNexusITSupport
+    extends NexusParametrizedITSupport
 {
 
     /**
