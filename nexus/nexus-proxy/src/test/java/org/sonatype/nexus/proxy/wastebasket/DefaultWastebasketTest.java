@@ -179,7 +179,6 @@ public class DefaultWastebasketTest
                         public void onCollectionExit( final WalkerContext context, final StorageCollectionItem coll )
                             throws Exception
                         {
-                            System.out.println( coll.getPath() );
                             FileUtils.deleteDirectory( new File( repoLocation, coll.getPath() ) );
                         }
                     } );
