@@ -85,7 +85,7 @@ public abstract class NexusITSupport
      * Transformer used to transform coordinates.
      * Lazy initialized on first usage.
      */
-    private Filter coordinatesTransformer;
+    private Filter filter;
 
     /**
      * Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
@@ -229,11 +229,11 @@ public abstract class NexusITSupport
      */
     public Filter filter()
     {
-        if ( coordinatesTransformer == null )
+        if ( filter == null )
         {
-            coordinatesTransformer = new CompositeFilter( filters );
+            filter = new CompositeFilter( filters );
         }
-        return coordinatesTransformer;
+        return filter;
     }
 
     /**
