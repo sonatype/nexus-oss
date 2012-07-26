@@ -34,7 +34,7 @@ public class WildcardPermissionFactory
     implements PermissionFactory
 {
     @Override
-    public Permission create( String permission )
+    public Permission create( final String permission )
     {
         return new WildcardPermission( permission );
     }
