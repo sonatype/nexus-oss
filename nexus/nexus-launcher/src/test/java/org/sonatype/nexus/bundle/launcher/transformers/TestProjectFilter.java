@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.sisu.maven.bridge.support.ModelBuildingRequestBuilder.model;
 
 import java.util.Map;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -53,6 +54,7 @@ public class TestProjectFilter
      *
      * @param modelResolver Model resolver used to resolve effective model of test project (pom). Cannot be null.
      */
+    @Inject
     public TestProjectFilter( @Named( "remote-model-resolver-using-settings" )
                               final MavenModelResolver modelResolver )
     {
