@@ -25,8 +25,6 @@ import org.sonatype.nexus.bundle.launcher.Filter;
  *
  * @since 2.2
  */
-@Named
-@Singleton
 public abstract class MapFilterSupport
     implements Filter
 {
