@@ -72,7 +72,7 @@ public abstract class NexusRunningITSupport
         {
             startAndStopStrategy = strategy.value();
         }
-        if ( nexusBundleCoordinates!= null && !nexusBundleCoordinates.equals( runningNexusBundleCoordinates ) )
+        if ( filteredNexusBundleCoordinates != null && !filteredNexusBundleCoordinates.equals( runningNexusBundleCoordinates ) )
         {
             stopNexus( staticNexus );
             staticNexus = null;
@@ -94,7 +94,7 @@ public abstract class NexusRunningITSupport
         else
         {
             staticNexus = nexus;
-            runningNexusBundleCoordinates = nexusBundleCoordinates;
+            runningNexusBundleCoordinates = filteredNexusBundleCoordinates;
         }
     }
 

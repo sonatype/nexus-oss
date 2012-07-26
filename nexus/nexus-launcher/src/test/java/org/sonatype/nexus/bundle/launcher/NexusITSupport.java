@@ -12,18 +12,26 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
+import static org.sonatype.nexus.bundle.launcher.transformers.TestProjectFilter.TEST_PROJECT_POM_FILE;
+
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
+import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
+import org.sonatype.nexus.bundle.launcher.transformers.CompositeFilter;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
+import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 
 /**
@@ -36,38 +44,60 @@ public abstract class NexusITSupport
 {
 
     /**
-     * Path in project where IT resources will be searched.
-     */
-    private static final String SRC_TEST_IT_RESOURCES = "src/test/it-resources";
-
-    /**
      * Artifact resolver used to resolve artifacts by Maven coordinates.
+     * Never null.
      */
     @Inject
     @Named( "remote-artifact-resolver-using-settings" )
     private MavenArtifactResolver artifactResolver;
 
+    /**
+     * Model resolver used to resolve effective Maven models.
+     * Never null.
+     */
     @Inject
     @Named( "remote-model-resolver-using-settings" )
     private MavenModelResolver modelResolver;
 
+    @Inject
+    private NexusBundleResolver nexusBundleResolver;
+
+    /**
+     * List of filters used to filter coordinates.
+     * Never null.
+     */
+    @Inject
+    private List<Filter> filters;
+
     /**
      * Test specific artifact resolver utility.
-     * Cannot be null.
+     * Lazy initialized on first usage.
      */
     private NexusITArtifactResolver testArtifactResolver;
 
     /**
      * Test specific file resolver utility.
-     * Cannot be null.
+     * Lazy initialized on first usage.
      */
     private NexusITFileResolver testFileResolver;
+
+    /**
+     * Transformer used to transform coordinates.
+     * Lazy initialized on first usage.
+     */
+    private Filter coordinatesTransformer;
 
     /**
      * Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
      * "injected-test.properties".
      */
     protected final String nexusBundleCoordinates;
+
+    /**
+     * Transformed Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
+     * "injected-test.properties".
+     */
+    protected String filteredNexusBundleCoordinates;
 
     /**
      * Runs IT by against Nexus bundle coordinates specified in "injected-test.properties".
@@ -84,7 +114,7 @@ public abstract class NexusITSupport
      *                               coordinates from "injected-test.properties".
      * @since 2.2
      */
-    public NexusITSupport( final String nexusBundleCoordinates )
+    public NexusITSupport( @Nullable final String nexusBundleCoordinates )
     {
         this.nexusBundleCoordinates = nexusBundleCoordinates;
     }
@@ -111,31 +141,60 @@ public abstract class NexusITSupport
                 }
 
             } );
+        binder.bind( BundleResolver.class ).annotatedWith( NexusSpecific.class ).toInstance(
+            new BundleResolver()
+            {
+                @Override
+                public File resolve()
+                {
+                    final BundleResolver resolver;
+                    if ( filteredNexusBundleCoordinates == null )
+                    {
+                        resolver = nexusBundleResolver;
+                    }
+                    else
+                    {
+                        resolver = new MavenBridgedBundleResolver( filteredNexusBundleCoordinates, artifactResolver );
+                    }
+                    return resolver.resolve();
+                }
+            }
+        );
+    }
+
+    /**
+     * Filters nexus bundle coordinates, if present (not null).
+     */
+    @Before
+    public void filterNexusBundleCoordinates()
+    {
         if ( nexusBundleCoordinates != null )
         {
-            binder.bind( BundleResolver.class ).annotatedWith( NexusSpecific.class ).toInstance(
-                new BundleResolver()
-                {
-                    @Override
-                    public File resolve()
-                    {
-                        return new MavenBridgedBundleResolver( nexusBundleCoordinates, artifactResolver ).resolve();
-                    }
-                }
+            // TODO create this map only once?
+            final Map<String, String> context = Maps.newHashMap();
+            fillContext( context );
+
+            filteredNexusBundleCoordinates = filter().filter( context, nexusBundleCoordinates );
+
+            logger.info(
+                "TEST {} is running against Nexus bundle {}",
+                testName.getMethodName(), filteredNexusBundleCoordinates
+            );
+        }
+        else
+        {
+            logger.info(
+                "TEST {} is running against a Nexus bundle resolved from injected-test.properties",
+                testName.getMethodName()
             );
         }
     }
 
-    @Before
-    public void logNexusBundleCoordinates()
-    {
-        logger.info(
-            "TEST {} is running against Nexus bundle {}",
-            testName.getMethodName(),
-            nexusBundleCoordinates == null ? "resolved from injected-test.properties" : nexusBundleCoordinates
-        );
-    }
-
+    /**
+     * Lazy initializes IT specific artifact resolver.
+     *
+     * @return IT specific artifact resolver. Never null.
+     */
     public NexusITArtifactResolver artifactResolver()
     {
         if ( testArtifactResolver == null )
@@ -147,6 +206,11 @@ public abstract class NexusITSupport
         return testArtifactResolver;
     }
 
+    /**
+     * Lazy initializes IT specific file resolver.
+     *
+     * @return IT specific artifact file. Never null.
+     */
     public NexusITFileResolver fileResolver()
     {
         if ( testFileResolver == null )
@@ -157,4 +221,29 @@ public abstract class NexusITSupport
         }
         return testFileResolver;
     }
+
+    /**
+     * Lazy initializes IT specific filter.
+     *
+     * @return IT specific filter. Never null.
+     */
+    public Filter filter()
+    {
+        if ( coordinatesTransformer == null )
+        {
+            coordinatesTransformer = new CompositeFilter( filters );
+        }
+        return coordinatesTransformer;
+    }
+
+    /**
+     * Fills teh context with test related mappings.
+     *
+     * @param context to fill up
+     */
+    public void fillContext( final Map<String, String> context )
+    {
+        context.put( TEST_PROJECT_POM_FILE, util.resolveFile( "pom.xml" ).getAbsolutePath() );
+    }
+
 }
