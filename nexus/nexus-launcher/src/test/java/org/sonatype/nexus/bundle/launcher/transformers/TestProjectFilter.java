@@ -15,6 +15,7 @@ package org.sonatype.nexus.bundle.launcher.transformers;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.sisu.maven.bridge.support.ModelBuildingRequestBuilder.model;
 
+import java.io.File;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -81,7 +82,7 @@ public class TestProjectFilter
         {
             try
             {
-                final Model model = modelResolver.resolveModel( model().pom( testProjectPomFile ) );
+                final Model model = modelResolver.resolveModel( model().pom( new File( testProjectPomFile ) ) );
 
                 mappings.put( "project.groupId", model.getGroupId() );
                 mappings.put( "project.artifactId", model.getArtifactId() );
