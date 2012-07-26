@@ -12,19 +12,18 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
-import org.sonatype.inject.Nullable;
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.sisu.bl.support.DefaultBundleConfiguration;
-import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
-import org.sonatype.sisu.bl.support.resolver.BundleResolver;
-import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.inject.Nullable;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
+import org.sonatype.sisu.bl.support.resolver.BundleResolver;
+import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 
 /**
  * Default Nexus bundle configuration.

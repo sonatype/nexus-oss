@@ -12,11 +12,10 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
-import org.sonatype.sisu.bl.WebBundleConfiguration;
-import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
-
 import java.io.File;
 import java.util.List;
+
+import org.sonatype.sisu.bl.WebBundleConfiguration;
 
 /**
  * An Nexus bundle configuration.

@@ -28,7 +28,7 @@ import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 import com.google.common.base.Throwables;
 
 /**
- ** Nexus Integration Tests artifact resolver utilities.
+ * Nexus Integration Tests artifact resolver utilities.
  *
  * @since 2.2
  */
@@ -119,11 +119,11 @@ public class NexusITArtifactResolver
      * @return resolved artifact file
      */
     public File resolveFromDependencyManagement( final String groupId,
-                                                    final String artifactId,
-                                                    final String type,
-                                                    final String classifier,
-                                                    final String overrideType,
-                                                    final String overrideClassifier )
+                                                 final String artifactId,
+                                                 final String type,
+                                                 final String classifier,
+                                                 final String overrideType,
+                                                 final String overrideClassifier )
     {
         try
         {

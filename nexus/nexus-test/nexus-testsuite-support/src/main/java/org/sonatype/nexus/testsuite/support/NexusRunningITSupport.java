@@ -23,6 +23,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import com.google.common.base.Throwables;
 
 /**
@@ -49,7 +51,8 @@ public abstract class NexusRunningITSupport
 
     private static NexusBundle staticNexus;
 
-    private static NexusStartAndStopStrategy.Strategy startAndStopStrategy = NexusStartAndStopStrategy.Strategy.EACH_METHOD;
+    private static NexusStartAndStopStrategy.Strategy startAndStopStrategy =
+        NexusStartAndStopStrategy.Strategy.EACH_METHOD;
 
     private static String runningNexusBundleCoordinates;
 
@@ -71,14 +74,15 @@ public abstract class NexusRunningITSupport
         {
             startAndStopStrategy = strategy.value();
         }
-        if ( filteredNexusBundleCoordinates != null && !filteredNexusBundleCoordinates.equals( runningNexusBundleCoordinates ) )
+        if ( filteredNexusBundleCoordinates != null && !filteredNexusBundleCoordinates.equals(
+            runningNexusBundleCoordinates ) )
         {
             stopNexus( staticNexus );
             staticNexus = null;
             runningNexusBundleCoordinates = null;
         }
         startNexus( nexus() );
-        MatcherAssert.assertThat( "Nexus is running before test starts", nexus().isRunning(), Matchers.is( true ) );
+        assertThat( "Nexus is running before test starts", nexus().isRunning(), is( true ) );
     }
 
     @After

@@ -12,13 +12,12 @@
  */
 package org.sonatype.nexus.testsuite.support;
 
-import org.junit.Test;
-import org.sonatype.nexus.testsuite.support.NexusRunningITSupport;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
+
+import org.junit.Test;
 
 /**
  * Test starting and launching of Nexus.

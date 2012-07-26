@@ -12,16 +12,16 @@
  */
 package org.sonatype.nexus.testsuite.support;
 
-import org.junit.Test;
-import org.sonatype.nexus.testsuite.support.NexusITSupport;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.junit.Test;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
 
 /**
  * Test starting and launching of Nexus.

@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.Test;
-import org.sonatype.nexus.testsuite.support.NexusParametrizedITSupport;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
 
 /**
  * Test starting and launching of Nexus using default parameters lookup.
