@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
+import static org.junit.runners.Parameterized.Parameters;
 import static org.sonatype.nexus.bundle.launcher.ParametersLoader.loadTestParameters;
 
 import java.util.Collection;
@@ -27,7 +28,7 @@ public class StartAndStopNexusRunningParametrizedFilteredIT
     extends StartAndStopNexusRunningParametrizedIT
 {
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> data()
     {
         return loadTestParameters( StartAndStopNexusRunningParametrizedFilteredIT.class );

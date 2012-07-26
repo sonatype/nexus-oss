@@ -23,7 +23,7 @@ import javax.inject.Named;
 import org.junit.Test;
 
 /**
- * Test starting and launching of Nexus.
+ * Test starting and launching of Nexus using default parameters lookup.
  *
  * @since 2.0
  */

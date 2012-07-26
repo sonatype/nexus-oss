@@ -15,6 +15,7 @@ package org.sonatype.nexus.bundle.launcher;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.runners.Parameterized.Parameters;
 import static org.sonatype.nexus.bundle.launcher.ParametersLoader.loadDefaultTestParameters;
 import static org.sonatype.nexus.bundle.launcher.ParametersLoader.loadTestParameters;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
@@ -35,7 +36,7 @@ public class StartAndStopNexusParametrizedFilteredIT
     extends StartAndStopNexusParametrizedIT
 {
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> data()
     {
         return loadTestParameters( StartAndStopNexusParametrizedFilteredIT.class );
