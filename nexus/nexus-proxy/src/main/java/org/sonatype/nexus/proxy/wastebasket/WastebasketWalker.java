@@ -14,8 +14,12 @@ package org.sonatype.nexus.proxy.wastebasket;
 
 import java.util.Collection;
 
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -75,11 +79,18 @@ public class WastebasketWalker
             return;
         }
 
-        // item is now gone, let's check if this is empty and if so delete it as well
-        Collection<StorageItem> items = item.list();
-        if ( items.isEmpty() )
+        try
         {
-            ctx.getRepository().getLocalStorage().shredItem( ctx.getRepository(), item.getResourceStoreRequest() );
+            // item is now gone, let's check if this is empty and if so delete it as well
+            Collection<StorageItem> items = item.list();
+            if ( items.isEmpty() )
+            {
+                ctx.getRepository().getLocalStorage().shredItem( ctx.getRepository(), item.getResourceStoreRequest() );
+            }
+        }
+        catch ( final ItemNotFoundException ignore )
+        {
+            // someone else removed the item in the mean time. yet we anyhow wanted to remove it so... nevermind
         }
     }
 }
