@@ -62,6 +62,24 @@ public abstract class ParametersLoader
     }
 
     /**
+     * Load test specific parameters by looking up a file named "<test class name>-parameters.json" from classpath
+     *
+     * @param testClass test class
+     * @return test parameters, Never null.
+     * @see {@link #loadTestParameters(java.io.File)}
+     */
+    public static Collection<Object[]> loadTestParameters( final Class testClass )
+    {
+        final String parametersFileName = checkNotNull( testClass ).getSimpleName() + "-parameters.json";
+        final URL resource = testClass.getClassLoader().getResource( parametersFileName );
+        if ( resource == null )
+        {
+            throw new RuntimeException( "Cannot find a file named '" + parametersFileName + "' in classpath" );
+        }
+        return loadTestParameters( new File( resource.getFile() ) );
+    }
+
+    /**
      * Load test parameters by looking up an "parameters.json" file in classpath..
      *
      * @return test parameters
@@ -72,7 +90,7 @@ public abstract class ParametersLoader
         final URL resource = ParametersLoader.class.getClassLoader().getResource( "parameters.json" );
         if ( resource == null )
         {
-            throw new RuntimeException( "Cannot find a file named 'parameters.jso' in classpath" );
+            throw new RuntimeException( "Cannot find a file named 'parameters.json' in classpath" );
         }
         return loadTestParameters( new File( resource.getFile() ) );
     }
