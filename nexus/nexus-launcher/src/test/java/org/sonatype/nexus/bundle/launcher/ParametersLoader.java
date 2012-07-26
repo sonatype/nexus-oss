@@ -62,7 +62,7 @@ public abstract class ParametersLoader
     }
 
     /**
-     * Load test parameters from "target/test-classes/parameters.json".
+     * Load test parameters by looking up an "parameters.json" file in classpath..
      *
      * @return test parameters
      * @see {@link #loadTestParameters(java.io.File)}
