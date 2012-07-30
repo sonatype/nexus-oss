@@ -56,7 +56,7 @@ public class CompositeFilter
         String filtered = value;
         for ( final Filter filter : filters )
         {
-            final String result = filter.filter( context, value );
+            final String result = filter.filter( context, filtered );
             if ( result != null )
             {
                 filtered = result;
