@@ -12,17 +12,12 @@
  */
 package org.sonatype.nexus.testsuite.support.filters;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.sisu.maven.bridge.support.ModelBuildingRequestBuilder.model;
-
-import java.io.File;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelBuildingException;
 import org.sonatype.nexus.testsuite.support.Filter;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 import com.google.common.collect.Maps;
@@ -38,17 +33,9 @@ import com.google.common.collect.Maps;
 @Named
 @Singleton
 public class TestProjectFilter
-    extends MapFilterSupport
+    extends TestProjectFilterSupport
     implements Filter
 {
-
-    public static final String TEST_PROJECT_POM_FILE = "testProjectPomFile";
-
-    /**
-     * Model resolver used to resolve effective model of test project (pom).
-     * Never null.
-     */
-    private final MavenModelResolver modelResolver;
 
     /**
      * Constructor.
@@ -59,48 +46,31 @@ public class TestProjectFilter
     public TestProjectFilter( @Named( "remote-model-resolver-using-settings" )
                               final MavenModelResolver modelResolver )
     {
-        this.modelResolver = checkNotNull( modelResolver );
+        super( modelResolver );
     }
 
     /**
-     * Returns mappings by extracting testing project model properties.
+     * Returns mappings by extracting project model properties from project under test.
      *
      * @param context filtering context. Cannot be null.
-     *                @param value   value to be filtered. Ignored by this filter.
+     * @param value   value to be filtered. Ignored by this filter.
+     * @param model   resolved model of project under test. Cannot be null.
      * @return mappings extracted from project under test model
      */
     @Override
-    Map<String, String> mappings( final Map<String, String> context, final String value )
+    Map<String, String> mappings( final Map<String, String> context, final String value, final Model model )
     {
         final Map<String, String> mappings = Maps.newHashMap();
 
-        final String testProjectPomFile = context.get( TEST_PROJECT_POM_FILE );
-        if ( testProjectPomFile == null )
+        mappings.put( "project.groupId", model.getGroupId() );
+        mappings.put( "project.artifactId", model.getArtifactId() );
+        mappings.put( "project.version", model.getVersion() );
+
+        if ( model.getProperties() != null )
         {
-            // TODO log a warning?
+            mappings.putAll( Maps.fromProperties( model.getProperties() ) );
         }
-        else
-        {
-            try
-            {
-                final Model model = modelResolver.resolveModel( model().pom( new File( testProjectPomFile ) ) );
 
-                mappings.put( "project.groupId", model.getGroupId() );
-                mappings.put( "project.artifactId", model.getArtifactId() );
-                mappings.put( "project.version", model.getVersion() );
-
-                if ( model.getProperties() != null )
-                {
-                    mappings.putAll( Maps.fromProperties( model.getProperties() ) );
-                }
-
-                return mappings;
-            }
-            catch ( ModelBuildingException e )
-            {
-                // TODO log?
-            }
-        }
         return mappings;
     }
 
