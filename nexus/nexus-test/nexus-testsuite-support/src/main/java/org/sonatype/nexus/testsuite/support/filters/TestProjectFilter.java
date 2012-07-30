@@ -66,10 +66,11 @@ public class TestProjectFilter
      * Returns mappings by extracting testing project model properties.
      *
      * @param context filtering context. Cannot be null.
+     *                @param value   value to be filtered. Ignored by this filter.
      * @return mappings extracted from project under test model
      */
     @Override
-    Map<String, String> mappings( final Map<String, String> context )
+    Map<String, String> mappings( final Map<String, String> context, final String value )
     {
         final Map<String, String> mappings = Maps.newHashMap();
 

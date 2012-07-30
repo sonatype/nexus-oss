@@ -40,7 +40,7 @@ public abstract class MapFilterSupport
         // TODO use a matcher for ${*}?
         if ( filtered.contains( "${" ) )
         {
-            final Map<String, String> mappings = mappings( context );
+            final Map<String, String> mappings = mappings( context, value );
             if ( mappings != null )
             {
                 for ( final Map.Entry<String, String> property : mappings.entrySet() )
@@ -56,8 +56,9 @@ public abstract class MapFilterSupport
      * Returns the mappings between placeholders and values that this filer supports.
      *
      * @param context filtering context. Never null.
+     * @param value   value to be filtered. Cannot be null.
      * @return mappings. Should not be null.
      */
-    abstract Map<String, String> mappings( final Map<String, String> context );
+    abstract Map<String, String> mappings( final Map<String, String> context, final String value );
 
 }

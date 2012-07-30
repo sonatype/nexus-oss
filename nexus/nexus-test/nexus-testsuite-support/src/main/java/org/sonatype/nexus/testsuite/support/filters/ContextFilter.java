@@ -35,10 +35,11 @@ public class ContextFilter
      * Mappings = context.
      *
      * @param context filtering context. Cannot be null.
+     * @param value   value to be filtered. Ignored by this filter.
      * @return mappings = context
      */
     @Override
-    Map<String, String> mappings( final Map<String, String> context )
+    Map<String, String> mappings( final Map<String, String> context, final String value )
     {
         return Maps.newHashMap( context );
     }
