@@ -216,7 +216,7 @@ public abstract class NexusITSupport
         if ( testFileResolver == null )
         {
             testFileResolver = new NexusITFileResolver(
-                util.getBaseDir(), util.getTargetDir(), testName.getMethodName()
+                util.getBaseDir(), util.getTargetDir(), getClass(), testName.getMethodName()
             );
         }
         return testFileResolver;

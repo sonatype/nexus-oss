@@ -50,18 +50,27 @@ public class NexusITFileResolver
     private final String testMethodName;
 
     /**
+     * Running test class.
+     * Cannot be null.
+     */
+    private final Class testClass;
+
+    /**
      * Constructor.
      *
      * @param baseDir        base directory of project containing the test class. Cannot be null.
      * @param targetDir      target directory of project containing the test class. Cannot be null.
+     * @param testClass      running test class. Cannot be null.
      * @param testMethodName name of running test method. Cannot be null.
      */
     public NexusITFileResolver( final File baseDir,
                                 final File targetDir,
+                                final Class testClass,
                                 final String testMethodName )
     {
         this.targetDir = checkNotNull( targetDir );
         this.baseDir = checkNotNull( baseDir );
+        this.testClass = checkNotNull( testClass );
         this.testMethodName = checkNotNull( testMethodName );
     }
 
@@ -83,7 +92,7 @@ public class NexusITFileResolver
                             targetDir,
                             "its"
                         ),
-                        getClass().getSimpleName()
+                        testClass.getSimpleName()
                     ),
                     testMethodName
                 ),
@@ -162,7 +171,7 @@ public class NexusITFileResolver
                         baseDir,
                         SRC_TEST_IT_RESOURCES
                     ),
-                    getClass().getCanonicalName().replace( ".", "/" )
+                    testClass.getCanonicalName().replace( ".", "/" )
                 ),
                 path
             );
@@ -186,7 +195,7 @@ public class NexusITFileResolver
                             baseDir,
                             SRC_TEST_IT_RESOURCES
                         ),
-                        getClass().getCanonicalName().replace( ".", "/" )
+                        testClass.getCanonicalName().replace( ".", "/" )
                     ),
                     testMethodName
                 ),
