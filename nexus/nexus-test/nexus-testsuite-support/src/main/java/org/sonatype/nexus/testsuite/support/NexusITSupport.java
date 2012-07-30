@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.support;
 
-import static org.sonatype.nexus.testsuite.support.transformers.TestProjectFilter.TEST_PROJECT_POM_FILE;
+import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilter.TEST_PROJECT_POM_FILE;
 
 import java.io.File;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
-import org.sonatype.nexus.testsuite.support.transformers.CompositeFilter;
+import org.sonatype.nexus.testsuite.support.filters.CompositeFilter;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
