@@ -22,7 +22,6 @@ import de.is24.nexus.yum.version.alias.AliasNotFoundException;
 import de.is24.nexus.yum.version.alias.domain.AliasKey;
 import de.is24.nexus.yum.version.alias.domain.AliasMapping;
 
-
 @Component(role = YumConfiguration.class)
 public class DefaultYumConfiguration implements YumConfiguration {
   public static final String YUM_XML = "yum.xml";
@@ -161,8 +160,10 @@ public class DefaultYumConfiguration implements YumConfiguration {
 
   private void fillAliasMap() {
     aliasMap.clear();
-    for (AliasMapping aliasMapping : xmlYumConfiguration.getAliasMappings()) {
-      aliasMap.put(aliasMapping.getAliasKey(), aliasMapping.getVersion());
+    if (xmlYumConfiguration.getAliasMappings() != null) {
+      for (AliasMapping aliasMapping : xmlYumConfiguration.getAliasMappings()) {
+        aliasMap.put(aliasMapping.getAliasKey(), aliasMapping.getVersion());
+      }
     }
   }
 
