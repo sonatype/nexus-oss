@@ -62,6 +62,12 @@ public class DefaultWastebasket
         return walker;
     }
 
+    // @TestAccessible
+    void setWalker( final Walker walker )
+    {
+        this.walker = walker;
+    }
+
     // ==
 
     @Requirement( hint = "serial" )

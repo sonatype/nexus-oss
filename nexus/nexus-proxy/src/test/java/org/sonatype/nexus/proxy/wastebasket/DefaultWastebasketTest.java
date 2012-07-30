@@ -24,6 +24,8 @@ import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
@@ -31,6 +33,11 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
+import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.nexus.proxy.walker.WalkerProcessor;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 /**
@@ -131,6 +138,55 @@ public class DefaultWastebasketTest
 
         assertThat( basketDir, FileMatchers.isDirectory() );
         assertThat( basketDir, FileMatchers.isEmpty() );
+    }
+
+    /**
+     * NXCM-4474 Check that if a directory is removed by some other means while it has being emptied the walker will not
+     * fail.
+     *
+     * The test will add a walker processor in front of wastebasket processor that will delete the first
+     * collection (directory) it finds. In that way by the time that wastebasket processor wants to remove it, it is
+     * already removed. Yet, this should not end up in an error but just silently skip it.
+     */
+    @Test
+    public void walkingDoesNotFailIfDirectoryRemoved()
+        throws Exception
+    {
+        final File repoLocation = this.addRepository( "active-repo" );
+        final File repoTrashLocation = new File( repoLocation, ".nexus/trash" );
+        final File trashContent = new File( "src/test/resources/active-repo/.nexus/trash" );
+        FileUtils.copyDirectoryStructure( trashContent, repoTrashLocation );
+
+        final DefaultWastebasket wastebasket = (DefaultWastebasket) this.lookup( Wastebasket.class );
+        final Walker walker = wastebasket.getWalker();
+        wastebasket.setWalker(
+            new Walker()
+            {
+                @Override
+                public void walk( final WalkerContext context )
+                    throws WalkerException
+                {
+                    context.getProcessors().add( 0, new AbstractWalkerProcessor()
+                    {
+                        @Override
+                        public void processItem( final WalkerContext context, final StorageItem item )
+                            throws Exception
+                        {
+                            // do noting
+                        }
+
+                        @Override
+                        public void onCollectionExit( final WalkerContext context, final StorageCollectionItem coll )
+                            throws Exception
+                        {
+                            FileUtils.deleteDirectory( new File( repoLocation, coll.getPath() ) );
+                        }
+                    } );
+                    walker.walk( context );
+                }
+            }
+        );
+        wastebasket.purgeAll( DefaultWastebasket.ALL );
     }
 
 }
