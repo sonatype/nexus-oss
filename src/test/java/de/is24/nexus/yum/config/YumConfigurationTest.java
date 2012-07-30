@@ -169,6 +169,7 @@ public class YumConfigurationTest extends AbstractYumNexusTestCase {
     config.load();
     // then
     assertThat(config.getXmlYumConfiguration().getRepositoryCreationTimeout(), is(120));
+    Assert.assertNotNull(config.getXmlYumConfiguration().getAliasMappings());
   }
 
   private NexusConfiguration createNexusConfig(File tmpDir) {
