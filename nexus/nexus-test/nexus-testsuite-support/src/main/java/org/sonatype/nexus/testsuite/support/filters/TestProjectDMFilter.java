@@ -23,7 +23,6 @@ import org.apache.maven.model.Model;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.nexus.testsuite.support.Filter;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
 /**
