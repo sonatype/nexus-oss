@@ -25,7 +25,7 @@ public interface Filter
 {
 
     /**
-     * Transforms given coordinates into another coordinates
+     * Filters placeholders.
      *
      * @param context filtering context. Cannot be null.
      * @param value   value to be filtered. Cannot be null.
