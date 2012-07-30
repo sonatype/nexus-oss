@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.noelios.restlet.http.HttpResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -44,6 +45,7 @@ import org.restlet.data.Tag;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.restlet.util.Series;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -145,6 +147,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
+        // NXCM-5155 Force browsers to never cache content pages
+        final Series<Parameter> headers = ((HttpResponse) response).getHttpCall().getResponseHeaders();
+        headers.add( "Pragma", "no-cache" );
+        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
+
         ResourceStoreRequest req = getResourceStoreRequest( request );
 
         try
@@ -259,11 +266,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     /**
      * A strategy to get ResourceStore implementor. To be implemented by subclass.
-     * 
-     * @return
-     * @throws NoSuchRepositoryException
-     * @throws NoSuchRepositoryGroupException
-     * @throws NoSuchRepositoryRouterException
      */
     protected abstract ResourceStore getResourceStore( final Request request )
         throws NoSuchResourceStoreException, ResourceException;
