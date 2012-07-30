@@ -31,6 +31,8 @@ import org.testng.annotations.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 /**
  * This IT checks that previously retrieved P2 metadata is used from cache, even when the proxied P2 repository is unavailable.
@@ -53,31 +55,36 @@ public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
 
         // init local storage
         Response content = null;
+        String metadataBefore;
         try
         {
             content = RequestFacade.sendMessage( url, Method.GET );
-            assertThat( content.getEntity().getText(), containsString( "<?metadataRepository" ) );
-            installAndVerifyP2Feature();
+            metadataBefore = content.getEntity().getText();
         }
         finally
         {
             RequestFacade.releaseResponse( content );
         }
+
+        assertThat( metadataBefore, containsString( "<?metadataRepository" ) );
 
         // invalidate remote repo
         replaceProxy();
 
         // check delivery from local storage
+        String metadataAfter;
         try
         {
             content = RequestFacade.sendMessage( url, Method.GET );
-            assertThat( content.getEntity().getText(), containsString( "<?metadataRepository" ) );
-            installAndVerifyP2Feature();
+            metadataAfter = content.getEntity().getText();
         }
         finally
         {
             RequestFacade.releaseResponse( content );
         }
+
+        assertThat( metadataAfter, containsString( "<?metadataRepository" ) );
+        assertThat( metadataAfter, is( equalTo( metadataBefore ) ) );
     }
 
     private void replaceProxy()
