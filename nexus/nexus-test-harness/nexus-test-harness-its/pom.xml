@@ -173,6 +173,12 @@
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
           </excludes>
+          <properties>
+            <property>
+              <name>listener</name>
+              <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
+            </property>
+          </properties>
         </configuration>
       </plugin>
     </plugins>

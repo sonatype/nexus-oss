@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher;
+package org.sonatype.nexus.testsuite.support;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -33,7 +33,7 @@ public @interface NexusStartAndStopStrategy
 {
 
     // fully qualify due to http://bugs.sun.com/view_bug.do?bug_id=6512707
-    org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy value() default org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_METHOD;
+    NexusStartAndStopStrategy.Strategy value() default NexusStartAndStopStrategy.Strategy.EACH_METHOD;
 
     public static enum Strategy
     {

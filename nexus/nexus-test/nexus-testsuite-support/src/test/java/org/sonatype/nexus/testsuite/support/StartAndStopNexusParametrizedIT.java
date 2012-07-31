@@ -10,25 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher;
-
-import org.junit.Test;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+package org.sonatype.nexus.testsuite.support;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.junit.Test;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
+
 /**
- * Test starting and launching of Nexus.
+ * Test starting and launching of Nexus using default parameters lookup.
  *
  * @since 2.0
  */
-public class StartAndStopNexusIT
-    extends NexusITSupport
+public class StartAndStopNexusParametrizedIT
+    extends NexusParametrizedITSupport
 {
 
     /**
@@ -40,6 +41,11 @@ public class StartAndStopNexusIT
     @Inject
     @Named( "${NexusITSupport.groovyPluginCoordinates}" )
     private String groovyPluginCoordinates;
+
+    public StartAndStopNexusParametrizedIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
 
     /**
      * Starts/Stops Nexus while it checks that:<br/>
@@ -80,7 +86,7 @@ public class StartAndStopNexusIT
     {
         try
         {
-            nexus().getConfiguration().addPlugins( resolveArtifact( groovyPluginCoordinates ) );
+            nexus().getConfiguration().addPlugins( artifactResolver().resolveArtifact( groovyPluginCoordinates ) );
             nexus().start();
         }
         finally

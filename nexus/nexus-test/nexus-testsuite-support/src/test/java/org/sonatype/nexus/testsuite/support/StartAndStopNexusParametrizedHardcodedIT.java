@@ -10,24 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.support;
+package org.sonatype.nexus.testsuite.support;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.junit.runners.Parameterized.Parameters;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.util.Arrays;
+import java.util.Collection;
 
-import com.google.inject.BindingAnnotation;
-
-@BindingAnnotation
-@Target( { TYPE, FIELD, PARAMETER, METHOD } )
-@Retention( RUNTIME )
-public @interface NexusSpecific
+/**
+ * Test starting and launching of Nexus using a filtered parameters specified in IT.
+ *
+ * @since 2.2
+ */
+public class StartAndStopNexusParametrizedHardcodedIT
+    extends StartAndStopNexusParametrizedIT
 {
 
-}
+    @Parameters
+    public static Collection<Object[]> data()
+    {
+        return Arrays.asList( new Object[][]{
+            { "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" },
+        } );
+    }
 
+    public StartAndStopNexusParametrizedHardcodedIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
+
+}

@@ -10,24 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.support;
+package org.sonatype.nexus.testsuite.support.filters;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.sonatype.nexus.testsuite.support.Filter;
+import com.google.common.collect.Maps;
 
-import com.google.inject.BindingAnnotation;
-
-@BindingAnnotation
-@Target( { TYPE, FIELD, PARAMETER, METHOD } )
-@Retention( RUNTIME )
-public @interface NexusSpecific
+/**
+ * Replaces placeholders with values from filtering context.
+ *
+ * @since 2.2
+ */
+@Named
+@Singleton
+public class ContextFilter
+    extends MapFilterSupport
+    implements Filter
 {
 
-}
+    /**
+     * Mappings = context.
+     *
+     * @param context filtering context. Cannot be null.
+     * @param value   value to be filtered. Ignored by this filter.
+     * @return mappings = context
+     */
+    @Override
+    Map<String, String> mappings( final Map<String, String> context, final String value )
+    {
+        return Maps.newHashMap( context );
+    }
 
+}

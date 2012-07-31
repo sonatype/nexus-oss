@@ -10,14 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher;
-
-import org.junit.Test;
+package org.sonatype.nexus.testsuite.support;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
+
+import org.junit.Test;
 
 /**
  * Test starting and launching of Nexus.

@@ -27,10 +27,11 @@
   <artifactId>nexus-test</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus : Test</name>
+  <name>Nexus : Test : Support</name>
 
   <modules>
     <module>nexus-test-common</module>
+    <module>nexus-testsuite-support</module>
   </modules>
 
   <build>

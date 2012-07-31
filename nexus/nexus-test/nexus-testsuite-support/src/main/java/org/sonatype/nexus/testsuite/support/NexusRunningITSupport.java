@@ -10,11 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher;
+package org.sonatype.nexus.testsuite.support;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_METHOD;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -24,6 +23,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import com.google.common.base.Throwables;
 
 /**
@@ -50,7 +51,20 @@ public abstract class NexusRunningITSupport
 
     private static NexusBundle staticNexus;
 
-    private static NexusStartAndStopStrategy.Strategy startAndStopStrategy = EACH_METHOD;
+    private static NexusStartAndStopStrategy.Strategy startAndStopStrategy =
+        NexusStartAndStopStrategy.Strategy.EACH_METHOD;
+
+    private static String runningNexusBundleCoordinates;
+
+    public NexusRunningITSupport()
+    {
+        super();
+    }
+
+    public NexusRunningITSupport( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
 
     @Before
     public void beforeTestIsRunning()
@@ -60,6 +74,13 @@ public abstract class NexusRunningITSupport
         {
             startAndStopStrategy = strategy.value();
         }
+        if ( filteredNexusBundleCoordinates != null && !filteredNexusBundleCoordinates.equals(
+            runningNexusBundleCoordinates ) )
+        {
+            stopNexus( staticNexus );
+            staticNexus = null;
+            runningNexusBundleCoordinates = null;
+        }
         startNexus( nexus() );
         assertThat( "Nexus is running before test starts", nexus().isRunning(), is( true ) );
     }
@@ -67,13 +88,16 @@ public abstract class NexusRunningITSupport
     @After
     public void afterTestWasRunning()
     {
-        if ( EACH_METHOD.equals( startAndStopStrategy ) )
+        if ( NexusStartAndStopStrategy.Strategy.EACH_METHOD.equals( startAndStopStrategy ) )
         {
             stopNexus( nexus );
+            staticNexus = null;
+            runningNexusBundleCoordinates = null;
         }
         else
         {
             staticNexus = nexus;
+            runningNexusBundleCoordinates = filteredNexusBundleCoordinates;
         }
     }
 
@@ -81,6 +105,8 @@ public abstract class NexusRunningITSupport
     public static void afterAllTestsWereRun()
     {
         stopNexus( staticNexus );
+        staticNexus = null;
+        runningNexusBundleCoordinates = null;
     }
 
     /**
