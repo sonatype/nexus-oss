@@ -280,9 +280,11 @@ public class DefaultNexusBundle
             NexusBundleConfiguration config = getConfiguration();
 
             File jswConfigFile = new File( config.getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf" );
-            File jswAddonConfigFile = new File( config.getTargetDirectory(), "nexus/conf/wrapper-override.conf" );
 
-            JSWConfig jswConfig = new JSWConfig( jswConfigFile, jswAddonConfigFile );
+            JSWConfig jswConfig = new JSWConfig(
+                jswConfigFile,
+                "The following properties are added by Nexus IT as an override of properties already configured"
+            );
             jswConfig.load();
 
             jswConfig.configureMonitor( jswMonitorPort );

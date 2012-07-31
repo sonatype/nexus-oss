@@ -149,9 +149,10 @@ Ext.override(Ext.data.Connection, {
             var enctype = form.getAttribute("enctype");
             if (o.isUpload || (enctype && enctype.toLowerCase() == 'multipart/form-data'))
             {
-              // hack for IE if a non success response is received, we can't
-              // access the response data
-              // IE denies access
+              // hack for IE: if a non success response is received, we can't
+              // access the response data, because an error page is loaded from local disc
+              // for most response codes, making the containing iframe protected because it has
+              // a different domain (CORS)
               if (Ext.isIE)
               {
                 if (url.indexOf('?') >= 0)
