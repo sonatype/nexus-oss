@@ -13,6 +13,8 @@
 package org.sonatype.nexus.testsuite.support;
 
 import static org.junit.runners.Parameterized.Parameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoader.loadFirstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoader.loadSystemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoader.loadTestParameters;
 
 import java.util.Collection;
@@ -29,7 +31,10 @@ public class StartAndStopNexusRunningParametrizedFilteredIT
     @Parameters
     public static Collection<Object[]> data()
     {
-        return loadTestParameters( StartAndStopNexusRunningParametrizedFilteredIT.class );
+        return loadFirstAvailableTestParameters(
+            loadSystemTestParameters(),
+            loadTestParameters( StartAndStopNexusRunningParametrizedFilteredIT.class )
+        );
     }
 
     public StartAndStopNexusRunningParametrizedFilteredIT( final String nexusBundleCoordinates )

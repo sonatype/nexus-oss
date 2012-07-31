@@ -13,6 +13,9 @@
 package org.sonatype.nexus.testsuite.support;
 
 import static org.junit.runners.Parameterized.Parameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoader.loadDefaultTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoader.loadFirstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoader.loadSystemTestParameters;
 
 import java.util.Collection;
 
@@ -32,7 +35,10 @@ public abstract class NexusParametrizedITSupport
     @Parameters
     public static Collection<Object[]> data()
     {
-        return ParametersLoader.loadDefaultTestParameters();
+        return loadFirstAvailableTestParameters(
+            loadSystemTestParameters(),
+            loadDefaultTestParameters()
+        );
     }
 
     public NexusParametrizedITSupport( final String nexusBundleCoordinates )
