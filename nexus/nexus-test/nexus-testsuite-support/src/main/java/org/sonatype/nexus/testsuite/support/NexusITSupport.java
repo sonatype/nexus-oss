@@ -25,12 +25,14 @@ import org.junit.Before;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
 import org.sonatype.nexus.testsuite.support.filters.CompositeFilter;
+import org.sonatype.nexus.testsuite.support.filters.ImplicitVersionFilter;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 
@@ -231,7 +233,10 @@ public abstract class NexusITSupport
     {
         if ( filter == null )
         {
-            filter = new CompositeFilter( filters );
+            final List<Filter> memberFilters = Lists.newArrayList();
+            memberFilters.add( new ImplicitVersionFilter() );
+            memberFilters.addAll( filters );
+            filter = new CompositeFilter( memberFilters );
         }
         return filter;
     }
