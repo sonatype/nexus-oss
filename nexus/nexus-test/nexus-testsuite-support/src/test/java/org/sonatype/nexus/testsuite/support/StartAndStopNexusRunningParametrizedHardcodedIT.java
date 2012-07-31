@@ -17,6 +17,8 @@ import static org.junit.runners.Parameterized.Parameters;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.runners.Parameterized;
+
 /**
  * Test starting and launching of Nexus using a filtered parameters specified in IT.
  *
