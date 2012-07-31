@@ -12,15 +12,19 @@
  */
 package org.sonatype.nexus.client.rest.jersey;
 
+import java.net.URI;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 
+import com.sun.jersey.api.client.ClientHandlerException;
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.params.CoreProtocolPNames;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
@@ -70,10 +74,21 @@ public class JerseyNexusClientFactory
                                              final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories,
                                              final ConnectionInfo connectionInfo )
     {
-        final ApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
         // we are java2java client, so we use XML instead of JSON, as
         // some current Nexus are one way only! So, we fix for XML
         final XStream xstream = new NexusXStreamFactory().createAndConfigureForXml();
+
+        // we use XML for communication (unlike web browsers do, for which JSON makes more sense)
+        return new JerseyNexusClient( connectionCondition, subsystemFactories, connectionInfo, xstream,
+                                      doCreateHttpClientFor( connectionInfo, xstream ),
+                                      APPLICATION_XML_UTF8_TYPE );
+    }
+
+    // ==
+
+    protected ApacheHttpClient4 doCreateHttpClientFor( final ConnectionInfo connectionInfo, final XStream xstream )
+    {
+        final ApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
         config.getSingletons().add( new XStreamXmlProvider( xstream, APPLICATION_XML_UTF8_TYPE ) );
         // set _real_ URL for baseUrl, and not a redirection (typically http instead of https)
         config.getProperties().put( ApacheHttpClient4Config.PROPERTY_FOLLOW_REDIRECTS, Boolean.FALSE );
@@ -81,12 +96,50 @@ public class JerseyNexusClientFactory
         applyProxyIfAny( connectionInfo, config );
 
         final ApacheHttpClient4 client = ApacheHttpClient4.create( config );
+
         // set UA
         client.getClientHandler().getHttpClient().getParams().setParameter( CoreProtocolPNames.USER_AGENT,
                                                                             "Nexus-Client/1.0" );
-        // we use XML for communication (unlike web browsers do, for which JSON makes more sense)
-        return new JerseyNexusClient( connectionCondition, subsystemFactories, connectionInfo, xstream, client,
-                                      APPLICATION_XML_UTF8_TYPE );
+
+        // NXCM-4547 JERSEY-1293 Enforce proxy setting on httpclient
+        enforceProxyUri( config, client );
+
+        return client;
+    }
+
+    // ==
+
+    /**
+     * NXCM-4547 JERSEY-1293 Enforce proxy setting on httpclient
+     *
+     * Revisit for jersey 1.13.
+     */
+    private void enforceProxyUri( final ApacheHttpClient4Config config, final ApacheHttpClient4 client )
+    {
+        final Object proxyProperty = config.getProperties().get( ApacheHttpClient4Config.PROPERTY_PROXY_URI );
+        if ( proxyProperty != null )
+        {
+            final URI uri = getProxyUri( proxyProperty );
+            final HttpHost proxy = new HttpHost( uri.getHost(), uri.getPort(), uri.getScheme() );
+            client.getClientHandler().getHttpClient().getParams().setParameter( ConnRoutePNames.DEFAULT_PROXY, proxy );
+        }
+    }
+
+    private static URI getProxyUri( final Object proxy )
+    {
+        if ( proxy instanceof URI )
+        {
+            return (URI) proxy;
+        }
+        else if ( proxy instanceof String )
+        {
+            return URI.create( (String) proxy );
+        }
+        else
+        {
+            throw new ClientHandlerException( "The proxy URI (" + ApacheHttpClient4Config.PROPERTY_PROXY_URI +
+                                                  ") property MUST be an instance of String or URI" );
+        }
     }
 
     // ==
