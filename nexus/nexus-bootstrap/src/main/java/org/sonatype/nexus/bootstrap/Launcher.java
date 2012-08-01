@@ -39,13 +39,26 @@ import org.sonatype.sisu.jetty.Jetty8;
  */
 public class Launcher
 {
+
     protected final Logger log;
+
+    public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
+
+    public static final String KEEP_ALIVE_PORT = ShutdownIfNotAliveThread.class.getName() + ".port";
+
+    public static final String KEEP_ALIVE_PING_INTERVAL = ShutdownIfNotAliveThread.class.getName() + ".pingInterval";
+
+    public static final String KEEP_ALIVE_TIMEOUT = ShutdownIfNotAliveThread.class.getName() + ".timeout";
 
     protected static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
 
     protected static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
     protected static final String NEXUS_WORK = "nexus-work";
+
+    private static final int FIVE_SECONDS = 5000;
+
+    private static final int ONE_SECOND = 1000;
 
     protected Jetty8 server;
 
@@ -73,6 +86,7 @@ public class Launcher
 
         ensureTmpDirSanity();
         maybeEnableCommandMonitor();
+        maybeEnableShutdownIfNotAlive();
 
         server.startJetty();
         return null; // continue running
@@ -190,7 +204,7 @@ public class Launcher
     }
 
     protected Properties loadProperties(final String resource, final boolean required) throws IOException {
-        URL url = getResource(resource);
+        URL url = getResource( resource );
         if (url == null) {
             if (required) {
                 log.error("Missing resource: {}", resource);
@@ -237,9 +251,24 @@ public class Launcher
     }
 
     protected void maybeEnableCommandMonitor() throws IOException {
-        String commandMonitorPort = System.getProperty(CommandMonitorThread.class.getName() + ".port");
+        String commandMonitorPort = System.getProperty( COMMAND_MONITOR_PORT );
         if (commandMonitorPort != null) {
             new CommandMonitorThread(this, Integer.parseInt(commandMonitorPort)).start();
+        }
+    }
+
+    protected void maybeEnableShutdownIfNotAlive()
+        throws IOException
+    {
+        final String port = System.getProperty( KEEP_ALIVE_PORT );
+        if ( port != null )
+        {
+            new ShutdownIfNotAliveThread(
+                this,
+                Integer.parseInt( port ),
+                Integer.getInteger( KEEP_ALIVE_PING_INTERVAL, FIVE_SECONDS ),
+                Integer.getInteger( KEEP_ALIVE_TIMEOUT, ONE_SECOND )
+            ).start();
         }
     }
 
