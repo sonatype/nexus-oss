@@ -276,11 +276,6 @@ public class Launcher
         System.exit(0);
     }
 
-    public void commandRestart() {
-        log.error("Restart not supported, stopping instead");
-        System.exit(0);
-    }
-
     public void stop() throws Exception {
         server.stopJetty();
     }

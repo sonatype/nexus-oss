@@ -34,8 +34,6 @@ public class CommandMonitorThread
 
     private static final String STOP_COMMAND = "STOP";
 
-    private static final String RESTART_COMMAND = "RESTART";
-
     private final Launcher launcher;
 
     private final ServerSocket socket;
@@ -70,10 +68,6 @@ public class CommandMonitorThread
                     log.info("Requesting application stop");
                     launcher.commandStop();
                     running = false;
-                }
-                else if (RESTART_COMMAND.equals(command)) {
-                    log.info("Requesting appreciation restart");
-                    launcher.commandRestart();
                 }
                 else {
                     log.error("Unknown command: {}", command);
