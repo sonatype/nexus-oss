@@ -18,20 +18,20 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.v2_0_0.CRepository;
-import org.sonatype.nexus.configuration.model.v2_0_0.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.configuration.model.v2_0_1.upgrade.BasicVersionUpgrade;
 
 /**
- * Upgrades configuration model from version 1.10.0 to 2.0.<BR>
+ * Upgrades configuration model from version 2.0.0 to 2.0.1.
  * 
- * @author velo
+ * @author cstamas
  */
-@Component( role = SingleVersionUpgrader.class, hint = "1.10.0" )
-public class Upgrade1100to200
+@Component( role = SingleVersionUpgrader.class, hint = "2.0.0" )
+public class Upgrade200to201
     extends AbstractLogEnabled
     implements SingleVersionUpgrader
 {
@@ -41,15 +41,15 @@ public class Upgrade1100to200
     {
         FileReader fr = null;
 
-        org.sonatype.nexus.configuration.model.v1_10_0.Configuration conf = null;
+        org.sonatype.nexus.configuration.model.v2_0_0.Configuration conf = null;
 
         try
         {
             // reading without interpolation to preserve user settings as variables
             fr = new FileReader( file );
 
-            org.sonatype.nexus.configuration.model.v1_10_0.io.xpp3.NexusConfigurationXpp3Reader reader =
-                new org.sonatype.nexus.configuration.model.v1_10_0.io.xpp3.NexusConfigurationXpp3Reader();
+            org.sonatype.nexus.configuration.model.v2_0_0.io.xpp3.NexusConfigurationXpp3Reader reader =
+                new org.sonatype.nexus.configuration.model.v2_0_0.io.xpp3.NexusConfigurationXpp3Reader();
 
             conf = reader.read( fr );
         }
@@ -71,28 +71,32 @@ public class Upgrade1100to200
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.nexus.configuration.model.v1_10_0.Configuration oldc =
-            (org.sonatype.nexus.configuration.model.v1_10_0.Configuration) message.getConfiguration();
+        org.sonatype.nexus.configuration.model.v2_0_0.Configuration oldc =
+            (org.sonatype.nexus.configuration.model.v2_0_0.Configuration) message.getConfiguration();
 
         BasicVersionUpgrade versionConverter = new BasicVersionUpgrade()
         {
             @Override
-            public CRepository upgradeCRepository( org.sonatype.nexus.configuration.model.v1_10_0.CRepository cRepository )
+            public org.sonatype.nexus.configuration.model.CLocalStorage upgradeCLocalStorage( org.sonatype.nexus.configuration.model.v2_0_0.CLocalStorage cLocalStorage )
             {
-                CRepository newRepo = super.upgradeCRepository( cRepository );
-
-                // shut down NFC on any non-proxy repository
-                final boolean isProxyRepository =
-                    cRepository.isNotFoundCacheActive() &&
-                    newRepo.getRemoteStorage() != null &&
-                    newRepo.getRemoteStorage().getUrl() != null;
-                newRepo.setNotFoundCacheActive( isProxyRepository );
-
-                return newRepo;
+                final org.sonatype.nexus.configuration.model.CLocalStorage localStorage =
+                    super.upgradeCLocalStorage( cLocalStorage );
+                if ( localStorage != null )
+                {
+                    if ( StringUtils.equals( localStorage.getProvider(), "apacheHttpClient3x" ) )
+                    {
+                        // nullify the provider IF: it is set, and is set to the "old" HttpClient3x only
+                        // as in nullified case, the
+                        // org.sonatype.nexus.proxy.storage.remote.DefaultRemoteProviderHintFactory will kick in as we
+                        // want
+                        localStorage.setProvider( null );
+                    }
+                }
+                return localStorage;
             }
         };
 
-        org.sonatype.nexus.configuration.model.v2_0_0.Configuration newc = versionConverter.upgradeConfiguration( oldc );
+        org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
