@@ -77,22 +77,22 @@ public class Upgrade200to201
         BasicVersionUpgrade versionConverter = new BasicVersionUpgrade()
         {
             @Override
-            public org.sonatype.nexus.configuration.model.CLocalStorage upgradeCLocalStorage( org.sonatype.nexus.configuration.model.v2_0_0.CLocalStorage cLocalStorage )
+            public org.sonatype.nexus.configuration.model.CRemoteStorage upgradeCRemoteStorage( org.sonatype.nexus.configuration.model.v2_0_0.CRemoteStorage cRemoteStorage )
             {
-                final org.sonatype.nexus.configuration.model.CLocalStorage localStorage =
-                    super.upgradeCLocalStorage( cLocalStorage );
-                if ( localStorage != null )
+                final org.sonatype.nexus.configuration.model.CRemoteStorage remoteStorage =
+                    super.upgradeCRemoteStorage( cRemoteStorage );
+                if ( remoteStorage != null )
                 {
-                    if ( StringUtils.equals( localStorage.getProvider(), "apacheHttpClient3x" ) )
+                    if ( StringUtils.equals( remoteStorage.getProvider(), "apacheHttpClient3x" ) )
                     {
                         // nullify the provider IF: it is set, and is set to the "old" HttpClient3x only
                         // as in nullified case, the
                         // org.sonatype.nexus.proxy.storage.remote.DefaultRemoteProviderHintFactory will kick in as we
                         // want
-                        localStorage.setProvider( null );
+                        remoteStorage.setProvider( null );
                     }
                 }
-                return localStorage;
+                return remoteStorage;
             }
         };
 
