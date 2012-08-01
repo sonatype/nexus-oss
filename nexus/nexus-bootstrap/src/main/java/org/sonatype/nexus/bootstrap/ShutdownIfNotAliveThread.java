@@ -99,12 +99,10 @@ public class ShutdownIfNotAliveThread
         }
         catch ( ConnectException e )
         {
-            // TODO this check is quite a hack. we need a better way to determine that connection was refused
-            if ( "Connection refused".equals( e.getMessage() ) )
-            {
-                running = false;
-                shutdown();
-            }
+            log.info( "Exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
+
+            running = false;
+            shutdown();
         }
         catch ( IOException e )
         {
