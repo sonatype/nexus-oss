@@ -26,6 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.bootstrap.KeepAliveThread;
+import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
@@ -34,8 +36,6 @@ import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.jsw.exec.JSWExec;
 import org.sonatype.sisu.jsw.exec.JSWExecFactory;
-import org.sonatype.sisu.jsw.monitor.KeepAliveThread;
-import org.sonatype.sisu.jsw.monitor.internal.log.Slf4jLogProxy;
 import org.sonatype.sisu.jsw.util.JSWConfig;
 
 /**
@@ -68,17 +68,17 @@ public class DefaultNexusBundle
     private final FileTaskBuilder fileTaskBuilder;
 
     /**
-     * Port on which Nexus JSW Monitor is running. 0 (zero) if application is not running.
+     * Port on which Nexus Command Monitor is running. 0 (zero) if application is not running.
      */
-    private int jswMonitorPort;
+    private int commandMonitorPort;
 
     /**
-     * Port on which Nexus JSW Keep Alive is running. 0 (zero) if application is not running.
+     * Port on which Nexus Keep Alive is running. 0 (zero) if application is not running.
      */
-    private int jswKeepAlivePort;
+    private int keepAlivePort;
 
     /**
-     * JSW keep alive thread. Null if server is not started.
+     * Keep alive thread. Null if server is not started.
      */
     private KeepAliveThread keepAliveThread;
 
@@ -103,8 +103,8 @@ public class DefaultNexusBundle
     /**
      * Additionally <br/>
      * - configures Nexus/Jetty port<br/>
-     * - installs JSW command monitor<br/>
-     * - installs JSW keep alive monitor<br/>
+     * - installs command monitor<br/>
+     * - installs keep alive monitor<br/>
      * - configure remote debugging if requested<br/>
      * - installs plugins.
      * <p/>
@@ -118,8 +118,8 @@ public class DefaultNexusBundle
     {
         super.configure();
 
-        jswMonitorPort = getPortReservationService().reservePort();
-        jswKeepAlivePort = getPortReservationService().reservePort();
+        commandMonitorPort = getPortReservationService().reservePort();
+        keepAlivePort = getPortReservationService().reservePort();
 
         configureJSW();
         installPlugins();
@@ -136,15 +136,15 @@ public class DefaultNexusBundle
     {
         super.unconfigure();
 
-        if ( jswMonitorPort > 0 )
+        if ( commandMonitorPort > 0 )
         {
-            getPortReservationService().cancelPort( jswMonitorPort );
-            jswMonitorPort = 0;
+            getPortReservationService().cancelPort( commandMonitorPort );
+            commandMonitorPort = 0;
         }
-        if ( jswKeepAlivePort > 0 )
+        if ( keepAlivePort > 0 )
         {
-            getPortReservationService().cancelPort( jswKeepAlivePort );
-            jswKeepAlivePort = 0;
+            getPortReservationService().cancelPort( keepAlivePort );
+            keepAlivePort = 0;
         }
     }
 
@@ -160,7 +160,7 @@ public class DefaultNexusBundle
     {
         try
         {
-            keepAliveThread = new KeepAliveThread( jswKeepAlivePort, new Slf4jLogProxy( log ) );
+            keepAliveThread = new KeepAliveThread( keepAlivePort );
             keepAliveThread.start();
         }
         catch ( IOException e )
@@ -221,7 +221,7 @@ public class DefaultNexusBundle
     {
         if ( jswExec == null )
         {
-            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus", jswMonitorPort );
+            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus", commandMonitorPort );
         }
         return jswExec;
     }
@@ -287,8 +287,23 @@ public class DefaultNexusBundle
             );
             jswConfig.load();
 
-            jswConfig.configureMonitor( jswMonitorPort );
-            jswConfig.configureKeepAlive( jswKeepAlivePort );
+            // If nexus launcher is not the one from nexus-bootstrap we will replace it and use sisu-jsw-utils
+            // launcher and threads. This will allow testing against Nexus < 2.1
+            String mainClass = jswConfig.getProperty( "wrapper.java.mainclass" );
+            if ( "org.codehaus.plexus.classworlds.launcher.Launcher".equals( mainClass ) )
+            {
+                jswConfig.configureMonitor( commandMonitorPort );
+                jswConfig.configureKeepAlive( keepAlivePort );
+            }
+            else
+            {
+                jswConfig.addIndexedProperty(
+                    "wrapper.java.additional", "-D" + Launcher.COMMAND_MONITOR_PORT + "=" + commandMonitorPort
+                );
+                jswConfig.addIndexedProperty(
+                    "wrapper.java.additional", "-D" + Launcher.KEEP_ALIVE_PORT + "=" + keepAlivePort
+                );
+            }
 
             // configure remote debug if requested
             if ( config.getDebugPort() > 0 )
