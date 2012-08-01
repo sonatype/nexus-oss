@@ -19,6 +19,7 @@ import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -123,8 +124,10 @@ public class DefaultNexusBundle
         commandMonitorPort = getPortReservationService().reservePort();
         keepAlivePort = getPortReservationService().reservePort();
 
-        configureJSW();
-        configureNexusProperties();
+        final ConfigurationStrategy strategy = determineConfigurationStrategy();
+
+        configureJSW( strategy );
+        configureNexusProperties( strategy );
         installPlugins();
     }
 
@@ -229,6 +232,44 @@ public class DefaultNexusBundle
     }
 
     /**
+     * Configure Nexus properties using provided configuration strategy.
+     *
+     * @param strategy configuration strategy
+     */
+    private void configureNexusProperties( final ConfigurationStrategy strategy )
+    {
+        strategy.configureNexus();
+    }
+
+    /**
+     * Configure JSW properties using provided configuration strategy.
+     *
+     * @param strategy configuration strategy
+     */
+    private void configureJSW( final ConfigurationStrategy strategy )
+    {
+        try
+        {
+            final NexusBundleConfiguration config = getConfiguration();
+
+            final File jswConfigFile = new File( config.getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf" );
+
+            final JSWConfig jswConfig = new JSWConfig(
+                jswConfigFile,
+                "The following properties are added by Nexus IT as an override of properties already configured"
+            ).load();
+
+            strategy.configureJSW( jswConfig );
+
+            jswConfig.save();
+        }
+        catch ( final IOException e )
+        {
+            throw Throwables.propagate( e );
+        }
+    }
+
+    /**
      * Install Nexus plugins in {@code sonatype-work/nexus/plugin-repository}.
      */
     private void installPlugins()
@@ -256,99 +297,30 @@ public class DefaultNexusBundle
     }
 
     /**
-     * Configures Nexus properties, depending on nexus version.
-     * If Nexus is using nexus-bootstrap (after Nexus 2.1) will use "conf/nexus.properties" otherwise will use
-     * "conf/nexus-test.properties" that is used as an override.
+     * Determines a configuration strategy based on version of Nexus to be started.
+     *
+     * @return configuration strategy. Never null.
      */
-    private void configureNexusProperties()
+    private ConfigurationStrategy determineConfigurationStrategy()
     {
-        if ( isNexusVersion21OrBigger() )
+        final File libDir = new File( getConfiguration().getTargetDirectory(), "nexus/lib" );
+        // nexus-bootstrap-<version>.jar is only present starting with version 2.1
+        final String[] nexusBootstrapJarsBiggerThen2Dot1 = libDir.list( new FilenameFilter()
         {
-            final Properties nexusProperties = new Properties();
-
-            nexusProperties.setProperty( "application-port", String.valueOf( getPort() ) );
-            nexusProperties.setProperty( Launcher.COMMAND_MONITOR_PORT, String.valueOf( commandMonitorPort ) );
-            nexusProperties.setProperty( Launcher.KEEP_ALIVE_PORT, String.valueOf( keepAlivePort ) );
-
-            final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
-            if ( !systemProperties.isEmpty() )
+            @Override
+            public boolean accept( final File dir, final String name )
             {
-                for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
-                {
-                    nexusProperties.setProperty( entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() );
-                }
+                return name.startsWith( "nexus-" )
+                    && name.endsWith( ".jar" )
+                    && !"nexus-bootstrap-2.1.jar".equals( name );
             }
 
-            onDirectory( getConfiguration().getTargetDirectory() ).apply(
-                fileTaskBuilder.properties( path( "nexus/conf/nexus-test.properties" ) )
-                    .properties( nexusProperties )
-            );
-        }
-        else
+        } );
+        if ( nexusBootstrapJarsBiggerThen2Dot1 != null && nexusBootstrapJarsBiggerThen2Dot1.length > 0 )
         {
-            onDirectory( getConfiguration().getTargetDirectory() ).apply(
-                fileTaskBuilder.properties( path( "nexus/conf/nexus.properties" ) )
-                    .property( "application-port", String.valueOf( getPort() ) )
-            );
+            return new CS22AndAbove();
         }
-    }
-
-    /**
-     * Creates a JSW configuration file specifying:<br/>
-     * - debugging options if debugging is enabled<br/>
-     * - installs JSW command monitor
-     */
-    private void configureJSW()
-    {
-        try
-        {
-            final NexusBundleConfiguration config = getConfiguration();
-
-            final File jswConfigFile = new File( config.getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf" );
-
-            final JSWConfig jswConfig = new JSWConfig(
-                jswConfigFile,
-                "The following properties are added by Nexus IT as an override of properties already configured"
-            ).load();
-
-            // For Nexus versions not 2.1 or bigger we will replace the main class and use sisu-jsw-utils threads and
-            // configuration file for setting system properties
-            if ( !isNexusVersion21OrBigger() )
-            {
-                jswConfig.configureMonitor( commandMonitorPort );
-                jswConfig.configureKeepAlive( keepAlivePort );
-
-                final Map<String, String> systemProperties = config.getSystemProperties();
-                if ( !systemProperties.isEmpty() )
-                {
-                    for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
-                    {
-                        jswConfig.addIndexedProperty(
-                            "wrapper.java.additional",
-                            format( "-D%s=%s", entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() )
-                        );
-                    }
-                }
-            }
-
-            // configure remote debug if requested
-            if ( config.getDebugPort() > 0 )
-            {
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xdebug" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xnoagent" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Djava.compiler=NONE" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional",
-                                              "-Xrunjdwp:transport=dt_socket,server=y,suspend="
-                                                  + ( config.isSuspendOnStart() ? "y" : "n" )
-                                                  + ",address=" + config.getDebugPort() );
-            }
-
-            jswConfig.save();
-        }
-        catch ( final IOException e )
-        {
-            throw Throwables.propagate( e );
-        }
+        return new CS21AndBellow();
     }
 
     /**
@@ -387,4 +359,105 @@ public class DefaultNexusBundle
     {
         return getName() + "-" + System.currentTimeMillis();
     }
+
+    private static interface ConfigurationStrategy
+    {
+
+        void configureJSW( JSWConfig jswConfig );
+
+        void configureNexus();
+    }
+
+    private class CS22AndAbove
+        implements ConfigurationStrategy
+    {
+
+        @Override
+        public void configureJSW( final JSWConfig jswConfig )
+        {
+            // configure remote debug if requested
+            if ( getConfiguration().getDebugPort() > 0 )
+            {
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xdebug" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xnoagent" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Djava.compiler=NONE" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional",
+                                              "-Xrunjdwp:transport=dt_socket,server=y,suspend="
+                                                  + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
+                                                  + ",address=" + getConfiguration().getDebugPort() );
+            }
+        }
+
+        @Override
+        public void configureNexus()
+        {
+            final Properties nexusProperties = new Properties();
+
+            nexusProperties.setProperty( "application-port", String.valueOf( getPort() ) );
+            nexusProperties.setProperty( Launcher.COMMAND_MONITOR_PORT, String.valueOf( commandMonitorPort ) );
+            nexusProperties.setProperty( Launcher.KEEP_ALIVE_PORT, String.valueOf( keepAlivePort ) );
+
+            final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
+            if ( !systemProperties.isEmpty() )
+            {
+                for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
+                {
+                    nexusProperties.setProperty( entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() );
+                }
+            }
+
+            onDirectory( getConfiguration().getTargetDirectory() ).apply(
+                fileTaskBuilder.properties( path( "nexus/conf/nexus-test.properties" ) )
+                    .properties( nexusProperties )
+            );
+        }
+
+    }
+
+    private class CS21AndBellow
+        implements ConfigurationStrategy
+    {
+
+        @Override
+        public void configureJSW( final JSWConfig jswConfig )
+        {
+            jswConfig.configureMonitor( commandMonitorPort );
+            jswConfig.configureKeepAlive( keepAlivePort );
+
+            final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
+            if ( !systemProperties.isEmpty() )
+            {
+                for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
+                {
+                    jswConfig.addIndexedProperty(
+                        "wrapper.java.additional",
+                        format( "-D%s=%s", entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() )
+                    );
+                }
+            }
+
+            // configure remote debug if requested
+            if ( getConfiguration().getDebugPort() > 0 )
+            {
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xdebug" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xnoagent" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Djava.compiler=NONE" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional",
+                                              "-Xrunjdwp:transport=dt_socket,server=y,suspend="
+                                                  + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
+                                                  + ",address=" + getConfiguration().getDebugPort() );
+            }
+        }
+
+        @Override
+        public void configureNexus()
+        {
+            onDirectory( getConfiguration().getTargetDirectory() ).apply(
+                fileTaskBuilder.properties( path( "nexus/conf/nexus.properties" ) )
+                    .property( "application-port", String.valueOf( getPort() ) )
+            );
+        }
+
+    }
+
 }
