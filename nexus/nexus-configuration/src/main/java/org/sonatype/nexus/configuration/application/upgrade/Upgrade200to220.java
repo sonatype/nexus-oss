@@ -31,7 +31,7 @@ import org.sonatype.nexus.configuration.model.v2_2_0.upgrade.BasicVersionUpgrade
  * @author cstamas
  */
 @Component( role = SingleVersionUpgrader.class, hint = "2.0.0" )
-public class Upgrade200to201
+public class Upgrade200to220
     extends AbstractLogEnabled
     implements SingleVersionUpgrader
 {
