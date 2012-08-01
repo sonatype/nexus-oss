@@ -44,11 +44,12 @@ public class DefaultLdapContextFactoryTest
                     is( "ldap://localhost:439" ) );
     }
 
-    @Test( expected = IllegalArgumentException.class )
-    public void testInvalidLdapUrl()
+    @Test
+    public void testValidLdapsUrl()
     {
-        underTest.setUrl( "localhost:439" );
-        underTest.getSetupEnvironment( null, null, false );
+        underTest.setUrl( "ldaps://localhost:439" );
+        assertThat( underTest.getSetupEnvironment( null, null, false ).get( Context.PROVIDER_URL ),
+                    is( "ldaps://localhost:439" ) );
     }
 
     @Test( expected = NullPointerException.class )
