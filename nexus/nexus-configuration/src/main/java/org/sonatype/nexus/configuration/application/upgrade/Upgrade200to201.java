@@ -23,10 +23,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.v2_0_1.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.configuration.model.v2_2_0.upgrade.BasicVersionUpgrade;
 
 /**
- * Upgrades configuration model from version 2.0.0 to 2.0.1.
+ * Upgrades configuration model from version 2.0.0 to 2.2.0.
  * 
  * @author cstamas
  */
