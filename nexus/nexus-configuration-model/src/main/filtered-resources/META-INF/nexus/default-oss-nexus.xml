@@ -48,7 +48,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repo1.maven.org/maven2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -76,7 +75,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repository.apache.org/snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -104,7 +102,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://nexus.codehaus.org/snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
