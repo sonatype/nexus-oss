@@ -13,9 +13,10 @@
 
 package org.sonatype.nexus.bootstrap;
 
+import static org.sonatype.nexus.bootstrap.commands.PingCommand.PING_COMMAND;
+
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import org.slf4j.Logger;
@@ -46,6 +47,8 @@ public class ShutdownIfNotAliveThread
 
     private Socket socket;
 
+    private final CommandMonitorTalker talker;
+
     public ShutdownIfNotAliveThread( final Launcher launcher,
                                      final int port,
                                      final int pingInterval,
@@ -60,8 +63,10 @@ public class ShutdownIfNotAliveThread
         this.port = port;
         this.pingInterval = pingInterval;
         this.timeout = timeout;
-        this.running = true;
 
+        this.talker = new CommandMonitorTalker( LOCALHOST, port );
+
+        this.running = true;
         this.setDaemon( true );
         setName( "Shutdown if not alive" );
     }
@@ -92,10 +97,7 @@ public class ShutdownIfNotAliveThread
         try
         {
             log.debug( "Pinging on port {} ...", port );
-
-            socket = new Socket();
-            socket.connect( new InetSocketAddress( LOCALHOST, port ), timeout );
-
+            talker.send( PING_COMMAND );
         }
         catch ( ConnectException e )
         {
@@ -104,7 +106,7 @@ public class ShutdownIfNotAliveThread
             running = false;
             shutdown();
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
             log.info( "Skipping exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
         }
