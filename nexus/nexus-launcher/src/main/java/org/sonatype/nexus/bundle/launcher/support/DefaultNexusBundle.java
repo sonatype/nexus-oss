@@ -325,31 +325,6 @@ public class DefaultNexusBundle
         return new CS21AndBellow();
     }
 
-    /**
-     * Determines if Nexus version is bigger then 2.1 (one that uses nexus-bootstrap.
-     *
-     * @return true if Nexus version is bigger then 2.1
-     *         <p/>
-     *         TODO this is not a very proof way of determining version
-     */
-    private boolean isNexusVersion21OrBigger()
-    {
-        try
-        {
-            final File jswConfigFile = new File(
-                getConfiguration().getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf"
-            );
-            final JSWConfig jswConfig = new JSWConfig( jswConfigFile ).load();
-            final String mainClass = jswConfig.getProperty( WRAPPER_JAVA_MAINCLASS );
-
-            return mainClass.startsWith( "org.sonatype.nexus.bootstrap" );
-        }
-        catch ( final IOException e )
-        {
-            throw Throwables.propagate( e );
-        }
-    }
-
     @Override
     public File getWorkDirectory()
     {
