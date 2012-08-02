@@ -30,6 +30,8 @@ import org.sonatype.appcontext.publisher.AbstractStringDumpingEntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
+import org.sonatype.nexus.bootstrap.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.commands.StopApplicationCommand;
 import org.sonatype.sisu.jetty.Jetty8;
 
 /**
@@ -253,7 +255,11 @@ public class Launcher
     protected void maybeEnableCommandMonitor() throws IOException {
         String commandMonitorPort = System.getProperty( COMMAND_MONITOR_PORT );
         if (commandMonitorPort != null) {
-            new CommandMonitorThread(this, Integer.parseInt(commandMonitorPort)).start();
+            new CommandMonitorThread(
+                Integer.parseInt( commandMonitorPort ),
+                new StopApplicationCommand( this ),
+                new PingCommand()
+            ).start();
         }
     }
 

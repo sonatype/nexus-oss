@@ -21,6 +21,8 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Thread which listens for command messages to control the JVM.
@@ -32,17 +34,19 @@ public class CommandMonitorThread
 {
     private static final Logger log = LoggerFactory.getLogger(CommandMonitorThread.class);
 
-    public static final String STOP_COMMAND = "STOP";
-
-    private final Launcher launcher;
-
     private final ServerSocket socket;
 
-    public CommandMonitorThread(final Launcher launcher, final int port) throws IOException {
-        if (launcher == null) {
-            throw new NullPointerException();
+    private final Map<String,Command> commands = new HashMap<String, Command>(  );
+
+    public CommandMonitorThread(final int port, final Command... commands) throws IOException {
+        if ( commands != null )
+        {
+            for ( final Command command : commands )
+            {
+                this.commands.put( command.getId(), command );
+            }
         }
-        this.launcher = launcher;
+
         setDaemon(true);
         setName("Bootstrap Command Monitor");
         // Only listen on local interface
@@ -60,17 +64,18 @@ public class CommandMonitorThread
                 log.info("Accepted client: {}", client);
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                String command = reader.readLine();
-                log.info("Read command: {}", command);
+                String commandId = reader.readLine();
+                log.info("Read command: {}", commandId);
                 client.close();
 
-                if (STOP_COMMAND.equals(command)) {
-                    log.info("Requesting application stop");
-                    launcher.commandStop();
-                    running = false;
+                final Command command = commands.get( commandId );
+                if ( command == null )
+                {
+                    log.error( "Unknown command: {}", commandId );
                 }
-                else {
-                    log.error("Unknown command: {}", command);
+                else
+                {
+                    running = !command.execute();
                 }
             }
             catch (Exception e) {
@@ -85,6 +90,31 @@ public class CommandMonitorThread
             // ignore
         }
 
-        log.info("Stopped");
+        log.info( "Stopped" );
     }
+
+    public int getPort()
+    {
+        return socket.getLocalPort();
+    }
+
+    public static interface Command
+    {
+
+        /**
+         * ID of command (when it should be executed).
+         *
+         * @return command id. Never null.
+         */
+        String getId();
+
+        /**
+         * Executes the command.
+         *
+         * @return true, if command monitor thread should stop running
+         */
+        boolean execute();
+
+    }
+
 }
