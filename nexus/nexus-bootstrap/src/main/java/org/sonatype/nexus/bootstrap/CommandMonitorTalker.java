@@ -28,6 +28,8 @@ public class CommandMonitorTalker
 {
     private static Logger log = LoggerFactory.getLogger(CommandMonitorTalker.class);
 
+    public static final String LOCALHOST = "127.0.0.1";
+
     private final String host;
 
     private final int port;

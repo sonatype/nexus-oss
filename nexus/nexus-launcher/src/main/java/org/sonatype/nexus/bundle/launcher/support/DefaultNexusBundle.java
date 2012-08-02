@@ -14,6 +14,8 @@ package org.sonatype.nexus.bundle.launcher.support;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static org.sonatype.nexus.bootstrap.CommandMonitorTalker.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.CommandMonitorThread.STOP_COMMAND;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
@@ -29,6 +31,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.bootstrap.CommandMonitorTalker;
 import org.sonatype.nexus.bootstrap.KeepAliveThread;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
@@ -39,8 +44,6 @@ import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.jsw.exec.JSWExec;
 import org.sonatype.sisu.jsw.exec.JSWExecFactory;
-import org.sonatype.sisu.jsw.monitor.CommandMonitorTalker;
-import org.sonatype.sisu.jsw.monitor.CommandMonitorThread;
 import org.sonatype.sisu.jsw.util.JSWConfig;
 import com.google.common.base.Throwables;
 
@@ -54,6 +57,8 @@ public class DefaultNexusBundle
     extends DefaultWebBundle<NexusBundle, NexusBundleConfiguration>
     implements NexusBundle
 {
+
+    private static final Logger log = LoggerFactory.getLogger( DefaultNexusBundle.class );
 
     /**
      * JSW utility factory.
@@ -175,7 +180,7 @@ public class DefaultNexusBundle
         {
             throw new RuntimeException( "Could not start JSW keep alive thread", e );
         }
-        CommandMonitorTalker.installStopShutdownHook( commandMonitorPort );
+        installStopShutdownHook( commandMonitorPort );
         jswExec().start();
     }
 
@@ -191,7 +196,7 @@ public class DefaultNexusBundle
     {
         try
         {
-            new CommandMonitorTalker( commandMonitorPort ).send( CommandMonitorThread.STOP_COMMAND );
+            sendStopToNexus( commandMonitorPort );
         }
         finally
         {
@@ -337,6 +342,37 @@ public class DefaultNexusBundle
     protected String generateId()
     {
         return getName() + "-" + System.currentTimeMillis();
+    }
+
+    private static void installStopShutdownHook( final int commandPort )
+    {
+        Thread stopShutdownHook = new Thread( "JSW Sanity Stopper" )
+        {
+            @Override
+            public void run()
+            {
+                sendStopToNexus( commandPort );
+            }
+        };
+
+        Runtime.getRuntime().addShutdownHook( stopShutdownHook );
+        log.debug( "Installed stop shutdown hook" );
+    }
+
+    private static void sendStopToNexus( final int commandPort )
+    {
+        log.debug( "Sending stop command to Nexus" );
+        try
+        {
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_COMMAND );
+        }
+        catch ( Exception e )
+        {
+            log.debug(
+                "Skipping exception got while sending stop command {}:{}",
+                e.getClass().getName(), e.getMessage()
+            );
+        }
     }
 
     private static interface ConfigurationStrategy

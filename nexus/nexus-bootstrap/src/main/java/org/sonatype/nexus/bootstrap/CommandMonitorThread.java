@@ -32,7 +32,7 @@ public class CommandMonitorThread
 {
     private static final Logger log = LoggerFactory.getLogger(CommandMonitorThread.class);
 
-    private static final String STOP_COMMAND = "STOP";
+    public static final String STOP_COMMAND = "STOP";
 
     private final Launcher launcher;
 
