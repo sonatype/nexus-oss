@@ -13,19 +13,29 @@
 package org.sonatype.nexus.security.ldap.realms.testharness.nexus5193;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.restlet.data.MediaType.APPLICATION_JSON;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
+import java.io.File;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.restlet.data.MediaType;
+import org.restlet.data.Response;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
+import org.sonatype.nexus.security.ldap.realms.testharness.LdapConnMessageUtil;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
@@ -63,29 +73,40 @@ public class Nexus5193LdapsSupportIT
     }
 
     @Test
-    public void searchWithLdaps()
+    public void testAuth()
         throws Exception
     {
-        PlexusUserSearchCriteriaResourceRequest resourceRequest = new PlexusUserSearchCriteriaResourceRequest();
-        PlexusUserSearchCriteriaResource criteria = new PlexusUserSearchCriteriaResource();
-        criteria.setUserId( "" );
-        criteria.setEffectiveUsers( true );
-        resourceRequest.setData( criteria );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        LdapConnMessageUtil connUtil = new LdapConnMessageUtil( getJsonXStream(), MediaType.APPLICATION_JSON );
+        LdapConnectionInfoDTO request = getConnectionInfo();
+        LdapConnectionInfoDTO responseConnInfo = connUtil.updateConnectionInfo( request );
+        responseConnInfo.setSystemPassword( "" );
+        request.setSystemPassword( "" );
 
-        XStreamRepresentation representation = new XStreamRepresentation( this.getJsonXStream(), "", APPLICATION_JSON );
+        assertThat( responseConnInfo, equalTo( request ) );
 
+        // test for correct ldap config
+        File ldapConfigFile = new File( WORK_CONF_DIR, "/ldap.xml" );
+        assertThat( "cannot find ldap config", ldapConfigFile.exists() );
+        assertThat( FileUtils.readFileToString( ldapConfigFile ), containsString( "more&amp;more" ) );
 
-        representation.setPayload( resourceRequest );
+        connUtil.validateLdapConfig( getConnectionInfo() );
 
-        final String response = RequestFacade.doPutForText( RequestFacade.SERVICE_LOCAL + "user_search/LDAP", representation, NexusRequestMatchers.isSuccessful() );
-
-        PlexusUserListResourceResponse userList =
-            (PlexusUserListResourceResponse) new XStreamRepresentation( this.getJsonXStream(), response,
-                                                                        APPLICATION_JSON )
-                .getPayload( new PlexusUserListResourceResponse() );
-
-        List<PlexusUserResource> users = userList.getData();
-        assertThat( users, hasSize( 2 ) );
+        connUtil.testAuth( getConnectionInfo(), isSuccessful() );
     }
 
+    private LdapConnectionInfoDTO getConnectionInfo()
+    {
+        LdapConnectionInfoDTO connInfo = new LdapConnectionInfoDTO();
+
+        connInfo.setAuthScheme( "simple" );
+        connInfo.setHost( "localhost" );
+        connInfo.setPort( this.getLdapPort() );
+        connInfo.setProtocol( "ldaps" );
+        // connInfo.setRealm( "" );
+        connInfo.setSearchBase( "o=sonatype" );
+        connInfo.setSystemPassword( "secret" );
+        connInfo.setSystemUsername( "uid=admin,ou=system" );
+        return connInfo;
+    }
 }
