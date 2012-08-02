@@ -17,6 +17,8 @@ import static java.lang.String.format;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
+import static org.sonatype.sisu.jsw.util.JSWConfig.WRAPPER_JAVA_ADDITIONAL;
+import static org.sonatype.sisu.jsw.util.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -338,7 +340,7 @@ public class DefaultNexusBundle
                 getConfiguration().getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf"
             );
             final JSWConfig jswConfig = new JSWConfig( jswConfigFile ).load();
-            final String mainClass = jswConfig.getProperty( "wrapper.java.mainclass" );
+            final String mainClass = jswConfig.getProperty( WRAPPER_JAVA_MAINCLASS );
 
             return mainClass.startsWith( "org.sonatype.nexus.bootstrap" );
         }
@@ -378,10 +380,10 @@ public class DefaultNexusBundle
             // configure remote debug if requested
             if ( getConfiguration().getDebugPort() > 0 )
             {
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xdebug" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xnoagent" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Djava.compiler=NONE" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional",
+                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Xdebug" );
+                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Xnoagent" );
+                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Djava.compiler=NONE" );
+                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL,
                                               "-Xrunjdwp:transport=dt_socket,server=y,suspend="
                                                   + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
                                                   + ",address=" + getConfiguration().getDebugPort() );
@@ -430,7 +432,7 @@ public class DefaultNexusBundle
                 for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
                 {
                     jswConfig.addIndexedProperty(
-                        "wrapper.java.additional",
+                        WRAPPER_JAVA_ADDITIONAL,
                         format( "-D%s=%s", entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() )
                     );
                 }
@@ -439,10 +441,10 @@ public class DefaultNexusBundle
             // configure remote debug if requested
             if ( getConfiguration().getDebugPort() > 0 )
             {
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xdebug" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xnoagent" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Djava.compiler=NONE" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional",
+                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Xdebug" );
+                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Xnoagent" );
+                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Djava.compiler=NONE" );
+                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL,
                                               "-Xrunjdwp:transport=dt_socket,server=y,suspend="
                                                   + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
                                                   + ",address=" + getConfiguration().getDebugPort() );
