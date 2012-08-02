@@ -1113,6 +1113,11 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-logging-extras-appender</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1803,6 +1808,7 @@
     <module>nexus-utils</module>
     <module>nexus-web-utils</module>
     <module>nexus-logging-extras</module>
+    <module>nexus-logging-extras-appender</module>
     <module>nexus-api</module>
     <module>nexus-oss-edition</module>
     <module>nexus-configuration-model</module>

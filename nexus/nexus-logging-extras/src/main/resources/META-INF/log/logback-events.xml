@@ -19,7 +19,7 @@
 
 <included>
 
-  <appender name="events" class="org.sonatype.nexus.log.internal.NexusEventSystemAppender">
+  <appender name="events" class="org.sonatype.nexus.logback.ForwardingAppender">
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>
     </filter>

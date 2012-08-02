@@ -91,6 +91,9 @@
         <excludes>
           <exclude>META-INF/**</exclude>
           <exclude>WEB-INF/lib/appcontext*.jar</exclude>
+          <exclude>WEB-INF/lib/slf4j-api*.jar</exclude>
+          <exclude>WEB-INF/lib/logback-core*.jar</exclude>
+          <exclude>WEB-INF/lib/logback-classic*.jar</exclude>
           <exclude>WEB-INF/classes/logback.xml</exclude>
         </excludes>
       </unpackOptions>
@@ -101,6 +104,7 @@
     <dependencySet>
       <includes>
         <include>org.sonatype.nexus:nexus-bootstrap</include>
+        <include>org.sonatype.nexus:nexus-logging-extras-appender</include>
         <include>javax.servlet:*</include>
         <include>org.eclipse.jetty:*</include>
         <include>org.codehaus.plexus:*</include>
