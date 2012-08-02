@@ -14,6 +14,7 @@ package org.sonatype.nexus.bootstrap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.bootstrap.commands.PingCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -68,6 +69,10 @@ public class CommandMonitorThread
                 log.debug("Read command: {}", commandId);
                 client.close();
 
+                if ( commandId == null )
+                {
+                    commandId = PingCommand.PING_COMMAND;
+                }
                 final Command command = commands.get( commandId );
                 if ( command == null )
                 {
