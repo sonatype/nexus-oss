@@ -13,6 +13,7 @@
 package org.sonatype.nexus.logback;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
@@ -23,6 +24,7 @@ import ch.qos.logback.core.UnsynchronizedAppenderBase;
  * @author cstamas
  * @since 2.2
  */
+@Named
 public class ForwardingAppender
     extends UnsynchronizedAppenderBase<ILoggingEvent>
 {
