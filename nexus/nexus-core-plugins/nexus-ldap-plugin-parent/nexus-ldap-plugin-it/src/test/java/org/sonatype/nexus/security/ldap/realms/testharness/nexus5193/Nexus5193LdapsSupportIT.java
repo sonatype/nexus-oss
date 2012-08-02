@@ -78,35 +78,26 @@ public class Nexus5193LdapsSupportIT
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         LdapConnMessageUtil connUtil = new LdapConnMessageUtil( getJsonXStream(), MediaType.APPLICATION_JSON );
-        LdapConnectionInfoDTO request = getConnectionInfo();
-        LdapConnectionInfoDTO responseConnInfo = connUtil.updateConnectionInfo( request );
-        responseConnInfo.setSystemPassword( "" );
-        request.setSystemPassword( "" );
+        final LdapConnectionInfoDTO connectionInfo = getConnectionInfo();
 
-        assertThat( responseConnInfo, equalTo( request ) );
-
-        // test for correct ldap config
-        File ldapConfigFile = new File( WORK_CONF_DIR, "/ldap.xml" );
-        assertThat( "cannot find ldap config", ldapConfigFile.exists() );
-        assertThat( FileUtils.readFileToString( ldapConfigFile ), containsString( "more&amp;more" ) );
-
-        connUtil.validateLdapConfig( getConnectionInfo() );
-
-        connUtil.testAuth( getConnectionInfo(), isSuccessful() );
+        connUtil.testAuth( connectionInfo, isSuccessful() );
     }
 
     private LdapConnectionInfoDTO getConnectionInfo()
     {
         LdapConnectionInfoDTO connInfo = new LdapConnectionInfoDTO();
 
-        connInfo.setAuthScheme( "simple" );
+        connInfo.setSearchBase( "o=sonatype" );
+        connInfo.setAuthScheme( "none" );
+        connInfo.setProtocol( "ldaps" );
         connInfo.setHost( "localhost" );
         connInfo.setPort( this.getLdapPort() );
-        connInfo.setProtocol( "ldaps" );
-        // connInfo.setRealm( "" );
-        connInfo.setSearchBase( "o=sonatype" );
-        connInfo.setSystemPassword( "secret" );
-        connInfo.setSystemUsername( "uid=admin,ou=system" );
+        connInfo.setRealm( null );
+        connInfo.setSystemPassword( null );
+        connInfo.setSystemUsername( null );
+//        connInfo.setAuthScheme( "simple" );
+//        connInfo.setSystemPassword( "secret" );
+//        connInfo.setSystemUsername( "uid=admin,ou=system" );
         return connInfo;
     }
 }
