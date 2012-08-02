@@ -18,7 +18,6 @@ import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 import static org.sonatype.sisu.jsw.util.JSWConfig.WRAPPER_JAVA_ADDITIONAL;
-import static org.sonatype.sisu.jsw.util.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -40,6 +39,8 @@ import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.jsw.exec.JSWExec;
 import org.sonatype.sisu.jsw.exec.JSWExecFactory;
+import org.sonatype.sisu.jsw.monitor.CommandMonitorTalker;
+import org.sonatype.sisu.jsw.monitor.CommandMonitorThread;
 import org.sonatype.sisu.jsw.util.JSWConfig;
 import com.google.common.base.Throwables;
 
@@ -174,6 +175,7 @@ public class DefaultNexusBundle
         {
             throw new RuntimeException( "Could not start JSW keep alive thread", e );
         }
+        CommandMonitorTalker.installStopShutdownHook( commandMonitorPort );
         jswExec().start();
     }
 
@@ -189,7 +191,7 @@ public class DefaultNexusBundle
     {
         try
         {
-            jswExec().stop();
+            new CommandMonitorTalker( commandMonitorPort ).send( CommandMonitorThread.STOP_COMMAND );
         }
         finally
         {
@@ -228,7 +230,7 @@ public class DefaultNexusBundle
     {
         if ( jswExec == null )
         {
-            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus", commandMonitorPort );
+            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus" );
         }
         return jswExec;
     }
