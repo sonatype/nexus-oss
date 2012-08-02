@@ -15,7 +15,8 @@ package org.sonatype.nexus.bundle.launcher.support;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.sonatype.nexus.bootstrap.CommandMonitorTalker.LOCALHOST;
-import static org.sonatype.nexus.bootstrap.CommandMonitorThread.STOP_COMMAND;
+import static org.sonatype.nexus.bootstrap.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
+import static org.sonatype.nexus.bootstrap.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
@@ -34,8 +35,10 @@ import javax.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.CommandMonitorTalker;
-import org.sonatype.nexus.bootstrap.KeepAliveThread;
+import org.sonatype.nexus.bootstrap.CommandMonitorThread;
 import org.sonatype.nexus.bootstrap.Launcher;
+import org.sonatype.nexus.bootstrap.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.commands.StopMonitorCommand;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
@@ -91,7 +94,7 @@ public class DefaultNexusBundle
     /**
      * Keep alive thread. Null if server is not started.
      */
-    private KeepAliveThread keepAliveThread;
+    private CommandMonitorThread keepAliveThread;
 
     /**
      * Constructor.
@@ -173,7 +176,11 @@ public class DefaultNexusBundle
     {
         try
         {
-            keepAliveThread = new KeepAliveThread( keepAlivePort );
+            keepAliveThread = new CommandMonitorThread(
+                keepAlivePort,
+                new PingCommand(),
+                new StopMonitorCommand()
+            );
             keepAliveThread.start();
         }
         catch ( IOException e )
@@ -202,7 +209,8 @@ public class DefaultNexusBundle
         {
             if ( keepAliveThread != null )
             {
-                keepAliveThread.stopRunning();
+                sendStopToKeepAlive( keepAlivePort );
+                keepAliveThread = null;
             }
         }
     }
@@ -364,12 +372,28 @@ public class DefaultNexusBundle
         log.debug( "Sending stop command to Nexus" );
         try
         {
-            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_COMMAND );
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_APPLICATION_COMMAND );
         }
         catch ( Exception e )
         {
             log.debug(
-                "Skipping exception got while sending stop command {}:{}",
+                "Skipping exception got while sending stop command to Nexus {}:{}",
+                e.getClass().getName(), e.getMessage()
+            );
+        }
+    }
+
+    private static void sendStopToKeepAlive( final int commandPort )
+    {
+        log.debug( "Sending stop command to keep alive thread" );
+        try
+        {
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_MONITOR_COMMAND );
+        }
+        catch ( Exception e )
+        {
+            log.debug(
+                "Skipping exception got while sending stop command to keep alive thread {}:{}",
                 e.getClass().getName(), e.getMessage()
             );
         }
