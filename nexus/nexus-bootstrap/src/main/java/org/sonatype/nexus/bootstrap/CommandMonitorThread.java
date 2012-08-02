@@ -61,11 +61,11 @@ public class CommandMonitorThread
         while (running) {
             try {
                 Socket client = socket.accept();
-                log.info("Accepted client: {}", client);
+                log.debug("Accepted client: {}", client);
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 String commandId = reader.readLine();
-                log.info("Read command: {}", commandId);
+                log.debug("Read command: {}", commandId);
                 client.close();
 
                 final Command command = commands.get( commandId );

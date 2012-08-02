@@ -38,7 +38,7 @@ public class PingCommand
     @Override
     public boolean execute()
     {
-        log.info( "Pinged" );
+        log.debug( "Pinged" );
         return false;
     }
 
