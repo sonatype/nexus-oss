@@ -11,14 +11,15 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package org.sonatype.nexus.bootstrap;
+package org.sonatype.nexus.bootstrap.monitor;
 
-import static org.sonatype.nexus.bootstrap.commands.PingCommand.PING_COMMAND;
+import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
 
+import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**

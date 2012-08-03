@@ -30,8 +30,10 @@ import org.sonatype.appcontext.publisher.AbstractStringDumpingEntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
-import org.sonatype.nexus.bootstrap.commands.PingCommand;
-import org.sonatype.nexus.bootstrap.commands.StopApplicationCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.ShutdownIfNotAliveThread;
 import org.sonatype.sisu.jetty.Jetty8;
 
 /**
@@ -52,15 +54,15 @@ public class Launcher
 
     public static final String KEEP_ALIVE_TIMEOUT = ShutdownIfNotAliveThread.class.getName() + ".timeout";
 
+    public static final String FIVE_SECONDS = "5000";
+
+    public static final String ONE_SECOND = "1000";
+
     protected static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
 
     protected static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
     protected static final String NEXUS_WORK = "nexus-work";
-
-    private static final String FIVE_SECONDS = "5000";
-
-    private static final String ONE_SECOND = "1000";
 
     protected Jetty8 server;
 

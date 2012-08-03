@@ -11,13 +11,13 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package org.sonatype.nexus.bootstrap;
+package org.sonatype.nexus.bootstrap.monitor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doAnswer;
-import static org.sonatype.nexus.bootstrap.CommandMonitorTalker.LOCALHOST;
-import static org.sonatype.nexus.bootstrap.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,12 +25,16 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.sonatype.nexus.bootstrap.commands.PingCommand;
-import org.sonatype.nexus.bootstrap.commands.StopMonitorCommand;
+import org.sonatype.nexus.bootstrap.Launcher;
+import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.ShutdownIfNotAliveThread;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
- * {@link ShutdownIfNotAliveThread} unit tests.
+ * {@link org.sonatype.nexus.bootstrap.monitor.ShutdownIfNotAliveThread} unit tests.
  *
  * @since 2.2
  */
