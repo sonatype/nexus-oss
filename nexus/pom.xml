@@ -1489,6 +1489,13 @@
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
                   <excludes>
+                    <exclude>org.sonatype.sisu.litmus:litmus-testsupport:(,1.2]</exclude>
+                  </excludes>
+                  <message>litmus-testsupport greater than 1.3 required</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
                     <exclude>org.slf4j:*</exclude>
                   </excludes>
                   <includes>
