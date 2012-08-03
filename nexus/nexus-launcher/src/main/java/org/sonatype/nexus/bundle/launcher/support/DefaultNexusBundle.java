@@ -427,8 +427,6 @@ public class DefaultNexusBundle
             final Properties nexusProperties = new Properties();
 
             nexusProperties.setProperty( "application-port", String.valueOf( getPort() ) );
-            nexusProperties.setProperty( Launcher.COMMAND_MONITOR_PORT, String.valueOf( commandMonitorPort ) );
-            nexusProperties.setProperty( Launcher.KEEP_ALIVE_PORT, String.valueOf( keepAlivePort ) );
 
             final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
             if ( !systemProperties.isEmpty() )
