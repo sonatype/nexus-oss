@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
 
-import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
@@ -35,7 +34,7 @@ public class ShutdownIfNotAliveThread
 
     private static LogProxy log = LogProxy.getLogger( ShutdownIfNotAliveThread.class );
 
-    private final Launcher launcher;
+    private final Runnable shutdown;
 
     private int port;
 
@@ -49,17 +48,17 @@ public class ShutdownIfNotAliveThread
 
     private final CommandMonitorTalker talker;
 
-    public ShutdownIfNotAliveThread( final Launcher launcher,
+    public ShutdownIfNotAliveThread( final Runnable shutdown,
                                      final int port,
                                      final int pingInterval,
                                      final int timeout )
         throws IOException
     {
-        if ( launcher == null )
+        if ( shutdown == null )
         {
             throw new NullPointerException();
         }
-        this.launcher = launcher;
+        this.shutdown = shutdown;
         this.port = port;
         this.pingInterval = pingInterval;
         this.timeout = timeout;
@@ -119,7 +118,7 @@ public class ShutdownIfNotAliveThread
     void shutdown()
     {
         log.info( "Shutting down as there is no ping response on port {}", port );
-        launcher.commandStop();
+        shutdown.run();
     }
 
     public void stopRunning()

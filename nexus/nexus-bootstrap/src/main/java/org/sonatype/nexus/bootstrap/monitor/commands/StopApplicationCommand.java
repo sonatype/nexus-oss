@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.bootstrap.monitor.commands;
 
-import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
-import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.log.LogProxy;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
 
 /**
  * Stop launcher.
@@ -29,15 +28,15 @@ public class StopApplicationCommand
 
     public static final String STOP_APPLICATION_COMMAND = "STOP";
 
-    private final Launcher launcher;
+    private final Runnable shutdown;
 
-    public StopApplicationCommand( final Launcher launcher )
+    public StopApplicationCommand( final Runnable shutdown )
     {
-        if ( launcher == null )
+        if ( shutdown == null )
         {
             throw new NullPointerException();
         }
-        this.launcher = launcher;
+        this.shutdown = shutdown;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class StopApplicationCommand
     public boolean execute()
     {
         log.info( "Requesting application stop" );
-        launcher.commandStop();
+        shutdown.run();
 
         return true;
     }

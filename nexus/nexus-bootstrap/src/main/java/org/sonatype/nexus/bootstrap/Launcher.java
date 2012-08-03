@@ -263,7 +263,14 @@ public class Launcher
         if (commandMonitorPort != null) {
             new CommandMonitorThread(
                 Integer.parseInt( commandMonitorPort ),
-                new StopApplicationCommand( this ),
+                new StopApplicationCommand( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Launcher.this.commandStop();
+                    }
+                } ),
                 new PingCommand()
             ).start();
         }
@@ -298,7 +305,14 @@ public class Launcher
                 }
             }
             new ShutdownIfNotAliveThread(
-                this,
+                new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Launcher.this.commandStop();
+                    }
+                },
                 Integer.parseInt( port ),
                 Integer.parseInt( pingInterval ),
                 Integer.parseInt( timeout )

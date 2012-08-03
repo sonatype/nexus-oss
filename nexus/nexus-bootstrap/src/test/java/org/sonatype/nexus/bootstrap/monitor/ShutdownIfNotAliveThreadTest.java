@@ -42,9 +42,6 @@ public class ShutdownIfNotAliveThreadTest
     extends TestSupport
 {
 
-    @Mock
-    private Launcher launcher;
-
     @Test
     public void keepAlive()
         throws Exception
@@ -58,19 +55,15 @@ public class ShutdownIfNotAliveThreadTest
 
         final AtomicBoolean shutDown = new AtomicBoolean( false );
 
-        doAnswer( new Answer()
-        {
-            @Override
-            public Object answer( final InvocationOnMock invocation )
-                throws Throwable
-            {
-                shutDown.set( true );
-                return null;
-            }
-        } ).when( launcher ).commandStop();
-
         ShutdownIfNotAliveThread aliveThread = new ShutdownIfNotAliveThread(
-            launcher, keepAliveThread.getPort(), 100, 1000
+            new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    shutDown.set( true );
+                }
+            }, keepAliveThread.getPort(), 100, 1000
         );
         aliveThread.start();
 
