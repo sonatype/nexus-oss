@@ -12,14 +12,13 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
-import static java.lang.String.format;
-import static org.sonatype.nexus.bootstrap.CommandMonitorTalker.LOCALHOST;
-import static org.sonatype.nexus.bootstrap.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
-import static org.sonatype.nexus.bootstrap.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
+import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
+import static org.sonatype.sisu.bl.jsw.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
-import static org.sonatype.sisu.jsw.util.JSWConfig.WRAPPER_JAVA_ADDITIONAL;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -34,18 +33,19 @@ import javax.inject.Provider;
 import org.apache.tools.ant.taskdefs.condition.Os;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.bootstrap.CommandMonitorTalker;
-import org.sonatype.nexus.bootstrap.CommandMonitorThread;
 import org.sonatype.nexus.bootstrap.Launcher;
-import org.sonatype.nexus.bootstrap.commands.PingCommand;
-import org.sonatype.nexus.bootstrap.commands.StopMonitorCommand;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.bundle.launcher.internal.NexusITLauncher;
+import org.sonatype.sisu.bl.jsw.JSWConfig;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.RunningBundles;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
-import org.sonatype.sisu.jsw.util.JSWConfig;
 import com.google.common.base.Throwables;
 
 /**
@@ -82,6 +82,8 @@ public class DefaultNexusBundle
      */
     private CommandMonitorThread keepAliveThread;
 
+    private ConfigurationStrategy strategy;
+
     @Inject
     public DefaultNexusBundle( final Provider<NexusBundleConfiguration> configurationProvider,
                                final RunningBundles runningBundles,
@@ -113,7 +115,7 @@ public class DefaultNexusBundle
         commandMonitorPort = getPortReservationService().reservePort();
         keepAlivePort = getPortReservationService().reservePort();
 
-        final ConfigurationStrategy strategy = determineConfigurationStrategy();
+        strategy = determineConfigurationStrategy();
 
         configureJSW( strategy );
         configureNexusProperties( strategy );
@@ -140,6 +142,7 @@ public class DefaultNexusBundle
             getPortReservationService().cancelPort( keepAlivePort );
             keepAlivePort = 0;
         }
+        strategy = null;
     }
 
     /**
@@ -176,8 +179,8 @@ public class DefaultNexusBundle
             fileTaskBuilder.exec().spawn()
                 .script( path( "bin/nexus" ) )
                 .withArgument( "console" )
-                .withEnv( Launcher.COMMAND_MONITOR_PORT, String.valueOf( commandMonitorPort ) )
-                .withEnv( Launcher.KEEP_ALIVE_PORT, String.valueOf( keepAlivePort ) )
+                .withEnv( strategy.commandMonitorProperty(), String.valueOf( commandMonitorPort ) )
+                .withEnv( strategy.keepAliveProperty(), String.valueOf( keepAlivePort ) )
         );
     }
 
@@ -396,6 +399,10 @@ public class DefaultNexusBundle
     private static interface ConfigurationStrategy
     {
 
+        String commandMonitorProperty();
+
+        String keepAliveProperty();
+
         void configureJSW( JSWConfig jswConfig );
 
         void configureNexus();
@@ -406,18 +413,31 @@ public class DefaultNexusBundle
     {
 
         @Override
+        public String commandMonitorProperty()
+        {
+            return Launcher.COMMAND_MONITOR_PORT;
+        }
+
+        @Override
+        public String keepAliveProperty()
+        {
+            return Launcher.KEEP_ALIVE_PORT;
+        }
+
+        @Override
         public void configureJSW( final JSWConfig jswConfig )
         {
             // configure remote debug if requested
             if ( getConfiguration().getDebugPort() > 0 )
             {
-                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Xdebug" );
-                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Xnoagent" );
-                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Djava.compiler=NONE" );
-                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL,
-                                              "-Xrunjdwp:transport=dt_socket,server=y,suspend="
-                                                  + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
-                                                  + ",address=" + getConfiguration().getDebugPort() );
+                jswConfig.addJavaStartupParameter( "-Xdebug" );
+                jswConfig.addJavaStartupParameter( "-Xnoagent" );
+                jswConfig.addJavaStartupParameter(
+                    "-Xrunjdwp:transport=dt_socket,server=y,suspend="
+                        + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
+                        + ",address=" + getConfiguration().getDebugPort()
+                );
+                jswConfig.addJavaSystemProperty( "java.compiler", "NONE" );
             }
         }
 
@@ -450,33 +470,43 @@ public class DefaultNexusBundle
     {
 
         @Override
+        public String commandMonitorProperty()
+        {
+            return NexusITLauncher.COMMAND_MONITOR_PORT;
+        }
+
+        @Override
+        public String keepAliveProperty()
+        {
+            return NexusITLauncher.KEEP_ALIVE_PORT;
+        }
+
+        @Override
         public void configureJSW( final JSWConfig jswConfig )
         {
-            jswConfig.configureMonitor( commandMonitorPort );
-            jswConfig.configureKeepAlive( keepAlivePort );
-
-            final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
-            if ( !systemProperties.isEmpty() )
+            String mainClass = jswConfig.getProperty( WRAPPER_JAVA_MAINCLASS );
+            if ( !NexusITLauncher.class.getName().equals( mainClass ) )
             {
-                for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
-                {
-                    jswConfig.addIndexedProperty(
-                        WRAPPER_JAVA_ADDITIONAL,
-                        format( "-D%s=%s", entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() )
-                    );
-                }
+                jswConfig.setJavaMainClass( NexusITLauncher.class );
+                jswConfig.addJavaSystemProperty( NexusITLauncher.LAUNCHER, mainClass );
+
+                jswConfig.addToJavaClassPath( NexusITLauncher.class );
+                jswConfig.addToJavaClassPath( Launcher.class );
             }
+
+            jswConfig.addJavaSystemProperties( getConfiguration().getSystemProperties() );
 
             // configure remote debug if requested
             if ( getConfiguration().getDebugPort() > 0 )
             {
-                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Xdebug" );
-                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Xnoagent" );
-                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL, "-Djava.compiler=NONE" );
-                jswConfig.addIndexedProperty( WRAPPER_JAVA_ADDITIONAL,
-                                              "-Xrunjdwp:transport=dt_socket,server=y,suspend="
-                                                  + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
-                                                  + ",address=" + getConfiguration().getDebugPort() );
+                jswConfig.addJavaStartupParameter( "-Xdebug" );
+                jswConfig.addJavaStartupParameter( "-Xnoagent" );
+                jswConfig.addJavaStartupParameter(
+                    "-Xrunjdwp:transport=dt_socket,server=y,suspend="
+                        + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
+                        + ",address=" + getConfiguration().getDebugPort()
+                );
+                jswConfig.addJavaSystemProperty( "java.compiler", "NONE" );
             }
         }
 
