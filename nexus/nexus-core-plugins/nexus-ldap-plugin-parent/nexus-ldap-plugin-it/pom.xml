@@ -100,7 +100,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- funny, but plexus-ldap-testsuite requires JUNIT??? -->
+    <!-- TODO plexus-ldap-testsuite requires JUNIT???, fix it -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
