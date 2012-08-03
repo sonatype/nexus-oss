@@ -176,6 +176,8 @@ public class DefaultNexusBundle
             fileTaskBuilder.exec().spawn()
                 .script( path( "bin/nexus" ) )
                 .withArgument( "console" )
+                .withEnv( Launcher.COMMAND_MONITOR_PORT, String.valueOf( commandMonitorPort ) )
+                .withEnv( Launcher.KEEP_ALIVE_PORT, String.valueOf( keepAlivePort ) )
         );
     }
 
