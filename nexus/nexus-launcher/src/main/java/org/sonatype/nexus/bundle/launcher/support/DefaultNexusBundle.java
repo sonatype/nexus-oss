@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.sonatype.nexus.bootstrap.CommandMonitorTalker.LOCALHOST;
 import static org.sonatype.nexus.bootstrap.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
@@ -32,6 +31,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.tools.ant.taskdefs.condition.Os;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.CommandMonitorTalker;
@@ -45,8 +45,6 @@ import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.RunningBundles;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
-import org.sonatype.sisu.jsw.exec.JSWExec;
-import org.sonatype.sisu.jsw.exec.JSWExecFactory;
 import org.sonatype.sisu.jsw.util.JSWConfig;
 import com.google.common.base.Throwables;
 
@@ -62,18 +60,6 @@ public class DefaultNexusBundle
 {
 
     private static final Logger log = LoggerFactory.getLogger( DefaultNexusBundle.class );
-
-    /**
-     * JSW utility factory.
-     * Cannot be null.
-     */
-    private final JSWExecFactory jswExecFactory;
-
-    /**
-     * JSW utility to star/stop Nexus.
-     * Lazy created.
-     */
-    private JSWExec jswExec;
 
     /**
      * File task builder.
@@ -96,22 +82,14 @@ public class DefaultNexusBundle
      */
     private CommandMonitorThread keepAliveThread;
 
-    /**
-     * Constructor.
-     *
-     * @param jswExecFactory JSW executor factory.
-     * @since 2.0
-     */
     @Inject
     public DefaultNexusBundle( final Provider<NexusBundleConfiguration> configurationProvider,
                                final RunningBundles runningBundles,
                                final FileTaskBuilder fileTaskBuilder,
-                               final PortReservationService portReservationService,
-                               final JSWExecFactory jswExecFactory )
+                               final PortReservationService portReservationService )
     {
         super( "nexus", configurationProvider, runningBundles, fileTaskBuilder, portReservationService );
         this.fileTaskBuilder = fileTaskBuilder;
-        this.jswExecFactory = checkNotNull( jswExecFactory );
     }
 
     /**
@@ -188,7 +166,17 @@ public class DefaultNexusBundle
             throw new RuntimeException( "Could not start JSW keep alive thread", e );
         }
         installStopShutdownHook( commandMonitorPort );
-        jswExec().start();
+
+        final File nexusDir = getNexusDirectory();
+
+        makeExecutable( nexusDir, "nexus" );
+        makeExecutable( nexusDir, "wrapper" );
+
+        onDirectory( nexusDir ).apply(
+            fileTaskBuilder.exec().spawn()
+                .script( path( "bin/nexus" ) )
+                .withArgument( "console" )
+        );
     }
 
     /**
@@ -232,20 +220,6 @@ public class DefaultNexusBundle
         {
             return false;
         }
-    }
-
-    /**
-     * Lazy creates and returns JSW utility.
-     *
-     * @return JSW utility (never null)
-     */
-    private JSWExec jswExec()
-    {
-        if ( jswExec == null )
-        {
-            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus" );
-        }
-        return jswExec;
     }
 
     /**
@@ -346,10 +320,28 @@ public class DefaultNexusBundle
         return new File( getConfiguration().getTargetDirectory(), "sonatype-work/nexus" );
     }
 
+    public File getNexusDirectory()
+    {
+        return new File( getConfiguration().getTargetDirectory(), "nexus" );
+    }
+
     @Override
     protected String generateId()
     {
         return getName() + "-" + System.currentTimeMillis();
+    }
+
+    private void makeExecutable( final File baseDir,
+                                 final String scriptName )
+    {
+        if ( !Os.isFamily( Os.FAMILY_WINDOWS ) )
+        {
+            onDirectory( baseDir ).apply(
+                fileTaskBuilder.chmod( path( "/" ) )
+                    .include( "**/" + scriptName )
+                    .permissions( "u+x" )
+            );
+        }
     }
 
     private static void installStopShutdownHook( final int commandPort )
