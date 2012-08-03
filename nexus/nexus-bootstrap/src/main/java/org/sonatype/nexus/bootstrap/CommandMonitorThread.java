@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.bootstrap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +32,7 @@ import java.util.Map;
 public class CommandMonitorThread
     extends Thread
 {
-    private static final Logger log = LoggerFactory.getLogger(CommandMonitorThread.class);
+    private static final LogProxy log = LogProxy.getLogger( CommandMonitorThread.class );
 
     private final ServerSocket socket;
 

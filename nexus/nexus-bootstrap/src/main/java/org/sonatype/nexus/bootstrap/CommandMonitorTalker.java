@@ -12,8 +12,7 @@
  */
 package org.sonatype.nexus.bootstrap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -26,7 +25,7 @@ import java.net.Socket;
  */
 public class CommandMonitorTalker
 {
-    private static Logger log = LoggerFactory.getLogger(CommandMonitorTalker.class);
+    private static LogProxy log = LogProxy.getLogger( CommandMonitorTalker.class );
 
     public static final String LOCALHOST = "127.0.0.1";
 

@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.bootstrap.commands;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
  * Stops command monitor.
@@ -25,7 +24,7 @@ public class StopMonitorCommand
     implements CommandMonitorThread.Command
 {
 
-    private static final Logger log = LoggerFactory.getLogger( StopMonitorCommand.class );
+    private static final LogProxy log = LogProxy.getLogger( StopMonitorCommand.class );
 
     public static final String STOP_MONITOR_COMMAND = "STOP_MONITOR";
 

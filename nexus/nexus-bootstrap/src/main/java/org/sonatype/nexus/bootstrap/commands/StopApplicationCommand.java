@@ -12,10 +12,9 @@
  */
 package org.sonatype.nexus.bootstrap.commands;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.CommandMonitorThread;
 import org.sonatype.nexus.bootstrap.Launcher;
+import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
  * Stop launcher.
@@ -26,7 +25,7 @@ public class StopApplicationCommand
     implements CommandMonitorThread.Command
 {
 
-    private static final Logger log = LoggerFactory.getLogger( StopApplicationCommand.class );
+    private static final LogProxy log = LogProxy.getLogger( StopApplicationCommand.class );
 
     public static final String STOP_APPLICATION_COMMAND = "STOP";
 

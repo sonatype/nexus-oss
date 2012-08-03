@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.bootstrap.commands;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
  * Responds to pings (by doing nothing).
@@ -25,7 +24,7 @@ public class PingCommand
     implements CommandMonitorThread.Command
 {
 
-    private static final Logger log = LoggerFactory.getLogger( PingCommand.class );
+    private static final LogProxy log = LogProxy.getLogger( PingCommand.class );
 
     public static final String PING_COMMAND = "PING";
 

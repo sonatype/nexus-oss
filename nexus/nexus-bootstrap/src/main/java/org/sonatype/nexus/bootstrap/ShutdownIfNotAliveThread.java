@@ -19,8 +19,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
  * Thread which listens for command messages to control the JVM.
@@ -33,7 +32,7 @@ public class ShutdownIfNotAliveThread
 
     static final String LOCALHOST = "127.0.0.1";
 
-    private static Logger log = LoggerFactory.getLogger( ShutdownIfNotAliveThread.class );
+    private static LogProxy log = LogProxy.getLogger( ShutdownIfNotAliveThread.class );
 
     private final Launcher launcher;
 
