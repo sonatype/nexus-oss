@@ -990,6 +990,12 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.sonatype.sisu.litmus</groupId>
+        <artifactId>litmus-testsupport</artifactId>
+        <version>1.3</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit-dep</artifactId>
         <version>4.10</version>
@@ -1448,6 +1454,13 @@
                     <exclude>junit:junit</exclude>
                   </excludes>
                   <message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead.</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>junit:junit-dep:(,4.9]</exclude>
+                  </excludes>
+                  <message>junit:junit-dep 4.9 wrongly includes hamcrest api in jar, 4.10 or greater required due to TestRule changes over earlier versions</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>

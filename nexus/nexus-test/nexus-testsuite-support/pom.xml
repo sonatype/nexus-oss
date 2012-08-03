@@ -80,7 +80,6 @@
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <version>1.3</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
