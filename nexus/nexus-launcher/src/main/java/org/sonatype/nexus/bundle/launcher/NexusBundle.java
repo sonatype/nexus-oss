@@ -25,6 +25,8 @@ public interface NexusBundle
     extends WebBundle<NexusBundle, NexusBundleConfiguration>
 {
 
+    File getNexusDirectory();
+
     File getWorkDirectory();
 
 }
