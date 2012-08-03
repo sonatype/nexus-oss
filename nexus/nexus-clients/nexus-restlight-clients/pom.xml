@@ -79,12 +79,6 @@
         <version>1.5.8</version>
       </dependency>
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit-dep</artifactId>
-        <version>4.5</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>nexus-restlight-test-harness</artifactId>
         <version>${project.version}</version>

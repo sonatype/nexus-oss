@@ -86,7 +86,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
-      <version>4.10</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
