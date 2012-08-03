@@ -58,6 +58,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
+      <scope>compile</scope>
     </dependency>
     <!-- this is here as a convenience to projects using test common -->
     <dependency>
