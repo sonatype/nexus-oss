@@ -333,7 +333,7 @@ public class DefaultNexusBundle
     @Override
     protected String generateId()
     {
-        return getName() + "-" + System.currentTimeMillis();
+        return "nx"; // TODO? use a system property if we should or not add: + "-" + System.currentTimeMillis();
     }
 
     private void makeExecutable( final File baseDir,

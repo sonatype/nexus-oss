@@ -22,6 +22,7 @@ import javax.inject.Named;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
+import org.junit.Rule;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
 import org.sonatype.nexus.testsuite.support.filters.CompositeFilter;
@@ -101,6 +102,9 @@ public abstract class NexusITSupport
      */
     protected String filteredNexusBundleCoordinates;
 
+    @Rule
+    public TestIndex testIndex = new TestIndex( util.resolveFile( "target/its" ) );
+
     /**
      * Runs IT by against Nexus bundle coordinates specified in "injected-test.properties".
      */
@@ -139,7 +143,7 @@ public abstract class NexusITSupport
                 @Override
                 public File resolve()
                 {
-                    return fileResolver().methodSpecificDirectory( "bundle" );
+                    return testIndex.getDirectory();
                 }
 
             } );
@@ -182,6 +186,8 @@ public abstract class NexusITSupport
                 "TEST {} is running against Nexus bundle {}",
                 testName.getMethodName(), filteredNexusBundleCoordinates
             );
+
+            testIndex.recordInfo( "bundle", filteredNexusBundleCoordinates );
         }
         else
         {
