@@ -58,9 +58,9 @@ public class Launcher
 
     protected static final String NEXUS_WORK = "nexus-work";
 
-    private static final int FIVE_SECONDS = 5000;
+    private static final String FIVE_SECONDS = "5000";
 
-    private static final int ONE_SECOND = 1000;
+    private static final String ONE_SECOND = "1000";
 
     protected Jetty8 server;
 
@@ -254,6 +254,10 @@ public class Launcher
 
     protected void maybeEnableCommandMonitor() throws IOException {
         String commandMonitorPort = System.getProperty( COMMAND_MONITOR_PORT );
+        if ( commandMonitorPort == null )
+        {
+            commandMonitorPort = System.getenv( COMMAND_MONITOR_PORT );
+        }
         if (commandMonitorPort != null) {
             new CommandMonitorThread(
                 Integer.parseInt( commandMonitorPort ),
@@ -266,14 +270,36 @@ public class Launcher
     protected void maybeEnableShutdownIfNotAlive()
         throws IOException
     {
-        final String port = System.getProperty( KEEP_ALIVE_PORT );
+        String port = System.getProperty( KEEP_ALIVE_PORT );
+        if ( port == null )
+        {
+            port = System.getenv( KEEP_ALIVE_PORT );
+        }
         if ( port != null )
         {
+            String pingInterval = System.getProperty( KEEP_ALIVE_PING_INTERVAL );
+            if ( pingInterval == null )
+            {
+                pingInterval = System.getenv( KEEP_ALIVE_PING_INTERVAL );
+                if ( pingInterval == null )
+                {
+                    pingInterval = FIVE_SECONDS;
+                }
+            }
+            String timeout = System.getProperty( KEEP_ALIVE_TIMEOUT );
+            if ( timeout == null )
+            {
+                timeout = System.getenv( KEEP_ALIVE_TIMEOUT );
+                if ( timeout == null )
+                {
+                    timeout = ONE_SECOND;
+                }
+            }
             new ShutdownIfNotAliveThread(
                 this,
                 Integer.parseInt( port ),
-                Integer.getInteger( KEEP_ALIVE_PING_INTERVAL, FIVE_SECONDS ),
-                Integer.getInteger( KEEP_ALIVE_TIMEOUT, ONE_SECOND )
+                Integer.parseInt( pingInterval ),
+                Integer.parseInt( timeout )
             ).start();
         }
     }
