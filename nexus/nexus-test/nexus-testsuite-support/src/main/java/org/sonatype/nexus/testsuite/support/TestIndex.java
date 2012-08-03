@@ -13,10 +13,12 @@
 package org.sonatype.nexus.testsuite.support;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -110,6 +112,7 @@ public class TestIndex
             load();
             reference = index.add( description );
             save();
+            copyXls();
 
             testDir = new File( indexDir, String.valueOf( index.getCounter() ) );
             checkState(
@@ -118,6 +121,21 @@ public class TestIndex
                 testDir.getAbsolutePath()
             );
             initialized = true;
+        }
+    }
+
+    private void copyXls()
+    {
+        try
+        {
+            copyURLToFile(
+                getClass().getClassLoader().getResource( "index.xsl" ),
+                new File( indexDir, "index.xsl" )
+            );
+        }
+        catch ( IOException e )
+        {
+            // well, that's it!
         }
     }
 
@@ -143,7 +161,12 @@ public class TestIndex
     {
         try
         {
-            writeStringToFile( indexXml, marshaller.marshal( index ) );
+            String data = marshaller.marshal( index );
+            // TODO this is a hack
+            data = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                + "<?xml-stylesheet type=\"text/xsl\" href=\"index.xsl\"?>"
+                + data.substring( "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length() );
+            writeStringToFile( indexXml, data );
         }
         catch ( Exception e )
         {
