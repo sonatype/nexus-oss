@@ -40,7 +40,7 @@ import com.google.common.base.Throwables;
  *
  * @since 1.4
  */
-public class TestIndex
+public class TestIndexRule
     extends TestWatcher
 {
 
@@ -96,7 +96,7 @@ public class TestIndex
      *
      * @param indexDir root directory that contains the index and test specific directories. Cannot be null.
      */
-    public TestIndex( final File indexDir )
+    public TestIndexRule( final File indexDir )
     {
         this.indexDir = indexDir;
     }
