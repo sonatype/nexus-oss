@@ -42,6 +42,7 @@ import com.google.common.base.Throwables;
  */
 public class TestIndexRule
     extends TestWatcher
+    implements TestIndex
 {
 
     /**
@@ -135,25 +136,14 @@ public class TestIndexRule
         save();
     }
 
-    /**
-     * Returns a test specific directory of format ${indexDir}/${counter}.
-     * If directory does not exist yet, it will be created.
-     *
-     * @return test specific directory
-     */
+    @Override
     public File getDirectory()
     {
         initialize();
         return testDir;
     }
 
-    /**
-     * Returns a test specific directory of format ${indexDir}/${counter}/${name}.
-     * If directory does not exist yet, it will be created.
-     *
-     * @param name name of test specific directory
-     * @return test specific directory. Never null
-     */
+    @Override
     public File getDirectory( final String name )
     {
         final File dir = new File( getDirectory(), name );
@@ -165,38 +155,21 @@ public class TestIndexRule
         return dir;
     }
 
-    /**
-     * Records information about current running test.
-     *
-     * @param key   information key
-     * @param value information value
-     */
+    @Override
     public void recordInfo( final String key, final String value )
     {
         initialize();
         test.withTestInfos( new TestInfoXO().withLink( false ).withKey( key ).withValue( value ) );
     }
 
-    /**
-     * Records information about current running test.
-     * The value is considered to be a link.
-     *
-     * @param key   information key
-     * @param value information value
-     */
+    @Override
     public void recordLink( final String key, final String value )
     {
         initialize();
         test.withTestInfos( new TestInfoXO().withLink( true ).withKey( key ).withValue( value ) );
     }
 
-    /**
-     * Records information about current running test.
-     * The value is considered to be a link to a file.
-     *
-     * @param key  information key
-     * @param file information value
-     */
+    @Override
     public void recordLink( final String key, final File file )
     {
         if ( file.exists() )
