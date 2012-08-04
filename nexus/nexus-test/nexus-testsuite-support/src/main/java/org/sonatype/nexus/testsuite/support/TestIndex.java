@@ -155,7 +155,7 @@ public class TestIndex
             save();
             copyStyleSheets();
 
-            testDir = new File( indexDir, String.valueOf( index.getCounter() ) );
+            testDir = new File( indexDir, String.valueOf( index.counter ) );
             checkState(
                 ( testDir.mkdirs() || testDir.exists() ) && testDir.isDirectory(),
                 "Not able to create test directory '{}'",
@@ -239,11 +239,6 @@ public class TestIndex
         @XmlElement( name = "test" )
         private List<IndexReference> references = new ArrayList<IndexReference>();
 
-        public int getCounter()
-        {
-            return counter;
-        }
-
         public IndexReference add( final Description description )
         {
             final IndexReference reference = new IndexReference();
@@ -283,21 +278,6 @@ public class TestIndex
 
         @XmlElement( name = "info" )
         private List<IndexReferenceInfo> infos = new ArrayList<IndexReferenceInfo>();
-
-        public int getIndex()
-        {
-            return index;
-        }
-
-        public String getClassName()
-        {
-            return className;
-        }
-
-        public String getMethodName()
-        {
-            return methodName;
-        }
 
         public void addInfo( final String key, final String value )
         {
