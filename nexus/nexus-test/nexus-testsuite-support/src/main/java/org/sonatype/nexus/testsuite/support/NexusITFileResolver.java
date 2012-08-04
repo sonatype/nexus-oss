@@ -38,12 +38,6 @@ public class NexusITFileResolver
     private final File baseDir;
 
     /**
-     * The target directory of project containing the test class.
-     * Cannot be null.
-     */
-    private final File targetDir;
-
-    /**
      * The name of running test method.
      * Cannot be null.
      */
@@ -59,16 +53,13 @@ public class NexusITFileResolver
      * Constructor.
      *
      * @param baseDir        base directory of project containing the test class. Cannot be null.
-     * @param targetDir      target directory of project containing the test class. Cannot be null.
      * @param testClass      running test class. Cannot be null.
      * @param testMethodName name of running test method. Cannot be null.
      */
     public NexusITFileResolver( final File baseDir,
-                                final File targetDir,
                                 final Class testClass,
                                 final String testMethodName )
     {
-        this.targetDir = checkNotNull( targetDir );
         this.baseDir = checkNotNull( baseDir );
         this.testClass = checkNotNull( testClass );
         this.testMethodName = checkNotNull( testMethodName );
