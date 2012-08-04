@@ -13,14 +13,21 @@
 package org.sonatype.nexus.testsuite.support;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.lang.Boolean.TRUE;
+import static javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static javax.xml.bind.Marshaller.JAXB_FRAGMENT;
 import static org.apache.commons.io.FileUtils.copyURLToFile;
-import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -28,9 +35,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-import org.sonatype.sisu.goodies.marshal.Marshaller;
-import org.sonatype.sisu.goodies.marshal.internal.jaxb.JaxbComponentFactoryImpl;
-import org.sonatype.sisu.goodies.marshal.internal.jaxb.JaxbMarshaller;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
@@ -42,8 +46,6 @@ public class TestIndex
 {
 
     private final File indexDir;
-
-    private final Marshaller marshaller;
 
     private Description description;
 
@@ -57,21 +59,36 @@ public class TestIndex
 
     private IndexReference reference;
 
+    private long startTime;
+
     public TestIndex( final File indexDir )
     {
         this.indexDir = indexDir;
-        marshaller = new JaxbMarshaller( new JaxbComponentFactoryImpl() );
     }
 
     @Override
     protected void starting( final Description description )
     {
         this.description = Preconditions.checkNotNull( description );
+        this.startTime = System.currentTimeMillis();
+    }
+
+    @Override
+    protected void succeeded( final Description description )
+    {
+        reference.success = true;
+    }
+
+    @Override
+    protected void failed( final Throwable e, final Description description )
+    {
+        reference.success = false;
     }
 
     @Override
     protected void finished( final Description description )
     {
+        reference.duration = ( System.currentTimeMillis() - startTime ) / 1000;
         save();
     }
 
@@ -104,6 +121,25 @@ public class TestIndex
         reference.addLink( key, value );
     }
 
+    public void recordLink( final String key, final File file )
+    {
+        if ( file.exists() )
+        {
+            initialize();
+            try
+            {
+                // TODO use a better algorithm to relativize
+                final String canonicalFile = file.getCanonicalPath();
+                final String canonicalDir = indexDir.getCanonicalPath();
+                reference.addLink( key, canonicalFile.substring( canonicalDir.length() + 1 ) );
+            }
+            catch ( IOException e )
+            {
+                // TODO?
+            }
+        }
+    }
+
     private void initialize()
     {
         checkState( description != null );
@@ -112,7 +148,7 @@ public class TestIndex
             load();
             reference = index.add( description );
             save();
-            copyXls();
+            copyStyleSheets();
 
             testDir = new File( indexDir, String.valueOf( index.getCounter() ) );
             checkState(
@@ -124,10 +160,14 @@ public class TestIndex
         }
     }
 
-    private void copyXls()
+    private void copyStyleSheets()
     {
         try
         {
+            copyURLToFile(
+                getClass().getClassLoader().getResource( "index.css" ),
+                new File( indexDir, "index.css" )
+            );
             copyURLToFile(
                 getClass().getClassLoader().getResource( "index.xsl" ),
                 new File( indexDir, "index.xsl" )
@@ -147,11 +187,12 @@ public class TestIndex
         {
             try
             {
-                index = marshaller.unmarshal( readFileToString( indexXml ), Index.class );
+                final Unmarshaller unmarshaller = JAXBContext.newInstance( Index.class ).createUnmarshaller();
+                index = (Index) unmarshaller.unmarshal( indexXml );
             }
             catch ( Exception e )
             {
-                // TODO? could not read index
+                // TODO Should we fail the test if we cannot write the index?
                 throw Throwables.propagate( e );
             }
         }
@@ -161,16 +202,23 @@ public class TestIndex
     {
         try
         {
-            String data = marshaller.marshal( index );
-            // TODO this is a hack
-            data = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                + "<?xml-stylesheet type=\"text/xsl\" href=\"index.xsl\"?>"
-                + data.substring( "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length() );
-            writeStringToFile( indexXml, data );
+            final StringWriter writer = new StringWriter();
+            final PrintWriter printWriter = new PrintWriter( writer );
+
+            printWriter.println( "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" );
+            printWriter.println( "<?xml-stylesheet type=\"text/css\" href=\"index.css\"?>" );
+            printWriter.println( "<?xml-stylesheet type=\"text/xsl\" href=\"index.xsl\"?>" );
+
+            final Marshaller marshaller = JAXBContext.newInstance( Index.class ).createMarshaller();
+            marshaller.setProperty( JAXB_FORMATTED_OUTPUT, TRUE );
+            marshaller.setProperty( JAXB_FRAGMENT, TRUE );
+            marshaller.marshal( index, writer );
+
+            writeStringToFile( indexXml, writer.toString() );
         }
         catch ( Exception e )
         {
-            // TODO?
+            // TODO Should we fail the test if we cannot write the index?
             throw Throwables.propagate( e );
         }
     }
@@ -215,6 +263,12 @@ public class TestIndex
 
         @XmlElement
         private String methodName;
+
+        @XmlElement
+        private boolean success;
+
+        @XmlElement
+        private long duration;
 
         @XmlElement( name = "info" )
         private List<IndexReferenceInfo> infos = new ArrayList<IndexReferenceInfo>();

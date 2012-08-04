@@ -1,0 +1,39 @@
+body, table, form, input, td, th, p, textarea, select {
+    font-family: Verdana, Helvetica, sans serif;
+    font-size: 11px;
+}
+
+table.pane {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px #bbb solid;
+}
+
+td.pane {
+    border: 1px #bbb solid;
+    padding: 3px 4px 3px 4px;
+    vertical-align: top;
+    background: #FFFFFF;
+}
+
+td.pane-header {
+    border: 1px #bbb solid;
+    border-right: none;
+    border-left: none;
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+td.right {
+    text-align: right;
+}
+
+td.success-false {
+    color: red;
+    font-weight: bold;
+}
+
+th.pane {
+    border: 1px #bbb solid;
+    font-weight: bold;
+}
