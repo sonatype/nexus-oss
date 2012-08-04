@@ -23,18 +23,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.sonatype.nexus.testsuite.support.index.IndexXO;
+import org.sonatype.nexus.testsuite.support.index.TestInfoXO;
+import org.sonatype.nexus.testsuite.support.index.TestXO;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
@@ -55,9 +52,9 @@ public class TestIndex
 
     private File indexXml;
 
-    private Index index;
+    private IndexXO index;
 
-    private IndexReference reference;
+    private TestXO test;
 
     private long startTime;
 
@@ -76,24 +73,27 @@ public class TestIndex
     @Override
     protected void succeeded( final Description description )
     {
-        reference.success = true;
+        initialize();
+        test.setSuccess( true );
     }
 
     @Override
     protected void failed( final Throwable e, final Description description )
     {
-        reference.success = false;
+        initialize();
+        test.setSuccess( false );
         final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
+        final PrintWriter pw = new PrintWriter( sw );
         e.printStackTrace( pw );
-        reference.throwableMessage = e.getMessage();
-        reference.throwableStackTrace = sw.toString();
+        test.setThrowableMessage( e.getMessage() );
+        test.setThrowableStacktrace( sw.toString() );
     }
 
     @Override
     protected void finished( final Description description )
     {
-        reference.duration = ( System.currentTimeMillis() - startTime ) / 1000;
+        initialize();
+        test.setDuration( ( System.currentTimeMillis() - startTime ) / 1000 );
         save();
     }
 
@@ -117,13 +117,13 @@ public class TestIndex
     public void recordInfo( final String key, final String value )
     {
         initialize();
-        reference.addInfo( key, value );
+        test.withTestInfos( new TestInfoXO().withLink( false ).withKey( key ).withValue( value ) );
     }
 
     public void recordLink( final String key, final String value )
     {
         initialize();
-        reference.addLink( key, value );
+        test.withTestInfos( new TestInfoXO().withLink( true ).withKey( key ).withValue( value ) );
     }
 
     public void recordLink( final String key, final File file )
@@ -136,7 +136,7 @@ public class TestIndex
                 // TODO use a better algorithm to relativize
                 final String canonicalFile = file.getCanonicalPath();
                 final String canonicalDir = indexDir.getCanonicalPath();
-                reference.addLink( key, canonicalFile.substring( canonicalDir.length() + 1 ) );
+                recordLink( key, canonicalFile.substring( canonicalDir.length() + 1 ) );
             }
             catch ( IOException e )
             {
@@ -151,11 +151,20 @@ public class TestIndex
         if ( !initialized )
         {
             load();
-            reference = index.add( description );
+
+            index.setCounter( index.getCounter() + 1 );
+
+            test = new TestXO()
+                .withIndex( index.getCounter() )
+                .withClassName( description.getClassName() )
+                .withMethodName( description.getMethodName() );
+
+            index.withTests( test );
+
             save();
             copyStyleSheets();
 
-            testDir = new File( indexDir, String.valueOf( index.counter ) );
+            testDir = new File( indexDir, String.valueOf( index.getCounter() ) );
             checkState(
                 ( testDir.mkdirs() || testDir.exists() ) && testDir.isDirectory(),
                 "Not able to create test directory '{}'",
@@ -187,13 +196,13 @@ public class TestIndex
     private void load()
     {
         indexXml = new File( indexDir, "index.xml" );
-        index = new Index();
+        index = new IndexXO().withCounter( 0 );
         if ( indexXml.exists() )
         {
             try
             {
-                final Unmarshaller unmarshaller = JAXBContext.newInstance( Index.class ).createUnmarshaller();
-                index = (Index) unmarshaller.unmarshal( indexXml );
+                final Unmarshaller unmarshaller = JAXBContext.newInstance( IndexXO.class ).createUnmarshaller();
+                index = (IndexXO) unmarshaller.unmarshal( indexXml );
             }
             catch ( Exception e )
             {
@@ -214,7 +223,7 @@ public class TestIndex
             printWriter.println( "<?xml-stylesheet type=\"text/css\" href=\"index.css\"?>" );
             printWriter.println( "<?xml-stylesheet type=\"text/xsl\" href=\"index.xsl\"?>" );
 
-            final Marshaller marshaller = JAXBContext.newInstance( Index.class ).createMarshaller();
+            final Marshaller marshaller = JAXBContext.newInstance( IndexXO.class ).createMarshaller();
             marshaller.setProperty( JAXB_FORMATTED_OUTPUT, TRUE );
             marshaller.setProperty( JAXB_FRAGMENT, TRUE );
             marshaller.marshal( index, writer );
@@ -226,91 +235,6 @@ public class TestIndex
             // TODO Should we fail the test if we cannot write the index?
             throw Throwables.propagate( e );
         }
-    }
-
-    @XmlRootElement
-    @XmlType( name = "test-index" )
-    public static class Index
-    {
-
-        @XmlElement
-        private int counter = 0;
-
-        @XmlElement( name = "test" )
-        private List<IndexReference> references = new ArrayList<IndexReference>();
-
-        public IndexReference add( final Description description )
-        {
-            final IndexReference reference = new IndexReference();
-            reference.index = ++counter;
-            reference.className = description.getClassName();
-            reference.methodName = description.getMethodName();
-
-            references.add( reference );
-
-            return reference;
-        }
-    }
-
-    public static class IndexReference
-    {
-
-        @XmlElement
-        private int index;
-
-        @XmlElement
-        private String className;
-
-        @XmlElement
-        private String methodName;
-
-        @XmlElement
-        private boolean success;
-
-        @XmlElement
-        private long duration;
-
-        @XmlElement(name = "throwable-message")
-        private String throwableMessage;
-
-        @XmlElement(name = "throwable-stacktrace")
-        private String throwableStackTrace;
-
-        @XmlElement( name = "info" )
-        private List<IndexReferenceInfo> infos = new ArrayList<IndexReferenceInfo>();
-
-        public void addInfo( final String key, final String value )
-        {
-            final IndexReferenceInfo info = new IndexReferenceInfo();
-            info.key = key;
-            info.value = value;
-
-            infos.add( info );
-        }
-
-        public void addLink( final String key, final String value )
-        {
-            final IndexReferenceInfo info = new IndexReferenceInfo();
-            info.key = key;
-            info.value = value;
-            info.link = true;
-
-            infos.add( info );
-        }
-    }
-
-    public static class IndexReferenceInfo
-    {
-
-        @XmlElement
-        private String key;
-
-        @XmlElement
-        private String value;
-
-        @XmlAttribute
-        private boolean link;
-
     }
 
 }
