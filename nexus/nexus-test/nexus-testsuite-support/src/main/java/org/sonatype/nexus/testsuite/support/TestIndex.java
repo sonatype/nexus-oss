@@ -36,28 +36,66 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
 /**
+ * JUnit rule for indexing test related directories.
+ *
  * @since 1.4
  */
 public class TestIndex
     extends TestWatcher
 {
 
+    /**
+     * The root directory that contains the index and test specific directories.
+     * Never null.
+     */
     private final File indexDir;
 
+    /**
+     * Test description.
+     * Set when test starts.
+     */
     private Description description;
 
-    private boolean initialized;
-
-    private File testDir;
-
-    private File indexXml;
-
-    private IndexXO index;
-
-    private TestXO test;
-
+    /**
+     * Timestamp when test was started.
+     */
     private long startTime;
 
+    /**
+     * True if the rule is initialized.
+     * Used to lazy create an index entry on first usage.
+     */
+    private boolean initialized;
+
+    /**
+     * Test specific directory of format ${indexDir}/${counter}.
+     * Lazy initialized upon first usage.
+     */
+    private File testDir;
+
+    /**
+     * File contained indexing information.
+     * Lazy initialized upon first usage.
+     */
+    private File indexXml;
+
+    /**
+     * Index data.
+     * Lazy initialized upon first usage.
+     */
+    private IndexXO index;
+
+    /**
+     * Index test data.
+     * Lazy initialized upon first usage.
+     */
+    private TestXO test;
+
+    /**
+     * Constructor.
+     *
+     * @param indexDir root directory that contains the index and test specific directories. Cannot be null.
+     */
     public TestIndex( final File indexDir )
     {
         this.indexDir = indexDir;
@@ -97,12 +135,25 @@ public class TestIndex
         save();
     }
 
+    /**
+     * Returns a test specific directory of format ${indexDir}/${counter}.
+     * If directory does not exist yet, it will be created.
+     *
+     * @return test specific directory
+     */
     public File getDirectory()
     {
         initialize();
         return testDir;
     }
 
+    /**
+     * Returns a test specific directory of format ${indexDir}/${counter}/${name}.
+     * If directory does not exist yet, it will be created.
+     *
+     * @param name name of test specific directory
+     * @return test specific directory. Never null
+     */
     public File getDirectory( final String name )
     {
         final File dir = new File( getDirectory(), name );
@@ -114,18 +165,38 @@ public class TestIndex
         return dir;
     }
 
+    /**
+     * Records information about current running test.
+     *
+     * @param key   information key
+     * @param value information value
+     */
     public void recordInfo( final String key, final String value )
     {
         initialize();
         test.withTestInfos( new TestInfoXO().withLink( false ).withKey( key ).withValue( value ) );
     }
 
+    /**
+     * Records information about current running test.
+     * The value is considered to be a link.
+     *
+     * @param key   information key
+     * @param value information value
+     */
     public void recordLink( final String key, final String value )
     {
         initialize();
         test.withTestInfos( new TestInfoXO().withLink( true ).withKey( key ).withValue( value ) );
     }
 
+    /**
+     * Records information about current running test.
+     * The value is considered to be a link to a file.
+     *
+     * @param key  information key
+     * @param file information value
+     */
     public void recordLink( final String key, final File file )
     {
         if ( file.exists() )
@@ -145,6 +216,10 @@ public class TestIndex
         }
     }
 
+    /**
+     * Reads the index from ${indexDir}/index.xml and records information about current running test.
+     * It will also create the test specific directory under ${indexDir}.
+     */
     private void initialize()
     {
         checkState( description != null );
@@ -170,10 +245,14 @@ public class TestIndex
                 "Not able to create test directory '{}'",
                 testDir.getAbsolutePath()
             );
+
             initialized = true;
         }
     }
 
+    /**
+     * Copy index CSS and XSLT to ${indexDir} (they are referenced by index.xml), overriding existent ones.
+     */
     private void copyStyleSheets()
     {
         try
@@ -193,6 +272,9 @@ public class TestIndex
         }
     }
 
+    /**
+     * Loads index data from ${indexDir}/index.xml.
+     */
     private void load()
     {
         indexXml = new File( indexDir, "index.xml" );
@@ -212,6 +294,9 @@ public class TestIndex
         }
     }
 
+    /**
+     * Saves index data from ${indexDir}/index.xml.
+     */
     private void save()
     {
         try
