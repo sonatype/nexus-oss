@@ -79,12 +79,6 @@ public abstract class NexusITSupport
     private NexusITArtifactResolver testArtifactResolver;
 
     /**
-     * Test specific file resolver utility.
-     * Lazy initialized on first usage.
-     */
-    private NexusITFileResolver testFileResolver;
-
-    /**
      * Transformer used to transform coordinates.
      * Lazy initialized on first usage.
      */
@@ -102,8 +96,19 @@ public abstract class NexusITSupport
      */
     protected String filteredNexusBundleCoordinates;
 
+    /**
+     * Test index.
+     * Never null.
+     */
     @Rule
-    public TestIndex testIndex = new TestIndex( util.resolveFile( "target/its" ) );
+    public TestIndexRule testIndex = new TestIndexRule( util.resolveFile( "target/its" ) );
+
+    /**
+     * Test data.
+     * Never null.
+     */
+    @Rule
+    public TestDataRule testData = new TestDataRule( util.resolveFile( "src/test/it-resources" ) );
 
     /**
      * Runs IT by against Nexus bundle coordinates specified in "injected-test.properties".
@@ -216,19 +221,13 @@ public abstract class NexusITSupport
     }
 
     /**
-     * Lazy initializes IT specific file resolver.
+     * Returns test data accessor.
      *
-     * @return IT specific artifact file. Never null.
+     * @return test data accessor. Never null.
      */
-    public NexusITFileResolver fileResolver()
+    public TestDataRule testData()
     {
-        if ( testFileResolver == null )
-        {
-            testFileResolver = new NexusITFileResolver(
-                util.getBaseDir(), util.getTargetDir(), getClass(), testName.getMethodName()
-            );
-        }
-        return testFileResolver;
+        return testData;
     }
 
     /**
