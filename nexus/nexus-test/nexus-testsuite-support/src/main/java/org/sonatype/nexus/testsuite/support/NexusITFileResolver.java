@@ -75,32 +75,6 @@ public class NexusITFileResolver
     }
 
     /**
-     * Returns a directory specific to running test method.
-     * <p/>
-     * Format: {@code <project>/target/its/<test class package>/<test class name>/<test method name>/<path>}
-     *
-     * @param path path to be appended to test method specific directory
-     * @return directory specific to running test method + provided path
-     */
-    public File methodSpecificDirectory( String path )
-    {
-        return
-            new File(
-                new File(
-                    new File(
-                        new File(
-                            targetDir,
-                            "its"
-                        ),
-                        testClass.getSimpleName()
-                    ),
-                    testMethodName
-                ),
-                path
-            );
-    }
-
-    /**
      * Resolves a test file by looking up the specified path into test resources.
      * <p/>
      * It searches the following path locations:<br/>
