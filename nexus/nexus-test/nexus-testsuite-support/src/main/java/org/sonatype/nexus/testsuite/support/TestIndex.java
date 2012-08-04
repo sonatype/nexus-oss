@@ -83,6 +83,11 @@ public class TestIndex
     protected void failed( final Throwable e, final Description description )
     {
         reference.success = false;
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace( pw );
+        reference.throwableMessage = e.getMessage();
+        reference.throwableStackTrace = sw.toString();
     }
 
     @Override
@@ -269,6 +274,12 @@ public class TestIndex
 
         @XmlElement
         private long duration;
+
+        @XmlElement(name = "throwable-message")
+        private String throwableMessage;
+
+        @XmlElement(name = "throwable-stacktrace")
+        private String throwableStackTrace;
 
         @XmlElement( name = "info" )
         private List<IndexReferenceInfo> infos = new ArrayList<IndexReferenceInfo>();

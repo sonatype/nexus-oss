@@ -29,6 +29,11 @@
                 <xsl:attribute name="class">
                   pane success-<xsl:value-of select="success"/>
                 </xsl:attribute>
+                <xsl:if test="throwable-message">
+                  <xsl:attribute name="title">
+                    <xsl:value-of select="throwable-message"/>
+                  </xsl:attribute>
+                </xsl:if>
                 <xsl:value-of select="className"/>
               </td>
               <td class="pane">
