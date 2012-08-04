@@ -27,6 +27,7 @@ import org.junit.runner.Description;
  */
 public class TestDataRule
     extends TestWatcher
+    implements TestData
 {
 
     /**
@@ -57,17 +58,7 @@ public class TestDataRule
         this.description = checkNotNull( description );
     }
 
-    /**
-     * Resolves a test data file by looking up the specified path into data directory.
-     * <p/>
-     * It searches the following path locations:<br/>
-     * {@code ${dataDir}/${test class package}/${test class name}/${test method name}/${path}}<br/>
-     * {@code ${dataDir}/${test class package}/${test class name}/${path}}<br/>
-     * {@code ${dataDir}/${path}}<br/>
-     *
-     * @param path path to look up
-     * @return found file
-     */
+    @Override
     public File resolveFile( final String path )
     {
         checkState( description != null, "Test was not yet initialized" );

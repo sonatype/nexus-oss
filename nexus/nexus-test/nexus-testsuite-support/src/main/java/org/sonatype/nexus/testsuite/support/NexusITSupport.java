@@ -108,7 +108,7 @@ public abstract class NexusITSupport
      * Never null.
      */
     @Rule
-    public TestDataRule testData = new TestDataRule( util.resolveFile( "src/test/it-resources" ) );
+    public TestData testData = new TestDataRule( util.resolveFile( "src/test/it-resources" ) );
 
     /**
      * Runs IT by against Nexus bundle coordinates specified in "injected-test.properties".
@@ -225,7 +225,7 @@ public abstract class NexusITSupport
      *
      * @return test data accessor. Never null.
      */
-    public TestDataRule testData()
+    public TestData testData()
     {
         return testData;
     }
