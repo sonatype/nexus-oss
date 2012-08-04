@@ -33,6 +33,6 @@ public interface TestData
      * @param path path to look up
      * @return found file
      */
-    File resolveFile( final String path );
+    File resolveFile( String path );
 
 }
