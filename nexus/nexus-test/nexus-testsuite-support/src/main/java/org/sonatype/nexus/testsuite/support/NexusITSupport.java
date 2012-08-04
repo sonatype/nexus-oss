@@ -195,6 +195,7 @@ public abstract class NexusITSupport
                 "TEST {} is running against a Nexus bundle resolved from injected-test.properties",
                 testName.getMethodName()
             );
+            testIndex.recordLink( "bundle", "../test-classes/injected-test.properties" );
         }
     }
 
