@@ -91,81 +91,93 @@ public class TestDataRule
     /**
      * Returns a test data file.
      * <p/>
-     * Format: {@code ${dataDir}/${path}}
+     * Format: {@code <dataDir>/</path>}
      *
      * @param path path to be appended
      * @return test source directory specific to running test + provided path
      */
     private File resolveFromDataDirectory( final String path )
     {
-        return
-            new File(
-                dataDir,
-                path
-            );
+        return file( dataDir, path );
     }
 
     /**
      * Returns a test data file.
      * <p/>
-     * Format: {@code ${dataDir}/${test class package}/${test class name}/${test method name}/${path}}
+     * Format: {@code <dataDir>/<test class package>/</path>}
+     *
+     * @param path path to be appended
+     * @return test source directory specific to running test class package + provided path
+     */
+    private File resolveFromPackageDirectory( String path )
+    {
+        return file( dataDir, asPath( description.getTestClass().getPackage() ), path );
+    }
+
+    /**
+     * Returns a test data file.
+     * <p/>
+     * Format: {@code <dataDir>/<test class package>/<test class name>/</path>}
      *
      * @param path path to be appended
      * @return test source directory specific to running test class + provided path
      */
     private File resolveFromClassDirectory( String path )
     {
-        return
-            new File(
-                new File(
-                    dataDir,
-                    description.getTestClass().getCanonicalName().replace( ".", "/" )
-                ),
-                path
-            );
+        return file( dataDir, asPath( description.getTestClass() ), path );
     }
 
     /**
      * Returns a test data file.
      * <p/>
-     * Format: {@code ${dataDir}/${test class package}/${test method name}/${path}}
-     *
-     * @param path path to be appended
-     * @return test source directory specific to running test class + provided path
-     */
-    private File resolveFromPackageDirectory( String path )
-    {
-        return
-            new File(
-                new File(
-                    dataDir,
-                    description.getTestClass().getPackage().getName().replace( ".", "/" )
-                ),
-                path
-            );
-    }
-
-    /**
-     * Returns a test data file.
-     * <p/>
-     * {@code ${dataDir}/${test class package}/${test class name}/${test method name}/${path}}<br/>
+     * Format: {@code <dataDir>/<test class package>/<test class name>/<test method name>/</path>}
      *
      * @param path path to be appended
      * @return test source directory specific to running test method + provided path
      */
     private File testMethodSourceDirectory( String path )
     {
-        return
-            new File(
-                new File(
-                    new File(
-                        dataDir,
-                        description.getTestClass().getCanonicalName().replace( ".", "/" )
-                    ),
-                    description.getMethodName()
-                ),
-                path
-            );
+        return file( dataDir, asPath( description.getTestClass() ), description.getMethodName(), path );
+    }
+
+    /**
+     * Return a file path to a class (replaces "." with "/")
+     *
+     * @param clazz class to get the path for
+     * @return path to class
+     * @since 1.0
+     */
+    private static String asPath( final Class<?> clazz )
+    {
+        return asPath( clazz.getPackage() ) + "/" + clazz.getSimpleName();
+    }
+
+    /**
+     * Return a file path from a package (replaces "." with "/")
+     *
+     * @param pkg package to get the path for
+     * @return package path
+     */
+    private static String asPath( final Package pkg )
+    {
+        return pkg.getName().replace( ".", "/" );
+    }
+
+    /**
+     * File builder
+     *
+     * @param root  starting root
+     * @param paths paths to append
+     * @return a file starting from root and appended sub-paths
+     */
+    private static File file( final File root, final String... paths )
+    {
+        File file = root;
+        for ( String path : paths )
+        {
+            file = new File( file, path );
+        }
+        return file;
     }
 
 }

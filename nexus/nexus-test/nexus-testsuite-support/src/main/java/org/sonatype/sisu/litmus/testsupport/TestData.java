@@ -26,9 +26,10 @@ public interface TestData
      * Resolves a test data file by looking up the specified path into data directory.
      * <p/>
      * It searches the following path locations:<br/>
-     * {@code ${dataDir}/${test class package}/${test class name}/${test method name}/${path}}<br/>
-     * {@code ${dataDir}/${test class package}/${test class name}/${path}}<br/>
-     * {@code ${dataDir}/${path}}<br/>
+     * {@code <dataDir>/<test class package>/<test class name>/<test method name>/</path>}<br/>
+     * {@code <dataDir>/<test class package>/<test class name>/<path>}<br/>
+     * {@code <dataDir>/<test class package>/<path>}<br/>
+     * {@code <dataDir>/<path>}<br/>
      *
      * @param path path to look up
      * @return found file
