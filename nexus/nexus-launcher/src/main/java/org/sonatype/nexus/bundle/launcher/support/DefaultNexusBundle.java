@@ -13,12 +13,14 @@
 package org.sonatype.nexus.bundle.launcher.support;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
 import static org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
 import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
 import static org.sonatype.sisu.bl.jsw.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
+import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -44,6 +46,7 @@ import org.sonatype.nexus.bundle.launcher.internal.NexusITLauncher;
 import org.sonatype.sisu.bl.jsw.JSWConfig;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.RunningBundles;
+import org.sonatype.sisu.bl.support.TimedCondition;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import com.google.common.base.Throwables;
@@ -182,6 +185,29 @@ public class DefaultNexusBundle
                 .withEnv( strategy.commandMonitorProperty(), String.valueOf( commandMonitorPort ) )
                 .withEnv( strategy.keepAliveProperty(), String.valueOf( keepAlivePort ) )
         );
+
+        // check that command monitor is installed in started nexus with a delay of 1s for 5s
+        log.info( "Checking presence of command monitor in started Nexus" );
+        final boolean monitorInstalled = new TimedCondition()
+        {
+            @Override
+            protected boolean isSatisfied()
+                throws Exception
+            {
+                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PING_COMMAND );
+                return true;
+            }
+        }.await( 1000, 5000, 1000 );
+        if ( monitorInstalled )
+        {
+            log.debug( "Command monitor installed in started Nexus on port '{}'", commandMonitorPort );
+        }
+        else
+        {
+            throw new RuntimeException(
+                format( "Command monitor did not startup on port '%s' in started Nexus", commandMonitorPort )
+            );
+        }
     }
 
     /**
