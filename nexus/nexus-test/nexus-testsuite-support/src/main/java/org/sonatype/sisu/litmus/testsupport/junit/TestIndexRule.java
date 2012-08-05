@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.support;
+package org.sonatype.sisu.litmus.testsupport.junit;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Boolean.TRUE;
@@ -32,6 +32,7 @@ import org.junit.runner.Description;
 import org.sonatype.nexus.testsuite.support.index.IndexXO;
 import org.sonatype.nexus.testsuite.support.index.TestInfoXO;
 import org.sonatype.nexus.testsuite.support.index.TestXO;
+import org.sonatype.sisu.litmus.testsupport.TestIndex;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
