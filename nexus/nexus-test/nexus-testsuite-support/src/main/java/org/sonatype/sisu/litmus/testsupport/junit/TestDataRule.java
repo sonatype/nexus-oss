@@ -73,13 +73,18 @@ public class TestDataRule
         {
             return level2;
         }
-        File level3 = resolveFromDataDirectory( path );
+        File level3 = resolveFromPackageDirectory( path );
         if ( level3.exists() )
         {
             return level3;
         }
+        File level4 = resolveFromDataDirectory( path );
+        if ( level4.exists() )
+        {
+            return level4;
+        }
         throw new RuntimeException(
-            "Path " + path + " not found in any of: " + level1 + ", " + level2 + ", " + level3
+            "Path " + path + " not found in any of: " + level1 + ", " + level2 + ", " + level3 + ", " + level4
         );
     }
 
@@ -115,6 +120,26 @@ public class TestDataRule
                 new File(
                     dataDir,
                     description.getTestClass().getCanonicalName().replace( ".", "/" )
+                ),
+                path
+            );
+    }
+
+    /**
+     * Returns a test data file.
+     * <p/>
+     * Format: {@code ${dataDir}/${test class package}/${test method name}/${path}}
+     *
+     * @param path path to be appended
+     * @return test source directory specific to running test class + provided path
+     */
+    private File resolveFromPackageDirectory( String path )
+    {
+        return
+            new File(
+                new File(
+                    dataDir,
+                    description.getTestClass().getPackage().getName().replace( ".", "/" )
                 ),
                 path
             );

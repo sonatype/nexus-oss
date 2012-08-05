@@ -63,7 +63,7 @@ public class TestDataRuleTest
     {
         File file = underTest.resolveFile( "from-package" );
         assertThat( file, is( equalTo( util.resolveFile(
-            "src/test/uncopied-resources/org/sonatype/sisu/litmus/testsupport/from-package"
+            "src/test/uncopied-resources/org/sonatype/sisu/litmus/testsupport/junit/from-package"
         ) ) ) );
     }
 
