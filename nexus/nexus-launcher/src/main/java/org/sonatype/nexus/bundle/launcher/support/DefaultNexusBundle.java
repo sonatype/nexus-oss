@@ -308,7 +308,7 @@ public class DefaultNexusBundle
             {
                 return name.startsWith( "nexus-" )
                     && name.endsWith( ".jar" )
-                    && !"nexus-bootstrap-2.1.jar".equals( name );
+                    && !name.startsWith( "nexus-bootstrap-2.1" );
             }
 
         } );
