@@ -18,7 +18,7 @@
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <target>System.out</target>
     <encoder>
-      <pattern>%date %level [%thread%X{DC}] %logger - %msg%n</pattern>
+      <pattern>${test.log.pattern}</pattern>
     </encoder>
   </appender>
 
