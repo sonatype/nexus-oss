@@ -158,6 +158,11 @@
               animateTarget : 'head-link-r',
               closable : true,
               closeAction : 'hide',
+              onEsc : function() {
+                if ( this.closable ) {
+                  Ext.Window.prototype.onEsc.apply(this, arguments);
+                }
+              },
               autoWidth : false,
               width : 300,
               autoHeight : true,
@@ -169,7 +174,13 @@
             });
 
         this.loginWindow.on('show', function() {
-              var panel, field;
+              var
+                    panel, field,
+                    // NEXUS-5108 hide close button when anon access is disabled
+                    anonDisabled = Sonatype.utils.anonDisabled || false; // if anonDisabled is undefined -> boolean
+
+              this.loginWindow.closable = !anonDisabled;
+              this.loginWindow.tools.close.setVisible(!anonDisabled);
 
               panel = this.loginWindow.findById('recovery-panel');
               if (panel && !panel.clickListenerAdded)
@@ -480,10 +491,12 @@
         var welcomeMsg = '<p style="text-align:center;"><a href="http://nexus.sonatype.org" target="new">' + '<img src="images/nexus200x50.png" border="0" alt="Welcome to the Sonatype Nexus Maven Repository Manager"></a>' + '</p>';
 
         var statusEnabled = sp.checkPermission('nexus:status', sp.READ);
-        if (!statusEnabled)
-        {
-          welcomeMsg += '</br>';
-          welcomeMsg += '<p style="color:red">Warning: Could not retrieve Nexus status, anonymous access might be disabled.</p>';
+        if (Sonatype.utils.anonDisabled && (!Sonatype.user.curr.isLoggedIn)) {
+          // show login window if anonymous access is disabled (unauthorized for status resource)
+          Sonatype.repoServer.RepoServer.loginHandler();
+        } else if (!statusEnabled) {
+          // other error, could not retrieve status. Backend down.
+          welcomeMsg += '</br><p style="color:red">Warning: Could not connect to Nexus.</p>';
         }
 
         welcomePanelConfig.items.push({
