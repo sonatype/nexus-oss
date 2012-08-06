@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, Sonatype, Nexus*/
 Sonatype.view = {
   FIELD_OFFSET_WITH_SCROLL : (3 + 16 + 3 + 30) * (-1) + '', // (help icon
   // margin) + (help
@@ -65,23 +66,19 @@ Sonatype.view = {
           "requestexception" : {
             fn : function(conn, response, options) {
 
-              if (Sonatype.config.repos.urls.status == options.url)
+              if (Sonatype.config.repos.urls.status === options.url)
               {
-                // when anonymous is diabled, use not logged in might find
-                // annoying error
-                // simply ignore it
+                // never show the connection error message for the status resource
+                // (if anonymous is disabled, UI would show this all the time, until you're logged in)
                 return;
-              }
-
-              if (Ext.isArray(options.suppressStatus))
-              {
+              } else if ( options.suppressStatus === true ) {
+                return;
+              } else if (Ext.isArray(options.suppressStatus)) {
                 if (options.suppressStatus.indexOf(response.status) < 0)
                 {
                   Sonatype.utils.connectionError(response, null, null, options);
                 }
-              }
-              else if (options.suppressStatus != response.status)
-              {
+              } else if (options.suppressStatus !== response.status) {
                 Sonatype.utils.connectionError(response, null, null, options);
               }
             },
