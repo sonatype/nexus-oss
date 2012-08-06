@@ -221,7 +221,6 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
                                                    final boolean systemContext )
     {
         Preconditions.checkNotNull( url, "No ldap URL specified (ldap://<hostname>:<port>)" );
-        Preconditions.checkArgument( url.startsWith( "ldap://" ), "LDAP URL is not valid (must be 'ldap://<hostname>:<port>')" );
 
         if ( username != null && principalSuffix != null )
         {
