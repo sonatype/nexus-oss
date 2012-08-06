@@ -18,14 +18,12 @@ import static org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationComma
 import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
 import static org.sonatype.sisu.bl.jsw.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
-import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import javax.inject.Inject;
@@ -102,8 +100,7 @@ public class DefaultNexusBundle
      * - configures Nexus/Jetty port<br/>
      * - installs command monitor<br/>
      * - installs keep alive monitor<br/>
-     * - configure remote debugging if requested<br/>
-     * - installs plugins.
+     * - configure remote debugging if requested
      * <p/>
      * {@inheritDoc}
      *
@@ -122,7 +119,6 @@ public class DefaultNexusBundle
 
         configureJSW( strategy );
         configureNexusProperties( strategy );
-        installPlugins();
     }
 
     /**
@@ -288,33 +284,6 @@ public class DefaultNexusBundle
         catch ( final IOException e )
         {
             throw Throwables.propagate( e );
-        }
-    }
-
-    /**
-     * Install Nexus plugins in {@code sonatype-work/nexus/plugin-repository}.
-     */
-    private void installPlugins()
-    {
-        NexusBundleConfiguration config = getConfiguration();
-        List<File> plugins = config.getPlugins();
-        for ( File plugin : plugins )
-        {
-            if ( plugin.isDirectory() )
-            {
-                onDirectory( config.getTargetDirectory() ).apply(
-                    fileTaskBuilder.copy()
-                        .directory( file( plugin ) )
-                        .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
-                );
-            }
-            else
-            {
-                onDirectory( config.getTargetDirectory() ).apply(
-                    fileTaskBuilder.expand( file( plugin ) )
-                        .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
-                );
-            }
         }
     }
 
