@@ -22,6 +22,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.tools.ant.taskdefs.condition.Os;
 import org.sonatype.inject.Nullable;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
@@ -187,6 +188,20 @@ public class DefaultNexusBundleConfiguration
                         .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
                 );
             }
+        }
+
+        // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62
+        if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+        {
+            overlays.add(
+                fileTaskBuilder.replace()
+                    .inFile( path( "nexus/conf/jetty.xml" ) )
+                    .replace(
+                        "org.eclipse.jetty.server.nio.SelectChannelConnector",
+                        "org.eclipse.jetty.server.nio.BlockingChannelConnector"
+                    )
+                    .failIfFileDoesNotExist()
+            );
         }
 
         return overlays;
