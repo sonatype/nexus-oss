@@ -69,7 +69,7 @@ public abstract class NexusITSupport
     private NexusBundleResolver nexusBundleResolver;
 
     /**
-     * List of filters used to filter coordinates.
+     * List of available filters.
      * Never null.
      */
     @Inject
@@ -82,7 +82,7 @@ public abstract class NexusITSupport
     private NexusITArtifactResolver testArtifactResolver;
 
     /**
-     * Transformer used to transform coordinates.
+     * Filter used to filter coordinates.
      * Lazy initialized on first usage.
      */
     private Filter filter;
@@ -94,7 +94,7 @@ public abstract class NexusITSupport
     protected final String nexusBundleCoordinates;
 
     /**
-     * Transformed Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
+     * Filtered Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
      * "injected-test.properties".
      */
     protected String filteredNexusBundleCoordinates;
