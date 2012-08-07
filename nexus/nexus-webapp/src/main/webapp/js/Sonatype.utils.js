@@ -927,11 +927,13 @@
                 Sonatype.utils.licenseInstalled = null;
                 Sonatype.utils.licenseExpired = null;
                 Sonatype.utils.trialLicense = null;
+                Sonatype.utils.anonDisabled = (response.status === 401);
 
                 Sonatype.user.curr.repoServer = null;
                 Sonatype.user.curr.isLoggedIn = null;
                 Sonatype.user.curr.username = null;
                 Sonatype.user.curr.loggedInUserSource = null;
+
               }
 
               var availSvrs = Sonatype.config.installedServers;
