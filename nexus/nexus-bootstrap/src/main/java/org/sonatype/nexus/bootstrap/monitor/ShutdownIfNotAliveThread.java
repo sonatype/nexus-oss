@@ -115,12 +115,20 @@ public class ShutdownIfNotAliveThread
         {
             try
             {
-                ping();
-                sleep( pingInterval );
+                try
+                {
+                    ping();
+                    sleep( pingInterval );
+                }
+                catch ( final InterruptedException ignore )
+                {
+                    ping();
+                }
             }
-            catch ( InterruptedException ignore )
+            catch ( ConnectException e )
             {
-                ping();
+                stopRunning();
+                shutdown();
             }
         }
 
@@ -129,8 +137,11 @@ public class ShutdownIfNotAliveThread
 
     /**
      * Pings the configured host/port.
+     *
+     * @throws ConnectException If ping fails
      */
     private void ping()
+        throws ConnectException
     {
         try
         {
@@ -140,13 +151,11 @@ public class ShutdownIfNotAliveThread
         catch ( ConnectException e )
         {
             log.warn( "Exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
-
-            running = false;
-            shutdown();
+            throw e;
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
-            log.info( "Skipping exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
+            log.info( "Skipping exception got while pinging {}:{}", ignore.getClass().getName(), ignore.getMessage() );
         }
     }
 
