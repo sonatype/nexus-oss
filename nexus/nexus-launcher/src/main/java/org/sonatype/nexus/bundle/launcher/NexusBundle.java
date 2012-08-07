@@ -26,19 +26,19 @@ public interface NexusBundle
 {
 
     /**
-     * Returns Nexus directory of this bundle. This is the directory named {@code nexus-<version>} in any Nexus bundle
-     * archive.
+     * Returns Nexus directory (absolute path) of this bundle. This is the directory named {@code nexus-<version>} in
+     * any Nexus bundle archive.
      *
-     * @return nexus directory. Never null.
+     * @return nexus directory (absolute path). Never null.
      * @since 2.2
      */
     File getNexusDirectory();
 
     /**
-     * Returns Nexus work directory of this bundle. This is the directory named {@code sonatype-work/nexus} in any Nexus
-     * bundle archive.
+     * Returns Nexus work directory (absolute path) of this bundle. This is the directory named
+     * {@code sonatype-work/nexus} in any Nexus bundle archive.
      *
-     * @return nexus work directory. Never null.
+     * @return nexus work directory (absolute path). Never null.
      */
     File getWorkDirectory();
 
