@@ -1659,6 +1659,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                   serviceTypePanel.activeItem = i;
                   if (item.items && item.items.length !== 0)
                   {
+                    serviceTypePanel.show();
                     item.items.each(function(item) {
                           item.disabled = false;
                         });
@@ -1718,6 +1719,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 if (item.items.length === 0) {
                   serviceTypePanel.hide();
                 } else  {
+                  serviceTypePanel.show();
                   item.items.each(function(item) {
                     item.enable();
                   });
