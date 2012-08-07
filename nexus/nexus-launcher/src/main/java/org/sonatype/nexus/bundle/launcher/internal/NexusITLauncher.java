@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.bundle.launcher.internal;
 
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 
@@ -174,6 +176,7 @@ public class NexusITLauncher
                         WrapperManager.stopAndReturn( 0 );
                     }
                 },
+                LOCALHOST,
                 Integer.parseInt( port ),
                 Integer.parseInt( pingInterval ),
                 Integer.parseInt( timeout )

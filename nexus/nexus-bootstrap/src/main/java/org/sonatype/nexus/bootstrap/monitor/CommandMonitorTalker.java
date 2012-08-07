@@ -32,11 +32,6 @@ public class CommandMonitorTalker
     private static LogProxy log = LogProxy.getLogger( CommandMonitorTalker.class );
 
     /**
-     * Local host IP (127.0.0.1).
-     */
-    public static final String LOCALHOST = "127.0.0.1";
-
-    /**
      * 5 seconds in milliseconds. Used as default timeout.
      */
     private static final int FIVE_SECONDS = 5000;
@@ -116,6 +111,26 @@ public class CommandMonitorTalker
         {
             socket.close();
         }
+    }
+
+    /**
+     * Returns the host to send commands to.
+     *
+     * @return host to send commands to. Never null.
+     */
+    public String getHost()
+    {
+        return host;
+    }
+
+    /**
+     * Returns the port on host to send commands to.
+     *
+     * @return port on host to send commands to. Bigger then 1.
+     */
+    public String getPort()
+    {
+        return host;
     }
 
 }

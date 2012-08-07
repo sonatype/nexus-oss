@@ -31,11 +31,6 @@ public class ShutdownIfNotAliveThread
 {
 
     /**
-     * Local host IP (127.0.0.1).
-     */
-    public static final String LOCALHOST = "127.0.0.1";
-
-    /**
      * Logger. Uses log proxy to be able to redirect log output to System.out if SLF4J is not available (Nexus < 2.1).
      */
     private static LogProxy log = LogProxy.getLogger( ShutdownIfNotAliveThread.class );
@@ -44,11 +39,6 @@ public class ShutdownIfNotAliveThread
      * Runnable to executed in case that keep alive determines that it should shutdown Nexus.
      */
     private final Runnable shutdown;
-
-    /**
-     * The port to be pinged.
-     */
-    private int port;
 
     /**
      * Interval between pinging.
@@ -75,12 +65,14 @@ public class ShutdownIfNotAliveThread
      * Constructor.
      *
      * @param shutdown     shutdown code to be run in case there is no ping response (connection refused)
-     * @param port         port to be pinged
+     * @param host         host to be pinged
+     * @param port         port on host to be pinged
      * @param pingInterval interval between pings
      * @param timeout      ping timeout
      * @throws IOException Re-thrown from creating an {@link CommandMonitorTalker}
      */
     public ShutdownIfNotAliveThread( final Runnable shutdown,
+                                     final String host,
                                      final int port,
                                      final int pingInterval,
                                      final int timeout )
@@ -91,11 +83,10 @@ public class ShutdownIfNotAliveThread
             throw new NullPointerException();
         }
         this.shutdown = shutdown;
-        this.port = port;
         this.pingInterval = pingInterval;
         this.timeout = timeout;
 
-        this.talker = new CommandMonitorTalker( LOCALHOST, port );
+        this.talker = new CommandMonitorTalker( host, port );
 
         this.running = true;
         this.setDaemon( true );
@@ -109,7 +100,10 @@ public class ShutdownIfNotAliveThread
     @Override
     public void run()
     {
-        log.info( "Shutdown thread pinging on port {} every {} milliseconds", port, pingInterval );
+        log.info(
+            "Shutdown thread pinging {} on port {} every {} milliseconds",
+            talker.getHost(), talker.getPort(), pingInterval
+        );
 
         while ( running )
         {
@@ -145,7 +139,7 @@ public class ShutdownIfNotAliveThread
     {
         try
         {
-            log.debug( "Pinging on port {} ...", port );
+            log.debug( "Pinging {} on port {} ...", talker.getHost(), talker.getPort() );
             talker.send( PING_COMMAND, timeout );
         }
         catch ( ConnectException e )
@@ -165,7 +159,7 @@ public class ShutdownIfNotAliveThread
     // @TestAccessible
     void shutdown()
     {
-        log.warn( "Shutting down as there is no ping response on port {}", port );
+        log.warn( "Shutting down as there is no ping response from {} on port {}", talker.getHost(), talker.getPort() );
         shutdown.run();
     }
 

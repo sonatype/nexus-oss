@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
-import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
 import static org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
 import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;

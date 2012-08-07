@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.bootstrap;
 
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -313,6 +315,7 @@ public class Launcher
                         Launcher.this.commandStop();
                     }
                 },
+                LOCALHOST,
                 Integer.parseInt( port ),
                 Integer.parseInt( pingInterval ),
                 Integer.parseInt( timeout )
