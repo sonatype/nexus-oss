@@ -17,7 +17,6 @@ import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COM
 
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.Socket;
 
 import org.sonatype.nexus.bootstrap.log.LogProxy;
 
@@ -43,8 +42,6 @@ public class ShutdownIfNotAliveThread
     private int timeout;
 
     private boolean running;
-
-    private Socket socket;
 
     private final CommandMonitorTalker talker;
 
@@ -109,10 +106,6 @@ public class ShutdownIfNotAliveThread
         {
             log.info( "Skipping exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
         }
-        finally
-        {
-            close( socket );
-        }
     }
 
     void shutdown()
@@ -124,22 +117,6 @@ public class ShutdownIfNotAliveThread
     public void stopRunning()
     {
         running = false;
-        close( socket );
-    }
-
-    private void close( final Socket socket )
-    {
-        if ( socket != null )
-        {
-            try
-            {
-                socket.close();
-            }
-            catch ( IOException ignore )
-            {
-                // ignore
-            }
-        }
     }
 
 }
