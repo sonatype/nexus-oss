@@ -146,7 +146,7 @@ public class ShutdownIfNotAliveThread
         try
         {
             log.debug( "Pinging on port {} ...", port );
-            talker.send( PING_COMMAND );
+            talker.send( PING_COMMAND, timeout );
         }
         catch ( ConnectException e )
         {

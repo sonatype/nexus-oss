@@ -37,6 +37,11 @@ public class CommandMonitorTalker
     public static final String LOCALHOST = "127.0.0.1";
 
     /**
+     * 5 seconds in milliseconds. Used as default timeout.
+     */
+    private static final int FIVE_SECONDS = 5000;
+
+    /**
      * Host to send commands to.
      * Never null.
      */
@@ -77,6 +82,20 @@ public class CommandMonitorTalker
     public void send( final String command )
         throws Exception
     {
+        send( command, FIVE_SECONDS );
+    }
+
+    /**
+     * Sends a command to a {@link CommandMonitorThread} on configured host/port, timing out after the specified number
+     * of milliseconds.
+     *
+     * @param command to send. Cannot be null.
+     * @param timeout number of milliseconds after which sending the command should timeout
+     * @throws Exception Re-thrown if sending command fails
+     */
+    public void send( final String command, final int timeout )
+        throws Exception
+    {
         if ( command == null )
         {
             throw new NullPointerException();
@@ -85,7 +104,7 @@ public class CommandMonitorTalker
         log.debug( "Sending command: {}", command );
 
         Socket socket = new Socket();
-        socket.setSoTimeout( 5000 );
+        socket.setSoTimeout( timeout );
         socket.connect( new InetSocketAddress( host, port ) );
         try
         {
