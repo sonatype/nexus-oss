@@ -1657,11 +1657,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 if (item.id == id + '_' + rec.data.typeId)
                 {
                   serviceTypePanel.activeItem = i;
-                  if (item.items)
+                  if (item.items && item.items.length !== 0)
                   {
+                    serviceTypePanel.show();
                     item.items.each(function(item) {
                           item.disabled = false;
                         });
+                  } else {
+                    serviceTypePanel.hide();
                   }
                 }
               });
@@ -1710,14 +1713,20 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         // Then enable the fields in that card
         var formId = this.id;
         serviceTypePanel.items.each(function(item, i, len) {
-              if (item.id == formId + '_' + record.data.id)
+              if (item.id === formId + '_' + record.data.id)
               {
                 serviceTypePanel.getLayout().setActiveItem(item);
-                item.items.each(function(item) {
-                      item.enable();
-                    });
+                if (item.items.length === 0) {
+                  serviceTypePanel.hide();
+                } else  {
+                  serviceTypePanel.show();
+                  item.items.each(function(item) {
+                    item.enable();
+                  });
+                }
               }
             }, serviceTypePanel);
+
         serviceTypePanel.doLayout();
       },
 
