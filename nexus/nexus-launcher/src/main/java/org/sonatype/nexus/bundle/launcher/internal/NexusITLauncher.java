@@ -23,27 +23,64 @@ import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
- * TODO
+ * The main Nexus class (launcher) used to replace Nexus launchers for versions < 2.2.
+ * <p/>
+ * The launcher will start (if configured) the threads bellow and then redirect to original JSW configured launcher:
+ * <br/>
+ * * the command monitor (on port {#link NexusITLauncher#COMMAND_MONITOR_PORT}<br/>
+ * * the keep alive thread (on port {#link NexusITLauncher#KEEP_ALIVE_PORT}<br></br>
  *
- * @since 1.0
+ * @since 2.2
  */
 public class NexusITLauncher
 {
 
+    /**
+     * Name of property to be looked up in system properties containing the FQCN of original launcher
+     */
     public static final String LAUNCHER = NexusITLauncher.class.getName() + ".launcher";
 
+    /**
+     * Name of environment variable/system property to be looked up for the port number of command monitor thread.
+     * If not present, command monitor will not be started.
+     */
     public static final String COMMAND_MONITOR_PORT = NexusITLauncher.class.getName() + ".monitor.port";
 
+    /**
+     * Name of environment variable/system property to be looked up for the port number of keep alive thread.
+     * If not present, keep alive will not be started.
+     */
     public static final String KEEP_ALIVE_PORT = NexusITLauncher.class.getName() + ".keepAlive.port";
 
+    /**
+     * Name of environment variable/system property to be looked up for keep alive ping interval.
+     * If not present, a default of 5 seconds will be used.
+     */
     public static final String KEEP_ALIVE_PING_INTERVAL = ShutdownIfNotAliveThread.class.getName() + ".pingInterval";
 
+    /**
+     * Name of environment variable/system property to be looked up for keep alive timeout.
+     * If not present, a default of 1 second will be used.
+     */
     public static final String KEEP_ALIVE_TIMEOUT = ShutdownIfNotAliveThread.class.getName() + ".timeout";
 
+    /**
+     * 5 seconds in milliseconds.
+     */
     public static final String FIVE_SECONDS = "5000";
 
+    /**
+     * 1 second in milliseconds.
+     */
     public static final String ONE_SECOND = "1000";
 
+    /**
+     * Starts the command monitor/keep alive if configured and launches original JSW launcher.
+     *
+     * @param args startup arguments
+     * @return null (continue running)
+     * @throws Exception re-thrown
+     */
     public Integer start( final String[] args )
         throws Exception
     {
@@ -65,6 +102,11 @@ public class NexusITLauncher
         return null; // continue running
     }
 
+    /**
+     * Starts the command monitor if {#link NexusITLauncher#COMMAND_MONITOR_PORT} is configured.
+     *
+     * @throws IOException If command monitor fails to start
+     */
     protected void maybeEnableCommandMonitor()
         throws IOException
     {
@@ -90,6 +132,11 @@ public class NexusITLauncher
         }
     }
 
+    /**
+     * Starts the command monitor if {#link NexusITLauncher#KEEP_ALIVE_PORT} is configured.
+     *
+     * @throws IOException If command monitor fails to start
+     */
     protected void maybeEnableShutdownIfNotAlive()
         throws IOException
     {
