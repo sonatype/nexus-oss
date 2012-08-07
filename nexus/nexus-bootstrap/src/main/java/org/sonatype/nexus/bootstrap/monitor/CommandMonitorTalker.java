@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.bootstrap.monitor;
 
-import org.sonatype.nexus.bootstrap.log.LogProxy;
-
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
  * Talks to the command monitor.
@@ -25,42 +25,78 @@ import java.net.Socket;
  */
 public class CommandMonitorTalker
 {
+
+    /**
+     * Logger. Uses log proxy to be able to redirect log output to System.out if SLF4J is not available (Nexus < 2.1).
+     */
     private static LogProxy log = LogProxy.getLogger( CommandMonitorTalker.class );
 
+    /**
+     * Local host IP (127.0.0.1).
+     */
     public static final String LOCALHOST = "127.0.0.1";
 
+    /**
+     * Host to send commands to.
+     * Never null.
+     */
     private final String host;
 
+    /**
+     * Port on host to send commands to.
+     * Bigger then 1.
+     */
     private final int port;
 
-    public CommandMonitorTalker(final String host, final int port) {
-        if (host == null) {
+    /**
+     * Constructor.
+     *
+     * @param host to send commands to. Cannot be null.
+     * @param port on host to send commands to. Must be bigger then 1.
+     */
+    public CommandMonitorTalker( final String host, final int port )
+    {
+        if ( host == null )
+        {
             throw new NullPointerException();
         }
         this.host = host;
-        if (port < 1) {
-            throw new IllegalArgumentException("Invalid port");
+        if ( port < 1 )
+        {
+            throw new IllegalArgumentException( "Invalid port" );
         }
         this.port = port;
     }
 
-    public void send(final String command) throws Exception {
-        if (command == null) {
+    /**
+     * Sends a command to a {@link CommandMonitorThread} on configured host/port.
+     *
+     * @param command to send. Cannot be null.
+     * @throws Exception Re-thrown if sending command fails
+     */
+    public void send( final String command )
+        throws Exception
+    {
+        if ( command == null )
+        {
             throw new NullPointerException();
         }
 
-        log.debug("Sending command: {}", command);
+        log.debug( "Sending command: {}", command );
 
         Socket socket = new Socket();
-        socket.setSoTimeout(5000);
-        socket.connect(new InetSocketAddress(host, port));
-        try {
+        socket.setSoTimeout( 5000 );
+        socket.connect( new InetSocketAddress( host, port ) );
+        try
+        {
             OutputStream output = socket.getOutputStream();
-            output.write(command.getBytes());
+            output.write( command.getBytes() );
             output.close();
         }
-        finally {
+        finally
+        {
             socket.close();
         }
     }
+
 }

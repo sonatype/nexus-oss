@@ -33,10 +33,10 @@ public class ShutdownIfNotAliveThread
     /**
      * Local host IP (127.0.0.1).
      */
-    static final String LOCALHOST = "127.0.0.1";
+    public static final String LOCALHOST = "127.0.0.1";
 
     /**
-     * Logger.
+     * Logger. Uses log proxy to be able to redirect log output to System.out if SLF4J is not available (Nexus < 2.1).
      */
     private static LogProxy log = LogProxy.getLogger( ShutdownIfNotAliveThread.class );
 
@@ -132,7 +132,7 @@ public class ShutdownIfNotAliveThread
             }
         }
 
-        log.debug( "Done" );
+        log.debug( "Stopped" );
     }
 
     /**
