@@ -26,6 +26,10 @@
 
   <name>Nexus : Test : Test Suite Support</name>
 
+  <properties>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
+  </properties>
+
   <build>
     <testResources>
       <testResource>
@@ -80,7 +84,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <version>1.3</version>
+      <version>1.4-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

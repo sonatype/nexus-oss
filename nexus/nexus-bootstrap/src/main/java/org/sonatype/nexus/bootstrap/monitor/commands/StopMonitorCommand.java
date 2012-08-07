@@ -10,35 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.support;
+package org.sonatype.nexus.bootstrap.monitor.commands;
 
-import static org.junit.runners.Parameterized.Parameters;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
- * Test starting and launching of Nexus using a filtered parameters specified in IT.
+ * Stops command monitor.
  *
  * @since 2.2
  */
-public class StartAndStopNexusRunningParametrizedHardcodedIT
-    extends StartAndStopNexusRunningParametrizedIT
+public class StopMonitorCommand
+    implements CommandMonitorThread.Command
 {
 
-    @Parameters
-    public static Collection<Object[]> data()
+    private static final LogProxy log = LogProxy.getLogger( StopMonitorCommand.class );
+
+    public static final String STOP_MONITOR_COMMAND = "STOP_MONITOR";
+
+    @Override
+    public String getId()
     {
-        return Arrays.asList( new Object[][]{
-            { "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" },
-        } );
+        return STOP_MONITOR_COMMAND;
     }
 
-    public StartAndStopNexusRunningParametrizedHardcodedIT( final String nexusBundleCoordinates )
+    @Override
+    public boolean execute()
     {
-        super( nexusBundleCoordinates );
+        log.info( "Requesting monitor stop" );
+        return true;
     }
 
 }

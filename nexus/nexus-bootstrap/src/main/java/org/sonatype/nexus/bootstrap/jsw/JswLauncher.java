@@ -41,10 +41,6 @@ public class JswLauncher
                 WrapperManager.stopAndReturn(0);
             }
 
-            @Override
-            public void commandRestart() {
-                WrapperManager.restartAndReturn();
-            }
         };
     }
 

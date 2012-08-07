@@ -15,18 +15,43 @@ package org.sonatype.nexus.testsuite.support;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
 
 /**
- * Test starting and launching of Nexus using default parameters lookup.
+ * Test starting and stopping of Nexus using parameters.
  *
- * @since 2.0
+ * @since 2.2
  */
 public class StartAndStopNexusRunningParametrizedIT
     extends NexusRunningParametrizedITSupport
 {
+
+    // Uncomment the following line to suppress default parameters lookup and use test specific ones
+    // @Parameters
+    public static Collection<Object[]> testSpecificParameters()
+    {
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters( StartAndStopNexusRunningParametrizedIT.class )
+        ).load();
+    }
+
+    // Uncomment the following line to suppress default parameters lookup and use the ones specified by the method
+    // @Parameters
+    public static Collection<Object[]> hardcodedParameters()
+    {
+        return Arrays.asList( new Object[][]{
+            { "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" },
+        } );
+    }
 
     public StartAndStopNexusRunningParametrizedIT( final String nexusBundleCoordinates )
     {

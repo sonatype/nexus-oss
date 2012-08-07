@@ -22,6 +22,7 @@ import javax.inject.Named;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
+import org.junit.Rule;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
 import org.sonatype.nexus.testsuite.support.filters.CompositeFilter;
@@ -29,7 +30,10 @@ import org.sonatype.nexus.testsuite.support.filters.ImplicitVersionFilter;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
+import org.sonatype.sisu.litmus.testsupport.TestData;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
+import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
+import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 import com.google.common.collect.Lists;
@@ -65,7 +69,7 @@ public abstract class NexusITSupport
     private NexusBundleResolver nexusBundleResolver;
 
     /**
-     * List of filters used to filter coordinates.
+     * List of available filters.
      * Never null.
      */
     @Inject
@@ -78,13 +82,7 @@ public abstract class NexusITSupport
     private NexusITArtifactResolver testArtifactResolver;
 
     /**
-     * Test specific file resolver utility.
-     * Lazy initialized on first usage.
-     */
-    private NexusITFileResolver testFileResolver;
-
-    /**
-     * Transformer used to transform coordinates.
+     * Filter used to filter coordinates.
      * Lazy initialized on first usage.
      */
     private Filter filter;
@@ -96,10 +94,24 @@ public abstract class NexusITSupport
     protected final String nexusBundleCoordinates;
 
     /**
-     * Transformed Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
+     * Filtered Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
      * "injected-test.properties".
      */
     protected String filteredNexusBundleCoordinates;
+
+    /**
+     * Test index.
+     * Never null.
+     */
+    @Rule
+    public TestIndexRule testIndex = new TestIndexRule( util.resolveFile( "target/its" ) );
+
+    /**
+     * Test data.
+     * Never null.
+     */
+    @Rule
+    public TestDataRule testData = new TestDataRule( util.resolveFile( "src/test/it-resources" ) );
 
     /**
      * Runs IT by against Nexus bundle coordinates specified in "injected-test.properties".
@@ -139,7 +151,7 @@ public abstract class NexusITSupport
                 @Override
                 public File resolve()
                 {
-                    return fileResolver().methodSpecificDirectory( "bundle" );
+                    return testIndex.getDirectory();
                 }
 
             } );
@@ -182,6 +194,8 @@ public abstract class NexusITSupport
                 "TEST {} is running against Nexus bundle {}",
                 testName.getMethodName(), filteredNexusBundleCoordinates
             );
+
+            testIndex.recordInfo( "bundle", filteredNexusBundleCoordinates );
         }
         else
         {
@@ -189,6 +203,7 @@ public abstract class NexusITSupport
                 "TEST {} is running against a Nexus bundle resolved from injected-test.properties",
                 testName.getMethodName()
             );
+            testIndex.recordLink( "bundle", "../test-classes/injected-test.properties" );
         }
     }
 
@@ -209,19 +224,13 @@ public abstract class NexusITSupport
     }
 
     /**
-     * Lazy initializes IT specific file resolver.
+     * Returns test data accessor.
      *
-     * @return IT specific artifact file. Never null.
+     * @return test data accessor. Never null.
      */
-    public NexusITFileResolver fileResolver()
+    public TestData testData()
     {
-        if ( testFileResolver == null )
-        {
-            testFileResolver = new NexusITFileResolver(
-                util.getBaseDir(), util.getTargetDir(), getClass(), testName.getMethodName()
-            );
-        }
-        return testFileResolver;
+        return testData;
     }
 
     /**
