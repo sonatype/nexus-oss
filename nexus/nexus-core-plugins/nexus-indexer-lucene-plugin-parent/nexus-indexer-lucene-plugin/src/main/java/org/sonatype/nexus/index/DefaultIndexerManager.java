@@ -187,17 +187,6 @@ public class DefaultIndexerManager
 
     private File tempDirectory;
 
-    public DefaultIndexerManager()
-    {
-        // Note: this is needed and used in ITs only!
-        // See org.sonatype.nexus.rt.boot.ITIndexerActivationEventInspector for details
-        if ( SystemPropertiesHelper.getBoolean( "mavenIndexerBlockingCommits", DefaultIndexingContext.BLOCKING_COMMIT ) )
-        {
-            DefaultIndexingContext.BLOCKING_COMMIT = true;
-        }
-        // This above is needed and used in ITs only!
-    }
-
     @VisibleForTesting
     protected void setIndexUpdater( final IndexUpdater indexUpdater )
     {
