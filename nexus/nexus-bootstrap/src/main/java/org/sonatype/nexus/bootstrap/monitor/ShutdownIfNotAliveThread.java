@@ -100,7 +100,7 @@ public class ShutdownIfNotAliveThread
         }
         catch ( ConnectException e )
         {
-            log.info( "Exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
+            log.warn( "Exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
 
             running = false;
             shutdown();
@@ -117,7 +117,7 @@ public class ShutdownIfNotAliveThread
 
     void shutdown()
     {
-        log.info( "Shutting down as there is no ping response on port {}", port );
+        log.warn( "Shutting down as there is no ping response on port {}", port );
         shutdown.run();
     }
 

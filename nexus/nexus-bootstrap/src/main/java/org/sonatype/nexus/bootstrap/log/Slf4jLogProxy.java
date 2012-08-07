@@ -61,4 +61,10 @@ public class Slf4jLogProxy
         log.error( message, e );
     }
 
+    @Override
+    public void warn( final String message, Object... args )
+    {
+        log.warn( message, args );
+    }
+
 }

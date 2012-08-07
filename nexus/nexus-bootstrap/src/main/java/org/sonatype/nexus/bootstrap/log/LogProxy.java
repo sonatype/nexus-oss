@@ -41,6 +41,11 @@ public class LogProxy
         // does nothing
     }
 
+    public void warn( final String message, Object... args )
+    {
+        // does nothing
+    }
+
     public static LogProxy getLogger( final Class clazz )
     {
         try

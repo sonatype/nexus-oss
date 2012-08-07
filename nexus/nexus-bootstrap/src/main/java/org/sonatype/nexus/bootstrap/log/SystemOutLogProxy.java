@@ -35,16 +35,13 @@ public class SystemOutLogProxy
     @Override
     public void debug( final String message, Object... args )
     {
-        String timestamp = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ).format( new Date() );
-        System.out.println(
-            timestamp + " " + clazz.getSimpleName() + " - " + String.format( message.replace( "{}", "%s" ), args )
-        );
+        message( "DEBUG", message, args );
     }
 
     @Override
     public void info( final String message, final Object... args )
     {
-        debug( message, args );
+        message( "INFO", message, args );
     }
 
     @Override
@@ -57,7 +54,22 @@ public class SystemOutLogProxy
     @Override
     public void error( final String message, Object... args )
     {
-        debug( message, args );
+        message( "ERROR", message, args );
+    }
+
+    @Override
+    public void warn( final String message, Object... args )
+    {
+        message( "WARN", message, args );
+    }
+
+    private void message( final String level, final String message, Object... args )
+    {
+        final String timestamp = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ).format( new Date() );
+        System.out.println(
+            timestamp + " [" + level + "] " + clazz.getSimpleName()
+                + " - " + String.format( message.replace( "{}", "%s" ), args )
+        );
     }
 
 }
