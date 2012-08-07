@@ -21,7 +21,8 @@ import java.net.ConnectException;
 import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
- * Thread which listens for command messages to control the JVM.
+ * Thread which pings a specified host/port at a configured interval and runs a shutdown coe in case that there is no
+ * response (connection refused).
  *
  * @since 2.2
  */
@@ -29,22 +30,56 @@ public class ShutdownIfNotAliveThread
     extends Thread
 {
 
+    /**
+     * Local host IP (127.0.0.1).
+     */
     static final String LOCALHOST = "127.0.0.1";
 
+    /**
+     * Logger.
+     */
     private static LogProxy log = LogProxy.getLogger( ShutdownIfNotAliveThread.class );
 
+    /**
+     * Runnable to executed in case that keep alive determines that it should shutdown Nexus.
+     */
     private final Runnable shutdown;
 
+    /**
+     * The port to be pinged.
+     */
     private int port;
 
+    /**
+     * Interval between pinging.
+     */
     private int pingInterval;
 
+    /**
+     * Ping timeout.
+     */
     private int timeout;
 
+    /**
+     * True if this thread should continue running.
+     */
     private boolean running;
 
+    /**
+     * Command monitor talker used to ping the configured port.
+     * Never nul.
+     */
     private final CommandMonitorTalker talker;
 
+    /**
+     * Constructor.
+     *
+     * @param shutdown     shutdown code to be run in case there is no ping response (connection refused)
+     * @param port         port to be pinged
+     * @param pingInterval interval between pings
+     * @param timeout      ping timeout
+     * @throws IOException Re-thrown from creating an {@link CommandMonitorTalker}
+     */
     public ShutdownIfNotAliveThread( final Runnable shutdown,
                                      final int port,
                                      final int pingInterval,
@@ -67,6 +102,10 @@ public class ShutdownIfNotAliveThread
         setName( "Shutdown if not alive" );
     }
 
+    /**
+     * Continue pinging on configured port until there is a connection (refused) exception, case when a shutdown will be
+     * performed.
+     */
     @Override
     public void run()
     {
@@ -88,6 +127,9 @@ public class ShutdownIfNotAliveThread
         log.debug( "Done" );
     }
 
+    /**
+     * Pings the configured host/port.
+     */
     private void ping()
     {
         try
@@ -108,12 +150,19 @@ public class ShutdownIfNotAliveThread
         }
     }
 
+    /**
+     * Runs the shutdown code.
+     */
+    // @TestAccessible
     void shutdown()
     {
         log.warn( "Shutting down as there is no ping response on port {}", port );
         shutdown.run();
     }
 
+    /**
+     * Stops this thread from running (without running the shutdown code).
+     */
     public void stopRunning()
     {
         running = false;
