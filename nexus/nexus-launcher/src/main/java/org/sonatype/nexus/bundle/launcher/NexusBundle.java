@@ -25,8 +25,21 @@ public interface NexusBundle
     extends WebBundle<NexusBundle, NexusBundleConfiguration>
 {
 
+    /**
+     * Returns Nexus directory of this bundle. This is the directory named {@code nexus-<version>} in any Nexus bundle
+     * archive.
+     *
+     * @return nexus directory. Never null.
+     * @since 2.2
+     */
     File getNexusDirectory();
 
+    /**
+     * Returns Nexus work directory of this bundle. This is the directory named {@code sonatype-work/nexus} in any Nexus
+     * bundle archive.
+     *
+     * @return nexus work directory. Never null.
+     */
     File getWorkDirectory();
 
 }
