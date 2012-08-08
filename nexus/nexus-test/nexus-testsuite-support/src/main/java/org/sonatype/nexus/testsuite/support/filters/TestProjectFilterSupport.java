@@ -68,25 +68,22 @@ public abstract class TestProjectFilterSupport
     {
         final Map<String, String> mappings = Maps.newHashMap();
 
-        if ( value.contains( "${project." ) )
+        final String testProjectPomFile = context.get( TEST_PROJECT_POM_FILE );
+        if ( testProjectPomFile == null )
         {
-            final String testProjectPomFile = context.get( TEST_PROJECT_POM_FILE );
-            if ( testProjectPomFile == null )
+            // TODO log a warning?
+        }
+        else
+        {
+            try
             {
-                // TODO log a warning?
-            }
-            else
-            {
-                try
-                {
-                    final Model model = modelResolver.resolveModel( model().pom( new File( testProjectPomFile ) ) );
+                final Model model = modelResolver.resolveModel( model().pom( new File( testProjectPomFile ) ) );
 
-                    return mappings( context, value, model );
-                }
-                catch ( ModelBuildingException e )
-                {
-                    // TODO log?
-                }
+                return mappings( context, value, model );
+            }
+            catch ( ModelBuildingException e )
+            {
+                // TODO log?
             }
         }
 

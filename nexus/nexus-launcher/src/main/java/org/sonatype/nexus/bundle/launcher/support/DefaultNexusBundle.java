@@ -12,31 +12,42 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
+import static org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
+import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
+import static org.sonatype.sisu.bl.jsw.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
-import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
+import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.tools.ant.taskdefs.condition.Os;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.bootstrap.Launcher;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.bundle.launcher.internal.NexusITLauncher;
+import org.sonatype.sisu.bl.jsw.JSWConfig;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.RunningBundles;
+import org.sonatype.sisu.bl.support.TimedCondition;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
-import org.sonatype.sisu.jsw.exec.JSWExec;
-import org.sonatype.sisu.jsw.exec.JSWExecFactory;
-import org.sonatype.sisu.jsw.monitor.KeepAliveThread;
-import org.sonatype.sisu.jsw.monitor.internal.log.Slf4jLogProxy;
-import org.sonatype.sisu.jsw.util.JSWConfig;
+import com.google.common.base.Throwables;
 
 /**
  * Default Nexus bundle implementation.
@@ -49,17 +60,7 @@ public class DefaultNexusBundle
     implements NexusBundle
 {
 
-    /**
-     * JSW utility factory.
-     * Cannot be null.
-     */
-    private final JSWExecFactory jswExecFactory;
-
-    /**
-     * JSW utility to star/stop Nexus.
-     * Lazy created.
-     */
-    private JSWExec jswExec;
+    private static final Logger log = LoggerFactory.getLogger( DefaultNexusBundle.class );
 
     /**
      * File task builder.
@@ -68,45 +69,38 @@ public class DefaultNexusBundle
     private final FileTaskBuilder fileTaskBuilder;
 
     /**
-     * Port on which Nexus JSW Monitor is running. 0 (zero) if application is not running.
+     * Port on which Nexus Command Monitor is running. 0 (zero) if application is not running.
      */
-    private int jswMonitorPort;
+    private int commandMonitorPort;
 
     /**
-     * Port on which Nexus JSW Keep Alive is running. 0 (zero) if application is not running.
+     * Port on which Nexus Keep Alive is running. 0 (zero) if application is not running.
      */
-    private int jswKeepAlivePort;
+    private int keepAlivePort;
 
     /**
-     * JSW keep alive thread. Null if server is not started.
+     * Keep alive thread. Null if server is not started.
      */
-    private KeepAliveThread keepAliveThread;
+    private CommandMonitorThread keepAliveThread;
 
-    /**
-     * Constructor.
-     *
-     * @param jswExecFactory JSW executor factory.
-     * @since 2.0
-     */
+    private ConfigurationStrategy strategy;
+
     @Inject
     public DefaultNexusBundle( final Provider<NexusBundleConfiguration> configurationProvider,
                                final RunningBundles runningBundles,
                                final FileTaskBuilder fileTaskBuilder,
-                               final PortReservationService portReservationService,
-                               final JSWExecFactory jswExecFactory )
+                               final PortReservationService portReservationService )
     {
         super( "nexus", configurationProvider, runningBundles, fileTaskBuilder, portReservationService );
         this.fileTaskBuilder = fileTaskBuilder;
-        this.jswExecFactory = checkNotNull( jswExecFactory );
     }
 
     /**
      * Additionally <br/>
      * - configures Nexus/Jetty port<br/>
-     * - installs JSW command monitor<br/>
-     * - installs JSW keep alive monitor<br/>
-     * - configure remote debugging if requested<br/>
-     * - installs plugins.
+     * - installs command monitor<br/>
+     * - installs keep alive monitor<br/>
+     * - configure remote debugging if requested
      * <p/>
      * {@inheritDoc}
      *
@@ -118,12 +112,13 @@ public class DefaultNexusBundle
     {
         super.configure();
 
-        jswMonitorPort = getPortReservationService().reservePort();
-        jswKeepAlivePort = getPortReservationService().reservePort();
+        commandMonitorPort = getPortReservationService().reservePort();
+        keepAlivePort = getPortReservationService().reservePort();
 
-        configureJSW();
-        installPlugins();
-        configureNexusPort();
+        strategy = determineConfigurationStrategy();
+
+        configureJSW( strategy );
+        configureNexusProperties( strategy );
     }
 
     /**
@@ -136,16 +131,17 @@ public class DefaultNexusBundle
     {
         super.unconfigure();
 
-        if ( jswMonitorPort > 0 )
+        if ( commandMonitorPort > 0 )
         {
-            getPortReservationService().cancelPort( jswMonitorPort );
-            jswMonitorPort = 0;
+            getPortReservationService().cancelPort( commandMonitorPort );
+            commandMonitorPort = 0;
         }
-        if ( jswKeepAlivePort > 0 )
+        if ( keepAlivePort > 0 )
         {
-            getPortReservationService().cancelPort( jswKeepAlivePort );
-            jswKeepAlivePort = 0;
+            getPortReservationService().cancelPort( keepAlivePort );
+            keepAlivePort = 0;
         }
+        strategy = null;
     }
 
     /**
@@ -160,14 +156,54 @@ public class DefaultNexusBundle
     {
         try
         {
-            keepAliveThread = new KeepAliveThread( jswKeepAlivePort, new Slf4jLogProxy( log ) );
+            keepAliveThread = new CommandMonitorThread(
+                keepAlivePort,
+                new PingCommand(),
+                new StopMonitorCommand()
+            );
             keepAliveThread.start();
         }
         catch ( IOException e )
         {
             throw new RuntimeException( "Could not start JSW keep alive thread", e );
         }
-        jswExec().start();
+        installStopShutdownHook( commandMonitorPort );
+
+        final File nexusDir = getNexusDirectory();
+
+        makeExecutable( nexusDir, "nexus" );
+        makeExecutable( nexusDir, "wrapper" );
+
+        onDirectory( nexusDir ).apply(
+            fileTaskBuilder.exec().spawn()
+                .script( path( "bin/nexus" + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? ".bat" : "" ) ) )
+                .withArgument( "console" )
+                .withEnv( strategy.commandMonitorProperty(), String.valueOf( commandMonitorPort ) )
+                .withEnv( strategy.keepAliveProperty(), String.valueOf( keepAlivePort ) )
+        );
+
+        // check that command monitor is installed in started nexus with a delay of 1s for 5s
+        log.info( "Checking presence of command monitor in started Nexus" );
+        final boolean monitorInstalled = new TimedCondition()
+        {
+            @Override
+            protected boolean isSatisfied()
+                throws Exception
+            {
+                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PING_COMMAND );
+                return true;
+            }
+        }.await( 1000, 5000, 1000 );
+        if ( monitorInstalled )
+        {
+            log.debug( "Command monitor installed in started Nexus on port '{}'", commandMonitorPort );
+        }
+        else
+        {
+            throw new RuntimeException(
+                format( "Command monitor did not startup on port '%s' in started Nexus", commandMonitorPort )
+            );
+        }
     }
 
     /**
@@ -182,13 +218,14 @@ public class DefaultNexusBundle
     {
         try
         {
-            jswExec().stop();
+            sendStopToNexus( commandMonitorPort );
         }
         finally
         {
             if ( keepAliveThread != null )
             {
-                keepAliveThread.stopRunning();
+                sendStopToKeepAlive( keepAlivePort );
+                keepAliveThread = null;
             }
         }
     }
@@ -213,114 +250,68 @@ public class DefaultNexusBundle
     }
 
     /**
-     * Lazy creates and returns JSW utility.
+     * Configure Nexus properties using provided configuration strategy.
      *
-     * @return JSW utility (never null)
+     * @param strategy configuration strategy
      */
-    private JSWExec jswExec()
+    private void configureNexusProperties( final ConfigurationStrategy strategy )
     {
-        if ( jswExec == null )
-        {
-            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus", jswMonitorPort );
-        }
-        return jswExec;
+        strategy.configureNexus();
     }
 
     /**
-     * Install Nexus plugins in {@code sonatype-work/nexus/plugin-repository}.
-     */
-    private void installPlugins()
-    {
-        NexusBundleConfiguration config = getConfiguration();
-        List<File> plugins = config.getPlugins();
-        for ( File plugin : plugins )
-        {
-            if ( plugin.isDirectory() )
-            {
-                onDirectory( config.getTargetDirectory() ).apply(
-                    fileTaskBuilder.copy()
-                        .directory( file( plugin ) )
-                        .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
-                );
-            }
-            else
-            {
-                onDirectory( config.getTargetDirectory() ).apply(
-                    fileTaskBuilder.expand( file( plugin ) )
-                        .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
-                );
-            }
-        }
-    }
-
-    /**
-     * Configures "application-port" nexus property.
-     */
-    private void configureNexusPort()
-    {
-        onDirectory( getConfiguration().getTargetDirectory() ).apply(
-            fileTaskBuilder.properties( path( "nexus/conf/nexus.properties" ) )
-                .property( "application-port", String.valueOf( getPort() ) )
-        );
-    }
-
-    /**
-     * Creates a JSW configuration file specifying:<br/>
-     * - debugging options if debugging is enabled<br/>
-     * - installs JSW command monitor
+     * Configure JSW properties using provided configuration strategy.
      *
-     * @throws RuntimeException if a problem occurred during reading of JSW configuration or writing the additional JSW
-     *                          configuration file
+     * @param strategy configuration strategy
      */
-    private void configureJSW()
-        throws RuntimeException
+    private void configureJSW( final ConfigurationStrategy strategy )
     {
         try
         {
-            NexusBundleConfiguration config = getConfiguration();
+            final NexusBundleConfiguration config = getConfiguration();
 
-            File jswConfigFile = new File( config.getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf" );
+            final File jswConfigFile = new File( config.getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf" );
 
-            JSWConfig jswConfig = new JSWConfig(
+            final JSWConfig jswConfig = new JSWConfig(
                 jswConfigFile,
                 "The following properties are added by Nexus IT as an override of properties already configured"
-            );
-            jswConfig.load();
+            ).load();
 
-            jswConfig.configureMonitor( jswMonitorPort );
-            jswConfig.configureKeepAlive( jswKeepAlivePort );
-
-            // configure remote debug if requested
-            if ( config.getDebugPort() > 0 )
-            {
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xdebug" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xnoagent" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Djava.compiler=NONE" );
-                jswConfig.addIndexedProperty( "wrapper.java.additional",
-                                              "-Xrunjdwp:transport=dt_socket,server=y,suspend="
-                                                  + ( config.isSuspendOnStart() ? "y" : "n" )
-                                                  + ",address=" + config.getDebugPort() );
-            }
-
-            final Map<String, String> systemProperties = config.getSystemProperties();
-            if ( !systemProperties.isEmpty() )
-            {
-                for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
-                {
-                    jswConfig.addIndexedProperty(
-                        "wrapper.java.additional",
-                        format( "-D%s=%s", entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() )
-                    );
-                }
-            }
+            strategy.configureJSW( jswConfig );
 
             jswConfig.save();
-
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
-            throw new RuntimeException( e );
+            throw Throwables.propagate( e );
         }
+    }
+
+    /**
+     * Determines a configuration strategy based on version of Nexus to be started.
+     *
+     * @return configuration strategy. Never null.
+     */
+    private ConfigurationStrategy determineConfigurationStrategy()
+    {
+        final File libDir = new File( getConfiguration().getTargetDirectory(), "nexus/lib" );
+        // nexus-bootstrap-<version>.jar is only present starting with version 2.1
+        final String[] nexusBootstrapJarsBiggerThen2Dot1 = libDir.list( new FilenameFilter()
+        {
+            @Override
+            public boolean accept( final File dir, final String name )
+            {
+                return name.startsWith( "nexus-" )
+                    && name.endsWith( ".jar" )
+                    && !name.startsWith( "nexus-bootstrap-2.1" );
+            }
+
+        } );
+        if ( nexusBootstrapJarsBiggerThen2Dot1 != null && nexusBootstrapJarsBiggerThen2Dot1.length > 0 )
+        {
+            return new CS22AndAbove();
+        }
+        return new CS21AndBellow();
     }
 
     @Override
@@ -329,9 +320,200 @@ public class DefaultNexusBundle
         return new File( getConfiguration().getTargetDirectory(), "sonatype-work/nexus" );
     }
 
+    public File getNexusDirectory()
+    {
+        return new File( getConfiguration().getTargetDirectory(), "nexus" );
+    }
+
     @Override
     protected String generateId()
     {
-        return getName() + "-" + System.currentTimeMillis();
+        return "nx"; // TODO? use a system property if we should or not add: + "-" + System.currentTimeMillis();
     }
+
+    private void makeExecutable( final File baseDir,
+                                 final String scriptName )
+    {
+        if ( !Os.isFamily( Os.FAMILY_WINDOWS ) )
+        {
+            onDirectory( baseDir ).apply(
+                fileTaskBuilder.chmod( path( "/" ) )
+                    .include( "**/" + scriptName )
+                    .permissions( "u+x" )
+            );
+        }
+    }
+
+    private static void installStopShutdownHook( final int commandPort )
+    {
+        Thread stopShutdownHook = new Thread( "JSW Sanity Stopper" )
+        {
+            @Override
+            public void run()
+            {
+                sendStopToNexus( commandPort );
+            }
+        };
+
+        Runtime.getRuntime().addShutdownHook( stopShutdownHook );
+        log.debug( "Installed stop shutdown hook" );
+    }
+
+    private static void sendStopToNexus( final int commandPort )
+    {
+        log.debug( "Sending stop command to Nexus" );
+        try
+        {
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_APPLICATION_COMMAND );
+        }
+        catch ( Exception e )
+        {
+            log.debug(
+                "Skipping exception got while sending stop command to Nexus {}:{}",
+                e.getClass().getName(), e.getMessage()
+            );
+        }
+    }
+
+    private static void sendStopToKeepAlive( final int commandPort )
+    {
+        log.debug( "Sending stop command to keep alive thread" );
+        try
+        {
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_MONITOR_COMMAND );
+        }
+        catch ( Exception e )
+        {
+            log.debug(
+                "Skipping exception got while sending stop command to keep alive thread {}:{}",
+                e.getClass().getName(), e.getMessage()
+            );
+        }
+    }
+
+    private static interface ConfigurationStrategy
+    {
+
+        String commandMonitorProperty();
+
+        String keepAliveProperty();
+
+        void configureJSW( JSWConfig jswConfig );
+
+        void configureNexus();
+    }
+
+    private class CS22AndAbove
+        implements ConfigurationStrategy
+    {
+
+        @Override
+        public String commandMonitorProperty()
+        {
+            return Launcher.COMMAND_MONITOR_PORT;
+        }
+
+        @Override
+        public String keepAliveProperty()
+        {
+            return Launcher.KEEP_ALIVE_PORT;
+        }
+
+        @Override
+        public void configureJSW( final JSWConfig jswConfig )
+        {
+            // configure remote debug if requested
+            if ( getConfiguration().getDebugPort() > 0 )
+            {
+                jswConfig.addJavaStartupParameter( "-Xdebug" );
+                jswConfig.addJavaStartupParameter( "-Xnoagent" );
+                jswConfig.addJavaStartupParameter(
+                    "-Xrunjdwp:transport=dt_socket,server=y,suspend="
+                        + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
+                        + ",address=" + getConfiguration().getDebugPort()
+                );
+                jswConfig.addJavaSystemProperty( "java.compiler", "NONE" );
+            }
+        }
+
+        @Override
+        public void configureNexus()
+        {
+            final Properties nexusProperties = new Properties();
+
+            nexusProperties.setProperty( "application-port", String.valueOf( getPort() ) );
+
+            final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
+            if ( !systemProperties.isEmpty() )
+            {
+                for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
+                {
+                    nexusProperties.setProperty( entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() );
+                }
+            }
+
+            onDirectory( getConfiguration().getTargetDirectory() ).apply(
+                fileTaskBuilder.properties( path( "nexus/conf/nexus-test.properties" ) )
+                    .properties( nexusProperties )
+            );
+        }
+
+    }
+
+    private class CS21AndBellow
+        implements ConfigurationStrategy
+    {
+
+        @Override
+        public String commandMonitorProperty()
+        {
+            return NexusITLauncher.COMMAND_MONITOR_PORT;
+        }
+
+        @Override
+        public String keepAliveProperty()
+        {
+            return NexusITLauncher.KEEP_ALIVE_PORT;
+        }
+
+        @Override
+        public void configureJSW( final JSWConfig jswConfig )
+        {
+            String mainClass = jswConfig.getProperty( WRAPPER_JAVA_MAINCLASS );
+            if ( !NexusITLauncher.class.getName().equals( mainClass ) )
+            {
+                jswConfig.setJavaMainClass( NexusITLauncher.class );
+                jswConfig.addJavaSystemProperty( NexusITLauncher.LAUNCHER, mainClass );
+
+                jswConfig.addToJavaClassPath( NexusITLauncher.class );
+                jswConfig.addToJavaClassPath( Launcher.class );
+            }
+
+            jswConfig.addJavaSystemProperties( getConfiguration().getSystemProperties() );
+
+            // configure remote debug if requested
+            if ( getConfiguration().getDebugPort() > 0 )
+            {
+                jswConfig.addJavaStartupParameter( "-Xdebug" );
+                jswConfig.addJavaStartupParameter( "-Xnoagent" );
+                jswConfig.addJavaStartupParameter(
+                    "-Xrunjdwp:transport=dt_socket,server=y,suspend="
+                        + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
+                        + ",address=" + getConfiguration().getDebugPort()
+                );
+                jswConfig.addJavaSystemProperty( "java.compiler", "NONE" );
+            }
+        }
+
+        @Override
+        public void configureNexus()
+        {
+            onDirectory( getConfiguration().getTargetDirectory() ).apply(
+                fileTaskBuilder.properties( path( "nexus/conf/nexus.properties" ) )
+                    .property( "application-port", String.valueOf( getPort() ) )
+            );
+        }
+
+    }
+
 }

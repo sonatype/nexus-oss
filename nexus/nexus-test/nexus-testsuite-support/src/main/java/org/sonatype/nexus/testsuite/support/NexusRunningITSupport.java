@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.support;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -88,6 +89,12 @@ public abstract class NexusRunningITSupport
     @After
     public void afterTestWasRunning()
     {
+        if ( nexus != null )
+        {
+            testIndex.recordLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
+            testIndex.recordLink( "nexus.log", new File( nexus.getWorkDirectory(), "logs/nexus.log" ) );
+        }
+
         if ( NexusStartAndStopStrategy.Strategy.EACH_METHOD.equals( startAndStopStrategy ) )
         {
             stopNexus( nexus );

@@ -36,10 +36,13 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-jsw-utils</artifactId>
-      <version>1.3-SNAPSHOT</version>
-      <scope>compile</scope>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-bootstrap</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>tanukisoft</groupId>
+      <artifactId>wrapper</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>

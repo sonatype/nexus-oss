@@ -20,7 +20,7 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.responds
 import org.junit.Test;
 
 /**
- * Test starting and launching of Nexus.
+ * Test starting and stopping of Nexus.
  *
  * @since 2.0
  */

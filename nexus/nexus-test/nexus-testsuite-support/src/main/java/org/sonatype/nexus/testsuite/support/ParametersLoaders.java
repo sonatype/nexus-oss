@@ -224,6 +224,25 @@ public abstract class ParametersLoaders
     }
 
     /**
+     * Load test parameters from an array.
+     *
+     * @param parameters parameters arrays (sets)
+     * @return test parameters loader. Never null.
+     */
+    public static Loader testParameters( final String[]... parameters )
+    {
+        return new Loader()
+        {
+            @Override
+            public Collection<Object[]> load()
+            {
+                return Arrays.<Object[]>asList( parameters );
+            }
+
+        };
+    }
+
+    /**
      * Iterates provided loaders and return the first non empty list of parameters.
      *
      * @param loaders to be iterated

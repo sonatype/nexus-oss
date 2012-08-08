@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.bootstrap;
 
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,10 @@ import org.sonatype.appcontext.publisher.AbstractStringDumpingEntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
+import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.ShutdownIfNotAliveThread;
 import org.sonatype.sisu.jetty.Jetty8;
 
 /**
@@ -39,7 +45,20 @@ import org.sonatype.sisu.jetty.Jetty8;
  */
 public class Launcher
 {
+
     protected final Logger log;
+
+    public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
+
+    public static final String KEEP_ALIVE_PORT = ShutdownIfNotAliveThread.class.getName() + ".port";
+
+    public static final String KEEP_ALIVE_PING_INTERVAL = ShutdownIfNotAliveThread.class.getName() + ".pingInterval";
+
+    public static final String KEEP_ALIVE_TIMEOUT = ShutdownIfNotAliveThread.class.getName() + ".timeout";
+
+    public static final String FIVE_SECONDS = "5000";
+
+    public static final String ONE_SECOND = "1000";
 
     protected static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
 
@@ -73,6 +92,7 @@ public class Launcher
 
         ensureTmpDirSanity();
         maybeEnableCommandMonitor();
+        maybeEnableShutdownIfNotAlive();
 
         server.startJetty();
         return null; // continue running
@@ -190,7 +210,7 @@ public class Launcher
     }
 
     protected Properties loadProperties(final String resource, final boolean required) throws IOException {
-        URL url = getResource(resource);
+        URL url = getResource( resource );
         if (url == null) {
             if (required) {
                 log.error("Missing resource: {}", resource);
@@ -237,18 +257,73 @@ public class Launcher
     }
 
     protected void maybeEnableCommandMonitor() throws IOException {
-        String commandMonitorPort = System.getProperty(CommandMonitorThread.class.getName() + ".port");
+        String commandMonitorPort = System.getProperty( COMMAND_MONITOR_PORT );
+        if ( commandMonitorPort == null )
+        {
+            commandMonitorPort = System.getenv( COMMAND_MONITOR_PORT );
+        }
         if (commandMonitorPort != null) {
-            new CommandMonitorThread(this, Integer.parseInt(commandMonitorPort)).start();
+            new CommandMonitorThread(
+                Integer.parseInt( commandMonitorPort ),
+                new StopApplicationCommand( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Launcher.this.commandStop();
+                    }
+                } ),
+                new PingCommand()
+            ).start();
+        }
+    }
+
+    protected void maybeEnableShutdownIfNotAlive()
+        throws IOException
+    {
+        String port = System.getProperty( KEEP_ALIVE_PORT );
+        if ( port == null )
+        {
+            port = System.getenv( KEEP_ALIVE_PORT );
+        }
+        if ( port != null )
+        {
+            String pingInterval = System.getProperty( KEEP_ALIVE_PING_INTERVAL );
+            if ( pingInterval == null )
+            {
+                pingInterval = System.getenv( KEEP_ALIVE_PING_INTERVAL );
+                if ( pingInterval == null )
+                {
+                    pingInterval = FIVE_SECONDS;
+                }
+            }
+            String timeout = System.getProperty( KEEP_ALIVE_TIMEOUT );
+            if ( timeout == null )
+            {
+                timeout = System.getenv( KEEP_ALIVE_TIMEOUT );
+                if ( timeout == null )
+                {
+                    timeout = ONE_SECOND;
+                }
+            }
+            new ShutdownIfNotAliveThread(
+                new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Launcher.this.commandStop();
+                    }
+                },
+                LOCALHOST,
+                Integer.parseInt( port ),
+                Integer.parseInt( pingInterval ),
+                Integer.parseInt( timeout )
+            ).start();
         }
     }
 
     public void commandStop() {
-        System.exit(0);
-    }
-
-    public void commandRestart() {
-        log.error("Restart not supported, stopping instead");
         System.exit(0);
     }
 
