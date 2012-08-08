@@ -19,13 +19,8 @@
  * @constructor
  */
 Nexus.profile.UserProfile = function(cfg) {
-  // this may happen on opening a bookmark
-  if (!Sonatype.user.curr || !Sonatype.user.curr.isLoggedIn) {
-    Sonatype.repoServer.RepoServer.loginHandler();
-    return;
-  }
-
   var
+        _this = this,
         config = cfg || {},
         defaultConfig = {
           autoScroll : true,
@@ -36,6 +31,30 @@ Nexus.profile.UserProfile = function(cfg) {
 
   Ext.apply(this, config, defaultConfig);
 
+  // this may happen on opening a bookmark
+  if (!Sonatype.user.curr || !Sonatype.user.curr.isLoggedIn) {
+    // initialize empty tab (we cannot remove it without this call)
+    Nexus.profile.UserProfile.superclass.constructor.call(this, {
+      title : 'Profile'
+    });
+
+    // suppress the next change TO this tab, because we don't have valid user data yet
+    Sonatype.view.mainTabPanel.on("beforetabchange", function(tabPanel, newTab, oldTab) {
+      if (newTab === _this) {
+        Sonatype.view.mainTabPanel.remove(_this);
+        return false;
+      }
+    }, _this, {
+      single : true
+    });
+
+    if ( !Sonatype.view.justLoggedOut ) {
+      Sonatype.view.afterLoginToken = window.location.hash.substring(1);
+      Sonatype.repoServer.RepoServer.loginHandler();
+    }
+
+    return;
+  }
 
   Sonatype.Events.fireEvent('userProfileInit', views);
 
