@@ -18,12 +18,15 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 /**
  * Test starting and stopping of Nexus using parameters.
@@ -35,7 +38,7 @@ public class StartAndStopNexusRunningParametrizedIT
 {
 
     // Uncomment the following line to suppress default parameters lookup and use test specific ones
-    // @Parameters
+    // @Parameterized.Parameters
     public static Collection<Object[]> testSpecificParameters()
     {
         return firstAvailableTestParameters(
@@ -45,12 +48,24 @@ public class StartAndStopNexusRunningParametrizedIT
     }
 
     // Uncomment the following line to suppress default parameters lookup and use the ones specified by the method
-    // @Parameters
+    // @Parameterized.Parameters
     public static Collection<Object[]> hardcodedParameters()
     {
         return Arrays.asList( new Object[][]{
             { "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" },
         } );
+    }
+
+    // Uncomment the following line to suppress default parameters lookup and use test specific ones
+    // @Parameterized.Parameters
+    public static Collection<Object[]> hardcodedAndSystemProperties()
+    {
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters(
+                $( "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" )
+            )
+        ).load();
     }
 
     public StartAndStopNexusRunningParametrizedIT( final String nexusBundleCoordinates )
