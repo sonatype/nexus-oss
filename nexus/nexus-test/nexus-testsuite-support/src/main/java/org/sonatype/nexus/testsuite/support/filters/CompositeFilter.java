@@ -37,7 +37,7 @@ public class CompositeFilter
     /**
      * Constructor.
      *
-     * @param filters member filters.Cannot be null.
+     * @param filters member filters. Cannot be null.
      */
     public CompositeFilter( final List<Filter> filters )
     {
