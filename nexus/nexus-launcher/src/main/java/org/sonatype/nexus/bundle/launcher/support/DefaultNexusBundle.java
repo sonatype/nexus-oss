@@ -176,7 +176,7 @@ public class DefaultNexusBundle
 
         onDirectory( nexusDir ).apply(
             fileTaskBuilder.exec().spawn()
-                .script( path( "bin/nexus" ) )
+                .script( path( "bin/nexus" + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? ".bat" : "" ) ) )
                 .withArgument( "console" )
                 .withEnv( strategy.commandMonitorProperty(), String.valueOf( commandMonitorPort ) )
                 .withEnv( strategy.keepAliveProperty(), String.valueOf( keepAlivePort ) )
