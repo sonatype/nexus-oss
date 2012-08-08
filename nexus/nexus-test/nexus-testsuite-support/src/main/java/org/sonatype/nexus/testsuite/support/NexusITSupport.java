@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
@@ -205,6 +206,17 @@ public abstract class NexusITSupport
             );
             testIndex.recordLink( "bundle", "../test-classes/injected-test.properties" );
         }
+    }
+
+    @After
+    public void recordSurefireAndFailsafeInfo()
+    {
+        testIndex.recordLink(
+            "failsafe", util.resolveFile( "target/failsafe-reports/" + getClass().getName() + ".txt" )
+        );
+        testIndex.recordLink(
+            "surefire", util.resolveFile( "target/surefire-reports/" + getClass().getName() + ".txt" )
+        );
     }
 
     /**
