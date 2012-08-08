@@ -32,6 +32,7 @@ import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 import org.sonatype.sisu.litmus.testsupport.TestData;
+import org.sonatype.sisu.litmus.testsupport.TestIndex;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
@@ -152,7 +153,7 @@ public abstract class NexusITSupport
                 @Override
                 public File resolve()
                 {
-                    return testIndex.getDirectory();
+                    return testIndex().getDirectory();
                 }
 
             } );
@@ -196,7 +197,7 @@ public abstract class NexusITSupport
                 testName.getMethodName(), filteredNexusBundleCoordinates
             );
 
-            testIndex.recordInfo( "bundle", filteredNexusBundleCoordinates );
+            testIndex().recordInfo( "bundle", filteredNexusBundleCoordinates );
         }
         else
         {
@@ -204,7 +205,7 @@ public abstract class NexusITSupport
                 "TEST {} is running against a Nexus bundle resolved from injected-test.properties",
                 testName.getMethodName()
             );
-            testIndex.recordLink( "bundle", "../test-classes/injected-test.properties" );
+            testIndex().recordLink( "bundle", "../test-classes/injected-test.properties" );
         }
     }
 
@@ -213,13 +214,13 @@ public abstract class NexusITSupport
     {
         {
             final String name = "target/failsafe-reports/" + getClass().getName();
-            testIndex.recordLink( "failsafe result", util.resolveFile( name + ".txt" ) );
-            testIndex.recordLink( "failsafe output", util.resolveFile( name + "-output.txt" ) );
+            testIndex().recordLink( "failsafe result", util.resolveFile( name + ".txt" ) );
+            testIndex().recordLink( "failsafe output", util.resolveFile( name + "-output.txt" ) );
         }
         {
             final String name = "target/surefire-reports/" + getClass().getName();
-            testIndex.recordLink( "surefire result", util.resolveFile( name + ".txt" ) );
-            testIndex.recordLink( "surefire output", util.resolveFile( name + "-output.txt" ) );
+            testIndex().recordLink( "surefire result", util.resolveFile( name + ".txt" ) );
+            testIndex().recordLink( "surefire output", util.resolveFile( name + "-output.txt" ) );
         }
     }
 
@@ -247,6 +248,16 @@ public abstract class NexusITSupport
     public TestData testData()
     {
         return testData;
+    }
+
+    /**
+     * Returns test index.
+     *
+     * @return test index. Never null.
+     */
+    public TestIndex testIndex()
+    {
+        return testIndex;
     }
 
     /**
