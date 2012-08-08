@@ -18,9 +18,11 @@
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <target>System.out</target>
     <encoder>
-      <pattern>%date %level [%thread%X{DC}] %logger - %msg%n</pattern>
+      <pattern>${test.log.pattern}</pattern>
     </encoder>
   </appender>
+
+  <logger name="Sisu" level="${test.log.level.Sisu:-INFO}"/>
 
   <logger name="org.sonatype.nexus.plugins.capabilities" level="TRACE"/>
 

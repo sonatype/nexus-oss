@@ -61,6 +61,9 @@
     <nexus-oss-webapp.version>2.2-SNAPSHOT</nexus-oss-webapp.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
 
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
+
     <arguments />
   </properties>
 
