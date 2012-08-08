@@ -47,6 +47,7 @@ import org.sonatype.sisu.bl.support.RunningBundles;
 import org.sonatype.sisu.bl.support.TimedCondition;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
+import org.sonatype.sisu.goodies.common.Time;
 import com.google.common.base.Throwables;
 
 /**
@@ -193,7 +194,7 @@ public class DefaultNexusBundle
                 new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PING_COMMAND );
                 return true;
             }
-        }.await( 1000, 5000, 1000 );
+        }.await( Time.seconds( 1 ), Time.seconds( 5 ), Time.seconds( 1 ) );
         if ( monitorInstalled )
         {
             log.debug( "Command monitor installed in started Nexus on port '{}'", commandMonitorPort );
