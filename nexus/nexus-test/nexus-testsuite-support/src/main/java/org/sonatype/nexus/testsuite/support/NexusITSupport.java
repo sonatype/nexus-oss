@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.support;
 
+import static org.sonatype.nexus.testsuite.support.NexusITFilter.contextEntry;
 import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilter.TEST_PROJECT_POM_FILE;
 
 import java.io.File;
@@ -26,8 +27,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
-import org.sonatype.nexus.testsuite.support.filters.CompositeFilter;
-import org.sonatype.nexus.testsuite.support.filters.ImplicitVersionFilter;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
@@ -38,7 +37,6 @@ import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 
@@ -87,7 +85,7 @@ public abstract class NexusITSupport
      * Filter used to filter coordinates.
      * Lazy initialized on first usage.
      */
-    private Filter filter;
+    private NexusITFilter filter;
 
     /**
      * Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
@@ -186,11 +184,7 @@ public abstract class NexusITSupport
     {
         if ( nexusBundleCoordinates != null )
         {
-            // TODO create this map only once?
-            final Map<String, String> context = Maps.newHashMap();
-            fillContext( context );
-
-            filteredNexusBundleCoordinates = filter().filter( context, nexusBundleCoordinates );
+            filteredNexusBundleCoordinates = filter().filter( nexusBundleCoordinates );
 
             logger.info(
                 "TEST {} is running against Nexus bundle {}",
@@ -265,26 +259,16 @@ public abstract class NexusITSupport
      *
      * @return IT specific filter. Never null.
      */
-    public Filter filter()
+    public NexusITFilter filter()
     {
         if ( filter == null )
         {
-            final List<Filter> memberFilters = Lists.newArrayList();
-            memberFilters.add( new ImplicitVersionFilter() );
-            memberFilters.addAll( filters );
-            filter = new CompositeFilter( memberFilters );
+            filter = new NexusITFilter(
+                filters,
+                contextEntry( TEST_PROJECT_POM_FILE, util.resolveFile( "pom.xml" ).getAbsolutePath() )
+            );
         }
         return filter;
-    }
-
-    /**
-     * Fills teh context with test related mappings.
-     *
-     * @param context to fill up
-     */
-    public void fillContext( final Map<String, String> context )
-    {
-        context.put( TEST_PROJECT_POM_FILE, util.resolveFile( "pom.xml" ).getAbsolutePath() );
     }
 
 }
