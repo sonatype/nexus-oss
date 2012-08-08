@@ -18,13 +18,15 @@
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <target>System.out</target>
     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} %-5level - %msg [%logger{16}][%thread%X{DC}]%n</pattern>
+      <pattern>${test.log.pattern}</pattern>
     </encoder>
   </appender>
 
   <logger name="Sisu" level="${test.log.level.Sisu:-INFO}"/>
   <logger name="org.apache.commons.httpclient" level="ERROR"/>
   <logger name="org.apache.http" level="${test.log.level.org.apache.http:-INFO}"/>
+
+  <logger name="org.sonatype.nexus.plugins.capabilities" level="TRACE"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>

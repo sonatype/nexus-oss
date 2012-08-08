@@ -33,13 +33,10 @@ public class NexusIsActiveConditionTest
 
     private NexusIsActiveCondition underTest;
 
-    @Override
     @Before
-    public void setUp()
+    public final void setUpNexusIsActiveCondition()
         throws Exception
     {
-        super.setUp();
-
         underTest = new NexusIsActiveCondition( eventBus );
         underTest.bind();
 

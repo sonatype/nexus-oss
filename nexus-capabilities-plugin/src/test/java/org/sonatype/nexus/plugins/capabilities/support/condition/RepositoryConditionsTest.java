@@ -25,6 +25,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryExis
 import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryLocalStatusCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryProxyModeCondition;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * {@link RepositoryConditions} UTs.
@@ -32,12 +33,13 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
  * @since 2.0
  */
 public class RepositoryConditionsTest
+    extends TestSupport
 {
 
     private RepositoryConditions underTest;
 
     @Before
-    public void setUp()
+    public void setUpRepositoryConditions()
     {
         final EventBus eventBus = mock( EventBus.class );
         underTest = new RepositoryConditions( eventBus, mock( RepositoryRegistry.class ) );

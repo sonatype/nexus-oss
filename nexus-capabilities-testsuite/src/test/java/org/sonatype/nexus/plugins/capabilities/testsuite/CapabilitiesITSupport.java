@@ -12,28 +12,23 @@
  */
 package org.sonatype.nexus.plugins.capabilities.testsuite;
 
-import static org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
+import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 
-import java.io.File;
 import javax.inject.Inject;
 
 import org.junit.Before;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.bundle.launcher.NexusRunningITSupport;
-import org.sonatype.nexus.bundle.launcher.NexusStartAndStopStrategy;
-import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
+import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
-import org.sonatype.nexus.capabilities.client.Capabilities;
-import org.sonatype.sisu.bl.support.resolver.BundleResolver;
-import com.google.inject.Binder;
-import com.google.inject.name.Names;
+import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
+import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 @NexusStartAndStopStrategy( EACH_TEST )
 public abstract class CapabilitiesITSupport
-    extends NexusRunningITSupport
+    extends NexusRunningParametrizedITSupport
 {
 
     protected static final String TEST_REPOSITORY = "releases";
@@ -43,38 +38,22 @@ public abstract class CapabilitiesITSupport
 
     private NexusClient nexusClient;
 
+    public CapabilitiesITSupport( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
+
     @Override
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
         return configuration.addPlugins(
-            resolvePluginFromDependencyManagement(
+            artifactResolver().resolvePluginFromDependencyManagement(
                 "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
             ),
-            resolvePluginFromDependencyManagement(
+            artifactResolver().resolvePluginFromDependencyManagement(
                 "org.sonatype.nexus.capabilities", "nexus-capabilities-testsuite-helper"
             )
         );
-    }
-
-    @Override
-    public void configure( final Binder binder )
-    {
-        super.configure( binder );
-        binder
-            .bind( BundleResolver.class )
-            .annotatedWith( Names.named( NexusBundleResolver.FALLBACK_NEXUS_BUNDLE_RESOLVER ) )
-            .toInstance(
-                new BundleResolver()
-                {
-                    @Override
-                    public File resolve()
-                    {
-                        return resolveFromDependencyManagement(
-                            "org.sonatype.nexus", "nexus-oss-webapp", null, null, null, null
-                        );
-                    }
-                }
-            );
     }
 
     @Before

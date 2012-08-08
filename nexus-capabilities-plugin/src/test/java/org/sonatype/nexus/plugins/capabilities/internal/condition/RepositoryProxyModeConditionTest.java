@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
@@ -43,30 +44,26 @@ public class RepositoryProxyModeConditionTest
 
     private RepositoryProxyModeCondition underTest;
 
+    @Mock
     private ProxyRepository repository;
 
+    @Mock
     private RepositoryRegistry repositoryRegistry;
 
-    @Override
     @Before
-    public void setUp()
+    public final void setUpRepositoryProxyModeCondition()
         throws Exception
     {
-        super.setUp();
-
         final RepositoryConditions.RepositoryId repositoryId = mock( RepositoryConditions.RepositoryId.class );
         when( repositoryId.get() ).thenReturn( TEST_REPOSITORY );
 
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
         when( repositoryKind.isFacetAvailable( ProxyRepository.class ) ).thenReturn( true );
 
-        repository = mock( ProxyRepository.class );
         when( repository.getId() ).thenReturn( TEST_REPOSITORY );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
         when( repository.getProxyMode() ).thenReturn( ProxyMode.ALLOW );
         when( repository.adaptToFacet( ProxyRepository.class ) ).thenReturn( repository );
-
-        repositoryRegistry = mock( RepositoryRegistry.class );
 
         underTest = new RepositoryProxyModeCondition(
             eventBus, repositoryRegistry, ProxyMode.ALLOW, repositoryId

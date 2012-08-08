@@ -37,6 +37,7 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -53,6 +54,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import com.google.common.collect.Maps;
 
 /**
@@ -61,25 +63,27 @@ import com.google.common.collect.Maps;
  * @since 2.0
  */
 public class DefaultCapabilityRegistryTest
+    extends TestSupport
 {
 
     static final CapabilityType CAPABILITY_TYPE = capabilityType( "test" );
 
+    @Mock
     private EventBus eventBus;
+
+    @Mock
+    private CapabilityStorage capabilityStorage;
+
+    @Mock
+    private CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
     private DefaultCapabilityRegistry underTest;
 
     private ArgumentCaptor<CapabilityEvent> rec;
 
-    private CapabilityStorage capabilityStorage;
-
-    private CapabilityDescriptorRegistry capabilityDescriptorRegistry;
-
     @Before
-    public void setUp()
+    public final void setUpCapabilityRegistry()
     {
-        capabilityStorage = mock( CapabilityStorage.class );
-
         final ValidatorRegistryProvider validatorRegistryProvider = mock( ValidatorRegistryProvider.class );
         final ValidatorRegistry validatorRegistry = mock( ValidatorRegistry.class );
         when( validatorRegistryProvider.get() ).thenReturn( validatorRegistry );
@@ -99,10 +103,7 @@ public class DefaultCapabilityRegistryTest
         final CapabilityFactoryRegistry capabilityFactoryRegistry = mock( CapabilityFactoryRegistry.class );
         when( capabilityFactoryRegistry.get( CAPABILITY_TYPE ) ).thenReturn( factory );
 
-        capabilityDescriptorRegistry = mock( CapabilityDescriptorRegistry.class );
         when( capabilityDescriptorRegistry.get( CAPABILITY_TYPE ) ).thenReturn( mock( CapabilityDescriptor.class ) );
-
-        eventBus = mock( EventBus.class );
 
         final ActivationConditionHandlerFactory achf = mock( ActivationConditionHandlerFactory.class );
         when( achf.create( Mockito.<DefaultCapabilityReference>any() ) ).thenReturn(

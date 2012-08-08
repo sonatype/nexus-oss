@@ -28,6 +28,11 @@ public class CrudIT
     extends CapabilitiesITSupport
 {
 
+    public CrudIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
+
     @Test
     public void crud()
     {

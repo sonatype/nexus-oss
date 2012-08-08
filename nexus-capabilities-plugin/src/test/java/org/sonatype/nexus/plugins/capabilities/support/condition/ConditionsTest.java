@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * {@link Conditions} UTs.
@@ -25,6 +26,7 @@ import org.junit.Test;
  * @since 2.0
  */
 public class ConditionsTest
+    extends TestSupport
 {
 
     /**

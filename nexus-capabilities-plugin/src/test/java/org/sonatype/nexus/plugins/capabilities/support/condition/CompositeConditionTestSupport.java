@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
@@ -34,25 +35,21 @@ public class CompositeConditionTestSupport
     extends EventBusTestSupport
 {
 
+    @Mock
     private Condition c1;
 
+    @Mock
     private Condition c2;
 
+    @Mock
     private Condition c3;
 
     private TestCondition underTest;
 
-    @Override
     @Before
-    public void setUp()
+    public final void setUpTestCondition()
         throws Exception
     {
-        super.setUp();
-
-        c1 = mock( Condition.class );
-        c2 = mock( Condition.class );
-        c3 = mock( Condition.class );
-
         underTest = new TestCondition( eventBus, c1, c2, c3 );
         underTest.bind();
 

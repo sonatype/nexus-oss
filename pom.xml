@@ -57,7 +57,12 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <nexus.version>2.1</nexus.version>
+    <nexus-testsuite-support.version>2.2-SNAPSHOT</nexus-testsuite-support.version>
+    <nexus-oss-webapp.version>2.2-SNAPSHOT</nexus-oss-webapp.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
+
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
 
     <arguments />
   </properties>
@@ -81,25 +86,9 @@
         <version>1</version>
       </dependency>
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit-dep</artifactId>
-        <version>4.10</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>3.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <version>1.3.RC2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-library</artifactId>
-        <version>1.3.RC2</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -126,21 +115,15 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-launcher</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-launcher</artifactId>
-        <version>${nexus.version}</version>
-        <classifier>tests</classifier>
+        <artifactId>nexus-testsuite-support</artifactId>
+        <version>${nexus-testsuite-support.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-webapp</artifactId>
         <type>zip</type>
         <classifier>bundle</classifier>
-        <version>${nexus.version}</version>
+        <version>${nexus-oss-webapp.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -198,7 +181,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.2</version>
+        <version>1.4-SNAPSHOT</version>
       </dependency>
 
       <!-- Internal -->
