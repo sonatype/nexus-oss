@@ -211,12 +211,16 @@ public abstract class NexusITSupport
     @After
     public void recordSurefireAndFailsafeInfo()
     {
-        testIndex.recordLink(
-            "failsafe", util.resolveFile( "target/failsafe-reports/" + getClass().getName() + ".txt" )
-        );
-        testIndex.recordLink(
-            "surefire", util.resolveFile( "target/surefire-reports/" + getClass().getName() + ".txt" )
-        );
+        {
+            final String name = "target/failsafe-reports/" + getClass().getName();
+            testIndex.recordLink( "failsafe result", util.resolveFile( name + ".txt" ) );
+            testIndex.recordLink( "failsafe output", util.resolveFile( name + "-output.txt" ) );
+        }
+        {
+            final String name = "target/surefire-reports/" + getClass().getName();
+            testIndex.recordLink( "surefire result", util.resolveFile( name + ".txt" ) );
+            testIndex.recordLink( "surefire output", util.resolveFile( name + "-output.txt" ) );
+        }
     }
 
     /**
