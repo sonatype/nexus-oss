@@ -32,13 +32,10 @@ public class ConditionTestSupport
 
     private TestCondition underTest;
 
-    @Override
     @Before
-    public void setUp()
+    public final void setUpTestCondition()
         throws Exception
     {
-        super.setUp();
-
         underTest = new TestCondition( eventBus );
         underTest.bind();
     }

@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -39,27 +40,23 @@ public class RepositoryExistsConditionTest
 
     static final String TEST_REPOSITORY = "test-repository";
 
-    private RepositoryExistsCondition underTest;
-
+    @Mock
     private Repository repository;
 
+    @Mock
     private RepositoryRegistry repositoryRegistry;
 
-    @Override
+    private RepositoryExistsCondition underTest;
+
     @Before
-    public void setUp()
+    public final void setUpRepositoryExistsCondition()
         throws Exception
     {
-        super.setUp();
-
         final RepositoryConditions.RepositoryId repositoryId = mock( RepositoryConditions.RepositoryId.class );
         when( repositoryId.get() ).thenReturn( TEST_REPOSITORY );
 
-        repository = mock( Repository.class );
         when( repository.getId() ).thenReturn( TEST_REPOSITORY );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
-
-        repositoryRegistry = mock( RepositoryRegistry.class );
 
         underTest = new RepositoryExistsCondition( eventBus, repositoryRegistry, repositoryId );
         underTest.bind();

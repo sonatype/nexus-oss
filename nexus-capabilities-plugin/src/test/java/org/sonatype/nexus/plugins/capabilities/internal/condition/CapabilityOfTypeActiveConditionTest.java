@@ -25,6 +25,7 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -44,36 +45,32 @@ public class CapabilityOfTypeActiveConditionTest
     extends EventBusTestSupport
 {
 
+    @Mock
     private CapabilityReference ref1;
 
+    @Mock
     private CapabilityReference ref2;
 
+    @Mock
     private CapabilityReference ref3;
 
+    @Mock
     private CapabilityRegistry capabilityRegistry;
 
     private CapabilityOfTypeActiveCondition underTest;
 
-    @Override
     @Before
-    public void setUp()
+    public final void setUpCapabilityOfTypeActiveCondition()
         throws Exception
     {
-        super.setUp();
-
-        capabilityRegistry = mock( CapabilityRegistry.class );
-
         final CapabilityType capabilityType = capabilityType( this.getClass().getName() );
 
-        ref1 = mock( CapabilityReference.class );
         when( ref1.context() ).thenReturn( mock( CapabilityContext.class ) );
         when( ref1.context().type() ).thenReturn( capabilityType );
 
-        ref2 = mock( CapabilityReference.class );
         when( ref2.context() ).thenReturn( mock( CapabilityContext.class ) );
         when( ref2.context().type() ).thenReturn( capabilityType );
 
-        ref3 = mock( CapabilityReference.class );
         when( ref3.context() ).thenReturn( mock( CapabilityContext.class ) );
         when( ref3.context().type() ).thenReturn( capabilityType( Capability.class.getName() ) );
 

@@ -19,6 +19,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabil
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -35,23 +36,19 @@ public class PassivateCapabilityDuringUpdateConditionTest
     extends EventBusTestSupport
 {
 
+    @Mock
     private CapabilityReference reference;
+
+    @Mock
+    private CapabilityRegistry capabilityRegistry;
 
     private PassivateCapabilityDuringUpdateCondition underTest;
 
-    private CapabilityRegistry capabilityRegistry;
-
-    @Override
     @Before
-    public void setUp()
+    public final void setUpPassivateCapabilityDuringUpdateCondition()
         throws Exception
     {
-        super.setUp();
-
         final CapabilityIdentity id = capabilityIdentity( "test" );
-
-        capabilityRegistry = mock( CapabilityRegistry.class );
-        reference = mock( CapabilityReference.class );
 
         final CapabilityContext context = mock( CapabilityContext.class );
         when( context.id() ).thenReturn( id );

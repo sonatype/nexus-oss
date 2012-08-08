@@ -20,6 +20,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.NexusIsActiveCondition;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * {@link NexusConditions} UTs.
@@ -27,6 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.condition.NexusIsActiveC
  * @since 2.0
  */
 public class NexusConditionsTest
+    extends TestSupport
 {
 
     /**

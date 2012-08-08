@@ -14,11 +14,11 @@ package org.sonatype.nexus.plugins.capabilities.support.condition;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
@@ -36,22 +36,19 @@ public class LogicalConditionsTest
 
     static final boolean SATISFIED = true;
 
-    private LogicalConditions underTest;
-
+    @Mock
     private Condition left;
 
+    @Mock
     private Condition right;
 
-    @Override
+    private LogicalConditions underTest;
+
     @Before
-    public void setUp()
+    public final void setUpLogicalConditions()
         throws Exception
     {
-        super.setUp();
-
         underTest = new LogicalConditions( eventBus );
-        left = mock( Condition.class );
-        right = mock( Condition.class );
     }
 
     public Condition prepare( final CompositeConditionSupport condition, boolean leftSatisfied,

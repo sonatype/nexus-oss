@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
@@ -33,18 +34,15 @@ public class InversionConditionTest
     extends EventBusTestSupport
 {
 
-    private InversionCondition underTest;
-
+    @Mock
     private Condition condition;
 
-    @Override
+    private InversionCondition underTest;
+
     @Before
-    public void setUp()
+    public final void setUpInversionCondition()
         throws Exception
     {
-        super.setUp();
-
-        condition = mock( Condition.class );
         underTest = new InversionCondition( eventBus, condition );
         underTest.bind();
 

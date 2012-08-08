@@ -25,10 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Support for tests using event bus.
@@ -36,16 +39,18 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
  * @since 2.0
  */
 public class EventBusTestSupport
+    extends TestSupport
 {
 
+    @Mock
     protected EventBus eventBus;
 
     protected List<Object> eventBusEvents;
 
-    public void setUp()
+    @Before
+    public final void setUpEventBus()
         throws Exception
     {
-        eventBus = mock( EventBus.class );
         eventBusEvents = new ArrayList<Object>();
 
         doAnswer( new Answer<Object>()

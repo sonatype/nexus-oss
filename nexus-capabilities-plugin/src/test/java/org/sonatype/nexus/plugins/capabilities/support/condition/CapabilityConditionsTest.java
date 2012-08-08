@@ -28,6 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.PassivateCapabilityDuringUpdateCondition;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * {@link CapabilityConditions} UTs.
@@ -35,12 +36,13 @@ import org.sonatype.nexus.plugins.capabilities.internal.condition.PassivateCapab
  * @since 2.0
  */
 public class CapabilityConditionsTest
+    extends TestSupport
 {
 
     private CapabilityConditions underTest;
 
     @Before
-    public void setUp()
+    public final void setUpCapabilityConditions()
     {
         final EventBus eventBus = mock( EventBus.class );
         final CapabilityDescriptorRegistry descriptorRegistry = mock( CapabilityDescriptorRegistry.class );

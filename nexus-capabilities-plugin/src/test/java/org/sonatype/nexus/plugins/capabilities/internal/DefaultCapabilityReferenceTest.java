@@ -34,6 +34,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -47,6 +48,7 @@ import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.NexusIsActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.NexusConditions;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * {@link DefaultCapabilityReference} UTs.
@@ -54,57 +56,58 @@ import org.sonatype.nexus.plugins.capabilities.support.condition.NexusConditions
  * @since 2.0
  */
 public class DefaultCapabilityReferenceTest
+    extends TestSupport
 {
 
     static final Map<String, String> NULL_PROPERTIES = null;
 
+    @Mock
     private Capability capability;
 
-    private DefaultCapabilityReference underTest;
-
+    @Mock
     private EventBus eventBus;
 
+    @Mock
     private Condition activationCondition;
 
+    @Mock
     private Condition validityCondition;
+
+    @Mock
+    private ActivationConditionHandlerFactory achf;
+
+    @Mock
+    private ValidityConditionHandlerFactory vchf;
+
+    @Mock
+    private NexusIsActiveCondition nexusIsActiveCondition;
+
+    @Mock
+    private CapabilityRegistry capabilityRegistry;
 
     private ArgumentCaptor<CapabilityEvent> re;
 
     private ArgumentCaptor<Object> ebc;
 
-    private ActivationConditionHandlerFactory achf;
-
-    private ValidityConditionHandlerFactory vchf;
-
-    private NexusIsActiveCondition nexusIsActiveCondition;
-
-    private CapabilityRegistry capabilityRegistry;
+    private DefaultCapabilityReference underTest;
 
     @Before
     public void setUp()
     {
-        eventBus = mock( EventBus.class );
-        capabilityRegistry = mock( CapabilityRegistry.class );
 
         final Conditions conditions = mock( Conditions.class );
         final NexusConditions nexusConditions = mock( NexusConditions.class );
-        nexusIsActiveCondition = mock( NexusIsActiveCondition.class );
 
         when( nexusIsActiveCondition.isSatisfied() ).thenReturn( true );
         when( nexusConditions.active() ).thenReturn( nexusIsActiveCondition );
         when( conditions.nexus() ).thenReturn( nexusConditions );
 
-        capability = mock( Capability.class );
-
-        activationCondition = mock( Condition.class );
         when( activationCondition.isSatisfied() ).thenReturn( true );
         when( capability.activationCondition() ).thenReturn( activationCondition );
 
-        validityCondition = mock( Condition.class );
         when( validityCondition.isSatisfied() ).thenReturn( true );
         when( capability.validityCondition() ).thenReturn( validityCondition );
 
-        achf = mock( ActivationConditionHandlerFactory.class );
         when( achf.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
             new Answer<ActivationConditionHandler>()
             {
@@ -119,7 +122,6 @@ public class DefaultCapabilityReferenceTest
             }
         );
 
-        vchf = mock( ValidityConditionHandlerFactory.class );
         when( vchf.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
             new Answer<ValidityConditionHandler>()
             {
