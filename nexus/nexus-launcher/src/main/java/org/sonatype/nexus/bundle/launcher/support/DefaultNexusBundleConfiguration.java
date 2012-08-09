@@ -60,6 +60,12 @@ public class DefaultNexusBundleConfiguration
     private final List<File> plugins;
 
     /**
+     * One of TRACE/DEBUG/INFO/ERROR or {@code null} if bundle defaults should be used.
+     * Can be null.
+     */
+    private String logLevel;
+
+    /**
      * Constructor.
      *
      * @since 2.2
@@ -167,6 +173,18 @@ public class DefaultNexusBundleConfiguration
     }
 
     @Override
+    public void setLogLevel( final String level )
+    {
+        logLevel = level;
+    }
+
+    @Override
+    public String getLogLevel()
+    {
+        return logLevel;
+    }
+
+    @Override
     public List<FileTask> getOverlays()
     {
         final List<FileTask> overlays = Lists.newArrayList( super.getOverlays() );
@@ -201,6 +219,16 @@ public class DefaultNexusBundleConfiguration
                         "org.eclipse.jetty.server.nio.BlockingChannelConnector"
                     )
                     .failIfFileDoesNotExist()
+            );
+        }
+
+        if ( getLogLevel() != null )
+        {
+            overlays.add(
+                fileTaskBuilder.properties( path( "sonatype-work/nexus/conf/logback.properties" ) )
+                    .property( "root.level", getLogLevel() )
+                    .property( "appender.pattern", "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" )
+                    .property( "appender.file", "${nexus.log-config-dir}/../logs/nexus.log" )
             );
         }
 
