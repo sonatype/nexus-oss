@@ -17,7 +17,6 @@ import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilter.TES
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -37,7 +36,6 @@ import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
-import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 
 /**
