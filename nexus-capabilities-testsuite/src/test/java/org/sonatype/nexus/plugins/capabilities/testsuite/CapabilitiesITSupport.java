@@ -14,10 +14,16 @@ package org.sonatype.nexus.plugins.capabilities.testsuite;
 
 import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
 
+import java.util.Collection;
 import javax.inject.Inject;
 
 import org.junit.Before;
+import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.client.core.NexusClient;
@@ -30,6 +36,17 @@ import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 public abstract class CapabilitiesITSupport
     extends NexusRunningParametrizedITSupport
 {
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data()
+    {
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters(
+                $( "org.sonatype.nexus:nexus-oss-webapp:zip:bundle" )
+            )
+        ).load();
+    }
 
     protected static final String TEST_REPOSITORY = "releases";
 
