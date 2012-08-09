@@ -17,12 +17,14 @@ import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilter.TES
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
@@ -112,6 +114,12 @@ public abstract class NexusITSupport
     public TestDataRule testData = new TestDataRule( util.resolveFile( "src/test/it-resources" ) );
 
     /**
+     * Copy of system properties before the test (class).
+     * Initialised before class starts.
+     */
+    private static Properties systemPropertiesBackup;
+
+    /**
      * Runs IT by against Nexus bundle coordinates specified in "injected-test.properties".
      */
     public NexusITSupport()
@@ -172,6 +180,24 @@ public abstract class NexusITSupport
                 }
             }
         );
+    }
+
+    /**
+     * Takes a snapshot of system properties before the test starts.
+     */
+    @BeforeClass
+    public static void backupSystemProperties()
+    {
+        systemPropertiesBackup = System.getProperties();
+    }
+
+    /**
+     * Restores system properties as they were before test started.
+     */
+    @After
+    public void restoreSystemProperties()
+    {
+        System.setProperties( systemPropertiesBackup );
     }
 
     /**
