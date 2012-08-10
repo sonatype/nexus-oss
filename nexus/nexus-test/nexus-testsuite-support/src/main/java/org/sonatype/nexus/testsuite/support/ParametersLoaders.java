@@ -212,7 +212,7 @@ public abstract class ParametersLoaders
             @Override
             public Collection<Object[]> load()
             {
-                final String sysPropsParameters = System.getProperty( "NexusItSupport.parameters" );
+                final String sysPropsParameters = System.getProperty( "it.parameters" );
                 if ( sysPropsParameters == null )
                 {
                     return Lists.newArrayList();
