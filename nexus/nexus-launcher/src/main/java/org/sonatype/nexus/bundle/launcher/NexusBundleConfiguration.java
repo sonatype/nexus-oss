@@ -75,7 +75,7 @@ public interface NexusBundleConfiguration
      * @param level one of TRACE/DEBUG/INFO/ERROR or {@code null} if bundle defaults should be used
      * @since 2.2
      */
-    void setLogLevel( String level );
+    NexusBundleConfiguration setLogLevel( String level );
 
     /**
      * Gets log level, if configured

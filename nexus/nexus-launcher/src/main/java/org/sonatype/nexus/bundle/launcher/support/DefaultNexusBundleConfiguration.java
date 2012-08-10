@@ -173,9 +173,10 @@ public class DefaultNexusBundleConfiguration
     }
 
     @Override
-    public void setLogLevel( final String level )
+    public NexusBundleConfiguration setLogLevel( final String level )
     {
         logLevel = level;
+        return this;
     }
 
     @Override
