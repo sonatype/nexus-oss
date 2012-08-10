@@ -135,7 +135,9 @@ public abstract class NexusRunningITSupport
             if ( staticNexus == null )
             {
                 nexus = nexusProvider.get();
-                NexusBundleConfiguration config = configureNexus( nexus.getConfiguration() );
+                final NexusBundleConfiguration config = configureNexus(
+                    applyDefaultConfiguration( nexus ).getConfiguration()
+                );
                 if ( config != null )
                 {
                     nexus.setConfiguration( config );

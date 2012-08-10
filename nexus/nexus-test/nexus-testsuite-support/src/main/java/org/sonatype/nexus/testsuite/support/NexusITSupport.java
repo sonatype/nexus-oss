@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.support;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.testsuite.support.NexusITFilter.contextEntry;
 import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilter.TEST_PROJECT_POM_FILE;
 
@@ -20,10 +21,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
@@ -267,6 +270,40 @@ public abstract class NexusITSupport
             );
         }
         return filter;
+    }
+
+    /**
+     * Apply default configuration settings to specified Nexus.
+     *
+     * @param nexus tp apply default configurations settings to
+     * @return passed in Nexus, for fluent API usage
+     */
+    public NexusBundle applyDefaultConfiguration( final NexusBundle nexus )
+    {
+        String logLevel = System.getProperty( "it.nexus.log.level" );
+
+        if ( !"DEBUG".equalsIgnoreCase( logLevel ) )
+        {
+            final String useDebugFor = System.getProperty( "it.nexus.log.level.use.debug" );
+            if ( !StringUtils.isEmpty( useDebugFor ) )
+            {
+                final String[] segments = useDebugFor.split( "," );
+                for ( final String segment : segments )
+                {
+                    if ( getClass().getSimpleName().matches( segment.replace( ".", "\\." ).replace( "*", ".*" ) ) )
+                    {
+                        logLevel = "DEBUG";
+                    }
+                }
+            }
+        }
+
+        if ( !StringUtils.isEmpty( logLevel ) )
+        {
+            checkNotNull( nexus ).getConfiguration().setLogLevel( logLevel );
+        }
+
+        return nexus;
     }
 
 }
