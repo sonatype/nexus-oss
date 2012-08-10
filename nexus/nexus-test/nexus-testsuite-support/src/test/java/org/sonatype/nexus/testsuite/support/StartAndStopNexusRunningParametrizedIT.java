@@ -18,7 +18,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.goodies.common.Varargs.$;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
 
@@ -26,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 /**
  * Test starting and stopping of Nexus using parameters.
