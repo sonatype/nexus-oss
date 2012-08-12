@@ -46,7 +46,7 @@ import com.google.common.collect.Lists;
  * 
  * @author Marvin Froeder ( velo at sonatype.com )
  */
-public class DefaultTargetRegistryLRTest
+public class DefaultTargetRegistryIT
     extends AbstractDefaultTargetRegistryTest
 {
     private Function<Target, String> toIds = new Function<Target, String>()

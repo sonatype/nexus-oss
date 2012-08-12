@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 // This is an IT just because it runs longer then 15 seconds
-public class DefaultRepositoryItemUidLRTest
+public class DefaultRepositoryItemUidIT
 {
     private DummyRepositoryItemUidFactory factory;
 

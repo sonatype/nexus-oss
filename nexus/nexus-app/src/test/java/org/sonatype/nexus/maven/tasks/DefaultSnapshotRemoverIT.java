@@ -35,7 +35,7 @@ import java.util.Map;
  * @author juven
  */
 // This is an IT just because it runs longer then 15 seconds
-public class DefaultSnapshotRemoverLRTest
+public class DefaultSnapshotRemoverIT
     extends AbstractMavenRepoContentTests
 {
     protected void validateResults( MavenRepository repository, Map<String, Boolean> results )

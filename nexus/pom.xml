@@ -1966,21 +1966,6 @@
         <enunciate.skip>true</enunciate.skip> -->
         <test-env.skip>true</test-env.skip>
       </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <excludes>
-                  <exclude>**/*LRTest.java</exclude>
-                </excludes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-
     </profile>
 
     <!-- dummy profile for activating integration tests -->

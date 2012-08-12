@@ -15,7 +15,7 @@ package org.sonatype.nexus.index;
 import org.junit.Test;
 
 // This is an IT just because it runs longer then 15 seconds
-public class DisableIndexerManagerLRTest
+public class DisableIndexerManagerIT
     extends AbstractIndexerManagerTest
 {
 

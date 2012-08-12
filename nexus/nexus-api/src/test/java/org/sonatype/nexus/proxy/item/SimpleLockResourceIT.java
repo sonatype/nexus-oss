@@ -19,7 +19,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-public class SimpleLockResourceLRTest
+public class SimpleLockResourceIT
 {
     private static Random rnd = new Random( System.currentTimeMillis() );
 
