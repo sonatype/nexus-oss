@@ -46,7 +46,7 @@ public class DefaultNexusBundleConfiguration
     /**
      * Start timeout configuration property key.
      */
-    public static final String START_TIMEOUT = "NexusBundleConfiguration.startTimeout";
+    public static final String START_TIMEOUT = "nexus.launcher.startTimeout";
 
     /**
      * File task builder.

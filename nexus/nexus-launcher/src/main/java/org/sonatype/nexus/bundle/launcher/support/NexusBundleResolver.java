@@ -33,7 +33,7 @@ public class NexusBundleResolver
     /**
      * Bundle coordinates configuration property key.
      */
-    public static final String BUNDLE_COORDINATES = "NexusBundleConfiguration.bundleCoordinates";
+    public static final String BUNDLE_COORDINATES = "nexus.launcher.bundleCoordinates";
 
     /**
      * Constructor.
