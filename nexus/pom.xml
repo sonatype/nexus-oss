@@ -1978,6 +1978,14 @@
         </property>
       </activation>
       <!-- FIXME, make running cargo ITs part of this profile? -->
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <!-- Nexus quick build profiles: effects of -Pquick: tests will be compiled but not run, n-t-e-p will assemble the test environments effects of -Dquick: tests will not be compiled,
