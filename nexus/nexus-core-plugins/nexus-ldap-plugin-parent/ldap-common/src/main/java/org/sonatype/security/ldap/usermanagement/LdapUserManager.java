@@ -19,7 +19,7 @@ import java.util.TreeSet;
 import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.appcontext.internal.Preconditions;
 import org.sonatype.security.ldap.dao.LdapDAOException;
@@ -41,7 +41,7 @@ public class LdapUserManager
     extends AbstractReadOnlyUserManager
 {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger( LdapUserManager.class );
+    private static final Logger logger = LoggerFactory.getLogger( LdapUserManager.class );
 
     public static final String LDAP_REALM_KEY = "LdapAuthenticatingRealm";
     private static final String USER_SOURCE = "LDAP";
