@@ -27,7 +27,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 /**
  * Tests for {@link LdapUserManager}.
  */
-public class MockedLdapUserManagerTest
+public class LdapUserManagerMockedTest
     extends TestSupport
 {
 
