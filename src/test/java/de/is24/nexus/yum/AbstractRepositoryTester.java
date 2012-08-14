@@ -1,5 +1,6 @@
 package de.is24.nexus.yum;
 
+import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_DIR;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.BASE_TMP_FILE;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.easymock.EasyMock.createMock;
@@ -24,8 +25,6 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
 import com.google.code.tempusfugit.temporal.Condition;
-
-import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
 
 
 public abstract class AbstractRepositoryTester extends AbstractYumNexusTestCase {
@@ -56,6 +55,7 @@ public abstract class AbstractRepositoryTester extends AbstractYumNexusTestCase 
   @Before
   public void cleanUpCacheDirectory() throws Exception {
     deleteDirectory(BASE_TMP_FILE);
+    BASE_CACHE_DIR.mkdirs();
   }
 
   protected MavenRepository createRepository(final boolean isMavenHostedRepository) {
@@ -70,7 +70,7 @@ public abstract class AbstractRepositoryTester extends AbstractYumNexusTestCase 
     expect(repository.getRepositoryKind()).andReturn(kind).anyTimes();
     expect(repository.getId()).andReturn(repoId).anyTimes();
 
-    File repoDir = new File(RepositoryTestUtils.BASE_TMP_FILE, "tmp-repos/" + repoId);
+    File repoDir = new File(BASE_TMP_FILE, "tmp-repos/" + repoId);
     repoDir.mkdirs();
     expect(repository.getLocalUrl()).andReturn(repoDir.toURI().toString()).anyTimes();
 
