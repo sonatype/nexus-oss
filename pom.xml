@@ -6,7 +6,7 @@
 
   <groupId>de.is24.nexus</groupId>
   <artifactId>nexus-yum-plugin</artifactId>
-  <version>2.0.2.2-SNAPSHOT</version>
+  <version>2.1.1-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
   <name>Nexus Yum Plugin</name>
   <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
@@ -46,7 +46,7 @@
 
   <properties>
     <!-- Set the Nexus version here, against which you build the plugin -->
-    <nexus.version>2.0.2</nexus.version>
+    <nexus.version>2.1.1</nexus.version>
     <cobertura.line.coverage>70</cobertura.line.coverage>
     <cobertura.branch.coverage>70</cobertura.branch.coverage>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -297,12 +297,12 @@
             </goals>
             <phase>package</phase>
             <configuration>
-              <tasks>
+              <target>
                 <property name="project.build.finalName" value="${project.build.finalName}" />
                 <ant antfile="${project.basedir}\build-rpm.xml">
                   <target name="rpm" />
                 </ant>
-              </tasks>
+              </target>
             </configuration>
           </execution>
           <execution>

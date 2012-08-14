@@ -13,6 +13,8 @@ import javax.xml.bind.Unmarshaller;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -23,7 +25,7 @@ import de.is24.nexus.yum.version.alias.domain.AliasKey;
 import de.is24.nexus.yum.version.alias.domain.AliasMapping;
 
 @Component(role = YumConfiguration.class)
-public class DefaultYumConfiguration implements YumConfiguration {
+public class DefaultYumConfiguration implements YumConfiguration, Initializable {
   public static final String YUM_XML = "yum.xml";
 
   private static final Logger log = LoggerFactory.getLogger(DefaultYumConfiguration.class);
@@ -113,7 +115,7 @@ public class DefaultYumConfiguration implements YumConfiguration {
   @Inject
   public void setNexusConfiguration(NexusConfiguration nexusConfiguration) {
     this.nexusConfiguration = nexusConfiguration;
-    load();
+    // load();
   }
 
   @Override
@@ -219,5 +221,10 @@ public class DefaultYumConfiguration implements YumConfiguration {
     final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
     newConfig.setActive(active);
     saveConfig(newConfig);
+  }
+
+  @Override
+  public void initialize() throws InitializationException {
+    load();
   }
 }
