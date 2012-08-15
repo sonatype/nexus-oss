@@ -39,13 +39,10 @@ public class AbstractYumNexusTestCase extends NexusTestSupport {
 
   @Override
   protected void setUp() throws Exception {
-    super.setUp();
-
-    copyTestConf();
-
     initConfigurations();
+    super.setUp();
+    copyTestConf();
     initRestApiSettings();
-
     injectFields();
   }
 
