@@ -13,6 +13,7 @@
 package org.sonatype.nexus.testsuite.support;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 import static org.sonatype.nexus.testsuite.support.NexusITFilter.contextEntry;
 import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilter.TEST_PROJECT_POM_FILE;
 
@@ -31,6 +32,9 @@ import org.junit.Rule;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
+import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.client.rest.NexusClientFactory;
+import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
@@ -68,8 +72,18 @@ public abstract class NexusITSupport
     @Named( "remote-model-resolver-using-settings" )
     private MavenModelResolver modelResolver;
 
+    /**
+     * Nexus bundle resolver.
+     * Used in case that bundle is not specified as a constructor parameter.
+     */
     @Inject
     private NexusBundleResolver nexusBundleResolver;
+
+    /**
+     * Nexus client factory. Used to lazy create Nexus client.
+     */
+    @Inject
+    private NexusClientFactory nexusClientFactory;
 
     /**
      * List of available filters.
@@ -301,7 +315,7 @@ public abstract class NexusITSupport
     /**
      * Apply default configuration settings to specified Nexus.
      *
-     * @param nexus tp apply default configurations settings to
+     * @param nexus to apply default configurations settings to
      * @return passed in Nexus, for fluent API usage
      */
     public NexusBundle applyDefaultConfiguration( final NexusBundle nexus )
@@ -330,6 +344,48 @@ public abstract class NexusITSupport
         }
 
         return nexus;
+    }
+
+    /**
+     * Creates a {@link NexusClient} for specified Nexus instance, user and password.
+     *
+     * @param nexus    to create client for
+     * @param userName user
+     * @param password password
+     * @return created nexus client. Never null.
+     */
+    protected NexusClient createNexusClient( final NexusBundle nexus,
+                                             final String userName,
+                                             final String password )
+    {
+        return nexusClientFactory.createFor(
+            baseUrlFrom( checkNotNull( nexus ).getUrl() ),
+            new UsernamePasswordAuthenticationInfo( checkNotNull( userName ), checkNotNull( password ) )
+        );
+    }
+
+    /**
+     * Creates a {@link NexusClient} for specified Nexus instance, with user "admin" and password "admin123".
+     *
+     * @param nexus to create client for
+     * @return created nexus client. Never null.
+     */
+    protected NexusClient createNexusClientForAdmin( final NexusBundle nexus )
+    {
+        return createNexusClient( nexus, "admin", "admin123" );
+    }
+
+    /**
+     * Creates a {@link NexusClient} for specified Nexus instance for anonymous user.
+     *
+     * @param nexus to create client for
+     * @return created nexus client. Never null.
+     */
+    protected NexusClient createNexusClientForAnonymous( final NexusBundle nexus )
+    {
+        return nexusClientFactory.createFor(
+            baseUrlFrom( nexus.getUrl() )
+        );
     }
 
 }

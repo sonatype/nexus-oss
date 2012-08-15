@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.client.core.NexusClient;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 
@@ -45,6 +46,12 @@ public abstract class NexusRunningITSupport
      */
     @Inject
     private Provider<NexusBundle> nexusProvider;
+
+    /**
+     * Nexus client.
+     * Lazy created on first usage.
+     */
+    private NexusClient nexusClient;
 
     /**
      * Current running Nexus. Lazy created by {@link #nexus()}.
@@ -175,6 +182,20 @@ public abstract class NexusRunningITSupport
     protected NexusStartAndStopStrategy getStartAndStopStrategy()
     {
         return getClass().getAnnotation( NexusStartAndStopStrategy.class );
+    }
+
+    /**
+     * Lazy creates a Nexus client for "admin"/"admin123".
+     *
+     * @return Nexus client. Never null.
+     */
+    protected NexusClient client()
+    {
+        if ( nexusClient == null )
+        {
+            nexusClient = createNexusClientForAdmin( nexus() );
+        }
+        return nexusClient;
     }
 
     private Stopwatch startNexus( final NexusBundle nexusBundle )
