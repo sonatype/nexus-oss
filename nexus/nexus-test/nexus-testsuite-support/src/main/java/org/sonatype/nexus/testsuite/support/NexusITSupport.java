@@ -38,6 +38,7 @@ import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
+import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.litmus.testsupport.TestData;
 import org.sonatype.sisu.litmus.testsupport.TestIndex;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
@@ -75,9 +76,17 @@ public abstract class NexusITSupport
     /**
      * Nexus bundle resolver.
      * Used in case that bundle is not specified as a constructor parameter.
+     * Never null.
      */
     @Inject
     private NexusBundleResolver nexusBundleResolver;
+
+    /**
+     * File task builder used to build overlays.
+     * Never null.
+     */
+    @Inject
+    private FileTaskBuilder fileTaskBuilder;
 
     /**
      * Nexus client factory. Used to lazy create Nexus client.
@@ -293,6 +302,16 @@ public abstract class NexusITSupport
     public TestIndex testIndex()
     {
         return testIndex;
+    }
+
+    /**
+     * Returns overlay builder.
+     *
+     * @return overlay builder. Never null.
+     */
+    public FileTaskBuilder tasks()
+    {
+        return fileTaskBuilder;
     }
 
     /**
