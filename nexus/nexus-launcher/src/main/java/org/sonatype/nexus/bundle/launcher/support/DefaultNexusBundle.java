@@ -194,7 +194,7 @@ public class DefaultNexusBundle
                 new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PING_COMMAND );
                 return true;
             }
-        }.await( Time.seconds( 1 ), Time.seconds( 5 ), Time.seconds( 1 ) );
+        }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
         if ( monitorInstalled )
         {
             log.debug( "Command monitor installed in started Nexus on port '{}'", commandMonitorPort );
@@ -202,7 +202,10 @@ public class DefaultNexusBundle
         else
         {
             throw new RuntimeException(
-                format( "Command monitor did not startup on port '%s' in started Nexus", commandMonitorPort )
+                format(
+                    "Nexus did not started up command monitor on port '%s' in allocated timeout of 10 seconds"
+                    , commandMonitorPort
+                )
             );
         }
     }
