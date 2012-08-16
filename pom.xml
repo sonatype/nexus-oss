@@ -82,11 +82,6 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.sonatype.nexus.plugins</groupId>
-          <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>${nexus.version}</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-invoker-plugin</artifactId>
           <version>1.7</version>
