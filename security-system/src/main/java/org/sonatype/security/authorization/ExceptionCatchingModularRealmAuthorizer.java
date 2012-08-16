@@ -150,7 +150,10 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                if ( logger.isTraceEnabled() )
+                {
+                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                }
             }
         }
 
@@ -180,7 +183,10 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                if ( logger.isTraceEnabled() )
+                {
+                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                }
             }
         }
 
@@ -200,20 +206,29 @@ public class ExceptionCatchingModularRealmAuthorizer
             {
                 if ( ( (Authorizer) realm ).isPermitted( subjectPrincipal, permission ) )
                 {
-                    this.logger.trace( "Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
-                        + " has permisison: " + permission );
+                    if ( logger.isTraceEnabled() )
+                    {
+                        this.logger.trace( "Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
+                            + " has permisison: " + permission );
+                    }
                     return true;
                 }
                 else
                 {
-                    this.logger.trace( "Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
-                        + " does NOT have permisison: " + permission );
+                    if ( logger.isTraceEnabled() )
+                    {
+                        this.logger.trace( "Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
+                            + " does NOT have permisison: " + permission );
+                    }
                 }
 
             }
             catch ( AuthorizationException e )
             {
-                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                if ( logger.isTraceEnabled() )
+                {
+                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                }
             }
         }
 
@@ -238,7 +253,10 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                if ( logger.isTraceEnabled() )
+                {
+                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                }
             }
         }
 
@@ -267,7 +285,10 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                if ( logger.isTraceEnabled() )
+                {
+                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                }
             }
         }
 
@@ -296,11 +317,17 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                if ( logger.isTraceEnabled() )
+                {
+                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                }
             }
             catch ( Exception e )
             {
-                logger.warn( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                if ( logger.isTraceEnabled() )
+                {
+                    logger.warn( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                }
             }
         }
 
