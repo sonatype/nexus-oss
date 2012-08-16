@@ -19,6 +19,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
 public abstract class AbstractMavenRepositoryTemplate
@@ -26,7 +27,7 @@ public abstract class AbstractMavenRepositoryTemplate
 {
     private RepositoryPolicy repositoryPolicy;
 
-    public AbstractMavenRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
+    public AbstractMavenRepositoryTemplate( AbstractRepositoryTemplateProvider provider, String id, String description,
                                             ContentClass contentClass, Class<?> mainFacet,
                                             RepositoryPolicy repositoryPolicy )
     {
