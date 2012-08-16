@@ -1,143 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2008-2012 Sonatype, Inc.
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2012 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
-    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/pro/attributions
-    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
-    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.sonatype.nexus.plugin</groupId>
-    <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>12</version>
+    <relativePath />
   </parent>
 
-  <artifactId>nexus-maven-site-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
+  <groupId>org.sonatype.nexus.plugins</groupId>
+  <artifactId>nexus-maven-site-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-  <name>Nexus Professional Plugin :: Maven Site Plugin</name>
+  <name>Nexus Plugin :: Maven Site</name>
   <description>Adds a repository type for deploying maven sites.</description>
 
-  <dependencies>
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+    </license>
+  </licenses>
 
-    <!-- Because we enforce license -->
-    <dependency>
-      <groupId>com.sonatype.nexus.edition</groupId>
-      <artifactId>nexus-professional-edition</artifactId>
-    </dependency>
+  <scm>
+    <connection>scm:git:git@github.com/sonatype/nexus-maven-site-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-maven-site-plugin.git</developerConnection>
+    <url>http://github.com/sonatype/nexus-maven-site-plugin</url>
+  </scm>
 
-    <!-- This is a plugin -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-    </dependency>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <nexus.version>2.1.1</nexus.version>
+    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
+    <arguments />
+  </properties>
 
-    <!-- AllInOne for UTs -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
-    </dependency>
+  <modules>
+    <module>nexus-maven-site-plugin</module>
+    <module>nexus-maven-site-plugin-its</module>
+  </modules>
 
-    <!-- AllInOne for ITs -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-launcher</artifactId>
-    </dependency>
-
-  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webapp-dependencies</artifactId>
+        <version>${nexus.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
-    <plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-test-environment-maven-plugin</artifactId>
+          <version>${nexus.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>1.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.12.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.12.2</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+              <configuration>
+                <forkMode>always</forkMode>
+                <argLine>-Xmx512m</argLine>
+                <junitArtifactName>none:none</junitArtifactName>
+                <testNGArtifactName>org.testng:testng</testNGArtifactName>
+                <failIfNoTests>false</failIfNoTests>
+                <excludes>
+                  <exclude>**/*$*</exclude>
+                  <exclude>**/Abstract*</exclude>
+                </excludes>
+                <properties>
+                  <property>
+                    <name>usedefaultlisteners</name>
+                    <value>true</value>
+                  </property>
+                  <property>
+                    <name>reporter</name>
+                    <value>org.testng.reporters.JUnitXMLReporter</value>
+                  </property>
+                  <property>
+                    <name>listener</name>
+                    <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
+                  </property>
+                </properties>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
 
+        <plugin>
+          <!-- To perform a release run mvn release:prepare release:perform -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <useReleaseProfile>false</useReleaseProfile>
+            <goals>deploy</goals>
+            <arguments>${arguments}</arguments>
+            <releaseProfiles>release noit</releaseProfiles>
+            <tagNameFormat>nexus-p2-repository-plugin-@{version}</tagNameFormat>
+          </configuration>
+        </plugin>
+
+        <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -->
+        <plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <version>1.9.0</version>
+          <configuration>
+            <header>header-eplv1.txt</header>
+            <encoding>UTF-8</encoding>
+            <strictCheck>true</strictCheck>
+            <useDefaultExcludes>false</useDefaultExcludes>
+            <includes>
+              <include>**/*.java</include>
+              <include>**/*.vm</include>
+              <include>**/*.xml</include>
+              <include>**/*.groovy</include>
+              <include>**/*.aj</include>
+              <include>**/*.css</include>
+              <include>**/*.html</include>
+              <include>**/*.js</include>
+            </includes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <!-- grid makes this directory -->
+              <exclude>.maven/**</exclude>
+              <!-- eclipse makes this directory -->
+              <exclude>**/.settings/**</exclude>
+              <!-- netbeans adds these -->
+              <exclude>**/nbactions*.xml</exclude>
+              <exclude>**/nb-configuration.xml</exclude>
+              <!-- IntelliJ IDEA project directory -->
+              <exclude>**/.idea/**</exclude>
+            </excludes>
+            <mapping>
+              <vm>XML_STYLE</vm>
+              <groovy>JAVADOC_STYLE</groovy>
+              <aj>JAVADOC_STYLE</aj>
+            </mapping>
+            <properties>
+              <year>2012</year>
+            </properties>
+            <!-- this is important for multi-module project -->
+            <aggregate>true</aggregate>
+          </configuration>
+          <goals>
+            <goal>check</goal>
+          </goals>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/classes/static/js/nexus-maven-site-plugin-all.js</output>
-              <nosuffix>true</nosuffix>
-              <nomunge>true</nomunge>
-              <jswarn>false</jswarn>
-              <insertNewLine>true</insertNewLine>
-              <disableOptimizations>true</disableOptimizations>
-            </configuration>
-          </execution>
-        </executions>
+        <version>1.6</version>
+        <extensions>true</extensions>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>1.6</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <pluginSiteUrl>
+            http://links.sonatype.com/products/nexus/oss/plugins/unpack
+          </pluginSiteUrl>
+        </configuration>
       </plugin>
     </plugins>
   </build>
 
   <profiles>
+
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
     <profile>
-      <id>skip-test-harness-tests</id>
+      <id>idea</id>
+      <properties>
+        <nexus.plugin.type>jar</nexus.plugin.type>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>noit</id>
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <skip>true</skip>
+              <skipITs>true</skipITs>
             </configuration>
           </plugin>
           <plugin>
-            <groupId>org.sonatype.plugins</groupId>
+            <groupId>org.sonatype.nexus.plugins</groupId>
             <artifactId>nexus-test-environment-maven-plugin</artifactId>
             <configuration>
-              <testSkip>true</testSkip>
+              <pluginSkip>true</pluginSkip>
             </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>withTests</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-app</artifactId>
-          <classifier>tests</classifier>
-        </dependency>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-proxy</artifactId>
-          <classifier>tests</classifier>
-        </dependency>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-configuration</artifactId>
-          <classifier>tests</classifier>
-        </dependency>
-      </dependencies>
-    </profile>
   </profiles>
+
 </project>
