@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.rest;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -27,7 +26,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.restlet.Context;
 import org.restlet.data.Conditions;
 import org.restlet.data.Form;
@@ -56,7 +54,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
- *
+ * Tests for {@link AbstractResourceStoreContentPlexusResource}
  */
 public class ResourceStoreContentPlexusResourceTest
     extends TestSupport
@@ -173,7 +171,6 @@ public class ResourceStoreContentPlexusResourceTest
         when( fileItem.getItemContext() ).thenReturn( new RequestContext() );
 
     }
-
 
     @Test
     public void testNexus5155CacheHeadersForCollectionItems()
