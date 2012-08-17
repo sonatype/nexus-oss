@@ -147,10 +147,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        // NXCM-5155 Force browsers to never cache content pages
-        final Series<Parameter> headers = ((HttpResponse) response).getHttpCall().getResponseHeaders();
-        headers.add( "Pragma", "no-cache" );
-        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
 
         ResourceStoreRequest req = getResourceStoreRequest( request );
 
@@ -182,6 +178,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             return null;
         }
+    }
+
+    private void addNoCacheHeaders( final Response response )
+    {
+        // NXCM-5155 Force browsers to not cache this page
+        final Series<Parameter> headers = ((HttpResponse) response).getHttpCall().getResponseHeaders();
+        headers.add( "Pragma", "no-cache" );
+        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
     }
 
     @Override
@@ -431,6 +435,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
         else if ( item instanceof StorageCollectionItem )
         {
+
             String resPath = parsePathFromUri( req.getResourceRef().toString() );
 
             if ( !resPath.endsWith( "/" ) )
@@ -439,6 +444,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
                 return null;
             }
+
+            // NXCM-5155 do not cache index pages
+            addNoCacheHeaders( res );
 
             // we have a collection
             StorageCollectionItem coll = (StorageCollectionItem) item;
