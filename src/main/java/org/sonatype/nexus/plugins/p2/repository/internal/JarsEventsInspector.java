@@ -13,11 +13,9 @@
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
+import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.getP2Type;
 
 import java.io.File;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -62,7 +60,7 @@ public class JarsEventsInspector
 
         final RepositoryItemEvent event = (RepositoryItemEvent) evt;
 
-        return isABundle( event.getItem() );
+        return isP2Artifact( event.getItem() );
     }
 
     @Override
@@ -95,8 +93,8 @@ public class JarsEventsInspector
         p2MetadataGenerator.removeP2Metadata( event.getItem() );
     }
 
-    // TODO optimize by saving the fact that is a bundle as item attribute and check that one first
-    private boolean isABundle( final StorageItem item )
+    // TODO optimize by saving the fact that is a bundle/feature as item attribute and check that one first
+    private boolean isP2Artifact( final StorageItem item )
     {
         if ( item == null )
         {
@@ -105,46 +103,11 @@ public class JarsEventsInspector
         try
         {
             final File file = retrieveFile( repositories.getRepository( item.getRepositoryId() ), item.getPath() );
-            return isABundle( file );
+            return getP2Type(file) != null;
         }
         catch ( final Exception e )
         {
             return false;
         }
     }
-
-    static boolean isABundle( final File file )
-    {
-        if ( file == null )
-        {
-            return false;
-        }
-        JarFile jarFile = null;
-        try
-        {
-            jarFile = new JarFile( file );
-            final Manifest manifest = jarFile.getManifest();
-            final Attributes mainAttributes = manifest.getMainAttributes();
-            return mainAttributes.getValue( "Bundle-SymbolicName" ) != null;
-        }
-        catch ( final Exception e )
-        {
-            return false;
-        }
-        finally
-        {
-            if ( jarFile != null )
-            {
-                try
-                {
-                    jarFile.close();
-                }
-                catch ( final Exception ignored )
-                {
-                    // safe to ignore...
-                }
-            }
-        }
-    }
-
 }
