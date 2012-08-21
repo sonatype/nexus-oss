@@ -1,6 +1,6 @@
 package com.sonatype.nexus.staging.api;
 
-import de.is24.nexus.yum.plugin.m2yum.M2YumContentClass;
+import org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumContentClass;
 
 public class AbstractStagingProfilePlexusResource {
   public String validateProfile() {
