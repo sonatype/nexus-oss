@@ -1653,8 +1653,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           // Need to do the same w/ service type and make sure the correct card
           // is active. Dynamic cards, so little more generic
           var serviceTypePanel = formPanel.findById(formPanel.id + '_service-type-config-card-panel');
+          serviceTypePanel.hide();
           serviceTypePanel.items.each(function(item, i, len) {
-                if (item.id == id + '_' + rec.data.typeId)
+                if (item.id === id + '_' + rec.data.typeId)
                 {
                   serviceTypePanel.activeItem = i;
                   if (item.items && item.items.length !== 0)
@@ -1663,8 +1664,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                     item.items.each(function(item) {
                           item.disabled = false;
                         });
-                  } else {
-                    serviceTypePanel.hide();
                   }
                 }
               });
