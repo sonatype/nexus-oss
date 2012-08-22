@@ -5,13 +5,10 @@ import java.io.File;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
+import org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
-
-import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask;
 
 
 public abstract class AbstractSchedulerTest extends AbstractYumNexusTestCase {

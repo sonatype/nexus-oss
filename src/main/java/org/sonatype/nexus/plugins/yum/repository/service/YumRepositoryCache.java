@@ -2,12 +2,12 @@ package org.sonatype.nexus.plugins.yum.repository.service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
+
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 
 
 public class YumRepositoryCache {
-  private Map<String, YumRepository> cache = new ConcurrentHashMap<String, YumRepository>();
+  private final Map<String, YumRepository> cache = new ConcurrentHashMap<String, YumRepository>();
 
   public YumRepository lookup(String id, String version) {
     YumRepository yumRepository = cache.get(hash(id, version));

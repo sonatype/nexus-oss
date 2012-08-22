@@ -3,8 +3,6 @@ package org.sonatype.nexus.plugins.yum.plugin.impl;
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
-
 public class DelayedDirectoryDeletionTask implements Runnable {
 
   private final DeletionService service;

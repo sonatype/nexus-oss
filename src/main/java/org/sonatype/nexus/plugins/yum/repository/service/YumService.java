@@ -8,8 +8,6 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
 
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
-
 
 public interface YumService {
   ScheduledTask<YumRepository> createYumRepository(Repository repository);

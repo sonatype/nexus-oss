@@ -1,6 +1,5 @@
 package org.sonatype.nexus.plugins.yum.plugin.integration;
 
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.createDummyRpm;
 import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;

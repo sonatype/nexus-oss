@@ -1,10 +1,5 @@
 package org.sonatype.nexus.plugins.yum.repository.task;
 
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.PACKAGE_CACHE_DIR;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.REPODATA_DIR;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.RPM_BASE_FILE;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.TARGET_DIR;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.assertRepository;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 
 import java.io.File;
@@ -13,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.AbstractSchedulerTest;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;

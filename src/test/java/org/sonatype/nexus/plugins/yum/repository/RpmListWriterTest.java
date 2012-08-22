@@ -1,6 +1,5 @@
 package org.sonatype.nexus.plugins.yum.repository;
 
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.RPM_BASE_FILE;
 import static java.io.File.pathSeparator;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -13,8 +12,6 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.repository.ListFileFactory;
-import org.sonatype.nexus.plugins.yum.repository.RpmListWriter;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 
 

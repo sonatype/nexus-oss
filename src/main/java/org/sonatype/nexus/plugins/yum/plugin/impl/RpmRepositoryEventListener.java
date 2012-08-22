@@ -7,10 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.guice.plexus.config.Strategies;
 import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
+import org.sonatype.nexus.plugins.yum.plugin.AbstractEventListener;
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
 import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
+import org.sonatype.nexus.plugins.yum.plugin.event.YumRepositoryGenerateEvent;
 import org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumGroupRepository;
+import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
@@ -22,15 +25,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.appevents.Event;
-
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
-import org.sonatype.nexus.plugins.yum.plugin.AbstractEventListener;
-import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
-import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
-import org.sonatype.nexus.plugins.yum.plugin.event.YumRepositoryGenerateEvent;
-import org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumGroupRepository;
-import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 
 
 @Component(role = ItemEventListener.class, instantiationStrategy = Strategies.LOAD_ON_START)

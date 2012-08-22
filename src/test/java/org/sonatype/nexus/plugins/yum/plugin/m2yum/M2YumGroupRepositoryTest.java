@@ -8,12 +8,9 @@ import javax.inject.Inject;
 
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumGroupRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-
-import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
 
 public class M2YumGroupRepositoryTest extends AbstractRepositoryTester {
 

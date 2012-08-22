@@ -1,9 +1,9 @@
 package org.sonatype.nexus.plugins.yum.plugin.impl;
 
-import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
@@ -23,6 +23,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
+import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
+import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -33,12 +36,6 @@ import org.sonatype.scheduling.ScheduledTask;
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
-
-import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
-import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 
 
 /**

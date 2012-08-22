@@ -5,10 +5,7 @@ import java.io.File;
 import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Component;
-
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
-import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
 import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
 

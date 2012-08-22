@@ -1,16 +1,15 @@
 package org.sonatype.nexus.plugins.yum.rest;
 
-import static org.sonatype.nexus.plugins.yum.repository.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import static org.restlet.data.Status.SERVER_ERROR_INTERNAL;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-
-import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 

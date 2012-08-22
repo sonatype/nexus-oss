@@ -3,7 +3,6 @@
  */
 package org.sonatype.nexus.plugins.yum.version.alias.rest;
 
-import static org.sonatype.nexus.plugins.yum.version.alias.rest.RepositoryVersionAliasResource.RESOURCE_URI;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.instanceOf;
@@ -11,6 +10,7 @@ import static org.junit.Assert.assertThat;
 import static org.restlet.data.Method.GET;
 import static org.restlet.data.Method.POST;
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
+import static org.sonatype.nexus.plugins.yum.version.alias.rest.RepositoryVersionAliasResource.RESOURCE_URI;
 
 import javax.inject.Inject;
 
@@ -24,11 +24,8 @@ import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.version.alias.rest.RepositoryVersionAliasResource;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
 /**

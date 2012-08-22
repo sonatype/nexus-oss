@@ -4,8 +4,6 @@ import java.io.File;
 
 import org.sonatype.nexus.plugins.yum.config.domain.XmlYumConfiguration;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
-import org.sonatype.nexus.plugins.yum.config.domain.XmlYumConfiguration;
-import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
 
 
 public interface YumConfiguration {

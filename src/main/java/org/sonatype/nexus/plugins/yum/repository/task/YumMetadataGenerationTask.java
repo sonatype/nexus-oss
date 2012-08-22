@@ -1,12 +1,11 @@
 package org.sonatype.nexus.plugins.yum.repository.task;
 
-import static org.sonatype.nexus.plugins.yum.repository.RepositoryUtils.getBaseDir;
-import static org.sonatype.nexus.plugins.yum.repository.YumRepository.REPOMD_XML;
-import static org.sonatype.nexus.plugins.yum.repository.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.sonatype.nexus.plugins.yum.repository.YumRepository.REPOMD_XML;
+import static org.sonatype.nexus.plugins.yum.repository.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 import static org.sonatype.scheduling.TaskState.SLEEPING;
 import static org.sonatype.scheduling.TaskState.SUBMITTED;
@@ -27,9 +26,13 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.execution.CommandLineExecutor;
+import org.sonatype.nexus.plugins.yum.plugin.event.YumRepositoryGenerateEvent;
+import org.sonatype.nexus.plugins.yum.repository.ListFileFactory;
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
 import org.sonatype.nexus.plugins.yum.repository.RpmListWriter;
+import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -37,13 +40,6 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
-
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.execution.CommandLineExecutor;
-import org.sonatype.nexus.plugins.yum.plugin.event.YumRepositoryGenerateEvent;
-import org.sonatype.nexus.plugins.yum.repository.ListFileFactory;
-import org.sonatype.nexus.plugins.yum.repository.RpmListWriter;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.

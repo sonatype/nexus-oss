@@ -1,25 +1,28 @@
 package org.sonatype.nexus.plugins.yum.plugin.impl;
 
-import static org.sonatype.nexus.test.hamcrest.FileMatchers.exists;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.test.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
+
 import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
+import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
+import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+
 import com.google.code.tempusfugit.temporal.Condition;
-import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 
 
 public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {

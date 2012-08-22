@@ -15,13 +15,10 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.nexus.plugins.yum.repository.service.YumService;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-
-import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 
 public class DefaultYumServiceTest extends AbstractYumNexusTestCase {

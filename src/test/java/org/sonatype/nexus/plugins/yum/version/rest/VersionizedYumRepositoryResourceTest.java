@@ -22,17 +22,14 @@ import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
+import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
-
-import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
-import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 
 
 public class VersionizedYumRepositoryResourceTest extends AbstractYumNexusTestCase {

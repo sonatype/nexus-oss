@@ -2,7 +2,9 @@ package org.sonatype.nexus.plugins.yum.plugin.impl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.inject.Inject;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
@@ -13,10 +15,6 @@ import org.sonatype.nexus.plugins.yum.repository.task.RepositoryScanningTask;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
-import org.sonatype.nexus.plugins.yum.repository.task.RepositoryScanningTask;
 
 
 @Component(role = RepositoryRegistry.class)

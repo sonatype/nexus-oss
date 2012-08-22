@@ -1,10 +1,8 @@
 package org.sonatype.nexus.plugins.yum.metarepo.service;
 
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.REPOSITORY_RPM_CACHE_DIR;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.assertRepository;
-import static org.sonatype.nexus.test.hamcrest.FileMatchers.exists;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.test.hamcrest.FileMatchers.exists;
 
 import java.io.File;
 
@@ -13,11 +11,8 @@ import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 
 

@@ -3,7 +3,6 @@ package org.sonatype.nexus.plugins.yum.rest.domain;
 import org.restlet.data.MediaType;
 import org.restlet.resource.FileRepresentation;
 import org.sonatype.nexus.plugins.yum.repository.FileDirectoryStructure;
-import org.sonatype.nexus.plugins.yum.repository.FileDirectoryStructure;
 
 
 public class YumFileRepresentation extends FileRepresentation {

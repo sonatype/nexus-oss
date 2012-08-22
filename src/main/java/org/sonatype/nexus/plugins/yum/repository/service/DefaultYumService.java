@@ -1,10 +1,9 @@
 package org.sonatype.nexus.plugins.yum.repository.service;
 
-import static org.sonatype.nexus.plugins.yum.repository.RepositoryUtils.getBaseDir;
-import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
 import static java.io.File.pathSeparator;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
 
 import java.io.File;
 import java.net.URL;
@@ -14,17 +13,16 @@ import javax.inject.Inject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
-import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
-
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.plugins.yum.repository.task.TaskDoubledException;
 import org.sonatype.nexus.plugins.yum.repository.task.YumGroupRepositoryGenerationTask;
 import org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.scheduling.ScheduledTask;
 
 
 @Component(role = YumService.class)

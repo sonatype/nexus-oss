@@ -1,9 +1,8 @@
 package org.sonatype.nexus.plugins.yum.metarepo.rest;
 
-import static org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager.URL_PREFIX;
-
 import javax.inject.Inject;
 import javax.ws.rs.Path;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
@@ -11,11 +10,6 @@ import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.plugins.yum.rest.AbstractYumRepositoryResource;
 import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
-import org.sonatype.nexus.plugins.yum.rest.AbstractYumRepositoryResource;
-import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 
 
 /**

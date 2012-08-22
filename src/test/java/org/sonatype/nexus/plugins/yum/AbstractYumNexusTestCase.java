@@ -3,10 +3,10 @@ package org.sonatype.nexus.plugins.yum;
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.WaitFor.waitOrTimeout;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_DIR;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_DIR;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,6 @@ import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.test.NexusTestSupport;
 
 import com.google.code.tempusfugit.temporal.Condition;
@@ -86,7 +85,7 @@ public class AbstractYumNexusTestCase extends NexusTestSupport {
 
   private void initConfigurations() {
     oldTmpDir = System.getProperty(TMP_DIR_KEY);
-    System.setProperty(TMP_DIR_KEY, RepositoryTestUtils.BASE_CACHE_DIR.getAbsolutePath());
+    System.setProperty(TMP_DIR_KEY, BASE_CACHE_DIR.getAbsolutePath());
   }
 
   private void initRestApiSettings() throws Exception {

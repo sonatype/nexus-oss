@@ -12,13 +12,11 @@ import javax.inject.Inject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.repository.Repository;
-
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
 import org.sonatype.nexus.plugins.yum.repository.service.YumService;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 @Component(role = DeletionService.class)
 public class DefaultDeletionService implements DeletionService {

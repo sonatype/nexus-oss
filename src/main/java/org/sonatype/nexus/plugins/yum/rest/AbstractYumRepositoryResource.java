@@ -1,6 +1,7 @@
 package org.sonatype.nexus.plugins.yum.rest;
 
 import javax.inject.Inject;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -11,13 +12,10 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.plugins.yum.repository.FileDirectoryStructure;
 import org.sonatype.nexus.plugins.yum.rest.domain.IndexRepresentation;
+import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 import org.sonatype.nexus.plugins.yum.rest.domain.YumFileRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.nexus.plugins.yum.repository.FileDirectoryStructure;
-import org.sonatype.nexus.plugins.yum.rest.domain.IndexRepresentation;
-import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
-import org.sonatype.nexus.plugins.yum.rest.domain.YumFileRepresentation;
 
 
 public abstract class AbstractYumRepositoryResource extends AbstractPlexusResource {

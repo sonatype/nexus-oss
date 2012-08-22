@@ -1,8 +1,5 @@
 package org.sonatype.nexus.plugins.yum.repository.task;
 
-import static org.sonatype.nexus.plugins.yum.repository.task.YumGroupRepositoryGenerationTask.ID;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.assertRepository;
-import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -11,6 +8,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.yum.repository.task.YumGroupRepositoryGenerationTask.ID;
+import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
@@ -24,15 +23,13 @@ import java.util.concurrent.Callable;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.sonatype.nexus.plugins.yum.repository.task.YumGroupRepositoryGenerationTask;
+import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.scheduling.ScheduledTask;
-
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 
 public class YumGroupRepositoryGenerationTaskTest {
 

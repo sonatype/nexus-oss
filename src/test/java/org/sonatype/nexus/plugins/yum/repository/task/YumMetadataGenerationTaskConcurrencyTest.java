@@ -1,17 +1,14 @@
 package org.sonatype.nexus.plugins.yum.repository.task;
 
-import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.RPM_BASE_FILE;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.copyToTempDir;
-import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.createDummyRpm;
-import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.findMethod;
-import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 import static java.io.File.pathSeparator;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.findMethod;
+import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +32,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask;
+import org.sonatype.nexus.plugins.yum.repository.AbstractSchedulerTest;
+import org.sonatype.nexus.plugins.yum.repository.YumRepository;
+import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -43,10 +42,6 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
 
 import com.google.code.tempusfugit.temporal.Condition;
-
-import org.sonatype.nexus.plugins.yum.repository.AbstractSchedulerTest;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
-import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 
 public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerTest {
   private static final String RPM_NAME_2 = "hallomommy";
