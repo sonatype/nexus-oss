@@ -8,8 +8,6 @@ import java.util.Set;
 
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
-
 
 public class MavenRepositoryInfo {
   private final MavenRepository repository;

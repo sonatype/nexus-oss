@@ -9,9 +9,6 @@ import javax.ws.rs.Path;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
-import org.sonatype.plexus.rest.resource.PlexusResource;
-
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
@@ -20,6 +17,7 @@ import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.plugins.yum.rest.AbstractYumRepositoryResource;
 import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
 @Component(role = PlexusResource.class, hint = "VersionizedYumRepositoryResource")
