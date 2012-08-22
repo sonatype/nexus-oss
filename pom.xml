@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -90,8 +89,7 @@
     </dependency>
 
     <!-- #ITSet BEGINS -->
-    <!-- Nexus IT setup (dependencies below are needed if you have extensive 
-      ITs and you want to use Nexus Environment) -->
+    <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
     <!-- There are plugins connected to this dependency, see below! -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -110,7 +108,7 @@
       </exclusions>
     </dependency>
     <!-- #ITSet ENDS -->
-    
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
@@ -167,7 +165,13 @@
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
-    </dependency>    
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <version>${nexus.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
@@ -199,6 +203,22 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.9.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+    <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-lgpl</artifactId>
+      <version>1.9.9</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
       <scope>test</scope>
@@ -222,10 +242,8 @@
   </dependencies>
 
   <!-- #ITSet BEGINS -->
-  <!-- Nexus IT setup (dependencies below are needed if you have extensive 
-    ITs and you want to use Nexus Environment) -->
-  <!-- There are plugins and dependencies connected to this import, see below 
-    and above! -->
+  <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
+  <!-- There are plugins and dependencies connected to this import, see below and above! -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -379,21 +397,15 @@
             <configuration>
               <target>
                 <delete dir="${nexus.plugin.dir}/${project.artifactId}*" />
-                <unzip
-                  src="${project.build.directory}/${project.build.finalName}-bundle.zip"
-                  dest="${nexus.plugin.dir}" />
-                <copy
-                  file="${project.build.directory}/test-classes/nexus/wrapper-override.conf"
-                  todir="${nexus.base.dir}/conf/" />
+                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${nexus.plugin.dir}" />
+                <copy file="${project.build.directory}/test-classes/nexus/wrapper-override.conf" todir="${nexus.base.dir}/conf/" />
                 <exec executable="${nexus.exec}">
                   <arg value="${nexus.start.command}" />
                   <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
                   <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
                 </exec>
-                <waitfor maxwait="2" maxwaitunit="minute"
-                  checkevery="10" checkeveryunit="second">
-                  <http
-                    url="http://localhost:${nexus.port}/nexus/index.html" />
+                <waitfor maxwait="2" maxwaitunit="minute" checkevery="10" checkeveryunit="second">
+                  <http url="http://localhost:${nexus.port}/nexus/index.html" />
                 </waitfor>
               </target>
             </configuration>
