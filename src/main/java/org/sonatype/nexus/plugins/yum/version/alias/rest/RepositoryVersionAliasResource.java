@@ -3,26 +3,21 @@ package org.sonatype.nexus.plugins.yum.version.alias.rest;
 import static org.restlet.data.MediaType.TEXT_PLAIN;
 import static org.restlet.data.Method.POST;
 
-import java.io.File;
-
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
-import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
-import org.sonatype.nexus.plugins.yum.version.alias.service.RepositoryAliasService;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -43,15 +38,11 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 @Produces({ "application/xml", "application/json", "text/plain" })
 public class RepositoryVersionAliasResource extends AbstractPlexusResource implements PlexusResource {
   private static final String ALLOW_ANONYMOUS = "anon";
-  private static final String RPM_EXTENSION = ".rpm";
   public static final String URL_PREFIX = "yum/alias";
   private static final String PATH_PATTERN_TO_PROTECT = "/" + URL_PREFIX + "/*";
   public static final String REPOSITORY_ID_PARAM = "repositoryId";
   public static final String ALIAS_PARAM = "alias";
   public static final String RESOURCE_URI = "/" + URL_PREFIX + "/{" + REPOSITORY_ID_PARAM + "}/{" + ALIAS_PARAM + "}";
-
-  @Inject
-  private RepositoryAliasService repositoryAliasService;
 
   @Inject
   private YumConfiguration aliasMapper;
@@ -69,13 +60,6 @@ public class RepositoryVersionAliasResource extends AbstractPlexusResource imple
     }
 
     try {
-      if (alias.endsWith(RPM_EXTENSION)) {
-        alias = alias.substring(0, alias.length() - RPM_EXTENSION.length());
-
-        File rpmFile = repositoryAliasService.getFile(repositoryId, alias);
-        return new FileRepresentation(rpmFile, new MediaType("application/x-rpm"));
-      }
-
       return new StringRepresentation(aliasMapper.getVersion(repositoryId, alias));
     } catch (AliasNotFoundException e) {
       throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND,

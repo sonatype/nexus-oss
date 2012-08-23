@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
-import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
@@ -59,14 +58,6 @@ public class RepositoryVersionAliasResourceTest extends AbstractYumNexusTestCase
   @Test
   public void requestedAliasNotfoundNoParameters() throws Exception {
     assert404(createRequest(RELEASES, "bla"));
-  }
-
-  @Test
-  public void requestedAliasReturnedRpmFile() throws Exception {
-    final Request request = createRequest(RELEASES, "trunk.rpm");
-    final FileRepresentation rpmFile = (FileRepresentation) resource.get(null, request, null, null);
-    Assert.assertEquals("application/x-rpm", rpmFile.getMediaType().getName());
-    Assert.assertTrue(rpmFile.getFile().getName().contains(TRUNK_VERSION));
   }
 
   @Test

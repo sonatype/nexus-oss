@@ -3,8 +3,6 @@ package org.sonatype.nexus.plugins.yum.plugin.impl;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertThat;
-import static org.sonatype.nexus.test.hamcrest.FileMatchers.exists;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -27,13 +24,9 @@ import com.google.code.tempusfugit.temporal.Condition;
 
 public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {
   private static final String REPO_ID = "rpm-snapshots";
-  private static final String REPOSITORY_RPM_FILENAME = "is24-rel-" + REPO_ID + "-1.3-repo-1-1.noarch.rpm";
 
   @Inject
   private RepositoryRegistry repositoryRegistry;
-
-  @Inject
-  private RepositoryRpmManager repositoryRpmManager;
 
   @Inject
   private NexusScheduler nexusScheduler;
@@ -48,7 +41,6 @@ public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {
     repositoryRegistry.registerRepository(repository);
     waitForAllTasksToBeDone();
     Assert.assertNotNull(repositoryRegistry.findRepositoryForId(REPO_ID));
-    assertThat(repositoryRpmManager.getYumRepository().getFile(REPOSITORY_RPM_FILENAME), exists());
   }
 
   @Test

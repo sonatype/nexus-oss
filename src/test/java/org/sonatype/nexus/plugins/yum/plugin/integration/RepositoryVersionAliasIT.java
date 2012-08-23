@@ -1,8 +1,7 @@
 package org.sonatype.nexus.plugins.yum.plugin.integration;
 
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -16,12 +15,6 @@ public class RepositoryVersionAliasIT extends AbstractNexusTestBase {
   @Test
   public void shouldRetrieveAlias() throws Exception {
     assertEquals("5.1.15-1", executeGet("/yum/alias/releases/production"));
-  }
-
-  @Test
-  public void shouldRetriveRpmForAlias() throws Exception {
-    String content = executeGet("/yum/alias/releases/production.rpm");
-    assertThat(content.length(), greaterThan(1000));
   }
 
   @Test

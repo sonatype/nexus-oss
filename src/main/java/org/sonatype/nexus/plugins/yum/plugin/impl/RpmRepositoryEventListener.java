@@ -6,7 +6,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.guice.plexus.config.Strategies;
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
 import org.sonatype.nexus.plugins.yum.plugin.AbstractEventListener;
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
 import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
@@ -39,9 +38,6 @@ public class RpmRepositoryEventListener extends AbstractEventListener {
 
   @Inject
   private YumService yumService;
-
-  @Inject
-  private RepositoryRpmManager repositoryRpmManager;
 
   @Inject
   private DeletionService deletionService;
@@ -87,7 +83,6 @@ public class RpmRepositoryEventListener extends AbstractEventListener {
       LOG.info("ItemStoreEvent : {}", itemEvent.getItem().getPath());
       yumService.markDirty(itemEvent.getRepository(), getItemVersion(itemEvent.getItem()));
       yumService.addToYumRepository(itemEvent.getRepository(), itemEvent.getItem().getPath());
-      repositoryRpmManager.updateRepository(itemEvent.getRepository().getId(), getItemVersion(itemEvent.getItem()));
     }
   }
 

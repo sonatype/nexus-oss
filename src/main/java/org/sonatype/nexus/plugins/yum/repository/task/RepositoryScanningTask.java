@@ -1,19 +1,19 @@
 package org.sonatype.nexus.plugins.yum.repository.task;
 
 import static org.apache.commons.io.FileUtils.listFiles;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskState;
-
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
-import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
 
 
 /**
@@ -28,38 +28,35 @@ public class RepositoryScanningTask extends AbstractNexusTask<Object> {
   public static final String ID = "RepositoryScanningTask";
   private static final String[] RPM_EXTENSIONS = new String[] { "rpm" };
 
-  private RepositoryRpmManager repositoryRpmManager;
   private MavenRepositoryInfo mavenRepositoryInfo;
 
   @Override
   protected Object doRun() throws Exception {
-    if ((mavenRepositoryInfo == null) || (repositoryRpmManager == null)) {
-      throw new IllegalArgumentException("Please provide a mavenRepositoryInfo and repositoryRpmManager");
+    if (mavenRepositoryInfo == null) {
+      throw new IllegalArgumentException("Please provide a mavenRepositoryInfo");
     }
 
     getLogger().info("Start new RepositoryScanningJob for repository : {}",
       mavenRepositoryInfo.getRepository().getId());
-    scanRepository(mavenRepositoryInfo);
-    repositoryRpmManager.updateRepository(mavenRepositoryInfo);
+    scanRepository();
     getLogger().info("Scanning for repository {} done.", mavenRepositoryInfo.getRepository().getId());
     return null;
   }
 
   @SuppressWarnings("unchecked")
-  private void scanRepository(MavenRepositoryInfo repositoryInfo) {
+  private void scanRepository() {
     try {
-      getLogger().info("Start scanning of repository base url : {}", repositoryInfo.getRepository().getLocalUrl());
+      getLogger().info("Start scanning of repository base url : {}", mavenRepositoryInfo.getRepository().getLocalUrl());
 
-      File repositoryBaseDir = repositoryInfo.getBaseDir();
+      File repositoryBaseDir = mavenRepositoryInfo.getBaseDir();
       for (File file : (Collection<File>) listFiles(repositoryBaseDir, RPM_EXTENSIONS, true)) {
-        repositoryInfo.addVersion(file.getParentFile().getName());
+        mavenRepositoryInfo.addVersion(file.getParentFile().getName());
       }
 
-      getLogger().info("Found following versions in repository '{}' : {}", repositoryInfo.getId(),
-        repositoryInfo.getVersions());
+      getLogger().info("Found following versions in repository '{}' : {}", mavenRepositoryInfo.getId(), mavenRepositoryInfo.getVersions());
 
     } catch (Exception e) {
-      getLogger().error("Could not scan repository " + repositoryInfo.getId(), e);
+      getLogger().error("Could not scan repository " + mavenRepositoryInfo.getId(), e);
     }
   }
 
@@ -86,14 +83,6 @@ public class RepositoryScanningTask extends AbstractNexusTask<Object> {
   @Override
   protected String getMessage() {
     return "Scanning repository" + mavenRepositoryInfo.getRepository();
-  }
-
-  public RepositoryRpmManager getRepositoryRpmManager() {
-    return repositoryRpmManager;
-  }
-
-  public void setRepositoryRpmManager(RepositoryRpmManager repositoryRpmManager) {
-    this.repositoryRpmManager = repositoryRpmManager;
   }
 
   public MavenRepositoryInfo getMavenRepositoryInfo() {

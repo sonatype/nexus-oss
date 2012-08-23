@@ -3,13 +3,10 @@ package org.sonatype.nexus.plugins.yum.plugin.impl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.metarepo.service.RepositoryRpmManager;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.repository.task.RepositoryScanningTask;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -26,9 +23,6 @@ public class DefaultRepositoryRegistry implements RepositoryRegistry {
   @Requirement
   private NexusScheduler nexusScheduler;
 
-  @Inject
-  private RepositoryRpmManager repositoryRpmManager;
-
   @Override
   public void registerRepository(MavenRepository repository) {
     if (!repositories.containsKey(repository.getId())) {
@@ -41,7 +35,6 @@ public class DefaultRepositoryRegistry implements RepositoryRegistry {
 
   private void runScanningTask(MavenRepositoryInfo repositoryInfo) {
     RepositoryScanningTask task = nexusScheduler.createTaskInstance(RepositoryScanningTask.class);
-    task.setRepositoryRpmManager(repositoryRpmManager);
     task.setMavenRepositoryInfo(repositoryInfo);
     nexusScheduler.submit(RepositoryScanningTask.ID, task);
   }
