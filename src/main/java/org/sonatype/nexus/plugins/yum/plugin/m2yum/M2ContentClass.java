@@ -7,7 +7,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 /**
  * Override default maven2 content class to implement compability between
  * {@link org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass} and
- * {@link M2ContentClassTest}
+ * {@link M2YumContentClass}
  * 
  * @author sherold
  * 
