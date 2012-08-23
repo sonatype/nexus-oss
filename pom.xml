@@ -56,7 +56,8 @@
     <nexus.plugin.dir>${nexus.base.dir}/nexus/WEB-INF/plugin-repository</nexus.plugin.dir>
     <nexus.exec>${nexus.base.dir}/bin/nexus</nexus.exec>
     <nexus.work.dir>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</nexus.work.dir>
-    <nexus.port>8080</nexus.port>
+    <nexus.port>8081</nexus.port>
+    <skip.unittests>false</skip.unittests>
   </properties>
 
   <dependencies>
@@ -210,6 +211,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.9</version>
         <configuration>
+          <skip>${skip.unittests}</skip>
           <forkMode>always</forkMode>
           <threadCount>1</threadCount>
         </configuration>
@@ -358,6 +360,11 @@
             <goals>
               <goal>integration-test</goal>
             </goals>
+            <configuration>
+              <systemPropertyVariables>
+                <nexus.port>${nexus.port}</nexus.port>
+              </systemPropertyVariables>
+            </configuration>
           </execution>
           <execution>
             <id>verify</id>

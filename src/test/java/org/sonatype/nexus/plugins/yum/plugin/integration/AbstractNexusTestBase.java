@@ -47,7 +47,8 @@ public class AbstractNexusTestBase {
   private static final String NEXUS_PASSWORD = "admin123";
   private static final String NEXUS_USERNAME = "admin";
   protected static final Logger LOG = LoggerFactory.getLogger(AbstractNexusTestBase.class);
-  protected static final String NEXUS_BASE_URL = "http://localhost:8080/nexus";
+  protected static final String NEXUS_PORT = System.getProperty("nexus.port", "8080");
+  protected static final String NEXUS_BASE_URL = "http://localhost:" + NEXUS_PORT + "/nexus";
   protected static final String SERVICE_BASE_URL = NEXUS_BASE_URL + "/service/local";
   protected static final String STAGING_UPLOAD_URL = SERVICE_BASE_URL + "/staging/deploy/maven2";
   private static final String REPO_XML = "<repository>" + "<data>" + "<contentResourceURI>%s/repositories/%s</contentResourceURI>"
