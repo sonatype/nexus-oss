@@ -127,7 +127,7 @@ public class DefaultLdapConfiguration
 
     }
 
-    private Configuration getConfiguration()
+    public Configuration getConfiguration()
     {
         Reader fr = null;
         FileInputStream is = null;
