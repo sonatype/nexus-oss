@@ -15,9 +15,13 @@ package org.sonatype.nexus.testsuite.support;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.logHasNoCommonExceptions;
+import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.logHasNoFailingPlugins;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
 
 import org.junit.Test;
+import org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 /**
  * Test starting and stopping of Nexus.
@@ -45,6 +49,15 @@ public class StartAndStopNexusRunningIT
         assertThat( nexus().isRunning(), is( true ) );
 
         assertThat( nexus().getUrl(), respondsWithStatus( 200 ) );
+
+        assertThat( nexus().getLauncherLog(), FileMatchers.exists() );
+        assertThat( nexus().getLauncherLog(), FileMatchers.isFile() );
+
+        assertThat( nexus().getNexusLog(), FileMatchers.exists() );
+        assertThat( nexus().getNexusLog(), FileMatchers.isFile() );
+
+        assertThat( nexus().getNexusLog(), logHasNoCommonExceptions() );
+        assertThat( nexus().getNexusLog(), logHasNoFailingPlugins() );
     }
 
 }
