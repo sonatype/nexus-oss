@@ -13,6 +13,7 @@
 package org.sonatype.nexus.security.ldap.realms.pr;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import javax.inject.Inject;
@@ -72,7 +73,12 @@ public class LdapXmlBundleAssembler
 
             if ( configuration == null )
             {
-                bundle.getOutputStream().write( "No ldap configuration".getBytes( "us-ascii" ) );
+                final OutputStream outputStream = bundle.getOutputStream();
+                try {
+                    outputStream.write( "No ldap configuration".getBytes( "us-ascii" ) );
+                } finally {
+                    outputStream.close();
+                }
             }
             else
             {
