@@ -115,6 +115,26 @@
       <classifier>bundle</classifier>
       <scope>test</scope>
     </dependency>
+
+    <!-- NXCM-4591 -->
+    <dependency>
+      <groupId>org.sonatype.sisu.pr</groupId>
+      <artifactId>sisu-pr-testutil</artifactId>
+      <version>1.5</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>server-provider</artifactId>
+      <version>0.5.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

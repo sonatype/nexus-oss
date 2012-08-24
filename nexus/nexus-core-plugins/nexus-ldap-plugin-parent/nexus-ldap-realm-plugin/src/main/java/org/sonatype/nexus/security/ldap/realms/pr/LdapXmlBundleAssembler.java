@@ -63,7 +63,7 @@ public class LdapXmlBundleAssembler
     public Bundle assemble( final IssueSubmissionRequest issueSubmissionRequest )
         throws IssueSubmissionException
     {
-        ManagedBundle bundle = null;
+        ManagedBundle bundle;
         try
         {
             bundle = storage.createBundle( "ldap.xml", "application/xml" );
