@@ -29,6 +29,12 @@ import org.sonatype.sisu.litmus.testsupport.hamcrest.LogFileMatcher;
 public abstract class NexusMatchers
 {
 
+    /**
+     * Log file should not contain any of the common unwanted exceptions: NullPointerException, ClassNotFoundException,
+     * ClassCastException.
+     *
+     * @return matcher. Never null.
+     */
     @Factory
     public static Matcher<File> logHasNoCommonExceptions()
     {
@@ -39,12 +45,22 @@ public abstract class NexusMatchers
         );
     }
 
+    /**
+     * Log file has no reference to plugins that failed to activate (all plugins were activated successfully).
+     *
+     * @return matcher. Never null.
+     */
     @Factory
     public static Matcher<File> logHasNoFailingPlugins()
     {
         return InversionMatcher.not( logHasFailingPlugins() );
     }
 
+    /**
+     * Log file has a reference to an arbitrary plugin that failed to activate.
+     *
+     * @return matcher. Never null.
+     */
     @Factory
     public static LogFileMatcher logHasFailingPlugins()
     {
@@ -53,6 +69,12 @@ public abstract class NexusMatchers
         ) );
     }
 
+    /**
+     * Log file has a reference to a specified plugin that failed to activate.
+     *
+     * @param pluginId id of plugin that is supposed to fail to activate in format {@code <groupId>:<artifactId>}
+     * @return matcher. Never null.
+     */
     @Factory
     public static LogFileMatcher logHasFailingPlugin( final String pluginId )
     {

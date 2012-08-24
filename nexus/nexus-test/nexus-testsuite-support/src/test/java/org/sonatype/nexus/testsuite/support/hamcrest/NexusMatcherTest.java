@@ -37,9 +37,11 @@ public class NexusMatcherTest
     @Rule
     public TestInfoRule testInfo = new TestInfoRule();
 
+    /**
+     * Verify that if log file to be matched does not exist an {@link AssertionError} is thrown with a proper message.
+     */
     @Test
     public void inexistentLogFile()
-        throws Exception
     {
         thrown.expect( AssertionError.class );
         thrown.expectMessage( "java.io.FileNotFoundException: File 'nexus.log' does not exist" );
@@ -49,9 +51,11 @@ public class NexusMatcherTest
         );
     }
 
+    /**
+     * Verify that a log file that does not contain NPE,CNF,CCE matches.
+     */
     @Test
     public void logFileHasNoCommonExceptions()
-        throws Exception
     {
         assertThat(
             resolveLogFile(),
@@ -59,6 +63,9 @@ public class NexusMatcherTest
         );
     }
 
+    /**
+     * Verify that a log file that has all plugins activated successfully matches.
+     */
     @Test
     public void logFileHasNoFailingPlugins()
         throws Exception
@@ -69,6 +76,9 @@ public class NexusMatcherTest
         );
     }
 
+    /**
+     * Verify that a log file that has failing plugins matches.
+     */
     @Test
     public void logFileHasFailingPlugins()
         throws Exception
@@ -79,6 +89,9 @@ public class NexusMatcherTest
         );
     }
 
+    /**
+     * Verify that a log file that has a failing "com.sonatype.nexus.plugin:nexus-outreach-plugin" plugin matches.
+     */
     @Test
     public void logFileHasFailingPlugin()
         throws Exception
