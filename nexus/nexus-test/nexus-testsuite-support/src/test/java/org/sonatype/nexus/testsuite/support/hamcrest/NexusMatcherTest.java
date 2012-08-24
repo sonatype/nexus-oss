@@ -90,6 +90,20 @@ public class NexusMatcherTest
     }
 
     /**
+     * Verify that a log file that has  successfully activated "org.sonatype.nexus.plugins:nexus-indexer-lucene-plugin"
+     * plugin matches, even if some other plugin failed to activate.
+     */
+    @Test
+    public void logFileHasPluginActivatedSuccessfully()
+        throws Exception
+    {
+        assertThat(
+            resolveLogFile(),
+            NexusMatchers.logHasPluginActivatedSuccessfully( "org.sonatype.nexus.plugins:nexus-indexer-lucene-plugin" )
+        );
+    }
+
+    /**
      * Verify that a log file that has a failing "com.sonatype.nexus.plugin:nexus-outreach-plugin" plugin matches.
      */
     @Test

@@ -70,6 +70,21 @@ public abstract class NexusMatchers
     }
 
     /**
+     * Log file has a reference that a specified plugin was successfully activated.
+     *
+     * @param pluginId id of plugin that is supposed to fail to activate in format {@code <groupId>:<artifactId>}
+     * @return matcher. Never null.
+     */
+    @Factory
+    public static LogFileMatcher logHasPluginActivatedSuccessfully( final String pluginId )
+    {
+        final String escapedPluginId = pluginId.replace( ".", "\\." );
+        return LogFileMatcher.hasText( Pattern.compile(
+            ".*Plugin manager request \"ACTIVATE\" on plugin \"" + escapedPluginId + ".*\" was successful."
+        ) );
+    }
+
+    /**
      * Log file has a reference to a specified plugin that failed to activate.
      *
      * @param pluginId id of plugin that is supposed to fail to activate in format {@code <groupId>:<artifactId>}
