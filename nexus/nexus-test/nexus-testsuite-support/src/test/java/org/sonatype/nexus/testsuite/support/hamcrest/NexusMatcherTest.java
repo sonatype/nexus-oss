@@ -13,9 +13,11 @@
 package org.sonatype.nexus.testsuite.support.hamcrest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 
+import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -44,7 +46,10 @@ public class NexusMatcherTest
     public void inexistentLogFile()
     {
         thrown.expect( AssertionError.class );
-        thrown.expectMessage( "java.io.FileNotFoundException: File 'nexus.log' does not exist" );
+        thrown.expectMessage( Matchers.<String>allOf(
+            containsString( "java.io.FileNotFoundException" ),
+            containsString( "nexus.log" )
+        ) );
         assertThat(
             new File( "nexus.log" ),
             NexusMatchers.doesNotHaveCommonExceptions()
