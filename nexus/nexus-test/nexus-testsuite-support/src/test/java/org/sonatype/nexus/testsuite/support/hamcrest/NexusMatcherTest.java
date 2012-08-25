@@ -47,7 +47,7 @@ public class NexusMatcherTest
         thrown.expectMessage( "java.io.FileNotFoundException: File 'nexus.log' does not exist" );
         assertThat(
             new File( "nexus.log" ),
-            NexusMatchers.logHasNoCommonExceptions()
+            NexusMatchers.doesNotHaveCommonExceptions()
         );
     }
 
@@ -55,11 +55,11 @@ public class NexusMatcherTest
      * Verify that a log file that does not contain NPE,CNF,CCE matches.
      */
     @Test
-    public void logFileHasNoCommonExceptions()
+    public void doesNotHaveCommonExceptions()
     {
         assertThat(
             resolveLogFile(),
-            NexusMatchers.logHasNoCommonExceptions()
+            NexusMatchers.doesNotHaveCommonExceptions()
         );
     }
 
@@ -67,12 +67,12 @@ public class NexusMatcherTest
      * Verify that a log file that has all plugins activated successfully matches.
      */
     @Test
-    public void logFileHasNoFailingPlugins()
+    public void doesNotHaveFailingPlugins()
         throws Exception
     {
         assertThat(
             resolveLogFile(),
-            NexusMatchers.logHasNoFailingPlugins()
+            NexusMatchers.doesNotHaveFailingPlugins()
         );
     }
 
@@ -80,12 +80,12 @@ public class NexusMatcherTest
      * Verify that a log file that has failing plugins matches.
      */
     @Test
-    public void logFileHasFailingPlugins()
+    public void hasFailingPlugins()
         throws Exception
     {
         assertThat(
             resolveLogFile(),
-            NexusMatchers.logHasFailingPlugins()
+            NexusMatchers.hasFailingPlugins()
         );
     }
 
@@ -94,12 +94,12 @@ public class NexusMatcherTest
      * plugin matches, even if some other plugin failed to activate.
      */
     @Test
-    public void logFileHasPluginActivatedSuccessfully()
+    public void hasPluginActivatedSuccessfully()
         throws Exception
     {
         assertThat(
             resolveLogFile(),
-            NexusMatchers.logHasPluginActivatedSuccessfully( "org.sonatype.nexus.plugins:nexus-indexer-lucene-plugin" )
+            NexusMatchers.hasPluginActivatedSuccessfully( "org.sonatype.nexus.plugins:nexus-indexer-lucene-plugin" )
         );
     }
 
@@ -107,12 +107,12 @@ public class NexusMatcherTest
      * Verify that a log file that has a failing "com.sonatype.nexus.plugin:nexus-outreach-plugin" plugin matches.
      */
     @Test
-    public void logFileHasFailingPlugin()
+    public void hasFailingPlugin()
         throws Exception
     {
         assertThat(
             resolveLogFile(),
-            NexusMatchers.logHasFailingPlugin( "com.sonatype.nexus.plugin:nexus-outreach-plugin" )
+            NexusMatchers.hasFailingPlugin( "com.sonatype.nexus.plugin:nexus-outreach-plugin" )
         );
     }
 

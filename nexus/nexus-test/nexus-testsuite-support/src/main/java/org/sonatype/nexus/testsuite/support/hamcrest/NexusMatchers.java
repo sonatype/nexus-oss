@@ -36,7 +36,7 @@ public abstract class NexusMatchers
      * @return matcher. Never null.
      */
     @Factory
-    public static Matcher<File> logHasNoCommonExceptions()
+    public static Matcher<File> doesNotHaveCommonExceptions()
     {
         return Matchers.allOf(
             InversionMatcher.not( LogFileMatcher.hasExceptionOfType( NullPointerException.class ) ),
@@ -51,9 +51,9 @@ public abstract class NexusMatchers
      * @return matcher. Never null.
      */
     @Factory
-    public static Matcher<File> logHasNoFailingPlugins()
+    public static Matcher<File> doesNotHaveFailingPlugins()
     {
-        return InversionMatcher.not( logHasFailingPlugins() );
+        return InversionMatcher.not( hasFailingPlugins() );
     }
 
     /**
@@ -62,7 +62,7 @@ public abstract class NexusMatchers
      * @return matcher. Never null.
      */
     @Factory
-    public static LogFileMatcher logHasFailingPlugins()
+    public static LogFileMatcher hasFailingPlugins()
     {
         return LogFileMatcher.hasText( Pattern.compile(
             ".*Plugin manager request \"ACTIVATE\" on plugin \".*\" FAILED!"
@@ -76,7 +76,7 @@ public abstract class NexusMatchers
      * @return matcher. Never null.
      */
     @Factory
-    public static LogFileMatcher logHasPluginActivatedSuccessfully( final String pluginId )
+    public static LogFileMatcher hasPluginActivatedSuccessfully( final String pluginId )
     {
         final String escapedPluginId = pluginId.replace( ".", "\\." );
         return LogFileMatcher.hasText( Pattern.compile(
@@ -91,7 +91,7 @@ public abstract class NexusMatchers
      * @return matcher. Never null.
      */
     @Factory
-    public static LogFileMatcher logHasFailingPlugin( final String pluginId )
+    public static LogFileMatcher hasFailingPlugin( final String pluginId )
     {
         final String escapedPluginId = pluginId.replace( ".", "\\." );
         return LogFileMatcher.hasText( Pattern.compile(

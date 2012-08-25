@@ -18,8 +18,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.logHasNoCommonExceptions;
-import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.logHasNoFailingPlugins;
+import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.doesNotHaveCommonExceptions;
+import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.doesNotHaveFailingPlugins;
 import static org.sonatype.sisu.goodies.common.Varargs.$;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
 
@@ -98,8 +98,8 @@ public class StartAndStopNexusRunningParametrizedIT
         assertThat( nexus().getNexusLog(), FileMatchers.exists() );
         assertThat( nexus().getNexusLog(), FileMatchers.isFile() );
 
-        assertThat( nexus().getNexusLog(), logHasNoCommonExceptions() );
-        assertThat( nexus().getNexusLog(), logHasNoFailingPlugins() );
+        assertThat( nexus().getNexusLog(), doesNotHaveCommonExceptions() );
+        assertThat( nexus().getNexusLog(), doesNotHaveFailingPlugins() );
     }
 
 }
