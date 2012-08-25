@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.doesNotHaveCommonExceptions;
 import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.doesNotHaveFailingPlugins;
+import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.logFile;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
 
 import org.junit.Test;
@@ -57,6 +58,9 @@ public class StartAndStopNexusRunningIT
 
         assertThat( nexus().getNexusLog(), doesNotHaveCommonExceptions() );
         assertThat( nexus().getNexusLog(), doesNotHaveFailingPlugins() );
+
+        assertThat( nexus(), logFile( doesNotHaveCommonExceptions() ) );
+        assertThat( nexus(), logFile( doesNotHaveFailingPlugins() ) );
     }
 
 }

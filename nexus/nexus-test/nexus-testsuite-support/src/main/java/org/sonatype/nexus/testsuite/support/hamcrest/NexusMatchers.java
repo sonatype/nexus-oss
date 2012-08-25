@@ -15,11 +15,15 @@ package org.sonatype.nexus.testsuite.support.hamcrest;
 import java.io.File;
 import java.util.regex.Pattern;
 
+import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.InversionMatcher;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.LogFileMatcher;
+import com.google.common.base.Preconditions;
 
 /**
  * Nexus related hamcrest matchers.
@@ -97,6 +101,55 @@ public abstract class NexusMatchers
         return LogFileMatcher.hasText( Pattern.compile(
             ".*Plugin manager request \"ACTIVATE\" on plugin \"" + escapedPluginId + ".*\" FAILED!"
         ) );
+    }
+
+    /**
+     * Forwards matching on nexus.log to given matcher.
+     *
+     * @param matcher to forward to
+     * @return matcher. Never null.
+     */
+    @Factory
+    public static Matcher<NexusBundle> logFile( final Matcher<File> matcher )
+    {
+        return new NexusLogMatcher( matcher );
+    }
+
+    /**
+     * Forwards matching on nexus.log to given matcher.
+     */
+    private static class NexusLogMatcher
+        extends TypeSafeMatcher<NexusBundle>
+    {
+
+        /**
+         * To forward matching too.
+         * Never null.
+         */
+        private final Matcher<File> matcher;
+
+        private NexusLogMatcher( final Matcher<File> matcher )
+        {
+            this.matcher = Preconditions.checkNotNull( matcher );
+        }
+
+        @Override
+        protected boolean matchesSafely( final NexusBundle item )
+        {
+            return matcher.matches( item.getNexusLog() );
+        }
+
+        @Override
+        public void describeTo( final Description description )
+        {
+            matcher.describeTo( description );
+        }
+
+        @Override
+        protected void describeMismatchSafely( final NexusBundle item, final Description mismatchDescription )
+        {
+            matcher.describeMismatch( item.getNexusLog(), mismatchDescription );
+        }
     }
 
 }
