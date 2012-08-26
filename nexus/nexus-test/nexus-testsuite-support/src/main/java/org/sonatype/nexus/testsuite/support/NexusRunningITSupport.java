@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.client.core.NexusClient;
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 
 /**
@@ -44,6 +46,12 @@ public abstract class NexusRunningITSupport
      */
     @Inject
     private Provider<NexusBundle> nexusProvider;
+
+    /**
+     * Nexus client.
+     * Lazy created on first usage.
+     */
+    private NexusClient nexusClient;
 
     /**
      * Current running Nexus. Lazy created by {@link #nexus()}.
@@ -82,7 +90,12 @@ public abstract class NexusRunningITSupport
             staticNexus = null;
             runningNexusBundleCoordinates = null;
         }
-        startNexus( nexus() );
+
+        final Stopwatch stopwatch = startNexus( nexus() );
+        testIndex().recordInfo(
+            "startup time", stopwatch.elapsedMillis() == 0 ? "already running" : stopwatch.toString()
+        );
+
         assertThat( "Nexus is running before test starts", nexus().isRunning(), is( true ) );
     }
 
@@ -91,8 +104,8 @@ public abstract class NexusRunningITSupport
     {
         if ( nexus != null )
         {
-            testIndex.recordLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
-            testIndex.recordLink( "nexus.log", new File( nexus.getWorkDirectory(), "logs/nexus.log" ) );
+            testIndex().recordLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
+            testIndex().recordLink( "nexus.log", new File( nexus.getWorkDirectory(), "logs/nexus.log" ) );
         }
 
         if ( NexusStartAndStopStrategy.Strategy.EACH_METHOD.equals( startAndStopStrategy ) )
@@ -129,7 +142,9 @@ public abstract class NexusRunningITSupport
             if ( staticNexus == null )
             {
                 nexus = nexusProvider.get();
-                NexusBundleConfiguration config = configureNexus( nexus.getConfiguration() );
+                final NexusBundleConfiguration config = configureNexus(
+                    applyDefaultConfiguration( nexus ).getConfiguration()
+                );
                 if ( config != null )
                 {
                     nexus.setConfiguration( config );
@@ -169,10 +184,26 @@ public abstract class NexusRunningITSupport
         return getClass().getAnnotation( NexusStartAndStopStrategy.class );
     }
 
-    private static void startNexus( final NexusBundle nexusBundle )
+    /**
+     * Lazy creates a Nexus client for "admin"/"admin123".
+     *
+     * @return Nexus client. Never null.
+     */
+    protected NexusClient client()
     {
+        if ( nexusClient == null )
+        {
+            nexusClient = createNexusClientForAdmin( nexus() );
+        }
+        return nexusClient;
+    }
+
+    private Stopwatch startNexus( final NexusBundle nexusBundle )
+    {
+        final Stopwatch stopwatch = new Stopwatch();
         if ( nexusBundle != null && !nexusBundle.isRunning() )
         {
+            stopwatch.start();
             try
             {
                 LOGGER.info( "Starting Nexus ({})", nexusBundle );
@@ -182,7 +213,9 @@ public abstract class NexusRunningITSupport
             {
                 throw Throwables.propagate( e );
             }
+            stopwatch.stop();
         }
+        return stopwatch;
     }
 
     private static void stopNexus( final NexusBundle nexusBundle )

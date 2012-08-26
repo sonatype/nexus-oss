@@ -373,7 +373,7 @@
       },
 
       logout : function() {
-        Sonatype.utils.refreshTask.stop()
+        Sonatype.utils.refreshTask.stop();
 
         // do logout
         Ext.Ajax.request({
@@ -384,7 +384,7 @@
             Sonatype.utils.authToken = null;
             Sonatype.view.justLoggedOut = true;
             Sonatype.utils.loadNexusStatus();
-            window.location = 'index.html#welcome';
+            window.location.hash = 'welcome';
           }
         });
       },

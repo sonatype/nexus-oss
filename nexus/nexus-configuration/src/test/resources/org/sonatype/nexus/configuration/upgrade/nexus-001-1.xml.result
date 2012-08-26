@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>2.0.0</version>
+  <version>2.2.0</version>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
@@ -36,7 +36,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://192.168.1.1:8080/nexus/groups/public</url>
       </remoteStorage>
       <externalConfiguration>
@@ -64,7 +63,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://192.168.1.1:8080/nexus/groups/snapshot</url>
       </remoteStorage>
       <externalConfiguration>

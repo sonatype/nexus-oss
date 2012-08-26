@@ -69,4 +69,20 @@ public interface NexusBundleConfiguration
      */
     NexusBundleConfiguration addPlugins( File... plugins );
 
+    /**
+     * Sets log level.
+     *
+     * @param level one of TRACE/DEBUG/INFO/ERROR or {@code null} if bundle defaults should be used
+     * @since 2.2
+     */
+    NexusBundleConfiguration setLogLevel( String level );
+
+    /**
+     * Gets log level, if configured
+     *
+     * @return one of TRACE/DEBUG/INFO/ERROR or {@code null} if bundle defaults should be used
+     * @since 2.2
+     */
+    String getLogLevel();
+
 }

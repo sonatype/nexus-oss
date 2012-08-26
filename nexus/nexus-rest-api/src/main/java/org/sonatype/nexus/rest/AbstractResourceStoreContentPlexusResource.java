@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.noelios.restlet.http.HttpResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.shiro.subject.Subject;
@@ -112,6 +113,15 @@ public abstract class AbstractResourceStoreContentPlexusResource
         setModifiable( true );
     }
 
+    @VisibleForTesting
+    AbstractResourceStoreContentPlexusResource( final SecuritySystem securitySystem,
+                                                          final Map<String, ArtifactViewProvider> viewProviders )
+    {
+        this();
+        this.securitySystem = securitySystem;
+        this.viewProviders = viewProviders;
+    }
+
     @Override
     public boolean acceptsUpload()
     {
@@ -147,10 +157,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        // NXCM-5155 Force browsers to never cache content pages
-        final Series<Parameter> headers = ((HttpResponse) response).getHttpCall().getResponseHeaders();
-        headers.add( "Pragma", "no-cache" );
-        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
 
         ResourceStoreRequest req = getResourceStoreRequest( request );
 
@@ -182,6 +188,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             return null;
         }
+    }
+
+    private void addNoCacheHeaders( final Response response )
+    {
+        // NXCM-5155 Force browsers to not cache this page
+        final Series<Parameter> headers = ((HttpResponse) response).getHttpCall().getResponseHeaders();
+        headers.add( "Pragma", "no-cache" );
+        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
     }
 
     @Override
@@ -373,132 +387,151 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
         }
 
-        Representation result = null;
-
         if ( item instanceof StorageFileItem )
         {
-            // we have a file
-            StorageFileItem file = (StorageFileItem) item;
-
-            if ( req.getConditions().getModifiedSince() != null )
-            {
-                // this is a conditional GET
-                if ( file.getModified() > req.getConditions().getModifiedSince().getTime() )
-                {
-                    result = new StorageFileItemRepresentation( file );
-                }
-                else
-                {
-                    throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
-                }
-            }
-            else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
-                && file.getRepositoryItemAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
-            {
-                Tag tag = req.getConditions().getNoneMatch().get( 0 );
-
-                // this is a conditional get using ETag
-                if ( !file.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals(
-                    tag.getName() ) )
-                {
-                    result = new StorageFileItemRepresentation( file );
-                }
-                else
-                {
-                    throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
-                }
-            }
-            else
-            {
-                result = new StorageFileItemRepresentation( file );
-            }
+            return renderStorageFileItem( req, (StorageFileItem) item );
         }
         else if ( item instanceof StorageLinkItem )
         {
-            // we have a link, dereference it
-            // TODO: we should be able to do HTTP redirects too! (parametrize the dereferencing?)
-            try
-            {
-                return renderItem( context, req, res, variant, store,
-                    getNexus().dereferenceLinkItem( (StorageLinkItem) item ) );
-            }
-            catch ( Exception e )
-            {
-                handleException( req, res, e );
-
-                return null;
-            }
+            return renderStorageLinkItem( context, req, res, variant, store, (StorageLinkItem) item );
         }
         else if ( item instanceof StorageCollectionItem )
         {
-            String resPath = parsePathFromUri( req.getResourceRef().toString() );
+            return renderStorageCollectionItem( context, req, res, variant, store, (StorageCollectionItem) item );
+        }
 
-            if ( !resPath.endsWith( "/" ) )
+        return null;
+    }
+
+    @VisibleForTesting
+    Object renderStorageCollectionItem(final Context context, final Request req, final Response res,
+                                          final Variant variant, final ResourceStore store, final StorageCollectionItem coll )
+        throws IOException, NoSuchResourceStoreException, IllegalOperationException, ItemNotFoundException,
+        AccessDeniedException, ResourceException
+    {
+        String resPath = parsePathFromUri( req.getResourceRef().toString() );
+
+        if ( !resPath.endsWith( "/" ) )
+        {
+            res.redirectPermanent( createRedirectReference( req ).getTargetRef().toString() + "/" );
+
+            return null;
+        }
+
+        // NXCM-5155 do not cache index pages
+        addNoCacheHeaders( res );
+
+        if ( Method.HEAD.equals( req.getMethod() ) )
+        {
+            return renderHeadResponseItem( context, req, res, variant, store, coll.getResourceStoreRequest(), coll );
+        }
+
+        Collection<StorageItem> children = coll.list();
+
+        ContentListResourceResponse response = new ContentListResourceResponse();
+
+        ContentListResource resource;
+
+        List<String> uniqueNames = new ArrayList<String>( children.size() );
+
+        for ( StorageItem child : children )
+        {
+            if ( child.isVirtual()
+                || !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
             {
-                res.redirectPermanent( createRedirectReference( req ).getTargetRef().toString() + "/" );
-
-                return null;
-            }
-
-            // we have a collection
-            StorageCollectionItem coll = (StorageCollectionItem) item;
-
-            if ( Method.HEAD.equals( req.getMethod() ) )
-            {
-                return renderHeadResponseItem( context, req, res, variant, store, item.getResourceStoreRequest(), coll );
-            }
-
-            Collection<StorageItem> children = coll.list();
-
-            ContentListResourceResponse response = new ContentListResourceResponse();
-
-            ContentListResource resource;
-
-            List<String> uniqueNames = new ArrayList<String>( children.size() );
-
-            for ( StorageItem child : children )
-            {
-                if ( child.isVirtual()
-                    || !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
+                if ( !uniqueNames.contains( child.getName() ) )
                 {
-                    if ( !uniqueNames.contains( child.getName() ) )
-                    {
-                        resource = new ContentListResource();
+                    resource = new ContentListResource();
 
-                        resource.setText( child.getName() );
+                    resource.setText( child.getName() );
 
-                        resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
+                    resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
 
-                        String uri = getResourceUri( req, resource, child );
-                        resource.setResourceURI( uri );
+                    String uri = getResourceUri( req, resource, child );
+                    resource.setResourceURI( uri );
 
-                        resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );
+                    resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );
 
-                        resource.setLastModified( new Date( child.getModified() ) );
+                    resource.setLastModified( new Date( child.getModified() ) );
 
-                        resource.setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child ).getLength()
-                            : -1 );
+                    resource.setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child ).getLength() : -1 );
 
-                        response.addData( resource );
+                    response.addData( resource );
 
-                        uniqueNames.add( child.getName() );
-                    }
+                    uniqueNames.add( child.getName() );
                 }
-            }
-
-            if ( MediaType.TEXT_HTML.equals( variant.getMediaType() ) )
-            {
-                result = serialize( context, req, variant, response );
-
-                result.setModificationDate( new Date( coll.getModified() ) );
-            }
-            else
-            {
-                return response;
             }
         }
 
-        return result;
+        if ( MediaType.TEXT_HTML.equals( variant.getMediaType() ) )
+        {
+            Representation result = serialize( context, req, variant, response );
+
+            result.setModificationDate( new Date( coll.getModified() ) );
+
+            return result;
+        }
+        else
+        {
+            return response;
+        }
+    }
+
+    @VisibleForTesting
+    Object renderStorageLinkItem( final Context context, final Request req, final Response res,
+                                          final Variant variant, final ResourceStore store, final StorageLinkItem item )
+        throws ResourceException
+    {
+        // we have a link, dereference it
+        // TODO: we should be able to do HTTP redirects too! (parametrize the dereferencing?)
+        try
+        {
+            return renderItem( context, req, res, variant, store, getNexus().dereferenceLinkItem( item ) );
+        }
+        catch ( Exception e )
+        {
+            handleException( req, res, e );
+
+            return null;
+        }
+    }
+
+    @VisibleForTesting
+    Representation renderStorageFileItem( final Request req, final StorageFileItem file )
+        throws ResourceException
+    {
+        if ( req.getConditions().getModifiedSince() != null )
+        {
+            // this is a conditional GET
+            if ( file.getModified() > req.getConditions().getModifiedSince().getTime() )
+            {
+                return new StorageFileItemRepresentation( file );
+            }
+            else
+            {
+                throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
+            }
+        }
+        else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
+            && file.getRepositoryItemAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
+        {
+            Tag tag = req.getConditions().getNoneMatch().get( 0 );
+
+            // this is a conditional get using ETag
+            if ( !file.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals(
+                tag.getName() ) )
+            {
+                return new StorageFileItemRepresentation( file );
+            }
+            else
+            {
+                throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
+            }
+        }
+        else
+        {
+            return new StorageFileItemRepresentation( file );
+        }
     }
 
     private String getResourceUri( Request req, ContentListResource resource, StorageItem child )

@@ -47,6 +47,7 @@ import org.sonatype.sisu.bl.support.RunningBundles;
 import org.sonatype.sisu.bl.support.TimedCondition;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
+import org.sonatype.sisu.goodies.common.Time;
 import com.google.common.base.Throwables;
 
 /**
@@ -193,7 +194,7 @@ public class DefaultNexusBundle
                 new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PING_COMMAND );
                 return true;
             }
-        }.await( 1000, 5000, 1000 );
+        }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
         if ( monitorInstalled )
         {
             log.debug( "Command monitor installed in started Nexus on port '{}'", commandMonitorPort );
@@ -201,7 +202,10 @@ public class DefaultNexusBundle
         else
         {
             throw new RuntimeException(
-                format( "Command monitor did not startup on port '%s' in started Nexus", commandMonitorPort )
+                format(
+                    "Nexus did not started up command monitor on port '%s' in allocated timeout of 10 seconds"
+                    , commandMonitorPort
+                )
             );
         }
     }

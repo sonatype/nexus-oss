@@ -70,6 +70,8 @@ public class Nexus1116InvalidProxyIT
     {
         status = "started";
         File mavenProject = getTestFile( "pom.xml" ).getParentFile();
+
+        System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
         Verifier verifier;
         try
         {
@@ -81,8 +83,6 @@ public class Nexus1116InvalidProxyIT
             status = "failCreation" + e.getMessage();
             return;
         }
-
-        System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
 
         File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
         verifier.setLocalRepo( mavenRepository.getAbsolutePath() );

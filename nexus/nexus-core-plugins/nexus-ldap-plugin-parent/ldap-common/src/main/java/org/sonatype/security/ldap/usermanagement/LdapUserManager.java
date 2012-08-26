@@ -16,9 +16,12 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.appcontext.internal.Preconditions;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
@@ -38,14 +41,27 @@ public class LdapUserManager
     extends AbstractReadOnlyUserManager
 {
 
+    private static final Logger logger = LoggerFactory.getLogger( LdapUserManager.class );
+
     public static final String LDAP_REALM_KEY = "LdapAuthenticatingRealm";
     private static final String USER_SOURCE = "LDAP";
 
     @Requirement
     private LdapManager ldapManager;
 
-    @Requirement
-    private Logger logger;
+    /**
+     * Default constructor for plexus injection.
+     */
+    public LdapUserManager()
+    {
+        // plexus injection only
+    }
+
+    @VisibleForTesting
+    LdapUserManager( final LdapManager ldapManager )
+    {
+        this.ldapManager = Preconditions.checkNotNull( ldapManager );
+    }
 
     public User getUser( String userId )
         throws UserNotFoundException
@@ -104,7 +120,14 @@ public class LdapUserManager
     private User toPlexusUser( LdapUser ldapUser )
     {
         User user = new DefaultUser();
-        user.setEmailAddress( ldapUser.getEmail() );
+
+        String email = ldapUser.getEmail();
+        if ( email != null )
+        {
+            email = email.trim();
+        }
+        user.setEmailAddress( email );
+
         user.setName( ldapUser.getRealName() );
         user.setUserId( ldapUser.getUsername() );
         user.setSource( USER_SOURCE );
