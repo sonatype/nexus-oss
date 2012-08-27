@@ -106,7 +106,7 @@ public class LdapXmlBundleAssemblerTest
     }
 
     @Test
-    public void testAssemblyNoModel()
+    public void assembleBundleWithNoLdapConfig()
         throws IssueSubmissionException, IOException
     {
         when( source.getConfiguration() ).thenReturn( null );
@@ -117,7 +117,7 @@ public class LdapXmlBundleAssemblerTest
     }
 
     @Test
-    public void testAssembly()
+    public void assembleBundleWithLdapConfig()
         throws IssueSubmissionException, IOException
     {
         final Bundle bundle = underTest.assemble( request );
