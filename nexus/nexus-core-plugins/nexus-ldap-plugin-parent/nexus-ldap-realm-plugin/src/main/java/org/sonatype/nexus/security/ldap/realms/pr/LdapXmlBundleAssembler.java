@@ -32,6 +32,8 @@ import org.sonatype.sisu.pr.bundle.StorageManager;
 
 /**
  * Load LDAP configuration from disk and mask passwords.
+ *
+ * @since 2.2
  */
 @Named
 public class LdapXmlBundleAssembler
