@@ -46,6 +46,7 @@
 
   <modules>
     <module>nexus-obr-plugin</module>
+    <module>nexus-obr-testsuite</module>
   </modules>
 
   <properties>
