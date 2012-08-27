@@ -14,6 +14,8 @@ package org.sonatype.nexus.testsuite.support.hamcrest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.io.File;
 
@@ -62,6 +64,23 @@ public class NexusMatcherTest
     @Test
     public void doesNotHaveCommonExceptions()
     {
+        assertThat(
+            resolveLogFile(),
+            NexusMatchers.doesNotHaveCommonExceptions()
+        );
+    }
+
+    /**
+     * Verify that a log file that does contain one of NPE,CNF,CCE fails.
+     */
+    @Test
+    public void hasCommonExceptions()
+    {
+        thrown.expect( AssertionError.class );
+        thrown.expectMessage( Matchers.<String>allOf(
+            containsString( "Log file does not contain any of the common unwanted exceptions" ),
+            endsWith( "contained on line <1>: \"java.lang.ClassNotFoundException: some.package.Foo\"" )
+        ) );
         assertThat(
             resolveLogFile(),
             NexusMatchers.doesNotHaveCommonExceptions()

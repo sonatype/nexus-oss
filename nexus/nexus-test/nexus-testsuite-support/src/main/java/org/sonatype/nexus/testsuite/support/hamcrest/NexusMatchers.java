@@ -18,9 +18,9 @@ import java.util.regex.Pattern;
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.ConjunctionMatcher;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.InversionMatcher;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.LogFileMatcher;
 import com.google.common.base.Preconditions;
@@ -42,7 +42,8 @@ public abstract class NexusMatchers
     @Factory
     public static Matcher<File> doesNotHaveCommonExceptions()
     {
-        return Matchers.allOf(
+        return ConjunctionMatcher.allOf(
+            "Log file does not contain any of the common unwanted exceptions: NullPointerException, ClassNotFoundException, ClassCastException",
             InversionMatcher.not( LogFileMatcher.hasExceptionOfType( NullPointerException.class ) ),
             InversionMatcher.not( LogFileMatcher.hasExceptionOfType( ClassNotFoundException.class ) ),
             InversionMatcher.not( LogFileMatcher.hasExceptionOfType( ClassCastException.class ) )
