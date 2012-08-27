@@ -81,7 +81,7 @@ public class HttpClientUtilTest
     }
 
     @Test
-    public void testRedirectIndexPage()
+    public void doNotFollowRedirectsToDirIndex()
         throws ProtocolException
     {
         when( requestLine.getMethod() ).thenReturn( "GET" );
