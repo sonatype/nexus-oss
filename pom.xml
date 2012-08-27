@@ -184,10 +184,6 @@
                 <name>reporter</name>
                 <value>org.testng.reporters.JUnitXMLReporter</value>
               </property>
-              <property>
-                <name>listener</name>
-                <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
-              </property>
             </properties>
           </configuration>
         </plugin>
@@ -282,5 +278,41 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <profile>
+      <id>idea</id>
+      <properties>
+        <nexusPluginType>jar</nexusPluginType>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
