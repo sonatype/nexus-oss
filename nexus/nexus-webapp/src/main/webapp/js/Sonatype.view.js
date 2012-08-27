@@ -65,20 +65,36 @@ Sonatype.view = {
     Ext.Ajax.on({
           "requestexception" : {
             fn : function(conn, response, options) {
+              var suppressed = options.suppressStatus;
 
               if (Sonatype.config.repos.urls.status === options.url)
               {
                 // never show the connection error message for the status resource
                 // (if anonymous is disabled, UI would show this all the time, until you're logged in)
                 return;
-              } else if ( options.suppressStatus === true ) {
+              } else if ( suppressed === true ) {
+                // 'true' means suppress all error handling
                 return;
-              } else if (Ext.isArray(options.suppressStatus)) {
-                if (options.suppressStatus.indexOf(response.status) < 0)
-                {
-                  Sonatype.utils.connectionError(response, null, null, options);
+              }
+
+              if (!Ext.isArray(suppressed)) {
+                suppressed = [suppressed];
+              }
+
+              // NEXUS-5228 some plugins use numbers in their options, some use strings (suppressStatus : '404')
+              // and rely on type conversion. That should be fixed because
+              // a) it was relying on broken js behavior (implicit conversion),
+              // b) it did not work at all when multiple status codes should be suppressed
+              //     (['400', '404'] would still show error messages)
+              Ext.each(suppressed, function(item, idx, array) {
+                if (Ext.type(item) !== 'number') {
+                  Nexus.Log.warn('The "suppressStatus" config option is not an instance of Number. Trying to convert.' );
+                  array[idx] = parseInt(item, 10);
                 }
-              } else if (options.suppressStatus !== response.status) {
+              });
+
+              if (suppressed.indexOf(response.status) < 0)
+              {
                 Sonatype.utils.connectionError(response, null, null, options);
               }
             },
