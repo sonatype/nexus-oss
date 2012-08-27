@@ -20,102 +20,107 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>11</version>
+    <version>12</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
-  <artifactId>nexus-obr-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
+  <groupId>org.sonatype.nexus.obr</groupId>
+  <artifactId>nexus-obr</artifactId>
   <version>2.0.2-SNAPSHOT</version>
 
-  <name>Nexus Plugin :: OBR</name>
-  <description>Adds a repository type for OBR repositories.</description>
-  
+  <packaging>pom</packaging>
+
+  <name>Nexus OBR (Parent)</name>
+
   <licenses>
     <license>
       <name>Eclipse Public License</name>
       <url>http://www.eclipse.org/legal/epl-v10.html</url>
     </license>
   </licenses>
-  
+
   <scm>
     <connection>scm:git:git@github.com/sonatype/nexus-obr-plugin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-obr-plugin.git</developerConnection>
     <url>http://github.com/sonatype/nexus-obr-plugin</url>
   </scm>
 
+  <modules>
+    <module>nexus-obr-plugin</module>
+  </modules>
+
   <properties>
-    <felix.home>${project.build.directory}/felix</felix.home>
     <nexus.version>2.0</nexus.version>
     <applifecycle.version>1.6</applifecycle.version>
   </properties>
 
-  <dependencies>
+  <dependencyManagement>
+    <dependencies>
 
-    <!-- Real dependency -->
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.service.obr</artifactId>
-      <version>1.0.2</version>
-    </dependency>
+      <!-- Real dependency -->
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.osgi.service.obr</artifactId>
+        <version>1.0.2</version>
+      </dependency>
 
-    <!-- Nexus dependencies -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
+      <!-- Nexus dependencies -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-rest-api</artifactId>
+        <version>${nexus.version}</version>
+        <scope>provided</scope>
+      </dependency>
 
-    <!-- AllInOne for UTs -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- More for UTs -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
+      <!-- AllInOne for UTs -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-test-api</artifactId>
+        <version>${nexus.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <!-- More for UTs -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-app</artifactId>
+        <version>${nexus.version}</version>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-proxy</artifactId>
+        <version>${nexus.version}</version>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-configuration</artifactId>
+        <version>${nexus.version}</version>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
 
-    <!-- AllInOne for ITs -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${nexus.version}</version>
-      <scope>test</scope>
-    </dependency>
+      <!-- AllInOne for ITs -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-harness-launcher</artifactId>
+        <version>${nexus.version}</version>
+        <scope>test</scope>
+      </dependency>
 
-    <!-- Other test stuff -->
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.main.distribution</artifactId>
-      <version>3.2.2</version>
-      <classifier>project</classifier>
-      <type>tar.gz</type>
-      <scope>test</scope>
-    </dependency>
+      <!-- Other test stuff -->
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.main.distribution</artifactId>
+        <version>3.2.2</version>
+        <classifier>project</classifier>
+        <type>tar.gz</type>
+        <scope>test</scope>
+      </dependency>
 
-  </dependencies>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
@@ -154,7 +159,8 @@
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>2.9</version>
           <configuration>
-            <forkMode>always</forkMode> <!-- "always" for the latest resort, "once" is actually what we want -->
+            <forkMode>always</forkMode>
+            <!-- "always" for the latest resort, "once" is actually what we want -->
             <junitArtifactName>none:none</junitArtifactName>
             <!-- currently using testng to execute the ITs at *IT.java -->
             <testNGArtifactName>org.testng:testng</testNGArtifactName>
@@ -274,180 +280,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-        <version>1.5.5</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <includes>
-                  <include>org.apache.felix:org.osgi.service.obr</include>
-                  <include>org.apache.felix:org.osgi.core</include>
-                </includes>
-              </artifactSet>
-              <filters>
-                <filter>
-                  <artifact>org.apache.felix:org.osgi.service.obr</artifact>
-                  <includes>
-                    <include>org/osgi/service/obr/*.class</include>
-                  </includes>
-                </filter>
-                <filter>
-                  <artifact>org.apache.felix:org.osgi.core</artifact>
-                  <includes>
-                    <include>org/osgi/framework/Version.class</include>
-                  </includes>
-                </filter>
-              </filters>
-              <relocations>
-                <relocation>
-                  <pattern>org.osgi.framework</pattern>
-                  <shadedPattern>org.sonatype.nexus.obr.util</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.5.1</version>
-        <configuration>
-          <instrumentation>
-            <includes>
-              <include>org/sonatype/nexus/obr/**/*.class</include>
-            </includes>
-          </instrumentation>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>${nexus.version}</version>
-        <configuration>
-          <extraResourcesArtifacts>
-            <dependency>
-              <groupId>org.apache.felix</groupId>
-              <artifactId>org.apache.felix.main.distribution</artifactId>
-              <classifier>project</classifier>
-              <type>tar.gz</type>
-              <outputDirectory>${felix.home}</outputDirectory>
-            </dependency>
-          </extraResourcesArtifacts>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>0.0.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/classes/static/js/nexus-obr-plugin-all.js</output>
-              <nosuffix>true</nosuffix>
-              <nomunge>true</nomunge>
-              <jswarn>false</jswarn>
-              <insertNewLine>true</insertNewLine>
-              <disableOptimizations>true</disableOptimizations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <version>1.6-SONATYPE-r940877</version>
-        <executions>
-          <execution>
-            <id>maven-fake-repo</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>install</goal>
-            </goals>
-            <configuration>
-              <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
-              <extraArtifacts>
-                <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
-                <xml>org.ops4j.pax.web:samples:0.6.0:pom</xml>
-                <xml>org.apache.felix:maven-bundle-plugin:1.4.3</xml>
-                <xml>org.ops4j.base:ops4j-base-lang:0.5.0</xml>
-                <xml>org.ops4j.base:ops4j-base-util-property:0.5.0</xml>
-                <xml>org.ops4j.pax.swissbox:pax-swissbox-core:0.2.0</xml>
-                <xml>org.ops4j.pax.swissbox:pax-swissbox-optional-jcl:0.2.0</xml>
-                <xml>org.ops4j.pax.swissbox:pax-swissbox-property:0.2.0</xml>
-                <xml>org.mortbay.jetty:jetty:6.1.16</xml>
-                <xml>org.apache.tomcat:jasper:6.0.18</xml>
-                <xml>org.osgi:org.osgi.core:4.0.1</xml>
-                <xml>org.osgi:org.osgi.compendium:4.0.1</xml>
-                <xml>javax.servlet:servlet-api:2.3</xml>
-                <xml>commons-httpclient:commons-httpclient:3.1</xml>
-                <xml>junit:junit:4.4</xml>
-                <xml>org.easymock:easymock:2.3</xml>
-                <xml>org.apache.maven.wagon:wagon-ssh-external:1.0-alpha-6</xml>
-                <xml>org.apache.maven.plugins:maven-site-plugin:2.0-beta-7:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-release-plugin:2.0-beta-6:maven-plugin</xml>
-              </extraArtifacts>
-            </configuration>
-          </execution>
-          <execution>
-            <id>obr-fake-hosted</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>install</goal>
-            </goals>
-            <configuration>
-              <localRepositoryPath>${project.build.directory}/felix-repo</localRepositoryPath>
-              <extraArtifacts>
-                <xml>org.apache.felix:org.apache.felix.webconsole:3.0.0</xml>
-                <xml>org.apache.felix:org.osgi.compendium:1.4.0</xml>
-                <xml>org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0</xml>
-                <xml>org.apache.portals:portlet-api_2.0_spec:1.0</xml>
-              </extraArtifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-    </plugins>
   </build>
 
 </project>
