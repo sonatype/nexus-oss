@@ -29,7 +29,7 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 @BenchmarkMethodChart
 @AxisRange( min = 0 )
 @RunWith( OrderedRunner.class )
-public class JacksonJSONFSAttributeStoragePerformanceLRTest
+public class JacksonJSONFSAttributeStoragePerformanceIT
     extends AttributeStoragePerformanceTestSupport
 {
 

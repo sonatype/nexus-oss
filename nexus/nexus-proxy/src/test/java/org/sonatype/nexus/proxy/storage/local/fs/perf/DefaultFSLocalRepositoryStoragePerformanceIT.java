@@ -56,7 +56,7 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 @BenchmarkHistoryChart( )
 @BenchmarkMethodChart( )
 @AxisRange( min = 0 )
-public class DefaultFSLocalRepositoryStoragePerformanceITLRTest
+public class DefaultFSLocalRepositoryStoragePerformanceIT
     extends AbstractNexusTestEnvironment
 {
     @Rule
