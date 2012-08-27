@@ -127,14 +127,11 @@
         </executions>
         <configuration>
           <descriptors>
-            <descriptor> src/main/assembly/metadata-rebuild-cli-assembly.xml
-                        </descriptor>
+            <descriptor>src/main/assembly/metadata-rebuild-cli-assembly.xml</descriptor>
           </descriptors>
           <archive>
             <manifest>
-              <mainClass>
-                org.sonatype.nexus.tools.metadata.MetadataRebuildCli
-                            </mainClass>
+              <mainClass>org.sonatype.nexus.tools.metadata.MetadataRebuildCli</mainClass>
             </manifest>
           </archive>
         </configuration>

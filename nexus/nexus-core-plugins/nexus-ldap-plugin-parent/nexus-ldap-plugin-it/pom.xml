@@ -101,12 +101,15 @@
       </exclusions>
     </dependency>
     <!-- TODO plexus-ldap-testsuite requires JUNIT???, fix it -->
+    <!--
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
+      <version>4.10</version>
       <scope>runtime</scope>
     </dependency>
-
+    -->
+    
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-webapp</artifactId>

@@ -133,13 +133,8 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -147,6 +142,7 @@
       <artifactId>litmus-testsupport</artifactId>
       <scope>compile</scope>
     </dependency>
+    
 
     <!-- Starting up Jetty "fake remote" -->
     <dependency>

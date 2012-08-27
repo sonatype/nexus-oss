@@ -35,10 +35,6 @@
       <artifactId>nexus-restlight-test-harness</artifactId>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-    </dependency>
-    <dependency>
       <groupId> org.jdom</groupId>
       <artifactId>jdom</artifactId>
     </dependency>
@@ -63,8 +59,8 @@
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
     </dependency>
   </dependencies>
 </project>
