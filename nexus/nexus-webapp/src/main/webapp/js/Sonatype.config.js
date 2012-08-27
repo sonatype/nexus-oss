@@ -147,7 +147,6 @@
   Sonatype.user.anon = {
     username : '',
     isLoggedIn : false,
-    authToken : null,
     repoServer : {}
   };
 

@@ -165,15 +165,7 @@ Ext.override(Ext.data.Connection, {
                 }
               }
 
-              if (Sonatype.utils.authToken)
-              {
-                // Add auth header to each request
-                return this.doFormUpload(o, p, Sonatype.utils.appendAuth(url));
-              }
-              else
-              {
-                return this.doFormUpload(o, p, url);
-              }
+              return this.doFormUpload(o, p, url);
             }
             var f = Ext.lib.Ajax.serializeForm(form);
             p = p ? (p + '&' + f) : f;
@@ -201,13 +193,6 @@ Ext.override(Ext.data.Connection, {
               if (!hs || !hs['Content-Type']){
                   hs['Content-Type'] = 'application/json; charset=utf-8';
               }
-          }
-
-
-          if (Sonatype.utils.authToken)
-          {
-            // Add auth header to each request
-            o.headers.Authorization = 'Basic ' + Sonatype.utils.authToken
           }
 
           var cb = {
