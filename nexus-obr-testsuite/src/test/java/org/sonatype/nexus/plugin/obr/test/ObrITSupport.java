@@ -376,7 +376,7 @@ public abstract class ObrITSupport
         content().upload( new Location( repositoryId, path ), util.resolveFile( "target/felix-repo/" + path ) );
     }
 
-    protected void deployUsingMaven( final String projectName )
+    protected void deployUsingMaven( final String projectName, final String repositoryId )
         throws VerificationException
     {
         final File projectToBuildSource = testData().resolveFile( projectName );
@@ -387,6 +387,7 @@ public abstract class ObrITSupport
 
         final Properties properties = new Properties();
         properties.setProperty( "nexus-base-url", nexus().getUrl().toExternalForm() );
+        properties.setProperty( "nexus-repository-id", repositoryId );
 
         tasks().copy().directory( file( projectToBuildSource ) )
             .filterUsing( properties )
@@ -415,6 +416,16 @@ public abstract class ObrITSupport
 
         verifier.executeGoal( "deploy" );
         verifier.verifyErrorFreeLog();
+    }
+
+    protected String repositoryIdForTest()
+    {
+        String methodName = testName.getMethodName();
+        if ( methodName.contains( "[" ) )
+        {
+            return methodName.substring( 0, methodName.indexOf( "[" ) );
+        }
+        return methodName;
     }
 
 }

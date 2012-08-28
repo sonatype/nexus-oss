@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
 public class ObrShadowIT
     extends ObrITSupport
@@ -28,20 +27,18 @@ public class ObrShadowIT
     public void downloadFromShadow()
         throws Exception
     {
-        upload(
-            "releases", "org/apache/felix/org.apache.felix.webconsole/3.0.0/org.apache.felix.webconsole-3.0.0.jar"
-        );
-        upload(
-            "releases", "org/apache/felix/org.osgi.compendium/1.4.0/org.osgi.compendium-1.4.0.jar"
-        );
-        upload(
-            "releases", "org/apache/geronimo/specs/geronimo-servlet_3.0_spec/1.0/geronimo-servlet_3.0_spec-1.0.jar"
-        );
-        upload(
-            "releases", "org/apache/portals/portlet-api_2.0_spec/1.0/portlet-api_2.0_spec-1.0.jar"
-        );
-        createObrShadowRepository( "obr-shadow", "releases" );
-        deployUsingObrIntoFelix( "obr-shadow" );
+        final String mavenRId = repositoryIdForTest() + "-maven";
+        final String sRId = repositoryIdForTest() + "-shadow";
+
+        repositories().createMavenHostedReleaseRepository( mavenRId );
+
+        upload( mavenRId, FELIX_WEBCONSOLE );
+        upload( mavenRId, OSGI_COMPENDIUM );
+        upload( mavenRId, GERONIMO_SERVLET );
+        upload( mavenRId, PORTLET_API );
+
+        createObrShadowRepository( sRId, mavenRId );
+        deployUsingObrIntoFelix( sRId );
     }
 
 }

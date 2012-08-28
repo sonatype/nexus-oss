@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
 public class ObrGroupIT
     extends ObrITSupport
@@ -28,24 +27,34 @@ public class ObrGroupIT
     public void obrGroupOfGroups()
         throws Exception
     {
-        createObrHostedRepository( "obr-hosted-1" );
-        upload( "obr-hosted-1", FELIX_WEBCONSOLE );
+        final String h1RId = repositoryIdForTest() + "-hosted-1";
+        final String h2RId = repositoryIdForTest() + "-hosted-2";
+        final String h3RId = repositoryIdForTest() + "-hosted-3";
+        final String h4RId = repositoryIdForTest() + "-hosted-4";
 
-        createObrHostedRepository( "obr-hosted-2" );
-        upload( "obr-hosted-2", OSGI_COMPENDIUM );
+        final String g1RId = repositoryIdForTest() + "-group-1";
+        final String g2RId = repositoryIdForTest() + "-group-2";
+        final String g3RId = repositoryIdForTest() + "-group-3";
+        final String g4RId = repositoryIdForTest() + "-group-4";
 
-        createObrHostedRepository( "obr-hosted-3" );
-        upload( "obr-hosted-3", GERONIMO_SERVLET );
+        createObrHostedRepository( h1RId );
+        upload( h1RId, FELIX_WEBCONSOLE );
 
-        createObrHostedRepository( "obr-hosted-4" );
-        upload( "obr-hosted-4", PORTLET_API );
+        createObrHostedRepository( h2RId );
+        upload( h2RId, OSGI_COMPENDIUM );
 
-        createObrGroup( "obr-group-4", "obr-hosted-2", "obr-hosted-4" );
-        createObrGroup( "obr-group-3", "obr-group-4", "obr-hosted-3" );
-        createObrGroup( "obr-group-2", "obr-group-3", "obr-group-4" );
-        createObrGroup( "obr-group-1", "obr-hosted-1", "obr-group-2" );
+        createObrHostedRepository( h3RId );
+        upload( h3RId, GERONIMO_SERVLET );
 
-        deployUsingObrIntoFelix( "obr-group-1" );
+        createObrHostedRepository( h4RId );
+        upload( h4RId, PORTLET_API );
+
+        createObrGroup( g4RId, h2RId, h4RId );
+        createObrGroup( g3RId, g4RId, h3RId );
+        createObrGroup( g2RId, g3RId, g4RId );
+        createObrGroup( g1RId, h1RId, g2RId );
+
+        deployUsingObrIntoFelix( g1RId );
     }
 
 }

@@ -55,7 +55,7 @@
   <distributionManagement>
     <repository>
       <id>nexus</id>
-      <url>${nexus-base-url}content/repositories/obr-hosted</url>
+      <url>${nexus-base-url}content/repositories/${nexus-repository-id}</url>
     </repository>
   </distributionManagement>
 

@@ -13,8 +13,9 @@
 package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
+import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
+@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class ObrHostedIT
     extends ObrITSupport
 {
@@ -28,22 +29,27 @@ public class ObrHostedIT
     public void downloadFromHosted()
         throws Exception
     {
-        createObrHostedRepository( "obr-hosted" );
+        final String hRId = repositoryIdForTest() + "-hosted";
 
-        upload( "obr-hosted", FELIX_WEBCONSOLE );
-        upload( "obr-hosted", OSGI_COMPENDIUM );
-        upload( "obr-hosted", GERONIMO_SERVLET );
-        upload( "obr-hosted", PORTLET_API );
+        createObrHostedRepository( hRId );
 
-        deployUsingObrIntoFelix( "obr-hosted" );
+        upload( hRId, FELIX_WEBCONSOLE );
+        upload( hRId, OSGI_COMPENDIUM );
+        upload( hRId, GERONIMO_SERVLET );
+        upload( hRId, PORTLET_API );
+
+        deployUsingObrIntoFelix( hRId );
     }
 
     @Test
     public void deployToHosted()
         throws Exception
     {
-        createObrHostedRepository( "obr-hosted" );
-        deployUsingMaven( "helloworld-hs" );
+        final String hRId = repositoryIdForTest() + "-hosted";
+
+        createObrHostedRepository( hRId );
+
+        deployUsingMaven( "helloworld-hs", hRId );
     }
 
 }
