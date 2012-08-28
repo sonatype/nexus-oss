@@ -1,7 +1,0 @@
-<project name="test" default="rpm" xmlns:redline="antlib:org.redline_rpm">
-	<target name="rpm">
-		<redline:rpm group="IS24" name="is24-${project.artifactId}" version="${project.version}" destination="${project.build.directory}">
-			<zipfileset prefix="/data/is24/nexus/nexus/WEB-INF/plugin-repository" src="${project.build.directory}/${project.build.finalName}-bundle.zip" />
-		</redline:rpm>
-	</target>
-</project>
