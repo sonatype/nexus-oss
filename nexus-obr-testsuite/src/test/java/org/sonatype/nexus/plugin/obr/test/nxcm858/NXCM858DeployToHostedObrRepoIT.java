@@ -12,28 +12,32 @@
  */
 package org.sonatype.nexus.plugin.obr.test.nxcm858;
 
-import java.io.File;
+import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Properties;
+
+import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
-import org.sonatype.nexus.plugin.obr.test.AbstractOBRIntegrationTest;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
 public class NXCM858DeployToHostedObrRepoIT
-    extends AbstractOBRIntegrationTest
+    extends ObrITSupport
 {
+
+    public NXCM858DeployToHostedObrRepoIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
 
     @Test
     public void deployToHosted()
         throws Exception
     {
-        final File project = getTestFile( "helloworld-hs" );
-        final File s = getOverridableFile( "settings.xml" );
-
-        final Verifier v = AbstractMavenNexusIT.createMavenVerifier( project, s, getTestId() );
-
-        v.executeGoal( "deploy" );
-
-        v.verifyErrorFreeLog();
+        createObrHostedRepository( "obr-hosted" );
+        deployUsingMaven( "helloworld-hs" );
     }
+
 }

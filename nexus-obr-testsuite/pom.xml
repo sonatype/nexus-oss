@@ -32,90 +32,60 @@
   </properties>
 
   <dependencies>
-
-    <!-- Real dependency -->
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.service.obr</artifactId>
-    </dependency>
-
-    <!-- Nexus dependencies -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- AllInOne for UTs -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
+      <artifactId>nexus-testsuite-support</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- More for UTs -->
+    <!-- TODO Drop this dependency when we have proper client for repository -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
-      <classifier>tests</classifier>
+      <artifactId>nexus-test-utils</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
-      <classifier>tests</classifier>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-verifier</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-      <classifier>tests</classifier>
+      <groupId>de.pdark</groupId>
+      <artifactId>decentxml</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!-- AllInOne for ITs -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-launcher</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- Other test stuff -->
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.main.distribution</artifactId>
-      <classifier>project</classifier>
-      <type>tar.gz</type>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>${nexus.version}</version>
-        <configuration>
-          <nexusPluginsArtifacts>
-            <plugin>
-              <groupId>org.sonatype.nexus.plugins</groupId>
-              <artifactId>nexus-obr-plugin</artifactId>
-              <version>${project.version}</version>
-              <classifier>bundle</classifier>
-              <type>zip</type>
-            </plugin>
-          </nexusPluginsArtifacts>
-          <extraResourcesArtifacts>
-            <dependency>
-              <groupId>org.apache.felix</groupId>
-              <artifactId>org.apache.felix.main.distribution</artifactId>
-              <classifier>project</classifier>
-              <type>tar.gz</type>
-              <outputDirectory>${felix.home}</outputDirectory>
-            </dependency>
-          </extraResourcesArtifacts>
-        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>apache-maven</artifactId>
+                  <classifier>bin</classifier>
+                  <type>zip</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.felix</groupId>
+                  <artifactId>org.apache.felix.main.distribution</artifactId>
+                  <classifier>project</classifier>
+                  <type>tar.gz</type>
+
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
@@ -179,5 +149,33 @@
 
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

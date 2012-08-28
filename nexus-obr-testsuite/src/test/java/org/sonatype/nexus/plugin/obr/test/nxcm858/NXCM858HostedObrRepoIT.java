@@ -12,17 +12,30 @@
  */
 package org.sonatype.nexus.plugin.obr.test.nxcm858;
 
-import org.sonatype.nexus.plugin.obr.test.AbstractObrDownloadIT;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
 public class NXCM858HostedObrRepoIT
-    extends AbstractObrDownloadIT
+    extends ObrITSupport
 {
+
+    public NXCM858HostedObrRepoIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
 
     @Test
     public void downloadFromHosted()
         throws Exception
     {
-        downloadApacheFelixWebManagement( "obr-hosted" );
+        createObrHostedRepository( "obr-hosted" );
+
+        upload( "obr-hosted", FELIX_WEBCONSOLE );
+        upload( "obr-hosted", OSGI_COMPENDIUM );
+        upload( "obr-hosted", GERONIMO_SERVLET );
+        upload( "obr-hosted", PORTLET_API );
+
+        deployUsingObrIntoFelix( "obr-hosted" );
     }
+
 }

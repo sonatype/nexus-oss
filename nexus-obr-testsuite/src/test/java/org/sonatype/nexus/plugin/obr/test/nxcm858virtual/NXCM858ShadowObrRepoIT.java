@@ -12,17 +12,36 @@
  */
 package org.sonatype.nexus.plugin.obr.test.nxcm858virtual;
 
-import org.sonatype.nexus.plugin.obr.test.AbstractObrDownloadIT;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
 public class NXCM858ShadowObrRepoIT
-    extends AbstractObrDownloadIT
+    extends ObrITSupport
 {
+
+    public NXCM858ShadowObrRepoIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
 
     @Test
     public void downloadFromShadow()
         throws Exception
     {
-        downloadApacheFelixWebManagement( "obr-shadow" );
+        upload(
+            "releases", "org/apache/felix/org.apache.felix.webconsole/3.0.0/org.apache.felix.webconsole-3.0.0.jar"
+        );
+        upload(
+            "releases", "org/apache/felix/org.osgi.compendium/1.4.0/org.osgi.compendium-1.4.0.jar"
+        );
+        upload(
+            "releases", "org/apache/geronimo/specs/geronimo-servlet_3.0_spec/1.0/geronimo-servlet_3.0_spec-1.0.jar"
+        );
+        upload(
+            "releases", "org/apache/portals/portlet-api_2.0_spec/1.0/portlet-api_2.0_spec-1.0.jar"
+        );
+        createObrShadowRepository( "obr-shadow", "releases" );
+        deployUsingObrIntoFelix( "obr-shadow" );
     }
+
 }

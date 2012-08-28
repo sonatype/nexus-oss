@@ -12,32 +12,49 @@
  */
 package org.sonatype.nexus.plugin.obr.test.nxcm858proxy;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 
-import org.sonatype.nexus.plugin.obr.test.AbstractObrDownloadIT;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
 public class NXCM858ProxyObrRepoIT
-    extends AbstractObrDownloadIT
+    extends ObrITSupport
 {
+
+    public NXCM858ProxyObrRepoIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
 
     @Test
     public void downloadFromProxy()
         throws Exception
     {
-        downloadApacheFelixWebManagement( "obr-proxy" );
+        createObrHostedRepository( "obr-hosted" );
 
-        assertExists( "org/apache/felix/org.apache.felix.webconsole/3.0.0/org.apache.felix.webconsole-3.0.0.jar" );
-        assertExists( "org/apache/felix/org.osgi.compendium/1.4.0/org.osgi.compendium-1.4.0.jar" );
-        assertExists( "org/apache/geronimo/specs/geronimo-servlet_3.0_spec/1.0/geronimo-servlet_3.0_spec-1.0.jar" );
-        assertExists( "org/apache/portals/portlet-api_2.0_spec/1.0/portlet-api_2.0_spec-1.0.jar" );
+        upload( "obr-hosted", FELIX_WEBCONSOLE );
+        upload( "obr-hosted", OSGI_COMPENDIUM );
+        upload( "obr-hosted", GERONIMO_SERVLET );
+        upload( "obr-hosted", PORTLET_API );
 
+        createObrProxyRepository(
+            "obr-proxy", nexus().getUrl().toExternalForm() + "content/repositories/obr-hosted/.meta/obr.xml"
+        );
+
+        deployUsingObrIntoFelix( "obr-proxy" );
+
+        verifyExistenceInStorage( FELIX_WEBCONSOLE );
+        verifyExistenceInStorage( OSGI_COMPENDIUM );
+        verifyExistenceInStorage( GERONIMO_SERVLET );
+        verifyExistenceInStorage( PORTLET_API );
     }
 
-    private void assertExists( final String filename )
+    private void verifyExistenceInStorage( final String filename )
     {
-        final File f = new File( nexusWorkDir, "storage/obr-proxy/" + filename );
-        Assert.assertTrue( f.exists(), "File not found: " + filename );
+        assertThat( new File( nexus().getWorkDirectory(), "storage/obr-proxy/" + filename ), exists() );
     }
+
 }

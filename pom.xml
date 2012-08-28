@@ -50,8 +50,11 @@
   </modules>
 
   <properties>
-    <nexus.version>2.0</nexus.version>
+    <nexus.version>2.2-SNAPSHOT</nexus.version>
     <applifecycle.version>1.6</applifecycle.version>
+
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
   </properties>
 
   <dependencyManagement>
@@ -120,110 +123,129 @@
         <scope>test</scope>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>apache-maven</artifactId>
+        <version>3.0.4</version>
+        <classifier>bin</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-support</artifactId>
+        <version>2.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.shared</groupId>
+        <artifactId>maven-verifier</artifactId>
+        <version>1.3</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit-dep</artifactId>
+          </exclusion>
+          <exclusion>
+            <artifactId>junit</artifactId>
+            <groupId>junit</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>de.pdark</groupId>
+        <artifactId>decentxml</artifactId>
+        <version>1.3</version>
+      </dependency>
+
+      <!-- TODO Drop this dependency when we have proper client for repository -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-utils</artifactId>
+        <version>${nexus.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-oss-webapp</artifactId>
+        <type>zip</type>
+        <classifier>bundle</classifier>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-obr-plugin</artifactId>
+        <type>nexus-plugin</type>
+        <version>2.0.2-SNAPSHOT</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+    </testResources>
+
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>${applifecycle.version}</version>
-          <extensions>true</extensions>
-          <configuration>
-            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/obr</pluginSiteUrl>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.plugins</groupId>
-              <artifactId>app-lifecycle-nexus</artifactId>
-              <version>${applifecycle.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.9</version>
+          <version>2.12</version>
           <configuration>
-            <junitArtifactName>junit:junit-dep</junitArtifactName>
-            <testNGArtifactName>none:none</testNGArtifactName>
-            <systemProperties>
-              <property>
-                <name>user.home</name>
-                <value>${project.build.directory}/user_home</value>
-              </property>
-            </systemProperties>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.9</version>
-          <configuration>
-            <forkMode>always</forkMode>
-            <!-- "always" for the latest resort, "once" is actually what we want -->
-            <junitArtifactName>none:none</junitArtifactName>
-            <!-- currently using testng to execute the ITs at *IT.java -->
-            <testNGArtifactName>org.testng:testng</testNGArtifactName>
-            <systemProperties>
-              <property>
-                <name>user.home</name>
-                <value>${project.build.directory}/user_home</value>
-              </property>
-            </systemProperties>
+            <failIfNoTests>false</failIfNoTests>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <!-- force use of property -->
+            <forkMode>once</forkMode>
+            <argLine>-ea</argLine>
+            <workingDirectory>${project.build.directory}</workingDirectory>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+            </systemPropertyVariables>
             <excludes>
-              <exclude>**/*$*</exclude>
-              <exclude>**/Abstract*</exclude>
+              <exclude>**/Abstract*.java</exclude>
+              <exclude>**/Test*.java</exclude>
             </excludes>
-            <properties>
-              <property>
-                <name>usedefaultlisteners</name>
-                <value>true</value>
-              </property>
-              <property>
-                <name>reporter</name>
-                <value>org.testng.reporters.JUnitXMLReporter</value>
-              </property>
-            </properties>
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.sonatype.nexus.plugins</groupId>
-          <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>${nexus.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>setup-nexus-plugin-environment</goal>
-                <goal>package</goal>
-              </goals>
-            </execution>
-          </executions>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.12</version>
           <configuration>
-            <nexusBundleArtifact>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-oss-webapp</artifactId>
-              <version>${nexus.version}</version>
-              <type>zip</type>
-              <classifier>bundle</classifier>
-            </nexusBundleArtifact>
-            <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
-            <nexusVersion>${nexus.version}</nexusVersion>
-            <nexusPluginsArtifacts>
-              <plugin>
-                <groupId>org.sonatype.nexus</groupId>
-                <artifactId>nexus-it-helper-plugin</artifactId>
-                <version>${nexus.version}</version>
-                <classifier>cp</classifier>
-              </plugin>
-              <plugin>
-                <groupId>org.sonatype.nexus</groupId>
-                <artifactId>nexus-it-helper-plugin</artifactId>
-                <version>${nexus.version}</version>
-                <classifier>bundle</classifier>
-                <type>zip</type>
-              </plugin>
-            </nexusPluginsArtifacts>
+            <failIfNoTests>false</failIfNoTests>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <!--
+            For each test, so that we can use the process timeout.
+            forkMode=always will cause duplicate "T E S T S" header to be rendered :-(
+            -->
+            <forkMode>always</forkMode>
+            <argLine>-ea</argLine>
+            <workingDirectory>${project.build.directory}</workingDirectory>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
         <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -->
@@ -278,41 +300,5 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <profiles>
-    <profile>
-      <id>it</id>
-      <activation>
-        <property>
-          <name>it</name>
-        </property>
-      </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
-    <profile>
-      <id>idea</id>
-      <properties>
-        <nexusPluginType>jar</nexusPluginType>
-      </properties>
-    </profile>
-  </profiles>
 
 </project>

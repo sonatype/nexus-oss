@@ -12,25 +12,31 @@
  */
 package org.sonatype.nexus.plugin.obr.test.nxcm1573;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Assert;
-import org.restlet.data.MediaType;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.plugin.obr.test.AbstractOBRIntegrationTest;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
+import java.io.File;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+
+import org.junit.Test;
+import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
-import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public class NXCM1573UpdateOBRProxyUrlIT
-    extends AbstractOBRIntegrationTest
+    extends ObrITSupport
 {
-    RepositoryMessageUtil repoMessageUtil;
 
-    public NXCM1573UpdateOBRProxyUrlIT()
-        throws Exception
+    public NXCM1573UpdateOBRProxyUrlIT( final String nexusBundleCoordinates )
     {
-        repoMessageUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
+        super( nexusBundleCoordinates );
     }
 
     @Test
@@ -64,48 +70,62 @@ public class NXCM1573UpdateOBRProxyUrlIT
         proxyRepo.setRemoteStorage( remoteStorage );
 
         // create the repo
-        repoMessageUtil.createRepository( proxyRepo, false );
+        repositories().createRepository( proxyRepo );
 
         // check for equality here
-        assertObrPath( getNexusConfigUtil().getRepo( "obr" ), "http://sigil.codecauldron.org/", "/spring-external.obr" );
+        assertObrPath( "http://sigil.codecauldron.org/", "/spring-external.obr" );
 
         // note internal opposed to external
         proxyRepo.getRemoteStorage().setRemoteStorageUrl( "http://sigil.codecauldron.org/spring-internal.obr" );
 
         // update the repo
-        repoMessageUtil.updateRepo( proxyRepo, false );
+        repositories().updateRepo( proxyRepo );
 
         // check again for equality here
-        assertObrPath( getNexusConfigUtil().getRepo( "obr" ), "http://sigil.codecauldron.org/", "/spring-internal.obr" );
+        assertObrPath( "http://sigil.codecauldron.org/", "/spring-internal.obr" );
 
         // note sigil2
         proxyRepo.getRemoteStorage().setRemoteStorageUrl( "http://sigil2.codecauldron.org/spring-external.obr" );
 
         // update the repo
-        repoMessageUtil.updateRepo( proxyRepo, false );
+        repositories().updateRepo( proxyRepo );
 
         // check again for equality here
-        assertObrPath( getNexusConfigUtil().getRepo( "obr" ), "http://sigil2.codecauldron.org/", "/spring-external.obr" );
+        assertObrPath( "http://sigil2.codecauldron.org/", "/spring-external.obr" );
 
         // note sigil3 and external -> internal
         proxyRepo.getRemoteStorage().setRemoteStorageUrl( "http://sigil3.codecauldron.org/spring-internal.obr" );
 
         // update the repo
-        repoMessageUtil.updateRepo( proxyRepo, false );
+        repositories().updateRepo( proxyRepo );
 
         // check again for equality here
-        assertObrPath( getNexusConfigUtil().getRepo( "obr" ), "http://sigil3.codecauldron.org/", "/spring-internal.obr" );
+        assertObrPath( "http://sigil3.codecauldron.org/", "/spring-internal.obr" );
     }
 
-    private void assertObrPath( final CRepository repository, final String remoteUrlShouldBe,
-                                final String obrPathShouldBe )
+    private void assertObrPath( final String expectedRemoteUrl,
+                                final String expectedObrPath )
+        throws Exception
     {
-        Assert.assertEquals( remoteUrlShouldBe, repository.getRemoteStorage().getUrl() );
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilder db = dbf.newDocumentBuilder();
+        final Document doc = db.parse( new File( nexus().getWorkDirectory(), "conf/nexus.xml" ) );
 
-        final Xpp3Dom dom = (Xpp3Dom) repository.getExternalConfiguration();
+        final XPath xpath = XPathFactory.newInstance().newXPath();
 
-        final Xpp3Dom child = dom.getChild( "obrPath" );
+        final Node url = (Node) xpath.evaluate(
+            "/nexusConfiguration/repositories/repository[id='obr']/remoteStorage/url",
+            doc, XPathConstants.NODE
+        );
+        assertThat( url, is( notNullValue() ) );
+        assertThat( url.getTextContent(), is( expectedRemoteUrl ) );
 
-        Assert.assertEquals( obrPathShouldBe, child.getValue() );
+        final Node obrPath = (Node) xpath.evaluate(
+            "/nexusConfiguration/repositories/repository[id='obr']/externalConfiguration/obrPath",
+            doc, XPathConstants.NODE
+        );
+        assertThat( obrPath, is( notNullValue() ) );
+        assertThat( obrPath.getTextContent(), is( expectedObrPath ) );
     }
+
 }

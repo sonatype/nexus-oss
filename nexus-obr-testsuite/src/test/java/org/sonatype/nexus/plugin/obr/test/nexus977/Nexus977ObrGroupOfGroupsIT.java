@@ -12,40 +12,40 @@
  */
 package org.sonatype.nexus.plugin.obr.test.nexus977;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.plugin.obr.test.AbstractObrDownloadIT;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
 public class Nexus977ObrGroupOfGroupsIT
-    extends AbstractObrDownloadIT
+    extends ObrITSupport
 {
 
-    @Override
-    protected void runOnce()
-        throws Exception
+    public Nexus977ObrGroupOfGroupsIT( final String nexusBundleCoordinates )
     {
-        super.runOnce();
-
-        copy( "o1", "org/apache/felix/org.apache.felix.webconsole/3.0.0/org.apache.felix.webconsole-3.0.0.jar" );
-        copy( "o2", "org/apache/felix/org.osgi.compendium/1.4.0/org.osgi.compendium-1.4.0.jar" );
-        copy( "o3", "org/apache/geronimo/specs/geronimo-servlet_3.0_spec/1.0/geronimo-servlet_3.0_spec-1.0.jar" );
-        copy( "o4", "org/apache/portals/portlet-api_2.0_spec/1.0/portlet-api_2.0_spec-1.0.jar" );
-    }
-
-    private void copy( final String dest, final String file )
-        throws IOException
-    {
-        FileUtils.copyFile( new File( FELIX_REPO, file ), new File( nexusWorkDir, "storage/" + dest + "/" + file ) );
+        super( nexusBundleCoordinates );
     }
 
     @Test
     public void obrGroupOfGroups()
         throws Exception
     {
-        downloadApacheFelixWebManagement( "g1" );
+        createObrHostedRepository( "obr-hosted-1" );
+        upload( "obr-hosted-1", FELIX_WEBCONSOLE );
+
+        createObrHostedRepository( "obr-hosted-2" );
+        upload( "obr-hosted-2", OSGI_COMPENDIUM );
+
+        createObrHostedRepository( "obr-hosted-3" );
+        upload( "obr-hosted-3", GERONIMO_SERVLET );
+
+        createObrHostedRepository( "obr-hosted-4" );
+        upload( "obr-hosted-4", PORTLET_API );
+
+        createObrGroup( "obr-group-4", "obr-hosted-2", "obr-hosted-4" );
+        createObrGroup( "obr-group-3", "obr-group-4", "obr-hosted-3" );
+        createObrGroup( "obr-group-2", "obr-group-3", "obr-group-4" );
+        createObrGroup( "obr-group-1", "obr-hosted-1", "obr-group-2" );
+
+        deployUsingObrIntoFelix( "obr-group-1" );
     }
 
 }

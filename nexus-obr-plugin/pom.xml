@@ -78,6 +78,18 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>${applifecycle.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/obr</pluginSiteUrl>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>${applifecycle.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>

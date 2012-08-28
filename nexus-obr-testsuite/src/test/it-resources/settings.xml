@@ -18,6 +18,14 @@
 
   <localRepository>${project.build.directory}/maven_repo</localRepository>
 
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+  </servers>
+
   <mirrors>
     <mirror>
       <id>nexus</id>
