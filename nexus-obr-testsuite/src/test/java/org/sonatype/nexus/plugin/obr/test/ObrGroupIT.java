@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.plugin.obr.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import org.junit.Test;
 
 public class ObrGroupIT
@@ -55,6 +58,47 @@ public class ObrGroupIT
         createObrGroup( g1RId, h1RId, g2RId );
 
         deployUsingObrIntoFelix( g1RId );
+    }
+
+    /**
+     * NXCM-2795:
+     * Verifies that bundles are found via an OBR group when groups contains multiple OBR hosted repositories.
+     *
+     * @throws Exception unexpected
+     */
+    @Test
+    public void fourHostedInAGroup()
+        throws Exception
+    {
+        final String h1RId = repositoryIdForTest() + "-hosted-1";
+        final String h2RId = repositoryIdForTest() + "-hosted-2";
+        final String h3RId = repositoryIdForTest() + "-hosted-3";
+        final String h4RId = repositoryIdForTest() + "-hosted-4";
+
+        final String gRId = repositoryIdForTest() + "-group";
+
+        createObrHostedRepository( h1RId );
+        upload( h1RId, FELIX_WEBCONSOLE );
+
+        createObrHostedRepository( h2RId );
+        upload( h2RId, OSGI_COMPENDIUM );
+
+        createObrHostedRepository( h3RId );
+        upload( h3RId, GERONIMO_SERVLET );
+
+        createObrHostedRepository( h4RId );
+        upload( h4RId, PORTLET_API );
+
+        createObrGroup( gRId, h1RId, h2RId, h3RId, h4RId );
+
+        // verify that group level merged OBR is valid
+        deployUsingObrIntoFelix( gRId );
+
+        // verify that each deployed file can be downloaded
+        assertThat( download( gRId, FELIX_WEBCONSOLE ), exists() );
+        assertThat( download( gRId, OSGI_COMPENDIUM ), exists() );
+        assertThat( download( gRId, GERONIMO_SERVLET ), exists() );
+        assertThat( download( gRId, PORTLET_API ), exists() );
     }
 
 }

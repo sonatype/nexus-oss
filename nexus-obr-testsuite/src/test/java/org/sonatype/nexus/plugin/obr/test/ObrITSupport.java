@@ -378,6 +378,14 @@ public abstract class ObrITSupport
         content().upload( new Location( repositoryId, path ), util.resolveFile( "target/felix-repo/" + path ) );
     }
 
+    protected File download( final String repositoryId, final String path )
+        throws IOException
+    {
+        final File downloaded = new File( testIndex().getDirectory( "downloads" ), path );
+        content().download( new Location( repositoryId, path ), downloaded );
+        return downloaded;
+    }
+
     protected void deployUsingMaven( final String projectName, final String repositoryId )
         throws VerificationException
     {
