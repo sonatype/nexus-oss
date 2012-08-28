@@ -13,9 +13,7 @@
 package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class ObrHostedIT
     extends ObrITSupport
 {

@@ -53,10 +53,12 @@ import org.sonatype.nexus.test.utils.RepositoryGroupsNexusRestClient;
 import org.sonatype.nexus.test.utils.TasksNexusRestClient;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
+import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
+@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public abstract class ObrITSupport
     extends NexusRunningParametrizedITSupport
 {

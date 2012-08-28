@@ -28,11 +28,9 @@ import javax.xml.xpath.XPathFactory;
 import org.junit.Test;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class ObrProxyIT
     extends ObrITSupport
 {
