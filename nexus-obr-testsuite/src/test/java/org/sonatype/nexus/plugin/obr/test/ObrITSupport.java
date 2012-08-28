@@ -403,8 +403,6 @@ public abstract class ObrITSupport
 
         tasks().chmod( file( new File( mavenHome, "bin" ) ) ).include( "mvn" ).permissions( "755" ).run();
 
-        testIndex().recordLink( "maven.log", new File( projectToBuildTarget, "maven.log" ) );
-
         System.setProperty( "maven.home", mavenHome.getAbsolutePath() );
         final Verifier verifier = new Verifier( projectToBuildTarget.getAbsolutePath(), false );
         verifier.setAutoclean( true );
@@ -418,6 +416,8 @@ public abstract class ObrITSupport
 
         verifier.executeGoal( "deploy" );
         verifier.verifyErrorFreeLog();
+
+        testIndex().recordLink( "maven.log", new File( projectToBuildTarget, "maven.log" ) );
     }
 
     protected String repositoryIdForTest()

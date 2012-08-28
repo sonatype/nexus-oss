@@ -40,7 +40,7 @@ public class ObrHostedIT
     }
 
     @Test
-    public void deployToHosted()
+    public void deployToHostedUsingMaven()
         throws Exception
     {
         final String hRId = repositoryIdForTest() + "-hosted";
