@@ -15,11 +15,11 @@ package org.sonatype.nexus.plugin.obr.test;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
-public class Nexus977ObrGroupOfGroupsIT
+public class ObrGroupIT
     extends ObrITSupport
 {
 
-    public Nexus977ObrGroupOfGroupsIT( final String nexusBundleCoordinates )
+    public ObrGroupIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

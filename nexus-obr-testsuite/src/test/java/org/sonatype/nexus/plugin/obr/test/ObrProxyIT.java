@@ -15,8 +15,10 @@ package org.sonatype.nexus.plugin.obr.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import java.io.File;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -30,13 +32,36 @@ import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public class NXCM1573UpdateOBRProxyUrlIT
+public class ObrProxyIT
     extends ObrITSupport
 {
 
-    public NXCM1573UpdateOBRProxyUrlIT( final String nexusBundleCoordinates )
+    public ObrProxyIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
+    }
+
+    @Test
+    public void downloadFromProxy()
+        throws Exception
+    {
+        createObrHostedRepository( "obr-hosted" );
+
+        upload( "obr-hosted", FELIX_WEBCONSOLE );
+        upload( "obr-hosted", OSGI_COMPENDIUM );
+        upload( "obr-hosted", GERONIMO_SERVLET );
+        upload( "obr-hosted", PORTLET_API );
+
+        createObrProxyRepository(
+            "obr-proxy", nexus().getUrl().toExternalForm() + "content/repositories/obr-hosted/.meta/obr.xml"
+        );
+
+        deployUsingObrIntoFelix( "obr-proxy" );
+
+        verifyExistenceInStorage( FELIX_WEBCONSOLE );
+        verifyExistenceInStorage( OSGI_COMPENDIUM );
+        verifyExistenceInStorage( GERONIMO_SERVLET );
+        verifyExistenceInStorage( PORTLET_API );
     }
 
     @Test
@@ -126,6 +151,11 @@ public class NXCM1573UpdateOBRProxyUrlIT
         );
         assertThat( obrPath, is( notNullValue() ) );
         assertThat( obrPath.getTextContent(), is( expectedObrPath ) );
+    }
+
+    private void verifyExistenceInStorage( final String filename )
+    {
+        assertThat( new File( nexus().getWorkDirectory(), "storage/obr-proxy/" + filename ), exists() );
     }
 
 }
