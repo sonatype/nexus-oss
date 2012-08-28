@@ -10,27 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin.obr.test.nxcm858proxy;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
-
-import java.io.File;
+package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
 import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
-public class NXCM858ProxyObrRepoIT
+public class NXCM858HostedObrRepoIT
     extends ObrITSupport
 {
 
-    public NXCM858ProxyObrRepoIT( final String nexusBundleCoordinates )
+    public NXCM858HostedObrRepoIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
 
     @Test
-    public void downloadFromProxy()
+    public void downloadFromHosted()
         throws Exception
     {
         createObrHostedRepository( "obr-hosted" );
@@ -40,21 +35,7 @@ public class NXCM858ProxyObrRepoIT
         upload( "obr-hosted", GERONIMO_SERVLET );
         upload( "obr-hosted", PORTLET_API );
 
-        createObrProxyRepository(
-            "obr-proxy", nexus().getUrl().toExternalForm() + "content/repositories/obr-hosted/.meta/obr.xml"
-        );
-
-        deployUsingObrIntoFelix( "obr-proxy" );
-
-        verifyExistenceInStorage( FELIX_WEBCONSOLE );
-        verifyExistenceInStorage( OSGI_COMPENDIUM );
-        verifyExistenceInStorage( GERONIMO_SERVLET );
-        verifyExistenceInStorage( PORTLET_API );
-    }
-
-    private void verifyExistenceInStorage( final String filename )
-    {
-        assertThat( new File( nexus().getWorkDirectory(), "storage/obr-proxy/" + filename ), exists() );
+        deployUsingObrIntoFelix( "obr-hosted" );
     }
 
 }

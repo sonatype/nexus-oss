@@ -10,34 +10,42 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin.obr.test.nxcm858;
+package org.sonatype.nexus.plugin.obr.test;
 
-import static org.sonatype.sisu.filetasks.builder.FileRef.file;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Properties;
-
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.obr.test.ObrITSupport;
 
-public class NXCM858DeployToHostedObrRepoIT
+public class Nexus977ObrGroupOfGroupsIT
     extends ObrITSupport
 {
 
-    public NXCM858DeployToHostedObrRepoIT( final String nexusBundleCoordinates )
+    public Nexus977ObrGroupOfGroupsIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
 
     @Test
-    public void deployToHosted()
+    public void obrGroupOfGroups()
         throws Exception
     {
-        createObrHostedRepository( "obr-hosted" );
-        deployUsingMaven( "helloworld-hs" );
+        createObrHostedRepository( "obr-hosted-1" );
+        upload( "obr-hosted-1", FELIX_WEBCONSOLE );
+
+        createObrHostedRepository( "obr-hosted-2" );
+        upload( "obr-hosted-2", OSGI_COMPENDIUM );
+
+        createObrHostedRepository( "obr-hosted-3" );
+        upload( "obr-hosted-3", GERONIMO_SERVLET );
+
+        createObrHostedRepository( "obr-hosted-4" );
+        upload( "obr-hosted-4", PORTLET_API );
+
+        createObrGroup( "obr-group-4", "obr-hosted-2", "obr-hosted-4" );
+        createObrGroup( "obr-group-3", "obr-group-4", "obr-hosted-3" );
+        createObrGroup( "obr-group-2", "obr-group-3", "obr-group-4" );
+        createObrGroup( "obr-group-1", "obr-hosted-1", "obr-group-2" );
+
+        deployUsingObrIntoFelix( "obr-group-1" );
     }
 
 }
