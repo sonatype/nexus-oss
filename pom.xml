@@ -75,11 +75,17 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-testsuite-support</artifactId>
+      <version>${nexus.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
-    
+
 
     <!-- #ITSet BEGINS -->
     <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
@@ -141,6 +147,13 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>1.9.0</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Pure Java RPM-library -->
+    <dependency>
+      <groupId>org.redline-rpm</groupId>
+      <artifactId>redline</artifactId>
+      <version>1.1.9</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
