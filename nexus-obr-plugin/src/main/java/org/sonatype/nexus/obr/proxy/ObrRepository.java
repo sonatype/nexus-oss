@@ -300,18 +300,21 @@ public class ObrRepository
         {
             final RepositoryItemEvent itemEvt = (RepositoryItemEvent) evt;
 
-            try
+            if ( this.equals( itemEvt.getRepository() ) )
             {
-                final Resource resource =
-                    obrMetadataSource.buildResource( ObrUtils.getCachedItem( itemEvt.getItemUid() ) );
-                if ( resource != null )
+                try
                 {
-                    ObrUtils.updateObr( obrMetadataSource, ObrUtils.createObrUid( this ), resource, adding );
+                    final Resource resource =
+                        obrMetadataSource.buildResource( ObrUtils.getCachedItem( itemEvt.getItemUid() ) );
+                    if ( resource != null )
+                    {
+                        ObrUtils.updateObr( obrMetadataSource, ObrUtils.createObrUid( this ), resource, adding );
+                    }
                 }
-            }
-            catch ( final Exception e )
-            {
-                getLogger().warn( "Problem updating OBR " + getId(), e );
+                catch ( final Exception e )
+                {
+                    getLogger().warn( "Problem updating OBR " + getId(), e );
+                }
             }
         }
 
