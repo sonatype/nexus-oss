@@ -9,12 +9,7 @@
   <packaging>nexus-plugin</packaging>
   <name>Nexus Yum Plugin</name>
   <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
-  <url>http://code.google.com/p/nexus-yum-plugin/</url>
-
-  <organization>
-    <name>Immobilien Scout GmbH</name>
-    <url>http://www.immobilienscout24.de</url>
-  </organization>
+  <url>https://github.com/sonatype/nexus-yum-plugin</url>
 
   <developers>
     <developer>
