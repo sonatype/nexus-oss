@@ -5,7 +5,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-yum-plugin</artifactId>
-  <version>2.1.2-SNAPSHOT</version>
+  <version>2.1.2</version>
   <packaging>nexus-plugin</packaging>
   <name>Nexus Yum Plugin</name>
   <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
