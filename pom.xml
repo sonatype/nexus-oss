@@ -25,8 +25,9 @@
   </developers>
 
   <scm>
-    <connection>scm:svn:http://nexus-yum-plugin.googlecode.com/svn/trunk</connection>
-    <developerConnection>scm:svn:https://nexus-yum-plugin.googlecode.com/svn/trunk</developerConnection>
+    <url>scm:git:https://github.com/sonatype/nexus-yum-plugin.git</url>
+    <connection>scm:git:https://github.com/sonatype/nexus-yum-plugin.git</connection>
+    <developerConnection>scm:git:https://github.com/sonatype/nexus-yum-plugin.git</developerConnection>
   </scm>
 
   <distributionManagement>
