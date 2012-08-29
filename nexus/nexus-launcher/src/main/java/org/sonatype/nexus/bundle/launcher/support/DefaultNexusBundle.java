@@ -330,6 +330,18 @@ public class DefaultNexusBundle
     }
 
     @Override
+    public File getNexusLog()
+    {
+        return new File( getWorkDirectory(), "logs/nexus.log" );
+    }
+
+    @Override
+    public File getLauncherLog()
+    {
+        return new File( getNexusDirectory(), "logs/wrapper.log" );
+    }
+
+    @Override
     protected String generateId()
     {
         return "nx"; // TODO? use a system property if we should or not add: + "-" + System.currentTimeMillis();

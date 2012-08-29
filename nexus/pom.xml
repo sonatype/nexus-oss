@@ -1971,21 +1971,6 @@
         <enunciate.skip>true</enunciate.skip> -->
         <test-env.skip>true</test-env.skip>
       </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <excludes>
-                  <exclude>**/*LRTest.java</exclude>
-                </excludes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-
     </profile>
 
     <!-- dummy profile for activating integration tests -->
@@ -1998,6 +1983,14 @@
         </property>
       </activation>
       <!-- FIXME, make running cargo ITs part of this profile? -->
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <!-- Nexus quick build profiles: effects of -Pquick: tests will be compiled but not run, n-t-e-p will assemble the test environments effects of -Dquick: tests will not be compiled,
