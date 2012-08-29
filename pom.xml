@@ -73,12 +73,14 @@
       <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
+    <!-- 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-testsuite-support</artifactId>
       <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
