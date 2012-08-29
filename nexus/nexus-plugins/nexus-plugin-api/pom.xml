@@ -153,7 +153,6 @@
       </exclusions>
     </dependency>
 
-
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-api</artifactId>
@@ -161,9 +160,8 @@
 
     <!-- Testing -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <scope>test</scope>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
     </dependency>
 
   </dependencies>

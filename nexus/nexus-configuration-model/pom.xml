@@ -39,13 +39,7 @@
       <artifactId>nexus-api</artifactId>
     </dependency>
 
-
     <!-- Testing -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>

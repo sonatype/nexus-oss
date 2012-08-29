@@ -176,9 +176,10 @@
     <plexus-jetty7.version>1.2.1</plexus-jetty7.version>
     <sisu-jetty8.version>1.3</sisu-jetty8.version>
     <sisu-velocity.version>1.1</sisu-velocity.version>
+    <sisu-problem-reporter.version>1.5.2</sisu-problem-reporter.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.21</plexus.restlet.bridge.version>
-    <plexus-security.version>2.8.1</plexus-security.version>
+    <plexus-security.version>2.8.2</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
@@ -990,10 +991,9 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit-dep</artifactId>
-        <version>4.8.2</version>
-        <type>jar</type>
+        <groupId>org.sonatype.sisu.litmus</groupId>
+        <artifactId>litmus-testsupport</artifactId>
+        <version>1.4</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1009,41 +1009,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-library</artifactId>
-        <version>1.3.RC2</version>
-        <scope>test</scope>
-      </dependency>
-      <!-- core To override any version from transitive dependencies. -->
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <version>1.3.RC2</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <version>2.4</version>
-        <type>jar</type>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>1.9.0-rc1</version>
-        <type>jar</type>
-        <scope>test</scope>
-      </dependency>
-      <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
-      <dependency>
-        <groupId>org.objenesis</groupId>
-        <artifactId>objenesis</artifactId>
-        <version>1.2</version>
-        <type>jar</type>
-        <!-- scope>test</scope -->
-      </dependency>
-      <dependency>
         <groupId>org.uncommons</groupId>
         <artifactId>reportng</artifactId>
         <version>1.1.2</version>
@@ -1055,6 +1020,31 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
+      <dependency>
+        <groupId>org.objenesis</groupId>
+        <artifactId>objenesis</artifactId>
+        <version>1.2</version>
+        <type>jar</type>
+        <!-- scope>test</scope -->
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu.pr</groupId>
+        <artifactId>sisu-pr-testutil</artifactId>
+        <version>${sisu-problem-reporter.version}</version>
+        <scope>test</scope>
+      </dependency>
+      
+      <!-- TODO remove easymock -->
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>2.4</version>
+        <type>jar</type>
+        <scope>test</scope>
+      </dependency>
+      
+      <!-- TODO remove carrotsearch and replace with contiperf -->
       <!-- profiling -->
       <dependency>
         <groupId>com.carrotsearch</groupId>
@@ -1069,22 +1059,23 @@
         <version>1.3.154</version>
         <scope>test</scope>
       </dependency>
+      <!-- TODO move http testing related libs to their own module or testsuite-support -->
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.5.1</version>
+        <version>0.5.3</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>junit-runner</artifactId>
-        <version>0.5.1</version>
+        <version>0.5.3</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>testng-runner</artifactId>
-        <version>0.5.1</version>
+        <version>0.5.3</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1452,6 +1443,13 @@
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
                   <excludes>
+                    <exclude>junit:junit-dep:(,4.9]</exclude>
+                  </excludes>
+                  <message>junit:junit-dep 4.9 wrongly includes hamcrest api in jar, 4.10 or greater required due to TestRule changes over earlier versions</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
                     <exclude>org.mockito:mockito-all</exclude>
                   </excludes>
                   <message>mockito-all includes third party classes within it - use mockito-core instead</message>
@@ -1462,7 +1460,7 @@
                     <exclude>org.hamcrest:*</exclude>
                   </excludes>
                   <includes>
-                    <include>org.hamcrest:*:1.3.RC2</include>
+                    <include>org.hamcrest:*:1.3</include>
                   </includes>
                   <message>Make sure you are using the hamcrest version defined in parent</message>
                 </bannedDependencies>
@@ -1472,6 +1470,13 @@
                     <exclude>org.hamcrest:hamcrest-all:*</exclude>
                   </excludes>
                   <message>Use more specific hamcrest dependencies like hamcrest-core, hamcrest-library</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.sonatype.sisu.litmus:litmus-testsupport:(,1.3]</exclude>
+                  </excludes>
+                  <message>litmus-testsupport greater than 1.3 required</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
