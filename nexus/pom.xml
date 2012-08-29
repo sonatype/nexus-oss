@@ -179,7 +179,7 @@
     <sisu-problem-reporter.version>1.5.2</sisu-problem-reporter.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.21</plexus.restlet.bridge.version>
-    <plexus-security.version>2.8.2-SNAPSHOT</plexus-security.version>
+    <plexus-security.version>2.8.2</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
