@@ -107,15 +107,9 @@
                 <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
                 <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
                 <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
-                <xml>org.ops4j.pax.web:samples:0.6.0:pom</xml>
+                <xml>org.apache.maven.plugins:maven-site-plugin:2.0-beta-7:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-release-plugin:2.0-beta-6:maven-plugin</xml>
                 <xml>org.apache.felix:maven-bundle-plugin:1.4.3</xml>
-                <xml>org.ops4j.base:ops4j-base-lang:0.5.0</xml>
-                <xml>org.ops4j.base:ops4j-base-util-property:0.5.0</xml>
-                <xml>org.ops4j.pax.swissbox:pax-swissbox-core:0.2.0</xml>
-                <xml>org.ops4j.pax.swissbox:pax-swissbox-optional-jcl:0.2.0</xml>
-                <xml>org.ops4j.pax.swissbox:pax-swissbox-property:0.2.0</xml>
-                <xml>org.mortbay.jetty:jetty:6.1.16</xml>
-                <xml>org.apache.tomcat:jasper:6.0.18</xml>
                 <xml>org.osgi:org.osgi.core:4.0.1</xml>
                 <xml>org.osgi:org.osgi.compendium:4.0.1</xml>
                 <xml>javax.servlet:servlet-api:2.3</xml>
@@ -123,8 +117,6 @@
                 <xml>junit:junit:4.4</xml>
                 <xml>org.easymock:easymock:2.3</xml>
                 <xml>org.apache.maven.wagon:wagon-ssh-external:1.0-alpha-6</xml>
-                <xml>org.apache.maven.plugins:maven-site-plugin:2.0-beta-7:maven-plugin</xml>
-                <xml>org.apache.maven.plugins:maven-release-plugin:2.0-beta-6:maven-plugin</xml>
               </extraArtifacts>
             </configuration>
           </execution>
