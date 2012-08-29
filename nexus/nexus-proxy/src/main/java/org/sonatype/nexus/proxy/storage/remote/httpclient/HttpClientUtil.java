@@ -22,6 +22,9 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
@@ -32,11 +35,13 @@ import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpProcessor;
+import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
@@ -105,11 +110,12 @@ class HttpClientUtil
      * * (if necessary) configure authentication<br/>
      * * (if necessary) configure proxy as configured for repository
      *
+     * @return the created http client
      * @param ctxPrefix context keys prefix
      * @param ctx       remote repository context
      * @param logger    logger
      */
-    static void configure( final String ctxPrefix,
+    static HttpClient configure( final String ctxPrefix,
                            final RemoteStorageContext ctx,
                            final Logger logger )
     {
@@ -126,6 +132,18 @@ class HttpClientUtil
             }
         };
 
+        // NEXUS-5125 do not redirect to index pages
+        httpClient.setRedirectStrategy( new DefaultRedirectStrategy() {
+            @Override
+            public boolean isRedirected( final HttpRequest request, final HttpResponse response,
+                                         final HttpContext context )
+                throws ProtocolException
+            {
+                return super.isRedirected( request, response, context ) &&
+                    !response.getFirstHeader("location").getValue().endsWith( "/" );
+            }
+        } );
+
         ctx.putContextObject( ctxPrefix + CTX_KEY_CLIENT, httpClient );
 
         configureAuthentication( httpClient, ctxPrefix, ctx, ctx.getRemoteAuthenticationSettings(), logger, "" );
@@ -133,6 +151,8 @@ class HttpClientUtil
 
         // NEXUS-3338: we don't know after config change is remote S3 (url changed maybe)
         ctx.putContextObject( ctxPrefix + CTX_KEY_S3_FLAG, new BooleanFlagHolder() );
+
+        return httpClient;
     }
 
     /**
