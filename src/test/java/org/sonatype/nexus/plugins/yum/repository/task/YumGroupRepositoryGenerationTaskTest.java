@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
@@ -29,6 +30,8 @@ import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.test.os.IgnoreOn;
+import org.sonatype.nexus.test.os.OsTestRule;
 import org.sonatype.scheduling.ScheduledTask;
 
 public class YumGroupRepositoryGenerationTaskTest {
@@ -41,13 +44,15 @@ public class YumGroupRepositoryGenerationTaskTest {
   private static final String REPO_ID2 = "group-repo-id2";
   private GroupRepository groupRepo;
 
+  @Rule
+  public OsTestRule osTestRule = new OsTestRule();
+
   @Test
+  @IgnoreOn("mac")
   public void shouldGenerateGroupRepo() throws Exception {
-    if (!isOSX()) {
-      givenGroupRepoWith2YumRepos();
-      thenGenerateYumRepo();
-      RepositoryTestUtils.assertRepository(new File(GROUP_REPO_DIR, "repodata"), "group-repo");
-    }
+    givenGroupRepoWith2YumRepos();
+    thenGenerateYumRepo();
+    RepositoryTestUtils.assertRepository(new File(GROUP_REPO_DIR, "repodata"), "group-repo");
   }
 
   @Test
@@ -118,10 +123,5 @@ public class YumGroupRepositoryGenerationTaskTest {
     when(repo.getLocalUrl()).thenReturn(repoDir.getAbsolutePath());
     when(repo.getRepositoryKind()).thenReturn(kind);
     return repo;
-  }
-
-  private boolean isOSX() {
-    String osName = System.getProperty("os.name");
-    return osName.contains("OS X");
   }
 }

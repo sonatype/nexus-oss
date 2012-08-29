@@ -329,23 +329,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- don't execute tests twice during release process -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.2.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>perform</goal>
-            </goals>
-            <configuration>
-              <arguments>-Dmaven.test.skip=true</arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 </project>

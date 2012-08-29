@@ -1,6 +1,5 @@
 package org.sonatype.nexus.plugins.yum.plugin.integration;
 
-import static org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumGroupRepository.ID;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.http.util.EntityUtils.consume;
@@ -9,6 +8,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumGroupRepository.ID;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,8 +29,11 @@ import org.apache.http.auth.AuthenticationException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
+import org.junit.Rule;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.test.os.IgnoreOn;
+import org.sonatype.nexus.test.os.OsTestRule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -50,7 +53,11 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
   private static final String ARTIFACT_VERSION2 = "2";
   private static final String ARTIFACT_VERSION3 = "3";
 
+  @Rule
+  public OsTestRule osTestRule = new OsTestRule();
+
   @Test
+  @IgnoreOn("mac")
   public void shouldRegenerateGroupRepoWhenRpmGetsUploaded() throws Exception {
     givenGroupRepoWith2Rpms();
     String primaryXml = getGroupRepoPrimaryXml();
@@ -59,6 +66,7 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
   }
 
   @Test
+  @IgnoreOn("mac")
   public void shouldRegenerateGroupRepoWhenMemberRepoIsRemoved() throws Exception {
     givenGroupRepoWith2Rpms();
     removeMemberRepo(MEMBER_REPO2);
@@ -69,6 +77,7 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
   }
 
   @Test
+  @IgnoreOn("mac")
   public void shouldRegenerateGroupRepoWhenMemberRepoIsAdded() throws Exception {
     givenGroupRepoWith2Rpms();
     givenTestRepository(MEMBER_REPO3);
