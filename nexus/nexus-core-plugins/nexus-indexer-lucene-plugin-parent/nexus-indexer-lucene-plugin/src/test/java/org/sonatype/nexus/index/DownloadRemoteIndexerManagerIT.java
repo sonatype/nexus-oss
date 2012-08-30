@@ -42,7 +42,7 @@ import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 
 // This is an IT just because it runs longer then 15 seconds
-public class DownloadRemoteIndexerManagerLRTest
+public class DownloadRemoteIndexerManagerIT
     extends AbstractIndexerManagerTest
 {
     private Server server;

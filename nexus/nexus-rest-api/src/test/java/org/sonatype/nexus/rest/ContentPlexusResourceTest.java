@@ -38,6 +38,9 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.restlet.util.Series;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * Tests for {@link ContentPlexusResource}.
@@ -96,26 +99,4 @@ public class ContentPlexusResourceTest
         assertThat( contentPlexusResource.getResourceStorePath( encodedRequest ), equalTo( tilde ) );
     }
 
-    @Test
-    public void testNexus5155NoCacheHeaders()
-        throws ResourceException
-    {
-        final HttpResponse response = mock( HttpResponse.class );
-        final HttpServerCall httpCall = mock( HttpServerCall.class );
-        final Series headers = mock( Series.class );
-
-        when( response.getHttpCall() ).thenReturn( httpCall );
-        when( httpCall.getResponseHeaders() ).thenReturn( headers );
-
-        try {
-            new ContentPlexusResource().get( mock( Context.class ),
-                                             mock( Request.class ),
-                                             response,
-                                             mock( Variant.class ) );
-        } catch( Throwable t ) {
-            // don't care for throwable, just verify that headers are set
-            verify( headers ).add( "Pragma", "no-cache" );
-            verify( headers ).add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
-        }
-    }
 }

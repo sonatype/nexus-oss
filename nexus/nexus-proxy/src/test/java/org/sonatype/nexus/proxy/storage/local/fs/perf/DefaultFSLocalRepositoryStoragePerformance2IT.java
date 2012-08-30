@@ -61,7 +61,7 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 @BenchmarkHistoryChart( )
 @BenchmarkMethodChart( )
 @AxisRange( min = 0 )
-public class DefaultFSLocalRepositoryStoragePerformanceLRTest
+public class DefaultFSLocalRepositoryStoragePerformance2IT
 {
     @Rule
     public MethodRule benchmarkRun = new BenchmarkRule();

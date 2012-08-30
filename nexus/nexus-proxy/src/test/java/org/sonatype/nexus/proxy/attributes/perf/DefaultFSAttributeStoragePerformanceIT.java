@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.attributes.perf;
 import org.junit.runner.RunWith;
 import org.sonatype.nexus.proxy.attributes.AttributeStorage;
 import org.sonatype.nexus.proxy.attributes.DefaultFSAttributeStorage;
-import org.sonatype.nexus.proxy.attributes.JacksonXMLMarshaller;
+import org.sonatype.nexus.proxy.attributes.XStreamMarshaller;
 import org.sonatype.nexus.proxy.attributes.perf.internal.OrderedRunner;
 
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
@@ -29,9 +29,10 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 @BenchmarkMethodChart
 @AxisRange( min = 0 )
 @RunWith( OrderedRunner.class )
-public class JacksonXMLFSAttributeStoragePerformanceLRTest
+public class DefaultFSAttributeStoragePerformanceIT
     extends AttributeStoragePerformanceTestSupport
 {
+
     // @Rule
     // public MethodRule benchmarkRun = new BenchmarkRule();
 
@@ -39,8 +40,9 @@ public class JacksonXMLFSAttributeStoragePerformanceLRTest
     {
         DefaultFSAttributeStorage attributeStorage =
             new DefaultFSAttributeStorage( applicationConfiguration,
-                new JacksonXMLMarshaller() );
+                new XStreamMarshaller() );
         attributeStorage.initializeWorkingDirectory();
         return attributeStorage;
     }
+
 }

@@ -42,4 +42,18 @@ public interface NexusBundle
      */
     File getWorkDirectory();
 
+    /**
+     * Returns Nexus log file.
+     *
+     * @return nexus log file. Never null.
+     */
+    File getNexusLog();
+
+    /**
+     * Returns launcher log file (wrapper.log).
+     *
+     * @return launcher log file. Never null.
+     */
+    File getLauncherLog();
+
 }

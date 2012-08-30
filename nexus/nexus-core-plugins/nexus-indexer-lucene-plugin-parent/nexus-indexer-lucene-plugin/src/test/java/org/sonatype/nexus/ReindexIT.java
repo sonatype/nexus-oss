@@ -37,7 +37,7 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 
 // This is an IT just because it runs longer then 15 seconds
-public class ReindexLRTest
+public class ReindexIT
     extends AbstractMavenRepoContentTests
 {
     public static final long A_DAY_MILLIS = 24 * 60 * 60 * 1000;

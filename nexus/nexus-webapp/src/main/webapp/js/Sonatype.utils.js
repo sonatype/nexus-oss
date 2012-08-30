@@ -22,7 +22,6 @@
     attributionsURL : '',
     purchaseURL : '',
     userLicenseURL : '',
-    authToken : '',
     lowercase : function(str) {
       if (Ext.isEmpty(str))
       {
@@ -727,7 +726,6 @@
                                   else
                                   {
                                     w.close();
-                                    Sonatype.utils.updateAuthToken(Sonatype.user.curr.username, options.cbPassThru.newPassword);
                                     Sonatype.MessageBox.show({
                                           title : 'Password Changed',
                                           msg : 'Password change request completed successfully.',
@@ -756,8 +754,8 @@
       w.show();
     },
 
-    updateAuthToken : function(username, password) {
-      Sonatype.utils.authToken = Sonatype.utils.base64.encode(username + ':' + password);
+    getAuthToken : function(username, password) {
+      return Sonatype.utils.base64.encode(username + ':' + password);
     },
 
     refreshTask : (function() {
@@ -813,15 +811,13 @@
         activeWindow.getEl().mask("Logging you in...");
       }
 
-      Sonatype.utils.updateAuthToken(username, password);
-
       Ext.Ajax.request({
             method : 'GET',
             cbPassThru : {
               username : username
             },
             headers : {
-              'Authorization' : 'Basic ' + Sonatype.utils.authToken
+              'Authorization' : 'Basic ' + Sonatype.utils.getAuthToken(username, password)
             }, // @todo: send HTTP basic auth data
             url : Sonatype.config.repos.urls.login,
             success : function(response, options) {
@@ -845,7 +841,6 @@
             failure : function(response, options) {
               Sonatype.utils.refreshTask.stop();
               Sonatype.utils.clearCookie('JSESSIONID');
-              Sonatype.utils.authToken = null;
               if (activeWindow)
               {
                 activeWindow.getEl().unmask();
@@ -862,7 +857,6 @@
                   url : Sonatype.config.repos.urls.logout,
                   callback : function(options, success, response) {
                     Sonatype.utils.clearCookie('JSESSIONID');
-                    Sonatype.utils.authToken = null;
                     Sonatype.view.justLoggedOut = true;
                   }
                 });
@@ -1099,18 +1093,6 @@
 
     openWindow : function(url) {
       window.open(url);
-    },
-
-    appendAuth : function(url) {
-      if (url.indexOf('?') >= 0)
-      {
-        return url + '&authorization=Basic ' + Sonatype.utils.authToken;
-      }
-      else
-      {
-        return url + '?authorization=Basic ' + Sonatype.utils.authToken;
-      }
-
     },
 
     generateErrorReportHandler : function(username) {

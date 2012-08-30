@@ -14,6 +14,7 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 
 import java.io.IOException;
 
+import org.hamcrest.Matcher;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -116,6 +117,25 @@ public class LdapConnMessageUtil
         LOG.debug( "sendMessage: " + representation.getText() );
 
         return RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
+    }
+
+    public String testAuth( LdapConnectionInfoDTO resource, final Matcher<Response> matcher )
+        throws IOException
+    {
+
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
+
+        String serviceURI = RequestFacade.SERVICE_LOCAL + "ldap/test_auth";
+
+        LdapConnectionInfoResponse repoResponseRequest = new LdapConnectionInfoResponse();
+        repoResponseRequest.setData( resource );
+
+        // now set the payload
+        representation.setPayload( repoResponseRequest );
+
+        LOG.debug( "sendMessage: " + representation.getText() );
+
+        return RequestFacade.doPutForText( serviceURI, representation, matcher );
     }
 
     public LdapConnectionInfoDTO getResourceFromResponse( Response response )

@@ -126,10 +126,10 @@ public class Nexus4579OptionalTrashForSnapshotsIT
     public void removeAllSnapshotsDirectly()
         throws Exception
     {
-        Matcher<Collection<Object>> empty = empty();
+        Matcher<Collection<? extends Object>> empty = empty();
 
         // need local variables because generics won't compile otherwise
-        Collection<Object> files = FileUtils.listFiles( groupFolder, null, true );
+        Collection<? extends Object> files = FileUtils.listFiles( groupFolder, null, true );
         assertThat( files, not( empty ) );
 
         runSnapshotRemover( "remove-directly", true );

@@ -16,13 +16,56 @@
 Ext.namespace('Nexus');
 
 /**
+ * Nexus logging utility.
+ *
  * @static
- * @param msg {String} The message to log.
  */
-Nexus.log = function(msg) {
-  // Sonatype.config may be undefined if Nexus.log is called on setup of ext js extensions
-  // it should always be there on runtime for UI components, but better safe than sorry
-  if (Sonatype.config && Sonatype.config.isDebug && console) {
-    console.log(msg);
-  }
-};
+Nexus.Log = (function() {
+  var log = function(level, msg) {
+    if (console) {
+      console.log(level + ' ' + msg);
+    }
+  };
+
+  return {
+    /**
+     * @static
+     * @param msg {String} The message to log.
+     */
+    debug : function(msg) {
+      // Sonatype.config may be undefined if Nexus.log is called on setup of ext js extensions
+      // it should always be there on runtime for UI components, but better safe than sorry
+      if ( Sonatype.config && Sonatype.config.isDebug )
+      {
+        log('DEBUG', msg);
+      }
+    },
+    /**
+     * @static
+     * @param msg {String} The message to log.
+     */
+    info : function(msg) {
+      log('INFO', msg);
+    },
+    /**
+     * @static
+     * @param msg {String} The message to log.
+     */
+    warn : function(msg) {
+      log('WARN', msg);
+    },
+    /**
+     * @static
+     * @param msg {String} The message to log.
+     */
+    error : function(msg) {
+      log('WARN', msg);
+    }
+  };
+}());
+
+/**
+ * @static
+ * @see Nexus.Log.debug
+ */
+Nexus.log = Nexus.Log.debug;
