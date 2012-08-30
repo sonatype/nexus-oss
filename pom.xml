@@ -49,6 +49,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <nexus.version>2.1.1</nexus.version>
+
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
+
     <arguments />
   </properties>
 
@@ -94,6 +98,24 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.12.2</version>
+          <configuration>
+            <failIfNoTests>false</failIfNoTests>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <!-- force use of property -->
+            <forkMode>once</forkMode>
+            <argLine>-ea</argLine>
+            <workingDirectory>${project.build.directory}</workingDirectory>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+            </systemPropertyVariables>
+            <excludes>
+              <exclude>**/Abstract*.java</exclude>
+              <exclude>**/Test*.java</exclude>
+            </excludes>
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -106,6 +128,9 @@
                 <goal>verify</goal>
               </goals>
               <configuration>
+                <failIfNoTests>false</failIfNoTests>
+                <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+
                 <forkMode>always</forkMode>
                 <argLine>-Xmx512m</argLine>
                 <junitArtifactName>none:none</junitArtifactName>
