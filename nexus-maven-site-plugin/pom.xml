@@ -35,7 +35,7 @@
     <!-- This is a plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
+      <artifactId>nexus-app</artifactId>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
