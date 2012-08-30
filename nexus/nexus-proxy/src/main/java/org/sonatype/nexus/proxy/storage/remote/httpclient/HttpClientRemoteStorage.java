@@ -136,19 +136,6 @@ public class HttpClientRemoteStorage
 
         if ( httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK )
         {
-
-            if ( method.getURI().getPath().endsWith( "/" ) )
-            {
-                // this is a collection and not a file!
-                // httpClient will follow redirections, and the getPath()
-                // _should_
-                // give us URL with ending "/"
-                release( httpResponse );
-                throw new RemoteItemNotFoundException(
-                    "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
-                        + remoteURL.toString() + "\")", request, repository );
-            }
-
             InputStream is;
             try
             {
@@ -199,6 +186,15 @@ public class HttpClientRemoteStorage
                 throw new RemoteItemNotFoundException(
                     "The remoteURL we requested does not exists on remote server (remoteUrl=\"" + remoteURL.toString()
                         + "\", response code is 404)", request, repository );
+            }
+            else if ( httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY ||
+                httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY )
+            {
+                // NEXUS-5125 unfollowed redirect means collection (path.endsWith("/"))
+                // see also HttpClientUtil#configure
+                throw new RemoteItemNotFoundException(
+                    "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
+                        + remoteURL.toString() + "\")", request, repository );
             }
             else
             {
