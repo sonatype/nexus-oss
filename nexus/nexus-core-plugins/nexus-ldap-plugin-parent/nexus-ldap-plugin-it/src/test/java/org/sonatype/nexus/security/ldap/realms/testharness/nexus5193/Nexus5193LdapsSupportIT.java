@@ -42,6 +42,7 @@ import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
+import org.sonatype.sisu.litmus.testsupport.net.TrustingX509TrustManager;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
