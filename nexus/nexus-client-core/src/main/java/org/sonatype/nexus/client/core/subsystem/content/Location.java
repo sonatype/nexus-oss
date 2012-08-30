@@ -16,12 +16,16 @@ import org.sonatype.nexus.client.internal.util.Check;
 
 public class Location
 {
+
+    private final String contentType;
+
     private final String repositoryId;
 
     private final String repositoryPath;
 
-    public Location( final String repositoryId, final String repositoryPath )
+    public Location( final String contentType, final String repositoryId, final String repositoryPath )
     {
+        this.contentType = Check.notBlank( contentType, "contentType" );
         this.repositoryId = Check.notBlank( repositoryId, "repositoryId" );
         String repoPath = Check.notBlank( repositoryPath, "repositoryPath" );
         while ( repoPath.startsWith( "/" ) )
@@ -31,9 +35,14 @@ public class Location
         this.repositoryPath = repoPath;
     }
 
+    public Location( final String repositoryId, final String repositoryPath )
+    {
+        this( "repositories", repositoryId, repositoryPath );
+    }
+
     public String toContentPath()
     {
-        return "repositories/" + repositoryId + "/" + repositoryPath;
+        return String.format( "%s/%s/%s", contentType, repositoryId, repositoryPath );
     }
 
     // --
@@ -43,4 +52,20 @@ public class Location
     {
         return toContentPath();
     }
+
+    public static Location repositoryLocation( final String repositoryId, final String path )
+    {
+        return new Location( "repositories", repositoryId, path );
+    }
+
+    public static Location groupLocation( final String groupId, final String path )
+    {
+        return new Location( "groups", groupId, path );
+    }
+
+    public static Location siteLocation( final String siteId, final String path )
+    {
+        return new Location( "sites", siteId, path );
+    }
+
 }
