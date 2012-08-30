@@ -25,8 +25,9 @@ public class MavenSiteNexusIndexHtmlCustomizer
     @Override
     public String getPostHeadContribution( Map<String, Object> ctx )
     {
-        String version =
-            getVersionFromJarFile( "/META-INF/maven/com.sonatype.nexus.plugin/nexus-maven-site-plugin/pom.properties" );
+        final String version = getVersionFromJarFile(
+            "/META-INF/maven/org.sonatype.nexus.plugins/nexus-maven-site-plugin/pom.properties"
+        );
 
         return "<script src=\"static/js/nexus-maven-site-plugin-all.js" + ( version == null ? "" : "?" + version )
             + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
