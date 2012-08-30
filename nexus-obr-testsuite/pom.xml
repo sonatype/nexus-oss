@@ -48,11 +48,6 @@
       <artifactId>maven-verifier</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>de.pdark</groupId>
-      <artifactId>decentxml</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -80,7 +75,6 @@
                   <artifactId>org.apache.felix.main.distribution</artifactId>
                   <classifier>project</classifier>
                   <type>tar.gz</type>
-
                 </artifactItem>
               </artifactItems>
             </configuration>

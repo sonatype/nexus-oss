@@ -154,12 +154,6 @@
         </exclusions>
       </dependency>
 
-      <dependency>
-        <groupId>de.pdark</groupId>
-        <artifactId>decentxml</artifactId>
-        <version>1.3</version>
-      </dependency>
-
       <!-- TODO Drop this dependency when we have proper client for repository -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
