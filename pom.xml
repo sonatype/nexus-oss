@@ -24,8 +24,8 @@
     <relativePath />
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
-  <artifactId>nexus-maven-site-parent</artifactId>
+  <groupId>org.sonatype.nexus.maven-site</groupId>
+  <artifactId>nexus-maven-site</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
@@ -55,7 +55,7 @@
 
   <modules>
     <module>nexus-maven-site-plugin</module>
-    <module>nexus-maven-site-plugin-its</module>
+    <module>nexus-maven-site-testsuite</module>
   </modules>
 
   <dependencyManagement>

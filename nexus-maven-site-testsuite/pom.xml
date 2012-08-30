@@ -17,27 +17,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-maven-site-parent</artifactId>
+    <groupId>org.sonatype.nexus.maven-site</groupId>
+    <artifactId>nexus-maven-site</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-maven-site-plugin-its</artifactId>
+  <artifactId>nexus-maven-site-testsuite</artifactId>
   <packaging>jar</packaging>
 
-  <name>Nexus Plugin :: Maven Site Plugin ITs</name>
-  <description>Adds a repository type for deploying maven sites.</description>
-
-  <dependencies>
-
-    <!-- Because we enforce license -->
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-maven-site-plugin</artifactId>
-      <version>${project.version}</version>
-      <type>nexus-plugin</type>
-    </dependency>
-
-  </dependencies>
+  <name>Nexus Maven Site :: Testsuite</name>
 
 </project>
