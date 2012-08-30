@@ -32,12 +32,20 @@
   </distributionManagement>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>2.2</version>
+      </extension>
+    </extensions>
+
     <!-- This should be in the super-POM, but apparently isn't. -->
     <pluginManagement>
       <plugins>
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.5.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -45,39 +53,14 @@
     <plugins>
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.1</version>
+        <version>2.5.1</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>2.0.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.skins</groupId>
-            <artifactId>maven-default-skin</artifactId>
-            <version>1.1</version>
-          </dependency>
-        </dependencies>
+        <version>3.1</version>
       </plugin>
     </plugins>
   </build>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.maven.skins</groupId>
-        <artifactId>maven-default-skin</artifactId>
-        <version>1.1</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.skins</groupId>
-      <artifactId>maven-default-skin</artifactId>
-      <version>1.1</version>
-    </dependency>
-  </dependencies>
 
 </project>

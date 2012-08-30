@@ -167,7 +167,7 @@ public abstract class NexusSiteITSupport
             .filterUsing( properties )
             .to().file( file( mavenSettingsTarget ) ).run();
 
-        final File mavenHome = util.resolveFile( "target/apache-maven-2.2.1" );
+        final File mavenHome = util.resolveFile( "target/apache-maven-3.0.4" );
         final File localRepo = util.resolveFile( "target/apache-maven-local-repository" );
 
         tasks().chmod( file( new File( mavenHome, "bin" ) ) ).include( "mvn" ).permissions( "755" ).run();
