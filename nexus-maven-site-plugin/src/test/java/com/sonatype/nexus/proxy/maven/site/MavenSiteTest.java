@@ -14,14 +14,11 @@ package com.sonatype.nexus.proxy.maven.site;
 
 import java.io.FileReader;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;

@@ -49,7 +49,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <nexus.version>2.1.1</nexus.version>
-    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
     <arguments />
   </properties>
 
@@ -213,44 +212,11 @@
         </dependencies>
         <configuration>
           <pluginSiteUrl>
-            http://links.sonatype.com/products/nexus/oss/plugins/unpack
+            http://links.sonatype.com/products/nexus/oss/plugins/maven-site
           </pluginSiteUrl>
         </configuration>
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
-    <profile>
-      <id>idea</id>
-      <properties>
-        <nexus.plugin.type>jar</nexus.plugin.type>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>noit</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <skipITs>true</skipITs>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.sonatype.nexus.plugins</groupId>
-            <artifactId>nexus-test-environment-maven-plugin</artifactId>
-            <configuration>
-              <pluginSkip>true</pluginSkip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>
