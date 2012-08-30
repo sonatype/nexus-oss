@@ -44,6 +44,10 @@
       <artifactId>wrapper</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

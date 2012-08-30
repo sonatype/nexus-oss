@@ -15,18 +15,60 @@ package org.sonatype.nexus.testsuite.support;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.doesNotHaveCommonExceptions;
+import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.doesNotHaveFailingPlugins;
+import static org.sonatype.nexus.testsuite.support.hamcrest.NexusMatchers.logFile;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.respondsWithStatus;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 /**
- * Test starting and launching of Nexus using default parameters lookup.
+ * Test starting and stopping of Nexus using parameters.
  *
- * @since 2.0
+ * @since 2.2
  */
 public class StartAndStopNexusRunningParametrizedIT
     extends NexusRunningParametrizedITSupport
 {
+
+    // Uncomment the following line to suppress default parameters lookup and use test specific ones
+    // @Parameterized.Parameters
+    public static Collection<Object[]> testSpecificParameters()
+    {
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters( StartAndStopNexusRunningParametrizedIT.class )
+        ).load();
+    }
+
+    // Uncomment the following line to suppress default parameters lookup and use the ones specified by the method
+    // @Parameterized.Parameters
+    public static Collection<Object[]> hardcodedParameters()
+    {
+        return Arrays.asList( new Object[][]{
+            { "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" },
+        } );
+    }
+
+    // Uncomment the following line to suppress default parameters lookup and use test specific ones
+    // @Parameterized.Parameters
+    public static Collection<Object[]> hardcodedAndSystemProperties()
+    {
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters(
+                $( "org.sonatype.nexus:nexus-oss-webapp:zip:bundle:${project.version}" )
+            )
+        ).load();
+    }
 
     public StartAndStopNexusRunningParametrizedIT( final String nexusBundleCoordinates )
     {
@@ -50,6 +92,18 @@ public class StartAndStopNexusRunningParametrizedIT
         assertThat( nexus().isRunning(), is( true ) );
 
         assertThat( nexus().getUrl(), respondsWithStatus( 200 ) );
+
+        assertThat( nexus().getLauncherLog(), FileMatchers.exists() );
+        assertThat( nexus().getLauncherLog(), FileMatchers.isFile() );
+
+        assertThat( nexus().getNexusLog(), FileMatchers.exists() );
+        assertThat( nexus().getNexusLog(), FileMatchers.isFile() );
+
+        assertThat( nexus().getNexusLog(), doesNotHaveCommonExceptions() );
+        assertThat( nexus().getNexusLog(), doesNotHaveFailingPlugins() );
+
+        assertThat( nexus(), logFile( doesNotHaveCommonExceptions() ) );
+        assertThat( nexus(), logFile( doesNotHaveFailingPlugins() ) );
     }
 
 }

@@ -47,10 +47,6 @@
       <artifactId>plexus-cli</artifactId>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
     </dependency>
@@ -73,15 +69,11 @@
         </executions>
         <configuration>
           <descriptors>
-            <descriptor>
-              src/main/assembly/repository-conversion-cli-assembly.xml
-                        </descriptor>
+            <descriptor>src/main/assembly/repository-conversion-cli-assembly.xml</descriptor>
           </descriptors>
           <archive>
             <manifest>
-              <mainClass>
-                org.sonatype.nexus.tools.repository.RepositoryConvertorCli
-                            </mainClass>
+              <mainClass>org.sonatype.nexus.tools.repository.RepositoryConvertorCli</mainClass>
             </manifest>
           </archive>
         </configuration>

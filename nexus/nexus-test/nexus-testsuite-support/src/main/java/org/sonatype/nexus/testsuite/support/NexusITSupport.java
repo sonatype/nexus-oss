@@ -12,28 +12,40 @@
  */
 package org.sonatype.nexus.testsuite.support;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
+import static org.sonatype.nexus.testsuite.support.NexusITFilter.contextEntry;
 import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilter.TEST_PROJECT_POM_FILE;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
-import org.sonatype.nexus.testsuite.support.filters.CompositeFilter;
-import org.sonatype.nexus.testsuite.support.filters.ImplicitVersionFilter;
+import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.client.rest.NexusClientFactory;
+import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
+import org.sonatype.sisu.filetasks.FileTaskBuilder;
+import org.sonatype.sisu.litmus.testsupport.TestData;
+import org.sonatype.sisu.litmus.testsupport.TestIndex;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
+import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
+import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 
 /**
@@ -61,11 +73,29 @@ public abstract class NexusITSupport
     @Named( "remote-model-resolver-using-settings" )
     private MavenModelResolver modelResolver;
 
+    /**
+     * Nexus bundle resolver.
+     * Used in case that bundle is not specified as a constructor parameter.
+     * Never null.
+     */
     @Inject
     private NexusBundleResolver nexusBundleResolver;
 
     /**
-     * List of filters used to filter coordinates.
+     * File task builder used to build overlays.
+     * Never null.
+     */
+    @Inject
+    private FileTaskBuilder fileTaskBuilder;
+
+    /**
+     * Nexus client factory. Used to lazy create Nexus client.
+     */
+    @Inject
+    private NexusClientFactory nexusClientFactory;
+
+    /**
+     * List of available filters.
      * Never null.
      */
     @Inject
@@ -78,16 +108,10 @@ public abstract class NexusITSupport
     private NexusITArtifactResolver testArtifactResolver;
 
     /**
-     * Test specific file resolver utility.
+     * Filter used to filter coordinates.
      * Lazy initialized on first usage.
      */
-    private NexusITFileResolver testFileResolver;
-
-    /**
-     * Transformer used to transform coordinates.
-     * Lazy initialized on first usage.
-     */
-    private Filter filter;
+    private NexusITFilter filter;
 
     /**
      * Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
@@ -96,10 +120,30 @@ public abstract class NexusITSupport
     protected final String nexusBundleCoordinates;
 
     /**
-     * Transformed Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
+     * Filtered Nexus bundle coordinates to run the IT against. If null, it will look up the coordinates from
      * "injected-test.properties".
      */
     protected String filteredNexusBundleCoordinates;
+
+    /**
+     * Test index.
+     * Never null.
+     */
+    @Rule
+    public TestIndexRule testIndex = new TestIndexRule( util.resolveFile( "target/its" ) );
+
+    /**
+     * Test data.
+     * Never null.
+     */
+    @Rule
+    public TestDataRule testData = new TestDataRule( util.resolveFile( "src/test/it-resources" ) );
+
+    /**
+     * Copy of system properties before the test (class).
+     * Initialised before class starts.
+     */
+    private static Properties systemPropertiesBackup;
 
     /**
      * Runs IT by against Nexus bundle coordinates specified in "injected-test.properties".
@@ -139,7 +183,7 @@ public abstract class NexusITSupport
                 @Override
                 public File resolve()
                 {
-                    return fileResolver().methodSpecificDirectory( "bundle" );
+                    return testIndex().getDirectory();
                 }
 
             } );
@@ -165,6 +209,24 @@ public abstract class NexusITSupport
     }
 
     /**
+     * Takes a snapshot of system properties before the test starts.
+     */
+    @BeforeClass
+    public static void backupSystemProperties()
+    {
+        systemPropertiesBackup = System.getProperties();
+    }
+
+    /**
+     * Restores system properties as they were before test started.
+     */
+    @After
+    public void restoreSystemProperties()
+    {
+        System.setProperties( systemPropertiesBackup );
+    }
+
+    /**
      * Filters nexus bundle coordinates, if present (not null).
      */
     @Before
@@ -172,16 +234,14 @@ public abstract class NexusITSupport
     {
         if ( nexusBundleCoordinates != null )
         {
-            // TODO create this map only once?
-            final Map<String, String> context = Maps.newHashMap();
-            fillContext( context );
-
-            filteredNexusBundleCoordinates = filter().filter( context, nexusBundleCoordinates );
+            filteredNexusBundleCoordinates = filter().filter( nexusBundleCoordinates );
 
             logger.info(
                 "TEST {} is running against Nexus bundle {}",
                 testName.getMethodName(), filteredNexusBundleCoordinates
             );
+
+            testIndex().recordInfo( "bundle", filteredNexusBundleCoordinates );
         }
         else
         {
@@ -189,6 +249,22 @@ public abstract class NexusITSupport
                 "TEST {} is running against a Nexus bundle resolved from injected-test.properties",
                 testName.getMethodName()
             );
+            testIndex().recordLink( "bundle", "../test-classes/injected-test.properties" );
+        }
+    }
+
+    @After
+    public void recordSurefireAndFailsafeInfo()
+    {
+        {
+            final String name = "target/failsafe-reports/" + getClass().getName();
+            testIndex().recordLink( "failsafe result", util.resolveFile( name + ".txt" ) );
+            testIndex().recordLink( "failsafe output", util.resolveFile( name + "-output.txt" ) );
+        }
+        {
+            final String name = "target/surefire-reports/" + getClass().getName();
+            testIndex().recordLink( "surefire result", util.resolveFile( name + ".txt" ) );
+            testIndex().recordLink( "surefire output", util.resolveFile( name + "-output.txt" ) );
         }
     }
 
@@ -209,19 +285,33 @@ public abstract class NexusITSupport
     }
 
     /**
-     * Lazy initializes IT specific file resolver.
+     * Returns test data accessor.
      *
-     * @return IT specific artifact file. Never null.
+     * @return test data accessor. Never null.
      */
-    public NexusITFileResolver fileResolver()
+    public TestData testData()
     {
-        if ( testFileResolver == null )
-        {
-            testFileResolver = new NexusITFileResolver(
-                util.getBaseDir(), util.getTargetDir(), getClass(), testName.getMethodName()
-            );
-        }
-        return testFileResolver;
+        return testData;
+    }
+
+    /**
+     * Returns test index.
+     *
+     * @return test index. Never null.
+     */
+    public TestIndex testIndex()
+    {
+        return testIndex;
+    }
+
+    /**
+     * Returns overlay builder.
+     *
+     * @return overlay builder. Never null.
+     */
+    public FileTaskBuilder tasks()
+    {
+        return fileTaskBuilder;
     }
 
     /**
@@ -229,26 +319,92 @@ public abstract class NexusITSupport
      *
      * @return IT specific filter. Never null.
      */
-    public Filter filter()
+    public NexusITFilter filter()
     {
         if ( filter == null )
         {
-            final List<Filter> memberFilters = Lists.newArrayList();
-            memberFilters.add( new ImplicitVersionFilter() );
-            memberFilters.addAll( filters );
-            filter = new CompositeFilter( memberFilters );
+            filter = new NexusITFilter(
+                filters,
+                contextEntry( TEST_PROJECT_POM_FILE, util.resolveFile( "pom.xml" ).getAbsolutePath() )
+            );
         }
         return filter;
     }
 
     /**
-     * Fills teh context with test related mappings.
+     * Apply default configuration settings to specified Nexus.
      *
-     * @param context to fill up
+     * @param nexus to apply default configurations settings to
+     * @return passed in Nexus, for fluent API usage
      */
-    public void fillContext( final Map<String, String> context )
+    public NexusBundle applyDefaultConfiguration( final NexusBundle nexus )
     {
-        context.put( TEST_PROJECT_POM_FILE, util.resolveFile( "pom.xml" ).getAbsolutePath() );
+        String logLevel = System.getProperty( "it.nexus.log.level" );
+
+        if ( !"DEBUG".equalsIgnoreCase( logLevel ) )
+        {
+            final String useDebugFor = System.getProperty( "it.nexus.log.level.use.debug" );
+            if ( !StringUtils.isEmpty( useDebugFor ) )
+            {
+                final String[] segments = useDebugFor.split( "," );
+                for ( final String segment : segments )
+                {
+                    if ( getClass().getSimpleName().matches( segment.replace( ".", "\\." ).replace( "*", ".*" ) ) )
+                    {
+                        logLevel = "DEBUG";
+                    }
+                }
+            }
+        }
+
+        if ( !StringUtils.isEmpty( logLevel ) )
+        {
+            checkNotNull( nexus ).getConfiguration().setLogLevel( logLevel );
+        }
+
+        return nexus;
+    }
+
+    /**
+     * Creates a {@link NexusClient} for specified Nexus instance, user and password.
+     *
+     * @param nexus    to create client for
+     * @param userName user
+     * @param password password
+     * @return created nexus client. Never null.
+     */
+    protected NexusClient createNexusClient( final NexusBundle nexus,
+                                             final String userName,
+                                             final String password )
+    {
+        return nexusClientFactory.createFor(
+            baseUrlFrom( checkNotNull( nexus ).getUrl() ),
+            new UsernamePasswordAuthenticationInfo( checkNotNull( userName ), checkNotNull( password ) )
+        );
+    }
+
+    /**
+     * Creates a {@link NexusClient} for specified Nexus instance, with user "admin" and password "admin123".
+     *
+     * @param nexus to create client for
+     * @return created nexus client. Never null.
+     */
+    protected NexusClient createNexusClientForAdmin( final NexusBundle nexus )
+    {
+        return createNexusClient( nexus, "admin", "admin123" );
+    }
+
+    /**
+     * Creates a {@link NexusClient} for specified Nexus instance for anonymous user.
+     *
+     * @param nexus to create client for
+     * @return created nexus client. Never null.
+     */
+    protected NexusClient createNexusClientForAnonymous( final NexusBundle nexus )
+    {
+        return nexusClientFactory.createFor(
+            baseUrlFrom( nexus.getUrl() )
+        );
     }
 
 }

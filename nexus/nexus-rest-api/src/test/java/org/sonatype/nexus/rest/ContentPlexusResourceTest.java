@@ -12,11 +12,22 @@
  */
 package org.sonatype.nexus.rest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
 
+import com.noelios.restlet.http.HttpCall;
+import com.noelios.restlet.http.HttpResponse;
+import com.noelios.restlet.http.HttpServerCall;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -24,12 +35,12 @@ import org.restlet.data.Preference;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import org.restlet.util.Series;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * Tests for {@link ContentPlexusResource}.
@@ -87,4 +98,5 @@ public class ContentPlexusResourceTest
         assertThat( contentPlexusResource.getResourceStorePath( nonEncodedRequest ), equalTo( tilde ) );
         assertThat( contentPlexusResource.getResourceStorePath( encodedRequest ), equalTo( tilde ) );
     }
+
 }

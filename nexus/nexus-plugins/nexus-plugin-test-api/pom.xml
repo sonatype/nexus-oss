@@ -62,16 +62,11 @@
       <artifactId>nexus-rest-api</artifactId>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <scope>compile</scope>
-    </dependency>
 
     <!-- Testing -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
       <scope>compile</scope>
     </dependency>
 

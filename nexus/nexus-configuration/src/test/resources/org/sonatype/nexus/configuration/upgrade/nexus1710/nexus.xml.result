@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>2.0.0</version>
+  <version>2.2.0</version>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
@@ -34,7 +34,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>https://repository.apache.org/content/groups/snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -62,7 +61,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://snapshots.repository.codehaus.org/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -113,7 +111,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://maven.restlet.org</url>
       </remoteStorage>
       <externalConfiguration>
@@ -281,7 +278,6 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repo1.maven.org/maven2</url>
       </remoteStorage>
       <externalConfiguration>
@@ -355,7 +351,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://oss.sonatype.org/content/repositories/plexus-releases/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -429,7 +424,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://oss.sonatype.org/content/repositories/plexus-snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -457,7 +451,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>https://maven.atlassian.com/public</url>
       </remoteStorage>
       <externalConfiguration>
@@ -485,7 +478,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://download.java.net/maven/2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -513,7 +505,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repository.codehaus.org/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -541,7 +532,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repository.jboss.org/maven2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -569,7 +559,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repo.open.iona.com/maven2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -597,7 +586,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://download.terracotta.org/maven2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -671,7 +659,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://archiva.openqa.org/repository/releases</url>
       </remoteStorage>
       <externalConfiguration>
@@ -722,7 +709,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://snapshots.jboss.org/maven2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -750,7 +736,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repo.ddsteps.org/maven/release/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -824,7 +809,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
       </remoteStorage>
       <externalConfiguration>

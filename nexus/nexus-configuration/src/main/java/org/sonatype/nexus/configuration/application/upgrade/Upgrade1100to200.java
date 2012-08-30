@@ -22,7 +22,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.v2_0_0.CRepository;
 import org.sonatype.nexus.configuration.model.v2_0_0.upgrade.BasicVersionUpgrade;
 
 /**
@@ -92,10 +92,10 @@ public class Upgrade1100to200
             }
         };
 
-        org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
+        org.sonatype.nexus.configuration.model.v2_0_0.Configuration newc = versionConverter.upgradeConfiguration( oldc );
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v2_0_0.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.v2_0_0.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 }

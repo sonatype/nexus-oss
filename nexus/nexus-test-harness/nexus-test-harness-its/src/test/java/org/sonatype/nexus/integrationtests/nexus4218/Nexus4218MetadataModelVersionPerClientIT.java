@@ -91,9 +91,12 @@ public class Nexus4218MetadataModelVersionPerClientIT
             }
         };
 
+        final File mvnInstallDir = new File( bundle.getParentFile(), "apache-maven-3.0.3" );
+
         Commandline cl = new Commandline();
+        cl.addEnvironment( "M2_HOME", mvnInstallDir.getCanonicalPath() );
         cl.setWorkingDirectory( getTestFile( "m3" ) );
-        cl.setExecutable( new File( bundle.getParentFile(), "apache-maven-3.0.3/bin/mvn" ).getCanonicalPath() );
+        cl.setExecutable( new File( mvnInstallDir, "bin/mvn" ).getCanonicalPath() );
         cl.createArg().setValue( "install" );
         cl.createArg().setValue( "-s" );
         cl.createArg().setValue( getOverridableFile( "settings.xml" ).getCanonicalPath() );
@@ -143,9 +146,12 @@ public class Nexus4218MetadataModelVersionPerClientIT
             }
         };
 
+        File mvnInstallDir = new File( bundle.getParentFile(), "maven-2.0.6" );
+
         Commandline cl = new Commandline();
+        cl.addEnvironment( "M2_HOME", mvnInstallDir.getCanonicalPath() );
         cl.setWorkingDirectory( getTestFile( "m2" ) );
-        cl.setExecutable( new File( bundle.getParentFile(), "maven-2.0.6/bin/mvn" ).getCanonicalPath() );
+        cl.setExecutable( new File( mvnInstallDir, "bin/mvn" ).getCanonicalPath() );
         cl.createArg().setValue( "install" );
         cl.createArg().setValue( "-s" );
         cl.createArg().setValue( getOverridableFile( "settings.xml" ).getCanonicalPath() );

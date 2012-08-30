@@ -256,10 +256,6 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
                                   url : Sonatype.config.repos.urls.usersSetPassword,
                                   success : function(response, options) {
                                     w.close();
-                                    if (Sonatype.user.curr.username == options.cbPassThru.userId)
-                                    {
-                                      Sonatype.utils.updateAuthToken(Sonatype.user.curr.username, options.cbPassThru.newPassword);
-                                    }
                                     Sonatype.MessageBox.show({
                                           id : 'password-changed-messagebox',
                                           title : 'Password Changed',

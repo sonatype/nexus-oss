@@ -212,12 +212,31 @@ public abstract class ParametersLoaders
             @Override
             public Collection<Object[]> load()
             {
-                final String sysPropsParameters = System.getProperty( "NexusItSupport.parameters" );
+                final String sysPropsParameters = System.getProperty( "it.parameters" );
                 if ( sysPropsParameters == null )
                 {
                     return Lists.newArrayList();
                 }
                 return testParameters( new File( sysPropsParameters ), failIfNotFound ).load();
+            }
+
+        };
+    }
+
+    /**
+     * Load test parameters from an array.
+     *
+     * @param parameters parameters arrays (sets)
+     * @return test parameters loader. Never null.
+     */
+    public static Loader testParameters( final String[]... parameters )
+    {
+        return new Loader()
+        {
+            @Override
+            public Collection<Object[]> load()
+            {
+                return Arrays.<Object[]>asList( parameters );
             }
 
         };

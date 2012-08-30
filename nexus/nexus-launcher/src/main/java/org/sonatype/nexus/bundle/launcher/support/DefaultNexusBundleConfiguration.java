@@ -12,18 +12,25 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.sisu.filetasks.builder.FileRef.file;
+import static org.sonatype.sisu.filetasks.builder.FileRef.path;
+
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.tools.ant.taskdefs.condition.Os;
 import org.sonatype.inject.Nullable;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
+import org.sonatype.sisu.filetasks.FileTask;
+import org.sonatype.sisu.filetasks.FileTaskBuilder;
+import com.google.common.collect.Lists;
 
 /**
  * Default Nexus bundle configuration.
@@ -39,22 +46,35 @@ public class DefaultNexusBundleConfiguration
     /**
      * Start timeout configuration property key.
      */
-    public static final String START_TIMEOUT = "NexusBundleConfiguration.startTimeout";
+    public static final String START_TIMEOUT = "nexus.launcher.startTimeout";
+
+    /**
+     * File task builder.
+     * Cannot be null.
+     */
+    private final FileTaskBuilder fileTaskBuilder;
 
     /**
      * List of Nexus plugins to be installed. Should never be null.
      */
-    private List<File> plugins;
+    private final List<File> plugins;
+
+    /**
+     * One of TRACE/DEBUG/INFO/ERROR or {@code null} if bundle defaults should be used.
+     * Can be null.
+     */
+    private String logLevel;
 
     /**
      * Constructor.
      *
-     * @since 2.0
+     * @since 2.2
      */
     @Inject
-    public DefaultNexusBundleConfiguration()
+    public DefaultNexusBundleConfiguration( final FileTaskBuilder fileTaskBuilder )
     {
-        setPlugins();
+        this.fileTaskBuilder = checkNotNull( fileTaskBuilder );
+        this.plugins = Lists.newArrayList();
     }
 
     /**
@@ -121,7 +141,7 @@ public class DefaultNexusBundleConfiguration
     @Override
     public NexusBundleConfiguration setPlugins( final List<File> plugins )
     {
-        this.plugins = new ArrayList<File>();
+        this.plugins.clear();
         if ( plugins != null )
         {
             this.plugins.addAll( plugins );
@@ -150,6 +170,70 @@ public class DefaultNexusBundleConfiguration
     {
         this.plugins.addAll( Arrays.asList( plugins ) );
         return this;
+    }
+
+    @Override
+    public NexusBundleConfiguration setLogLevel( final String level )
+    {
+        logLevel = level;
+        return this;
+    }
+
+    @Override
+    public String getLogLevel()
+    {
+        return logLevel;
+    }
+
+    @Override
+    public List<FileTask> getOverlays()
+    {
+        final List<FileTask> overlays = Lists.newArrayList( super.getOverlays() );
+
+        for ( final File plugin : getPlugins() )
+        {
+            if ( plugin.isDirectory() )
+            {
+                overlays.add(
+                    fileTaskBuilder.copy()
+                        .directory( file( plugin ) )
+                        .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
+                );
+            }
+            else
+            {
+                overlays.add(
+                    fileTaskBuilder.expand( file( plugin ) )
+                        .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
+                );
+            }
+        }
+
+        // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62
+        if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+        {
+            overlays.add(
+                fileTaskBuilder.replace()
+                    .inFile( path( "nexus/conf/jetty.xml" ) )
+                    .replace(
+                        "org.eclipse.jetty.server.nio.SelectChannelConnector",
+                        "org.eclipse.jetty.server.nio.BlockingChannelConnector"
+                    )
+                    .failIfFileDoesNotExist()
+            );
+        }
+
+        if ( getLogLevel() != null )
+        {
+            overlays.add(
+                fileTaskBuilder.properties( path( "sonatype-work/nexus/conf/logback.properties" ) )
+                    .property( "root.level", getLogLevel() )
+                    .property( "appender.pattern", "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" )
+                    .property( "appender.file", "${nexus.log-config-dir}/../logs/nexus.log" )
+            );
+        }
+
+        return overlays;
     }
 
 }
