@@ -168,7 +168,7 @@ public abstract class NexusSiteITSupport
             .to().file( file( mavenSettingsTarget ) ).run();
 
         final File mavenHome = util.resolveFile( "target/apache-maven-2.2.1" );
-        final File localRepo = util.resolveFile( "target/maven/fake-repo" );
+        final File localRepo = util.resolveFile( "target/apache-maven-local-repository" );
 
         tasks().chmod( file( new File( mavenHome, "bin" ) ) ).include( "mvn" ).permissions( "755" ).run();
 

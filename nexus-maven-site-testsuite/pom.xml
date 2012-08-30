@@ -84,7 +84,7 @@
           <plugin>
             <artifactId>maven-invoker-plugin</artifactId>
             <configuration>
-              <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
+              <localRepositoryPath>${project.build.directory}/apache-maven-local-repository</localRepositoryPath>
             </configuration>
             <executions>
               <execution>
