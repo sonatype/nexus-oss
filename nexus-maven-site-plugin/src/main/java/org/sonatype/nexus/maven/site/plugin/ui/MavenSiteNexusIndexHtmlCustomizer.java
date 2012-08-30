@@ -10,13 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.proxy.maven.site;
+package org.sonatype.nexus.maven.site.plugin.ui;
+
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
+import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
+import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 
-@Component( role = DefaultMavenSiteRepositoryConfigurator.class )
-public class DefaultMavenSiteRepositoryConfigurator
-    extends AbstractWebSiteRepositoryConfigurator
+@Component( role = NexusIndexHtmlCustomizer.class, hint = "MavenSiteNexusIndexHtmlCustomizer" )
+public class MavenSiteNexusIndexHtmlCustomizer
+    extends AbstractNexusIndexHtmlCustomizer
 {
+    @Override
+    public String getPostHeadContribution( Map<String, Object> ctx )
+    {
+        String version =
+            getVersionFromJarFile( "/META-INF/maven/com.sonatype.nexus.plugin/nexus-maven-site-plugin/pom.properties" );
+
+        return "<script src=\"static/js/nexus-maven-site-plugin-all.js" + ( version == null ? "" : "?" + version )
+            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+    }
 }
