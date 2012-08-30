@@ -13,15 +13,17 @@
 package org.sonatype.nexus.maven.site.plugin.ui;
 
 import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
-import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 
-@Component( role = NexusIndexHtmlCustomizer.class, hint = "MavenSiteNexusIndexHtmlCustomizer" )
+@Named( "MavenSiteNexusIndexHtmlCustomizer" )
+@Singleton
 public class MavenSiteNexusIndexHtmlCustomizer
     extends AbstractNexusIndexHtmlCustomizer
 {
+
     @Override
     public String getPostHeadContribution( Map<String, Object> ctx )
     {
@@ -32,4 +34,5 @@ public class MavenSiteNexusIndexHtmlCustomizer
         return "<script src=\"static/js/nexus-maven-site-plugin-all.js" + ( version == null ? "" : "?" + version )
             + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
     }
+
 }

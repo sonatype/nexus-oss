@@ -12,28 +12,38 @@
  */
 package org.sonatype.nexus.maven.site.plugin;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
-import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
-@Component( role = TemplateProvider.class, hint = MavenSiteTemplateProvider.PROVIDER_ID )
+@Named( MavenSiteTemplateProvider.PROVIDER_ID )
+@Singleton
 public class MavenSiteTemplateProvider
     extends AbstractRepositoryTemplateProvider
     implements Initializable
 {
+
     public static final String PROVIDER_ID = "site-repository";
 
     private static final String MAVEN_SITE_ID = "maven-site";
 
-    @Requirement
-    private RepositoryTypeRegistry repositoryTypeRegistry;
+    private final RepositoryTypeRegistry repositoryTypeRegistry;
+
+    @Inject
+    public MavenSiteTemplateProvider( final RepositoryTypeRegistry repositoryTypeRegistry )
+    {
+        this.repositoryTypeRegistry = checkNotNull( repositoryTypeRegistry );
+    }
 
     public TemplateSet getTemplates()
     {

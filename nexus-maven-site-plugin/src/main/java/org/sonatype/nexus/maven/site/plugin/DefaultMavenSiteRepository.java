@@ -12,11 +12,13 @@
  */
 package org.sonatype.nexus.maven.site.plugin;
 
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
@@ -35,19 +37,27 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * The default Maven Site Repository.
- * 
+ *
  * @author cstamas
  */
-@Component( role = WebSiteRepository.class, hint = "maven-site", instantiationStrategy = "per-lookup", description = "Maven Site Repository" )
+@Named( "maven-site" )
 public class DefaultMavenSiteRepository
     extends AbstractWebSiteRepository
     implements MavenSiteRepository, WebSiteRepository
 {
-    @Requirement( hint = "maven-site" )
-    private ContentClass contentClass;
 
-    @Requirement
-    private DefaultMavenSiteRepositoryConfigurator repositoryConfigurator;
+    private final ContentClass contentClass;
+
+    private final Configurator repositoryConfigurator;
+
+    @Inject
+    public DefaultMavenSiteRepository( final @Named( "maven-site" ) ContentClass contentClass,
+                                       final @Named( "maven-site" ) Configurator repositoryConfigurator )
+    {
+
+        this.contentClass = checkNotNull( contentClass );
+        this.repositoryConfigurator = checkNotNull( repositoryConfigurator );
+    }
 
     private RepositoryKind repositoryKind;
 

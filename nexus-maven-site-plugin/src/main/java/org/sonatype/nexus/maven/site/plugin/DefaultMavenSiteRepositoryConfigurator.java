@@ -12,11 +12,17 @@
  */
 package org.sonatype.nexus.maven.site.plugin;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
 
-@Component( role = DefaultMavenSiteRepositoryConfigurator.class )
+@Named( "maven-site" )
+@Singleton
 public class DefaultMavenSiteRepositoryConfigurator
     extends AbstractWebSiteRepositoryConfigurator
+    implements Configurator
 {
+
 }

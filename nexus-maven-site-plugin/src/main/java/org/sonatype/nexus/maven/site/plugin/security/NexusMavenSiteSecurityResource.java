@@ -12,16 +12,20 @@
  */
 package org.sonatype.nexus.maven.site.plugin.security;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component( role = StaticSecurityResource.class, hint = "NexusMavenSiteSecurityResource" )
+import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
+
+@Named( "NexusMavenSiteSecurityResource" )
+@Singleton
 public class NexusMavenSiteSecurityResource
     extends AbstractStaticSecurityResource
 {
+
     public String getResourcePath()
     {
         return "/META-INF/nexus-maven-site-plugin-security.xml";
     }
+
 }

@@ -12,20 +12,25 @@
  */
 package org.sonatype.nexus.maven.site.plugin;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
  * The Maven Site content class. It is not compatible with anything, hence it is not groupable.
- * 
+ *
  * @author cstamas
  */
-@Component( role = ContentClass.class, hint = MavenSiteContentClass.ID )
+@Named( MavenSiteContentClass.ID )
+@Singleton
 public class MavenSiteContentClass
     extends AbstractIdContentClass
 {
+
     public static final String ID = "maven-site";
+
     public static final String NAME = "Maven Site";
 
     public String getId()
@@ -43,7 +48,7 @@ public class MavenSiteContentClass
     {
         return false;
     }
-    
+
     public boolean isGroupable()
     {
         return false;

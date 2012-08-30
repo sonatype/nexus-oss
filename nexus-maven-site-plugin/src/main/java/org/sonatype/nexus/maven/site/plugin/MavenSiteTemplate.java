@@ -61,4 +61,5 @@ public class MavenSiteTemplate
 
         return result;
     }
+
 }
