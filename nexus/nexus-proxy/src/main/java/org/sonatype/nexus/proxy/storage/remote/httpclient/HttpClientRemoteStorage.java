@@ -130,7 +130,21 @@ public class HttpClientRemoteStorage
         final URL remoteURL =
             appendQueryString( getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() ), repository );
 
-        final HttpGet method = new HttpGet( remoteURL.toExternalForm() );
+        final String url = remoteURL.toExternalForm();
+        if ( url.endsWith( "/" ) )
+        {
+            // NEXUS-5125 we do not want to fetch any collection
+            // Even though it is unlikely that we actually see a request for a collection here,
+            // requests for paths like this over the REST layer will be localOnly not trigger a remote request.
+            //
+            // The usual case is that there is a request for a directory that is redirected to '/', see below behavior
+            // for SC_MOVED_*
+            throw new RemoteItemNotFoundException(
+                "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
+                    + remoteURL.toString() + "\")", request, repository );
+        }
+
+        final HttpGet method = new HttpGet( url );
 
         final HttpResponse httpResponse = executeRequest( repository, request, method );
 
