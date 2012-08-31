@@ -14,23 +14,29 @@ package org.sonatype.nexus.integrationtests.nexus4674;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.sisu.goodies.common.Varargs;
 import org.testng.annotations.Test;
 
 /**
  * This test reindex a single version of a GA and check if all versions still present.
- * 
+ *
  * @author velo
  */
 public class Nexus4674UpdateGAVIndexIT
     extends AbstractNexusIntegrationTest
 {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger( Nexus4674UpdateGAVIndexIT.class );
 
     @Test
     public void searchTest()
@@ -41,19 +47,36 @@ public class Nexus4674UpdateGAVIndexIT
         getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> r = getSearchMessageUtil().searchFor( "nexus4674" );
+        logContent( r );
         assertThat( r, hasSize( 5 ) );
 
         // index GAV
-        getSearchMessageUtil().reindexGAV( REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus4674", "artifact", "1" ) );
+        getSearchMessageUtil().reindexGAV(
+            REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus4674", "artifact", "1" )
+        );
 
         r = getSearchMessageUtil().searchFor( "nexus4674" );
+        logContent( r );
         assertThat( r, hasSize( 5 ) );
 
         // index subartifact GAV
-        getSearchMessageUtil().reindexGAV( REPO_TEST_HARNESS_REPO,
-            GavUtil.newGav( "nexus4674.artifact", "subartifact", "1" ) );
+        getSearchMessageUtil().reindexGAV(
+            REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus4674.artifact", "subartifact", "1" )
+        );
 
+        logContent( r );
         r = getSearchMessageUtil().searchFor( "nexus4674" );
         assertThat( r, hasSize( 5 ) );
+    }
+
+    private void logContent( final List<NexusArtifact> artifacts )
+    {
+        if ( artifacts != null && artifacts.size() > 0 )
+        {
+            for ( final NexusArtifact a : artifacts )
+            {
+                LOGGER.info( "Found artifact: {}:{}:{}", $( a.getGroupId(), a.getArtifactId(), a.getVersion() ) );
+            }
+        }
     }
 }
