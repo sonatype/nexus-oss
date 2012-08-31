@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.nexus.maven-site</groupId>
     <artifactId>nexus-maven-site</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-maven-site-testsuite</artifactId>
