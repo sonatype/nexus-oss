@@ -46,9 +46,11 @@ public class MavenSiteIT
         super( nexusBundleCoordinates );
     }
 
+    /**
+     * Verify that maven site repository is available in list of repository types.
+     */
     @Test
     public void repoType()
-        throws Exception
     {
         final JerseyNexusClient client = (JerseyNexusClient) client();
 
@@ -68,6 +70,11 @@ public class MavenSiteIT
         assertThat( typeFormats, hasItem( "maven-site" ) );
     }
 
+    /**
+     * Verify that a "site site:deploy" maven build can deploy to a maven site repository.
+     *
+     * @throws Exception unexpected
+     */
     @Test
     public void siteDeployViaMaven()
         throws Exception
@@ -82,6 +89,9 @@ public class MavenSiteIT
         assertThat( indexHtml, matchSha1( new File( builtProjectHome, "target/site/index.html" ) ) );
     }
 
+    /**
+     * Verify that accessing a css file via a maven site repository will respond with "text/css" mime type.
+     */
     @Test
     public void cssMimeType()
     {
@@ -98,6 +108,10 @@ public class MavenSiteIT
         assertThat( clientResponse.getType(), is( MediaType.valueOf( "text/css" ) ) );
     }
 
+    /**
+     * Verify that directory listing of the root of a maven site repository will return an xml collection of contained
+     * items.
+     */
     @Test
     public void directoryListing()
     {
@@ -115,6 +129,9 @@ public class MavenSiteIT
         assertThat( clientResponse.getEntity( ContentListResourceResponse.class ), is( notNullValue() ) );
     }
 
+    /**
+     * Verify that accessing the root of a maven site repository via exposed URL will return the index.html.
+     */
     @Test
     public void indexHtml()
     {
