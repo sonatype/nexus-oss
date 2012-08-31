@@ -1,4 +1,4 @@
-Nexus MAven Site Plugin
+Nexus Maven Site Plugin
 ===================
 
 TODO: doc
