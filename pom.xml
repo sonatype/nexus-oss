@@ -3,13 +3,20 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.sonatype.nexus</groupId>
-  <artifactId>nexus-yum-plugin</artifactId>
+  <groupId>org.sonatype.nexus.yum</groupId>
+  <artifactId>nexus-yum</artifactId>
   <version>2.2-SNAPSHOT</version>
-  <packaging>nexus-plugin</packaging>
-  <name>Nexus Yum Plugin</name>
+  <packaging>pom</packaging>
+  <name>Nexus Yum (Parent)</name>
   <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
   <url>https://github.com/sonatype/nexus-yum-plugin</url>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+    </license>
+  </licenses>
 
   <developers>
     <developer>
@@ -38,10 +45,16 @@
     </snapshotRepository>
   </distributionManagement>
 
+  <modules>
+    <module>nexus-yum-plugin</module>
+    <module>nexus-yum-testsuite</module>
+  </modules>
 
   <properties>
     <!-- Set the Nexus version here, against which you build the plugin -->
     <nexus.version>2.1.2</nexus.version>
+    <nexus-testsuite-support.version>2.2-SNAPSHOT</nexus-testsuite-support.version>
+    <nexus-oss-webapp.version>2.2-SNAPSHOT</nexus-oss-webapp.version>
     <app.lifecycle.version>1.6</app.lifecycle.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hamcrest.version>1.2.1</hamcrest.version>
@@ -55,280 +68,148 @@
     <skip.unittests>false</skip.unittests>
   </properties>
 
-  <dependencies>
-    <!-- This dependency is only needed if you want to include REST Resources -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-    </dependency>
-
-    <!-- Basic testing -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.8.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-testsuite-support</artifactId>
-      <version>${nexus.version}</version>
-      <scope>test</scope>
-    </dependency>
-    -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-
-    <!-- #ITSet BEGINS -->
-    <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
-    <!-- There are plugins connected to this dependency, see below! -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-launcher</artifactId>
-      <scope>test</scope>
-      <version>${nexus.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>maven-toolchain</artifactId>
-          <groupId>org.apache.maven</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>testng</artifactId>
-          <groupId>org.testng</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- #ITSet ENDS -->
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-exec</artifactId>
-      <version>1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.tempus-fugit</groupId>
-      <artifactId>tempus-fugit</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>${hamcrest.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <version>${hamcrest.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <version>3.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>1.9.0</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Pure Java RPM-library -->
-    <dependency>
-      <groupId>org.redline-rpm</groupId>
-      <artifactId>redline</artifactId>
-      <version>1.1.9</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-  <!-- #ITSet BEGINS -->
-  <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
-  <!-- There are plugins and dependencies connected to this import, see below and above! -->
   <dependencyManagement>
     <dependencies>
+      <!-- This dependency is only needed if you want to include REST Resources -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-webapp-dependencies</artifactId>
+        <artifactId>nexus-rest-api</artifactId>
         <version>${nexus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
+      </dependency>
+
+      <!-- Basic testing -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.10</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-support</artifactId>
+        <version>${nexus-testsuite-support.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-test-api</artifactId>
+        <version>${nexus.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-utils</artifactId>
+        <version>${nexus.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+
+      <!-- #ITSet BEGINS -->
+      <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
+      <!-- There are plugins connected to this dependency, see below! -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-harness-launcher</artifactId>
+        <scope>test</scope>
+        <version>${nexus.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>maven-toolchain</artifactId>
+            <groupId>org.apache.maven</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>testng</artifactId>
+            <groupId>org.testng</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <!-- #ITSet ENDS -->
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-exec</artifactId>
+        <version>1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>xmlunit</groupId>
+        <artifactId>xmlunit</artifactId>
+        <version>1.3</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.tempus-fugit</groupId>
+        <artifactId>tempus-fugit</artifactId>
+        <version>1.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-library</artifactId>
+        <version>${hamcrest.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
+        <version>${hamcrest.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>3.0</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>1.9.0</version>
+        <scope>test</scope>
+      </dependency>
+      <!-- Pure Java RPM-library -->
+      <dependency>
+        <groupId>org.redline-rpm</groupId>
+        <artifactId>redline</artifactId>
+        <version>1.1.9</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- Internal Dependencies -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-yum-plugin</artifactId>
+        <version>2.2-SNAPSHOT</version>
+        <type>nexus-plugin</type>
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <!-- #ITSet ENDS -->
 
   <build>
-    <plugins>
+    <pluginManagement>
+      <plugins>
+        <!-- Have to set source level to Java 6, we use annotations ;-) -->
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3.1</version>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
 
-      <!-- Needed for custom packaging -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>${app.lifecycle.version}</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>${app.lifecycle.version}</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <id>create-bundle</id>
-            <phase>package</phase>
-            <goals>
-              <goal>create-bundle</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+        <!-- Fork Tests because of problems with Sisu-Guice-Version -->
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.9</version>
+          <configuration>
+            <skip>${skip.unittests}</skip>
+            <forkMode>always</forkMode>
+            <threadCount>1</threadCount>
+          </configuration>
+        </plugin>
 
-      <!-- Have to set source level to Java 6, we use annotations ;-) -->
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.1</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
 
-      <!-- Fork Tests because of problems with Sisu-Guice-Version -->
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.9</version>
-        <configuration>
-          <skip>${skip.unittests}</skip>
-          <forkMode>always</forkMode>
-          <threadCount>1</threadCount>
-        </configuration>
-      </plugin>
-
-      <!-- download and unpack Nexus Professional bundle -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <execution>
-            <id>copy-nexus-war-file</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>tar.gz</type>
-                </artifactItem>
-              </artifactItems>
-              <!-- other configurations here -->
-              <outputDirectory>${nexus.root.dir}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- copy jar to sonatype config dir -->
-      <!-- copy wrapper-override.conf -->
-      <!-- run nexus application -->
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <id>install-yum-plugin-and-start-nexus</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <phase>pre-integration-test</phase>
-            <configuration>
-              <target>
-                <delete dir="${nexus.plugin.dir}/${project.artifactId}*" />
-                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${nexus.plugin.dir}" />
-                <copy file="${project.build.directory}/test-classes/nexus/wrapper-override.conf" todir="${nexus.base.dir}/conf/" />
-                <exec executable="${nexus.exec}">
-                  <arg value="${nexus.start.command}" />
-                  <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
-                  <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
-                </exec>
-                <waitfor maxwait="2" maxwaitunit="minute" checkevery="10" checkeveryunit="second">
-                  <http url="http://localhost:${nexus.port}/nexus/index.html" />
-                </waitfor>
-              </target>
-            </configuration>
-          </execution>
-          <execution>
-            <id>shutdown-nexus</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <phase>post-integration-test</phase>
-            <configuration>
-              <target>
-                <exec executable="${nexus.exec}">
-                  <arg value="stop" />
-                  <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
-                  <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
-                </exec>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.redline-rpm</groupId>
-            <artifactId>redline</artifactId>
-            <version>1.1.9</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-
-      <!-- run integration tests -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.9</version>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <goals>
-              <goal>integration-test</goal>
-            </goals>
-            <configuration>
-              <systemPropertyVariables>
-                <nexus.port>${nexus.port}</nexus.port>
-              </systemPropertyVariables>
-            </configuration>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>
