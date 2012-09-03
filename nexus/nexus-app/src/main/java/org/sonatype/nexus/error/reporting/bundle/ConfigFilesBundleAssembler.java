@@ -69,7 +69,9 @@ public class ConfigFilesBundleAssembler
                     // following files are written with the current in-memory model
                     && !pathname.getName().equals( "nexus.xml" )
                     && !pathname.getName().equals( "security.xml" )
-                    && !pathname.getName().equals( "security-configuration.xml" );
+                    && !pathname.getName().equals( "security-configuration.xml" )
+                    // ldap plugins add this config themselves
+                    && !pathname.getName().equals( "ldap.xml" );
             }
         };
 
