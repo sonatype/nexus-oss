@@ -100,12 +100,23 @@ public class MavenSiteIT
         createMavenSiteRepository( repositoryId );
         copySiteContentToRepository( "site-content", repositoryId );
 
-        final ClientResponse clientResponse = getStatusOf(
-            format( "service/local/repositories/%s/content/css/site.css", repositoryId )
-        );
+        ClientResponse clientResponse = null;
+        try
+        {
+            clientResponse = getStatusOf(
+                format( "service/local/repositories/%s/content/css/site.css", repositoryId )
+            );
 
-        assertThat( clientResponse.getStatus(), is( 200 ) );
-        assertThat( clientResponse.getType(), is( MediaType.valueOf( "text/css" ) ) );
+            assertThat( clientResponse.getStatus(), is( 200 ) );
+            assertThat( clientResponse.getType(), is( MediaType.valueOf( "text/css" ) ) );
+        }
+        finally
+        {
+            if ( clientResponse != null )
+            {
+                clientResponse.close();
+            }
+        }
     }
 
     /**
@@ -120,13 +131,24 @@ public class MavenSiteIT
         createMavenSiteRepository( repositoryId );
         copySiteContentToRepository( "site-content", repositoryId );
 
-        final ClientResponse clientResponse = getStatusOf(
-            format( "service/local/repositories/%s/content/", repositoryId )
-        );
+        ClientResponse clientResponse = null;
+        try
+        {
+            clientResponse = getStatusOf(
+                format( "service/local/repositories/%s/content/", repositoryId )
+            );
 
-        assertThat( clientResponse.getStatus(), is( 200 ) );
-        assertThat( clientResponse.getType().toString(), startsWith( "application/xml" ) );
-        assertThat( clientResponse.getEntity( ContentListResourceResponse.class ), is( notNullValue() ) );
+            assertThat( clientResponse.getStatus(), is( 200 ) );
+            assertThat( clientResponse.getType().toString(), startsWith( "application/xml" ) );
+            assertThat( clientResponse.getEntity( ContentListResourceResponse.class ), is( notNullValue() ) );
+        }
+        finally
+        {
+            if ( clientResponse != null )
+            {
+                clientResponse.close();
+            }
+        }
     }
 
     /**
@@ -140,13 +162,24 @@ public class MavenSiteIT
         createMavenSiteRepository( repositoryId );
         copySiteContentToRepository( "site-content", repositoryId );
 
-        final ClientResponse clientResponse = getStatusOf(
-            format( "content/sites/%s/", repositoryId )
-        );
+        ClientResponse clientResponse = null;
+        try
+        {
+            clientResponse = getStatusOf(
+                format( "content/sites/%s/", repositoryId )
+            );
 
-        assertThat( clientResponse.getStatus(), is( 200 ) );
-        assertThat( clientResponse.getType(), is( MediaType.TEXT_HTML_TYPE ) );
-        assertThat( clientResponse.getEntity( String.class ), containsString( "<html" ) );
+            assertThat( clientResponse.getStatus(), is( 200 ) );
+            assertThat( clientResponse.getType(), is( MediaType.TEXT_HTML_TYPE ) );
+            assertThat( clientResponse.getEntity( String.class ), containsString( "<html" ) );
+        }
+        finally
+        {
+            if ( clientResponse != null )
+            {
+                clientResponse.close();
+            }
+        }
     }
 
 }
