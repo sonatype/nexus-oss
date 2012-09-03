@@ -355,15 +355,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>quick</id>
-      <properties>
-        <test>void</test>
-        <it.test>void</it.test>
-        <failIfNoTests>false</failIfNoTests>
-      </properties>
-    </profile>
-
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
     <profile>
       <id>idea</id>
