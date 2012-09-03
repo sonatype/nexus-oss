@@ -32,7 +32,7 @@ public class VelocityContentGenerator
     public static final String ID = "velocity";
 
     @Requirement
-    private Velocity velocityComponent;
+    private Velocity velocity;
 
     @Override
     public String getGeneratorId()
@@ -51,7 +51,7 @@ public class VelocityContentGenerator
             StringWriter sw = new StringWriter();
             VelocityContext vctx = new VelocityContext( item.getItemContext() );
             isr = new InputStreamReader( item.getInputStream(), "UTF-8" );
-            velocityComponent.getEngine().evaluate( vctx, sw, item.getRepositoryItemUid().toString(), isr );
+            velocity.getEngine().evaluate( vctx, sw, item.getRepositoryItemUid().toString(), isr );
             return new StringContentLocator( sw.toString() );
         }
         catch ( Exception e )
