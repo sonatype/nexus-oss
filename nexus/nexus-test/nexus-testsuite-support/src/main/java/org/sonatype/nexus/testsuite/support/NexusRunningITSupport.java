@@ -19,6 +19,7 @@ import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.testsuite.client.RemoteLoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 
@@ -97,11 +99,15 @@ public abstract class NexusRunningITSupport
         );
 
         assertThat( "Nexus is running before test starts", nexus().isRunning(), is( true ) );
+
+        logRemoteThatTestIs( "STARTING" );
     }
 
     @After
     public void afterTestWasRunning()
     {
+        logRemoteThatTestIs( "FINISHED" );
+
         if ( nexus != null )
         {
             testIndex().recordLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
@@ -196,6 +202,32 @@ public abstract class NexusRunningITSupport
             nexusClient = createNexusClientForAdmin( nexus() );
         }
         return nexusClient;
+    }
+
+    /**
+     * Returns a logger that is forwarding logging to remote nexus log so logged message will appear in nexus.log.
+     *
+     * @return remote logger. Never null.
+     */
+    protected Logger remoteLogger()
+    {
+        return client().getSubsystem( RemoteLoggerFactory.class ).getLogger( this.getClass().getName() );
+    }
+
+    /**
+     * Logs remote (in nexus.log) what the test is doing.
+     *
+     * @param doingWhat test state
+     */
+    private void logRemoteThatTestIs( final String doingWhat )
+    {
+        final String startMessage = "TEST " + testName.getMethodName() + " " + doingWhat;
+
+        final Logger remoteLogger = remoteLogger();
+
+        remoteLogger.info( StringUtils.repeat( "*", startMessage.length() ) );
+        remoteLogger.info( startMessage );
+        remoteLogger.info( StringUtils.repeat( "*", startMessage.length() ) );
     }
 
     private Stopwatch startNexus( final NexusBundle nexusBundle )
