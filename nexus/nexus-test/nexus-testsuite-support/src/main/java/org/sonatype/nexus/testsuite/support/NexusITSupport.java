@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.slf4j.Logger;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.support.NexusBundleResolver;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
@@ -429,6 +430,21 @@ public abstract class NexusITSupport
         return nexusClientFactory.createFor(
             baseUrlFrom( nexus.getUrl() )
         );
+    }
+
+    /**
+     * Logs remote (in nexus.log) what the test is doing.
+     *
+     * @param remoteLogger logger to use
+     * @param doingWhat    test state
+     */
+    protected void logRemoteThatTestIs( final Logger remoteLogger, final String doingWhat )
+    {
+        final String startMessage = "TEST " + testName.getMethodName() + " " + doingWhat;
+
+        remoteLogger.info( org.apache.commons.lang.StringUtils.repeat( "*", startMessage.length() ) );
+        remoteLogger.info( startMessage );
+        remoteLogger.info( org.apache.commons.lang.StringUtils.repeat( "*", startMessage.length() ) );
     }
 
 }

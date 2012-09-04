@@ -221,13 +221,7 @@ public abstract class NexusRunningITSupport
      */
     private void logRemoteThatTestIs( final String doingWhat )
     {
-        final String startMessage = "TEST " + testName.getMethodName() + " " + doingWhat;
-
-        final Logger remoteLogger = remoteLogger();
-
-        remoteLogger.info( StringUtils.repeat( "*", startMessage.length() ) );
-        remoteLogger.info( startMessage );
-        remoteLogger.info( StringUtils.repeat( "*", startMessage.length() ) );
+        logRemoteThatTestIs( remoteLogger(), doingWhat );
     }
 
     private Stopwatch startNexus( final NexusBundle nexusBundle )
