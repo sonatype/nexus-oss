@@ -440,11 +440,15 @@ public abstract class NexusITSupport
      */
     protected void logRemoteThatTestIs( final Logger remoteLogger, final String doingWhat )
     {
-        final String startMessage = "TEST " + testName.getMethodName() + " " + doingWhat;
+        final String message = "TEST " + testName.getMethodName() + " " + doingWhat;
 
-        remoteLogger.info( org.apache.commons.lang.StringUtils.repeat( "*", startMessage.length() ) );
-        remoteLogger.info( startMessage );
-        remoteLogger.info( org.apache.commons.lang.StringUtils.repeat( "*", startMessage.length() ) );
+        final StringBuilder fullMessage = new StringBuilder(  )
+            .append( "\n" )
+            .append( StringUtils.repeat( "*", message.length() ) ).append( "\n" )
+            .append( message ).append( "\n" )
+            .append( StringUtils.repeat( "*", message.length() ) );
+
+        remoteLogger.info( fullMessage.toString() );
     }
 
 }
