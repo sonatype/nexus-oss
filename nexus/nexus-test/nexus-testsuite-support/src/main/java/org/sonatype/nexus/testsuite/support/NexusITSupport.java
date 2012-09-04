@@ -442,13 +442,40 @@ public abstract class NexusITSupport
     {
         final String message = "TEST " + testName.getMethodName() + " " + doingWhat;
 
-        final StringBuilder fullMessage = new StringBuilder(  )
+        final StringBuilder fullMessage = new StringBuilder()
             .append( "\n" )
             .append( StringUtils.repeat( "*", message.length() ) ).append( "\n" )
             .append( message ).append( "\n" )
             .append( StringUtils.repeat( "*", message.length() ) );
 
         remoteLogger.info( fullMessage.toString() );
+    }
+
+    /**
+     * Generates a repository id specific to the test.
+     * The id will be equal to the name of the current running test method.
+     *
+     * @return repository id. Never null.
+     */
+    protected String repositoryIdForTest()
+    {
+        String methodName = testName.getMethodName();
+        if ( methodName.contains( "[" ) )
+        {
+            return methodName.substring( 0, methodName.indexOf( "[" ) );
+        }
+        return methodName;
+    }
+
+    /**
+     * Generates a repository id specific to the test appending the suffix.
+     * The id will be equal to the name of the current running test method + "-" + suffix.
+     *
+     * @return repository id. Never null.
+     */
+    protected String repositoryIdForTest( final String suffix )
+    {
+        return String.format( "%s-%s", repositoryIdForTest(), checkNotNull( suffix ) );
     }
 
 }
