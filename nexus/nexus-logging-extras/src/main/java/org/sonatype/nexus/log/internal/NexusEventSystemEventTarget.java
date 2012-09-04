@@ -12,11 +12,8 @@
  */
 package org.sonatype.nexus.log.internal;
 
-import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.logback.EventTarget;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
@@ -28,13 +25,11 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
  * @author cstamas
  * @since 2.2
  */
-@Named
-@Singleton
-@Typed( EventTarget.class )
+@Component( role = EventTarget.class )
 public class NexusEventSystemEventTarget
     implements EventTarget
 {
-    @Inject
+    @Requirement
     private ApplicationEventMulticaster eventMulticaster;
 
     @Override

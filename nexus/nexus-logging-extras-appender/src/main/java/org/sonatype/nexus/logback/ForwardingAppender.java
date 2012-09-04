@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.logback;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
@@ -24,19 +21,50 @@ import ch.qos.logback.core.UnsynchronizedAppenderBase;
  * @author cstamas
  * @since 2.2
  */
-@Named
 public class ForwardingAppender
     extends UnsynchronizedAppenderBase<ILoggingEvent>
 {
-    @Inject
     private EventTarget target;
+
+    /**
+     * Default constructor that creates and resets this instance.
+     */
+    public ForwardingAppender()
+    {
+        reset();
+    }
 
     @Override
     protected void append( final ILoggingEvent event )
     {
+        target.onEvent( event );
+    }
+
+    // ==
+
+    /**
+     * Installs or replaces an {@link EventTarget} to have events forwarded to it.
+     * 
+     * @param target
+     */
+    public void installEventTarget( final EventTarget target )
+    {
         if ( target != null )
         {
-            target.onEvent( event );
+            this.target = target;
         }
+        else
+        {
+            reset();
+        }
+    }
+
+    /**
+     * Performs a "reset" of this forwarding appender, and previously installed {@link EventTarget} (if any) will stop
+     * receiving events.
+     */
+    public void reset()
+    {
+        this.target = NoopEventTarget.INSTANCE;
     }
 }
