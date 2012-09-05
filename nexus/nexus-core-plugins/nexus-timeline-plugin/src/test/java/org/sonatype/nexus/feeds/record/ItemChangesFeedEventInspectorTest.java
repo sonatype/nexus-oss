@@ -12,27 +12,27 @@
  */
 package org.sonatype.nexus.feeds.record;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.RequestContext;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
-import org.sonatype.nexus.proxy.item.AbstractRepositoryItemUidFactory;
-import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
+import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
+import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
+import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -51,7 +51,7 @@ public class ItemChangesFeedEventInspectorTest
 
     @Mock
     private StorageFileItem storageFileItem;
-    
+
     @Mock
     private RepositoryItemUid repositoryItemUid;
 
@@ -59,24 +59,57 @@ public class ItemChangesFeedEventInspectorTest
     public void setup()
     {
         when( repository.getId() ).thenReturn( "test" );
-        when( storageFileItem.getItemContext() ).thenReturn( new RequestContext(  ) );
+        when( storageFileItem.getItemContext() ).thenReturn( new RequestContext() );
         when( storageFileItem.getRepositoryItemUid() ).thenReturn( repositoryItemUid );
+        when( storageFileItem.getRepositoryItemAttributes() ).thenReturn( new DefaultAttributes() );
     }
 
     @Test
     public void eventsOnHiddenFilesAreNotRecorded()
     {
-        final ItemChangesFeedEventInspector underTest = new ItemChangesFeedEventInspector(
-            feedRecorder, applicationStatusSource
-        );
-
+        final ItemChangesFeedEventInspector underTest =
+            new ItemChangesFeedEventInspector( feedRecorder, applicationStatusSource );
         final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
-        
         when( repositoryItemUid.getBooleanAttributeValue( IsHiddenAttribute.class ) ).thenReturn( true );
-        
         underTest.inspect( evt );
 
         verifyNoMoreInteractions( feedRecorder );
     }
 
+    @Test
+    public void eventsOnMavenMetadataSignatureAndHashFilesAreNotRecorded()
+    {
+        final ItemChangesFeedEventInspector underTest =
+            new ItemChangesFeedEventInspector( feedRecorder, applicationStatusSource );
+        {
+            final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
+            when( repositoryItemUid.getBooleanAttributeValue( IsMavenRepositoryMetadataAttribute.class ) ).thenReturn(
+                true );
+            underTest.inspect( evt );
+        }
+        {
+            final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
+            when( repositoryItemUid.getBooleanAttributeValue( IsMavenArtifactSignatureAttribute.class ) ).thenReturn(
+                true );
+            underTest.inspect( evt );
+        }
+        {
+            final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
+            when( repositoryItemUid.getBooleanAttributeValue( IsMavenChecksumAttribute.class ) ).thenReturn( true );
+            underTest.inspect( evt );
+        }
+
+        // these events above should be filtered out by ItemChangesFeedEventInspector, feedRecordes shall be untouched
+        verifyNoMoreInteractions( feedRecorder );
+
+        // now do touch it (with event that has all the flags we added false)
+        final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate( repository, storageFileItem );
+        when( repositoryItemUid.getBooleanAttributeValue( IsMavenRepositoryMetadataAttribute.class ) ).thenReturn(
+            false );
+        when( repositoryItemUid.getBooleanAttributeValue( IsMavenArtifactSignatureAttribute.class ) ).thenReturn( false );
+        when( repositoryItemUid.getBooleanAttributeValue( IsMavenChecksumAttribute.class ) ).thenReturn( false );
+        underTest.inspect( evt );
+        // method touched only once
+        verify( feedRecorder, times( 1 ) ).addNexusArtifactEvent( any( NexusArtifactEvent.class ) );
+    }
 }
