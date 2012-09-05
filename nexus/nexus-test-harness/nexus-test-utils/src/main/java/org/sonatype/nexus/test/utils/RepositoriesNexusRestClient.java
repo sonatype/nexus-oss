@@ -59,7 +59,11 @@ public class RepositoriesNexusRestClient
 
     public static final String SERVICE_PART = NexusRestClient.SERVICE_LOCAL + "repositories";
 
-    private static final Integer DO_NOT_SET = null;
+    private static final Integer USE_DEFAULT_ARTIFACT_MAX_AGE = null;
+
+    private static final Integer USE_DEFAULT_METADATA_MAX_AGE = null;
+
+    private static final RepositoryWritePolicy USE_DEFAULT_REPOSITORY_WRITE_POLICY = null;
 
     private final NexusRestClient nexusRestClient;
 
@@ -505,6 +509,14 @@ public class RepositoriesNexusRestClient
     public void createMavenHostedRepository( final String id, final RepositoryPolicy repositoryPolicy )
         throws IOException
     {
+        createMavenHostedRepository( id, repositoryPolicy, USE_DEFAULT_REPOSITORY_WRITE_POLICY );
+    }
+
+    public void createMavenHostedRepository( final String id,
+                                             final RepositoryPolicy repositoryPolicy,
+                                             final RepositoryWritePolicy repositoryWritePolicy )
+        throws IOException
+    {
         final RepositoryResource repository = new RepositoryResource();
 
         repository.setId( id );
@@ -513,6 +525,10 @@ public class RepositoriesNexusRestClient
         repository.setProvider( "maven2" );
         repository.setFormat( "maven2" );
         repository.setRepoPolicy( repositoryPolicy.name() );
+        if ( repositoryWritePolicy != null )
+        {
+            repository.setWritePolicy( repositoryWritePolicy.name() );
+        }
         repository.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
         repository.setBrowseable( true );
         repository.setIndexable( true );
@@ -524,7 +540,7 @@ public class RepositoriesNexusRestClient
     public void createMavenProxyReleaseRepository( final String id, final String url )
         throws IOException
     {
-        createMavenProxyReleaseRepository( id, url, DO_NOT_SET, DO_NOT_SET );
+        createMavenProxyReleaseRepository( id, url, USE_DEFAULT_ARTIFACT_MAX_AGE, USE_DEFAULT_METADATA_MAX_AGE );
     }
 
     public void createMavenProxyReleaseRepository( final String id,
@@ -539,7 +555,7 @@ public class RepositoriesNexusRestClient
     public void createMavenProxySnapshotRepository( final String id, final String url )
         throws IOException
     {
-        createMavenProxySnapshotRepository( id, url, DO_NOT_SET, DO_NOT_SET );
+        createMavenProxySnapshotRepository( id, url, USE_DEFAULT_ARTIFACT_MAX_AGE, USE_DEFAULT_METADATA_MAX_AGE );
     }
 
     public void createMavenProxySnapshotRepository( final String id,
