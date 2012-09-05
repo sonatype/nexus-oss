@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.testsuite.client.internal;
 
+import static java.lang.String.format;
+
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.testsuite.client.UIDLocks;
@@ -33,16 +35,16 @@ public class JerseyUIDLocks
     }
 
     @Override
-    public void lock( final String repository, final String path, final String lockType )
+    public void lock( final String repository, final String path, final LockType lockType )
     {
-        final String uri = String.format( "nexus-it-helper-plugin/uid/lock/%s/%s/%s", repository, lockType, path );
+        final String uri = format( "nexus-it-helper-plugin/uid/lock/%s/%s/%s", repository, lockType.name(), path );
         getNexusClient().serviceResource( uri ).get( ClientResponse.class ).close();
     }
 
     @Override
     public void unlock( final String repository, final String path )
     {
-        final String uri = String.format( "nexus-it-helper-plugin/uid/lock/%s/unlock/%s", repository, path );
+        final String uri = format( "nexus-it-helper-plugin/uid/lock/%s/unlock/%s", repository, path );
         getNexusClient().serviceResource( uri ).delete();
     }
 

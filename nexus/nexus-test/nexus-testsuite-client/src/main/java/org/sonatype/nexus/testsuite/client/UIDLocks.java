@@ -27,7 +27,7 @@ public interface UIDLocks
      * @param path       of item to be locked
      * @param lockType   on of read/create/delete/update
      */
-    void lock( String repository, String path, String lockType );
+    void lock( String repository, String path, LockType lockType );
 
     /**
      * Unlocks a repository item.
@@ -36,5 +36,15 @@ public interface UIDLocks
      * @param path       of item to be unlocked
      */
     void unlock( String repository, String path );
+
+    /**
+     * Allowed locking types.
+     */
+    public enum LockType
+    {
+
+        read, create, update, delete;
+
+    }
 
 }
