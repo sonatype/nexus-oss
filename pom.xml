@@ -273,8 +273,8 @@
               <exclude>**/nb-configuration.xml</exclude>
               <!-- IntelliJ IDEA project directory-->
               <exclude>**/.idea/**</exclude>
-              <!-- The classes in guava package are copied over from com.google.common.eventbus in order to make then extensible (they are package protected) -->
-              <exclude>**/org/sonatype/nexus/eventbus/internal/guava/**</exclude>
+              <!-- IT resources -->
+              <exclude>**/it-resources/**</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>
