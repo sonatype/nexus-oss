@@ -25,10 +25,13 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
+import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
+import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
+import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
 import org.sonatype.plexus.appevents.Event;
 
 /**
- * Event inspector that creates feeds about item changes.
+ * Event inspector that persists item events into Timeline.
  *
  * @author Juven Xu
  * @author cstamas
@@ -68,6 +71,9 @@ public class ItemChangesFeedEventInspector
         // filter out links and dirs/collections and hidden files
         if ( StorageFileItem.class.isAssignableFrom( ievt.getItem().getClass() )
             && !ievt.getItemUid().getBooleanAttributeValue( IsHiddenAttribute.class )
+            && !ievt.getItemUid().getBooleanAttributeValue( IsMavenRepositoryMetadataAttribute.class ) // "maven-metadata.xml"
+            && !ievt.getItemUid().getBooleanAttributeValue( IsMavenArtifactSignatureAttribute.class ) // "*.asc"
+            && !ievt.getItemUid().getBooleanAttributeValue( IsMavenChecksumAttribute.class ) // "*.sha1" or "*.md5" 
             && !( (StorageFileItem) ievt.getItem() ).isContentGenerated() )
         {
             StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
