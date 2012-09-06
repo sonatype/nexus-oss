@@ -135,6 +135,49 @@
           </annotations>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0+</version>
+          <code>
+            <![CDATA[
+              public CapabilityResource withId( final String id )
+              {
+                  setId( id );
+                  return this;
+              }
+
+              public CapabilityResource withTypeId( final String typeId )
+              {
+                  setTypeId( typeId );
+                  return this;
+              }
+
+              public CapabilityResource withEnabled( final boolean enabled )
+              {
+                  setEnabled( enabled );
+                  return this;
+              }
+
+              public CapabilityResource withNotes( final String notes )
+              {
+                  setNotes( notes );
+                  return this;
+              }
+
+              public CapabilityResource withProperty( final CapabilityPropertyResource property )
+              {
+                  addProperty( property );
+                  return this;
+              }
+
+              public static CapabilityResource capability()
+              {
+                  return new CapabilityResource();
+              }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
 
     <class>
@@ -161,6 +204,31 @@
           <description>The value of the property.</description>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0+</version>
+          <code>
+            <![CDATA[
+              public CapabilityPropertyResource withKey( final String key )
+              {
+                  setKey( key );
+                  return this;
+              }
+
+              public CapabilityPropertyResource withValue( final String value )
+              {
+                  setValue( value );
+                  return this;
+              }
+
+              public static CapabilityPropertyResource capabilityProperty()
+              {
+                  return new CapabilityPropertyResource();
+              }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
 
     <class>

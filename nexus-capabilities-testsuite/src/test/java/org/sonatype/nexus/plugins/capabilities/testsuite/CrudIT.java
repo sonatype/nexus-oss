@@ -16,12 +16,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource.capabilityProperty;
+import static org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource.capability;
 
 import java.util.List;
 
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 
 public class CrudIT
@@ -37,17 +38,7 @@ public class CrudIT
     public void crud()
     {
         // create
-        CapabilityResource cap = new CapabilityResource();
-        cap.setNotes( "crud-test" );
-        cap.setTypeId( "TouchTest" );
-        CapabilityPropertyResource prop = new CapabilityPropertyResource();
-        prop.setKey( "repoOrGroupId" );
-        prop.setValue( TEST_REPOSITORY );
-        cap.addProperty( prop );
-        prop = new CapabilityPropertyResource();
-        prop.setKey( "message" );
-        prop.setValue( "Testing CRUD" );
-        cap.addProperty( prop );
+        final CapabilityResource cap = testCapability();
 
         CapabilityListItemResource r = capabilities().add( cap );
         assertThat( r.getId(), is( notNullValue() ) );
@@ -78,7 +69,7 @@ public class CrudIT
     @Test
     public void enable()
     {
-        final CapabilityListItemResource created = createCapability();
+        final CapabilityListItemResource created = capabilities().add( testCapability() );
         final CapabilityListItemResource enabled = capabilities().enable( created.getId() );
 
         assertThat( enabled.isEnabled(), is( true ) );
@@ -87,32 +78,17 @@ public class CrudIT
     @Test
     public void disable()
     {
-        final CapabilityListItemResource created = createCapability();
+        final CapabilityListItemResource created = capabilities().add( testCapability() );
         final CapabilityListItemResource enabled = capabilities().disable( created.getId() );
 
         assertThat( enabled.isEnabled(), is( false ) );
     }
 
-    private CapabilityListItemResource createCapability()
+    private CapabilityResource testCapability()
     {
-        final CapabilityResource cap = new CapabilityResource();
-        cap.setNotes( "crud-test" );
-        cap.setTypeId( "TouchTest" );
-
-        {
-            final CapabilityPropertyResource prop = new CapabilityPropertyResource();
-            prop.setKey( "repoOrGroupId" );
-            prop.setValue( TEST_REPOSITORY );
-            cap.addProperty( prop );
-        }
-        {
-            final CapabilityPropertyResource prop = new CapabilityPropertyResource();
-            prop.setKey( "message" );
-            prop.setValue( "Testing CRUD" );
-            cap.addProperty( prop );
-        }
-
-        return capabilities().add( cap );
+        return capability().withTypeId( "TouchTest" ).withNotes( "crud-test" )
+            .withProperty( capabilityProperty().withKey( "repoOrGroupId" ).withValue( TEST_REPOSITORY ) )
+            .withProperty( capabilityProperty().withKey( "message" ).withValue( "Testing CRUD" ) );
     }
 
 }
