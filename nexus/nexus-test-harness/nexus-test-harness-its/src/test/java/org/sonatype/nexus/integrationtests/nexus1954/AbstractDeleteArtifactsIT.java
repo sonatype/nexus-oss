@@ -169,6 +169,9 @@ public abstract class AbstractDeleteArtifactsIT
 
         runUpdateIndex();
 
+        TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
+
         long hostedLastMod2 = readLastMod( hostedIndexProps );
         Assert.assertTrue( hostedLastMod < hostedLastMod2 );
 
