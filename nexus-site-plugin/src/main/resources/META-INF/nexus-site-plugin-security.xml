@@ -18,8 +18,8 @@
   <roles>
     <role>
       <id>maven-site-all-read</id>
-      <name>Repo: All Maven Site Repositories (Read)</name>
-      <description>Gives access to read ALL content of ALL Maven Site Repositories in Nexus.</description>
+      <name>Repo: All Site Repositories (Read)</name>
+      <description>Gives access to read ALL content of ALL Site Repositories in Nexus.</description>
       <sessionTimeout>60</sessionTimeout>
       <privileges>
         <privilege>maven-site-read</privilege>
@@ -28,8 +28,8 @@
     </role>
     <role>
       <id>maven-site-all-full</id>
-      <name>Repo: All Maven Site Repositories (Full Control)</name>
-      <description>Gives access to create/read/update/delete ALL content of ALL Maven Site Repositories in Nexus.</description>
+      <name>Repo: All Site Repositories (Full Control)</name>
+      <description>Gives access to create/read/update/delete ALL content of ALL Site Repositories in Nexus.</description>
       <sessionTimeout>60</sessionTimeout>
       <privileges>
         <privilege>maven-site-create</privilege>
@@ -43,8 +43,8 @@
   <privileges>
     <privilege>
       <id>maven-site-create</id>
-      <name>All Maven Site Repositories - (create)</name>
-      <description>Give permission to create any content in any Maven Site repository.</description>
+      <name>All Site Repositories - (create)</name>
+      <description>Give permission to create any content in any Site repository.</description>
       <type>target</type>
       <properties>
         <property>
@@ -67,8 +67,8 @@
     </privilege>
     <privilege>
       <id>maven-site-read</id>
-      <name>All Maven Site Repositories - (read)</name>
-      <description>Give permission to read any content in any Maven Site Repository.</description>
+      <name>All Site Repositories - (read)</name>
+      <description>Give permission to read any content in any Site Repository.</description>
       <type>target</type>
       <properties>
         <property>
@@ -91,8 +91,8 @@
     </privilege>
     <privilege>
       <id>maven-site-update</id>
-      <name>All Maven Site Repositories - (update)</name>
-      <description>Give permission to update any content in any Maven Site Repository.</description>
+      <name>All Site Repositories - (update)</name>
+      <description>Give permission to update any content in any Site Repository.</description>
       <type>target</type>
       <properties>
         <property>
@@ -115,8 +115,8 @@
     </privilege>
     <privilege>
       <id>maven-site-delete</id>
-      <name>All Maven Site Repositories - (delete)</name>
-      <description>Give permission to delete any content in any Maven Site Repository.</description>
+      <name>All Site Repositories - (delete)</name>
+      <description>Give permission to delete any content in any Site Repository.</description>
       <type>target</type>
       <properties>
         <property>

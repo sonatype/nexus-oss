@@ -31,7 +31,7 @@ public class MavenSiteContentClass
 
     public static final String ID = "maven-site";
 
-    public static final String NAME = "Maven Site";
+    public static final String NAME = "Site";
 
     public String getId()
     {
