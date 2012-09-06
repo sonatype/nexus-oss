@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Arrays;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
@@ -72,6 +75,9 @@ public class JerseyServerConfiguration
         @Override
         public void setTo( final String host, final int port, final String... nonProxyHosts )
         {
+            checkNotNull( host, "Host cannot be null" );
+            checkArgument( !host.isEmpty(), "Host cannot be empty" );
+
             final GlobalConfigurationResource configuration = getConfiguration();
 
             final RemoteHttpProxySettings httpProxySettings = new RemoteHttpProxySettings();
