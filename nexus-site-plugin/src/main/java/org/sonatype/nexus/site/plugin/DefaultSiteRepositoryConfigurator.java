@@ -12,16 +12,17 @@
  */
 package org.sonatype.nexus.site.plugin;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfiguration;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-public class DefaultMavenSiteRepositoryConfiguration
-    extends AbstractWebSiteRepositoryConfiguration
+import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
+
+@Named( "maven-site" )
+@Singleton
+public class DefaultSiteRepositoryConfigurator
+    extends AbstractWebSiteRepositoryConfigurator
+    implements Configurator
 {
-
-    public DefaultMavenSiteRepositoryConfiguration( Xpp3Dom configuration )
-    {
-        super( configuration );
-    }
 
 }

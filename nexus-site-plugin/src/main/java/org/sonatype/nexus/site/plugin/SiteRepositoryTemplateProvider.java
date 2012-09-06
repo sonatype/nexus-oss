@@ -26,9 +26,9 @@ import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
-@Named( MavenSiteTemplateProvider.PROVIDER_ID )
+@Named( SiteRepositoryTemplateProvider.PROVIDER_ID )
 @Singleton
-public class MavenSiteTemplateProvider
+public class SiteRepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
     implements Initializable
 {
@@ -40,7 +40,7 @@ public class MavenSiteTemplateProvider
     private final RepositoryTypeRegistry repositoryTypeRegistry;
 
     @Inject
-    public MavenSiteTemplateProvider( final RepositoryTypeRegistry repositoryTypeRegistry )
+    public SiteRepositoryTemplateProvider( final RepositoryTypeRegistry repositoryTypeRegistry )
     {
         this.repositoryTypeRegistry = checkNotNull( repositoryTypeRegistry );
     }
@@ -51,7 +51,7 @@ public class MavenSiteTemplateProvider
 
         try
         {
-            templates.add( new MavenSiteTemplate( this, MAVEN_SITE_ID, "Maven Site (hosted)" ) );
+            templates.add( new SiteRepositoryTemplate( this, MAVEN_SITE_ID, "Maven Site (hosted)" ) );
         }
         catch ( Exception e )
         {

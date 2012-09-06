@@ -47,7 +47,7 @@ import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import com.google.common.base.Throwables;
 import com.sun.jersey.api.client.ClientResponse;
 
-public abstract class NexusSiteITSupport
+public abstract class SiteRepositoryITSupport
     extends NexusRunningParametrizedITSupport
 {
 
@@ -65,7 +65,7 @@ public abstract class NexusSiteITSupport
     // TODO replace this with a proper client
     private RepositoriesNexusRestClient repositories;
 
-    public NexusSiteITSupport( final String nexusBundleCoordinates )
+    public SiteRepositoryITSupport( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

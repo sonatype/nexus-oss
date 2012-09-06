@@ -23,9 +23,9 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  *
  * @author cstamas
  */
-@Named( MavenSiteContentClass.ID )
+@Named( SiteContentClass.ID )
 @Singleton
-public class MavenSiteContentClass
+public class SiteContentClass
     extends AbstractIdContentClass
 {
 

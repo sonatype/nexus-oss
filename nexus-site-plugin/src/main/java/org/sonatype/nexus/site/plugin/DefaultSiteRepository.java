@@ -41,9 +41,9 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * @author cstamas
  */
 @Named( "maven-site" )
-public class DefaultMavenSiteRepository
+public class DefaultSiteRepository
     extends AbstractWebSiteRepository
-    implements MavenSiteRepository, WebSiteRepository
+    implements SiteRepository, WebSiteRepository
 {
 
     private final ContentClass contentClass;
@@ -51,8 +51,8 @@ public class DefaultMavenSiteRepository
     private final Configurator repositoryConfigurator;
 
     @Inject
-    public DefaultMavenSiteRepository( final @Named( "maven-site" ) ContentClass contentClass,
-                                       final @Named( "maven-site" ) Configurator repositoryConfigurator )
+    public DefaultSiteRepository( final @Named( "maven-site" ) ContentClass contentClass,
+                                  final @Named( "maven-site" ) Configurator repositoryConfigurator )
     {
 
         this.contentClass = checkNotNull( contentClass );
@@ -70,7 +70,7 @@ public class DefaultMavenSiteRepository
     {
         if ( repositoryKind == null )
         {
-            repositoryKind = new DefaultRepositoryKind( MavenSiteRepository.class, null );
+            repositoryKind = new DefaultRepositoryKind( SiteRepository.class, null );
         }
 
         return repositoryKind;
@@ -83,13 +83,13 @@ public class DefaultMavenSiteRepository
     }
 
     @Override
-    protected CRepositoryExternalConfigurationHolderFactory<DefaultMavenSiteRepositoryConfiguration> getExternalConfigurationHolderFactory()
+    protected CRepositoryExternalConfigurationHolderFactory<DefaultSiteRepositoryConfiguration> getExternalConfigurationHolderFactory()
     {
-        return new CRepositoryExternalConfigurationHolderFactory<DefaultMavenSiteRepositoryConfiguration>()
+        return new CRepositoryExternalConfigurationHolderFactory<DefaultSiteRepositoryConfiguration>()
         {
-            public DefaultMavenSiteRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+            public DefaultSiteRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
             {
-                return new DefaultMavenSiteRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+                return new DefaultSiteRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
             }
         };
     }

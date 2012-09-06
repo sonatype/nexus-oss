@@ -37,11 +37,11 @@ import com.google.common.collect.Collections2;
 import com.sun.jersey.api.client.ClientResponse;
 
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
-public class MavenSiteIT
-    extends NexusSiteITSupport
+public class SiteRepositoryIT
+    extends SiteRepositoryITSupport
 {
 
-    public MavenSiteIT( final String nexusBundleCoordinates )
+    public SiteRepositoryIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

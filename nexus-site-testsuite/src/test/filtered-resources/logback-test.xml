@@ -26,7 +26,7 @@
   <logger name="org.apache.commons.httpclient" level="ERROR"/>
   <logger name="org.apache.http" level="${test.log.level.org.apache.http:-INFO}"/>
 
-  <logger name="org.sonatype.nexus.maven.site" level="TRACE"/>
+  <logger name="org.sonatype.nexus.site" level="TRACE"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>

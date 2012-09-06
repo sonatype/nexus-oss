@@ -12,17 +12,28 @@
  */
 package org.sonatype.nexus.site.plugin;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 
-@Named( "maven-site" )
-@Singleton
-public class DefaultMavenSiteRepositoryConfigurator
-    extends AbstractWebSiteRepositoryConfigurator
-    implements Configurator
+/**
+ * A Repository that holds Maven Site.
+ *
+ * @author cstamas
+ */
+public interface SiteRepository
+    extends WebSiteRepository
 {
 
+    /**
+     * Accepts the Maven Site az ZIP file, and automatically "unzips" it honoring the dir structures in ZIP file and
+     * prefixing those with the prefix.
+     *
+     * @param prefix
+     * @param bundle
+     * @throws IOException
+     */
+    void deploySiteBundle( String prefix, InputStream bundle )
+        throws IOException;
 }

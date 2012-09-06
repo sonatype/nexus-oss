@@ -21,13 +21,13 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 
-public class MavenSiteTemplate
+public class SiteRepositoryTemplate
     extends AbstractRepositoryTemplate
 {
 
-    public MavenSiteTemplate( MavenSiteTemplateProvider provider, String id, String description )
+    public SiteRepositoryTemplate( SiteRepositoryTemplateProvider provider, String id, String description )
     {
-        super( provider, id, description, new MavenSiteContentClass(), MavenSiteRepository.class );
+        super( provider, id, description, new SiteContentClass(), SiteRepository.class );
     }
 
     @Override
@@ -51,11 +51,11 @@ public class MavenSiteTemplate
         CRepositoryCoreConfiguration result = new CRepositoryCoreConfiguration(
             getTemplateProvider().getApplicationConfiguration(),
             repo,
-            new CRepositoryExternalConfigurationHolderFactory<DefaultMavenSiteRepositoryConfiguration>()
+            new CRepositoryExternalConfigurationHolderFactory<DefaultSiteRepositoryConfiguration>()
             {
-                public DefaultMavenSiteRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+                public DefaultSiteRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
                 {
-                    return new DefaultMavenSiteRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+                    return new DefaultSiteRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
                 }
             } );
 

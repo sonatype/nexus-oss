@@ -12,28 +12,16 @@
  */
 package org.sonatype.nexus.site.plugin;
 
-import java.io.IOException;
-import java.io.InputStream;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfiguration;
 
-import org.sonatype.nexus.proxy.repository.WebSiteRepository;
-
-/**
- * A Repository that holds Maven Site.
- *
- * @author cstamas
- */
-public interface MavenSiteRepository
-    extends WebSiteRepository
+public class DefaultSiteRepositoryConfiguration
+    extends AbstractWebSiteRepositoryConfiguration
 {
 
-    /**
-     * Accepts the Maven Site az ZIP file, and automatically "unzips" it honoring the dir structures in ZIP file and
-     * prefixing those with the prefix.
-     *
-     * @param prefix
-     * @param bundle
-     * @throws IOException
-     */
-    void deploySiteBundle( String prefix, InputStream bundle )
-        throws IOException;
+    public DefaultSiteRepositoryConfiguration( Xpp3Dom configuration )
+    {
+        super( configuration );
+    }
+
 }
