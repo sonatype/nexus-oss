@@ -255,6 +255,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.12</version>
           <configuration>
+            <failIfNoTests>false</failIfNoTests>
             <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <!-- force use of property -->
             <forkMode>once</forkMode>
@@ -277,6 +278,7 @@
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>2.12</version>
           <configuration>
+            <failIfNoTests>false</failIfNoTests>
             <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <!--
             For each test, so that we can use the process timeout.
