@@ -10,38 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
+package org.sonatype.nexus.client.internal.rest.jersey.subsystem.config;
 
-import org.sonatype.nexus.client.core.spi.SubsystemSupport;
-import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
-import org.sonatype.nexus.client.core.subsystem.config.HttpProxy;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyHttpProxy;
+import org.sonatype.nexus.client.core.subsystem.config.OptionalSegment;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
-public class JerseyServerConfiguration
-    extends SubsystemSupport<JerseyNexusClient>
-    implements ServerConfiguration
+public abstract class JerseyOptionalSegmentSupport<ME extends OptionalSegment, S>
+    extends JerseySegmentSupport<ME, S>
+    implements OptionalSegment<ME, S>
 {
 
-    /**
-     * Http Proxy configuration segment.
-     * Lazy initialized on first request.
-     */
-    private HttpProxy httpProxy;
-
-    public JerseyServerConfiguration( final JerseyNexusClient nexusClient )
+    public JerseyOptionalSegmentSupport( final JerseyNexusClient nexusClient )
     {
         super( nexusClient );
     }
 
     @Override
-    public HttpProxy proxySettings()
+    public ME disable()
     {
-        if ( httpProxy == null )
-        {
-            httpProxy = new JerseyHttpProxy( getNexusClient() );
-        }
-        return httpProxy;
+        onDisable( settings() );
+        save();
+        return me();
     }
+
+    protected abstract void onDisable( final S settings );
 
 }

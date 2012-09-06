@@ -10,21 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core.subsystem;
+package org.sonatype.nexus.client.core.subsystem.config;
 
-import org.sonatype.nexus.client.core.subsystem.config.HttpProxy;
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 
 /**
- * Server configuration subsystem.
+ * A configuration segment.
  *
  * @since 2.2
  */
-public interface ServerConfiguration
+public interface Segment<ME extends Segment, S>
 {
 
-    /**
-     * @return Http Proxy configuration segment.
-     */
-    HttpProxy proxySettings();
+    S settings();
+
+    ME refresh();
+
+    ME save();
 
 }
