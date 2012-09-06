@@ -21,6 +21,7 @@ import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
 import org.sonatype.nexus.client.core.subsystem.config.HttpProxy;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
@@ -89,6 +90,32 @@ public class JerseyServerConfiguration
             }
 
             configuration.setGlobalHttpProxySettings( httpProxySettings );
+
+            setConfiguration( configuration );
+        }
+
+        @Override
+        public void setCredentials( final String username, final String password )
+        {
+            setCredentials( username, password, null, null );
+        }
+
+        @Override
+        public void setCredentials( final String username, final String password,
+                                    final String ntlmHost, final String ntlmDomain )
+        {
+            checkNotNull( username, "User name cannot be null" );
+            checkArgument( !username.isEmpty(), "User name cannot be empty" );
+
+            final GlobalConfigurationResource configuration = getConfiguration();
+
+            final AuthenticationSettings auth = new AuthenticationSettings();
+            auth.setUsername( username );
+            auth.setPassword( password );
+            auth.setNtlmHost( ntlmHost );
+            auth.setNtlmDomain( ntlmDomain );
+
+            configuration.getGlobalHttpProxySettings().setAuthentication( auth );
 
             setConfiguration( configuration );
         }

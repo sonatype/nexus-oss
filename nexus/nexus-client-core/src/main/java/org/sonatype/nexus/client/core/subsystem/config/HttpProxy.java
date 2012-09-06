@@ -23,11 +23,29 @@ public interface HttpProxy
     /**
      * Configure Nexus to use the specified HTTP proxy.
      *
-     * @param host          host name/ip of HTTP proxy to be used for remote connections
-     * @param port          port of HTTP proxy to be used for remote connections
-     * @param nonProxyHosts (optional) list of hosts for which the proxy should not be used
+     * @param host          host name/ip of HTTP proxy to be used for remote connections. Cannot be null/empty.
+     * @param port          port of HTTP proxy to be used for remote connections.
+     * @param nonProxyHosts (optional) list of hosts for which the proxy should not be used.
      */
     void setTo( String host, int port, String... nonProxyHosts );
+
+    /**
+     * Configure Nexus to use the specified credentials to authenticate against HTTP proxy.
+     *
+     * @param username to use to authenticate against HTTP proxy. Cannot be null/empty.
+     * @param password to use to authenticate against HTTP proxy.
+     */
+    void setCredentials( String username, String password );
+
+    /**
+     * Configure Nexus to use the specified credentials to authenticate against HTTP proxy.
+     *
+     * @param username   to use to authenticate against HTTP proxy. Cannot be null/empty.
+     * @param password   to use to authenticate against HTTP proxy.
+     * @param ntlmHost   NTLM host.
+     * @param ntlmDomain NTLM domain.
+     */
+    void setCredentials( String username, String password, String ntlmHost, String ntlmDomain );
 
     /**
      * Configure Nexus to not use an HTTP proxy.
