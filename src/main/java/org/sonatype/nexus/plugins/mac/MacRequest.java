@@ -2,6 +2,11 @@ package org.sonatype.nexus.plugins.mac;
 
 import org.apache.maven.index.ArtifactInfoFilter;
 
+/**
+ * A request carrying needed information to construct response Archetype Catalog properly.
+ * 
+ * @author cstamas
+ */
 public class MacRequest
 {
     private final String repositoryId;
@@ -19,9 +24,7 @@ public class MacRequest
                        final ArtifactInfoFilter artifactInfoFilter )
     {
         this.repositoryId = repositoryId;
-
         this.repositoryUrl = repositoryUrl;
-
         this.artifactInfoFilter = artifactInfoFilter;
     }
 
