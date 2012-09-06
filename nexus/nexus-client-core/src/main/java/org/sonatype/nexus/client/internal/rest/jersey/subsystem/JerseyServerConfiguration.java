@@ -81,12 +81,20 @@ public class JerseyServerConfiguration
 
             final GlobalConfigurationResource configuration = getConfiguration();
 
-            final RemoteHttpProxySettings httpProxySettings = new RemoteHttpProxySettings();
+            RemoteHttpProxySettings httpProxySettings = configuration.getGlobalHttpProxySettings();
+            if ( httpProxySettings == null )
+            {
+                httpProxySettings = new RemoteHttpProxySettings();
+            }
             httpProxySettings.setProxyHostname( host );
             httpProxySettings.setProxyPort( port );
             if ( nonProxyHosts != null && nonProxyHosts.length > 0 )
             {
                 httpProxySettings.setNonProxyHosts( Arrays.asList( nonProxyHosts ) );
+            }
+            else
+            {
+                httpProxySettings.setNonProxyHosts( null );
             }
 
             configuration.setGlobalHttpProxySettings( httpProxySettings );
