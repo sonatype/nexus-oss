@@ -24,12 +24,12 @@
     <relativePath />
   </parent>
 
-  <groupId>org.sonatype.nexus.site</groupId>
-  <artifactId>nexus-site</artifactId>
+  <groupId>org.sonatype.nexus.repository.site</groupId>
+  <artifactId>nexus-site-repository</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Nexus Site (Parent)</name>
+  <name>Nexus Site Repository (Parent)</name>
   <description>Adds a repository type for deploying web sites.</description>
 
   <licenses>
@@ -40,9 +40,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git@github.com/sonatype/nexus-site.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-site.git</developerConnection>
-    <url>http://github.com/sonatype/nexus-site</url>
+    <connection>scm:git:git@github.com/sonatype/nexus-site-repository.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-site-repository.git</developerConnection>
+    <url>http://github.com/sonatype/nexus-site-repository</url>
   </scm>
 
   <properties>
@@ -57,8 +57,8 @@
   </properties>
 
   <modules>
-    <module>nexus-site-plugin</module>
-    <module>nexus-site-testsuite</module>
+    <module>nexus-site-repository-plugin</module>
+    <module>nexus-site-repository-testsuite</module>
   </modules>
 
   <dependencyManagement>
@@ -105,7 +105,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-site-plugin</artifactId>
+        <artifactId>nexus-site-repository-plugin</artifactId>
         <type>nexus-plugin</type>
         <version>1.0-SNAPSHOT</version>
       </dependency>

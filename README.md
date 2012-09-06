@@ -1,5 +1,5 @@
-Nexus Site Plugin
-===================
+Nexus Site Repository Plugin
+============================
 
 TODO: doc
 
