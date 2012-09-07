@@ -233,6 +233,8 @@
               <exclude>**/nb-configuration.xml</exclude>
               <!-- IntelliJ IDEA project directory -->
               <exclude>**/.idea/**</exclude>
+              <!-- Exclude test resources -->
+              <exclude>**/src/test/resources/**</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>
