@@ -18,7 +18,7 @@
     afterProviderSelectHandler:function ( combo, rec, index ) {
       hostedHandler.apply( this, arguments );
 
-      if ( rec.data.provider == 'maven-site' ) {
+      if ( rec.data.provider == 'site' ) {
         this.find( 'name', 'writePolicy' )[0].setValue( 'ALLOW_WRITE' );
       }
       else {
@@ -31,7 +31,7 @@
     populateFields:function ( arr, srcObj, fpanel ) {
       Sonatype.repoServer.HostedRepositorySummaryPanel.superclass.populateFields.call( this, arr, srcObj, fpanel );
 
-      if ( this.payload.data.provider == 'maven-site' ) {
+      if ( this.payload.data.provider == 'site' ) {
         this.populateSiteDistributionManagementField(
           this.payload.data.id, this.payload.data.contentResourceURI
         );

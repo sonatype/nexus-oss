@@ -40,7 +40,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  *
  * @author cstamas
  */
-@Named( "maven-site" )
+@Named( "site" )
 public class DefaultSiteRepository
     extends AbstractWebSiteRepository
     implements SiteRepository, WebSiteRepository
@@ -51,8 +51,8 @@ public class DefaultSiteRepository
     private final Configurator repositoryConfigurator;
 
     @Inject
-    public DefaultSiteRepository( final @Named( "maven-site" ) ContentClass contentClass,
-                                  final @Named( "maven-site" ) Configurator repositoryConfigurator )
+    public DefaultSiteRepository( final @Named( "site" ) ContentClass contentClass,
+                                  final @Named( "site" ) Configurator repositoryConfigurator )
     {
 
         this.contentClass = checkNotNull( contentClass );

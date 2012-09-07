@@ -35,7 +35,7 @@ public class SiteRepositoryTemplateProvider
 
     public static final String PROVIDER_ID = "site-repository";
 
-    private static final String MAVEN_SITE_ID = "maven-site";
+    private static final String MAVEN_SITE_ID = "site";
 
     private final RepositoryTypeRegistry repositoryTypeRegistry;
 
@@ -65,6 +65,6 @@ public class SiteRepositoryTemplateProvider
         throws InitializationException
     {
         repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor(
-            WebSiteRepository.class, "maven-site", "sites" ) );
+            WebSiteRepository.class, "site", "sites" ) );
     }
 }

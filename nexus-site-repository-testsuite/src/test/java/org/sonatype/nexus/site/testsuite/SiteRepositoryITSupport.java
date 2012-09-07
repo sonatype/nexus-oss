@@ -108,7 +108,7 @@ public abstract class SiteRepositoryITSupport
         repository.setId( repositoryId );
         repository.setName( repository.getId() );
         repository.setRepoType( "hosted" );
-        repository.setProvider( "maven-site" );
+        repository.setProvider( "site" );
         repository.setProviderRole( WebSiteRepository.class.getName() );
         repository.setRepoPolicy( RepositoryPolicy.MIXED.name() );
         repository.setBrowseable( true );

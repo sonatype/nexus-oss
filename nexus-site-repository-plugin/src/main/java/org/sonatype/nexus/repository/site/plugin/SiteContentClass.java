@@ -29,7 +29,7 @@ public class SiteContentClass
     extends AbstractIdContentClass
 {
 
-    public static final String ID = "maven-site";
+    public static final String ID = "site";
 
     public static final String NAME = "Site";
 

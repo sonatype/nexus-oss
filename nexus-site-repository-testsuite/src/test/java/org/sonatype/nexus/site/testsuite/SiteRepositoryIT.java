@@ -67,7 +67,7 @@ public class SiteRepositoryIT
                 }
             } );
 
-        assertThat( typeFormats, hasItem( "maven-site" ) );
+        assertThat( typeFormats, hasItem( "site" ) );
     }
 
     /**
