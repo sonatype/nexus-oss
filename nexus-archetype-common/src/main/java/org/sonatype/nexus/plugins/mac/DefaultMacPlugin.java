@@ -25,7 +25,7 @@ public class DefaultMacPlugin
 {
     @Requirement
     private NexusIndexer indexer;
-
+    
     /**
      * Lists available archatypes for given request.
      * 
@@ -76,10 +76,8 @@ public class DefaultMacPlugin
 
         try
         {
-            ArchetypeCatalog catalog = new ArchetypeCatalog();
-
+            final ArchetypeCatalog catalog = new ArchetypeCatalog();
             Archetype archetype = null;
-
             // fill it in
             for ( ArtifactInfo info : infos )
             {
@@ -93,10 +91,8 @@ public class DefaultMacPlugin
                 {
                     archetype.setRepository( request.getRepositoryUrl() );
                 }
-
                 catalog.addArchetype( archetype );
             }
-
             return catalog;
         }
         finally
