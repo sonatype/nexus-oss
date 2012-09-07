@@ -1,124 +1,29 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
-    <version>16</version>
-    <relativePath>../spice-parent/pom.xml</relativePath>
+    <version>20</version>
   </parent>
 
-  <artifactId>nexus-archetype-common</artifactId>
+  <artifactId>nexus-archetype-common-parent</artifactId>
   <version>1.2-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-  <name>Nexus Maven Archetype Catalog Plugin Common</name>
+  <name>Nexus Maven Archetype Catalog Parent</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spice-inject-plexus.version>1.4.3</spice-inject-plexus.version>
-    <plexus.version>1.5.4</plexus.version>
     <maven-indexer.version>4.1.3-SONATYPE</maven-indexer.version>
   </properties>
+  
+  <modules>
+    <module>nexus-archetype-common</module>
+    <module>nexus-archetype-common-cli</module>
+  </modules>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.archetype</groupId>
-      <artifactId>archetype-catalog</artifactId>
-      <version>2.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.indexer</groupId>
-      <artifactId>indexer-core</artifactId>
-      <version>${maven-indexer.version}</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-      <version>${spice-inject-plexus.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-      <version>${plexus.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-cli</artifactId>
-      <version>1.5</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-        <version>${plexus.version}</version>
-        <executions>
-          <execution>
-            <id>process-classes</id>
-            <goals>
-              <goal>generate-metadata</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>process-test-classes</id>
-            <goals>
-              <goal>generate-test-metadata</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.2</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>cli</shadedClassifierName>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>org.sonatype.nexus.plugins.mac.cli.NexusArchetypeCli</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-    </plugins>
-  </build>
 </project>
