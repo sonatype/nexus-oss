@@ -27,6 +27,11 @@ public interface SiteRepository
 {
 
     /**
+     * ID of site repository.
+     */
+    public static final String ID = "site";
+
+    /**
      * Accepts a web site az ZIP file, and automatically "unzips" it honoring the dir structures in ZIP file and
      * prefixing those with the prefix.
      *

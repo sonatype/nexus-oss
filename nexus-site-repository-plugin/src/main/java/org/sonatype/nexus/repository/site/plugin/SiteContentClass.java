@@ -23,19 +23,17 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  *
  * @author cstamas
  */
-@Named( SiteContentClass.ID )
+@Named( SiteRepository.ID )
 @Singleton
 public class SiteContentClass
     extends AbstractIdContentClass
 {
 
-    public static final String ID = "site";
-
     public static final String NAME = "Site";
 
     public String getId()
     {
-        return ID;
+        return SiteRepository.ID;
     }
 
     @Override

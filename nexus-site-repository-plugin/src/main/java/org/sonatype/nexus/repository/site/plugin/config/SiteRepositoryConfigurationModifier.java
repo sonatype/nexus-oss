@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.configuration.application.ConfigurationModifier;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.repository.site.plugin.SiteRepository;
 
 /**
  * Modifies nexus.xml if needed:
@@ -44,7 +45,7 @@ public class SiteRepositoryConfigurationModifier
             {
                 if ( "maven-site".equals( repository.getProviderHint() ) )
                 {
-                    repository.setProviderHint( "site" );
+                    repository.setProviderHint( SiteRepository.ID );
                     modified = true;
                 }
             }
@@ -56,12 +57,12 @@ public class SiteRepositoryConfigurationModifier
             {
                 if ( "maven-site".equals( repositoryTarget.getId() ) )
                 {
-                    repositoryTarget.setId( "site" );
+                    repositoryTarget.setId( SiteRepository.ID );
                     modified = true;
                 }
                 if ( "maven-site".equals( repositoryTarget.getContentClass() ) )
                 {
-                    repositoryTarget.setContentClass( "site" );
+                    repositoryTarget.setContentClass( SiteRepository.ID );
                     modified = true;
                 }
             }

@@ -35,8 +35,6 @@ public class SiteRepositoryTemplateProvider
 
     public static final String PROVIDER_ID = "site-repository";
 
-    private static final String MAVEN_SITE_ID = "site";
-
     private final RepositoryTypeRegistry repositoryTypeRegistry;
 
     @Inject
@@ -51,7 +49,7 @@ public class SiteRepositoryTemplateProvider
 
         try
         {
-            templates.add( new SiteRepositoryTemplate( this, MAVEN_SITE_ID, "Site (hosted)" ) );
+            templates.add( new SiteRepositoryTemplate( this, SiteRepository.ID, "Site (hosted)" ) );
         }
         catch ( Exception e )
         {

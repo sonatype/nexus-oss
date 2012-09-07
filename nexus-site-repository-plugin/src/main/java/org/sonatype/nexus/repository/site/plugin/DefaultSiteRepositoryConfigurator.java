@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
 
-@Named( "site" )
+@Named( SiteRepository.ID )
 @Singleton
 public class DefaultSiteRepositoryConfigurator
     extends AbstractWebSiteRepositoryConfigurator

@@ -38,7 +38,7 @@ public class SiteRepositoryTemplate
         repo.setId( "" );
 
         repo.setProviderRole( WebSiteRepository.class.getName() );
-        repo.setProviderHint( "site" );
+        repo.setProviderHint( SiteRepository.ID );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
