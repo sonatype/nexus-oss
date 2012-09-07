@@ -14,6 +14,7 @@ package org.sonatype.nexus.test.utils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.inError;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
@@ -149,6 +150,23 @@ public class RepositoriesNexusRestClient
         }
 
         return responseResource;
+    }
+
+    /**
+     * Updates remote URL for a proxy repository.
+     *
+     * @param repositoryId proxy repository id
+     * @param url          new URL
+     * @return updated repository
+     * @throws IOException if a problem occurred during update
+     */
+    public RepositoryBaseResource updateProxyRepositoryRemoteUrl( final String repositoryId, final String url )
+        throws IOException
+    {
+        final RepositoryBaseResource repository = getRepository( repositoryId );
+        assertThat( repository, instanceOf( RepositoryResource.class ) );
+        ( (RepositoryResource) repository ).getRemoteStorage().setRemoteStorageUrl( url );
+        return updateRepo( repository );
     }
 
     /**
