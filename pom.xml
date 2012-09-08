@@ -86,12 +86,6 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-testsuite-support</artifactId>
-        <version>${nexus-testsuite-support.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-test-api</artifactId>
         <version>${nexus.version}</version>
         <scope>test</scope>
@@ -102,7 +96,16 @@
         <version>${nexus.version}</version>
         <scope>test</scope>
       </dependency>
-
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-support</artifactId>
+        <version>${nexus-testsuite-support.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-client</artifactId>
+        <version>${nexus-testsuite-support.version}</version>
+      </dependency>
 
       <!-- #ITSet BEGINS -->
       <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->

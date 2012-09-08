@@ -20,6 +20,10 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-testsuite-support</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-testsuite-client</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -40,6 +44,33 @@
       </testResource>
     </testResources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-plugin-bundle</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-yum-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <type>zip</type>
+                  <classifier>bundle</classifier>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                  <destFileName>plugin.zip</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>

@@ -1,5 +1,9 @@
 package org.sonatype.nexus.plugins.yum.plugin;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.junit.Test;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.testsuite.support.NexusRunningITSupport;
@@ -15,9 +19,13 @@ public class GroupRepositoryIT extends NexusRunningITSupport {
 
   @Override
   protected NexusBundleConfiguration configureNexus(NexusBundleConfiguration configuration) {
-    return configuration.addPlugins(artifactResolver().resolvePluginFromDependencyManagement("org.sonatype.nexus.plugins",
-        "nexus-yum-plugin"));
+    URI pluginFileURI;
+    try {
+      pluginFileURI = getClass().getResource("/plugin.zip").toURI();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException("Could not determine plugin URI.", e);
+    }
+    return configuration.addPlugins(new File(pluginFileURI));
   }
-
 
 }
