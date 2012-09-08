@@ -52,19 +52,12 @@
 
   <properties>
     <!-- Set the Nexus version here, against which you build the plugin -->
-    <nexus.version>2.1.2</nexus.version>
+    <nexus.version>2.2-SNAPSHOT</nexus.version>
     <nexus-testsuite-support.version>2.2-SNAPSHOT</nexus-testsuite-support.version>
     <nexus-oss-webapp.version>2.2-SNAPSHOT</nexus-oss-webapp.version>
     <app.lifecycle.version>1.6</app.lifecycle.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hamcrest.version>1.2.1</hamcrest.version>
-    <nexus.start.command>start</nexus.start.command>
-    <nexus.root.dir>${project.build.directory}/nexus</nexus.root.dir>
-    <nexus.base.dir>${nexus.root.dir}/nexus-${nexus.version}</nexus.base.dir>
-    <nexus.plugin.dir>${nexus.base.dir}/nexus/WEB-INF/plugin-repository</nexus.plugin.dir>
-    <nexus.exec>${nexus.base.dir}/bin/nexus</nexus.exec>
-    <nexus.work.dir>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</nexus.work.dir>
-    <nexus.port>8081</nexus.port>
     <skip.unittests>false</skip.unittests>
   </properties>
 

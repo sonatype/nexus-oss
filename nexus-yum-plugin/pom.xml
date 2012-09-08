@@ -23,6 +23,13 @@
     <pluginName>Nexus Yum Plugin</pluginName>
     <pluginDescription>Allows Nexus to create yum repositories for uploaded RPM packages</pluginDescription>
     <pluginSiteUrl>https://github.com/sonatype/nexus-yum-plugin</pluginSiteUrl>
+    <nexus.start.command>start</nexus.start.command>
+    <nexus.root.dir>${project.build.directory}/nexus</nexus.root.dir>
+    <nexus.base.dir>${nexus.root.dir}/nexus-oss-webapp-${nexus.version}</nexus.base.dir>
+    <nexus.plugin.dir>${nexus.base.dir}/nexus/WEB-INF/plugin-repository</nexus.plugin.dir>
+    <nexus.exec>${nexus.base.dir}/bin/nexus</nexus.exec>
+    <nexus.work.dir>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</nexus.work.dir>
+    <nexus.port>8081</nexus.port>
   </properties>
 
   <dependencies>
@@ -133,13 +140,12 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus</artifactId>
+                  <artifactId>nexus-oss-webapp</artifactId>
                   <version>${nexus.version}</version>
                   <classifier>bundle</classifier>
                   <type>tar.gz</type>
                 </artifactItem>
               </artifactItems>
-              <!-- other configurations here -->
               <outputDirectory>${nexus.root.dir}</outputDirectory>
             </configuration>
           </execution>
@@ -200,7 +206,7 @@
           </dependency>
         </dependencies>
       </plugin>
-
+      
       <!-- run integration tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -228,5 +234,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
