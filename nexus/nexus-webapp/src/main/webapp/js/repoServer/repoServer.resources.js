@@ -28,7 +28,7 @@
 
   var proxyHostname = 'This is the host name of the HTTP proxy used for remote connections. (no HTTP/HTTPs required...just the host or ip)';
   var proxyPort = 'This is the port number of the HTTP proxy used for remote connections.';
-  var nonProxyHosts = 'Enter a hostname and click "Add" to add it to the list.';
+  var nonProxyHosts = 'List of host names to exclude from http proxy. Regular expressions are supported, e.g. \'.*\.somecompany\.com\'.';
 
   var username = 'The username used for authentication to the HTTP proxy.';
   var password = 'The password used for authentication to the HTTP proxy.';
