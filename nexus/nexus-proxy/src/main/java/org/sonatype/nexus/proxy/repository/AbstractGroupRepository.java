@@ -89,25 +89,30 @@ public abstract class AbstractGroupRepository
     @Override
     public void onEvent( Event<?> evt )
     {
-        // we must do this before the super.onEvent() call!
-        // members changed if config was dirty AND the "old" and "new" member ID list (List<String>) are NOT equal
-        boolean membersChanged =
-            getCurrentCoreConfiguration().isDirty()
-                && !getExternalConfiguration( false ).getMemberRepositoryIds().equals(
-                    getExternalConfiguration( true ).getMemberRepositoryIds() );
-
+        boolean membersChanged = false;
         List<String> currentMemberIds = Collections.emptyList();
         List<String> newMemberIds = Collections.emptyList();
-        // we have to "remember" these before commit happens in super.onEvent
-        // but ONLY if we are dirty and we do have "member changes" (see membersChanged above)
-        // this same boolean drives the firing of the event too, for which we are actually collecting these lists
-        // if no event to be fired, these lines should also not execute, since they are "dirtying" the config
-        // if membersChange is true, config is already dirty, and we DO KNOW there is member change to happen
-        // and we will fire the event too
-        if ( membersChanged )
+
+        if ( isConfigured() )
         {
-            currentMemberIds = getExternalConfiguration( false ).getMemberRepositoryIds();
-            newMemberIds = getExternalConfiguration( true ).getMemberRepositoryIds();
+            // we must do this before the super.onEvent() call!
+            // members changed if config was dirty AND the "old" and "new" member ID list (List<String>) are NOT equal
+            membersChanged =
+                getCurrentCoreConfiguration().isDirty()
+                    && !getExternalConfiguration( false ).getMemberRepositoryIds().equals(
+                        getExternalConfiguration( true ).getMemberRepositoryIds() );
+
+            // we have to "remember" these before commit happens in super.onEvent
+            // but ONLY if we are dirty and we do have "member changes" (see membersChanged above)
+            // this same boolean drives the firing of the event too, for which we are actually collecting these lists
+            // if no event to be fired, these lines should also not execute, since they are "dirtying" the config
+            // if membersChange is true, config is already dirty, and we DO KNOW there is member change to happen
+            // and we will fire the event too
+            if ( membersChanged )
+            {
+                currentMemberIds = getExternalConfiguration( false ).getMemberRepositoryIds();
+                newMemberIds = getExternalConfiguration( true ).getMemberRepositoryIds();
+            }
         }
 
         super.onEvent( evt );
