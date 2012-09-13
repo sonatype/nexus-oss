@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext,Sonatype*/
 (function () {
 
   var hostedHandler = Sonatype.repoServer.HostedRepositoryEditor.prototype.afterProviderSelectHandler;
@@ -18,10 +19,9 @@
     afterProviderSelectHandler:function ( combo, rec, index ) {
       hostedHandler.apply( this, arguments );
 
-      if ( rec.data.provider == 'site' ) {
+      if ( rec.data.provider === 'site' ) {
         this.find( 'name', 'writePolicy' )[0].setValue( 'ALLOW_WRITE' );
-      }
-      else {
+      } else {
         this.find( 'name', 'writePolicy' )[0].setValue( 'ALLOW_WRITE_ONCE' );
       }
     }
@@ -31,12 +31,11 @@
     populateFields:function ( arr, srcObj, fpanel ) {
       Sonatype.repoServer.HostedRepositorySummaryPanel.superclass.populateFields.call( this, arr, srcObj, fpanel );
 
-      if ( this.payload.data.provider == 'site' ) {
+      if ( this.payload.data.provider === 'site' ) {
         this.populateSiteDistributionManagementField(
           this.payload.data.id, this.payload.data.contentResourceURI
         );
-      }
-      else {
+      } else {
         this.populateDistributionManagementField(
           this.payload.data.id, this.payload.data.repoPolicy, this.payload.data.contentResourceURI
         );
@@ -51,4 +50,4 @@
       this.find( 'name', 'distMgmtField' )[0].setRawValue( distMgmtString );
     }
   } );
-})();
+}());
