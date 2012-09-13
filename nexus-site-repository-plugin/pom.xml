@@ -72,7 +72,7 @@
               <goal>aggregate</goal>
             </goals>
             <configuration>
-              <output>${project.build.directory}/classes/static/js/nexus-site-plugin-all.js</output>
+              <output>${project.build.directory}/classes/static/js/${project.version}/${project.artifactId}-all.js</output>
               <nosuffix>true</nosuffix>
               <nomunge>true</nomunge>
               <jswarn>false</jswarn>

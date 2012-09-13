@@ -13,10 +13,12 @@
 package org.sonatype.nexus.repository.site.plugin.ui;
 
 import java.util.Map;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
+import org.sonatype.nexus.repository.site.plugin.SiteRepositoryPlugin;
 
 @Named( "SiteRepositoryNexusIndexHtmlCustomizer" )
 @Singleton
@@ -24,15 +26,18 @@ public class SiteRepositoryNexusIndexHtmlCustomizer
     extends AbstractNexusIndexHtmlCustomizer
 {
 
+    private final SiteRepositoryPlugin owner;
+
+    @Inject
+    public SiteRepositoryNexusIndexHtmlCustomizer( final SiteRepositoryPlugin owner )
+    {
+        this.owner = owner;
+    }
+
     @Override
     public String getPostHeadContribution( Map<String, Object> ctx )
     {
-        final String version = getVersionFromJarFile(
-            "/META-INF/maven/org.sonatype.nexus.plugins/nexus-site-repository-plugin/pom.properties"
-        );
-
-        return "<script src=\"static/js/nexus-site-repository-plugin-all.js" + ( version == null ? "" : "?" + version )
-            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+        return "<script src=\"static/js/" + owner.getVersion() + "/" + owner.getId()  + "-all.js\" type=\"text/javascript\" charset=\"utf-8\"></script>";
     }
 
 }
