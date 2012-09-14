@@ -64,6 +64,8 @@ public class CommandMonitorThread
     public CommandMonitorThread( final int port, final Command... commands )
         throws IOException
     {
+        setDaemon( true );
+
         if ( commands != null )
         {
             for ( final Command command : commands )
