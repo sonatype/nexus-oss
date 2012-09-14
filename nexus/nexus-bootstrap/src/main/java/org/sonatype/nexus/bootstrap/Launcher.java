@@ -32,6 +32,8 @@ import org.sonatype.appcontext.publisher.AbstractStringDumpingEntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
+import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
@@ -273,7 +275,9 @@ public class Launcher
                         Launcher.this.commandStop();
                     }
                 } ),
-                new PingCommand()
+                new PingCommand(),
+                new ExitCommand(),
+                new HaltCommand()
             ).start();
         }
     }

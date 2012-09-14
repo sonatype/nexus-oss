@@ -19,6 +19,8 @@ import java.lang.reflect.Method;
 
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
 import org.sonatype.nexus.bootstrap.monitor.ShutdownIfNotAliveThread;
+import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 import org.tanukisoftware.wrapper.WrapperManager;
@@ -128,7 +130,9 @@ public class NexusITLauncher
                         WrapperManager.stopAndReturn( 0 );
                     }
                 } ),
-                new PingCommand()
+                new PingCommand(),
+                new ExitCommand(),
+                new HaltCommand()
             ).start();
         }
     }

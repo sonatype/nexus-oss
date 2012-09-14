@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
@@ -160,7 +162,9 @@ public class DefaultNexusBundle
             keepAliveThread = new CommandMonitorThread(
                 keepAlivePort,
                 new PingCommand(),
-                new StopMonitorCommand()
+                new StopMonitorCommand(),
+                new ExitCommand(),
+                new HaltCommand()
             );
             keepAliveThread.start();
         }
