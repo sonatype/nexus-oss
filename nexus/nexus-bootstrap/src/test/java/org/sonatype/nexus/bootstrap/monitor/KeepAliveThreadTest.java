@@ -10,29 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.monitor;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
-import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
+
 /**
- * {@link ShutdownIfNotAliveThread} unit tests.
+ * Test for {@link KeepAliveThreadTest}.
  *
  * @since 2.2
  */
-public class ShutdownIfNotAliveThreadTest
+public class KeepAliveThreadTest
     extends TestSupport
 {
-
     @Test
     public void keepAlive()
         throws Exception
@@ -44,30 +44,32 @@ public class ShutdownIfNotAliveThreadTest
         );
         keepAliveThread.start();
 
-        final AtomicBoolean shutDown = new AtomicBoolean( false );
+        final AtomicBoolean shutDown = new AtomicBoolean(false);
 
-        ShutdownIfNotAliveThread aliveThread = new ShutdownIfNotAliveThread(
+        KeepAliveThread thread = new KeepAliveThread(
+            LOCALHOST,
+            keepAliveThread.getPort(),
+            100,
+            1000,
             new Runnable()
             {
                 @Override
-                public void run()
-                {
-                    shutDown.set( true );
+                public void run() {
+                    shutDown.set(true);
                 }
-            }, LOCALHOST, keepAliveThread.getPort(), 100, 1000
+            }
         );
-        aliveThread.start();
+        thread.start();
 
-        Thread.sleep( 2000 );
+        Thread.sleep(2000);
 
-        new CommandMonitorTalker( LOCALHOST, keepAliveThread.getPort() ).send( STOP_MONITOR_COMMAND );
+        new CommandMonitorTalker(LOCALHOST, keepAliveThread.getPort()).send(STOP_MONITOR_COMMAND);
         keepAliveThread.join();
 
-        aliveThread.interrupt();
-        aliveThread.stopRunning();
-        aliveThread.join();
+        thread.interrupt();
+        thread.stopRunning();
+        thread.join();
 
-        assertThat( shutDown.get(), is( true ) );
+        assertThat(shutDown.get(), is(true));
     }
-
 }

@@ -12,18 +12,21 @@
  */
 package org.sonatype.nexus.bundle.launcher.internal;
 
-import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
-
-import java.io.IOException;
-import java.lang.reflect.Method;
-
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
-import org.sonatype.nexus.bootstrap.monitor.ShutdownIfNotAliveThread;
+import org.sonatype.nexus.bootstrap.monitor.KeepAliveThread;
 import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 import org.tanukisoftware.wrapper.WrapperManager;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PING_INTERVAL;
+import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PORT;
+import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TIMEOUT;
 
 /**
  * The main Nexus class (launcher) used to replace Nexus launchers for versions < 2.2.
@@ -48,24 +51,6 @@ public class NexusITLauncher
      * If not present, command monitor will not be started.
      */
     public static final String COMMAND_MONITOR_PORT = NexusITLauncher.class.getName() + ".monitor.port";
-
-    /**
-     * Name of environment variable/system property to be looked up for the port number of keep alive thread.
-     * If not present, keep alive will not be started.
-     */
-    public static final String KEEP_ALIVE_PORT = NexusITLauncher.class.getName() + ".keepAlive.port";
-
-    /**
-     * Name of environment variable/system property to be looked up for keep alive ping interval.
-     * If not present, a default of 5 seconds will be used.
-     */
-    public static final String KEEP_ALIVE_PING_INTERVAL = ShutdownIfNotAliveThread.class.getName() + ".pingInterval";
-
-    /**
-     * Name of environment variable/system property to be looked up for keep alive timeout.
-     * If not present, a default of 1 second will be used.
-     */
-    public static final String KEEP_ALIVE_TIMEOUT = ShutdownIfNotAliveThread.class.getName() + ".timeout";
 
     /**
      * 5 seconds in milliseconds.
@@ -170,15 +155,7 @@ public class NexusITLauncher
                     timeout = ONE_SECOND;
                 }
             }
-            new ShutdownIfNotAliveThread(
-                new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        WrapperManager.stopAndReturn( 0 );
-                    }
-                },
+            new KeepAliveThread(
                 LOCALHOST,
                 Integer.parseInt( port ),
                 Integer.parseInt( pingInterval ),

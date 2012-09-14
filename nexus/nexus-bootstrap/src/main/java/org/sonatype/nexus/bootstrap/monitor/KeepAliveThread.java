@@ -19,54 +19,79 @@ import java.net.ConnectException;
 import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
 
 /**
- * Thread which pings a specified host/port at a configured interval and halts the jvm if the remote monitor is unreachable.
+ * Thread which pings a specified host:port at a configured interval and executes a task if
+ * the remote monitor is unreachable (ie. {@link ConnectException}).
  *
  * @since 2.2
  */
-public class HaltIfRemoteMonitorUnreachableThread
+public class KeepAliveThread
     extends Thread
 {
-    // NOTE: Avoiding any logging our sysout usage by this class, this could lockup logging when its detected a failure and attempting to shutdown
+    // NOTE: Avoiding any logging our sysout usage by this class, this could lockup logging when its detected remote unreachable
 
-    /**
-     * Interval between pinging.
-     */
-    private int pingInterval;
+    public static final String KEEP_ALIVE_PORT = KeepAliveThread.class.getName() + ".port";
 
-    /**
-     * Ping timeout.
-     */
-    private int timeout;
+    public static final String KEEP_ALIVE_PING_INTERVAL = KeepAliveThread.class.getName() + ".pingInterval";
 
-    /**
-     * True if this thread should continue running.
-     */
-    private boolean running;
+    public static final String KEEP_ALIVE_TIMEOUT = KeepAliveThread.class.getName() + ".timeout";
 
-    /**
-     * Command monitor talker used to ping the configured port. Never nul.
-     */
     private final CommandMonitorTalker talker;
 
+    private final int interval;
+
+    private final int timeout;
+
+    private final Runnable task;
+
+    private volatile boolean running;
+
     /**
-     * @param host         host to be pinged
-     * @param port         port on host to be pinged
-     * @param pingInterval interval between pings
-     * @param timeout      ping timeout
+     * Execute custom {@link Runtime} when remote is unreachable.
+     *
+     * @param host      host to be pinged
+     * @param port      port on host to be pinged
+     * @param interval  interval between pings
+     * @param timeout   ping timeout
+     * @param task      task to execute when remote is unreachable
      */
-    public HaltIfRemoteMonitorUnreachableThread(final String host,
-                                                final int port,
-                                                final int pingInterval,
-                                                final int timeout)
+    public KeepAliveThread(final String host,
+                           final int port,
+                           final int interval,
+                           final int timeout,
+                           final Runnable task)
         throws IOException
     {
         setDaemon(true);
         setName(getClass().getName());
 
-        this.pingInterval = pingInterval;
-        this.timeout = timeout;
         this.talker = new CommandMonitorTalker(host, port);
+        this.interval = interval;
+        this.timeout = timeout;
+        this.task = task;
         this.running = true;
+    }
+
+    /**
+     * Halt the JVM when remote is unreachable.
+     *
+     * @param host     host to be pinged
+     * @param port     port on host to be pinged
+     * @param interval interval between pings
+     * @param timeout  ping timeout
+     */
+    public KeepAliveThread(final String host,
+                           final int port,
+                           final int interval,
+                           final int timeout)
+        throws IOException
+    {
+        this(host, port, interval, timeout, new Runnable()
+        {
+            @Override
+            public void run() {
+                Runtime.getRuntime().halt(666);
+            }
+        });
     }
 
     /**
@@ -78,15 +103,16 @@ public class HaltIfRemoteMonitorUnreachableThread
             try {
                 try {
                     ping();
-                    sleep(pingInterval);
+                    sleep(interval);
                 }
-                catch (final InterruptedException ignore) {
+                catch (final InterruptedException e) {
+                    // re-ping if we were interrupted for any reason
                     ping();
                 }
             }
             catch (ConnectException e) {
                 stopRunning();
-                halt();
+                executeTask();
             }
         }
     }
@@ -109,8 +135,8 @@ public class HaltIfRemoteMonitorUnreachableThread
     }
 
     // @TestAccessible
-    void halt() {
-        Runtime.getRuntime().halt(666);
+    void executeTask() {
+        task.run();
     }
 
     /**

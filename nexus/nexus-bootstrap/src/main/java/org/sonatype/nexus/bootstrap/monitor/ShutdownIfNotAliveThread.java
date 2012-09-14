@@ -17,22 +17,25 @@ import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COM
 import java.io.IOException;
 import java.net.ConnectException;
 
-import org.sonatype.nexus.bootstrap.log.LogProxy;
+//import org.sonatype.nexus.bootstrap.log.LogProxy;
 
 /**
  * Thread which pings a specified host/port at a configured interval and runs a shutdown coe in case that there is no
  * response (connection refused).
  *
  * @since 2.2
+ * @deprecated Use {@link KeepAliveThread} instead.
  */
+@Deprecated
 public class ShutdownIfNotAliveThread
     extends Thread
 {
+    // NOTE: Avoiding any logging our sysout usage by this class, this could lockup logging when its detected a failure and attempting to shutdown
 
-    /**
-     * Logger. Uses log proxy to be able to redirect log output to System.out if SLF4J is not available (Nexus < 2.1).
-     */
-    private static LogProxy log = LogProxy.getLogger( ShutdownIfNotAliveThread.class );
+    ///**
+    // * Logger. Uses log proxy to be able to redirect log output to System.out if SLF4J is not available (Nexus < 2.1).
+    // */
+    //private static LogProxy log = LogProxy.getLogger( ShutdownIfNotAliveThread.class );
 
     /**
      * Runnable to executed in case that keep alive determines that it should shutdown Nexus.
@@ -99,10 +102,10 @@ public class ShutdownIfNotAliveThread
     @Override
     public void run()
     {
-        log.info(
-            "Shutdown thread pinging {} on port {} every {} milliseconds",
-            talker.getHost(), talker.getPort(), pingInterval
-        );
+        //log.info(
+        //    "Shutdown thread pinging {} on port {} every {} milliseconds",
+        //    talker.getHost(), talker.getPort(), pingInterval
+        //);
 
         while ( running )
         {
@@ -125,7 +128,7 @@ public class ShutdownIfNotAliveThread
             }
         }
 
-        log.debug( "Stopped" );
+        //log.debug( "Stopped" );
     }
 
     /**
@@ -138,17 +141,17 @@ public class ShutdownIfNotAliveThread
     {
         try
         {
-            log.debug( "Pinging {} on port {} ...", talker.getHost(), talker.getPort() );
+            //log.debug( "Pinging {} on port {} ...", talker.getHost(), talker.getPort() );
             talker.send( PING_COMMAND, timeout );
         }
         catch ( ConnectException e )
         {
-            log.warn( "Exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
+            //log.warn( "Exception got while pinging {}:{}", e.getClass().getName(), e.getMessage() );
             throw e;
         }
         catch ( Exception ignore )
         {
-            log.info( "Skipping exception got while pinging {}:{}", ignore.getClass().getName(), ignore.getMessage() );
+            //log.info( "Skipping exception got while pinging {}:{}", ignore.getClass().getName(), ignore.getMessage() );
         }
     }
 
@@ -158,7 +161,7 @@ public class ShutdownIfNotAliveThread
     // @TestAccessible
     void shutdown()
     {
-        log.warn( "Shutting down as there is no ping response from {} on port {}", talker.getHost(), talker.getPort() );
+        //log.warn( "Shutting down as there is no ping response from {} on port {}", talker.getHost(), talker.getPort() );
         shutdown.run();
     }
 
