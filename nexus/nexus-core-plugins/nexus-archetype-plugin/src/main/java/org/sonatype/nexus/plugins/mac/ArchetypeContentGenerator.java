@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.RepositoryURLBuilder;
 
 /**
  * Archetype catalog content generator.
@@ -49,6 +50,9 @@ public class ArchetypeContentGenerator
     @Inject
     private IndexArtifactFilter indexArtifactFilter;
 
+    @Inject
+    private RepositoryURLBuilder repositoryURLBuilder;
+
     @Override
     public String getGeneratorId()
     {
@@ -62,7 +66,8 @@ public class ArchetypeContentGenerator
         // make length unknown (since it will be known only in the moment of actual content pull)
         item.setLength( -1 );
 
-        return new ArchetypeContentLocator( repository.getId(), 
+        return new ArchetypeContentLocator( repository,
+            repositoryURLBuilder.getExposedRepositoryContentUrl( repository ),
             ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( repository ), macPlugin,
             new ArtifactInfoFilter()
             {

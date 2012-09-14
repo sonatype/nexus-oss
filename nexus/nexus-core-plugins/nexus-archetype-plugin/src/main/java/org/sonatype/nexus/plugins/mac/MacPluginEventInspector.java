@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugins.mac;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -39,12 +39,10 @@ import org.sonatype.plexus.appevents.Event;
  * @author cstamas
  */
 public class MacPluginEventInspector
+    extends AbstractLoggingComponent
     implements EventInspector
 {
     private static final String ARCHETYPE_PATH = "/archetype-catalog.xml";
-
-    @Inject
-    private Logger logger;
 
     @Inject
     @Named( "maven2" )
@@ -117,18 +115,18 @@ public class MacPluginEventInspector
             }
             catch ( RepositoryNotAvailableException e )
             {
-                logger.info( "Unable to install the generated archetype catalog, repository \""
+                getLogger().info( "Unable to install the generated archetype catalog, repository \""
                     + e.getRepository().getId() + "\" is out of service." );
             }
             catch ( Exception e )
             {
-                if ( logger.isDebugEnabled() )
+                if ( getLogger().isDebugEnabled() )
                 {
-                    logger.info( "Unable to install the generated archetype catalog!", e );
+                    getLogger().info( "Unable to install the generated archetype catalog!", e );
                 }
                 else
                 {
-                    logger.info( "Unable to install the generated archetype catalog:" + e.getMessage() );
+                    getLogger().info( "Unable to install the generated archetype catalog:" + e.getMessage() );
                 }
             }
         }

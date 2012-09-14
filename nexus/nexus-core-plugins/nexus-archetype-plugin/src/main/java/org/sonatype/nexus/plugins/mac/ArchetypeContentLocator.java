@@ -21,20 +21,27 @@ import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Writer;
 import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.context.IndexingContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * A content locator to generate archetype catalog. This way, the actual work (search, archetype catalog model fillup
  * from results, converting it to string and flushing it as byte array backed stream) is postponed to very last moment,
  * when the content itself is asked for.
- *
+ * 
  * @author cstamas
  */
 public class ArchetypeContentLocator
     implements ContentLocator
 {
+    private final Logger logger;
 
-    private final String repositoryId;
+    private final Repository repository;
+
+    private final String repositoryContentUrl;
 
     private final IndexingContext indexingContext;
 
@@ -44,10 +51,13 @@ public class ArchetypeContentLocator
 
     private volatile String payload;
 
-    public ArchetypeContentLocator( String repositoryId, IndexingContext indexingContext, MacPlugin macPlugin,
-                                    ArtifactInfoFilter artifactInfoFilter )
+    public ArchetypeContentLocator( final Repository repository, final String repositoryContentUrl,
+                                    final IndexingContext indexingContext, final MacPlugin macPlugin,
+                                    final ArtifactInfoFilter artifactInfoFilter )
     {
-        this.repositoryId = repositoryId;
+        this.logger = LoggerFactory.getLogger( getClass() );
+        this.repository = repository;
+        this.repositoryContentUrl = repositoryContentUrl;
         this.indexingContext = indexingContext;
         this.macPlugin = macPlugin;
         this.artifactInfoFilter = artifactInfoFilter;
@@ -58,25 +68,23 @@ public class ArchetypeContentLocator
     {
         if ( payload == null )
         {
-            // TODO: what if URL is needed?
-            // this content generator will be sucked from the repo root,
-            // so it is fine for it to have no repositoryUrl
-            // perm filter added, now this generator will generate catalog with archetypes that user
-            // fetching it may see
+            final MacRequest req = new MacRequest( repository.getId(), repositoryContentUrl, artifactInfoFilter );
 
-            // TODO: we have now the URL too, but I want to wait for ArchetypeCatalog improvements and possible changes
-            MacRequest req = new MacRequest( repositoryId, null, artifactInfoFilter );
+            // NEXUS-5216: Warn if indexing context is null (indexable=false) for given repository but continue
+            // to return the correct empty catalog
+            if ( indexingContext == null )
+            {
+                logger.info(
+                    "Archetype Catalog for repository {} is not buildable as it lacks IndexingContext (indexable=false?).",
+                    RepositoryStringUtils.getHumanizedNameString( repository ) );
+            }
 
             // get the catalog
-            ArchetypeCatalog catalog = macPlugin.listArcherypesAsCatalog( req, indexingContext );
-
+            final ArchetypeCatalog catalog = macPlugin.listArcherypesAsCatalog( req, indexingContext );
             // serialize it to XML
-            StringWriter sw = new StringWriter();
-
-            ArchetypeCatalogXpp3Writer writer = new ArchetypeCatalogXpp3Writer();
-
+            final StringWriter sw = new StringWriter();
+            final ArchetypeCatalogXpp3Writer writer = new ArchetypeCatalogXpp3Writer();
             writer.write( sw, catalog );
-
             payload = sw.toString();
         }
 
