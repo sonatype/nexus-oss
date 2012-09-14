@@ -82,6 +82,6 @@ public class Nexus2923SearchResultDownloadLinkIT
         throws Exception
     {
         // use sendMessage because this is a non-service-URL (?)
-        RequestFacade.sendMessage( new URL( link ), Method.GET, null, ResponseMatchers.respondsWithStatusCode( 301 ) ).release();
+        RequestFacade.sendMessage( new URL( link ), Method.GET, null, ResponseMatchers.respondsWithStatusCode( 307 ) ).release();
     }
 }

@@ -22,6 +22,7 @@ import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusC
 import static org.sonatype.nexus.test.utils.StatusMatchers.isNotFound;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.maven.index.artifact.Gav;
@@ -76,25 +77,7 @@ public class Nexus602SearchSnapshotArtifactIT
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_SNAPSHOT_REPO + "&g=" + gav.getGroupId()
                 + "&a=" + gav.getArtifactId() + "&v=" + gav.getVersion();
-        Response response = null;
-
-        try
-        {
-            response = RequestFacade.doGetRequest( serviceURI );
-            assertThat(
-                response,
-                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
-
-            RequestFacade.releaseResponse( response );
-
-            response =
-                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
-                    isSuccessful() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        assertRedirection( serviceURI );
     }
 
     @Test
@@ -105,25 +88,7 @@ public class Nexus602SearchSnapshotArtifactIT
             "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_REPO + "&g=" + gav.getGroupId() + "&a="
                 + "artifact" + "&v=" + "1.0";
 
-        Response response = null;
-        try
-        {
-            response = RequestFacade.doGetRequest( serviceURI );
-            assertThat(
-                response,
-                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
-
-            RequestFacade.releaseResponse( response );
-
-            // location is full url, so sendMessage directly
-            response =
-                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
-                    isSuccessful() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        assertRedirection( serviceURI );
     }
 
     @Test
@@ -133,25 +98,7 @@ public class Nexus602SearchSnapshotArtifactIT
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + NEXUS_602_GROUP + "&g=" + gav.getGroupId() + "&a="
                 + gav.getArtifactId() + "&v=" + gav.getVersion();
-        Response response = null;
-
-        try
-        {
-            response = RequestFacade.doGetRequest( serviceURI );
-            assertThat(
-                response,
-                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
-
-            RequestFacade.releaseResponse( response );
-
-            response =
-                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
-                    isSuccessful() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        assertRedirection( serviceURI );
     }
 
     @Test
@@ -162,25 +109,7 @@ public class Nexus602SearchSnapshotArtifactIT
             "service/local/artifact/maven/redirect?r=" + NEXUS_602_GROUP + "&g=" + gav.getGroupId() + "&a="
                 + "artifact" + "&v=" + "1.0";
 
-        Response response = null;
-        try
-        {
-            response = RequestFacade.doGetRequest( serviceURI );
-            assertThat(
-                response,
-                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
-
-            RequestFacade.releaseResponse( response );
-
-            // location is full url, so sendMessage directly
-            response =
-                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
-                    isSuccessful() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        assertRedirection( serviceURI );
     }
 
     @Test
@@ -190,25 +119,7 @@ public class Nexus602SearchSnapshotArtifactIT
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + NEXUS_602_GROUP + "&g=" + gav.getGroupId() + "&a="
                 + gav.getArtifactId() + "&v=LATEST";
-        Response response = null;
-
-        try
-        {
-            response = RequestFacade.doGetRequest( serviceURI );
-            assertThat(
-                response,
-                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
-
-            RequestFacade.releaseResponse( response );
-
-            response =
-                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
-                    isSuccessful() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        assertRedirection( serviceURI );
     }
 
     @Test
@@ -218,25 +129,7 @@ public class Nexus602SearchSnapshotArtifactIT
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + NEXUS_602_GROUP + "&g=" + gav.getGroupId() + "&a="
                 + gav.getArtifactId() + "&v=RELEASE";
-        Response response = null;
-
-        try
-        {
-            response = RequestFacade.doGetRequest( serviceURI );
-            assertThat(
-                response,
-                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
-
-            RequestFacade.releaseResponse( response );
-
-            response =
-                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
-                    isSuccessful() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        assertRedirection( serviceURI );
     }
 
     @Test
@@ -248,6 +141,30 @@ public class Nexus602SearchSnapshotArtifactIT
                 + "invalidArtifact" + "&v=" + "32.64";
 
         RequestFacade.doGetForStatus( serviceURI, isNotFound() );
+    }
+
+    private void assertRedirection( final String serviceURI )
+        throws IOException
+    {
+        Response response = null;
+
+        try
+        {
+            response = RequestFacade.doGetRequest( serviceURI );
+            assertThat(
+                response,
+                allOf( isRedirecting(), respondsWithStatusCode( 307 ), redirectLocation( notNullValue( String.class ) ) ) );
+
+            RequestFacade.releaseResponse( response );
+
+            response =
+                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
+                                           isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
 }

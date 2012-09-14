@@ -1020,7 +1020,7 @@ public abstract class AbstractNexusIntegrationTest
 
             assertThat(
                 response,
-                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
+                allOf( isRedirecting(), respondsWithStatusCode( 307 ), redirectLocation( notNullValue( String.class ) ) ) );
 
             serviceURI = response.getLocationRef().toString();
         }
