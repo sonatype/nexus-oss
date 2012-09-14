@@ -54,6 +54,7 @@ public class KeepAliveThread
      * @param timeout   ping timeout
      * @param task      task to execute when remote is unreachable
      */
+    // TestAccessible for more uses the task should be to HALT
     public KeepAliveThread(final String host,
                            final int port,
                            final int interval,
