@@ -22,6 +22,11 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
+/**
+ * This class is part of Nexus internal implementation and can be changed or removed without prio notice.
+ * 
+ * @since 2.2
+ */
 @Named
 @Singleton
 public class QueryStringBuilder
