@@ -52,7 +52,7 @@ public class KeepAliveThread
      * @param port      port on host to be pinged
      * @param interval  interval between pings
      * @param timeout   ping timeout
-     * @param task      task to execute when remote is unreachable
+     * @param task      task to execute when remote is unreachable, this task should not log or write to syslog if possible to avoid locking up on shutdown
      */
     // TestAccessible for most uses the task should be to HALT
     public KeepAliveThread(final String host,
