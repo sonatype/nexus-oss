@@ -13,10 +13,10 @@
 
 package org.sonatype.nexus.bootstrap.monitor;
 
+import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
+
 import java.io.IOException;
 import java.net.ConnectException;
-
-import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
 
 /**
  * Thread which pings a specified host:port at a configured interval and executes a task if
@@ -124,7 +124,7 @@ public class KeepAliveThread
      */
     private void ping() throws ConnectException {
         try {
-            talker.send(PING_COMMAND, timeout);
+            talker.send(PingCommand.NAME, timeout);
         }
         catch (ConnectException e) {
             throw e;

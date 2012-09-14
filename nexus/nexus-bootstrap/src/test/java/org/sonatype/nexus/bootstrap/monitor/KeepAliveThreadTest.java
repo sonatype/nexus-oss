@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
-import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
 
 /**
  * Test for {@link KeepAliveThreadTest}.
@@ -63,7 +62,7 @@ public class KeepAliveThreadTest
 
         Thread.sleep(2000);
 
-        new CommandMonitorTalker(LOCALHOST, keepAliveThread.getPort()).send(STOP_MONITOR_COMMAND);
+        new CommandMonitorTalker(LOCALHOST, keepAliveThread.getPort()).send(StopMonitorCommand.NAME);
         keepAliveThread.join();
 
         thread.interrupt();

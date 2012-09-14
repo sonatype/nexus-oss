@@ -104,7 +104,7 @@ public class CommandMonitorThread
 
                 if ( commandId == null )
                 {
-                    commandId = PingCommand.PING_COMMAND;
+                    commandId = PingCommand.NAME;
                 }
                 final Command command = commands.get( commandId );
                 if ( command == null )

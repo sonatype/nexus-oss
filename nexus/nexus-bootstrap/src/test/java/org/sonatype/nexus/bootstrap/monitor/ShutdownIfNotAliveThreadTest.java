@@ -15,7 +15,6 @@ package org.sonatype.nexus.bootstrap.monitor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
-import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -60,7 +59,7 @@ public class ShutdownIfNotAliveThreadTest
 
         Thread.sleep( 2000 );
 
-        new CommandMonitorTalker( LOCALHOST, keepAliveThread.getPort() ).send( STOP_MONITOR_COMMAND );
+        new CommandMonitorTalker( LOCALHOST, keepAliveThread.getPort() ).send(StopMonitorCommand.NAME);
         keepAliveThread.join();
 
         aliveThread.interrupt();

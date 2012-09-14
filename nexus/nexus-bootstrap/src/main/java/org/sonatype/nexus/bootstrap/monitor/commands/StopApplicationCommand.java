@@ -26,7 +26,7 @@ public class StopApplicationCommand
 
     private static final LogProxy log = LogProxy.getLogger( StopApplicationCommand.class );
 
-    public static final String STOP_APPLICATION_COMMAND = "STOP";
+    public static final String NAME = "STOP";
 
     private final Runnable shutdown;
 
@@ -42,7 +42,7 @@ public class StopApplicationCommand
     @Override
     public String getId()
     {
-        return STOP_APPLICATION_COMMAND;
+        return NAME;
     }
 
     @Override
