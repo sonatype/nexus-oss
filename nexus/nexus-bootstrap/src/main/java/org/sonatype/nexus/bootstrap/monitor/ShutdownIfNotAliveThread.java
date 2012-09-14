@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.bootstrap.monitor;
 
-import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
+import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -142,7 +142,7 @@ public class ShutdownIfNotAliveThread
         try
         {
             //log.debug( "Pinging {} on port {} ...", talker.getHost(), talker.getPort() );
-            talker.send( PING_COMMAND, timeout );
+            talker.send(PingCommand.NAME, timeout );
         }
         catch ( ConnectException e )
         {
