@@ -21,6 +21,7 @@ import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.Properties;
 import javax.inject.Inject;
@@ -225,7 +226,7 @@ public class DefaultNexusBundle
     {
         try
         {
-            sendStopToNexus( commandMonitorPort );
+            terminateRemoteNexus( commandMonitorPort );
         }
         finally
         {
@@ -371,7 +372,7 @@ public class DefaultNexusBundle
             @Override
             public void run()
             {
-                sendStopToNexus( commandPort );
+                terminateRemoteNexus( commandPort );
             }
         };
 
@@ -392,6 +393,52 @@ public class DefaultNexusBundle
                 "Skipping exception got while sending stop command to Nexus {}:{}",
                 e.getClass().getName(), e.getMessage()
             );
+        }
+    }
+
+    private static void terminateRemoteNexus( final int commandPort ) {
+        log.debug("Attempting to terminate remote nexus");
+
+        // First attempt graceful shutdown
+        sendStopToNexus( commandPort );
+
+        CommandMonitorTalker talker = new CommandMonitorTalker( LOCALHOST, commandPort );
+        long started = System.currentTimeMillis();
+        long max = 5 * 60 * 1000; // wait 5 minutes for NX to shutdown, before attempting to halt it
+        long period = 1000;
+
+        // Then ping for a bit and finally give up and ask it to halt
+        while (true) {
+            try {
+                talker.send( PingCommand.NAME );
+            }
+            catch (ConnectException e) {
+                // likely its shutdown already
+                break;
+            }
+            catch (Exception e) {
+                // ignore, not sure there is much we can do
+            }
+
+            // If we have waited long enough, then ask remote to halt
+            if (System.currentTimeMillis() - started > max) {
+                try {
+                    talker.send( HaltCommand.NAME );
+                    break;
+                }
+                catch (Exception e) {
+                    // ignore, not sure there is much we can do
+                    break;
+                }
+            }
+
+            // Wait a wee bit and try again
+            try {
+                Thread.sleep(period);
+            }
+            catch (InterruptedException e) {
+                // ignore
+            }
         }
     }
 
