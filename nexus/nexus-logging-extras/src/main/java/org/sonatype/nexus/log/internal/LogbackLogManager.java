@@ -50,6 +50,8 @@ import org.sonatype.nexus.log.DefaultLogManagerMBean;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.logback.EventTarget;
+import org.sonatype.nexus.logback.ForwardingAppender;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -100,6 +102,9 @@ public class LogbackLogManager
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
+
+    @Requirement
+    private EventTarget eventTarget;
 
     private ObjectName jmxName;
 
@@ -482,6 +487,15 @@ public class LogbackLogManager
             {
                 Appender<ILoggingEvent> ap = it.next();
                 injector.injectMembers( ap );
+
+                // ForwardingAppender needs some special care: manual injection
+                // since @Inject is not on Jetty classpath (parent of this classpath) and Injector will not do anything
+                // with it since classloader will not pick up annotations on class while loading up the class itself
+                if ( ap instanceof ForwardingAppender )
+                {
+                    final ForwardingAppender fap = (ForwardingAppender) ap;
+                    fap.installEventTarget( eventTarget );
+                }
             }
         }
     }
