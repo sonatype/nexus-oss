@@ -13,9 +13,6 @@
 package org.sonatype.nexus.bundle.launcher.support;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
-import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
-import static org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
-import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
 import static org.sonatype.sisu.bl.jsw.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
@@ -36,9 +33,11 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.KeepAliveThread;
 import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
@@ -195,7 +194,7 @@ public class DefaultNexusBundle
             protected boolean isSatisfied()
                 throws Exception
             {
-                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PING_COMMAND );
+                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send(PingCommand.NAME);
                 return true;
             }
         }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
@@ -385,7 +384,7 @@ public class DefaultNexusBundle
         log.debug( "Sending stop command to Nexus" );
         try
         {
-            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_APPLICATION_COMMAND );
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send(StopApplicationCommand.NAME);
         }
         catch ( Exception e )
         {
@@ -401,7 +400,7 @@ public class DefaultNexusBundle
         log.debug( "Sending stop command to keep alive thread" );
         try
         {
-            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_MONITOR_COMMAND );
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( StopMonitorCommand.NAME );
         }
         catch ( Exception e )
         {
@@ -437,7 +436,7 @@ public class DefaultNexusBundle
         @Override
         public String keepAliveProperty()
         {
-            return Launcher.KEEP_ALIVE_PORT;
+            return KeepAliveThread.KEEP_ALIVE_PORT;
         }
 
         @Override
@@ -494,7 +493,7 @@ public class DefaultNexusBundle
         @Override
         public String keepAliveProperty()
         {
-            return NexusITLauncher.KEEP_ALIVE_PORT;
+            return KeepAliveThread.KEEP_ALIVE_PORT;
         }
 
         @Override
