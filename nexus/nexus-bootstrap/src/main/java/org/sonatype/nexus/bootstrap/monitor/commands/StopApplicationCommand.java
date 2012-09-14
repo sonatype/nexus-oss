@@ -51,7 +51,8 @@ public class StopApplicationCommand
         log.info( "Requesting application stop" );
         shutdown.run();
 
-        return true;
+        // Do not terminate the monitor on application stop, leave that to the jvm death
+        return false;
     }
 
 }
