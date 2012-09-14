@@ -230,6 +230,7 @@ public class DefaultNexusBundle
         }
         finally
         {
+            // Stop the launcher-controller-side monitor thread if there is one
             if ( keepAliveThread != null )
             {
                 sendStopToKeepAlive( keepAlivePort );
