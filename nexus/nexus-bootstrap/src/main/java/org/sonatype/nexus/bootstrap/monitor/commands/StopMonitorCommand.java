@@ -26,12 +26,12 @@ public class StopMonitorCommand
 
     private static final LogProxy log = LogProxy.getLogger( StopMonitorCommand.class );
 
-    public static final String STOP_MONITOR_COMMAND = "STOP_MONITOR";
+    public static final String NAME = "STOP_MONITOR";
 
     @Override
     public String getId()
     {
-        return STOP_MONITOR_COMMAND;
+        return NAME;
     }
 
     @Override

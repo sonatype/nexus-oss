@@ -13,9 +13,6 @@
 package org.sonatype.nexus.bundle.launcher.support;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
-import static org.sonatype.nexus.bootstrap.monitor.commands.PingCommand.PING_COMMAND;
-import static org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand.STOP_APPLICATION_COMMAND;
-import static org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand.STOP_MONITOR_COMMAND;
 import static org.sonatype.sisu.bl.jsw.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
@@ -24,6 +21,7 @@ import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.Properties;
 import javax.inject.Inject;
@@ -36,7 +34,11 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorTalker;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.KeepAliveThread;
+import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
@@ -160,7 +162,9 @@ public class DefaultNexusBundle
             keepAliveThread = new CommandMonitorThread(
                 keepAlivePort,
                 new PingCommand(),
-                new StopMonitorCommand()
+                new StopMonitorCommand(),
+                new ExitCommand(),
+                new HaltCommand()
             );
             keepAliveThread.start();
         }
@@ -191,7 +195,7 @@ public class DefaultNexusBundle
             protected boolean isSatisfied()
                 throws Exception
             {
-                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PING_COMMAND );
+                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send(PingCommand.NAME);
                 return true;
             }
         }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
@@ -222,10 +226,11 @@ public class DefaultNexusBundle
     {
         try
         {
-            sendStopToNexus( commandMonitorPort );
+            terminateRemoteNexus( commandMonitorPort );
         }
         finally
         {
+            // Stop the launcher-controller-side monitor thread if there is one
             if ( keepAliveThread != null )
             {
                 sendStopToKeepAlive( keepAlivePort );
@@ -367,7 +372,7 @@ public class DefaultNexusBundle
             @Override
             public void run()
             {
-                sendStopToNexus( commandPort );
+                terminateRemoteNexus( commandPort );
             }
         };
 
@@ -380,7 +385,7 @@ public class DefaultNexusBundle
         log.debug( "Sending stop command to Nexus" );
         try
         {
-            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_APPLICATION_COMMAND );
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send(StopApplicationCommand.NAME);
         }
         catch ( Exception e )
         {
@@ -391,12 +396,58 @@ public class DefaultNexusBundle
         }
     }
 
+    private static void terminateRemoteNexus( final int commandPort ) {
+        log.debug("Attempting to terminate remote nexus");
+
+        // First attempt graceful shutdown
+        sendStopToNexus( commandPort );
+
+        CommandMonitorTalker talker = new CommandMonitorTalker( LOCALHOST, commandPort );
+        long started = System.currentTimeMillis();
+        long max = 5 * 60 * 1000; // wait 5 minutes for NX to shutdown, before attempting to halt it
+        long period = 1000;
+
+        // Then ping for a bit and finally give up and ask it to halt
+        while (true) {
+            try {
+                talker.send( PingCommand.NAME );
+            }
+            catch (ConnectException e) {
+                // likely its shutdown already
+                break;
+            }
+            catch (Exception e) {
+                // ignore, not sure there is much we can do
+            }
+
+            // If we have waited long enough, then ask remote to halt
+            if (System.currentTimeMillis() - started > max) {
+                try {
+                    talker.send( HaltCommand.NAME );
+                    break;
+                }
+                catch (Exception e) {
+                    // ignore, not sure there is much we can do
+                    break;
+                }
+            }
+
+            // Wait a wee bit and try again
+            try {
+                Thread.sleep(period);
+            }
+            catch (InterruptedException e) {
+                // ignore
+            }
+        }
+    }
+
     private static void sendStopToKeepAlive( final int commandPort )
     {
         log.debug( "Sending stop command to keep alive thread" );
         try
         {
-            new CommandMonitorTalker( LOCALHOST, commandPort ).send( STOP_MONITOR_COMMAND );
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( StopMonitorCommand.NAME );
         }
         catch ( Exception e )
         {
@@ -432,7 +483,7 @@ public class DefaultNexusBundle
         @Override
         public String keepAliveProperty()
         {
-            return Launcher.KEEP_ALIVE_PORT;
+            return KeepAliveThread.KEEP_ALIVE_PORT;
         }
 
         @Override
@@ -489,7 +540,7 @@ public class DefaultNexusBundle
         @Override
         public String keepAliveProperty()
         {
-            return NexusITLauncher.KEEP_ALIVE_PORT;
+            return KeepAliveThread.KEEP_ALIVE_PORT;
         }
 
         @Override

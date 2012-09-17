@@ -12,32 +12,18 @@
  */
 package org.sonatype.nexus.bootstrap.monitor.commands;
 
-import org.sonatype.nexus.bootstrap.log.LogProxy;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
 
 /**
- * Stop launcher.
+ * Command to forcibly halt the JVM (via {@link Runtime#halt(int)}).
  *
  * @since 2.2
  */
-public class StopApplicationCommand
+public class HaltCommand
     implements CommandMonitorThread.Command
 {
 
-    private static final LogProxy log = LogProxy.getLogger( StopApplicationCommand.class );
-
-    public static final String NAME = "STOP";
-
-    private final Runnable shutdown;
-
-    public StopApplicationCommand( final Runnable shutdown )
-    {
-        if ( shutdown == null )
-        {
-            throw new NullPointerException();
-        }
-        this.shutdown = shutdown;
-    }
+    public static final String NAME = "HALT";
 
     @Override
     public String getId()
@@ -48,11 +34,9 @@ public class StopApplicationCommand
     @Override
     public boolean execute()
     {
-        log.info( "Requesting application stop" );
-        shutdown.run();
+        Runtime.getRuntime().halt(666);
 
-        // Do not terminate the monitor on application stop, leave that to the jvm death
-        return false;
+        throw new Error("Unreachable statement");
     }
 
 }
