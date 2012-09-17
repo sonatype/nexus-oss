@@ -86,7 +86,7 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -645,7 +645,8 @@ public class DefaultIndexerManager
                             if ( ai.sha1 == null )
                             {
                                 // if repo has no sha1 checksum, odd nexus one
-                                ai.sha1 = item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+                                ai.sha1 =
+                                    item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
                             }
                         }
                     }
@@ -719,7 +720,7 @@ public class DefaultIndexerManager
             }
 
             ArtifactContext ac = null;
-            
+
             // we need to convert Nexus Gav to Indexer Gav
             org.apache.maven.index.artifact.Gav igav = GavUtils.convert( gav );
 
@@ -1034,19 +1035,37 @@ public class DefaultIndexerManager
                         RepositoryStringUtils.getFormattedMessage(
                             "Cannot fetch remote index for repository %s, task cancelled.", repository ) );
                 }
+                catch ( FileNotFoundException e )
+                {
+                    // here, FileNotFoundException literally means ResourceFetcher -- that is HTTP based -- hit a 404 on
+                    // remote
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().info(
+                            RepositoryStringUtils.getFormattedMessage(
+                                "Cannot fetch remote index for repository %s as it does not publish indexes.",
+                                repository ), e );
+                    }
+                    else
+                    {
+                        getLogger().info(
+                            RepositoryStringUtils.getFormattedMessage(
+                                "Cannot fetch remote index for repository %s as it does not publish indexes.",
+                                repository ) );
+                    }
+                }
                 catch ( IOException e )
                 {
-                    // kept logs since tasks will only log error if debug is enabled
                     getLogger().warn(
-                        RepositoryStringUtils.getFormattedMessage( "Cannot fetch remote index for repository %s",
-                            repository ), e );
+                        RepositoryStringUtils.getFormattedMessage(
+                            "Cannot fetch remote index for repository %s due to IO problem.", repository ), e );
                     throw e;
                 }
                 catch ( Exception e )
                 {
                     getLogger().warn(
-                        RepositoryStringUtils.getFormattedMessage( "Cannot fetch remote index for repository %s",
-                            repository ), e );
+                        RepositoryStringUtils.getFormattedMessage(
+                            "Cannot fetch remote index for repository %s, error occurred.", repository ), e );
                 }
             }
 
@@ -1111,16 +1130,15 @@ public class DefaultIndexerManager
 
                     return item.getInputStream();
                 }
-                catch ( RemoteAccessException ex )
-                {
-                    // XXX: But we should detect this? Maybe a permission problem?
-                    throw new FileNotFoundException( name + " (" + ex.getMessage() + ")" );
-                }
                 catch ( ItemNotFoundException ex )
                 {
-                    FileNotFoundException fne = new FileNotFoundException( name + " (item not found)" );
+                    final FileNotFoundException fne = new FileNotFoundException( name + " (remote item not found)" );
                     fne.initCause( ex );
                     throw fne;
+                }
+                catch ( RemoteStorageException ex )
+                {
+                    throw new IOException( ex.getMessage(), ex );
                 }
             }
         } );
