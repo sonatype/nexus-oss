@@ -86,7 +86,6 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -1135,10 +1134,6 @@ public class DefaultIndexerManager
                     final FileNotFoundException fne = new FileNotFoundException( name + " (remote item not found)" );
                     fne.initCause( ex );
                     throw fne;
-                }
-                catch ( RemoteStorageException ex )
-                {
-                    throw new IOException( ex.getMessage(), ex );
                 }
             }
         } );
