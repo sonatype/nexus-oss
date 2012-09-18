@@ -14,6 +14,7 @@ package org.sonatype.nexus.bootstrap.jsw;
 
 import org.slf4j.Logger;
 import org.sonatype.nexus.bootstrap.Launcher;
+import org.sonatype.nexus.bootstrap.ShutdownHelper;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVENT;
@@ -76,6 +77,7 @@ public class JswLauncher
     }
 
     public static void main(final String[] args) throws Exception {
+        ShutdownHelper.setDelegate(new JswShutdownDelegate());
         WrapperManager.start(new JswLauncher(), args);
     }
 }

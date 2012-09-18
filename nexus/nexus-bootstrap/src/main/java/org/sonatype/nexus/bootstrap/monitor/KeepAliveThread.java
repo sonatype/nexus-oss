@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.bootstrap.monitor;
 
+import org.sonatype.nexus.bootstrap.ShutdownHelper;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 
 import java.io.IOException;
@@ -90,7 +91,7 @@ public class KeepAliveThread
         {
             @Override
             public void run() {
-                Runtime.getRuntime().halt(666);
+                ShutdownHelper.halt(666);
             }
         });
     }
