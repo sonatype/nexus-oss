@@ -26,6 +26,12 @@
   <name>Nexus : Logging Extras</name>
 
   <dependencies>
+    <!-- The appender -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-logging-extras-appender</artifactId>
+    </dependency>
+    
     <!-- We have components in here -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>

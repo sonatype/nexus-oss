@@ -64,6 +64,8 @@ public class CommandMonitorThread
     public CommandMonitorThread( final int port, final Command... commands )
         throws IOException
     {
+        setDaemon( true );
+
         if ( commands != null )
         {
             for ( final Command command : commands )
@@ -102,7 +104,7 @@ public class CommandMonitorThread
 
                 if ( commandId == null )
                 {
-                    commandId = PingCommand.PING_COMMAND;
+                    commandId = PingCommand.NAME;
                 }
                 final Command command = commands.get( commandId );
                 if ( command == null )

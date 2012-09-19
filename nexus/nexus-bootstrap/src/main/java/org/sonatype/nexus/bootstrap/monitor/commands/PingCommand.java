@@ -26,12 +26,12 @@ public class PingCommand
 
     private static final LogProxy log = LogProxy.getLogger( PingCommand.class );
 
-    public static final String PING_COMMAND = "PING";
+    public static final String NAME = "PING";
 
     @Override
     public String getId()
     {
-        return PING_COMMAND;
+        return NAME;
     }
 
     @Override

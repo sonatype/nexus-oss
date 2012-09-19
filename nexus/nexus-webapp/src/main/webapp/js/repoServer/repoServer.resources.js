@@ -28,12 +28,12 @@
 
   var proxyHostname = 'This is the host name of the HTTP proxy used for remote connections. (no HTTP/HTTPs required...just the host or ip)';
   var proxyPort = 'This is the port number of the HTTP proxy used for remote connections.';
-  var nonProxyHosts = 'List of host names to exclude from http proxy. Regular expressions are supported, e.g. \'.*\.somecompany\.com\'.';
+  var nonProxyHosts = 'List of host names to exclude from http proxy. Regular expressions are supported, e.g. \'.*\\.somecompany\\.com\'.';
 
   var username = 'The username used for authentication to the HTTP proxy.';
   var password = 'The password used for authentication to the HTTP proxy.';
   var privateKey = 'The ssl private key used for authentication to the HTTP proxy.';
-  var passphrase = 'The passphase for the private key.';
+  var passphrase = 'The passphrase for the private key.';
   var ntlmHost = 'The Windows NT Lan Manager for authentication.';
   var ntlmDomain = 'The Windows NT Lan Manager domain for authentication.';
 

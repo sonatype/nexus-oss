@@ -12,16 +12,6 @@
  */
 package org.sonatype.nexus.bootstrap;
 
-import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Properties;
-
 import org.eclipse.jetty.util.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +22,26 @@ import org.sonatype.appcontext.publisher.AbstractStringDumpingEntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
+import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+import org.sonatype.nexus.bootstrap.monitor.KeepAliveThread;
+import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
+import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
-import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
-import org.sonatype.nexus.bootstrap.monitor.ShutdownIfNotAliveThread;
 import org.sonatype.sisu.jetty.Jetty8;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Properties;
+
+import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PING_INTERVAL;
+import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PORT;
+import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TIMEOUT;
 
 /**
  * Nexus bootstrap launcher.
@@ -49,12 +54,6 @@ public class Launcher
     protected final Logger log;
 
     public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
-
-    public static final String KEEP_ALIVE_PORT = ShutdownIfNotAliveThread.class.getName() + ".port";
-
-    public static final String KEEP_ALIVE_PING_INTERVAL = ShutdownIfNotAliveThread.class.getName() + ".pingInterval";
-
-    public static final String KEEP_ALIVE_TIMEOUT = ShutdownIfNotAliveThread.class.getName() + ".timeout";
 
     public static final String FIVE_SECONDS = "5000";
 
@@ -273,7 +272,9 @@ public class Launcher
                         Launcher.this.commandStop();
                     }
                 } ),
-                new PingCommand()
+                new PingCommand(),
+                new ExitCommand(),
+                new HaltCommand()
             ).start();
         }
     }
@@ -306,15 +307,7 @@ public class Launcher
                     timeout = ONE_SECOND;
                 }
             }
-            new ShutdownIfNotAliveThread(
-                new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        Launcher.this.commandStop();
-                    }
-                },
+            new KeepAliveThread(
                 LOCALHOST,
                 Integer.parseInt( port ),
                 Integer.parseInt( pingInterval ),

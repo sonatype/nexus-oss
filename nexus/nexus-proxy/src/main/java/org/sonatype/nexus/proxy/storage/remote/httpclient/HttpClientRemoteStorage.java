@@ -56,6 +56,7 @@ import org.sonatype.nexus.proxy.storage.remote.AbstractHTTPRemoteRepositoryStora
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
@@ -99,6 +100,8 @@ public class HttpClientRemoteStorage
      */
     private static final boolean CAN_WRITE = true;
 
+    private QueryStringBuilder queryStringBuilder;
+
     // ----------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------
@@ -106,9 +109,10 @@ public class HttpClientRemoteStorage
     @Inject
     HttpClientRemoteStorage( final UserAgentBuilder userAgentBuilder,
                              final ApplicationStatusSource applicationStatusSource,
-                             final MimeSupport mimeSupport )
+                             final MimeSupport mimeSupport, QueryStringBuilder queryStringBuilder)
     {
         super( userAgentBuilder, applicationStatusSource, mimeSupport );
+        this.queryStringBuilder = queryStringBuilder;
     }
 
     // ----------------------------------------------------------------------
@@ -573,7 +577,8 @@ public class HttpClientRemoteStorage
     {
         final RemoteStorageContext ctx = getRemoteStorageContext( repository );
 
-        final String queryString = ctx.getRemoteConnectionSettings().getQueryString();
+        String queryString = queryStringBuilder.getQueryString( ctx, repository );
+
         if ( StringUtils.isNotBlank( queryString ) )
         {
             try

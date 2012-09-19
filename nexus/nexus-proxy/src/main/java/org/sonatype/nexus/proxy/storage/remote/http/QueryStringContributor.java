@@ -10,35 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bootstrap.monitor.commands;
+package org.sonatype.nexus.proxy.storage.remote.http;
 
-import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
-import org.sonatype.nexus.bootstrap.log.LogProxy;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
- * Stops command monitor.
- *
+ * Classes implementing this interface are injected into the {@link QueryStringBuilder} and asked for a custom string to
+ * append to the query string. The string will be prepended with either ``&'' or ``?'' as necessary. 
+ * 
  * @since 2.2
  */
-public class StopMonitorCommand
-    implements CommandMonitorThread.Command
+public interface QueryStringContributor
 {
-
-    private static final LogProxy log = LogProxy.getLogger( StopMonitorCommand.class );
-
-    public static final String NAME = "STOP_MONITOR";
-
-    @Override
-    public String getId()
-    {
-        return NAME;
-    }
-
-    @Override
-    public boolean execute()
-    {
-        log.info( "Requesting monitor stop" );
-        return true;
-    }
-
+    /**
+     * @param ctx The remote storage settings.
+     * @param repository The proxy repository
+     * @return The string to append to query string
+     */
+    public String getQueryString( RemoteStorageContext ctx, ProxyRepository repository );
 }

@@ -12,11 +12,18 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1650;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThan;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.Matchers;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
@@ -32,6 +39,7 @@ import org.testng.annotations.Test;
 public class Nexus1650MultipleManualTaskIT
     extends AbstractNexusIntegrationTest
 {
+
     @SuppressWarnings( "unchecked" )
     public static Collection<File> listFiles( File directory, String[] extensions, boolean recursive )
     {
@@ -108,6 +116,7 @@ public class Nexus1650MultipleManualTaskIT
         throws Exception
     {
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         createSnapshotTask( "Nexus1650Task1" );
         createSnapshotTask( "Nexus1650Task2" );
@@ -115,25 +124,46 @@ public class Nexus1650MultipleManualTaskIT
 
         List<ScheduledServiceListResource> tasks = TaskScheduleUtil.getTasks();
 
-        Assert.assertEquals( 3, tasks.size() );
+        assertThat( tasks, hasSize( 3 ) );
+
+        long startTimestamp = System.currentTimeMillis();
 
         for ( ScheduledServiceListResource resource : tasks )
         {
             TaskScheduleUtil.run( resource.getId() );
         }
 
-        tasks = TaskScheduleUtil.getTasks();
+        waitForOneTaskSleeping();
 
-        for ( ScheduledServiceListResource resource : tasks )
+        TaskScheduleUtil.waitForAllTasksToStop();
+
+        assertAllTasksWereRunning( startTimestamp );
+    }
+
+    private void assertAllTasksWereRunning( long startTimestamp )
+        throws IOException
+    {
+        final List<ScheduledServiceListResource> tasks = TaskScheduleUtil.getTasks();
+
+        for ( ScheduledServiceListResource task : tasks )
         {
-            TaskScheduleUtil.run( resource.getId() );
+            assertThat( "task did not run properly!", task.getLastRunTimeInMillis(), greaterThan( startTimestamp ) );
         }
+    }
 
-        Thread.sleep( 200 );
+    private void waitForOneTaskSleeping()
+        throws Exception
+    {
+        final long end = System.currentTimeMillis() + 10000;
 
-        Assert.assertTrue( isAtLeastOneSleeping() );
-
-        waitForTasksToComplete();
+        while ( !isAtLeastOneSleeping() )
+        {
+            Thread.sleep( 200 );
+            if ( System.currentTimeMillis() > end )
+            {
+                assertThat( "no task was seen sleeping in 10s", System.currentTimeMillis(), lessThan( end ) );
+            }
+        }
     }
 
     private boolean isAtLeastOneSleeping()
@@ -152,41 +182,4 @@ public class Nexus1650MultipleManualTaskIT
         return false;
     }
 
-    private void waitForTasksToComplete()
-        throws Exception
-    {
-        // Wait 1 full second between checks
-        long sleep = 1000;
-
-        Thread.sleep( 500 ); // give an time to task start
-
-        boolean allDone = false;
-
-        for ( int attempt = 0; attempt < 300; attempt++ )
-        {
-            Thread.sleep( sleep );
-
-            List<ScheduledServiceListResource> tasks = TaskScheduleUtil.getTasks();
-
-            for ( ScheduledServiceListResource task : tasks )
-            {
-                log.info( "Task: " + task.getName() + ", Attempt: " + attempt + ", LastRunResult: "
-                    + task.getLastRunResult() + ", Status: " + task.getStatus() );
-                if ( !task.getStatus().equals( "SUBMITTED" ) )
-                {
-                    allDone = false;
-                    break;
-                }
-                else
-                {
-                    allDone = true;
-                }
-            }
-
-            if ( allDone )
-            {
-                break;
-            }
-        }
-    }
 }

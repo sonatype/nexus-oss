@@ -257,7 +257,7 @@ public abstract class AbstractArtifactPlexusResource
 
                 response.setLocationRef( fileReference );
 
-                response.setStatus( Status.REDIRECTION_PERMANENT );
+                response.setStatus( Status.REDIRECTION_TEMPORARY );
 
                 String redirectMessage =
                     "If you are not automatically redirected use this url: " + fileReference.toString();

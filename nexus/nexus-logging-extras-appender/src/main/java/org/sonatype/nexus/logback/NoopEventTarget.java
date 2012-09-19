@@ -10,35 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bootstrap.monitor.commands;
+package org.sonatype.nexus.logback;
 
-import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
-import org.sonatype.nexus.bootstrap.log.LogProxy;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
-/**
- * Stops command monitor.
- *
- * @since 2.2
- */
-public class StopMonitorCommand
-    implements CommandMonitorThread.Command
+public final class NoopEventTarget
+    implements EventTarget
 {
-
-    private static final LogProxy log = LogProxy.getLogger( StopMonitorCommand.class );
-
-    public static final String NAME = "STOP_MONITOR";
+    final static NoopEventTarget INSTANCE = new NoopEventTarget();
 
     @Override
-    public String getId()
+    public void onEvent( final ILoggingEvent event )
     {
-        return NAME;
+        // noop
     }
-
-    @Override
-    public boolean execute()
-    {
-        log.info( "Requesting monitor stop" );
-        return true;
-    }
-
 }
