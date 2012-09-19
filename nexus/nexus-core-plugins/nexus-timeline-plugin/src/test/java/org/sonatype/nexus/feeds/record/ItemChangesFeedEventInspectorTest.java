@@ -77,7 +77,7 @@ public class ItemChangesFeedEventInspectorTest
     }
 
     @Test
-    public void eventsOnMavenMetadataSignatureAndHashFilesAreNotRecorded()
+    public void eventsOnMavenMetadataSignatureAndHashFilesShouldNotBeRecorded()
     {
         final ItemChangesFeedEventInspector underTest =
             new ItemChangesFeedEventInspector( feedRecorder, applicationStatusSource );
