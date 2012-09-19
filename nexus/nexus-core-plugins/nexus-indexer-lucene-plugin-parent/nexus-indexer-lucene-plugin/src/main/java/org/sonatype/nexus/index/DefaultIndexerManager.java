@@ -114,6 +114,8 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * <p>
  * Indexer Manager. This is a thin layer above Nexus Indexer and simply manages indexingContext additions, updates and
@@ -193,6 +195,18 @@ public class DefaultIndexerManager
             DefaultIndexingContext.BLOCKING_COMMIT = true;
         }
         // This above is needed and used in ITs only!
+    }
+
+    @VisibleForTesting
+    protected void setIndexUpdater( final IndexUpdater indexUpdater )
+    {
+        this.indexUpdater = indexUpdater;
+    }
+
+    @VisibleForTesting
+    protected void setNexusIndexer( final NexusIndexer nexusIndexer )
+    {
+        this.nexusIndexer = nexusIndexer;
     }
 
     protected Logger getLogger()
