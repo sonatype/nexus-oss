@@ -130,7 +130,7 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
 
     /**
      * Gets the node value, creating it on the fly if not existing.
-     * 
+     *
      * @param parent
      * @param name
      * @param defaultValue
@@ -157,7 +157,7 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
 
     /**
      * Sets node value, creating it on the fly if not existing.
-     * 
+     *
      * @param parent
      * @param name
      * @param value
@@ -178,10 +178,10 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
 
     /**
      * Gets a collection as unmodifiable list.
-     * 
+     *
      * @param parent
      * @param name
-     * @return
+     * @return a List, never null
      */
     protected List<String> getCollection( Xpp3Dom parent, String name )
     {
@@ -216,7 +216,7 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
             node = new Xpp3Dom( name );
             parent.addChild( node );
         }
-        
+
         for ( int i = node.getChildCount() - 1 ; i >= 0; i-- )
         {
             node.removeChild( i );
@@ -236,7 +236,7 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
 
     /**
      * Adds a value to collection. Collection node is created on the fly.
-     * 
+     *
      * @param parent
      * @param name
      * @param value
@@ -278,7 +278,7 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
 
     /**
      * Removes a value from a collection. Collection node is created if not exists.
-     * 
+     *
      * @param parent
      * @param name
      * @param value
