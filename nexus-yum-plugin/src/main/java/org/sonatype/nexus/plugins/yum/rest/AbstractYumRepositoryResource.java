@@ -15,7 +15,6 @@ import org.sonatype.nexus.plugins.yum.rest.domain.IndexRepresentation;
 import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 import org.sonatype.nexus.plugins.yum.rest.domain.YumFileRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 
 public abstract class AbstractYumRepositoryResource extends AbstractPlexusResource {
@@ -28,11 +27,6 @@ public abstract class AbstractYumRepositoryResource extends AbstractPlexusResour
     this.restApiSettings = restApiSettings;
     this.requestSegmentInterpetor = new UrlPathParser(getVersionedRepositoryBaseUrl(), getUrlPrefixName(),
       getSegmentCountAfterPrefix());
-  }
-
-  @Override
-  public PathProtectionDescriptor getResourceProtection() {
-    return new PathProtectionDescriptor("/" + getUrlPrefixName() + "/*", "anon");
   }
 
   @Override

@@ -37,9 +37,8 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 @Path(RepositoryVersionAliasResource.RESOURCE_URI)
 @Produces({ "application/xml", "application/json", "text/plain" })
 public class RepositoryVersionAliasResource extends AbstractPlexusResource implements PlexusResource {
-  private static final String ALLOW_ANONYMOUS = "anon";
   public static final String URL_PREFIX = "yum/alias";
-  private static final String PATH_PATTERN_TO_PROTECT = "/" + URL_PREFIX + "/*";
+  private static final String PATH_PATTERN_TO_PROTECT = "/" + URL_PREFIX + "/**";
   public static final String REPOSITORY_ID_PARAM = "repositoryId";
   public static final String ALIAS_PARAM = "alias";
   public static final String RESOURCE_URI = "/" + URL_PREFIX + "/{" + REPOSITORY_ID_PARAM + "}/{" + ALIAS_PARAM + "}";
@@ -93,7 +92,7 @@ public class RepositoryVersionAliasResource extends AbstractPlexusResource imple
 
   @Override
   public PathProtectionDescriptor getResourceProtection() {
-    return new PathProtectionDescriptor(PATH_PATTERN_TO_PROTECT, ALLOW_ANONYMOUS);
+    return new PathProtectionDescriptor(PATH_PATTERN_TO_PROTECT, "authcBasic,perms[nexus:yumAlias]");
   }
 
   @Override

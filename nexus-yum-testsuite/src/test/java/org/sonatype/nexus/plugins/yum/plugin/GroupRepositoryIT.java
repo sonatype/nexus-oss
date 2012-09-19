@@ -1,40 +1,37 @@
+/**
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2012 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
 package org.sonatype.nexus.plugins.yum.plugin;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-
 import org.junit.Test;
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.testsuite.support.NexusRunningITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 
-@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
-public class GroupRepositoryIT extends NexusRunningITSupport {
+public class GroupRepositoryIT extends AbstractIntegrationTestCase {
 
-  private static final String TEST_REPO_NAME = "dummy-group-repo";
 
   @Test
   public void shouldCreateAGroupRepository() throws Exception {
-    RepositoryTestService service = new RepositoryTestService(client());
-    service.deleteGroupRepo(TEST_REPO_NAME);
-    assertThat(service.createGroupRepo(TEST_REPO_NAME, "maven2yum"), is(true));
-  }
-
-  @Override
-  protected NexusBundleConfiguration configureNexus(NexusBundleConfiguration configuration) {
-    URL pluginFileUrl = getClass().getResource("/plugin.zip");
-    if (pluginFileUrl == null) {
-      throw new IllegalStateException("Couldn't find /plugin.zip in classpath");
-    }
-    try {
-      return configuration.addPlugins(new File(pluginFileUrl.toURI()));
-    } catch (URISyntaxException e) {
-      throw new RuntimeException("Could not determine plugin bundle URI.", e);
-    }
+    final Repositories repositories = client().getSubsystem(Repositories.class);
+    final String reponame = uniqueName();
+    final GroupRepository groupRepo = repositories.create(GroupRepository.class, reponame);
+    groupRepo.settings().setName(reponame);
+    groupRepo.settings().setProvider("maven2yum");
+    groupRepo.settings().setRepoType("group");
+    groupRepo.settings().setExposed(true);
+    assertThat(groupRepo.save().settings().getProvider(), is("maven2yum"));
   }
 
 }

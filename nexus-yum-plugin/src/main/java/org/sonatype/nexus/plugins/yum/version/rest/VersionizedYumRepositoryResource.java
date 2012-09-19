@@ -17,6 +17,7 @@ import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.plugins.yum.rest.AbstractYumRepositoryResource;
 import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
@@ -44,6 +45,11 @@ public class VersionizedYumRepositoryResource extends AbstractYumRepositoryResou
   @Override
   protected String getUrlPrefixName() {
     return "yum";
+  }
+
+  @Override
+  public PathProtectionDescriptor getResourceProtection() {
+    return new PathProtectionDescriptor(YUM_REPO_PREFIX + "/**", "authcBasic,perms[nexus:yumVersionizedRepositories]");
   }
 
   @Override
