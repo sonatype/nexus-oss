@@ -108,6 +108,10 @@ public class Nexus5249IndexerManagerTest
             }
         }
 
+        // as things above will trigger some bg tasks (failingRepository will be reindexed with a task)
+        waitForTasksToStop();
+        wairForAsyncEventsToCalmDown();
+
         // faking IndexUpdater that will fail with given exception for given "failing" repository
         final IndexUpdater realUpdater = lookup( IndexUpdater.class );
         // predicate to match invocation when the arguments are for the failingRepository
