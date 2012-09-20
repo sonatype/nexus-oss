@@ -57,7 +57,7 @@ import org.sonatype.sisu.charger.internal.FirstArrivedInOrderChargeStrategy;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractGroupRepository
@@ -100,7 +100,7 @@ public abstract class AbstractGroupRepository
             membersChanged =
                 getCurrentCoreConfiguration().isDirty()
                     && !getExternalConfiguration( false ).getMemberRepositoryIds().equals(
-                        getExternalConfiguration( true ).getMemberRepositoryIds() );
+                    getExternalConfiguration( true ).getMemberRepositoryIds() );
 
             // we have to "remember" these before commit happens in super.onEvent
             // but ONLY if we are dirty and we do have "member changes" (see membersChanged above)
@@ -120,9 +120,10 @@ public abstract class AbstractGroupRepository
         // act automatically on repo removal. Remove it from myself if member.
         if ( evt instanceof RepositoryRegistryEventRemove )
         {
-            RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
+            final RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
+            final AbstractGroupRepositoryConfiguration extConfig = this.getExternalConfiguration( false );
 
-            if ( this.getExternalConfiguration( false ).getMemberRepositoryIds().contains( revt.getRepository().getId() ) )
+            if ( extConfig != null && extConfig.getMemberRepositoryIds().contains( revt.getRepository().getId() ) )
             {
                 removeMemberRepositoryId( revt.getRepository().getId() );
             }
@@ -526,7 +527,7 @@ public abstract class AbstractGroupRepository
 
         final boolean isRequestGroupLocalOnly =
             request.isRequestGroupLocalOnly() || uid.getBooleanAttributeValue( IsGroupLocalOnlyAttribute.class );
-        
+
         final HashMap<Repository, Throwable> memberThrowables = new HashMap<Repository, Throwable>();
 
         if ( !isRequestGroupLocalOnly )
