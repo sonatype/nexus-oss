@@ -317,7 +317,7 @@ public class Launcher
     }
 
     public void commandStop() {
-        System.exit(0);
+        ShutdownHelper.exit(0);
     }
 
     public void stop() throws Exception {

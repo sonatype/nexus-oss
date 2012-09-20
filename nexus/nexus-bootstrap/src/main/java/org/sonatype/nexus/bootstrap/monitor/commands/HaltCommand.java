@@ -12,10 +12,11 @@
  */
 package org.sonatype.nexus.bootstrap.monitor.commands;
 
+import org.sonatype.nexus.bootstrap.ShutdownHelper;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
 
 /**
- * Command to forcibly halt the JVM (via {@link Runtime#halt(int)}).
+ * Command to forcibly halt the JVM (via {@link ShutdownHelper#halt(int)}).
  *
  * @since 2.2
  */
@@ -34,7 +35,7 @@ public class HaltCommand
     @Override
     public boolean execute()
     {
-        Runtime.getRuntime().halt(666);
+        ShutdownHelper.halt(666);
 
         throw new Error("Unreachable statement");
     }

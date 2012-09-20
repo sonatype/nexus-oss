@@ -10,34 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bootstrap.monitor.commands;
 
-import org.sonatype.nexus.bootstrap.ShutdownHelper;
-import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
+package org.sonatype.nexus.bootstrap.jsw;
+
+import org.sonatype.nexus.bootstrap.ShutdownHelper.ShutdownDelegate;
+import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
- * Command to exit the JVM (via {@link ShutdownHelper#exit(int)}).
+ * JSW {@link ShutdownDelegate}.
  *
  * @since 2.2
  */
-public class ExitCommand
-    implements CommandMonitorThread.Command
+public class JswShutdownDelegate
+    implements ShutdownDelegate
 {
-
-    public static final String NAME = "EXIT";
-
     @Override
-    public String getId()
-    {
-        return NAME;
+    public void doExit(final int code) {
+        WrapperManager.stop(code);
     }
 
     @Override
-    public boolean execute()
-    {
-        ShutdownHelper.exit(666);
-
-        throw new Error("Unreachable statement");
+    public void doHalt(final int code) {
+        WrapperManager.stopImmediate(code);
     }
-
 }
