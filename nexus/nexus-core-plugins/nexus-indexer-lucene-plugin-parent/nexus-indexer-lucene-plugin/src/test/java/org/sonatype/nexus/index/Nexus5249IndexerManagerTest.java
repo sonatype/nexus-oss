@@ -66,7 +66,8 @@ public class Nexus5249IndexerManagerTest
     protected void prepare( final IOException failure )
         throws Exception
     {
-        // count total of indexed, and total of indexed proxy repositories, and set the one to make it really go remotely
+        // count total of indexed, and total of indexed proxy repositories, and set the one to make it really go
+        // remotely
         indexedRepositories = 0;
         indexedProxyRepositories = 0;
         for ( Repository repository : repositoryRegistry.getRepositories() )
@@ -77,13 +78,21 @@ public class Nexus5249IndexerManagerTest
             {
                 indexedRepositories++;
             }
-            if ( repository.getId().equals( apacheSnapshots.getId() ) )
+            // leave only one to download remote indexes explicitly
+            if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
             {
                 final MavenProxyRepository mavenProxyRepository = repository.adaptToFacet( MavenProxyRepository.class );
-                mavenProxyRepository.setDownloadRemoteIndexes( true );
+                if ( repository.getId().equals( apacheSnapshots.getId() ) )
+                {
+                    mavenProxyRepository.setDownloadRemoteIndexes( true );
+                    failingRepository = mavenProxyRepository;
+                    indexedProxyRepositories++;
+                }
+                else
+                {
+                    mavenProxyRepository.setDownloadRemoteIndexes( false );
+                }
                 mavenProxyRepository.commitChanges();
-                failingRepository = mavenProxyRepository;
-                indexedProxyRepositories++;
             }
         }
 
