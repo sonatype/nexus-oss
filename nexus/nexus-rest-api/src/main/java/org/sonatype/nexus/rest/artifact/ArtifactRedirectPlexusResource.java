@@ -28,7 +28,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * POM Resource handler.
- * 
+ *
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "ArtifactRedirectPlexusResource" )
@@ -56,10 +56,18 @@ public class ArtifactRedirectPlexusResource
     }
 
     /**
-     * Emits HTTP redirects (or Not found if not found) to the location of the requested artifact. This resource never
-     * returns any content, only 301 Moved permanently or 404 Not found status codes. The HTTP client accessing this
-     * resource has to follow the redirection to get to the content of the artifact.
-     * 
+     * Emits HTTP redirects (or Not found) to the location of the requested artifact.
+     *
+     * <p>
+     * This resource never returns any content, only <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.8">HTTP RFC -
+     * 10.3.8 307 Temporary Redirect</a> or <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">
+     * HTTP RFC - 10.4.5 404 Not Found</a>. The HTTP client accessing this resource has to follow the redirection to get
+     * to the content of the artifact.
+     * <p>
+     * Prior versions of this resource may have responded with an inappropriate <a
+     * href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.2">HTTP RFC - 10.3.2 301 Moved Permanently
+     * </a>instead of 307 Temporary Redirect.
+     *
      * @param g Group id of the artifact (Required).
      * @param a Artifact id of the artifact (Required).
      * @param v Version of the artifact (Required) Supports resolving of "LATEST", "RELEASE" and snapshot versions
