@@ -20,7 +20,7 @@
   <name>Nexus Yum :: Plugin</name>
 
   <properties>
-    <pluginName>Nexus Yum Plugin</pluginName>
+    <pluginName>Nexus : Plugins : Yum</pluginName>
     <pluginDescription>Allows Nexus to create yum repositories for uploaded RPM packages</pluginDescription>
     <pluginSiteUrl>https://github.com/sonatype/nexus-yum-plugin</pluginSiteUrl>
     <nexus.start.command>start</nexus.start.command>
