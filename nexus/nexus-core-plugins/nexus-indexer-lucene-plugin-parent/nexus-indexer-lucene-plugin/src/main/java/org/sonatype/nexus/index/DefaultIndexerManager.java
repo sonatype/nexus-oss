@@ -86,7 +86,6 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -110,9 +109,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.util.CompositeException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * <p>
@@ -193,6 +195,18 @@ public class DefaultIndexerManager
             DefaultIndexingContext.BLOCKING_COMMIT = true;
         }
         // This above is needed and used in ITs only!
+    }
+
+    @VisibleForTesting
+    protected void setIndexUpdater( final IndexUpdater indexUpdater )
+    {
+        this.indexUpdater = indexUpdater;
+    }
+
+    @VisibleForTesting
+    protected void setNexusIndexer( final NexusIndexer nexusIndexer )
+    {
+        this.nexusIndexer = nexusIndexer;
     }
 
     protected Logger getLogger()
@@ -645,7 +659,8 @@ public class DefaultIndexerManager
                             if ( ai.sha1 == null )
                             {
                                 // if repo has no sha1 checksum, odd nexus one
-                                ai.sha1 = item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+                                ai.sha1 =
+                                    item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
                             }
                         }
                     }
@@ -719,7 +734,7 @@ public class DefaultIndexerManager
             }
 
             ArtifactContext ac = null;
-            
+
             // we need to convert Nexus Gav to Indexer Gav
             org.apache.maven.index.artifact.Gav igav = GavUtils.convert( gav );
 
@@ -790,17 +805,42 @@ public class DefaultIndexerManager
     public void reindexAllRepositories( final String path, final boolean fullReindex )
         throws IOException
     {
-        List<Repository> reposes = repositoryRegistry.getRepositories();
-
+        final List<Repository> reposes = repositoryRegistry.getRepositories();
+        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( Repository repository : reposes )
         {
-            // going directly to single-shot, we are iterating over all reposes anyway
-            reindexRepository( repository, path, fullReindex );
+            try
+            {
+                // going directly to single-shot, we are iterating over all reposes anyway
+                reindexRepository( repository, path, fullReindex );
+            }
+            catch ( IOException e )
+            {
+                exceptions.add( e );
+            }
         }
-
+        // this has to happen after _every_ reindex happened,
+        // as otherwise publish of a group might publish index
+        // containing a member that is not yet updated
         if ( REINDEX_PUBLISHES )
         {
-            publishAllIndex();
+            for ( Repository repository : reposes )
+            {
+                try
+                {
+                    publishRepositoryIndex( repository );
+                }
+                catch ( IOException e )
+                {
+                    exceptions.add( e );
+                }
+            }
+        }
+
+        if ( !exceptions.isEmpty() )
+        {
+            throw new IOException( "Exception(s) happened during reindexAllRepositories()", new CompositeException(
+                "Multiple exceptions happened, please see prior log messages for details.", exceptions ) );
         }
     }
 
@@ -911,11 +951,23 @@ public class DefaultIndexerManager
     public void downloadAllIndex()
         throws IOException
     {
-        List<ProxyRepository> reposes = repositoryRegistry.getRepositoriesWithFacet( ProxyRepository.class );
-
+        final List<ProxyRepository> reposes = repositoryRegistry.getRepositoriesWithFacet( ProxyRepository.class );
+        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( ProxyRepository repository : reposes )
         {
-            downloadRepositoryIndex( repository, false );
+            try
+            {
+                downloadRepositoryIndex( repository, false );
+            }
+            catch ( IOException e )
+            {
+                exceptions.add( e );
+            }
+        }
+        if ( !exceptions.isEmpty() )
+        {
+            throw new IOException( "Exception(s) happened during downloadAllIndex()", new CompositeException(
+                "Multiple exceptions happened, please see prior log messages for details.", exceptions ) );
         }
     }
 
@@ -1034,19 +1086,39 @@ public class DefaultIndexerManager
                         RepositoryStringUtils.getFormattedMessage(
                             "Cannot fetch remote index for repository %s, task cancelled.", repository ) );
                 }
+                catch ( FileNotFoundException e )
+                {
+                    // here, FileNotFoundException literally means ResourceFetcher -- that is HTTP based -- hit a 404 on
+                    // remote, so we neglect this, this is not an error state actually
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().info(
+                            RepositoryStringUtils.getFormattedMessage(
+                                "Cannot fetch remote index for repository %s as it does not publish indexes.",
+                                repository ), e );
+                    }
+                    else
+                    {
+                        getLogger().info(
+                            RepositoryStringUtils.getFormattedMessage(
+                                "Cannot fetch remote index for repository %s as it does not publish indexes.",
+                                repository ) );
+                    }
+                }
                 catch ( IOException e )
                 {
-                    // kept logs since tasks will only log error if debug is enabled
                     getLogger().warn(
-                        RepositoryStringUtils.getFormattedMessage( "Cannot fetch remote index for repository %s",
-                            repository ), e );
+                        RepositoryStringUtils.getFormattedMessage(
+                            "Cannot fetch remote index for repository %s due to IO problem.", repository ), e );
                     throw e;
                 }
                 catch ( Exception e )
                 {
-                    getLogger().warn(
-                        RepositoryStringUtils.getFormattedMessage( "Cannot fetch remote index for repository %s",
-                            repository ), e );
+                    final String message =
+                        RepositoryStringUtils.getFormattedMessage(
+                            "Cannot fetch remote index for repository %s, error occurred.", repository );
+                    getLogger().warn( message, e );
+                    throw new IOException( message, e );
                 }
             }
 
@@ -1060,7 +1132,7 @@ public class DefaultIndexerManager
     }
 
     protected boolean updateRemoteIndex( final ProxyRepository repository, boolean forceFullUpdate )
-        throws IOException, IllegalOperationException, ItemNotFoundException
+        throws IOException, IllegalOperationException
     {
         TaskUtil.checkInterruption();
 
@@ -1111,14 +1183,9 @@ public class DefaultIndexerManager
 
                     return item.getInputStream();
                 }
-                catch ( RemoteAccessException ex )
-                {
-                    // XXX: But we should detect this? Maybe a permission problem?
-                    throw new FileNotFoundException( name + " (" + ex.getMessage() + ")" );
-                }
                 catch ( ItemNotFoundException ex )
                 {
-                    FileNotFoundException fne = new FileNotFoundException( name + " (item not found)" );
+                    final FileNotFoundException fne = new FileNotFoundException( name + " (remote item not found)" );
                     fne.initCause( ex );
                     throw fne;
                 }
@@ -1179,12 +1246,24 @@ public class DefaultIndexerManager
     public void publishAllIndex()
         throws IOException
     {
-        List<Repository> reposes = repositoryRegistry.getRepositories();
-
+        final List<Repository> reposes = repositoryRegistry.getRepositories();
+        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         // just publish all, since we use merged context, no need for double pass
         for ( Repository repository : reposes )
         {
-            publishRepositoryIndex( repository );
+            try
+            {
+                publishRepositoryIndex( repository );
+            }
+            catch ( IOException e )
+            {
+                exceptions.add( e );
+            }
+        }
+        if ( !exceptions.isEmpty() )
+        {
+            throw new IOException( "Exception(s) happened during publishAllIndex()", new CompositeException(
+                "Multiple exceptions happened, please see prior log messages for details.", exceptions ) );
         }
     }
 
@@ -1401,11 +1480,24 @@ public class DefaultIndexerManager
     public void optimizeAllRepositoriesIndex()
         throws IOException
     {
-        List<Repository> repos = repositoryRegistry.getRepositories();
-
+        final List<Repository> repos = repositoryRegistry.getRepositories();
+        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( Repository repository : repos )
         {
-            optimizeRepositoryIndex( repository );
+            try
+            {
+                optimizeRepositoryIndex( repository );
+            }
+            catch ( IOException e )
+            {
+                exceptions.add( e );
+            }
+        }
+        if ( !exceptions.isEmpty() )
+        {
+            throw new IOException( "Exception(s) happened during optimizeAllRepositoriesIndex()",
+                new CompositeException( "Multiple exceptions happened, please see prior log messages for details.",
+                    exceptions ) );
         }
     }
 
