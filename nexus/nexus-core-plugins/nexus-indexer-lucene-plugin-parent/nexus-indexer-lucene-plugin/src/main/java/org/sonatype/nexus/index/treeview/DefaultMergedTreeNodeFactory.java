@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * A default implementation of merged TreeNodeFactory, that is failry simple to extend. Note: this implementation
@@ -37,12 +38,17 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class DefaultMergedTreeNodeFactory
     extends DefaultTreeNodeFactory
 {
+    private static final String CHECK_LOCAL_AVAILABILITY_KEY =
+        "org.sonatype.nexus.index.treeview.DefaultMergedTreeNodeFactory.checkLocalAvailability";
+
+    private static final boolean CHECK_LOCAL_AVAILABILITY = SystemPropertiesHelper.getBoolean(
+        CHECK_LOCAL_AVAILABILITY_KEY, false );
+
     private Repository repository;
 
     public DefaultMergedTreeNodeFactory( Repository repository )
     {
         super( repository.getId() );
-
         this.repository = repository;
     }
 
@@ -55,9 +61,9 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode decorateGNode( IndexTreeView tview, TreeViewRequest req, String path, String groupName,
                                       TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateGNode( tview, req, path, groupName, node );
+        final DefaultMergedTreeNode mnode =
+            (DefaultMergedTreeNode) super.decorateGNode( tview, req, path, groupName, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-
         return mnode;
     }
 
@@ -65,9 +71,8 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode decorateANode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
                                       TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateANode( tview, req, ai, path, node );
+        final DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateANode( tview, req, ai, path, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-
         return mnode;
     }
 
@@ -75,9 +80,8 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode decorateVNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
                                       TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateVNode( tview, req, ai, path, node );
+        final DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateVNode( tview, req, ai, path, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-
         return mnode;
     }
 
@@ -85,33 +89,76 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode decorateArtifactNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
                                              TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateArtifactNode( tview, req, ai, path, node );
+        final DefaultMergedTreeNode mnode =
+            (DefaultMergedTreeNode) super.decorateArtifactNode( tview, req, ai, path, node );
+        gatherArtifactNodeInfoIfAvailable( path, mnode );
+        return node;
+    }
 
-        ResourceStoreRequest request = getResourceStoreRequest( path );
+    @Override
+    protected TreeNode createNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
+                                   String nodeName, Type type )
+    {
+        final TreeNode result = super.createNode( tview, req, path, leaf, nodeName, type );
+        result.setRepositoryId( getRepository().getId() );
+        return result;
+    }
 
-        // default it to not available
-        mnode.setLocallyAvailable( false );
+    @Override
+    protected TreeNode instantiateNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
+                                        String nodeName )
+    {
+        return new DefaultMergedTreeNode( tview, req );
+    }
 
+    protected ResourceStoreRequest getResourceStoreRequest( String path )
+    {
+        return new ResourceStoreRequest( path, true );
+    }
+
+    protected boolean isPathAvailable( String path )
+    {
+        if ( !CHECK_LOCAL_AVAILABILITY )
+        {
+            return false;
+        }
         try
         {
-            StorageItem item = getRepository().retrieveItem( request );
+            final ResourceStoreRequest request = getResourceStoreRequest( path );
+            return getRepository().getLocalStorage().containsItem( getRepository(), request );
+        }
+        catch ( Exception e )
+        {
+            // for whatever reason, couldn't see item, so it's not cached locally we shall say
+        }
+        return false;
+    }
 
+    protected void gatherArtifactNodeInfoIfAvailable( final String path, final DefaultMergedTreeNode mnode )
+    {
+        if ( !CHECK_LOCAL_AVAILABILITY )
+        {
+            return;
+        }
+
+        final ResourceStoreRequest request = getResourceStoreRequest( path );
+        // default it to not available
+        mnode.setLocallyAvailable( false );
+        try
+        {
+            final StorageItem item = getRepository().retrieveItem( request );
             if ( item instanceof StorageFileItem )
             {
                 mnode.setLocallyAvailable( true );
-
                 mnode.setArtifactTimestamp( item.getModified() );
-
-                mnode.setArtifactMd5Checksum( item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
-
-                mnode.setArtifactSha1Checksum( item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
-
+                mnode.setArtifactMd5Checksum( item.getRepositoryItemAttributes().get(
+                    DigestCalculatingInspector.DIGEST_MD5_KEY ) );
+                mnode.setArtifactSha1Checksum( item.getRepositoryItemAttributes().get(
+                    DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
                 mnode.setInitiatorUserId( item.getRepositoryItemAttributes().get( AccessManager.REQUEST_USER ) );
-
-                mnode.setInitiatorIpAddress( item.getRepositoryItemAttributes().get( AccessManager.REQUEST_REMOTE_ADDRESS ) );
-
+                mnode.setInitiatorIpAddress( item.getRepositoryItemAttributes().get(
+                    AccessManager.REQUEST_REMOTE_ADDRESS ) );
                 mnode.setArtifactOriginUrl( item.getRemoteUrl() );
-
                 if ( !StringUtils.isEmpty( mnode.getArtifactOriginUrl() ) )
                 {
                     mnode.setArtifactOriginReason( "cached" );
@@ -130,47 +177,6 @@ public class DefaultMergedTreeNodeFactory
         {
             // TODO: do something here?
         }
-
-        return node;
-    }
-
-    @Override
-    protected TreeNode createNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
-                                   String nodeName, Type type )
-    {
-        TreeNode result = super.createNode( tview, req, path, leaf, nodeName, type );
-
-        result.setRepositoryId( getRepository().getId() );
-
-        return result;
-    }
-
-    @Override
-    protected TreeNode instantiateNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
-                                        String nodeName )
-    {
-        return new DefaultMergedTreeNode( tview, req );
-    }
-
-    protected ResourceStoreRequest getResourceStoreRequest( String path )
-    {
-        return new ResourceStoreRequest( path, true );
-    }
-
-    protected boolean isPathAvailable( String path )
-    {
-        ResourceStoreRequest request = getResourceStoreRequest( path );
-
-        try
-        {
-            return getRepository().getLocalStorage().containsItem( getRepository(), request );
-        }
-        catch ( Exception e )
-        {
-            // for whatever reason, couldn't see item, so it's not cached locally we shall say
-        }
-
-        return false;
     }
 
 }
