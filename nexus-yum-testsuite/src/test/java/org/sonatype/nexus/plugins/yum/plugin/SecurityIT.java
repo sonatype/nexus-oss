@@ -22,30 +22,43 @@ import org.sonatype.security.rest.model.UserResource;
 
 import com.sun.jersey.api.client.UniformInterfaceException;
 
-public class SecurityIT extends AbstractIntegrationTestCase {
-  private static final String ANOTHER_VERSION = "4.3.1";
-private static final String VERSION = "1.2.3";
-private static final String REPO = "releases";
-private static final String PASSWORD = "yum123";
+public class SecurityIT
+    extends AbstractIntegrationTestCase
+{
+    private static final String ANOTHER_VERSION = "4.3.1";
 
-@Test(expected = UniformInterfaceException.class)
-  public void shouldNotHaveReadAccessToAliasesForAnonymous() throws Exception {
-    final String alias = uniqueName();
-    yum().createOrUpdateAlias(REPO, alias, VERSION);
-    createNexusClientForAnonymous(nexus()).getSubsystem(YumClient.class).getAliasVersion(REPO, alias);
-  }
+    private static final String VERSION = "1.2.3";
 
-  @Test(expected = UniformInterfaceException.class)
-  public void shouldNotCreateAliasForAnonymous() throws Exception {
-    createNexusClientForAnonymous(nexus()).getSubsystem(YumClient.class).createOrUpdateAlias(REPO, uniqueName(), VERSION);
-  }
+    private static final String REPO = "releases";
 
-  @Test(expected = UniformInterfaceException.class)
-  public void shouldNotHaveUpdateAccessToAliasesForAnonymous() throws Exception {
-    final String alias = uniqueName();
-    yum().createOrUpdateAlias(REPO, alias, VERSION);
-    createNexusClientForAnonymous(nexus()).getSubsystem(YumClient.class).createOrUpdateAlias(REPO, alias, "3.2.1");
-  }
+    private static final String PASSWORD = "yum123";
+
+    @Test( expected = UniformInterfaceException.class )
+    public void shouldNotHaveReadAccessToAliasesForAnonymous()
+        throws Exception
+    {
+        final String alias = uniqueName();
+        yum().createOrUpdateAlias( REPO, alias, VERSION );
+        createNexusClientForAnonymous( nexus() ).getSubsystem( YumClient.class ).getAliasVersion( REPO, alias );
+    }
+
+    @Test( expected = UniformInterfaceException.class )
+    public void shouldNotCreateAliasForAnonymous()
+        throws Exception
+    {
+        createNexusClientForAnonymous( nexus() ).getSubsystem( YumClient.class ).createOrUpdateAlias( REPO,
+            uniqueName(), VERSION );
+    }
+
+    @Test( expected = UniformInterfaceException.class )
+    public void shouldNotHaveUpdateAccessToAliasesForAnonymous()
+        throws Exception
+    {
+        final String alias = uniqueName();
+        yum().createOrUpdateAlias( REPO, alias, VERSION );
+        createNexusClientForAnonymous( nexus() ).getSubsystem( YumClient.class ).createOrUpdateAlias( REPO, alias,
+            "3.2.1" );
+    }
 
     @Test
     public void shouldAllowAccessForYumAdmin()
