@@ -23,7 +23,11 @@ import java.util.List;
  * A composite {@link Exception} descendant, that is able to collect multiple causes to have them throw at the end of
  * some batch processing for example. Inspired by code from <a href=
  * "http://stackoverflow.com/questions/12481583/exception-composition-in-java-when-both-first-strategy-and-recovery-strategy-fai"
- * >Stack Overflow</a>.
+ * >Stack Overflow</a>. Note: this exception merely serves the purpose to hold multiple causes, but it not quite usable
+ * to log them. As today, Nexus uses SLF4J as logging API, that might be backed by any backend out of many existing
+ * (think WAR, but today logback is used) the overridden methods are not used. Hence, in case of logging
+ * {@link CompositeException}, the multiple causes will not be logged, you still need to manually log them, or process
+ * in any other way, if needed.
  * 
  * @author cstamas
  * @since 2.2
