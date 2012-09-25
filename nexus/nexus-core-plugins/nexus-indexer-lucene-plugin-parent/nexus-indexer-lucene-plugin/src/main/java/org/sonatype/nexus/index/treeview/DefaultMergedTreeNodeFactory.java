@@ -19,13 +19,19 @@ import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNode.Type;
 import org.apache.maven.index.treeview.TreeViewRequest;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
@@ -44,11 +50,14 @@ public class DefaultMergedTreeNodeFactory
     private static final boolean CHECK_LOCAL_AVAILABILITY = SystemPropertiesHelper.getBoolean(
         CHECK_LOCAL_AVAILABILITY_KEY, false );
 
-    private Repository repository;
+    private final Logger logger;
+
+    private final Repository repository;
 
     public DefaultMergedTreeNodeFactory( Repository repository )
     {
         super( repository.getId() );
+        this.logger = LoggerFactory.getLogger( getClass() );
         this.repository = repository;
     }
 
@@ -130,6 +139,8 @@ public class DefaultMergedTreeNodeFactory
         catch ( Exception e )
         {
             // for whatever reason, couldn't see item, so it's not cached locally we shall say
+            logger.warn( "IO related problem during local storage availability check in repository {}",
+                RepositoryStringUtils.getHumanizedNameString( getRepository() ), e );
         }
         return false;
     }
@@ -171,11 +182,23 @@ public class DefaultMergedTreeNodeFactory
         }
         catch ( ItemNotFoundException e )
         {
-            // mute it, probaly not available locally
+            // mute it, probably not available locally
         }
-        catch ( Exception e )
+        catch ( AccessDeniedException e )
         {
-            // TODO: do something here?
+            // mute it, probably user does not have authz to access this part of repo
+        }
+        catch ( IllegalOperationException e )
+        {
+            // like "repo is out of service", but why is then tree view accessed at all? In that case it's a bug
+            logger.warn( "Illegal operation tried against repository {}",
+                RepositoryStringUtils.getHumanizedNameString( getRepository() ), e );
+        }
+        catch ( StorageException e )
+        {
+            // this is lethal, some "io related" problem. Is basically IOException and is a problem on your instance or HW/net
+            logger.warn( "IO related problem in repository {}",
+                RepositoryStringUtils.getHumanizedNameString( getRepository() ), e );
         }
     }
 
