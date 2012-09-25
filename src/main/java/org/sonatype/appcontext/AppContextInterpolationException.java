@@ -11,11 +11,18 @@ public class AppContextInterpolationException
 {
     private static final long serialVersionUID = 7958491320532121743L;
 
+    /**
+     * @param message
+     */
     public AppContextInterpolationException( String message )
     {
         super( message );
     }
 
+    /**
+     * @param message
+     * @param cause
+     */
     public AppContextInterpolationException( String message, Throwable cause )
     {
         super( message, cause );

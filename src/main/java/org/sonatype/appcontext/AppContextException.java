@@ -11,11 +11,18 @@ public class AppContextException
 {
     private static final long serialVersionUID = 3396476391595403414L;
 
+    /**
+     * @param message
+     */
     public AppContextException( String message )
     {
         super( message );
     }
 
+    /**
+     * @param message
+     * @param cause
+     */
     public AppContextException( String message, Throwable cause )
     {
         super( message, cause );

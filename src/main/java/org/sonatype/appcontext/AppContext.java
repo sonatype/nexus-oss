@@ -2,6 +2,7 @@ package org.sonatype.appcontext;
 
 import java.util.Map;
 
+import org.sonatype.appcontext.guice.AppContextModule;
 import org.sonatype.appcontext.lifecycle.AppContextLifecycleManager;
 
 /**
@@ -17,6 +18,8 @@ public interface AppContext
     /**
      * A key to be used for mapping whenever needed, to find AppContext. For SISU/Guice support see
      * {@link AppContextModule} class. This key is merely to be used in Map-like mappings.
+     * 
+     * @deprecated Use {@code AppContext} interface FQN instead.
      */
     String APPCONTEXT_KEY = AppContext.class.getName();
 
@@ -41,7 +44,9 @@ public interface AppContext
      * of changing methods. This method is better suited for change detection, as the {@link #getModified()} might
      * "oversee" changes happening in same millisecond.
      * 
-     * @return
+     * @return an integer marking the "generation" of this instance. On changes made to this context is grows. It's
+     *         stepping is undefined, so only "equality" or relations like "bigger" or "smaller" might be checked
+     *         against it.
      * @since 3.2
      */
     int getGeneration();
@@ -49,20 +54,21 @@ public interface AppContext
     /**
      * Returns the id of this context.
      * 
-     * @return
+     * @return the ID of this context.
      */
     String getId();
 
     /**
      * Returns the parent app context if any, or {@code null} if this context is root context.
      * 
-     * @return
+     * @return the parent app context.
      */
     AppContext getParent();
 
     /**
      * Returns the context's lifecycle manager.
      * 
+     * @return the lifecycle manager of this context.
      * @since 3.1
      */
     AppContextLifecycleManager getLifecycleManager();
@@ -71,14 +77,16 @@ public interface AppContext
      * Flattens this AppContext (calculates "visible" entries from this and it's parent and returns a plain Map. This
      * map is not connected to AppContext anymore, and not modifiable! It is just a "snapshot".
      * 
-     * @return
+     * @return a "snapshot" of entries of this app context hierarchy as unmodifiable map.
      */
     Map<String, Object> flatten();
 
     /**
      * Interpolates passed in string using this app context as source.
      * 
-     * @return
+     * @param input the input string to interpolate. Keys are marked as ${key}.
+     * @return interpolated string using this app context.
+     * @throws AppContextInterpolationException in case of interpolation problem (like recursive evaluation etc).
      * @since 3.0
      */
     String interpolate( String input )
@@ -88,16 +96,18 @@ public interface AppContext
      * Returns the entry value, used in creation of this context. Gives access to source marker and raw (uninterpolated)
      * values. Low level method!
      * 
-     * @return
+     * @param key the key of the entry you want.
+     * @return the {@link AppContextEntry} corresponding to given {@code key} or {@code null} if no such entry.
      */
     AppContextEntry getAppContextEntry( String key );
 
     /**
      * Flattens this AppContext (calculates "visible" entries from this and it's parent and returns a plain Map but with
      * AppContextEntries as values. This map is not connected to AppContext anymore, and not modifiable! It is just a
-     * "snapshot". Low level method!
+     * "snapshot". Low level method! Similar to {@link #flatten()} method, but here, you get the {@link AppContextEntry}
+     * instances.
      * 
-     * @return
+     * @return a "snapshot" of {@link AppContextEntry}s of this app context hierarchy as unmodifiable map.
      */
     Map<String, AppContextEntry> flattenAppContextEntries();
 }

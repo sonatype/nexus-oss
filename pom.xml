@@ -1,17 +1,18 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
-    <version>19</version>
+    <version>20</version>
   </parent>
 
   <groupId>org.sonatype.appcontext</groupId>
   <artifactId>appcontext</artifactId>
-  <version>3.3-SNAPSHOT</version>
+  <version>4.0-SNAPSHOT</version>
 
   <name>Sonatype AppContext</name>
   <description>A small utility useful in various use cases, like "booting" an application. All it does is simply creates a plain Map, with it's values sourced from different places and applies different strategies (override order).</description>
@@ -26,30 +27,45 @@
 
   <dependencies>
 
-    <!-- interpolation -->
+    <!-- interpolation (mandatory) -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
       <version>1.14</version>
-      <optional>false</optional>
       <scope>compile</scope>
     </dependency>
 
-    <!-- logging (optional) -->
+    <!-- logging in dumping (optional, consumer env should provide) -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <optional>true</optional>
-      <scope>compile</scope>
+      <scope>provided</scope>
     </dependency>
-    
-    <!-- Guice module (optional) -->
+
+    <!-- SISU/Guice module (optional, consumer env should provide) -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-bean</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
       <classifier>no_aop</classifier>
-      <optional>true</optional>
-      <scope>compile</scope>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Servlet support (optional, consumer env should provide) -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.0.1</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Test -->

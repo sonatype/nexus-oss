@@ -9,6 +9,11 @@ import org.sonatype.appcontext.publisher.PrintStreamEntryPublisher;
 import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
 import org.sonatype.appcontext.source.Sources;
 
+/**
+ * A factory for creating {@link AppContext} instances.
+ * 
+ * @author cstamas
+ */
 public class Factory
 {
     private static final List<String> EMPTY = Collections.emptyList();

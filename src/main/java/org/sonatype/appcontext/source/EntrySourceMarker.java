@@ -7,5 +7,10 @@ package org.sonatype.appcontext.source;
  */
 public interface EntrySourceMarker
 {
+    /**
+     * Returns the description of this marker.
+     * 
+     * @return the description.
+     */
     String getDescription();
 }

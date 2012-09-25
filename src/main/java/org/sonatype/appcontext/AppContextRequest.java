@@ -8,6 +8,11 @@ import org.sonatype.appcontext.publisher.EntryPublisher;
 import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 
+/**
+ * Request for building {@link AppContext} instances.
+ * 
+ * @author cstamas
+ */
 public class AppContextRequest
 {
     private final String id;

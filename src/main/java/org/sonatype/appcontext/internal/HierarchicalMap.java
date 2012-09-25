@@ -2,11 +2,10 @@ package org.sonatype.appcontext.internal;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A Map (based on HashMap, so all of it's internalities applies), that might have a parent. Parent is referred only in
+ * A Map (based on HashMap, so all of it's peculiarities applies), that might have a parent. Parent is referred only in
  * case of query operations ({@link #get(Object)}, {@link #containsKey(Object)}, {@link #containsValue(Object)}), so for
  * example the {@link #get(Object)} method may "bubble" up on multiple ancestors to grab a value. Still, even if current
  * map has no entries, but it serves entries from it's parent, {@link #size()} of this map will return 0.
@@ -21,26 +20,25 @@ public class HierarchicalMap<K, V>
 {
     private static final long serialVersionUID = 3445870461584217031L;
 
-    private final HierarchicalMap<K, V> parent;
+    private final Map<K, V> parent;
 
     public HierarchicalMap()
     {
         this( null );
     }
 
-    public HierarchicalMap( final HierarchicalMap<K, V> parent )
+    public HierarchicalMap( final Map<K, V> parent )
     {
         super();
-
         this.parent = checkParentContext( parent );
     }
 
-    public HierarchicalMap<K, V> getParent()
+    public Map<K, V> getParent()
     {
         return parent;
     }
 
-    protected HierarchicalMap<K, V> checkParentContext( HierarchicalMap<K, V> context )
+    protected Map<K, V> checkParentContext( final Map<K, V> context )
     {
         if ( context != null )
         {
@@ -50,16 +48,26 @@ public class HierarchicalMap<K, V>
                     "The context cannot be parent of itself! The parent instance cannot equals to this instance!" );
             }
 
-            HierarchicalMap<K, V> otherParentContext = context.getParent();
-
-            while ( otherParentContext != null )
+            if ( context instanceof HierarchicalMap )
             {
-                if ( this == otherParentContext )
+                Map<K, V> otherParentContext = ( (HierarchicalMap<K, V>) context ).getParent();
+                while ( otherParentContext != null )
                 {
-                    throw new IllegalArgumentException( "The context cannot be an ancestor of itself! Cycle detected!" );
-                }
+                    if ( this == otherParentContext )
+                    {
+                        throw new IllegalArgumentException(
+                            "The context cannot be an ancestor of itself! Cycle detected!" );
+                    }
 
-                otherParentContext = otherParentContext.getParent();
+                    if ( otherParentContext instanceof HierarchicalMap )
+                    {
+                        otherParentContext = ( (HierarchicalMap<K, V>) otherParentContext ).getParent();
+                    }
+                    else
+                    {
+                        otherParentContext = null;
+                    }
+                }
             }
         }
 
@@ -75,12 +83,10 @@ public class HierarchicalMap<K, V>
     public boolean containsKey( Object key, boolean fallBackToParent )
     {
         boolean result = super.containsKey( key );
-
         if ( fallBackToParent && !result && getParent() != null )
         {
             result = getParent().containsKey( key );
         }
-
         return result;
     }
 
@@ -93,12 +99,10 @@ public class HierarchicalMap<K, V>
     public boolean containsValue( Object val, boolean fallBackToParent )
     {
         boolean result = super.containsValue( val );
-
         if ( fallBackToParent && !result && getParent() != null )
         {
             result = getParent().containsValue( val );
         }
-
         return result;
     }
 
@@ -128,26 +132,20 @@ public class HierarchicalMap<K, V>
 
     public Map<K, V> flatten()
     {
-        HashMap<K, V> result = new HashMap<K, V>();
-
-        HierarchicalMap<K, V> ctx = this;
-
-        Stack<HierarchicalMap<K, V>> stack = new Stack<HierarchicalMap<K, V>>();
-
-        while ( ctx != null )
+        final HashMap<K, V> result = new HashMap<K, V>();
+        final Map<K, V> parent = getParent();
+        if ( getParent() != null )
         {
-            stack.push( ctx );
-
-            ctx = ctx.getParent();
+            if ( parent instanceof HierarchicalMap )
+            {
+                result.putAll( ( (HierarchicalMap<K, V>) parent ).flatten() );
+            }
+            else
+            {
+                result.putAll( parent );
+            }
         }
-
-        while ( !stack.isEmpty() )
-        {
-            ctx = stack.pop();
-
-            result.putAll( ctx );
-        }
-
+        result.putAll( this );
         return result;
     }
 }
