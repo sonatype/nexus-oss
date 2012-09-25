@@ -19,20 +19,10 @@ public class Factory
     private static final List<String> EMPTY = Collections.emptyList();
 
     /**
-     * Creates a "default" request, with all the default sources and publishers. The request will have ID "default",
-     * default sources are coming from {@link Sources#getDefaultSources(String, List)} and
-     * {@link PrintStreamEntryPublisher} or {@link Slf4jLoggerEntryPublisher} publisher, depending is SLF4J detected on
-     * class path or not.
-     * 
-     * @return
-     */
-    public static AppContextRequest getDefaultRequest()
-    {
-        return getDefaultRequest( "default" );
-    }
-
-    /**
-     * Creates a "default" request with given ID. See {@link #getDefaultRequest()} for sources and publishers.
+     * Creates a "default" request with given ID. Creates a "default" request, with all the default sources and
+     * publishers. The request will have passed in ID, default sources are coming from
+     * {@link Sources#getDefaultSources(String, List)} and {@link PrintStreamEntryPublisher} or
+     * {@link Slf4jLoggerEntryPublisher} publisher, depending is SLF4J detected on class path or not.
      * 
      * @param id
      * @return

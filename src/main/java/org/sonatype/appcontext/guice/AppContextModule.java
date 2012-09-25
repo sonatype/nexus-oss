@@ -32,6 +32,6 @@ public class AppContextModule
     protected void configure()
     {
         bind( AppContext.class ).toInstance( appContext );
-        bind( ParameterKeys.PROPERTIES ).toInstance( new StringMapAdapter( appContext ) );
+        bind( ParameterKeys.PROPERTIES ).toInstance( new StringAdapter( appContext ) );
     }
 }
