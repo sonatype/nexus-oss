@@ -78,13 +78,15 @@ public class AppContextRequest
      * req.getSources().add( 0, new PropertiesFileEntrySource( new File( &quot;leastimportant.properties&quot; ) ) );
      * </pre>
      * 
-     * By using approach like this above, you always ensure that "least" important is the 1st element of the list, while
-     * the "bit more" important sources are moved forward (to list index greater than 0), while you do not disturb the
-     * order of the list "tail", where other important sources are (doing the prefix and key inclusion is handled).
-     * Still, if you know what you do, you can still invoke {@link List#clear()} and set the ordering you want from the
-     * scratch.
+     * By using approach like this above, you always ensure that "least" important is the 1st (index 0) element of the
+     * list, while the "bit more" important sources are moved forward (to list index greater than 0), while you do not
+     * disturb the order of the list "tail", where other important sources are (doing the prefix and key inclusion is
+     * handled). Still, if you know what you do, you can still invoke {@link List#clear()} and set the ordering you want
+     * from the scratch or just insert where you want without clearing the list. To rehearse, last {@link EntrySource}
+     * "wins", meaning, if it contributes a key-value (or multiple of them) to the context, and a mapping for key(s)
+     * exists, they will be overridden, stomped over by next source.
      * 
-     * @return
+     * @return list of ordered {@link EntrySource} sources to be used when {@link AppContext} is being created.
      */
     public List<EntrySource> getSources()
     {
