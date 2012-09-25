@@ -19,13 +19,20 @@ import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNode.Type;
 import org.apache.maven.index.treeview.TreeViewRequest;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * A default implementation of merged TreeNodeFactory, that is failry simple to extend. Note: this implementation
@@ -37,12 +44,20 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class DefaultMergedTreeNodeFactory
     extends DefaultTreeNodeFactory
 {
-    private Repository repository;
+    private static final String CHECK_LOCAL_AVAILABILITY_KEY =
+        "org.sonatype.nexus.index.treeview.DefaultMergedTreeNodeFactory.checkLocalAvailability";
+
+    private static final boolean CHECK_LOCAL_AVAILABILITY = SystemPropertiesHelper.getBoolean(
+        CHECK_LOCAL_AVAILABILITY_KEY, false );
+
+    private final Logger logger;
+
+    private final Repository repository;
 
     public DefaultMergedTreeNodeFactory( Repository repository )
     {
         super( repository.getId() );
-
+        this.logger = LoggerFactory.getLogger( getClass() );
         this.repository = repository;
     }
 
@@ -55,9 +70,9 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode decorateGNode( IndexTreeView tview, TreeViewRequest req, String path, String groupName,
                                       TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateGNode( tview, req, path, groupName, node );
+        final DefaultMergedTreeNode mnode =
+            (DefaultMergedTreeNode) super.decorateGNode( tview, req, path, groupName, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-
         return mnode;
     }
 
@@ -65,9 +80,8 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode decorateANode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
                                       TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateANode( tview, req, ai, path, node );
+        final DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateANode( tview, req, ai, path, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-
         return mnode;
     }
 
@@ -75,9 +89,8 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode decorateVNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
                                       TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateVNode( tview, req, ai, path, node );
+        final DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateVNode( tview, req, ai, path, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-
         return mnode;
     }
 
@@ -85,52 +98,9 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode decorateArtifactNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
                                              TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateArtifactNode( tview, req, ai, path, node );
-
-        ResourceStoreRequest request = getResourceStoreRequest( path );
-
-        // default it to not available
-        mnode.setLocallyAvailable( false );
-
-        try
-        {
-            StorageItem item = getRepository().retrieveItem( request );
-
-            if ( item instanceof StorageFileItem )
-            {
-                mnode.setLocallyAvailable( true );
-
-                mnode.setArtifactTimestamp( item.getModified() );
-
-                mnode.setArtifactMd5Checksum( item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
-
-                mnode.setArtifactSha1Checksum( item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
-
-                mnode.setInitiatorUserId( item.getRepositoryItemAttributes().get( AccessManager.REQUEST_USER ) );
-
-                mnode.setInitiatorIpAddress( item.getRepositoryItemAttributes().get( AccessManager.REQUEST_REMOTE_ADDRESS ) );
-
-                mnode.setArtifactOriginUrl( item.getRemoteUrl() );
-
-                if ( !StringUtils.isEmpty( mnode.getArtifactOriginUrl() ) )
-                {
-                    mnode.setArtifactOriginReason( "cached" );
-                }
-                else
-                {
-                    mnode.setArtifactOriginReason( "deployed" );
-                }
-            }
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // mute it, probaly not available locally
-        }
-        catch ( Exception e )
-        {
-            // TODO: do something here?
-        }
-
+        final DefaultMergedTreeNode mnode =
+            (DefaultMergedTreeNode) super.decorateArtifactNode( tview, req, ai, path, node );
+        gatherArtifactNodeInfoIfAvailable( path, mnode );
         return node;
     }
 
@@ -138,10 +108,8 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode createNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
                                    String nodeName, Type type )
     {
-        TreeNode result = super.createNode( tview, req, path, leaf, nodeName, type );
-
+        final TreeNode result = super.createNode( tview, req, path, leaf, nodeName, type );
         result.setRepositoryId( getRepository().getId() );
-
         return result;
     }
 
@@ -159,18 +127,79 @@ public class DefaultMergedTreeNodeFactory
 
     protected boolean isPathAvailable( String path )
     {
-        ResourceStoreRequest request = getResourceStoreRequest( path );
-
+        if ( !CHECK_LOCAL_AVAILABILITY )
+        {
+            return false;
+        }
         try
         {
+            final ResourceStoreRequest request = getResourceStoreRequest( path );
             return getRepository().getLocalStorage().containsItem( getRepository(), request );
         }
         catch ( Exception e )
         {
             // for whatever reason, couldn't see item, so it's not cached locally we shall say
+            logger.warn( "IO related problem during local storage availability check in repository {}",
+                RepositoryStringUtils.getHumanizedNameString( getRepository() ), e );
+        }
+        return false;
+    }
+
+    protected void gatherArtifactNodeInfoIfAvailable( final String path, final DefaultMergedTreeNode mnode )
+    {
+        if ( !CHECK_LOCAL_AVAILABILITY )
+        {
+            return;
         }
 
-        return false;
+        final ResourceStoreRequest request = getResourceStoreRequest( path );
+        // default it to not available
+        mnode.setLocallyAvailable( false );
+        try
+        {
+            final StorageItem item = getRepository().retrieveItem( request );
+            if ( item instanceof StorageFileItem )
+            {
+                mnode.setLocallyAvailable( true );
+                mnode.setArtifactTimestamp( item.getModified() );
+                mnode.setArtifactMd5Checksum( item.getRepositoryItemAttributes().get(
+                    DigestCalculatingInspector.DIGEST_MD5_KEY ) );
+                mnode.setArtifactSha1Checksum( item.getRepositoryItemAttributes().get(
+                    DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
+                mnode.setInitiatorUserId( item.getRepositoryItemAttributes().get( AccessManager.REQUEST_USER ) );
+                mnode.setInitiatorIpAddress( item.getRepositoryItemAttributes().get(
+                    AccessManager.REQUEST_REMOTE_ADDRESS ) );
+                mnode.setArtifactOriginUrl( item.getRemoteUrl() );
+                if ( !StringUtils.isEmpty( mnode.getArtifactOriginUrl() ) )
+                {
+                    mnode.setArtifactOriginReason( "cached" );
+                }
+                else
+                {
+                    mnode.setArtifactOriginReason( "deployed" );
+                }
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // mute it, probably not available locally
+        }
+        catch ( AccessDeniedException e )
+        {
+            // mute it, probably user does not have authz to access this part of repo
+        }
+        catch ( IllegalOperationException e )
+        {
+            // like "repo is out of service", but why is then tree view accessed at all? In that case it's a bug
+            logger.warn( "Illegal operation tried against repository {}",
+                RepositoryStringUtils.getHumanizedNameString( getRepository() ), e );
+        }
+        catch ( StorageException e )
+        {
+            // this is lethal, some "io related" problem. Is basically IOException and is a problem on your instance or HW/net
+            logger.warn( "IO related problem in repository {}",
+                RepositoryStringUtils.getHumanizedNameString( getRepository() ), e );
+        }
     }
 
 }
