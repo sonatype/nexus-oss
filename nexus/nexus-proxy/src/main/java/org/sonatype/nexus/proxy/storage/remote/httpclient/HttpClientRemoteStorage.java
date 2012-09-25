@@ -58,6 +58,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Apache HTTP client (4) {@link RemoteRepositoryStorage} implementation.
@@ -135,7 +136,7 @@ public class HttpClientRemoteStorage
             appendQueryString( getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() ), repository );
 
         final String url = remoteURL.toExternalForm();
-        if ( url.endsWith( "/" ) )
+        if ( remoteURL.getPath().endsWith( "/" ) )
         {
             // NEXUS-5125 we do not want to fetch any collection
             // Even though it is unlikely that we actually see a request for a collection here,
@@ -425,9 +426,10 @@ public class HttpClientRemoteStorage
      * @return response of making the request
      * @throws RemoteStorageException If an error occurred during execution of HTTP request
      */
-    private HttpResponse executeRequest( final ProxyRepository repository,
-                                         final ResourceStoreRequest request,
-                                         final HttpUriRequest httpRequest )
+    @VisibleForTesting
+    HttpResponse executeRequest( final ProxyRepository repository,
+                                 final ResourceStoreRequest request,
+                                 final HttpUriRequest httpRequest )
         throws RemoteStorageException
     {
         final URI methodUri = httpRequest.getURI();
