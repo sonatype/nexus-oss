@@ -56,16 +56,6 @@ public class PlexusContainerContextListener
     private PlexusContainer plexusContainer;
 
     /**
-     * The one in bundle/conf/nexus.properties when ran as bundle, in WAR it does not exists.
-     */
-    private File nexusPropertiesFile;
-
-    /**
-     * The one in nexus/WEB-INF/nexus.properties, always exists
-     */
-    private File nexusDefaultPropertiesFile;
-
-    /**
      * The plexus.xml file in nexus/WEB-INF/plexus.xml, always exists
      */
     private File plexusXmlFile;
@@ -84,7 +74,7 @@ public class PlexusContainerContextListener
 
                 final ContainerConfiguration plexusConfiguration =
                     new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
-                        plexusXmlFile.toURI().toURL() ).setContext( (Map) appContext ).setAutoWiring( true ).setClassPathScanning(
+                        plexusXmlFile.toURI().toURL() ).setContext( (Map) appContext.flatten() ).setAutoWiring( true ).setClassPathScanning(
                         PlexusConstants.SCANNING_INDEX ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
 
                 final ArrayList<Module> modules = new ArrayList<Module>( 2 );
@@ -185,23 +175,21 @@ public class PlexusContainerContextListener
         }
 
         // plexus files are always here
-        nexusDefaultPropertiesFile = new File( warWebInfFile, "plexus.properties" );
         plexusXmlFile = new File( warWebInfFile, "plexus.xml" );
 
         // no "real" parenting for now
         // for historical reasons, honor the "plexus" prefix too
         AppContextRequest request = Factory.getDefaultRequest( "nexus", parent, Arrays.asList( "plexus" ) );
 
-        // if in bundle only
-        if ( parent != null && basedirFile != null )
-        {
-            nexusPropertiesFile = new File( basedirFile, "conf/nexus.properties" );
-
-            // add the user overridable properties file, but it might not be present
-            request.getSources().add( 0, new PropertiesFileEntrySource( nexusPropertiesFile, false ) );
-        }
+        // add the user overridable test properties file, but it might not be present
+        request.getSources().add( 0,
+            new PropertiesFileEntrySource( new File( basedirFile, "conf/nexus-test.properties" ), false ) );
+        // add the user overridable properties file, but it might not be present
+        request.getSources().add( 0,
+            new PropertiesFileEntrySource( new File( basedirFile, "conf/nexus.properties" ), false ) );
 
         // add the "defaults" properties files, must be present
+        final File nexusDefaultPropertiesFile = new File( warWebInfFile, "plexus.properties" );
         request.getSources().add( 0, new PropertiesFileEntrySource( nexusDefaultPropertiesFile, true ) );
 
         // set basedir as LAST, no overrides for it
