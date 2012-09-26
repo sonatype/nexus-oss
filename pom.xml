@@ -57,8 +57,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <nexus.version>2.1</nexus.version>
-    <nexus-testsuite-support.version>2.2-SNAPSHOT</nexus-testsuite-support.version>
-    <nexus-oss-webapp.version>2.2-SNAPSHOT</nexus-oss-webapp.version>
+    <nexus-testsuite-support.version>2.2</nexus-testsuite-support.version>
+    <nexus-oss-webapp.version>2.2</nexus-oss-webapp.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
 
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
