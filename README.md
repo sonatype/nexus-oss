@@ -34,7 +34,7 @@ wanted to have a repository manager for their application RPMs. Why don't extend
 
 Ask for help at our [Google Group][7] or [create a new issue][8].
 
-### Installation
+## Installation
 
 1. [Install Sonatype Nexus][9]
 1. Download latest *nexus-yum-plugin-bundle.zip* from our downloads page
