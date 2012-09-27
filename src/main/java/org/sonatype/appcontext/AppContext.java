@@ -2,7 +2,7 @@ package org.sonatype.appcontext;
 
 import java.util.Map;
 
-import org.sonatype.appcontext.guice.AppContextModule;
+import org.sonatype.appcontext.guice.AppContextGuiceModule;
 import org.sonatype.appcontext.lifecycle.AppContextLifecycleManager;
 
 /**
@@ -17,7 +17,7 @@ public interface AppContext
 {
     /**
      * A key to be used for mapping whenever needed, to find AppContext. For SISU/Guice support see
-     * {@link AppContextModule} class. This key is merely to be used in Map-like mappings.
+     * {@link AppContextGuiceModule} class. This key is merely to be used in Map-like mappings.
      * 
      * @deprecated Use {@code AppContext} interface FQN instead.
      */

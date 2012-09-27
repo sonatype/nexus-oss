@@ -10,16 +10,19 @@ import org.sonatype.guice.bean.binders.ParameterKeys;
 
 /**
  * Simple adapter to adapt {@link AppContext} into a {@link Map} of strings, usable for SISU
- * {@link ParameterKeys#PROPERTIES} bindings. Since {@link AppContext} values are Objects, they are converted to String
- * on the fly using {@link String#valueOf(Object)}, hence, if you are about to inject a key that has some non-string
- * value, it will result in failure. Many operation implementations perform {@link AppContext#flatten()} to capture a
- * "snapshot" of {@link AppContext} with it's parent, and it might be costly operation. But anyway, the purpose of this
- * adapter is to be used in SISU, and parameters are looked up in bootstrap phase and never agin, so this overhead is
- * neglectable. Also, this means this adapter should not be used in any other cases.
+ * {@link ParameterKeys#PROPERTIES} bindings. Since {@link AppContext} values are Objects, and SISU
+ * {@link ParameterKeys#PROPERTIES} expect {@link Map} of string keys and string values, app context values are
+ * converted to String on the fly using {@link String#valueOf(Object)}, hence, if you are about to inject a key that has
+ * some non-string value, it will (probably) result in failure. Many operation implementations perform
+ * {@link AppContext#flatten()} to capture a "snapshot" of {@link AppContext} with it's parent, and it might be costly
+ * operation. But anyway, the purpose of this adapter is to be used in SISU, and parameters are looked up in bootstrap
+ * phase and never again, so this overhead is not noticeable (might affect wiring speed, but once application is wired,
+ * it's speed is not affected). Also, this means this adapter should not be used in any other cases, it was meant for
+ * this single use case.
  * 
  * @author cstamas
  */
-public class StringAdapter
+class StringAdapter
     implements Map<String, String>
 {
     private final AppContext appContext;
