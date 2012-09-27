@@ -1,9 +1,9 @@
-## Nexus Yum Plugin
+# Nexus Yum Plugin
 
 A plugin for Sonatype Nexus 1.9.2.x or 2.X which recognizes RPMs in Nexus Maven repositories and generates 
 Yum metadata, so that RedHat-compatible system can use Nexus as software repository. 
 
-### Audience
+## Audience
 
 The Nexus Yum Plugin is for all guys, who are deploying Java application for RedHat-compatible (RHEL, Centos, Fedora) servers and deploy via RPM.
 
@@ -11,7 +11,7 @@ The Nexus Yum Plugin is for all guys, who are deploying Java application for Red
 
 ![CLD at IS24][1]
 
-### History
+## History
 
 [Sonatype Nexus][2] is a common repository manager for [Maven][3], used by many companies to manage 
 their Java artifacts like JAR, WAR, pom.xml files. At [ImmobilienScout24][4] the DevOps-guys started 
@@ -19,7 +19,7 @@ their Java artifacts like JAR, WAR, pom.xml files. At [ImmobilienScout24][4] the
 [java applications via RPMs][6] and 
 wanted to have a repository manager for their application RPMs. Why don't extend Sonatype Nexus to host RPMs as well?
 
-### Features
+## Features
 
 - Use a Maven repository, hosted in Nexus, containing RPMs as if it is a Yum repository. This leverages the virtual repository mechanism in Nexus which allows you to use Maven tooling to deploy RPMs into a Maven repository but still allow Yum clients to interact with the repository using the protocol it understands.
 - Yum repositories are automatically updated if you upload/deploy/delete a new RPM into Nexus.
@@ -30,7 +30,7 @@ wanted to have a repository manager for their application RPMs. Why don't extend
 - Multiple createrepo tasks on the same repository get merged.
 - Use Yum group repositories as target of staging repositories (Nexus Pro)
 
-### Help & Issues
+## Help & Issues
 
 Ask for help at our [Google Group][7] or [create a new issue][8].
 
@@ -52,18 +52,18 @@ Ask for help at our [Google Group][7] or [create a new issue][8].
 
 Now the plugin should be installed.
 
-### Configuration
+## Configuration
 
 Here, you'll find everything about configuring Nexus Yum Plugin.
 
-#### Location
+### Location
 
 The configuration of the Nexus Yum Plugin can be found in *yum.xml* in the same directory as *nexus.xml* :
 	$NEXUS_WORK_DIR/conf/yum.xml
 Default:
 	~/sonatype-work/nexus/conf/yum.xml
 
-#### Example
+### Example
 
 Example *yum.xml*:
 
@@ -96,7 +96,7 @@ Example *yum.xml*:
 	  </aliasMappings>
 	</configuration>
 
-### How to build
+## How to build
 
 The build process is based on [Apache Maven 3][3]. You must have [createrepo][10] installed in order to execute all the integration tests. Just do a
 
@@ -104,7 +104,7 @@ The build process is based on [Apache Maven 3][3]. You must have [createrepo][10
 
 to run all tests and create a plugin bundle.
 
-[1]: https://github.com/sonatype/nexus-yum-plugin/raw/master/docs/images/NexusYumPlugin.png
+[1]: https://raw.github.com/sonatype/nexus-yum-plugin/master/docs/images/NeuxsYumPlugin.png
 [2]: http://nexus.sonatype.org
 [3]: http://maven.apache.org
 [4]: http://www.immobilienscout24.de
