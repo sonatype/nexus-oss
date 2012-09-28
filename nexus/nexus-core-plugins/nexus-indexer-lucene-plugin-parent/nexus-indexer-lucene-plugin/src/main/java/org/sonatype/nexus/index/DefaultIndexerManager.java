@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -338,35 +339,21 @@ public class DefaultIndexerManager
                 final GroupRepository groupRepository =
                     repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
 
-                File repoRoot = getRepositoryLocalStorageAsFile( repository );
-
-                ContextMemberProvider localCtxProvider = new ContextMemberProvider()
+                final File repoRoot = getRepositoryLocalStorageAsFile( repository );
+                final List<IndexingContext> memberContexts =
+                    Collections.unmodifiableList( getMemberIndexingContexts( groupRepository ) );
+                final ContextMemberProvider localCtxProvider = new ContextMemberProvider()
                 {
                     @Override
                     public Collection<IndexingContext> getMembers()
                     {
-                        List<Repository> members = groupRepository.getMemberRepositories();
-
-                        ArrayList<IndexingContext> result = new ArrayList<IndexingContext>( members.size() );
-
-                        for ( Repository member : members )
-                        {
-                            IndexingContext ctx = getRepositoryIndexContext( member );
-
-                            if ( ctx != null )
-                            {
-                                result.add( ctx );
-                            }
-                        }
-
-                        return result;
+                        return memberContexts;
                     }
                 };
 
                 ctx =
                     nexusIndexer.addMergedIndexingContext( getContextId( repository.getId() ), repository.getId(),
                         repoRoot, indexDirectory, repository.isSearchable(), localCtxProvider );
-
                 ctx.setSearchable( repository.isSearchable() );
             }
             else
@@ -453,26 +440,23 @@ public class DefaultIndexerManager
             // get context for repository, check is change needed
             IndexingContext ctx = getRepositoryIndexContext( repository );
 
-            // handle the isIndexed false->true transition, but also do this only if some specified properties changed
+            // remove context, if it already existed (ctx != null) and any of the following is true:
+            // is a group OR repo path changed OR we have an isIndexed transition happening
             if ( ctx != null
-                && ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository.isSearchable() ) )
+                && ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
+                    || !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository.isSearchable() ) )
             {
-                // recreate the context
+                // remove the context
                 removeRepositoryIndexContext( repositoryId, false );
+                ctx = null;
             }
 
-            // we have to handle "transition" in configuration (indexable true->false)
-            if ( repository.isIndexable() )
+            // add context, if it did not existed yet (ctx == null) or any of the following is true:
+            // is a group OR repo path changed OR we have an isIndexed transition happening
+            if ( repository.isIndexable() && ctx == null )
             {
-                if ( ctx == null
-                    || ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository.isSearchable() ) )
-                {
-                    // recreate the context
-                    addRepositoryIndexContext( repositoryId );
-                }
-
-                // set include in search/indexable
-                setRepositoryIndexContextSearchable( repositoryId, repository.isSearchable() );
+                // recreate the context
+                addRepositoryIndexContext( repositoryId );
             }
         }
         finally
@@ -524,6 +508,21 @@ public class DefaultIndexerManager
 
             ctx.setSearchable( searchable );
         }
+    }
+
+    protected List<IndexingContext> getMemberIndexingContexts( final GroupRepository groupRepository )
+    {
+        final List<Repository> members = groupRepository.getMemberRepositories();
+        final ArrayList<IndexingContext> result = new ArrayList<IndexingContext>( members.size() );
+        for ( Repository member : members )
+        {
+            final IndexingContext ctx = getRepositoryIndexContext( member );
+            if ( ctx != null )
+            {
+                result.add( ctx );
+            }
+        }
+        return result;
     }
 
     /**

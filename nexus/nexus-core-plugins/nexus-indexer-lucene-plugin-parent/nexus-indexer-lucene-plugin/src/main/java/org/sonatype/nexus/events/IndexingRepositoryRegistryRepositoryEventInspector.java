@@ -94,7 +94,6 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
             if ( evt instanceof RepositoryRegistryEventAdd )
             {
                 getIndexerManager().addRepositoryIndexContext( repository.getId() );
-                getIndexerManager().setRepositoryIndexContextSearchable( repository.getId(), repository.isSearchable() );
             }
             else if ( evt instanceof RepositoryRegistryEventRemove )
             {

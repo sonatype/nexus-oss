@@ -12,29 +12,88 @@
  */
 package org.sonatype.nexus.index;
 
-import org.junit.Test;
+import junit.framework.Assert;
 
+import org.junit.Test;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+
+/**
+ * UT for Indexer related to Group repositories.
+ */
 public class GroupUpdateIndexerManagerTest
     extends AbstractIndexerManagerTest
 {
 
+    /**
+     * Testing is a group member change correctly propagated to Maven Indexer IndexingContexts.
+     * 
+     * @throws Exception
+     */
     @Test
     public void testGroupUpdate()
         throws Exception
     {
-        assertTrue( true );
+        // This test was disabled when Nexus had issues with merging group indexes (back, when MergedIndexingContext
+        // was not existing in MI (groups had "normal", usually huuge indexes, and they had issues on group member
+        // changes as huge index was alway recreated.
+        // Uncommented and updated
 
-        // removed as functionallity has been removed for now
-        /*
-         * fillInRepo(); indexerManager.reindexAllRepositories( null, true ); searchFor( "org.sonatype.plexus", 1,
-         * "snapshots" ); searchFor( "org.sonatype.plexus", 1, "public" ); searchFor( "org.sonatype.test-evict", 1,
-         * "apache-snapshots" ); searchFor( "org.sonatype.test-evict", 0, "public" ); GroupRepository group =
-         * (GroupRepository) repositoryRegistry.getRepository( "public" ); group.removeMemberRepositoryId(
-         * snapshots.getId() ); super.nexusConfiguration.saveConfiguration(); waitForTasksToStop(); group =
-         * (GroupRepository) repositoryRegistry.getRepository( "public" ); assertFalse(
-         * group.getMemberRepositoryIds().contains( snapshots.getId() ) ); searchFor( "org.sonatype.plexus", 0, "public"
-         * ); group.addMemberRepositoryId( apacheSnapshots.getId() ); super.nexusConfiguration.saveConfiguration();
-         * waitForTasksToStop(); searchFor( "org.sonatype.test-evict", 1, "public" );
-         */
+        // add repo content
+        fillInRepo();
+
+        // our patient
+        final GroupRepository group = (GroupRepository) repositoryRegistry.getRepository( "public" );
+
+        // reindex
+        indexerManager.reindexAllRepositories( null, true );
+
+        // Note: public by default contains snapshots repository as member
+        // Snapshots repository is the only one that contains GroupID "org.sonatype.plexus".
+        // Meaning, the presence of this search (is in result set or not) is used
+        // to validate the group member changes.
+        // Similarly, Apache Snapshots repository by default is NOT member of
+        // Public, and it is the only one having artifact with groupID "org.sonatype.test-evict".
+
+        // assure context does exists (if Igor comments out few lines or so, as MI will plainly swallow targeted search
+        // against nonexistent context!)
+        Assert.assertNotNull( ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( group ) );
+
+        // do searches
+        searchFor( "org.sonatype.plexus", 1, "snapshots" ); // is in this repo
+        searchFor( "org.sonatype.plexus", 1, group.getId() ); // snapshots is member of public
+        searchFor( "org.sonatype.test-evict", 1, "apache-snapshots" ); // is in this repo
+        searchFor( "org.sonatype.test-evict", 0, group.getId() ); // apache-snapshots not a member
+
+        // reconfigure group: remove snapshots
+        group.removeMemberRepositoryId( snapshots.getId() );
+        nexusConfiguration.saveConfiguration();
+        waitForTasksToStop();
+        wairForAsyncEventsToCalmDown();
+
+        // assure context does exists (if Igor comments out few lines or so, as MI will plainly swallow targeted search
+        // against nonexistent context!)
+        Assert.assertNotNull( ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( group ) );
+
+        // do searches
+        searchFor( "org.sonatype.plexus", 1, "snapshots" ); // is in this repo
+        searchFor( "org.sonatype.plexus", 0, group.getId() ); // snapshots is not member of public
+        searchFor( "org.sonatype.test-evict", 1, "apache-snapshots" ); // is in this repo
+        searchFor( "org.sonatype.test-evict", 0, group.getId() ); // apache-snapshots not a member
+
+        // reconfigure group: add apache-snapshots
+        group.addMemberRepositoryId( apacheSnapshots.getId() );
+        nexusConfiguration.saveConfiguration();
+        waitForTasksToStop();
+        wairForAsyncEventsToCalmDown();
+
+        // assure context does exists (if Igor comments out few lines or so, as MI will plainly swallow targeted search
+        // against nonexistent context!)
+        Assert.assertNotNull( ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( group ) );
+
+        // do searches
+        searchFor( "org.sonatype.plexus", 1, "snapshots" ); // is in this repo
+        searchFor( "org.sonatype.plexus", 0, group.getId() ); // snapshots is not member of public
+        searchFor( "org.sonatype.test-evict", 1, "apache-snapshots" ); // is in this repo
+        searchFor( "org.sonatype.test-evict", 1, group.getId() ); // apache-snapshots is a member of public
     }
 }
