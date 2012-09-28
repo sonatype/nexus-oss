@@ -9,5 +9,8 @@ package org.sonatype.appcontext.lifecycle;
  */
 public interface LifecycleHandler
 {
+    /**
+     * Handles the lifecycle.
+     */
     void handle();
 }

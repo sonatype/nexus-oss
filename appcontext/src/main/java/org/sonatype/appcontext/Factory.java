@@ -25,7 +25,7 @@ public class Factory
      * {@link Slf4jLoggerEntryPublisher} publisher, depending is SLF4J detected on class path or not.
      * 
      * @param id
-     * @return
+     * @return the request to continue work with
      */
     public static AppContextRequest getDefaultRequest( final String id )
     {
@@ -33,12 +33,12 @@ public class Factory
     }
 
     /**
-     * Creates a "default" request with given ID and given parent app context. See {@link #getDefaultRequest()} for
-     * sources and publishers.
+     * Creates a "default" request with given ID and given parent app context. See {@link #getDefaultRequest(String)}
+     * for sources and publishers.
      * 
      * @param id
      * @param parent
-     * @return
+     * @return the request to continue work with
      */
     public static AppContextRequest getDefaultRequest( final String id, final AppContext parent )
     {
@@ -47,11 +47,14 @@ public class Factory
 
     /**
      * Creates a "default" request with given ID and given parent app context and given "aliases" (aliases are used in
-     * harvesting the sources, for prefix matching only). See {@link #getDefaultRequest()} for sources and publishers.
+     * harvesting the sources, for prefix matching only). See {@link #getDefaultRequest(String)} for sources and
+     * publishers.
      * 
      * @param id
      * @param parent
-     * @return
+     * @param aliases
+     * @param keyInclusions
+     * @return the request to continue work with
      */
     public static AppContextRequest getDefaultRequest( final String id, final AppContext parent,
                                                        final List<String> aliases, final String... keyInclusions )
@@ -63,7 +66,7 @@ public class Factory
      * Creates AppContext instance from the given request.
      * 
      * @param request
-     * @return
+     * @return the created {@link AppContext} instance.
      * @throws AppContextException
      */
     public static AppContext create( final AppContextRequest request )
@@ -80,7 +83,7 @@ public class Factory
      * @param id the ID of the app context
      * @param parent the parent of the appcontext or {@code null}
      * @param map the map to use as source for app context.
-     * @return
+     * @return the created {@link AppContext} instance.
      * @throws AppContextException
      */
     public static AppContext create( final String id, final AppContext parent, final Map<String, Object> map )

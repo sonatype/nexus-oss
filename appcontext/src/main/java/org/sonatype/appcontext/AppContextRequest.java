@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.sonatype.appcontext.internal.Preconditions;
 import org.sonatype.appcontext.publisher.EntryPublisher;
-import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 
 /**
@@ -27,11 +26,28 @@ public class AppContextRequest
 
     private final List<String> keyInclusions;
 
+    /**
+     * Constructor.
+     * 
+     * @param id
+     * @param sources
+     * @param publishers
+     */
     public AppContextRequest( final String id, final List<EntrySource> sources, final List<EntryPublisher> publishers )
     {
         this( id, null, sources, publishers, true, null );
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param id
+     * @param parent
+     * @param sources
+     * @param publishers
+     * @param useSystemPropertiesFallback
+     * @param keyInclusions
+     */
     public AppContextRequest( final String id, final AppContext parent, final List<EntrySource> sources,
                               final List<EntryPublisher> publishers, final boolean useSystemPropertiesFallback,
                               final List<String> keyInclusions )
@@ -51,7 +67,7 @@ public class AppContextRequest
     /**
      * Returns the AppContext ID, never {@code null}.
      * 
-     * @return
+     * @return the ID
      */
     public String getId()
     {
@@ -95,11 +111,11 @@ public class AppContextRequest
 
     /**
      * Maintains the list of {@link EntryPublisher} to be used when creating {@link AppContext}. If you don't want any
-     * publishing to happen (default is simple "console" publishing, writing {@link AppContext} out to
-     * {@link PrintStreamEntryPublisher} or {@link Slf4jLoggerEntryPublisher} if SLF4J on classpath). You can safely to
-     * {@link List#clear()} if you don't need any publishing.
+     * publishing to happen (default is simple "console" publishing, writing {@link AppContext} out to console
+     * (System.out) or log if SLF4J is found on class path). You can safely to {@link List#clear()} if you don't need
+     * any publishing.
      * 
-     * @return
+     * @return list of publishers to be used.
      */
     public List<EntryPublisher> getPublishers()
     {
@@ -107,12 +123,12 @@ public class AppContextRequest
     }
 
     /**
-     * A flag denoting will {@link System.getProperties()} be used in interpolation or not when creating
+     * A flag denoting will {@link System#getProperties()} be used in interpolation or not when creating
      * {@link AppContext}. If {@code true}, system properties source will be added as "least important" source, but it
      * will NOT get into {@link AppContext} map. It will be used in interpolation only. By default, this is {@code true}
      * when request created over some {@link Factory} method.
      * 
-     * @return
+     * @return {@code true} if system properties should be consulted too when interpolating {@link AppContext}.
      */
     public boolean isUseSystemPropertiesFallback()
     {
@@ -123,7 +139,7 @@ public class AppContextRequest
      * Returns the "key inclusions" for this request. If there are key inclusions, same sources will be created for them
      * as for "prefixed" inclusions based on {@link AppContext} ID.
      * 
-     * @return
+     * @return list of keys to include.
      */
     public List<String> getKeyInclusions()
     {

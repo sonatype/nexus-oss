@@ -9,9 +9,24 @@ package org.sonatype.appcontext.lifecycle;
  */
 public interface AppContextLifecycleManager
 {
+    /**
+     * Method to register a handler.
+     * 
+     * @param handler
+     */
     void registerManaged( LifecycleHandler handler );
 
+    /**
+     * Method to unregister a handler.
+     * 
+     * @param handler
+     */
     void unregisterManaged( LifecycleHandler handler );
 
+    /**
+     * Invoke registered handlers for passed in class.
+     * 
+     * @param clazz
+     */
     void invokeHandler( Class<? extends LifecycleHandler> clazz );
 }

@@ -21,6 +21,20 @@ public interface AppContext
     String APPCONTEXT_KEY = AppContext.class.getName();
 
     /**
+     * Returns the id of this context.
+     * 
+     * @return the ID of this context.
+     */
+    String getId();
+
+    /**
+     * Returns the parent app context if any, or {@code null} if this context is root context.
+     * 
+     * @return the parent app context.
+     */
+    AppContext getParent();
+
+    /**
      * Returns the time stamp in milliseconds when this context was created.
      * 
      * @return the creation time in milliseconds.
@@ -47,20 +61,6 @@ public interface AppContext
      * @since 3.2
      */
     int getGeneration();
-
-    /**
-     * Returns the id of this context.
-     * 
-     * @return the ID of this context.
-     */
-    String getId();
-
-    /**
-     * Returns the parent app context if any, or {@code null} if this context is root context.
-     * 
-     * @return the parent app context.
-     */
-    AppContext getParent();
 
     /**
      * Returns the context's lifecycle manager.
