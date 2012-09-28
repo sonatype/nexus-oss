@@ -196,7 +196,7 @@
             <useReleaseProfile>false</useReleaseProfile>
             <goals>deploy</goals>
             <arguments>${arguments}</arguments>
-            <releaseProfiles>release noit</releaseProfiles>
+            <releaseProfiles>release,noit</releaseProfiles>
             <tagNameFormat>nexus-site-repository-plugin-@{version}</tagNameFormat>
           </configuration>
         </plugin>
