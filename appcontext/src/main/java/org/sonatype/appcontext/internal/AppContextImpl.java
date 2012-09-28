@@ -18,17 +18,19 @@ public class AppContextImpl
 {
     private final long created;
 
-    private long modified;
-
-    private int generation;
-
     private final String id;
 
     private final AppContext parent;
-
-    private final HierarchicalMap<String, AppContextEntry> entries;
+    
+    private final HierarchicalMap<String, AppContextEntry> hmap;
 
     private final AppContextLifecycleManager lifecycleManager;
+
+    private volatile long modified;
+
+    private volatile int parentGeneration;
+    
+    private volatile int generation;
 
     public AppContextImpl( final long created, final String id, final AppContextImpl parent,
                            final Map<String, AppContextEntry> sourcedEntries )
@@ -42,14 +44,16 @@ public class AppContextImpl
 
         if ( parent != null )
         {
-            this.entries = new HierarchicalMap<String, AppContextEntry>( parent.getEntries() );
+            this.parentGeneration = parent.getGeneration();
+            this.hmap = new HierarchicalMap<String, AppContextEntry>( parent.getEntries() );
         }
         else
         {
-            this.entries = new HierarchicalMap<String, AppContextEntry>();
+            this.parentGeneration = -1;
+            this.hmap = new HierarchicalMap<String, AppContextEntry>();
         }
 
-        this.entries.putAll( sourcedEntries );
+        this.hmap.putAll( sourcedEntries );
         this.lifecycleManager = new AppContextLifecycleManagerImpl();
     }
 
@@ -60,11 +64,17 @@ public class AppContextImpl
 
     public long getModified()
     {
+        getGeneration(); // this will trigger setting of modified and generation if needed
         return modified;
     }
 
-    public int getGeneration()
+    public synchronized int getGeneration()
     {
+        if ( getParent() != null && getParent().getGeneration() > parentGeneration )
+        {
+            parentGeneration = getParent().getGeneration();
+            markContextModified( getParent().getModified() );
+        }
         return generation;
     }
 
@@ -85,7 +95,7 @@ public class AppContextImpl
 
     public AppContextEntry getAppContextEntry( String key )
     {
-        return entries.get( key );
+        return hmap.get( key );
     }
 
     public Map<String, Object> flatten()
@@ -102,7 +112,7 @@ public class AppContextImpl
     public Map<String, AppContextEntry> flattenAppContextEntries()
     {
         final HashMap<String, AppContextEntry> result = new HashMap<String, AppContextEntry>();
-        result.putAll( entries.flatten() );
+        result.putAll( hmap.flatten() );
         return Collections.unmodifiableMap( result );
     }
 
@@ -123,40 +133,45 @@ public class AppContextImpl
 
     protected HierarchicalMap<String, AppContextEntry> getEntries()
     {
-        return entries;
+        return hmap;
     }
 
     protected void markContextModified()
     {
-        this.generation++;
-        this.modified = System.currentTimeMillis();
+        markContextModified( System.currentTimeMillis() );
+    }
+
+    protected synchronized void markContextModified( final long timestamp )
+    {
+        generation++;
+        modified = Math.max( modified, timestamp );
     }
 
     // ==
 
     public int size()
     {
-        return entries.size();
+        return hmap.size();
     }
 
     public boolean isEmpty()
     {
-        return entries.isEmpty();
+        return hmap.isEmpty();
     }
 
     public boolean containsKey( Object key )
     {
-        return entries.containsKey( key );
+        return hmap.containsKey( key );
     }
 
     public boolean containsValue( Object value )
     {
-        return entries.containsValue( value );
+        return hmap.containsValue( value );
     }
 
     public Object get( Object key )
     {
-        final AppContextEntry entry = entries.get( key );
+        final AppContextEntry entry = hmap.get( key );
         if ( entry != null )
         {
             return entry.getValue();
@@ -170,7 +185,7 @@ public class AppContextImpl
     public Object put( String key, Object value )
     {
         final AppContextEntry oldEntry =
-            entries.put( Preconditions.checkNotNull( key ), new AppContextEntryImpl( created, key, value, value,
+            hmap.put( Preconditions.checkNotNull( key ), new AppContextEntryImpl( created, key, value, value,
                 new ProgrammaticallySetSourceMarker() ) );
         markContextModified();
         if ( oldEntry != null )
@@ -185,7 +200,7 @@ public class AppContextImpl
 
     public Object remove( Object key )
     {
-        final AppContextEntry oldEntry = entries.remove( key );
+        final AppContextEntry oldEntry = hmap.remove( key );
         markContextModified();
         if ( oldEntry != null )
         {
@@ -207,19 +222,19 @@ public class AppContextImpl
 
     public void clear()
     {
-        entries.clear();
+        hmap.clear();
         markContextModified();
     }
 
     public Set<String> keySet()
     {
-        return Collections.unmodifiableSet( entries.keySet() );
+        return Collections.unmodifiableSet( hmap.keySet() );
     }
 
     public Collection<Object> values()
     {
-        final ArrayList<Object> result = new ArrayList<Object>( entries.size() );
-        for ( Map.Entry<String, AppContextEntry> entry : entries.entrySet() )
+        final ArrayList<Object> result = new ArrayList<Object>( hmap.size() );
+        for ( Map.Entry<String, AppContextEntry> entry : hmap.entrySet() )
         {
             result.add( entry.getValue().getValue() );
         }
@@ -228,8 +243,8 @@ public class AppContextImpl
 
     public Set<java.util.Map.Entry<String, Object>> entrySet()
     {
-        final Map<String, Object> result = new HashMap<String, Object>( entries.size() );
-        for ( Map.Entry<String, AppContextEntry> entry : entries.entrySet() )
+        final Map<String, Object> result = new HashMap<String, Object>( hmap.size() );
+        for ( Map.Entry<String, AppContextEntry> entry : hmap.entrySet() )
         {
             result.put( entry.getKey(), entry.getValue().getValue() );
         }
@@ -240,6 +255,6 @@ public class AppContextImpl
 
     public String toString()
     {
-        return entries.values().toString();
+        return hmap.values().toString();
     }
 }
