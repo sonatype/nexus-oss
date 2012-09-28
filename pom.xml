@@ -35,6 +35,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
+    <arguments>-Dtest=VOID -Dit.test=VOID</arguments>
   </properties>
 
   <modules>
@@ -138,8 +139,7 @@
             <useReleaseProfile>false</useReleaseProfile>
             <goals>deploy</goals>
             <!--<arguments>-Prelease</arguments>-->
-            <!-- Use a quick build to verify the tag, and a full build with ITs for the deploy -->
-            <arguments />
+            <arguments>${arguments}</arguments>
             <preparationGoals /> 
             <releaseProfiles>release</releaseProfiles>
             <tagNameFormat>nexus-@{version}</tagNameFormat>
