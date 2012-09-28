@@ -27,7 +27,7 @@
   <artifactId>nexus</artifactId>
   <packaging>pom</packaging>
   <name>Nexus</name>
-  <version>2.3-SNAPSHOT</version>
+  <version>2.2</version>
   <description>Sonatype Nexus Repository Manager</description>
   <inceptionYear>2007</inceptionYear>
 
