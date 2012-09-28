@@ -1,7 +1,12 @@
 package org.sonatype.appcontext.internal;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,6 +44,7 @@ public class HierarchicalMap<K, V>
     }
 
     protected Map<K, V> checkParentContext( final Map<K, V> context )
+        throws IllegalArgumentException
     {
         if ( context != null )
         {
@@ -70,9 +76,10 @@ public class HierarchicalMap<K, V>
                 }
             }
         }
-
         return context;
     }
+
+    // ==
 
     @Override
     public boolean containsKey( Object key )
@@ -128,13 +135,90 @@ public class HierarchicalMap<K, V>
         }
     }
 
+    @Override
+    public Set<K> keySet()
+    {
+        final Set<K> result = new HashSet<K>();
+        if ( getParent() != null )
+        {
+            result.addAll( getParent().keySet() );
+        }
+        result.addAll( super.keySet() );
+        return Collections.unmodifiableSet( result );
+    }
+
+    @Override
+    public Collection<V> values()
+    {
+        final ArrayList<V> result = new ArrayList<V>();
+        if ( getParent() != null )
+        {
+            result.addAll( getParent().values() );
+        }
+        result.addAll( super.values() );
+        return Collections.unmodifiableCollection( result );
+    }
+
+    @Override
+    public Set<Entry<K, V>> entrySet()
+    {
+        final Set<Entry<K, V>> result = new HashSet<Entry<K, V>>();
+        if ( getParent() != null )
+        {
+            final Set<Entry<K, V>> parentEntries = getParent().entrySet();
+            for ( Entry<K, V> parentEntry : parentEntries )
+            {
+                if ( !containsKey( parentEntry.getKey(), false ) )
+                {
+                    result.add( parentEntry );
+                }
+            }
+        }
+        result.addAll( super.entrySet() );
+        return Collections.unmodifiableSet( result );
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return keySet().isEmpty();
+    }
+
+    @Override
+    public int size()
+    {
+        return keySet().size();
+    }
+
     // ==
 
+    /**
+     * "Pulls out" this map from the hierarchy. It simply returns a map with content that is to be found in this
+     * instance. The returned map is a copy, so changing it does not affect this instance!
+     * 
+     * @return a map that contains elements from this instance.
+     */
+    public Map<K, V> pullOut()
+    {
+        final HashMap<K, V> result = new HashMap<K, V>();
+        for ( Entry<K, V> entry : super.entrySet() )
+        {
+            result.put( entry.getKey(), entry.getValue() );
+        }
+        return result;
+    }
+
+    /**
+     * Flattens this instance of {@link HierarchicalMap} into single map. It simply calculates which entries are
+     * "visible" and returns a plain map. The returned map is a copy, so changing it does not affect this instance.
+     * 
+     * @return a map that contains elements from this instance including the hierarchy (if any).
+     */
     public Map<K, V> flatten()
     {
         final HashMap<K, V> result = new HashMap<K, V>();
         final Map<K, V> parent = getParent();
-        if ( getParent() != null )
+        if ( parent != null )
         {
             if ( parent instanceof HierarchicalMap )
             {

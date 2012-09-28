@@ -37,8 +37,8 @@ public class Nexus5279Test
         assertEquals( "bar", context2.get( "foo" ) );
         assertEquals( "rab", context2.get( "oof" ) );
         // while child is actually empty
-        assertEquals( 0, context2.entrySet().size() );
-        assertEquals( 0, context2.values().size() );
+        assertEquals( 2, context2.entrySet().size() );
+        assertEquals( 2, context2.values().size() );
         // while flattened map of child has proper sizes
         assertEquals( 2, context2.flatten().entrySet().size() );
         assertEquals( 2, context2.flatten().values().size() );
