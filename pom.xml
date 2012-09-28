@@ -197,7 +197,7 @@
             <goals>deploy</goals>
             <arguments>${arguments}</arguments>
             <releaseProfiles>release noit</releaseProfiles>
-            <tagNameFormat>nexus-p2-repository-plugin-@{version}</tagNameFormat>
+            <tagNameFormat>nexus-site-repository-plugin-@{version}</tagNameFormat>
           </configuration>
         </plugin>
 
