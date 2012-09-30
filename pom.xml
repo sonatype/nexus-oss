@@ -52,9 +52,9 @@
 
   <properties>
     <!-- Set the Nexus version here, against which you build the plugin -->
-    <nexus.version>2.2-SNAPSHOT</nexus.version>
-    <nexus-testsuite-support.version>2.2-SNAPSHOT</nexus-testsuite-support.version>
-    <nexus-oss-webapp.version>2.2-SNAPSHOT</nexus-oss-webapp.version>
+    <nexus.version>2.3-SNAPSHOT</nexus.version>
+    <nexus-testsuite-support.version>2.3-SNAPSHOT</nexus-testsuite-support.version>
+    <nexus-oss-webapp.version>2.3-SNAPSHOT</nexus-oss-webapp.version>
     <app.lifecycle.version>1.6</app.lifecycle.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hamcrest.version>1.2.1</hamcrest.version>
