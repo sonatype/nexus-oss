@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.apache.maven.index.context.ContextMemberProvider;
 import org.apache.maven.index.context.IndexingContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
@@ -41,6 +43,8 @@ import com.google.common.base.Preconditions;
 public class LazyContextMemberProvider
     implements ContextMemberProvider
 {
+    private final Logger logger;
+
     private final DefaultIndexerManager indexerManager;
 
     private final List<String> memberIds;
@@ -49,6 +53,7 @@ public class LazyContextMemberProvider
 
     public LazyContextMemberProvider( final DefaultIndexerManager indexerManager, final List<String> memberIds )
     {
+        this.logger = LoggerFactory.getLogger( getClass() );
         this.indexerManager = Preconditions.checkNotNull( indexerManager );
         this.memberIds = Preconditions.checkNotNull( memberIds );
     }
@@ -68,10 +73,20 @@ public class LazyContextMemberProvider
                     {
                         contexts.add( indexingContext );
                     }
+                    else
+                    {
+                        // logging as debug, since this would mean indexing is disabled on member repository
+                        // but IndexerManager will handle this case. This might be still the "old" lazy
+                        // context provider?
+                        logger.debug( "Repository with ID=\"{}\" has no IndexingContext available? (is null)", member );
+                    }
                 }
                 catch ( NoSuchRepositoryException e )
                 {
-
+                    // logging as debug, as this might be due concurrency, simultaneous search request and a config
+                    // change request that IndexerManager will handle, and this is still the "old" lazy context provider
+                    // not the new one?
+                    logger.debug( "Lazy context provider unable to lookup member by ID!", e );
                 }
             }
         }
