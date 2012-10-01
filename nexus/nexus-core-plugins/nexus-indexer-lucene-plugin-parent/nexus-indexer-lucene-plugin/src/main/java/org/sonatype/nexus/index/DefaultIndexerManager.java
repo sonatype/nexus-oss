@@ -340,20 +340,12 @@ public class DefaultIndexerManager
                     repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
 
                 final File repoRoot = getRepositoryLocalStorageAsFile( repository );
-                final List<IndexingContext> memberContexts =
-                    Collections.unmodifiableList( getMemberIndexingContexts( groupRepository ) );
-                final ContextMemberProvider localCtxProvider = new ContextMemberProvider()
-                {
-                    @Override
-                    public Collection<IndexingContext> getMembers()
-                    {
-                        return memberContexts;
-                    }
-                };
-
+                // a lazy context provider
+                final LazyContextMemberProvider memberContextProvider =
+                    new LazyContextMemberProvider( this, groupRepository.getMemberRepositoryIds() );
                 ctx =
                     nexusIndexer.addMergedIndexingContext( getContextId( repository.getId() ), repository.getId(),
-                        repoRoot, indexDirectory, repository.isSearchable(), localCtxProvider );
+                        repoRoot, indexDirectory, repository.isSearchable(), memberContextProvider );
                 ctx.setSearchable( repository.isSearchable() );
             }
             else
@@ -524,21 +516,6 @@ public class DefaultIndexerManager
 
             ctx.setSearchable( searchable );
         }
-    }
-
-    protected List<IndexingContext> getMemberIndexingContexts( final GroupRepository groupRepository )
-    {
-        final List<Repository> members = groupRepository.getMemberRepositories();
-        final ArrayList<IndexingContext> result = new ArrayList<IndexingContext>( members.size() );
-        for ( Repository member : members )
-        {
-            final IndexingContext ctx = getRepositoryIndexContext( member );
-            if ( ctx != null )
-            {
-                result.add( ctx );
-            }
-        }
-        return result;
     }
 
     /**
