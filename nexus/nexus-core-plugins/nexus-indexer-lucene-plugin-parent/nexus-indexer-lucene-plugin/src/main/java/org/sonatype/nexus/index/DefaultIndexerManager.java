@@ -409,7 +409,7 @@ public class DefaultIndexerManager
     public void updateRepositoryIndexContext( String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        Repository repository = repositoryRegistry.getRepository( repositoryId );
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
 
         Lock lock = getLock( repository.getId() ).writeLock();
         lock.lock();
@@ -440,15 +440,19 @@ public class DefaultIndexerManager
             // get context for repository, check is change needed
             IndexingContext ctx = getRepositoryIndexContext( repository );
 
+            boolean propagateChangesToGroupsOfRepository = false;
+
             // remove context, if it already existed (ctx != null) and any of the following is true:
             // is a group OR repo path changed OR we have an isIndexed transition happening
             if ( ctx != null
                 && ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
-                    || !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository.isSearchable() ) )
+                    || !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() )
+                    || !repository.isIndexable() || ctx.isSearchable() != repository.isSearchable() ) )
             {
                 // remove the context
                 removeRepositoryIndexContext( repositoryId, false );
                 ctx = null;
+                propagateChangesToGroupsOfRepository = true;
             }
 
             // add context, if it did not existed yet (ctx == null) or any of the following is true:
@@ -457,6 +461,18 @@ public class DefaultIndexerManager
             {
                 // recreate the context
                 addRepositoryIndexContext( repositoryId );
+                propagateChangesToGroupsOfRepository = true;
+            }
+
+            if ( propagateChangesToGroupsOfRepository )
+            {
+                // propagate changes to the repositor's groups (where it is a member)
+                // as a "stale" context would remain in the list returned by ContextMemberProvider
+                final List<GroupRepository> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository );
+                for ( GroupRepository group : groupsOfRepository )
+                {
+                    updateRepositoryIndexContext( group.getId() );
+                }
             }
         }
         finally
