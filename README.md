@@ -1,21 +1,68 @@
-Sonatype Nexus Core
-===================
+# Sonatype Nexus Core
 
 This is the Core codebase of Sonatype Nexus, aka "Nexus OSS".
 
-[Product homepage](http://nexus.sonatype.org)
+## Quick Links
 
-[Public source repository](https://github.com/sonatype/nexus)
+* [Product homepage](http://www.sonatype.org/nexus/participate)
+* [Public source repository](https://github.com/sonatype/nexus)
+* [Issue tracking](https://issues.sonatype.org/browse/NEXUS)
+* [Public wiki](https://docs.sonatype.com/display/SPRTNXOSS)
 
-[Issue tracking](https://issues.sonatype.org/browse/NEXUS)
+## Building
 
-[Public wiki](https://docs.sonatype.com/display/SPRTNXOSS)
+To build this project you need recent version of Maven and Sonatype Forge set up.
+Example Maven settings XML:
 
-To build this project you will need to add the Sonatype Forge repository to your setup:
+```
+<?xml version="1.0" encoding="UTF-8"?>
 
-https://repository.sonatype.org/content/groups/forge
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <mirrors>
+    <mirror>
+      <!-- This sends everything to Forge -->
+      <id>sonatype-forge</id>
+      <mirrorOf>external:*</mirrorOf>
+      <url>https://repository.sonatype.org/content/groups/forge</url>
+    </mirror>
+  </mirrors>
+  <profiles>
+    <profile>
+      <id>nexus</id>
+      <!-- Enable snapshots for the built in central repo to direct -->
+      <!-- all requests to nexus via the mirror -->
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+      </repositories>
+     <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <!-- make the profile active all the time -->
+    <activeProfile>nexus</activeProfile>
+  </activeProfiles>
+  <pluginGroups>
+    <!-- define the sonatype plugin group, so the nexus plugins will work without typing the groupId -->
+    <pluginGroup>org.sonatype.plugins</pluginGroup>
+  </pluginGroups>
+</settings>
+```
 
-If you are adding proxies for this in a Nexus instance be sure to add both release and snapshot proxy repositories for the above URL.
+Note: If you plan to proxy the be sure to add both release and snapshot proxy repositories for the above URL.
 
 Have fun,  
 Sonatype Team
