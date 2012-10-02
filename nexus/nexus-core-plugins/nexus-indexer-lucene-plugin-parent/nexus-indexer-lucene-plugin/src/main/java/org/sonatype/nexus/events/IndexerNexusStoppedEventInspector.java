@@ -31,7 +31,6 @@ import org.sonatype.plexus.appevents.Event;
 public class IndexerNexusStoppedEventInspector
     extends AbstractEventInspector
 {
-
     @Requirement
     private IndexerManager indexerManager;
 
@@ -40,13 +39,12 @@ public class IndexerNexusStoppedEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( Event<?> evt )
+    public boolean accepts( final Event<?> evt )
     {
-        // listen for STORE, CACHE, DELETE only
-        return ( NexusStoppedEvent.class.isAssignableFrom( evt.getClass() ) );
+        return evt instanceof NexusStoppedEvent;
     }
 
-    public void inspect( Event<?> evt )
+    public void inspect( final Event<?> evt )
     {
         try
         {
