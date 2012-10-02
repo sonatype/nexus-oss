@@ -24,7 +24,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
-import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactUpload;
+import org.sonatype.nexus.client.core.subsystem.artifact.MavenArtifact;
 import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.ArtifactCoordinate;
@@ -34,14 +34,14 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 
-public class JerseyArtifactUpload
+public class JerseyMavenArtifact
     extends SubsystemSupport<JerseyNexusClient>
-    implements ArtifactUpload
+    implements MavenArtifact
 {
 
     private static final MediaType UPLOAD_ARTIFACT_RESPONSE_MEDIATYPE = MediaType.APPLICATION_JSON_TYPE;
 
-    public JerseyArtifactUpload( final JerseyNexusClient nexusClient )
+    public JerseyMavenArtifact( final JerseyNexusClient nexusClient )
     {
         super( nexusClient );
     }

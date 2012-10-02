@@ -19,7 +19,7 @@ import org.sonatype.nexus.rest.model.ArtifactCoordinate;
  * 
  * @author cstamas
  */
-public interface ArtifactUpload
+public interface MavenArtifact
 {
 
   /**

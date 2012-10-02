@@ -18,8 +18,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
-import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactUpload;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyArtifactUpload;
+import org.sonatype.nexus.client.core.subsystem.artifact.MavenArtifact;
+import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyMavenArtifact;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 /**
@@ -29,8 +29,8 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
  */
 @Named
 @Singleton
-public class JerseyArtifactUploadSubsystemFactory
-    implements SubsystemFactory<ArtifactUpload, JerseyNexusClient>
+public class JerseyMavenArtifactSubsystemFactory
+    implements SubsystemFactory<MavenArtifact, JerseyNexusClient>
 {
 
     @Override
@@ -40,14 +40,14 @@ public class JerseyArtifactUploadSubsystemFactory
     }
 
     @Override
-    public Class<ArtifactUpload> getType()
+    public Class<MavenArtifact> getType()
     {
-        return ArtifactUpload.class;
+        return MavenArtifact.class;
     }
 
     @Override
-    public ArtifactUpload create( final JerseyNexusClient nexusClient )
+    public MavenArtifact create( final JerseyNexusClient nexusClient )
     {
-        return new JerseyArtifactUpload( nexusClient );
+        return new JerseyMavenArtifact( nexusClient );
     }
 }
