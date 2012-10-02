@@ -21,11 +21,17 @@ Ext.namespace('Nexus');
  * @static
  */
 Nexus.Log = (function() {
-  var log = function(level, msg) {
-    if (console) {
-      console.log(level + ' ' + msg);
+  var log = Ext.emptyFn;
+
+  try {
+    if ( typeof(console) === "object" && console.log !== undefined ) {
+      log = function(level, msg) {
+        console.log(level + ' ' + msg);
+      };
     }
-  };
+  } catch (e) {
+    // ignore, nothing left to do
+  }
 
   return {
     /**
