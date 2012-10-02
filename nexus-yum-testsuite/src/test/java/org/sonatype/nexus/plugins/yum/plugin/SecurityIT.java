@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.yum.plugin;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.plugins.yum.NameUtil.uniqueName;
 
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.security.Users;

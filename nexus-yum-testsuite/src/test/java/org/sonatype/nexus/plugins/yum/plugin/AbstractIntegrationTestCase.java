@@ -15,9 +15,6 @@ package org.sonatype.nexus.plugins.yum.plugin;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.YumClient;
@@ -55,11 +52,4 @@ public class AbstractIntegrationTestCase extends NexusRunningITSupport {
     }
   }
 
-  protected void wait(int timeout, TimeUnit unit) throws InterruptedException {
-    Thread.sleep(unit.toMillis(timeout));
-  }
-
-  protected String uniqueName() {
-    return "repo_" + new SimpleDateFormat("yyyyMMdd_HHmmss_SSS").format(new Date());
-  }
 }
