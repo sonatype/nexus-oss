@@ -65,7 +65,7 @@ Nexus.Log = (function() {
      * @param msg {String} The message to log.
      */
     error : function(msg) {
-      log('WARN', msg);
+      log('ERROR', msg);
     }
   };
 }());
