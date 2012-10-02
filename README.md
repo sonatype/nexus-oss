@@ -11,7 +11,7 @@ This is the Core codebase of Sonatype Nexus, aka "Nexus OSS".
 
 ## Building
 
-To build this project you need recent version of Maven and Sonatype Forge set up.
+To build this project you need recent version of Apache Maven (3.0.4+) and Sonatype Forge set up as mirror at least.
 Example Maven settings XML:
 
 ```
@@ -62,7 +62,9 @@ Example Maven settings XML:
 </settings>
 ```
 
-Note: If you plan to proxy the be sure to add both release and snapshot proxy repositories for the above URL.
+Note: As Maven "best practice", it is highly recommended to set up your own instance of Nexus and your local builds should use it instead of directly 
+reaching out, fetch from remote. In such case, to properly proxy the forge URL above, be sure to add both release and snapshot proxy repositories for it, as
+it is actually a repository group having "mixed" repository policy.
 
 Have fun,  
 Sonatype Team
