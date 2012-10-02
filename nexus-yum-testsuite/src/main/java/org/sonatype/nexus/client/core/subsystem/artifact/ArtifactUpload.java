@@ -29,5 +29,5 @@ public interface ArtifactUpload
    *          contains repository, meta data and file information
    * @return
    */
-  ArtifactCoordinate upload(UploadRequest req);
+    ArtifactCoordinate upload( UploadRequest req );
 }

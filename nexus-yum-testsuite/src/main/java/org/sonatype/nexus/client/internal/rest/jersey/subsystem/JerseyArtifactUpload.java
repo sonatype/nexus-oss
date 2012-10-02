@@ -18,13 +18,11 @@ import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.MessageBodyReader;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactUpload;
 import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
@@ -33,7 +31,6 @@ import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.provider.CompletableReader;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 
@@ -56,56 +53,29 @@ public class JerseyArtifactUpload
         final ClientResponse response =
             getNexusClient().serviceResource( "artifact/maven/content" ).type( addBoundary( MULTIPART_FORM_DATA_TYPE ) ).accept(
                 TEXT_HTML ).post( ClientResponse.class, entity );
-        if ( response.getStatus() < 300 )
-        {
-            return parseEntity( response );
-        }
 
         final String content = response.getEntity( String.class );
         response.close();
+        if ( response.getStatus() < 300 )
+        {
+            return parseEntity( content );
+        }
+
         throw new ClientHandlerException( "Upload failed due to status code " + response.getStatus() + ".\nResponse: "
             + content );
     }
 
-    @SuppressWarnings( "unchecked" )
-    private ArtifactCoordinate parseEntity( final ClientResponse response )
+    private ArtifactCoordinate parseEntity( final String content )
     {
-        final MessageBodyReader<ArtifactCoordinate> mbr = getArtifactCoordsMessageBodyReader( response );
+        final ObjectMapper mapper = new ObjectMapper();
         try
         {
-            ArtifactCoordinate result =
-                mbr.readFrom( ArtifactCoordinate.class, ArtifactCoordinate.class, new Annotation[0],
-                    UPLOAD_ARTIFACT_RESPONSE_MEDIATYPE, response.getHeaders(), response.getEntityInputStream() );
-            if ( mbr instanceof CompletableReader )
-            {
-                result = ( (CompletableReader<ArtifactCoordinate>) mbr ).complete( result );
-            }
-            if ( !( result instanceof Closeable ) )
-            {
-                response.close();
-            }
-            return result;
+            return mapper.readValue( content, ArtifactCoordinate.class );
         }
         catch ( IOException e )
         {
-            response.close();
-            throw new ClientHandlerException( e );
+            throw new ClientHandlerException( "Could not parse response.", e );
         }
-    }
-
-    private MessageBodyReader<ArtifactCoordinate> getArtifactCoordsMessageBodyReader( final ClientResponse response )
-    {
-        final MessageBodyReader<ArtifactCoordinate> mbr =
-            response.getClient().getMessageBodyWorkers().getMessageBodyReader( ArtifactCoordinate.class,
-                ArtifactCoordinate.class, new Annotation[0], UPLOAD_ARTIFACT_RESPONSE_MEDIATYPE );
-        if ( mbr == null )
-        {
-            response.close();
-            throw new ClientHandlerException(
-                "Could not find MessageBodyReader for type ArtifactCoordinate.class and media type "
-                    + UPLOAD_ARTIFACT_RESPONSE_MEDIATYPE );
-        }
-        return mbr;
     }
 
     private FormDataMultiPart createEntity( UploadRequest req )
