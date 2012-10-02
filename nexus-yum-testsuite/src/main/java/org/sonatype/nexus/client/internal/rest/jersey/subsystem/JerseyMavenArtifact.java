@@ -20,14 +20,19 @@ import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.MediaType;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
+import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactMaven;
 import org.sonatype.nexus.client.core.subsystem.artifact.MavenArtifact;
+import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
+import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
 import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
+import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
+import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.ArtifactCoordinate;
+import org.sonatype.nexus.rest.model.RepositoryResource;
 
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
@@ -39,11 +44,16 @@ public class JerseyMavenArtifact
     implements MavenArtifact
 {
 
-    private static final MediaType UPLOAD_ARTIFACT_RESPONSE_MEDIATYPE = MediaType.APPLICATION_JSON_TYPE;
+    private final ArtifactMaven artifactMaven;
 
-    public JerseyMavenArtifact( final JerseyNexusClient nexusClient )
+    private final Repositories repositories;
+
+    public JerseyMavenArtifact( final JerseyNexusClient nexusClient, final ArtifactMaven artifactMaven,
+                                final Repositories repositories )
     {
         super( nexusClient );
+        this.artifactMaven = artifactMaven;
+        this.repositories = repositories;
     }
 
     @Override
@@ -65,6 +75,21 @@ public class JerseyMavenArtifact
             + content );
     }
 
+    @Override
+    public void delete( ResolveRequest req )
+    {
+
+        final Repository<MavenHostedRepository, RepositoryResource> repository =
+            repositories.get( req.getRepositoryId() );
+        final ResolveResponse resolvedArtifact = artifactMaven.resolve( req );
+        if ( resolvedArtifact == null )
+        {
+            throw new IllegalArgumentException( "Could not find artifact for given request." );
+        }
+        final String urlToDelete = repository.settings().getContentResourceURI() + resolvedArtifact.getRepositoryPath();
+        getNexusClient().getClient().resource( urlToDelete ).accept( getNexusClient().getMediaType() ).delete();
+    }
+
     private ArtifactCoordinate parseEntity( final String content )
     {
         final ObjectMapper mapper = new ObjectMapper();
@@ -80,6 +105,7 @@ public class JerseyMavenArtifact
 
     private FormDataMultiPart createEntity( UploadRequest req )
     {
+        @SuppressWarnings( "resource" )
         final FormDataMultiPart entity = new FormDataMultiPart().field( "r", req.getRepositoryId() );
         if ( req.isHasPom() )
         {

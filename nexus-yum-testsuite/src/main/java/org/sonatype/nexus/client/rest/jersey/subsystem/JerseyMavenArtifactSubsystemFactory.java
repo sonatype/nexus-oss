@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.client.rest.jersey.subsystem;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -24,7 +25,7 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 /**
  * TODO
- *
+ * 
  * @since 1.0
  */
 @Named
@@ -32,6 +33,12 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 public class JerseyMavenArtifactSubsystemFactory
     implements SubsystemFactory<MavenArtifact, JerseyNexusClient>
 {
+
+    @Inject
+    private JerseyArtifactMavenSubsystemFactory artifactMavenSubsystemFactory;
+
+    @Inject
+    private JerseyRepositoriesFactory repositoriesFactory;
 
     @Override
     public Condition availableWhen()
@@ -48,6 +55,7 @@ public class JerseyMavenArtifactSubsystemFactory
     @Override
     public MavenArtifact create( final JerseyNexusClient nexusClient )
     {
-        return new JerseyMavenArtifact( nexusClient );
+        return new JerseyMavenArtifact( nexusClient, artifactMavenSubsystemFactory.create( nexusClient ),
+            repositoriesFactory.create( nexusClient ) );
     }
 }

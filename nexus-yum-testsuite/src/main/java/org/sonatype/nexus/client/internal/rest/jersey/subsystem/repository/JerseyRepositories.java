@@ -21,10 +21,10 @@ import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.spi.subsystem.repository.RepositoryFactory;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
+import org.sonatype.nexus.client.core.subsystem.repository.maven.RepositoryResourceResponse;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 
 /**
  * @since 2.2
@@ -36,8 +36,7 @@ public class JerseyRepositories
 
     private final Set<RepositoryFactory> repositoryFactories;
 
-    public JerseyRepositories( final JerseyNexusClient nexusClient,
-                               final Set<RepositoryFactory> repositoryFactories )
+    public JerseyRepositories( final JerseyNexusClient nexusClient, final Set<RepositoryFactory> repositoryFactories )
     {
         super( nexusClient );
         this.repositoryFactories = repositoryFactories;
@@ -48,9 +47,8 @@ public class JerseyRepositories
     {
         checkNotNull( id );
 
-        final RepositoryResourceResponse response = getNexusClient()
-            .serviceResource( "repositories/" + id )
-            .get( RepositoryResourceResponse.class );
+        final RepositoryResourceResponse response =
+            getNexusClient().serviceResource( "repositories/" + id ).get( RepositoryResourceResponse.class );
 
         return convert( id, response.getData() );
     }
@@ -60,9 +58,8 @@ public class JerseyRepositories
     {
         checkNotNull( id );
 
-        final RepositoryGroupResourceResponse response = getNexusClient()
-            .serviceResource( "repo_groups/" + id )
-            .get( RepositoryGroupResourceResponse.class );
+        final RepositoryGroupResourceResponse response =
+            getNexusClient().serviceResource( "repo_groups/" + id ).get( RepositoryGroupResourceResponse.class );
 
         return convert( id, response.getData() );
     }
@@ -70,13 +67,13 @@ public class JerseyRepositories
     @Override
     public Set<Repository> get()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null; // To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public Set<Repository> getGroups()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null; // To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -91,9 +88,8 @@ public class JerseyRepositories
                 return (R) r;
             }
         }
-        throw new IllegalStateException(
-            format( "No repository factory found for repository of type %s", type.getName() )
-        );
+        throw new IllegalStateException( format( "No repository factory found for repository of type %s",
+            type.getName() ) );
     }
 
     private <R extends Repository> R convert( final String id, final RepositoryBaseResource rbs )
@@ -111,9 +107,7 @@ public class JerseyRepositories
 
         if ( factory == null )
         {
-            throw new IllegalStateException(
-                format( "No repository factory found for repository with id %s", id )
-            );
+            throw new IllegalStateException( format( "No repository factory found for repository with id %s", id ) );
         }
 
         final JerseyRepositorySupport repository = (JerseyRepositorySupport) factory.create( getNexusClient() );

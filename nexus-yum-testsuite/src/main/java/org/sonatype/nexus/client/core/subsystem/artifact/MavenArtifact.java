@@ -22,12 +22,18 @@ import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 public interface MavenArtifact
 {
 
-  /**
-   * Uploads a file to a Nexus repostory
-   * 
-   * @param req
-   *          contains repository, meta data and file information
-   * @return
-   */
+    /**
+     * Uploads a file to a Nexus repostory
+     * 
+     * @param req contains repository, meta data and file information
+     * @return
+     */
     ArtifactCoordinate upload( UploadRequest req );
+
+    /**
+     * Deletes a given artifact from a Nexus repository
+     * 
+     * @param req
+     */
+    void delete( ResolveRequest req );
 }
