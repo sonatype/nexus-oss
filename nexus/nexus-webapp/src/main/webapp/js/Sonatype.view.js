@@ -77,7 +77,9 @@ Sonatype.view = {
                 return;
               }
 
-              if (!Ext.isArray(suppressed)) {
+              if (suppressed === undefined) {
+                suppressed = [];
+              } else if (!Ext.isArray(suppressed)) {
                 suppressed = [suppressed];
               }
 
