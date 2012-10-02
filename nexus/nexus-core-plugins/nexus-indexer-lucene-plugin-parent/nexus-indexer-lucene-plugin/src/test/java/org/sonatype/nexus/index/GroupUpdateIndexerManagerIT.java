@@ -20,9 +20,9 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * UT for Indexer related to Group repositories.
+ * IT for Indexer related to Group repositories.
  */
-public class GroupUpdateIndexerManagerTest
+public class GroupUpdateIndexerManagerIT
     extends AbstractIndexerManagerTest
 {
 
