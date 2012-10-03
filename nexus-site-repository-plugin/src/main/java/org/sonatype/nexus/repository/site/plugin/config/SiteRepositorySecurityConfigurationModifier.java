@@ -17,6 +17,9 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.site.plugin.SiteRepository;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
@@ -103,6 +106,26 @@ public class SiteRepositorySecurityConfigurationModifier
                     }
                     role.getPrivileges().clear();
                     role.getPrivileges().addAll( newPrivileges );
+                }
+            }
+        }
+
+        final List<CPrivilege> privileges = configuration.getPrivileges();
+        if ( privileges != null && privileges.size() > 0 )
+        {
+            for ( final CPrivilege privilege : privileges )
+            {
+                final List<CProperty> privilegeProps = privilege.getProperties();
+                if ( privilegeProps != null && privilegeProps.size() > 0 )
+                {
+                    for ( final CProperty privilegeProp : privilegeProps )
+                    {
+                        if ( "maven-site".equals( privilegeProp.getValue() ) )
+                        {
+                            privilegeProp.setValue( SiteRepository.ID );
+                            modified = true;
+                        }
+                    }
                 }
             }
         }
