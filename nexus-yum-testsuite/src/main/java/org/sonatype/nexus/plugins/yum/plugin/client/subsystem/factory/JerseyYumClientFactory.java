@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugins.yum.plugin.client.subsystem.factory;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -19,26 +20,35 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.client.rest.jersey.subsystem.JerseyRepositoriesFactory;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.YumClient;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.impl.JerseyYumClient;
 
 @Named
 @Singleton
-public class JerseyYumClientFactory implements SubsystemFactory<YumClient, JerseyNexusClient> {
+public class JerseyYumClientFactory
+    implements SubsystemFactory<YumClient, JerseyNexusClient>
+{
 
-  @Override
-  public Condition availableWhen() {
-    return NexusStatusConditions.anyModern();
-  }
+    @Inject
+    private JerseyRepositoriesFactory repositoriesFactory;
 
-  @Override
-  public Class<YumClient> getType() {
-    return YumClient.class;
-  }
+    @Override
+    public Condition availableWhen()
+    {
+        return NexusStatusConditions.anyModern();
+    }
 
-  @Override
-  public YumClient create(JerseyNexusClient nexusClient) {
-    return new JerseyYumClient(nexusClient);
-  }
+    @Override
+    public Class<YumClient> getType()
+    {
+        return YumClient.class;
+    }
+
+    @Override
+    public YumClient create( JerseyNexusClient nexusClient )
+    {
+        return new JerseyYumClient( nexusClient, repositoriesFactory.create( nexusClient ) );
+    }
 
 }

@@ -16,25 +16,35 @@ package org.sonatype.nexus.plugins.yum.plugin.client.subsystem;
  * Interface to access nexus-yum-plugin functionality in tests
  * 
  * @author sherold
- * 
  */
-public interface YumClient {
+public interface YumClient
+{
 
-  /**
-   * Retrieves the version behind the given alias.
-   * 
-   * @param repositoryId
-   * @param alias
-   * @return
-   */
-  String getAliasVersion(String repositoryId, String alias);
+    /**
+     * Retrieves the version behind the given alias.
+     * 
+     * @param repositoryId
+     * @param alias
+     * @return
+     */
+    String getAliasVersion( String repositoryId, String alias );
 
-  /**
-   * Creates for the given repository an alias to a specific
-   * 
-   * @param repositoryId
-   * @param alias
-   * @param version
-   */
-  void createOrUpdateAlias(String repositoryId, String alias, String version);
+    /**
+     * Creates for the given repository an alias to a specific
+     * 
+     * @param repositoryId
+     * @param alias
+     * @param version
+     */
+    void createOrUpdateAlias( String repositoryId, String alias, String version );
+
+    /**
+     * Retrieves the given metadata type (primary.xml, repomd.xml, etc.) from the repository and
+     * 
+     * @param repositoryId
+     * @param metadataType
+     * @param typically {@link String} or <code>byte[].class</code>
+     * @return the content of the metadata file. If the file is gzipped or bzipped the returning content is uncompressed
+     */
+    <T> T getMetadata( String repositoryId, MetadataType metadataType, Class<T> returnType );
 }

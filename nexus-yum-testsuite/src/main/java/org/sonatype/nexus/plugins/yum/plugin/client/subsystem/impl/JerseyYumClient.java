@@ -15,39 +15,92 @@ package org.sonatype.nexus.plugins.yum.plugin.client.subsystem.impl;
 import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
+import org.sonatype.nexus.client.core.subsystem.repository.GenericRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.CompressionAdapter;
+import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.MetadataType;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.YumClient;
+import org.sonatype.nexus.rest.model.RepositoryResource;
 
-public class JerseyYumClient extends SubsystemSupport<JerseyNexusClient> implements YumClient {
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
-  public JerseyYumClient(JerseyNexusClient nexusClient) {
-    super(nexusClient);
-  }
+public class JerseyYumClient
+    extends SubsystemSupport<JerseyNexusClient>
+    implements YumClient
+{
 
-  @Override
-  public String getAliasVersion(String repositoryId, String alias) {
-    return getNexusClient().serviceResource(getUrlPath(repositoryId, alias)).get(String.class);
-  }
+    private final Repositories repositories;
 
-
-  @Override
-  public void createOrUpdateAlias(String repositoryId, String alias, String version) {
-    getNexusClient().serviceResource(getUrlPath(repositoryId, alias)).type(TEXT_PLAIN).post(String.class, version);
-  }
-
-  private String getUrlPath(String repositoryId, String alias) {
-    return format("yum/alias/%s/%s", encodeUtf8(repositoryId), encodeUtf8(alias));
-  }
-
-  private static String encodeUtf8(String string) {
-    try {
-      return URLEncoder.encode(string, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalArgumentException("Could not utf8-encode string : " + string, e);
+    public JerseyYumClient( JerseyNexusClient nexusClient, Repositories repositories )
+    {
+        super( nexusClient );
+        this.repositories = repositories;
     }
-  }
+
+    @Override
+    public String getAliasVersion( String repositoryId, String alias )
+    {
+        return getNexusClient().serviceResource( getUrlPath( repositoryId, alias ) ).get( String.class );
+    }
+
+    @Override
+    public void createOrUpdateAlias( String repositoryId, String alias, String version )
+    {
+        getNexusClient().serviceResource( getUrlPath( repositoryId, alias ) ).type( TEXT_PLAIN ).post( String.class,
+            version );
+    }
+
+    @Override
+    public <T> T getMetadata( String repositoryId, MetadataType metadataType, Class<T> returnType )
+    {
+        final Repository<GenericRepository, RepositoryResource> repo = repositories.get( repositoryId );
+        final String url = repo.settings().getContentResourceURI() + "/repodata/" + metadataType.getFilename();
+        final ClientResponse clientResponse = getNexusClient().getClient().resource( url ).get( ClientResponse.class );
+        try
+        {
+            if ( clientResponse.getStatus() < 300 )
+            {
+                try
+                {
+                    clientResponse.setEntityInputStream( new CompressionAdapter( metadataType.getCompression() ).adapt( clientResponse.getEntityInputStream() ) );
+                }
+                catch ( IOException e )
+                {
+                    throw new RuntimeException( "Could not decompress response.", e );
+                }
+                return clientResponse.getEntity( returnType );
+            }
+            throw new UniformInterfaceException( "Could not get yum metatdata", clientResponse );
+        }
+        finally
+        {
+            clientResponse.close();
+        }
+    }
+
+    private String getUrlPath( String repositoryId, String alias )
+    {
+        return format( "yum/alias/%s/%s", encodeUtf8( repositoryId ), encodeUtf8( alias ) );
+    }
+
+    private static String encodeUtf8( String string )
+    {
+        try
+        {
+            return URLEncoder.encode( string, "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new IllegalArgumentException( "Could not utf8-encode string : " + string, e );
+        }
+    }
+
 }
