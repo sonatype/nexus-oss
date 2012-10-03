@@ -386,7 +386,7 @@
     </repositoryTarget>
     <repositoryTarget>
       <id>maven-site</id>
-      <name>All (site)</name>
+      <name>All (maven-site)</name>
       <contentClass>maven-site</contentClass>
       <patterns>
         <pattern>.*</pattern>

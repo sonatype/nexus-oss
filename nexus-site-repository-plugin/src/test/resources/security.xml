@@ -53,6 +53,104 @@
       </roles>
     </role>
   </roles>
+  <privileges>
+    <privilege>
+      <id>12b966fe2d0f2aab</id>
+      <name>some-site - (create)</name>
+      <description>some site</description>
+      <type>target</type>
+      <properties>
+        <property>
+          <key>repositoryGroupId</key>
+          <value></value>
+        </property>
+        <property>
+          <key>method</key>
+          <value>create,read</value>
+        </property>
+        <property>
+          <key>repositoryId</key>
+          <value>some-site</value>
+        </property>
+        <property>
+          <key>repositoryTargetId</key>
+          <value>maven-site</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>12b966fe2d60236e</id>
+      <name>some-site - (read)</name>
+      <description>some site</description>
+      <type>target</type>
+      <properties>
+        <property>
+          <key>repositoryGroupId</key>
+          <value></value>
+        </property>
+        <property>
+          <key>method</key>
+          <value>read</value>
+        </property>
+        <property>
+          <key>repositoryId</key>
+          <value>some-site</value>
+        </property>
+        <property>
+          <key>repositoryTargetId</key>
+          <value>maven-site</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>12b966fe2d92622f</id>
+      <name>some-site - (update)</name>
+      <description>some site</description>
+      <type>target</type>
+      <properties>
+        <property>
+          <key>repositoryGroupId</key>
+          <value></value>
+        </property>
+        <property>
+          <key>method</key>
+          <value>update,read</value>
+        </property>
+        <property>
+          <key>repositoryId</key>
+          <value>some-site</value>
+        </property>
+        <property>
+          <key>repositoryTargetId</key>
+          <value>maven-site</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>12b966fe2dc77eb6</id>
+      <name>some-site - (delete)</name>
+      <description>some site</description>
+      <type>target</type>
+      <properties>
+        <property>
+          <key>repositoryGroupId</key>
+          <value></value>
+        </property>
+        <property>
+          <key>method</key>
+          <value>delete,read</value>
+        </property>
+        <property>
+          <key>repositoryId</key>
+          <value>some-site</value>
+        </property>
+        <property>
+          <key>repositoryTargetId</key>
+          <value>maven-site</value>
+        </property>
+      </properties>
+    </privilege>
+  </privileges>
   <userRoleMappings>
     <userRoleMapping>
       <userId>admin</userId>
