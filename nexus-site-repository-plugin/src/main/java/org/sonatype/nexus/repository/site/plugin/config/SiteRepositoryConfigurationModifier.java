@@ -65,6 +65,11 @@ public class SiteRepositoryConfigurationModifier
                     repositoryTarget.setContentClass( SiteRepository.ID );
                     modified = true;
                 }
+                if ( repositoryTarget.getName()!=null && repositoryTarget.getName().contains( "maven-site" ) )
+                {
+                    repositoryTarget.setName( repositoryTarget.getName().replace( "maven-site", SiteRepository.ID ) );
+                    modified = true;
+                }
             }
         }
         return modified;
