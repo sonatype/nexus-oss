@@ -38,6 +38,8 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -59,6 +61,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Stopwatch;
 
 /**
  * Apache HTTP client (4) {@link RemoteRepositoryStorage} implementation.
@@ -71,6 +74,8 @@ public class HttpClientRemoteStorage
     extends AbstractHTTPRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
+
+    private static final Logger timingLog = LoggerFactory.getLogger( "remote.storage.timing" );
 
     // ----------------------------------------------------------------------
     // Constants
@@ -430,6 +435,29 @@ public class HttpClientRemoteStorage
     HttpResponse executeRequest( final ProxyRepository repository,
                                  final ResourceStoreRequest request,
                                  final HttpUriRequest httpRequest )
+        throws RemoteStorageException
+    {
+        final Stopwatch stopwatch = timingLog.isDebugEnabled() ? new Stopwatch().start() : null;
+        try
+        {
+            return doExecuteRequest( repository, request, httpRequest );
+        }
+        finally
+        {
+            if ( stopwatch != null )
+            {
+                stopwatch.stop();
+                timingLog.debug(
+                    "[{}] {} {} took {}",
+                    new Object[]{ repository.getId(), httpRequest.getMethod(), httpRequest.getURI(), stopwatch }
+                );
+            }
+        }
+    }
+
+    private HttpResponse doExecuteRequest( final ProxyRepository repository,
+                                           final ResourceStoreRequest request,
+                                           final HttpUriRequest httpRequest )
         throws RemoteStorageException
     {
         final URI methodUri = httpRequest.getURI();
