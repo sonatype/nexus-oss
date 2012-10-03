@@ -33,6 +33,10 @@ public class AbstractGroupRepositoryConfiguration
         super( configuration );
     }
 
+    /**
+     *
+     * @return a List of member repository ids, never null
+     */
     public List<String> getMemberRepositoryIds()
     {
         return getCollection( getRootNode(), MEMBER_REPOSITORIES );

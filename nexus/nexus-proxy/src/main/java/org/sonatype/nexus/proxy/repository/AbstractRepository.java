@@ -24,6 +24,8 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
@@ -97,7 +99,7 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  * </ul>
  * <p>
  * The subclasses only needs to implement the abstract method focusing on item retrieaval and other "basic" functions.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractRepository
@@ -243,8 +245,16 @@ public abstract class AbstractRepository
 
     protected AbstractRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
-        return (AbstractRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration(
-            forModification );
+        final CoreConfiguration cc = getCurrentCoreConfiguration();
+        if ( cc != null )
+        {
+            ExternalConfiguration<?> ec = cc.getExternalConfiguration();
+            if ( ec != null )
+            {
+                return (AbstractRepositoryConfiguration) ec.getConfiguration( forModification );
+            }
+        }
+        return null;
     }
 
     // ==
@@ -269,7 +279,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the cache manager.
-     * 
+     *
      * @return the cache manager
      */
     protected CacheManager getCacheManager()
@@ -279,7 +289,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the cache manager.
-     * 
+     *
      * @param cacheManager the new cache manager
      */
     protected void setCacheManager( CacheManager cacheManager )
@@ -289,7 +299,7 @@ public abstract class AbstractRepository
 
     /**
      * Returns the repository Item Uid Factory.
-     * 
+     *
      * @return
      */
     protected RepositoryItemUidFactory getRepositoryItemUidFactory()
@@ -299,7 +309,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the not found cache.
-     * 
+     *
      * @return the not found cache
      */
     public PathCache getNotFoundCache()
@@ -315,7 +325,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the not found cache.
-     * 
+     *
      * @param notFoundcache the new not found cache
      */
     public void setNotFoundCache( PathCache notFoundcache )
@@ -1160,7 +1170,7 @@ public abstract class AbstractRepository
     // Inner stuff
     /**
      * Maintains not found cache.
-     * 
+     *
      * @param path the path
      * @throws ItemNotFoundException the item not found exception
      */
@@ -1209,7 +1219,7 @@ public abstract class AbstractRepository
 
     /**
      * Adds the uid to not found cache.
-     * 
+     *
      * @param path the path
      */
     @Override
@@ -1228,7 +1238,7 @@ public abstract class AbstractRepository
 
     /**
      * Removes the uid from not found cache.
-     * 
+     *
      * @param path the path
      */
     public void removeFromNotFoundCache( ResourceStoreRequest request )
@@ -1246,7 +1256,7 @@ public abstract class AbstractRepository
 
     /**
      * Check conditions, such as availability, permissions, etc.
-     * 
+     *
      * @param request the request
      * @param permission the permission
      * @return false, if the request should not be processed with response appropriate for current method, or true is
@@ -1386,7 +1396,7 @@ public abstract class AbstractRepository
 
     /**
      * Whether or not the requested path should be added to NFC. Item will be added to NFC if is not local/remote only.
-     * 
+     *
      * @param request resource store request
      * @return true if requested path should be added to NFC
      * @since 2.0

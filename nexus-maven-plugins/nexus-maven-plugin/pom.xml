@@ -470,7 +470,6 @@
           <configuration>
             <failIfNoTests>false</failIfNoTests>
             <excludes>
-              <exclude>**/Abstract*</exclude>
               <exclude>**/fixture/*</exclude>
             </excludes>
           </configuration>
