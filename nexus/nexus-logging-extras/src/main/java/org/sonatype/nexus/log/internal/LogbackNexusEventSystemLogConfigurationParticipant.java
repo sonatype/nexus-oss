@@ -26,7 +26,7 @@ import org.sonatype.nexus.log.LogConfigurationParticipant;
  */
 @Component( role = LogConfigurationParticipant.class, hint="logback-events" )
 public class LogbackNexusEventSystemLogConfigurationParticipant
-    implements LogConfigurationParticipant
+    implements LogConfigurationParticipant, LogConfigurationParticipant.NonEditable
 {
     
     

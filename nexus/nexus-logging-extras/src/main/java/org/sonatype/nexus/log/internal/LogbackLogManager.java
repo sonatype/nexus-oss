@@ -397,7 +397,7 @@ public class LogbackLogManager
             {
                 String name = participant.getName();
                 File logConfigFile = new File( logConfigDir, name );
-                if ( !logConfigFile.exists() )
+                if ( participant instanceof LogConfigurationParticipant.NonEditable || !logConfigFile.exists() )
                 {
                     InputStream in = null;
                     try
