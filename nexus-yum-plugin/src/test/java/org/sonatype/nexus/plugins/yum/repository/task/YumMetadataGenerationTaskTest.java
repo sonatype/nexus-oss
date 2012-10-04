@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.repository.task;
+package org.sonatype.nexus.plugins.yum.repository.task;
 
 import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
 import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
@@ -48,151 +48,191 @@ import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 
-@SuppressWarnings("unchecked")
-public class YumMetadataGenerationTaskTest {
-	private static final String ANOTHER_REPO = "repo2";
-	private static final String ANOTHER_VERSION = "version2";
-	private static final String VERSION = "version";
-	private static final String NO_VERSION = null;
-	private static final String REPO = "REPO1";
-  private static final String BASE_URL = "http://foo.bla";
-  private static final String RPM_URL = BASE_URL + "/content/repositories/" + REPO;
-	private static final File RPM_DIR = new File(".");
+@SuppressWarnings( "unchecked" )
+public class YumMetadataGenerationTaskTest
+{
+    private static final String ANOTHER_REPO = "repo2";
 
-	@Test
-	public void shouldNotExecuteIfOperateOnSameRepository() throws Exception {
-		YumMetadataGenerationTask task = task(REPO, NO_VERSION);
-		assertFalse(task.allowConcurrentExecution(createMap(scheduledTask(task), scheduledTask(REPO, NO_VERSION, RUNNING))));
-	}
+    private static final String ANOTHER_VERSION = "version2";
 
-	@Test
-	public void shouldNotExecuteIfOperateOnSameRepositoryAndSameVersion() throws Exception {
-		YumMetadataGenerationTask task = task(REPO, VERSION);
-		assertFalse(task.allowConcurrentExecution(createMap(scheduledTask(task), scheduledTask(REPO, VERSION, RUNNING))));
-	}
+    private static final String VERSION = "version";
 
-	@Test
-	public void shouldExecuteIfOperateOnSameRepositoryAndAnotherVersion() throws Exception {
-		YumMetadataGenerationTask task = task(REPO, VERSION);
-		assertTrue(task.allowConcurrentExecution(createMap(scheduledTask(task), scheduledTask(REPO, ANOTHER_VERSION, RUNNING))));
-	}
+    private static final String NO_VERSION = null;
 
-	@Test
-	public void shouldExecuteIfOperateOnAnotherRepository() throws Exception {
-		YumMetadataGenerationTask task = task(REPO, NO_VERSION);
-		assertTrue(task.allowConcurrentExecution(createMap(scheduledTask(task), scheduledTask(ANOTHER_REPO, NO_VERSION, RUNNING))));
-	}
+    private static final String REPO = "REPO1";
 
-  @Test
-  public void shouldSetDefaultsForRepoParams() throws Exception {
-    // given
-    YumMetadataGenerationTask task = new YumMetadataGenerationTask();
-    setField(task, "repositoryRegistry", repoRegistry());
-    task.setRpmDir(RPM_DIR.getAbsolutePath());
-    task.setRpmUrl(RPM_URL);
-    // when
-    task.setDefaults();
-    // then
-    assertThat(task.getRepoDir(), is(RPM_DIR.getAbsoluteFile()));
-    assertThat(task.getRepoUrl(), is(RPM_URL));
-  }
+    private static final String BASE_URL = "http://foo.bla";
 
-  @Test
-  public void shouldSetDefaultsIfOnlyRepoWasSet() throws Exception {
-    // given
-    YumMetadataGenerationTask task = new YumMetadataGenerationTask();
-    task.setRepositoryId(REPO);
-    setField(task, "repositoryRegistry", repoRegistry());
-    setField(task, "restApiSettings", restApiSettings());
-    // when
-    task.setDefaults();
-    // then
-    assertThat(task.getRpmDir(), is(RPM_DIR.getAbsolutePath()));
-    assertThat(task.getRpmUrl(), is(RPM_URL));
-    assertThat(task.getRepoDir(), is(RPM_DIR.getAbsoluteFile()));
-    assertThat(task.getRepoUrl(), is(RPM_URL));
-  }
+    private static final String RPM_URL = BASE_URL + "/content/repositories/" + REPO;
 
-  private GlobalRestApiSettings restApiSettings() {
-    GlobalRestApiSettings settings = mock(GlobalRestApiSettings.class);
-    when(settings.getBaseUrl()).thenReturn(BASE_URL);
-    return settings;
-  }
+    private static final File RPM_DIR = new File( "." );
 
-  private RepositoryRegistry repoRegistry() throws Exception {
-    final Repository repo = mock(Repository.class);
-    when(repo.getId()).thenReturn(REPO);
-    when(repo.getLocalUrl()).thenReturn(RPM_DIR.getAbsolutePath());
-    final RepositoryRegistry repoRegistry = mock(RepositoryRegistry.class);
-    when(repoRegistry.getRepository(anyString())).thenReturn(repo);
-    return repoRegistry;
-  }
+    @Test
+    public void shouldNotExecuteIfOperateOnSameRepository()
+        throws Exception
+    {
+        YumMetadataGenerationTask task = task( REPO, NO_VERSION );
+        assertFalse( task.allowConcurrentExecution( createMap( scheduledTask( task ),
+            scheduledTask( REPO, NO_VERSION, RUNNING ) ) ) );
+    }
 
-  private ScheduledTask<YumRepository> scheduledTask(String repo, String version, TaskState state, Date scheduledAt) {
-		MockScheduledTask<YumRepository> scheduledTask = scheduledTask(task(repo, version));
-		scheduledTask.setTaskState(state);
-		scheduledTask.setSchedule(new OnceSchedule(new Date(scheduledAt.getTime() + 400)));
-		return scheduledTask;
-	}
+    @Test
+    public void shouldNotExecuteIfOperateOnSameRepositoryAndSameVersion()
+        throws Exception
+    {
+        YumMetadataGenerationTask task = task( REPO, VERSION );
+        assertFalse( task.allowConcurrentExecution( createMap( scheduledTask( task ),
+            scheduledTask( REPO, VERSION, RUNNING ) ) ) );
+    }
 
-	private ScheduledTask<YumRepository> scheduledTask(String repo, String version, TaskState state) {
-		return scheduledTask(repo, version, state, new Date());
-	}
+    @Test
+    public void shouldExecuteIfOperateOnSameRepositoryAndAnotherVersion()
+        throws Exception
+    {
+        YumMetadataGenerationTask task = task( REPO, VERSION );
+        assertTrue( task.allowConcurrentExecution( createMap( scheduledTask( task ),
+            scheduledTask( REPO, ANOTHER_VERSION, RUNNING ) ) ) );
+    }
 
-	private MockScheduledTask<YumRepository> scheduledTask(YumMetadataGenerationTask task) {
-		return new MockScheduledTask<YumRepository>(task);
-	}
+    @Test
+    public void shouldExecuteIfOperateOnAnotherRepository()
+        throws Exception
+    {
+        YumMetadataGenerationTask task = task( REPO, NO_VERSION );
+        assertTrue( task.allowConcurrentExecution( createMap( scheduledTask( task ),
+            scheduledTask( ANOTHER_REPO, NO_VERSION, RUNNING ) ) ) );
+    }
 
-	private YumMetadataGenerationTask task(String repo, String version) {
-		YumMetadataGenerationTask task = new YumMetadataGenerationTask() {
+    @Test
+    public void shouldSetDefaultsForRepoParams()
+        throws Exception
+    {
+        // given
+        YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+        setField( task, "repositoryRegistry", repoRegistry() );
+        task.setRpmDir( RPM_DIR.getAbsolutePath() );
+        task.setRpmUrl( RPM_URL );
+        // when
+        task.setDefaults();
+        // then
+        assertThat( task.getRepoDir(), is( RPM_DIR.getAbsoluteFile() ) );
+        assertThat( task.getRepoUrl(), is( RPM_URL ) );
+    }
 
-			@Override
-			protected YumRepository doRun() throws Exception {
-				return null;
-			}
+    @Test
+    public void shouldSetDefaultsIfOnlyRepoWasSet()
+        throws Exception
+    {
+        // given
+        YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+        task.setRepositoryId( REPO );
+        setField( task, "repositoryRegistry", repoRegistry() );
+        setField( task, "restApiSettings", restApiSettings() );
+        // when
+        task.setDefaults();
+        // then
+        assertThat( task.getRpmDir(), is( RPM_DIR.getAbsolutePath() ) );
+        assertThat( task.getRpmUrl(), is( RPM_URL ) );
+        assertThat( task.getRepoDir(), is( RPM_DIR.getAbsoluteFile() ) );
+        assertThat( task.getRepoUrl(), is( RPM_URL ) );
+    }
 
-		};
-    task.setRpmDir(RPM_DIR.getAbsolutePath());
-    task.setRpmUrl(RPM_URL);
-    task.setRepoDir(RPM_DIR);
-    task.setRepoUrl(RPM_URL);
-    task.setRepositoryId(repo);
-    task.setVersion(version);
-    task.setAddedFiles(null);
-    task.setSingleRpmPerDirectory(true);
+    private GlobalRestApiSettings restApiSettings()
+    {
+        GlobalRestApiSettings settings = mock( GlobalRestApiSettings.class );
+        when( settings.getBaseUrl() ).thenReturn( BASE_URL );
+        return settings;
+    }
 
-    final YumConfiguration yumConfig = createMock(YumConfiguration.class);
-    expect(yumConfig.getMaxParallelThreadCount()).andReturn(10).anyTimes();
-    replay(yumConfig);
-    setField(task, "yumConfig", yumConfig);
-		return task;
-	}
+    private RepositoryRegistry repoRegistry()
+        throws Exception
+    {
+        final Repository repo = mock( Repository.class );
+        when( repo.getId() ).thenReturn( REPO );
+        when( repo.getLocalUrl() ).thenReturn( RPM_DIR.getAbsolutePath() );
+        final RepositoryRegistry repoRegistry = mock( RepositoryRegistry.class );
+        when( repoRegistry.getRepository( anyString() ) ).thenReturn( repo );
+        return repoRegistry;
+    }
 
+    private ScheduledTask<YumRepository> scheduledTask( String repo, String version, TaskState state, Date scheduledAt )
+    {
+        MockScheduledTask<YumRepository> scheduledTask = scheduledTask( task( repo, version ) );
+        scheduledTask.setTaskState( state );
+        scheduledTask.setSchedule( new OnceSchedule( new Date( scheduledAt.getTime() + 400 ) ) );
+        return scheduledTask;
+    }
 
-	private Map<String, List<ScheduledTask<?>>> createMap(ScheduledTask<YumRepository>... scheduledTasks) {
-		List<ScheduledTask<?>> list = new ArrayList<ScheduledTask<?>>();
-		for (ScheduledTask<YumRepository> task : scheduledTasks) {
-			list.add(task);
-		}
-		return createMap(list);
-	}
+    private ScheduledTask<YumRepository> scheduledTask( String repo, String version, TaskState state )
+    {
+        return scheduledTask( repo, version, state, new Date() );
+    }
 
-	private Map<String, List<ScheduledTask<?>>> createMap(List<ScheduledTask<?>> yumTaskList) {
-		Map<String, List<ScheduledTask<?>>> activeTasks = new HashMap<String, List<ScheduledTask<?>>>();
-		activeTasks.put(ID, yumTaskList);
-		return activeTasks;
-	}
+    private MockScheduledTask<YumRepository> scheduledTask( YumMetadataGenerationTask task )
+    {
+        return new MockScheduledTask<YumRepository>( task );
+    }
 
-	private static class MockScheduledTask<T> extends DefaultScheduledTask<T> {
+    private YumMetadataGenerationTask task( String repo, String version )
+    {
+        YumMetadataGenerationTask task = new YumMetadataGenerationTask()
+        {
 
-		public MockScheduledTask(Callable<T> callable) {
-			super(ID, "", "", null, callable, new RunNowSchedule());
-		}
+            @Override
+            protected YumRepository doRun()
+                throws Exception
+            {
+                return null;
+            }
 
-		@Override
-		public void setTaskState(TaskState state) {
-			super.setTaskState(state);
-		}
+        };
+        task.setRpmDir( RPM_DIR.getAbsolutePath() );
+        task.setRpmUrl( RPM_URL );
+        task.setRepoDir( RPM_DIR );
+        task.setRepoUrl( RPM_URL );
+        task.setRepositoryId( repo );
+        task.setVersion( version );
+        task.setAddedFiles( null );
+        task.setSingleRpmPerDirectory( true );
 
-	}
+        final YumConfiguration yumConfig = createMock( YumConfiguration.class );
+        expect( yumConfig.getMaxParallelThreadCount() ).andReturn( 10 ).anyTimes();
+        replay( yumConfig );
+        setField( task, "yumConfig", yumConfig );
+        return task;
+    }
+
+    private Map<String, List<ScheduledTask<?>>> createMap( ScheduledTask<YumRepository>... scheduledTasks )
+    {
+        List<ScheduledTask<?>> list = new ArrayList<ScheduledTask<?>>();
+        for ( ScheduledTask<YumRepository> task : scheduledTasks )
+        {
+            list.add( task );
+        }
+        return createMap( list );
+    }
+
+    private Map<String, List<ScheduledTask<?>>> createMap( List<ScheduledTask<?>> yumTaskList )
+    {
+        Map<String, List<ScheduledTask<?>>> activeTasks = new HashMap<String, List<ScheduledTask<?>>>();
+        activeTasks.put( ID, yumTaskList );
+        return activeTasks;
+    }
+
+    private static class MockScheduledTask<T>
+        extends DefaultScheduledTask<T>
+    {
+
+        public MockScheduledTask( Callable<T> callable )
+        {
+            super( ID, "", "", null, callable, new RunNowSchedule() );
+        }
+
+        @Override
+        public void setTaskState( TaskState state )
+        {
+            super.setTaskState( state );
+        }
+
+    }
 }

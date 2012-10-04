@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.repository;
+package org.sonatype.nexus.plugins.yum.repository;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -18,20 +18,25 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-
-public final class RepositoryUtils {
-  private RepositoryUtils() {
-  }
-
-  public static File getBaseDir(Repository repository) throws URISyntaxException, MalformedURLException {
-    String localUrl = repository.getLocalUrl();
-    if (isFile(localUrl)) {
-      return new File(localUrl);
+public final class RepositoryUtils
+{
+    private RepositoryUtils()
+    {
     }
-    return new File(new URL(localUrl).toURI());
-  }
 
-  private static boolean isFile(String localUrl) {
-    return localUrl.startsWith("/");
-  }
+    public static File getBaseDir( Repository repository )
+        throws URISyntaxException, MalformedURLException
+    {
+        String localUrl = repository.getLocalUrl();
+        if ( isFile( localUrl ) )
+        {
+            return new File( localUrl );
+        }
+        return new File( new URL( localUrl ).toURI() );
+    }
+
+    private static boolean isFile( String localUrl )
+    {
+        return localUrl.startsWith( "/" );
+    }
 }

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.plugins.yum.plugin.impl;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -21,32 +21,41 @@ import java.util.Set;
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
-public class MavenRepositoryInfo {
-  private final MavenRepository repository;
-  private final Set<String> versions = new HashSet<String>();
+public class MavenRepositoryInfo
+{
+    private final MavenRepository repository;
 
-  public MavenRepositoryInfo(MavenRepository repository) {
-    this.repository = repository;
-  }
+    private final Set<String> versions = new HashSet<String>();
 
-  public MavenRepository getRepository() {
-    return repository;
-  }
+    public MavenRepositoryInfo( MavenRepository repository )
+    {
+        this.repository = repository;
+    }
 
-  public File getBaseDir() throws MalformedURLException, URISyntaxException {
-    return RepositoryUtils.getBaseDir(repository);
-  }
+    public MavenRepository getRepository()
+    {
+        return repository;
+    }
 
-  public void addVersion(String version) {
-    versions.add(version);
-  }
+    public File getBaseDir()
+        throws MalformedURLException, URISyntaxException
+    {
+        return RepositoryUtils.getBaseDir( repository );
+    }
 
-  public String getId() {
-    return repository.getId();
-  }
+    public void addVersion( String version )
+    {
+        versions.add( version );
+    }
 
-  public Set<String> getVersions() {
-    return versions;
-  }
+    public String getId()
+    {
+        return repository.getId();
+    }
+
+    public Set<String> getVersions()
+    {
+        return versions;
+    }
 
 }

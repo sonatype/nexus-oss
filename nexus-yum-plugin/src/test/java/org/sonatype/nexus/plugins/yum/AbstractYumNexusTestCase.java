@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum;
+package org.sonatype.nexus.plugins.yum;
 
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
@@ -37,99 +37,130 @@ import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
 
+public class AbstractYumNexusTestCase
+    extends NexusTestSupport
+{
+    public static final String NEXUS_BASE_URL = "http://localhost:8081/nexus";
 
-public class AbstractYumNexusTestCase extends NexusTestSupport {
-  public static final String NEXUS_BASE_URL = "http://localhost:8081/nexus";
-  public static final File NEXUS_CONF_DIR = new File(".", "target/test-classes/nexus/sonatype-work/nexus/conf/");
-  public static final String TMP_DIR_KEY = "java.io.tmpdir";
+    public static final File NEXUS_CONF_DIR = new File( ".", "target/test-classes/nexus/sonatype-work/nexus/conf/" );
 
-  private String oldTmpDir;
+    public static final String TMP_DIR_KEY = "java.io.tmpdir";
 
-  protected void waitFor(Condition condition) throws TimeoutException, InterruptedException {
-    waitOrTimeout(condition, Timeout.timeout(seconds(60)), new ThreadSleep(millis(30)));
-  }
+    private String oldTmpDir;
 
-  @Override
-  protected void setUp() throws Exception {
-    initConfigurations();
-    super.setUp();
-    copyTestConf();
-    initRestApiSettings();
-    injectFields();
-  }
-
-  private void copyTestConf() {
-    try {
-      copyDirectory(NEXUS_CONF_DIR, getConfHomeDir());
-    } catch (IOException e) {
-      throw new RuntimeException("Could not copy nexus configuration to a temp dir : " + NEXUS_CONF_DIR, e);
+    protected void waitFor( Condition condition )
+        throws TimeoutException, InterruptedException
+    {
+        waitOrTimeout( condition, Timeout.timeout( seconds( 60 ) ), new ThreadSleep( millis( 30 ) ) );
     }
-  }
 
-  private void injectFields() throws Exception, IllegalAccessException {
-    for (Field field : getAllFields()) {
-      if (field.getAnnotation(Inject.class) != null) {
-        lookupField(field, "");
-        continue;
-      }
-
-      Requirement requirement = field.getAnnotation(Requirement.class);
-      if (requirement != null) {
-        lookupField(field, requirement.hint());
-      }
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        initConfigurations();
+        super.setUp();
+        copyTestConf();
+        initRestApiSettings();
+        injectFields();
     }
-  }
 
-  private void lookupField(Field field, String hint) throws Exception, IllegalAccessException {
-    Object value = lookup(field.getType(), hint);
-    if (!field.isAccessible()) {
-      field.setAccessible(true);
-      field.set(this, value);
-      field.setAccessible(false);
+    private void copyTestConf()
+    {
+        try
+        {
+            copyDirectory( NEXUS_CONF_DIR, getConfHomeDir() );
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( "Could not copy nexus configuration to a temp dir : " + NEXUS_CONF_DIR, e );
+        }
     }
-  }
 
-  @Override
-  protected void tearDown() throws Exception {
-    System.setProperty(TMP_DIR_KEY, oldTmpDir);
-    super.tearDown();
-  }
+    private void injectFields()
+        throws Exception, IllegalAccessException
+    {
+        for ( Field field : getAllFields() )
+        {
+            if ( field.getAnnotation( Inject.class ) != null )
+            {
+                lookupField( field, "" );
+                continue;
+            }
 
-  private void initConfigurations() {
-    oldTmpDir = System.getProperty(TMP_DIR_KEY);
-    System.setProperty(TMP_DIR_KEY, BASE_CACHE_DIR.getAbsolutePath());
-  }
-
-  private void initRestApiSettings() throws Exception {
-    NexusConfiguration config = lookup(NexusConfiguration.class);
-    config.loadConfiguration(true);
-  }
-
-  private List<Field> getAllFields() {
-    List<Field> fields = new ArrayList<Field>();
-    Class<?> clazz = getClass();
-    do {
-      List<? extends Field> classFields = getFields(clazz);
-      fields.addAll(classFields);
-      clazz = clazz.getSuperclass();
-    } while (!Object.class.equals(clazz));
-    return fields;
-  }
-
-  private List<? extends Field> getFields(Class<?> clazz) {
-    return asList(clazz.getDeclaredFields());
-  }
-
-  public static File cloneToTempDir(File sourceDir) {
-    File tmpDir = new File(".", "target/tmp/" + randomAlphabetic(10));
-    tmpDir.mkdirs();
-    try {
-      copyDirectory(sourceDir, tmpDir);
-    } catch (IOException e) {
-      throw new RuntimeException("Could not copy nexus configuration to a temp dir : " + tmpDir, e);
+            Requirement requirement = field.getAnnotation( Requirement.class );
+            if ( requirement != null )
+            {
+                lookupField( field, requirement.hint() );
+            }
+        }
     }
-    return tmpDir;
-  }
 
+    private void lookupField( Field field, String hint )
+        throws Exception, IllegalAccessException
+    {
+        Object value = lookup( field.getType(), hint );
+        if ( !field.isAccessible() )
+        {
+            field.setAccessible( true );
+            field.set( this, value );
+            field.setAccessible( false );
+        }
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        System.setProperty( TMP_DIR_KEY, oldTmpDir );
+        super.tearDown();
+    }
+
+    private void initConfigurations()
+    {
+        oldTmpDir = System.getProperty( TMP_DIR_KEY );
+        System.setProperty( TMP_DIR_KEY, BASE_CACHE_DIR.getAbsolutePath() );
+    }
+
+    private void initRestApiSettings()
+        throws Exception
+    {
+        NexusConfiguration config = lookup( NexusConfiguration.class );
+        config.loadConfiguration( true );
+    }
+
+    private List<Field> getAllFields()
+    {
+        List<Field> fields = new ArrayList<Field>();
+        Class<?> clazz = getClass();
+        do
+        {
+            List<? extends Field> classFields = getFields( clazz );
+            fields.addAll( classFields );
+            clazz = clazz.getSuperclass();
+        }
+        while ( !Object.class.equals( clazz ) );
+        return fields;
+    }
+
+    private List<? extends Field> getFields( Class<?> clazz )
+    {
+        return asList( clazz.getDeclaredFields() );
+    }
+
+    public static File cloneToTempDir( File sourceDir )
+    {
+        File tmpDir = new File( ".", "target/tmp/" + randomAlphabetic( 10 ) );
+        tmpDir.mkdirs();
+        try
+        {
+            copyDirectory( sourceDir, tmpDir );
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( "Could not copy nexus configuration to a temp dir : " + tmpDir, e );
+        }
+        return tmpDir;
+    }
 
 }

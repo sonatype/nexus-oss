@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.m2yum;
+package org.sonatype.nexus.plugins.yum.plugin.m2yum;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
@@ -25,27 +25,33 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-
-@Component(role = M2YumRepositoryTypeRegistrator.class, instantiationStrategy = Strategies.LOAD_ON_START)
+@Component( role = M2YumRepositoryTypeRegistrator.class, instantiationStrategy = Strategies.LOAD_ON_START )
 @Singleton
-public class M2YumRepositoryTypeRegistratorImpl implements M2YumRepositoryTypeRegistrator {
-  private static final Logger LOG = LoggerFactory.getLogger(M2YumRepositoryTypeRegistratorImpl.class);
+public class M2YumRepositoryTypeRegistratorImpl
+    implements M2YumRepositoryTypeRegistrator
+{
+    private static final Logger LOG = LoggerFactory.getLogger( M2YumRepositoryTypeRegistratorImpl.class );
 
-  @Inject
-  private RepositoryTypeRegistry repositoryTypeRegistry;
+    @Inject
+    private RepositoryTypeRegistry repositoryTypeRegistry;
 
-  @Inject
-  public void registerRepositoryType() {
-    LOG.info("Try register my M2YumRepository and M2YumGroupRepository to the RepositoryTypeRegistry");
-    repositoryTypeRegistry.registerRepositoryTypeDescriptors(m2yumDescriptor());
-    repositoryTypeRegistry.registerRepositoryTypeDescriptors(m2yumGroupDescriptor());
-  }
+    @Inject
+    public void registerRepositoryType()
+    {
+        LOG.info( "Try register my M2YumRepository and M2YumGroupRepository to the RepositoryTypeRegistry" );
+        repositoryTypeRegistry.registerRepositoryTypeDescriptors( m2yumDescriptor() );
+        repositoryTypeRegistry.registerRepositoryTypeDescriptors( m2yumGroupDescriptor() );
+    }
 
-  private RepositoryTypeDescriptor m2yumDescriptor() {
-    return new RepositoryTypeDescriptor(Repository.class, M2YumRepository.ID, "repositories", RepositoryType.UNLIMITED_INSTANCES);
-  }
+    private RepositoryTypeDescriptor m2yumDescriptor()
+    {
+        return new RepositoryTypeDescriptor( Repository.class, M2YumRepository.ID, "repositories",
+            RepositoryType.UNLIMITED_INSTANCES );
+    }
 
-  private RepositoryTypeDescriptor m2yumGroupDescriptor() {
-    return new RepositoryTypeDescriptor(GroupRepository.class, M2YumGroupRepository.ID, "groups", RepositoryType.UNLIMITED_INSTANCES);
-  }
+    private RepositoryTypeDescriptor m2yumGroupDescriptor()
+    {
+        return new RepositoryTypeDescriptor( GroupRepository.class, M2YumGroupRepository.ID, "groups",
+            RepositoryType.UNLIMITED_INSTANCES );
+    }
 }

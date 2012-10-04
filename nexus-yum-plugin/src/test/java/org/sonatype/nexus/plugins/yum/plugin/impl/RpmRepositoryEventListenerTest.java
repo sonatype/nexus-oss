@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.plugins.yum.plugin.impl;
 
 import javax.inject.Inject;
 
@@ -28,65 +28,75 @@ import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 
+public class RpmRepositoryEventListenerTest
+    extends AbstractRepositoryTester
+{
+    @Inject
+    private ItemEventListener listener;
 
-public class RpmRepositoryEventListenerTest extends AbstractRepositoryTester {
-  @Inject
-  private ItemEventListener listener;
+    @Inject
+    private RepositoryRegistry repositoryRegistry;
 
-  @Inject
-  private RepositoryRegistry repositoryRegistry;
+    @Inject
+    private YumConfiguration yumConfig;
 
-  @Inject
-  private YumConfiguration yumConfig;
+    @Before
+    public void activateRepo()
+    {
+        yumConfig.setActive( true );
+    }
 
-  @Before
-  public void activateRepo() {
-    yumConfig.setActive(true);
-  }
+    @After
+    public void reactivateRepo()
+    {
+        yumConfig.setActive( true );
+    }
 
-  @After
-  public void reactivateRepo() {
-    yumConfig.setActive(true);
-  }
+    @Test
+    public void shouldRegisterRepository()
+        throws Exception
+    {
+        Repository repo = createRepository( true );
+        listener.onEvent( new RepositoryRegistryEventAdd( null, repo ) );
+        Assert.assertTrue( repositoryRegistry.isRegistered( repo ) );
+    }
 
-  @Test
-  public void shouldRegisterRepository() throws Exception {
-    Repository repo = createRepository(true);
-    listener.onEvent(new RepositoryRegistryEventAdd(null, repo));
-    Assert.assertTrue(repositoryRegistry.isRegistered(repo));
-  }
+    @Test
+    public void shouldNotRegisterRepository()
+        throws Exception
+    {
+        Repository repo = createRepository( false );
+        repositoryRegistry.unregisterRepository( repo );
+        listener.onEvent( new RepositoryRegistryEventAdd( null, repo ) );
+        Assert.assertFalse( repositoryRegistry.isRegistered( repo ) );
+    }
 
-  @Test
-  public void shouldNotRegisterRepository() throws Exception {
-    Repository repo = createRepository(false);
-    repositoryRegistry.unregisterRepository(repo);
-    listener.onEvent(new RepositoryRegistryEventAdd(null, repo));
-    Assert.assertFalse(repositoryRegistry.isRegistered(repo));
-  }
+    @Test
+    public void shouldNotCreateRepo()
+    {
+        Repository repo = createRepository( true );
+        repositoryRegistry.unregisterRepository( repo );
+        listener.onEvent( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test-source.jar" ) ) );
+    }
 
-  @Test
-  public void shouldNotCreateRepo() {
-    Repository repo = createRepository(true);
-    repositoryRegistry.unregisterRepository(repo);
-    listener.onEvent(new RepositoryItemEventStoreCreate(repo, createItem("VERSION", "test-source.jar")));
-  }
+    @Test
+    public void shouldNotCreateRepoForPom()
+    {
+        yumConfig.setActive( false );
 
-  @Test
-  public void shouldNotCreateRepoForPom() {
-    yumConfig.setActive(false);
+        MavenRepository repo = createRepository( true );
+        repositoryRegistry.registerRepository( repo );
+        listener.onEvent( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
+    }
 
-    MavenRepository repo = createRepository(true);
-    repositoryRegistry.registerRepository(repo);
-    listener.onEvent(new RepositoryItemEventStoreCreate(repo, createItem("VERSION", "test.pom")));
-  }
+    @Test
+    public void shouldCreateRepoForPom()
+    {
+        yumConfig.setActive( false );
 
-  @Test
-  public void shouldCreateRepoForPom() {
-    yumConfig.setActive(false);
-
-    MavenRepository repo = createRepository(true);
-    repositoryRegistry.registerRepository(repo);
-    listener.onEvent(new RepositoryItemEventStoreCreate(repo, createItem("VERSION", "test.rpm")));
-  }
+        MavenRepository repo = createRepository( true );
+        repositoryRegistry.registerRepository( repo );
+        listener.onEvent( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );
+    }
 
 }

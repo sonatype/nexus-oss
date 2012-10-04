@@ -10,25 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.rest.domain;
+package org.sonatype.nexus.plugins.yum.rest.domain;
 
 import org.restlet.data.MediaType;
 import org.restlet.resource.FileRepresentation;
 import org.sonatype.nexus.plugins.yum.repository.FileDirectoryStructure;
 
-
-public class YumFileRepresentation extends FileRepresentation {
-  public YumFileRepresentation(UrlPathInterpretation interpretation, FileDirectoryStructure fileDirectoryStructure) {
-    super(fileDirectoryStructure.getFile(interpretation.getPath()), getMediaType(interpretation.getPath()));
-  }
-
-  private static MediaType getMediaType(String path) {
-    if (path.endsWith("xml")) {
-      return MediaType.APPLICATION_XML;
-    } else if (path.endsWith("gz")) {
-      return MediaType.APPLICATION_GNU_ZIP;
-    } else {
-      return MediaType.APPLICATION_ALL;
+public class YumFileRepresentation
+    extends FileRepresentation
+{
+    public YumFileRepresentation( UrlPathInterpretation interpretation, FileDirectoryStructure fileDirectoryStructure )
+    {
+        super( fileDirectoryStructure.getFile( interpretation.getPath() ), getMediaType( interpretation.getPath() ) );
     }
-  }
+
+    private static MediaType getMediaType( String path )
+    {
+        if ( path.endsWith( "xml" ) )
+        {
+            return MediaType.APPLICATION_XML;
+        }
+        else if ( path.endsWith( "gz" ) )
+        {
+            return MediaType.APPLICATION_GNU_ZIP;
+        }
+        else
+        {
+            return MediaType.APPLICATION_ALL;
+        }
+    }
 }

@@ -10,15 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.event;
+package org.sonatype.nexus.plugins.yum.plugin.event;
 
 import org.sonatype.nexus.proxy.events.RepositoryEvent;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-public class YumRepositoryGenerateEvent extends RepositoryEvent {
+public class YumRepositoryGenerateEvent
+    extends RepositoryEvent
+{
 
-  public YumRepositoryGenerateEvent(Repository repository) {
-    super(repository);
-  }
+    public YumRepositoryGenerateEvent( Repository repository )
+    {
+        super( repository );
+    }
 
 }

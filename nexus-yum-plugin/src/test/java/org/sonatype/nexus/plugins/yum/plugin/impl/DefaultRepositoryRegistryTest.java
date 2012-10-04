@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.plugins.yum.plugin.impl;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -33,51 +33,64 @@ import org.sonatype.plexus.appevents.EventListener;
 
 import com.google.code.tempusfugit.temporal.Condition;
 
+public class DefaultRepositoryRegistryTest
+    extends AbstractRepositoryTester
+{
+    private static final String REPO_ID = "rpm-snapshots";
 
-public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {
-  private static final String REPO_ID = "rpm-snapshots";
+    @Inject
+    private RepositoryRegistry repositoryRegistry;
 
-  @Inject
-  private RepositoryRegistry repositoryRegistry;
+    @Inject
+    private NexusScheduler nexusScheduler;
 
-  @Inject
-  private NexusScheduler nexusScheduler;
+    @Test
+    public void shouldScanRepository()
+        throws Exception
+    {
+        MavenRepository repository = createMock( MavenRepository.class );
+        expect( repository.getId() ).andReturn( REPO_ID ).anyTimes();
+        expect( repository.getLocalUrl() ).andReturn( new File( ".", "target/test-classes/repo" ).toURI().toString() ).anyTimes();
+        replay( repository );
 
-  @Test
-  public void shouldScanRepository() throws Exception {
-    MavenRepository repository = createMock(MavenRepository.class);
-    expect(repository.getId()).andReturn(REPO_ID).anyTimes();
-    expect(repository.getLocalUrl()).andReturn(new File(".", "target/test-classes/repo").toURI().toString()).anyTimes();
-    replay(repository);
-
-    repositoryRegistry.registerRepository(repository);
-    waitForAllTasksToBeDone();
-    Assert.assertNotNull(repositoryRegistry.findRepositoryForId(REPO_ID));
-  }
-
-  @Test
-  public void shouldUnregisterRepository() throws Exception {
-    MavenRepository repository = createRepository(true);
-    repositoryRegistry.registerRepository(repository);
-    Assert.assertTrue(repositoryRegistry.isRegistered(repository));
-    repositoryRegistry.unregisterRepository(repository);
-    Assert.assertFalse(repositoryRegistry.isRegistered(repository));
-  }
-
-  @SuppressWarnings("serial")
-  public static class QueueingEventListener extends ArrayList<Event<?>> implements EventListener {
-    @Override
-    public void onEvent(Event<?> evt) {
-      add(evt);
+        repositoryRegistry.registerRepository( repository );
+        waitForAllTasksToBeDone();
+        Assert.assertNotNull( repositoryRegistry.findRepositoryForId( REPO_ID ) );
     }
-  }
 
-  private void waitForAllTasksToBeDone() throws TimeoutException, InterruptedException {
-    waitFor(new Condition() {
+    @Test
+    public void shouldUnregisterRepository()
+        throws Exception
+    {
+        MavenRepository repository = createRepository( true );
+        repositoryRegistry.registerRepository( repository );
+        Assert.assertTrue( repositoryRegistry.isRegistered( repository ) );
+        repositoryRegistry.unregisterRepository( repository );
+        Assert.assertFalse( repositoryRegistry.isRegistered( repository ) );
+    }
+
+    @SuppressWarnings( "serial" )
+    public static class QueueingEventListener
+        extends ArrayList<Event<?>>
+        implements EventListener
+    {
         @Override
-        public boolean isSatisfied() {
-          return nexusScheduler.getActiveTasks().isEmpty();
+        public void onEvent( Event<?> evt )
+        {
+            add( evt );
         }
-      });
-  }
+    }
+
+    private void waitForAllTasksToBeDone()
+        throws TimeoutException, InterruptedException
+    {
+        waitFor( new Condition()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return nexusScheduler.getActiveTasks().isEmpty();
+            }
+        } );
+    }
 }

@@ -10,50 +10,66 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum;
+package org.sonatype.nexus.plugins.yum;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.slf4j.Logger;
 
+public class LogOutputStream
+    extends OutputStream
+{
+    private static final int BUF_SIZE = 3 * 1024;
 
-public class LogOutputStream extends OutputStream {
-  private static final int BUF_SIZE = 3 * 1024;
-  private final Logger log;
-  private final boolean logLevelError;
-  private boolean loggedErrors = false;
+    private final Logger log;
 
-  private final ByteArrayOutputStream buffer = new ByteArrayOutputStream(BUF_SIZE);
+    private final boolean logLevelError;
 
-  public LogOutputStream(Logger log, boolean logLevelError) {
-    this.log = log;
-    this.logLevelError = logLevelError;
-  }
+    private boolean loggedErrors = false;
 
-  @Override
-  public void write(int b) throws IOException {
-    if ((b == 10) || (buffer.size() == (BUF_SIZE - 1))) {
-      log(buffer.toString());
-      buffer.reset();
-    } else {
-      buffer.write(b);
+    private final ByteArrayOutputStream buffer = new ByteArrayOutputStream( BUF_SIZE );
+
+    public LogOutputStream( Logger log, boolean logLevelError )
+    {
+        this.log = log;
+        this.logLevelError = logLevelError;
     }
-  }
 
-  private void log(String string) {
-    if (logLevelError) {
-      log.error(string);
-      loggedErrors = true;
-    } else {
-      if (string.contains("[ERROR]")) {
-        loggedErrors = true;
-      }
-      log.info(string);
+    @Override
+    public void write( int b )
+        throws IOException
+    {
+        if ( ( b == 10 ) || ( buffer.size() == ( BUF_SIZE - 1 ) ) )
+        {
+            log( buffer.toString() );
+            buffer.reset();
+        }
+        else
+        {
+            buffer.write( b );
+        }
     }
-  }
 
-  public boolean hasLoggedErrors() {
-    return loggedErrors;
-  }
+    private void log( String string )
+    {
+        if ( logLevelError )
+        {
+            log.error( string );
+            loggedErrors = true;
+        }
+        else
+        {
+            if ( string.contains( "[ERROR]" ) )
+            {
+                loggedErrors = true;
+            }
+            log.info( string );
+        }
+    }
+
+    public boolean hasLoggedErrors()
+    {
+        return loggedErrors;
+    }
 }

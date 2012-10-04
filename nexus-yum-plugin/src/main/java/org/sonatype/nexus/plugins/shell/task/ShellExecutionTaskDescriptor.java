@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.shell.task;
+package org.sonatype.nexus.plugins.shell.task;
 
 import static java.util.Arrays.asList;
 import static org.sonatype.nexus.formfields.FormField.MANDATORY;
@@ -21,32 +21,37 @@ import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
+@Component( role = ScheduledTaskDescriptor.class, hint = "ShellExecutionTask", description = ShellExecutionTaskDescriptor.NAME )
+public class ShellExecutionTaskDescriptor
+    extends AbstractScheduledTaskDescriptor
+{
+    public static final String ID = "ShellExecutionTask";
 
-@Component(
-  role = ScheduledTaskDescriptor.class, hint = "ShellExecutionTask", description = ShellExecutionTaskDescriptor.NAME
-)
-public class ShellExecutionTaskDescriptor extends AbstractScheduledTaskDescriptor {
-  public static final String ID = "ShellExecutionTask";
-  public static final String NAME = "Shell Execution Task";
-  public static final String COMMAND_FIELD_ID = "shellTaskCommand";
+    public static final String NAME = "Shell Execution Task";
 
-  private final StringTextFormField commandField = new StringTextFormField(
-    COMMAND_FIELD_ID,
-    "Command to execute in the shell",
-    "This should be the complete command with arguments to be executed in the shell. It should be exactly one command nothing more. No shell script code is allowed.",
-    MANDATORY);
+    public static final String COMMAND_FIELD_ID = "shellTaskCommand";
 
-  public String getId() {
-    return ID;
-  }
+    private final StringTextFormField commandField =
+        new StringTextFormField(
+            COMMAND_FIELD_ID,
+            "Command to execute in the shell",
+            "This should be the complete command with arguments to be executed in the shell. It should be exactly one command nothing more. No shell script code is allowed.",
+            MANDATORY );
 
-  public String getName() {
-    return NAME;
-  }
+    public String getId()
+    {
+        return ID;
+    }
 
-  @Override
-  public List<FormField> formFields() {
-    return asList((FormField) commandField);
-  }
+    public String getName()
+    {
+        return NAME;
+    }
+
+    @Override
+    public List<FormField> formFields()
+    {
+        return asList( (FormField) commandField );
+    }
 
 }

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.repository.task;
+package org.sonatype.nexus.plugins.yum.repository.task;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 
@@ -24,52 +24,66 @@ import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.AbstractSchedulerTest;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 
+public class YumRepositoryGeneratorJobTest
+    extends AbstractSchedulerTest
+{
+    private static final File PATH_NOT_EXISTS = new File( "/data/path/not/exists" );
 
-public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
-  private static final File PATH_NOT_EXISTS = new File("/data/path/not/exists");
-  private static final String SNAPSHOTS = "snapshots";
-  private static final String VERSION = "2.2-2";
-  private static final String BASE_URL = "http://localhost:8080/nexus/content/snapshots";
-  private static final String BASE_VERSIONED_URL = "http://localhost:8080/nexus/service/local/yum/snapshots/" + VERSION;
+    private static final String SNAPSHOTS = "snapshots";
 
-  @Requirement
-  private YumConfiguration yumConfig;
+    private static final String VERSION = "2.2-2";
 
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    deleteDirectory(RepositoryTestUtils.PACKAGE_CACHE_DIR);
-    deleteDirectory(RepositoryTestUtils.REPODATA_DIR);
-    deleteDirectory(yumConfig.getBaseTempDir());
-    yumConfig.setActive(true);
-  }
+    private static final String BASE_URL = "http://localhost:8080/nexus/content/snapshots";
 
-  @Test
-  public void shouldCreateRepo() throws Exception {
-    executeJob(createTask(RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS));
-    RepositoryTestUtils.assertRepository(RepositoryTestUtils.REPODATA_DIR, "default");
+    private static final String BASE_VERSIONED_URL = "http://localhost:8080/nexus/service/local/yum/snapshots/"
+        + VERSION;
 
-  }
+    @Requirement
+    private YumConfiguration yumConfig;
 
-  @Test
-  public void shouldNotExecuteCreateRepoIfDeactivated() throws Exception {
-    yumConfig.setActive(false);
-    executeJob(createTask(RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS));
-    Assert.assertFalse(RepositoryTestUtils.REPODATA_DIR.exists());
-  }
+    @Override
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+        deleteDirectory( RepositoryTestUtils.PACKAGE_CACHE_DIR );
+        deleteDirectory( RepositoryTestUtils.REPODATA_DIR );
+        deleteDirectory( yumConfig.getBaseTempDir() );
+        yumConfig.setActive( true );
+    }
 
-  @Test
-  public void shouldFilterForSpecificVersion() throws Exception {
-    executeJob(createTask(RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR,
-        BASE_VERSIONED_URL, SNAPSHOTS,
-        VERSION,
- null, true));
-    RepositoryTestUtils.assertRepository(RepositoryTestUtils.REPODATA_DIR, "filtering");
-  }
+    @Test
+    public void shouldCreateRepo()
+        throws Exception
+    {
+        executeJob( createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
+        RepositoryTestUtils.assertRepository( RepositoryTestUtils.REPODATA_DIR, "default" );
 
-  @Test(expected = ExecutionException.class)
-  public void shouldNotCreateRepoIfPathNotExists() throws Exception {
-    executeJob(createTask(PATH_NOT_EXISTS, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS));
-  }
+    }
+
+    @Test
+    public void shouldNotExecuteCreateRepoIfDeactivated()
+        throws Exception
+    {
+        yumConfig.setActive( false );
+        executeJob( createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
+        Assert.assertFalse( RepositoryTestUtils.REPODATA_DIR.exists() );
+    }
+
+    @Test
+    public void shouldFilterForSpecificVersion()
+        throws Exception
+    {
+        executeJob( createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR,
+            BASE_VERSIONED_URL, SNAPSHOTS, VERSION, null, true ) );
+        RepositoryTestUtils.assertRepository( RepositoryTestUtils.REPODATA_DIR, "filtering" );
+    }
+
+    @Test( expected = ExecutionException.class )
+    public void shouldNotCreateRepoIfPathNotExists()
+        throws Exception
+    {
+        executeJob( createTask( PATH_NOT_EXISTS, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
+    }
 
 }

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.plugins.yum.plugin.impl;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -49,86 +49,98 @@ import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
 
-
 /**
  * @author sherold
  * @author bvoss
  */
-public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester {
-  private static final Logger log = LoggerFactory.getLogger(ConcurrentRpmDeployedListenerTest.class);
+public class ConcurrentRpmDeployedListenerTest
+    extends AbstractRepositoryTester
+{
+    private static final Logger log = LoggerFactory.getLogger( ConcurrentRpmDeployedListenerTest.class );
 
-  @Rule
-  public ConcurrentRule concurrently = new ConcurrentRule();
+    @Rule
+    public ConcurrentRule concurrently = new ConcurrentRule();
 
-  @Rule
-  public RepeatingRule repeatedly = new RepeatingRule();
+    @Rule
+    public RepeatingRule repeatedly = new RepeatingRule();
 
-  @Inject
-	private NexusScheduler nexusScheduler;
+    @Inject
+    private NexusScheduler nexusScheduler;
 
-	@Inject
-  private ItemEventListener listener;
+    @Inject
+    private ItemEventListener listener;
 
-  @Inject
-  private RepositoryRegistry repositoryRegistry;
+    @Inject
+    private RepositoryRegistry repositoryRegistry;
 
-  @Inject
-  private YumConfiguration yumConfig;
+    @Inject
+    private YumConfiguration yumConfig;
 
-  @Before
-  public void activateRepo() {
-    yumConfig.setActive(true);
-  }
-
-  @After
-  public void reactivateRepo() {
-    yumConfig.setActive(true);
-  }
-
-  @Concurrent(count = 1)
-  @Test
-  public void shouldCreateRepoForPom() throws Exception {
-    for (int j = 0; j < 5; j++) {
-      shouldCreateRepoForRpm(j);
+    @Before
+    public void activateRepo()
+    {
+        yumConfig.setActive( true );
     }
-    log.info("done");
-  }
 
-  private void shouldCreateRepoForRpm(int index) throws URISyntaxException, MalformedURLException,
-    NoSuchAlgorithmException, IOException {
-    MavenRepository repo = createRepository(true, "repo" + index);
-    repositoryRegistry.registerRepository(repo);
-    for (int version = 0; version < 5; version++) {
-      assertNotMoreThan10ThreadForRpmUpload(repo, version);
+    @After
+    public void reactivateRepo()
+    {
+        yumConfig.setActive( true );
     }
-  }
 
-  private void assertNotMoreThan10ThreadForRpmUpload(MavenRepository repo, int version) throws URISyntaxException,
-    MalformedURLException, NoSuchAlgorithmException, IOException {
-    String versionStr = version + ".1";
-    File outputDirectory = new File(new URL(repo.getLocalUrl() + "/blalu/" +
-        versionStr).toURI());
-    File rpmFile = RepositoryTestUtils.createDummyRpm("test-artifact", versionStr, outputDirectory);
+    @Concurrent( count = 1 )
+    @Test
+    public void shouldCreateRepoForPom()
+        throws Exception
+    {
+        for ( int j = 0; j < 5; j++ )
+        {
+            shouldCreateRepoForRpm( j );
+        }
+        log.info( "done" );
+    }
 
-    StorageItem storageItem = createItem(versionStr, rpmFile.getName());
+    private void shouldCreateRepoForRpm( int index )
+        throws URISyntaxException, MalformedURLException, NoSuchAlgorithmException, IOException
+    {
+        MavenRepository repo = createRepository( true, "repo" + index );
+        repositoryRegistry.registerRepository( repo );
+        for ( int version = 0; version < 5; version++ )
+        {
+            assertNotMoreThan10ThreadForRpmUpload( repo, version );
+        }
+    }
 
-    listener.onEvent(new RepositoryItemEventStoreCreate(repo, storageItem));
+    private void assertNotMoreThan10ThreadForRpmUpload( MavenRepository repo, int version )
+        throws URISyntaxException, MalformedURLException, NoSuchAlgorithmException, IOException
+    {
+        String versionStr = version + ".1";
+        File outputDirectory = new File( new URL( repo.getLocalUrl() + "/blalu/" + versionStr ).toURI() );
+        File rpmFile = RepositoryTestUtils.createDummyRpm( "test-artifact", versionStr, outputDirectory );
 
-		final int activeWorker = getRunningTasks();
-		log.info("active worker: " + activeWorker);
-    assertThat(activeWorker, is(lessThanOrEqualTo(10)));
-  }
+        StorageItem storageItem = createItem( versionStr, rpmFile.getName() );
 
-	private int getRunningTasks() {
-		List<ScheduledTask<?>> tasks = nexusScheduler.getActiveTasks().get(ID);
-		int count = 0;
-		if (tasks != null) {
-			for (ScheduledTask<?> task : tasks) {
-				if (RUNNING.equals(task.getTaskState())) {
-					count++;
-				}
-			}
-		}
-		return count;
-	}
+        listener.onEvent( new RepositoryItemEventStoreCreate( repo, storageItem ) );
+
+        final int activeWorker = getRunningTasks();
+        log.info( "active worker: " + activeWorker );
+        assertThat( activeWorker, is( lessThanOrEqualTo( 10 ) ) );
+    }
+
+    private int getRunningTasks()
+    {
+        List<ScheduledTask<?>> tasks = nexusScheduler.getActiveTasks().get( ID );
+        int count = 0;
+        if ( tasks != null )
+        {
+            for ( ScheduledTask<?> task : tasks )
+            {
+                if ( RUNNING.equals( task.getTaskState() ) )
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
 }

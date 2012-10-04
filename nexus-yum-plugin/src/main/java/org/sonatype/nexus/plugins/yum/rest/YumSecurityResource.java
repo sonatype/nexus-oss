@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.rest;
+package org.sonatype.nexus.plugins.yum.rest;
 
 import javax.inject.Singleton;
 
@@ -18,11 +18,15 @@ import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 @Singleton
-public class YumSecurityResource extends AbstractStaticSecurityResource implements StaticSecurityResource {
+public class YumSecurityResource
+    extends AbstractStaticSecurityResource
+    implements StaticSecurityResource
+{
 
-  @Override
-  protected String getResourcePath() {
-    return "/META-INF/org.sonatype.nexus.plugins.yum-security.xml";
-  }
+    @Override
+    protected String getResourcePath()
+    {
+        return "/META-INF/org.sonatype.nexus.plugins.yum-security.xml";
+    }
 
 }

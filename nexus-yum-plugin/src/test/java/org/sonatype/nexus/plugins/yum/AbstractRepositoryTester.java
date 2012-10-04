@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum;
+package org.sonatype.nexus.plugins.yum;
 
 import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_DIR;
 import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.BASE_TMP_FILE;
@@ -38,67 +38,79 @@ import org.sonatype.scheduling.ScheduledTask;
 
 import com.google.code.tempusfugit.temporal.Condition;
 
+public abstract class AbstractRepositoryTester
+    extends AbstractYumNexusTestCase
+{
+    private static final String SNAPSHOTS = "snapshots";
 
-public abstract class AbstractRepositoryTester extends AbstractYumNexusTestCase {
-  private static final String SNAPSHOTS = "snapshots";
+    @Inject
+    private NexusScheduler nexusScheduler;
 
-  @Inject
-	private NexusScheduler nexusScheduler;
+    @After
+    public void waitForThreadPool()
+        throws Exception
+    {
+        waitFor( new Condition()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                int running = 0;
+                for ( Entry<String, List<ScheduledTask<?>>> entry : nexusScheduler.getActiveTasks().entrySet() )
+                {
+                    for ( ScheduledTask<?> task : entry.getValue() )
+                    {
+                        if ( RUNNING.equals( task.getTaskState() ) )
+                        {
+                            running++;
+                        }
+                    }
+                }
+                return running == 0;
+            }
+        } );
+    }
 
-  @After
-  public void waitForThreadPool() throws Exception {
-    waitFor(new Condition() {
-        @Override
-        public boolean isSatisfied() {
-				int running = 0;
-				for (Entry<String, List<ScheduledTask<?>>> entry : nexusScheduler.getActiveTasks().entrySet()) {
-					for (ScheduledTask<?> task : entry.getValue()) {
-						if (RUNNING.equals(task.getTaskState())) {
-							running++;
-						}
-					}
-				}
-				return running == 0;
-        }
-      });
-  }
+    @Before
+    public void cleanUpCacheDirectory()
+        throws Exception
+    {
+        deleteDirectory( BASE_TMP_FILE );
+        BASE_CACHE_DIR.mkdirs();
+    }
 
+    protected MavenRepository createRepository( final boolean isMavenHostedRepository )
+    {
+        return createRepository( isMavenHostedRepository, SNAPSHOTS );
+    }
 
-  @Before
-  public void cleanUpCacheDirectory() throws Exception {
-    deleteDirectory(BASE_TMP_FILE);
-    BASE_CACHE_DIR.mkdirs();
-  }
+    protected MavenRepository createRepository( final boolean isMavenHostedRepository, final String repoId )
+    {
+        RepositoryKind kind = createMock( RepositoryKind.class );
+        expect( kind.isFacetAvailable( MavenHostedRepository.class ) ).andReturn( isMavenHostedRepository );
 
-  protected MavenRepository createRepository(final boolean isMavenHostedRepository) {
-    return createRepository(isMavenHostedRepository, SNAPSHOTS);
-  }
+        MavenRepository repository = createMock( MavenRepository.class );
+        expect( repository.getRepositoryKind() ).andReturn( kind ).anyTimes();
+        expect( repository.getId() ).andReturn( repoId ).anyTimes();
 
-  protected MavenRepository createRepository(final boolean isMavenHostedRepository, final String repoId) {
-    RepositoryKind kind = createMock(RepositoryKind.class);
-    expect(kind.isFacetAvailable(MavenHostedRepository.class)).andReturn(isMavenHostedRepository);
+        File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );
+        repoDir.mkdirs();
+        expect( repository.getLocalUrl() ).andReturn( repoDir.toURI().toString() ).anyTimes();
 
-    MavenRepository repository = createMock(MavenRepository.class);
-    expect(repository.getRepositoryKind()).andReturn(kind).anyTimes();
-    expect(repository.getId()).andReturn(repoId).anyTimes();
+        replay( kind, repository );
 
-    File repoDir = new File(BASE_TMP_FILE, "tmp-repos/" + repoId);
-    repoDir.mkdirs();
-    expect(repository.getLocalUrl()).andReturn(repoDir.toURI().toString()).anyTimes();
+        return repository;
+    }
 
-    replay(kind, repository);
+    protected StorageItem createItem( String version, String filename )
+    {
+        StorageItem item = createMock( StorageItem.class );
 
-    return repository;
-  }
+        expect( item.getPath() ).andReturn( "blalu/" + version + "/" + filename ).anyTimes();
+        expect( item.getParentPath() ).andReturn( "blalu/" + version ).anyTimes();
+        expect( item.getItemContext() ).andReturn( new RequestContext() ).anyTimes();
 
-  protected StorageItem createItem(String version, String filename) {
-    StorageItem item = createMock(StorageItem.class);
-
-    expect(item.getPath()).andReturn("blalu/" + version + "/" + filename).anyTimes();
-    expect(item.getParentPath()).andReturn("blalu/" + version).anyTimes();
-    expect(item.getItemContext()).andReturn(new RequestContext()).anyTimes();
-
-    replay(item);
-    return item;
-  }
+        replay( item );
+        return item;
+    }
 }

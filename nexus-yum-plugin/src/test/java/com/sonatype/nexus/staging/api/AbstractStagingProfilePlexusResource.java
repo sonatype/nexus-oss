@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package com.sonatype.nexus.staging.api;
+package com.sonatype.nexus.staging.api;
 
 import org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumContentClass;
 
-public class AbstractStagingProfilePlexusResource {
-  public String validateProfile() {
-    return new M2YumContentClass().getId();
-  }
+public class AbstractStagingProfilePlexusResource
+{
+    public String validateProfile()
+    {
+        return new M2YumContentClass().getId();
+    }
 }

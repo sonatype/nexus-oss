@@ -10,39 +10,50 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.test.os;
+package org.sonatype.nexus.test.os;
 
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
-public class OsTestRule implements MethodRule {
+public class OsTestRule
+    implements MethodRule
+{
 
-  @Override
-  public Statement apply(final Statement statement, final FrameworkMethod method, final Object target) {
-    return new Statement() {
+    @Override
+    public Statement apply( final Statement statement, final FrameworkMethod method, final Object target )
+    {
+        return new Statement()
+        {
 
-      @Override
-      public void evaluate() throws Throwable {
-        IgnoreOn ignoreOn = method.getAnnotation(IgnoreOn.class);
-        if (ignoreOn == null || !matches(ignoreOn.value())) {
-          statement.evaluate();
-        }
-      }
-
-      private boolean matches(String[] osNames) {
-        if (osNames != null) {
-          String systemOsName = System.getProperty("os.name").toLowerCase();
-          for (String osName : osNames) {
-            if (systemOsName.contains(osName.toLowerCase())) {
-              return true;
+            @Override
+            public void evaluate()
+                throws Throwable
+            {
+                IgnoreOn ignoreOn = method.getAnnotation( IgnoreOn.class );
+                if ( ignoreOn == null || !matches( ignoreOn.value() ) )
+                {
+                    statement.evaluate();
+                }
             }
-          }
-        }
 
-        return false;
-      }
-    };
-  }
+            private boolean matches( String[] osNames )
+            {
+                if ( osNames != null )
+                {
+                    String systemOsName = System.getProperty( "os.name" ).toLowerCase();
+                    for ( String osName : osNames )
+                    {
+                        if ( systemOsName.contains( osName.toLowerCase() ) )
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+        };
+    }
 
 }

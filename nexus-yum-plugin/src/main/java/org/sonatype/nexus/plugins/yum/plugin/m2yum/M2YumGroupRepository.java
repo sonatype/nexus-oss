@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.m2yum;
+package org.sonatype.nexus.plugins.yum.plugin.m2yum;
 
 import static java.util.Arrays.asList;
 
@@ -33,78 +33,103 @@ import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-@Component(role = GroupRepository.class, hint = M2YumGroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2-Yum Repository Group")
-public class M2YumGroupRepository extends M2GroupRepository {
-  public static final String ID = "maven2yum";
+@Component( role = GroupRepository.class, hint = M2YumGroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2-Yum Repository Group" )
+public class M2YumGroupRepository
+    extends M2GroupRepository
+{
+    public static final String ID = "maven2yum";
 
-  @Requirement(hint = M2YumContentClass.ID)
-  private ContentClass contentClass;
+    @Requirement( hint = M2YumContentClass.ID )
+    private ContentClass contentClass;
 
-  @Requirement
-  private YumService yumService;
+    @Requirement
+    private YumService yumService;
 
-  @Requirement
-  private RepositoryRegistry repositoryRegistry;
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
 
-  private RepositoryKind repositoryKind;
+    private RepositoryKind repositoryKind;
 
-  @Override
-  public ContentClass getRepositoryContentClass() {
-    return contentClass;
-  }
-
-  private boolean skipTaskGeneration = false;
-
-  @Override
-  public RepositoryKind getRepositoryKind() {
-    if (repositoryKind == null) {
-      repositoryKind = new DefaultRepositoryKind(GroupRepository.class, asList(new Class<?>[] { MavenGroupRepository.class,
-          M2YumGroupRepository.class }));
+    @Override
+    public ContentClass getRepositoryContentClass()
+    {
+        return contentClass;
     }
-    return repositoryKind;
-  }
 
-  @Override
-  public void addMemberRepositoryId(String repositoryId) throws NoSuchRepositoryException, InvalidGroupingException {
-    super.addMemberRepositoryId(repositoryId);
-    if (!skipTaskGeneration && isRpmRepo(repositoryId)) {
-      yumService.createGroupRepository(this);
-    }
-  }
+    private boolean skipTaskGeneration = false;
 
-  private boolean isRpmRepo(String repositoryId) throws NoSuchRepositoryException {
-    final Repository repository = repositoryRegistry.getRepository(repositoryId);
-    try {
-      if (repository.getRepositoryKind().isFacetAvailable(MavenHostedRepository.class)
-          && new File(RepositoryUtils.getBaseDir(repository), "repodata/repomd.xml").exists()) {
-        return true;
-      }
-    } catch (Exception e) {
+    @Override
+    public RepositoryKind getRepositoryKind()
+    {
+        if ( repositoryKind == null )
+        {
+            repositoryKind =
+                new DefaultRepositoryKind( GroupRepository.class, asList( new Class<?>[] { MavenGroupRepository.class,
+                    M2YumGroupRepository.class } ) );
+        }
+        return repositoryKind;
     }
-    return false;
-  }
 
-  @Override
-  public void removeMemberRepositoryId(String repositoryId) {
-    super.removeMemberRepositoryId(repositoryId);
-    try {
-      if (isRpmRepo(repositoryId)) {
-        yumService.createGroupRepository(this);
-      }
-    } catch (NoSuchRepositoryException e) {
-      throw new RuntimeException("Could not detect rpm repository.", e);
+    @Override
+    public void addMemberRepositoryId( String repositoryId )
+        throws NoSuchRepositoryException, InvalidGroupingException
+    {
+        super.addMemberRepositoryId( repositoryId );
+        if ( !skipTaskGeneration && isRpmRepo( repositoryId ) )
+        {
+            yumService.createGroupRepository( this );
+        }
     }
-  }
 
-  @Override
-  public void setMemberRepositoryIds(List<String> repositories) throws NoSuchRepositoryException, InvalidGroupingException {
-    try {
-      skipTaskGeneration = true;
-      super.setMemberRepositoryIds(repositories);
-    } finally {
-      skipTaskGeneration = false;
+    private boolean isRpmRepo( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
+        try
+        {
+            if ( repository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class )
+                && new File( RepositoryUtils.getBaseDir( repository ), "repodata/repomd.xml" ).exists() )
+            {
+                return true;
+            }
+        }
+        catch ( Exception e )
+        {
+        }
+        return false;
     }
-    yumService.createGroupRepository(this);
-  }
+
+    @Override
+    public void removeMemberRepositoryId( String repositoryId )
+    {
+        super.removeMemberRepositoryId( repositoryId );
+        try
+        {
+            if ( isRpmRepo( repositoryId ) )
+            {
+                yumService.createGroupRepository( this );
+            }
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            throw new RuntimeException( "Could not detect rpm repository.", e );
+        }
+    }
+
+    @Override
+    public void setMemberRepositoryIds( List<String> repositories )
+        throws NoSuchRepositoryException, InvalidGroupingException
+    {
+        try
+        {
+            skipTaskGeneration = true;
+            super.setMemberRepositoryIds( repositories );
+        }
+        finally
+        {
+            skipTaskGeneration = false;
+        }
+        yumService.createGroupRepository( this );
+    }
 
 }

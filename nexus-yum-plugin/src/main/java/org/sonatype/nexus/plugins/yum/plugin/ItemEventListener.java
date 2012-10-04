@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin;
+package org.sonatype.nexus.plugins.yum.plugin;
 
 import javax.inject.Singleton;
 import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.plugin.Managed;
 
-
-@Managed @Singleton
-public interface ItemEventListener extends EventListener {
+@Managed
+@Singleton
+public interface ItemEventListener
+    extends EventListener
+{
 }

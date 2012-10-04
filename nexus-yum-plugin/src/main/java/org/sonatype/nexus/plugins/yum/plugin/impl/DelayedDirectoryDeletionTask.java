@@ -10,52 +10,66 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.plugins.yum.plugin.impl;
 
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-public class DelayedDirectoryDeletionTask implements Runnable {
+public class DelayedDirectoryDeletionTask
+    implements Runnable
+{
 
-  private final DeletionService service;
-  private final Repository repository;
-  private final String path;
-  private boolean active = false;
-  private int executionCount = 0;
+    private final DeletionService service;
 
-  public DelayedDirectoryDeletionTask(DeletionService service, Repository repository, String path) {
-    this.service = service;
-    this.repository = repository;
-    this.path = path + "/";
-  }
+    private final Repository repository;
 
-  public void setActive(boolean active) {
-    this.active = active;
-  }
+    private final String path;
 
-  @Override
-  public void run() {
-    executionCount++;
-      service.execute(this);
-  }
+    private boolean active = false;
 
-  public boolean isParent(Repository repo, String subPath) {
-    return repository.getId().equals(repository.getId()) && subPath.startsWith(path);
-  }
+    private int executionCount = 0;
 
-  public Repository getRepository() {
-    return repository;
-  }
+    public DelayedDirectoryDeletionTask( DeletionService service, Repository repository, String path )
+    {
+        this.service = service;
+        this.repository = repository;
+        this.path = path + "/";
+    }
 
-  public boolean isActive() {
-    return active;
-  }
+    public void setActive( boolean active )
+    {
+        this.active = active;
+    }
 
-  public String getPath() {
-    return path;
-  }
+    @Override
+    public void run()
+    {
+        executionCount++;
+        service.execute( this );
+    }
 
-  public int getExecutionCount() {
-    return executionCount;
-  }
+    public boolean isParent( Repository repo, String subPath )
+    {
+        return repository.getId().equals( repository.getId() ) && subPath.startsWith( path );
+    }
+
+    public Repository getRepository()
+    {
+        return repository;
+    }
+
+    public boolean isActive()
+    {
+        return active;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public int getExecutionCount()
+    {
+        return executionCount;
+    }
 }

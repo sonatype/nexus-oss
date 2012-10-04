@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.m2yum;
+package org.sonatype.nexus.plugins.yum.plugin.m2yum;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,13 +19,17 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.test.NexusTestSupport;
 
-public class M2ContentClassTest extends NexusTestSupport {
+public class M2ContentClassTest
+    extends NexusTestSupport
+{
 
-  @Test
-  public void shouldOverrideDefaultMaven2ContentClass() throws Exception {
-    getContainer().addComponent(new M2ContentClass(), ContentClass.class, M2ContentClass.ID);
-    Repository repo = getContainer().lookup(Repository.class, M2Repository.ID);
-    Assert.assertTrue(repo.getRepositoryContentClass() instanceof M2ContentClass);
-  }
+    @Test
+    public void shouldOverrideDefaultMaven2ContentClass()
+        throws Exception
+    {
+        getContainer().addComponent( new M2ContentClass(), ContentClass.class, M2ContentClass.ID );
+        Repository repo = getContainer().lookup( Repository.class, M2Repository.ID );
+        Assert.assertTrue( repo.getRepositoryContentClass() instanceof M2ContentClass );
+    }
 
 }

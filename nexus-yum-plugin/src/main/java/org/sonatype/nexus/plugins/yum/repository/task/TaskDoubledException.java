@@ -10,23 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.repository.task;
+package org.sonatype.nexus.plugins.yum.repository.task;
 
 import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.scheduling.ScheduledTask;
 
-public class TaskDoubledException extends RejectedExecutionException {
-  private static final long serialVersionUID = 1L;
+public class TaskDoubledException
+    extends RejectedExecutionException
+{
+    private static final long serialVersionUID = 1L;
 
-  private final ScheduledTask<?> original;
+    private final ScheduledTask<?> original;
 
-  public TaskDoubledException(ScheduledTask<?> original, String message) {
-    super(message);
-    this.original = original;
-  }
+    public TaskDoubledException( ScheduledTask<?> original, String message )
+    {
+        super( message );
+        this.original = original;
+    }
 
-  public ScheduledTask<?> getOriginal() {
-    return original;
-  }
+    public ScheduledTask<?> getOriginal()
+    {
+        return original;
+    }
 }

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
- package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.plugins.yum.plugin.impl;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -30,95 +30,127 @@ import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-@Component(role = DeletionService.class)
-public class DefaultDeletionService implements DeletionService {
+@Component( role = DeletionService.class )
+public class DefaultDeletionService
+    implements DeletionService
+{
 
-  private final static Logger log = LoggerFactory.getLogger(DefaultDeletionService.class);
+    private final static Logger log = LoggerFactory.getLogger( DefaultDeletionService.class );
 
-  private static final int POOL_SIZE = 10;
+    private static final int POOL_SIZE = 10;
 
-  private static final int MAX_EXECUTION_COUNT = 100;
+    private static final int MAX_EXECUTION_COUNT = 100;
 
-  @Inject
-  private YumConfiguration configuration;
+    @Inject
+    private YumConfiguration configuration;
 
-  @Inject
-  private YumService yumService;
+    @Inject
+    private YumService yumService;
 
-  private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(POOL_SIZE);
+    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor( POOL_SIZE );
 
-  private final Map<ScheduledFuture<?>, DelayedDirectoryDeletionTask> taskMap = new HashMap<ScheduledFuture<?>, DelayedDirectoryDeletionTask>();
-  private final Map<DelayedDirectoryDeletionTask, ScheduledFuture<?>> reverseTaskMap = new HashMap<DelayedDirectoryDeletionTask, ScheduledFuture<?>>();
+    private final Map<ScheduledFuture<?>, DelayedDirectoryDeletionTask> taskMap =
+        new HashMap<ScheduledFuture<?>, DelayedDirectoryDeletionTask>();
 
-  @Override
-  public void deleteRpm(Repository repository, String path) {
-    if (configuration.isDeleteProcessing()) {
-      final DelayedDirectoryDeletionTask task = findDelayedParentDirectory(repository, path);
-      if (task != null) {
-        activate(task);
-      } else {
-        log.info("Delete rpm {} / {}", repository.getId(), path);
-        yumService.recreateRepository(repository);
-      }
+    private final Map<DelayedDirectoryDeletionTask, ScheduledFuture<?>> reverseTaskMap =
+        new HashMap<DelayedDirectoryDeletionTask, ScheduledFuture<?>>();
+
+    @Override
+    public void deleteRpm( Repository repository, String path )
+    {
+        if ( configuration.isDeleteProcessing() )
+        {
+            final DelayedDirectoryDeletionTask task = findDelayedParentDirectory( repository, path );
+            if ( task != null )
+            {
+                activate( task );
+            }
+            else
+            {
+                log.info( "Delete rpm {} / {}", repository.getId(), path );
+                yumService.recreateRepository( repository );
+            }
+        }
     }
-  }
 
-  private void activate(DelayedDirectoryDeletionTask task) {
-    task.setActive(true);
-  }
-
-  private void schedule(DelayedDirectoryDeletionTask task) {
-    final ScheduledFuture<?> future = executor.schedule(task, configuration.getDelayAfterDeletion(), SECONDS);
-    taskMap.put(future, task);
-    reverseTaskMap.put(task, future);
-  }
-
-  private DelayedDirectoryDeletionTask findDelayedParentDirectory(Repository repository, String path) {
-    for (Runnable runnable : executor.getQueue()) {
-      DelayedDirectoryDeletionTask dirTask = taskMap.get(runnable);
-      if (dirTask != null && dirTask.isParent(repository, path)) {
-        return dirTask;
-      }
+    private void activate( DelayedDirectoryDeletionTask task )
+    {
+        task.setActive( true );
     }
-    return null;
-  }
 
-  @Override
-  public void deleteDirectory(Repository repository, String path) {
-    if (configuration.isDeleteProcessing()) {
-      if (findDelayedParentDirectory(repository, path) == null) {
-        schedule(new DelayedDirectoryDeletionTask(this, repository, path));
-      }
+    private void schedule( DelayedDirectoryDeletionTask task )
+    {
+        final ScheduledFuture<?> future = executor.schedule( task, configuration.getDelayAfterDeletion(), SECONDS );
+        taskMap.put( future, task );
+        reverseTaskMap.put( task, future );
     }
-  }
 
-  @Override
-  public void execute(DelayedDirectoryDeletionTask task) {
-    final ScheduledFuture<?> future = reverseTaskMap.remove(task);
-    if (future != null) {
-      taskMap.remove(future);
+    private DelayedDirectoryDeletionTask findDelayedParentDirectory( Repository repository, String path )
+    {
+        for ( Runnable runnable : executor.getQueue() )
+        {
+            DelayedDirectoryDeletionTask dirTask = taskMap.get( runnable );
+            if ( dirTask != null && dirTask.isParent( repository, path ) )
+            {
+                return dirTask;
+            }
+        }
+        return null;
     }
-    if (task.isActive()) {
-      if (isDeleted(task.getRepository(), task.getPath())) {
-        log.info("Recreate yum repository {} because of removed path {}", task.getRepository().getId(), task.getPath());
-        yumService.recreateRepository(task.getRepository());
-      } else if (task.getExecutionCount() < MAX_EXECUTION_COUNT){
-        log.info("Rescheduling creation of yum repository {} because path {} not deleted.", task.getRepository().getId(), task.getPath());
-        schedule(task);
-      } else {
-        log.warn("Deleting path {} in repository {} took too long - retried {} times.", new Object[] { task.getPath(),
-            task.getRepository().getId(), MAX_EXECUTION_COUNT });
-      }
-    }
-  }
 
-  private boolean isDeleted(Repository repository, String path) {
-    try {
-      repository.retrieveItem(new ResourceStoreRequest(path));
-      return false;
-    } catch (Exception e) {
-      return true;
+    @Override
+    public void deleteDirectory( Repository repository, String path )
+    {
+        if ( configuration.isDeleteProcessing() )
+        {
+            if ( findDelayedParentDirectory( repository, path ) == null )
+            {
+                schedule( new DelayedDirectoryDeletionTask( this, repository, path ) );
+            }
+        }
     }
-  }
+
+    @Override
+    public void execute( DelayedDirectoryDeletionTask task )
+    {
+        final ScheduledFuture<?> future = reverseTaskMap.remove( task );
+        if ( future != null )
+        {
+            taskMap.remove( future );
+        }
+        if ( task.isActive() )
+        {
+            if ( isDeleted( task.getRepository(), task.getPath() ) )
+            {
+                log.info( "Recreate yum repository {} because of removed path {}", task.getRepository().getId(),
+                    task.getPath() );
+                yumService.recreateRepository( task.getRepository() );
+            }
+            else if ( task.getExecutionCount() < MAX_EXECUTION_COUNT )
+            {
+                log.info( "Rescheduling creation of yum repository {} because path {} not deleted.",
+                    task.getRepository().getId(), task.getPath() );
+                schedule( task );
+            }
+            else
+            {
+                log.warn( "Deleting path {} in repository {} took too long - retried {} times.",
+                    new Object[] { task.getPath(), task.getRepository().getId(), MAX_EXECUTION_COUNT } );
+            }
+        }
+    }
+
+    private boolean isDeleted( Repository repository, String path )
+    {
+        try
+        {
+            repository.retrieveItem( new ResourceStoreRequest( path ) );
+            return false;
+        }
+        catch ( Exception e )
+        {
+            return true;
+        }
+    }
 
 }
