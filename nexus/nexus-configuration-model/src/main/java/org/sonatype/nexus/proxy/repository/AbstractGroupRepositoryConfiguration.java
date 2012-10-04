@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.configuration.validation.ValidationMessage;
@@ -22,6 +23,7 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
+import com.google.common.collect.Sets;
 
 public class AbstractGroupRepositoryConfiguration
     extends AbstractRepositoryConfiguration
@@ -81,13 +83,25 @@ public class AbstractGroupRepositoryConfiguration
             allReposesIds.add( repository.getId() );
         }
 
-        if ( !allReposesIds.containsAll( getMemberRepositoryIds() ) )
+        final List<String> memberRepositoryIds = getMemberRepositoryIds();
+
+        if ( !allReposesIds.containsAll( memberRepositoryIds ) )
         {
             ValidationMessage message =
                 new ValidationMessage( MEMBER_REPOSITORIES, "Group repository points to nonexistent members!",
                     "The source nexus repository is not existing." );
 
             response.addValidationError( message );
+        }
+
+        final Set<String> uniqueReposesIds = Sets.newHashSet( memberRepositoryIds );
+        if ( uniqueReposesIds.size() != memberRepositoryIds.size() )
+        {
+            response.addValidationError( new ValidationMessage(
+                MEMBER_REPOSITORIES,
+                "Group repository has same member multiple times!",
+                "Group repository has same member multiple times!"
+            ) );
         }
 
         // we cannot check for cycles here, since this class is not a component and to unravel groups, you would need
