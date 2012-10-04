@@ -42,4 +42,9 @@ public enum MetadataType
         return compression;
     }
 
+    public String getPath()
+    {
+        return "/repodata/" + filename;
+    }
+
 }

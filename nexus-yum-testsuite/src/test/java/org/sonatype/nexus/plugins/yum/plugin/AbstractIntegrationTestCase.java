@@ -21,35 +21,44 @@ import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.YumClient;
 import org.sonatype.nexus.testsuite.support.NexusRunningITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
-@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
-public class AbstractIntegrationTestCase extends NexusRunningITSupport {
+@NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
+public class AbstractIntegrationTestCase
+    extends NexusRunningITSupport
+{
 
-  private YumClient yum;
+    private YumClient yum;
 
-  @Override
-  protected NexusBundleConfiguration configureNexus(NexusBundleConfiguration configuration) {
-    return configuration.addPlugins(getPluginFile());// .enableDebugging(8000,
-                                                     // true);
-  }
-
-  protected YumClient yum() {
-    if (yum == null) {
-      yum = client().getSubsystem(YumClient.class);
+    @Override
+    protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
+    {
+        return configuration.addPlugins( getPluginFile() ).enableDebugging( 8000, true );
     }
 
-    return yum;
-  }
+    protected YumClient yum()
+    {
+        if ( yum == null )
+        {
+            yum = client().getSubsystem( YumClient.class );
+        }
 
-  private File getPluginFile() {
-    URL pluginFileUrl = getClass().getResource("/plugin.zip");
-    if (pluginFileUrl == null) {
-      throw new IllegalStateException("Couldn't find /plugin.zip in classpath");
+        return yum;
     }
-    try {
-      return new File(pluginFileUrl.toURI());
-    } catch (URISyntaxException e) {
-      throw new RuntimeException("Could not determine plugin bundle URI.", e);
+
+    private File getPluginFile()
+    {
+        URL pluginFileUrl = getClass().getResource( "/plugin.zip" );
+        if ( pluginFileUrl == null )
+        {
+            throw new IllegalStateException( "Couldn't find /plugin.zip in classpath" );
+        }
+        try
+        {
+            return new File( pluginFileUrl.toURI() );
+        }
+        catch ( URISyntaxException e )
+        {
+            throw new RuntimeException( "Could not determine plugin bundle URI.", e );
+        }
     }
-  }
 
 }

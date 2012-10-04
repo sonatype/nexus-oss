@@ -39,7 +39,7 @@ public interface YumClient
     void createOrUpdateAlias( String repositoryId, String alias, String version );
 
     /**
-     * Retrieves the given metadata type (primary.xml, repomd.xml, etc.) from the repository and
+     * Retrieves the given metadata type (primary.xml, repomd.xml, etc.) from the repository
      * 
      * @param repositoryId
      * @param metadataType
@@ -47,4 +47,15 @@ public interface YumClient
      * @return the content of the metadata file. If the file is gzipped or bzipped the returning content is uncompressed
      */
     <T> T getMetadata( String repositoryId, MetadataType metadataType, Class<T> returnType );
+
+    /**
+     * Retrieves the given metadata type (primary.xml, repomd.xml, etc.) from the repository and version
+     * 
+     * @param repositoryId
+     * @param version
+     * @param metadataType
+     * @param typically {@link String} or <code>byte[].class</code>
+     * @return the content of the metadata file. If the file is gzipped or bzipped the returning content is uncompressed
+     */
+    <T> T getMetadata( String repositoryId, String version, MetadataType metadataType, Class<T> returnType );
 }

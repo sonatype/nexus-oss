@@ -25,6 +25,7 @@ import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.CompressionAdapter;
+import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.CompressionType;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.MetadataType;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.YumClient;
 import org.sonatype.nexus.rest.model.RepositoryResource;
@@ -62,15 +63,28 @@ public class JerseyYumClient
     public <T> T getMetadata( String repositoryId, MetadataType metadataType, Class<T> returnType )
     {
         final Repository<GenericRepository, RepositoryResource> repo = repositories.get( repositoryId );
-        final String url = repo.settings().getContentResourceURI() + "/repodata/" + metadataType.getFilename();
+        final String url = repo.settings().getContentResourceURI() + metadataType.getPath();
         final ClientResponse clientResponse = getNexusClient().getClient().resource( url ).get( ClientResponse.class );
+        return handleResponse( clientResponse, returnType, metadataType.getCompression() );
+    }
+
+    @Override
+    public <T> T getMetadata( String repositoryId, String version, MetadataType metadataType, Class<T> returnType )
+    {
+        final String url = "yum/repos/" + repositoryId + "/" + version + "/" + metadataType.getPath();
+        final ClientResponse clientResponse = getNexusClient().serviceResource( url ).get( ClientResponse.class );
+        return handleResponse( clientResponse, returnType, metadataType.getCompression() );
+    }
+
+    private <T> T handleResponse( final ClientResponse clientResponse, Class<T> returnType, CompressionType compression )
+    {
         try
         {
             if ( clientResponse.getStatus() < 300 )
             {
                 try
                 {
-                    clientResponse.setEntityInputStream( new CompressionAdapter( metadataType.getCompression() ).adapt( clientResponse.getEntityInputStream() ) );
+                    clientResponse.setEntityInputStream( new CompressionAdapter( compression ).adapt( clientResponse.getEntityInputStream() ) );
                 }
                 catch ( IOException e )
                 {
@@ -78,7 +92,8 @@ public class JerseyYumClient
                 }
                 return clientResponse.getEntity( returnType );
             }
-            throw new UniformInterfaceException( "Could not get yum metatdata", clientResponse );
+            throw new UniformInterfaceException( "Could not get yum metatdata. Status: " + clientResponse.getStatus()
+                + ". Response: " + clientResponse.getEntity( String.class ), clientResponse );
         }
         finally
         {
