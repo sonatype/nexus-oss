@@ -39,6 +39,8 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -60,6 +62,8 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
+import com.google.common.base.Stopwatch;
+
 /**
  * The Class CommonsHttpClientRemoteStorage.
  * 
@@ -71,6 +75,7 @@ public class CommonsHttpClientRemoteStorage
     extends AbstractHTTPRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
+    private static final Logger timingLog = LoggerFactory.getLogger( "remote.storage.timing" );
 
     public static final String PROVIDER_STRING = "apacheHttpClient3x";
 
@@ -201,8 +206,8 @@ public class CommonsHttpClientRemoteStorage
             else
             {
                 throw new RemoteStorageException( "The method execution returned result code " + response
-                    + " (expected 200). [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
-                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]" );
+                    + " (expected 200). [repositoryId=\"" + repository.getId() + "\", requestPath=\""
+                    + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString() + "\"]" );
             }
         }
     }
@@ -293,6 +298,26 @@ public class CommonsHttpClientRemoteStorage
         ctx.putContextObject( CTX_KEY_S3_FLAG, new BooleanFlagHolder() );
     }
 
+    protected int executeMethod( ProxyRepository repository, ResourceStoreRequest request, HttpMethod method,
+                                 URL remoteUrl )
+        throws RemoteStorageException
+    {
+        final Stopwatch stopwatch = timingLog.isDebugEnabled() ? new Stopwatch().start() : null;
+        try
+        {
+            return doExecuteMethod( repository, request, method, remoteUrl );
+        }
+        finally
+        {
+            if ( stopwatch != null )
+            {
+                stopwatch.stop();
+                timingLog.debug( "[{}] {} {} took {}", new Object[] { repository.getId(), method.getName(), remoteUrl,
+                    stopwatch } );
+            }
+        }
+    }
+
     /**
      * Execute method. In case of any exception thrown by HttpClient, it will release the connection. In other cases it
      * is the duty of caller to do it, or process the input stream.
@@ -300,8 +325,8 @@ public class CommonsHttpClientRemoteStorage
      * @param method the method
      * @return the int
      */
-    protected int executeMethod( ProxyRepository repository, ResourceStoreRequest request, HttpMethod method,
-                                 URL remoteUrl )
+    protected int doExecuteMethod( ProxyRepository repository, ResourceStoreRequest request, HttpMethod method,
+                                   URL remoteUrl )
         throws RemoteStorageException
     {
         URI methodURI = null;
