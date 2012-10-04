@@ -18,23 +18,19 @@ import static org.sonatype.nexus.plugins.yum.plugin.client.subsystem.Compression
 
 public enum MetadataType
 {
-    REPOMD_XML( "repomd.xml", NONE ), PRIMARY_XML( "primary.xml.gz", GZIP ), PRIMARY_SQLITE( "primary.sqlite.bz2",
-        BZIP2 ), FILELIST_XML( "filelist.xml.gz", GZIP ), FILELIST_SQLITE( "filelist.sqlite.bz2", BZIP2 ), OTHER_XML(
-        "other.xml.gz", GZIP ), OTHER_SQLITE( "other.sqlite.bz2", BZIP2 );
+    REPOMD_XML( "/repodata/repomd.xml", NONE ), PRIMARY_XML( "/repodata/primary.xml.gz", GZIP ), PRIMARY_SQLITE(
+        "/repodata/primary.sqlite.bz2", BZIP2 ), FILELIST_XML( "/repodata/filelist.xml.gz", GZIP ), FILELIST_SQLITE(
+        "/repodata/filelist.sqlite.bz2", BZIP2 ), OTHER_XML( "/repodata/other.xml.gz", GZIP ), OTHER_SQLITE(
+        "/repodata/other.sqlite.bz2", BZIP2 ), INDEX( "/", NONE );
 
-    private final String filename;
+    private final String path;
 
     private final CompressionType compression;
 
-    private MetadataType( String filename, CompressionType compression )
+    private MetadataType( String path, CompressionType compression )
     {
-        this.filename = filename;
+        this.path = path;
         this.compression = compression;
-    }
-
-    public String getFilename()
-    {
-        return filename;
     }
 
     public CompressionType getCompression()
@@ -44,7 +40,7 @@ public enum MetadataType
 
     public String getPath()
     {
-        return "/repodata/" + filename;
+        return path;
     }
 
 }

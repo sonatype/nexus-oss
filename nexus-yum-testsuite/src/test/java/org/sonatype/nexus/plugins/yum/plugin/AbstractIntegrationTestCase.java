@@ -31,7 +31,7 @@ public class AbstractIntegrationTestCase
     @Override
     protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
     {
-        return configuration.addPlugins( getPluginFile() ).enableDebugging( 8000, true );
+        return configuration.addPlugins( getPluginFile() );// .enableDebugging( 8000, true );
     }
 
     protected YumClient yum()
@@ -59,6 +59,12 @@ public class AbstractIntegrationTestCase
         {
             throw new RuntimeException( "Could not determine plugin bundle URI.", e );
         }
+    }
+
+    protected File resource( String path )
+        throws URISyntaxException
+    {
+        return new File( getClass().getResource( path ).toURI() );
     }
 
 }

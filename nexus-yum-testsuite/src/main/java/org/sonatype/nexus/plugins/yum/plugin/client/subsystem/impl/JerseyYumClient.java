@@ -71,7 +71,7 @@ public class JerseyYumClient
     @Override
     public <T> T getMetadata( String repositoryId, String version, MetadataType metadataType, Class<T> returnType )
     {
-        final String url = "yum/repos/" + repositoryId + "/" + version + "/" + metadataType.getPath();
+        final String url = "yum/repos/" + repositoryId + "/" + version + metadataType.getPath();
         final ClientResponse clientResponse = getNexusClient().serviceResource( url ).get( ClientResponse.class );
         return handleResponse( clientResponse, returnType, metadataType.getCompression() );
     }
@@ -92,8 +92,8 @@ public class JerseyYumClient
                 }
                 return clientResponse.getEntity( returnType );
             }
-            throw new UniformInterfaceException( "Could not get yum metatdata. Status: " + clientResponse.getStatus()
-                + ". Response: " + clientResponse.getEntity( String.class ), clientResponse );
+            throw new UniformInterfaceException( "Could not get yum metatdata. Status: " + clientResponse.getStatus(),
+                clientResponse );
         }
         finally
         {
