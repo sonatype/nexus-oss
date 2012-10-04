@@ -48,7 +48,7 @@ public abstract class AbstractYumRepositoryResource
     {
         try
         {
-            UrlPathInterpretation interpretation = requestSegmentInterpetor.interprete( request );
+            final UrlPathInterpretation interpretation = requestSegmentInterpetor.interprete( request );
 
             if ( interpretation.isRedirect() )
             {
