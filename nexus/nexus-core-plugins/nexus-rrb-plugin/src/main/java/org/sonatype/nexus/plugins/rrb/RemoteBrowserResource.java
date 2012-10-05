@@ -13,15 +13,21 @@
 package org.sonatype.nexus.plugins.rrb;
 
 import java.net.URLDecoder;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import com.ning.http.client.FluentStringsMap;
+import com.ning.http.client.filter.FilterContext;
+import com.ning.http.client.filter.FilterException;
+import com.ning.http.client.filter.RequestFilter;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -37,6 +43,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -62,6 +69,9 @@ public class RemoteBrowserResource
 
     @Requirement
     private AhcProvider ahcProvider;
+
+    @Requirement
+    private QueryStringBuilder queryStringBuilder;
 
     private final Logger logger = LoggerFactory.getLogger( RemoteBrowserResource.class );
 
@@ -155,6 +165,27 @@ public class RemoteBrowserResource
         clientConfigBuilder.setFollowRedirects( true );
         clientConfigBuilder.setMaximumNumberOfRedirects( 3 );
         clientConfigBuilder.setMaxRequestRetry( 2 );
+
+        // HACK: In query string parameters (see NXCM-4737)
+        // FIXME: This should probably be handled in the AhcProvider for all users of legacy AHC client
+        String queryString = queryStringBuilder.getQueryString( proxyRepository.getRemoteStorageContext(), proxyRepository );
+        if ( StringUtils.isNotBlank( queryString ) )
+        {
+            final Map<String,String> parsed = QueryStrings.parse( queryString );
+            clientConfigBuilder.addRequestFilter( new RequestFilter()
+            {
+                @Override
+                public FilterContext filter( final FilterContext filterContext ) throws FilterException {
+                    FluentStringsMap queryParams = filterContext.getRequest().getQueryParams();
+                    for ( Map.Entry<String,String> entry : parsed.entrySet() )
+                    {
+                        queryParams.add( entry.getKey(), entry.getValue() );
+                    }
+                    return filterContext;
+                }
+            });
+        }
+
         final AsyncHttpClient client = new AsyncHttpClient( clientConfigBuilder.build() );
         return client;
     }
