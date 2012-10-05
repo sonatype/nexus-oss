@@ -27,6 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -42,8 +44,6 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
-
-import com.ning.http.client.AsyncHttpClient;
 
 /**
  * In this test we use example repo files that placed in the test resource catalogue To access these files locally via
@@ -65,8 +65,8 @@ public class MavenRepositoryReaderTest
     public void setUp()
         throws Exception
     {
-        final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        reader = new MavenRepositoryReader( asyncHttpClient );
+        final HttpClient httpClient = new DefaultHttpClient();
+        reader = new MavenRepositoryReader( httpClient );
 
         // Create a Jetty server with a handler that returns the content of the
         // given target (i.e. an emulated html, S3Repo, etc, file from the test

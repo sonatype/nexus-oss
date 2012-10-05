@@ -57,7 +57,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  *
  * @since 2.0
  */
-class HttpClientUtil
+public class HttpClientUtil
 {
 
     // ----------------------------------------------------------------------
@@ -115,7 +115,7 @@ class HttpClientUtil
      * @param ctx       remote repository context
      * @param logger    logger
      */
-    static HttpClient configure( final String ctxPrefix,
+    public static HttpClient configure( final String ctxPrefix,
                            final RemoteStorageContext ctx,
                            final Logger logger )
     {
@@ -161,7 +161,7 @@ class HttpClientUtil
      * @param ctxPrefix context keys prefix
      * @param ctx       remote repository context
      */
-    static void release( final String ctxPrefix,
+    public static void release( final String ctxPrefix,
                          final RemoteStorageContext ctx )
     {
         if ( ctx.hasContextObject( ctxPrefix + CTX_KEY_CLIENT ) )
@@ -181,7 +181,7 @@ class HttpClientUtil
      * @param ctx       remote repository context
      * @return HTTP client or {@code null} if not yet configured
      */
-    static HttpClient getHttpClient( final String ctxPrefix,
+    public static HttpClient getHttpClient( final String ctxPrefix,
                                      final RemoteStorageContext ctx )
     {
         return (HttpClient) ctx.getContextObject( ctxPrefix + CTX_KEY_CLIENT );

@@ -13,11 +13,15 @@
 package org.sonatype.nexus.plugins.rrb;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.parsers.ArtifactoryRemoteRepositoryParser;
@@ -26,10 +30,7 @@ import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Class for retrieving directory data from remote repository. This class is not thread-safe!
@@ -39,7 +40,7 @@ public class MavenRepositoryReader
 
     private final Logger logger = LoggerFactory.getLogger( MavenRepositoryReader.class );
 
-    private final AsyncHttpClient client;
+    private final HttpClient client;
 
     private String remotePath;
 
@@ -51,9 +52,9 @@ public class MavenRepositoryReader
 
     private String id;
 
-    public MavenRepositoryReader( final AsyncHttpClient client )
+    public MavenRepositoryReader( final HttpClient client )
     {
-        this.client = client;
+        this.client = checkNotNull(client);
     }
 
     /**
@@ -87,7 +88,7 @@ public class MavenRepositoryReader
         {
             logger.trace( html.toString() );
         }
-        return parseResult( html );
+        return parseResult(html);
     }
 
     private ArrayList<RepositoryDirectory> parseResult( StringBuilder indata )
@@ -216,76 +217,47 @@ public class MavenRepositoryReader
         return false;
     }
 
-    private StringBuilder getContent()
-    {
-        RequestBuilder builder = new RequestBuilder();
+    private StringBuilder getContent() {
+        StringBuilder buff = new StringBuilder();
 
-        if ( remoteUrl.indexOf( "?prefix" ) != -1 )
-        {
-            builder.setUrl( remoteUrl + "&delimiter=/" );
+        String url;
+        String sep = "?";
+        if (remoteUrl.contains("?prefix")) {
+            sep = "&";
         }
-        else
-        {
-            builder.setUrl( remoteUrl + "?delimiter=/" );
-        }
+        url = remoteUrl + sep + "delimiter=/";
 
-        Response response = null;
-        StringBuilder result = new StringBuilder();
+        HttpGet method = new HttpGet(url);
+        try {
+            // FIXME: This misses a lot of headers/query-string/user-agent customizations that the remote storage impl would have applied
+            logger.debug("Requesting: {}", method);
+            HttpResponse response = client.execute(method);
+            int statusCode = response.getStatusLine().getStatusCode();
+            logger.debug("Status code: {}", statusCode);
 
-        try
-        {
-            response = doCall( builder.build(), result );
-        }
-        catch ( IOException e )
-        {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.warn( e.getMessage(), e );
-            }
-            else
-            {
-                logger.warn( e.getMessage() );
-            }
-        }
-
-        // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200),
-        // stripping off the last '/'
-        // returns the error we are looking for (so we can do a query)
-
-        String serverHeader = response != null ? response.getHeader( "Server" ) : null;
-        if ( result.length() == 0 && serverHeader != null && serverHeader.equalsIgnoreCase( "AmazonS3" )
-            && remoteUrl.endsWith( "/" ) )
-        {
-            remoteUrl = remoteUrl.substring( 0, remoteUrl.length() - 1 );
-            // now just call it again
-            return getContent();
-        }
-
-        return result;
-    }
-
-    private Response doCall( Request request, StringBuilder result )
-        throws IOException
-    {
-        try
-        {
-            Response response = client.executeRequest( request ).get();
-            final int responseCode = response.getStatusCode();
-
-            logger.debug( "responseCode={}", responseCode );
-            BufferedReader reader = new BufferedReader( new InputStreamReader( response.getResponseBodyAsStream() ) );
-
-            String line = null;
-            while ( ( line = reader.readLine() ) != null )
-            {
-                result.append( line + "\n" );
+            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buff.append(line).append("\n");
             }
 
-            return response;
+            // HACK: Deal with S3 edge-case
+            // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200),
+            // stripping off the last '/' returns the error we are looking for (so we can do a query)
+            Header serverHeader = response.getFirstHeader(HttpHeaders.SERVER);
+            if (buff.length() == 0 && serverHeader != null &&
+                serverHeader.getValue().equalsIgnoreCase("AmazonS3") &&
+                remoteUrl.endsWith("/")) {
+                remoteUrl = remoteUrl.substring(0, remoteUrl.length() - 1);
+                return getContent();
+            }
+
+            return buff;
         }
-        catch ( Exception e )
-        {
-            throw new IOException( e );
+        catch (Exception e) {
+            logger.warn("Failed to get directory listing content", e);
         }
+
+        return buff;
     }
 }
