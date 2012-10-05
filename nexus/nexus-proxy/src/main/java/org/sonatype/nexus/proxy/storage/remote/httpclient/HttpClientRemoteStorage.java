@@ -35,6 +35,7 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -60,6 +61,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 
@@ -165,7 +167,7 @@ public class HttpClientRemoteStorage
             {
                 is = httpResponse.getEntity().getContent();
 
-                String mimeType = EntityUtils.getContentMimeType( httpResponse.getEntity() );
+                String mimeType = ContentType.getOrDefault( httpResponse.getEntity() ).getMimeType();
                 if ( mimeType == null )
                 {
                     mimeType = getMimeSupport().guessMimeTypeFromPath(
@@ -399,14 +401,21 @@ public class HttpClientRemoteStorage
     }
 
     @Override
-    protected void updateContext( final ProxyRepository repository,
-                                  final RemoteStorageContext ctx )
+    protected void updateContext( final ProxyRepository repository, final RemoteStorageContext ctx )
+        throws RemoteStorageException
     {
         // reset current http client, if exists
         HttpClientUtil.release( CTX_KEY, ctx );
 
-        // and create a new one
-        HttpClientUtil.configure( CTX_KEY, ctx, getLogger() );
+        try
+        {
+            // and create a new one
+            HttpClientUtil.configure( CTX_KEY, ctx, getLogger() );
+        }
+        catch ( IllegalStateException e )
+        {
+            throw new RemoteStorageException( "Could not create HTTPClient4x instance!", e );
+        }
     }
 
     @Override
@@ -478,14 +487,6 @@ public class HttpClientRemoteStorage
         httpRequest.setHeader( "accept-language", "en-us" );
         httpRequest.setHeader( "accept-encoding", "gzip,deflate,identity" );
         httpRequest.setHeader( "cache-control", "no-cache" );
-
-        // HTTP keep alive should not be used, except when NTLM is used
-        final Boolean isNtlmUsed = HttpClientUtil.isNTLMAuthenticationUsed( CTX_KEY, ctx );
-        if ( isNtlmUsed == null || !isNtlmUsed )
-        {
-            httpRequest.setHeader( "Connection", "close" );
-            httpRequest.setHeader( "Proxy-Connection", "close" );
-        }
 
         HttpResponse httpResponse = null;
         try

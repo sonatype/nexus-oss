@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
-import static org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +22,7 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -34,12 +33,17 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.params.SyncBasicHttpParams;
 import org.apache.http.protocol.BasicHttpProcessor;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
@@ -49,12 +53,13 @@ import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * Utilities related to HTTP client.
- *
+ * 
  * @since 2.0
  */
 class HttpClientUtil
@@ -80,8 +85,8 @@ class HttpClientUtil
     private static final String CTX_KEY_NTLM_IS_IN_USE = ".ntlmIsInUse";
 
     /**
-     * Key of optional system property for customizing the connection pool size.
-     * If not present HTTP client default is used (20 connections)
+     * Key of optional system property for customizing the connection pool size. If not present HTTP client default is
+     * used (20 connections)
      */
     public static final String CONNECTION_POOL_SIZE_KEY = "httpClient.connectionPoolSize";
 
@@ -109,19 +114,16 @@ class HttpClientUtil
      * * setting timeout as configured for repository<br/>
      * * (if necessary) configure authentication<br/>
      * * (if necessary) configure proxy as configured for repository
-     *
+     * 
      * @return the created http client
      * @param ctxPrefix context keys prefix
-     * @param ctx       remote repository context
-     * @param logger    logger
+     * @param ctx remote repository context
+     * @param logger logger
      */
-    static HttpClient configure( final String ctxPrefix,
-                           final RemoteStorageContext ctx,
-                           final Logger logger )
+    static HttpClient configure( final String ctxPrefix, final RemoteStorageContext ctx, final Logger logger )
+        throws IllegalStateException
     {
-        final DefaultHttpClient httpClient = new DefaultHttpClient(
-            createConnectionManager(), createHttpParams( ctx )
-        )
+        final DefaultHttpClient httpClient = new DefaultHttpClient( createConnectionManager(), createHttpParams( ctx ) )
         {
             @Override
             protected BasicHttpProcessor createHttpProcessor()
@@ -133,14 +135,15 @@ class HttpClientUtil
         };
 
         // NEXUS-5125 do not redirect to index pages
-        httpClient.setRedirectStrategy( new DefaultRedirectStrategy() {
+        httpClient.setRedirectStrategy( new DefaultRedirectStrategy()
+        {
             @Override
             public boolean isRedirected( final HttpRequest request, final HttpResponse response,
                                          final HttpContext context )
                 throws ProtocolException
             {
-                return super.isRedirected( request, response, context ) &&
-                    !response.getFirstHeader("location").getValue().endsWith( "/" );
+                return super.isRedirected( request, response, context )
+                    && !response.getFirstHeader( "location" ).getValue().endsWith( "/" );
             }
         } );
 
@@ -157,12 +160,11 @@ class HttpClientUtil
 
     /**
      * Releases the current HTTP client (if any) and removes context objects.
-     *
+     * 
      * @param ctxPrefix context keys prefix
-     * @param ctx       remote repository context
+     * @param ctx remote repository context
      */
-    static void release( final String ctxPrefix,
-                         final RemoteStorageContext ctx )
+    static void release( final String ctxPrefix, final RemoteStorageContext ctx )
     {
         if ( ctx.hasContextObject( ctxPrefix + CTX_KEY_CLIENT ) )
         {
@@ -176,26 +178,24 @@ class HttpClientUtil
 
     /**
      * Returns the HTTP client for context.
-     *
+     * 
      * @param ctxPrefix context keys prefix
-     * @param ctx       remote repository context
+     * @param ctx remote repository context
      * @return HTTP client or {@code null} if not yet configured
      */
-    static HttpClient getHttpClient( final String ctxPrefix,
-                                     final RemoteStorageContext ctx )
+    static HttpClient getHttpClient( final String ctxPrefix, final RemoteStorageContext ctx )
     {
         return (HttpClient) ctx.getContextObject( ctxPrefix + CTX_KEY_CLIENT );
     }
 
     /**
      * Whether or not the NTLM authentication is used.
-     *
+     * 
      * @param ctxPrefix context keys prefix
-     * @param ctx       remote repository context
+     * @param ctx remote repository context
      * @return {@code true} if NTLM authentication is used, {@code false} otherwise
      */
-    static Boolean isNTLMAuthenticationUsed( final String ctxPrefix,
-                                             final RemoteStorageContext ctx )
+    static Boolean isNTLMAuthenticationUsed( final String ctxPrefix, final RemoteStorageContext ctx )
     {
         final Object ntlmInUse = ctx.getContextObject( ctxPrefix + CTX_KEY_NTLM_IS_IN_USE );
         return ntlmInUse != null && Boolean.parseBoolean( ntlmInUse.toString() );
@@ -203,7 +203,7 @@ class HttpClientUtil
 
     /**
      * Exposes the Amazon S3 flag key.
-     *
+     * 
      * @param ctxPrefix context keys prefix
      * @returnAmazon S3 flag key
      */
@@ -216,11 +216,9 @@ class HttpClientUtil
     // Implementation methods
     // ----------------------------------------------------------------------
 
-    private static void configureAuthentication( final DefaultHttpClient httpClient,
-                                                 final String ctxPrefix,
+    private static void configureAuthentication( final DefaultHttpClient httpClient, final String ctxPrefix,
                                                  final RemoteStorageContext ctx,
-                                                 final RemoteAuthenticationSettings ras,
-                                                 final Logger logger,
+                                                 final RemoteAuthenticationSettings ras, final Logger logger,
                                                  final String authScope )
     {
         if ( ras != null )
@@ -244,13 +242,11 @@ class HttpClientUtil
                 // Using NTLM auth, adding it as first in policies
                 authorisationPreference.add( 0, AuthPolicy.NTLM );
 
-                logger( logger ).info(
-                    "... {}authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain()
-                );
+                logger( logger ).info( "... {} authentication setup for NTLM domain '{}'", authScope,
+                    nras.getNtlmDomain() );
 
-                credentials = new NTCredentials(
-                    nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain()
-                );
+                credentials =
+                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain() );
 
                 ctx.putContextObject( ctxPrefix + CTX_KEY_NTLM_IS_IN_USE, Boolean.TRUE );
             }
@@ -259,9 +255,8 @@ class HttpClientUtil
                 UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                 // Using Username/Pwd auth, will not add NTLM
-                logger( logger ).info(
-                    "... {}authentication setup for remote storage with username '{}'", authScope, uras.getUsername()
-                );
+                logger( logger ).info( "... {} authentication setup for remote storage with username '{}'", authScope,
+                    uras.getUsername() );
 
                 credentials = new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() );
             }
@@ -275,10 +270,8 @@ class HttpClientUtil
         }
     }
 
-    private static void configureProxy( final DefaultHttpClient httpClient,
-                                        final String ctxPrefix,
-                                        final RemoteStorageContext ctx,
-                                        final Logger logger )
+    private static void configureProxy( final DefaultHttpClient httpClient, final String ctxPrefix,
+                                        final RemoteStorageContext ctx, final Logger logger )
     {
         final RemoteProxySettings rps = ctx.getRemoteProxySettings();
 
@@ -304,11 +297,8 @@ class HttpClientUtil
                         logger( logger ).warn( "Invalid non proxy host regex: {}", nonProxyHostRegex, e );
                     }
                 }
-                httpClient.setRoutePlanner(
-                    new NonProxyHostsAwareHttpRoutePlanner(
-                        httpClient.getConnectionManager().getSchemeRegistry(), nonProxyHostPatterns
-                    )
-                );
+                httpClient.setRoutePlanner( new NonProxyHostsAwareHttpRoutePlanner(
+                    httpClient.getConnectionManager().getSchemeRegistry(), nonProxyHostPatterns ) );
 
             }
 
@@ -324,8 +314,7 @@ class HttpClientUtil
                             + " for BOTH server side and proxy side authentication!\n"
                             + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
                             + " if you have to use NTLM proxy, otherwise it will not work!\n"
-                            + " *** SERVER SIDE AUTH OVERRIDDEN"
-                    );
+                            + " *** SERVER SIDE AUTH OVERRIDDEN" );
                 }
 
             }
@@ -334,21 +323,28 @@ class HttpClientUtil
 
     private static HttpParams createHttpParams( final RemoteStorageContext ctx )
     {
-        final HttpParams params = new BasicHttpParams();
+        HttpParams params = new SyncBasicHttpParams();
+        params.setParameter( HttpProtocolParams.PROTOCOL_VERSION, HttpVersion.HTTP_1_1 );
+        params.setBooleanParameter( HttpProtocolParams.USE_EXPECT_CONTINUE, false );
+        params.setBooleanParameter( HttpConnectionParams.STALE_CONNECTION_CHECK, true );
+        params.setIntParameter( HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024 );
 
         // getting the timeout from RemoteStorageContext. The value we get depends on per-repo and global settings.
         // The value will "cascade" from repo level to global level, see implementation.
         int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
 
-        params.setParameter( CoreConnectionPNames.CONNECTION_TIMEOUT, timeout );
-        params.setParameter( CoreConnectionPNames.SO_TIMEOUT, timeout );
+        params.setIntParameter( HttpConnectionParams.CONNECTION_TIMEOUT, timeout );
+        params.setIntParameter( HttpConnectionParams.SO_TIMEOUT, timeout );
         return params;
     }
 
-    private static ThreadSafeClientConnManager createConnectionManager()
+    private static PoolingClientConnectionManager createConnectionManager()
+        throws IllegalStateException
     {
-        final ThreadSafeClientConnManager connManager = new ThreadSafeClientConnManager();
-
+        final SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register( new Scheme( "http", 80, PlainSocketFactory.getSocketFactory() ) );
+        schemeRegistry.register( new Scheme( "https", 443, SSLSocketFactory.getSocketFactory() ) );
+        final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager( schemeRegistry );
         int connectionPoolSize = SystemPropertiesHelper.getInteger( CONNECTION_POOL_SIZE_KEY, UNDEFINED_POOL_SIZE );
         if ( connectionPoolSize != UNDEFINED_POOL_SIZE )
         {
@@ -369,5 +365,4 @@ class HttpClientUtil
         }
         return LOGGER;
     }
-
 }
