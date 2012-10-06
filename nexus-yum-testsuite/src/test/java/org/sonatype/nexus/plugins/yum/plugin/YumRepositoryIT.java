@@ -20,7 +20,6 @@ import static org.sonatype.nexus.plugins.yum.RepoUtil.createHostedRepo;
 import static org.sonatype.nexus.plugins.yum.TimeUtil.sleep;
 import static org.sonatype.nexus.plugins.yum.plugin.client.subsystem.MetadataType.PRIMARY_XML;
 
-
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.artifact.MavenArtifact;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
@@ -41,7 +40,7 @@ public class YumRepositoryIT
     public void shouldRemoveRpmFromYumRepoIfRemovedByWebGui()
         throws Exception
     {
-        final String repoName = createHostedRepo( client() );
+        final String repoName = createHostedRepo( client() ).getId();
         final MavenArtifact artifact = client().getSubsystem( MavenArtifact.class );
         artifact.upload( new UploadRequest( repoName, GROUP_ID, ARTIFACT_ID, VERSION, "pom", "", "rpm",
             resource( "/test-artifact-1.2.3-1.noarch.rpm" ) ) );

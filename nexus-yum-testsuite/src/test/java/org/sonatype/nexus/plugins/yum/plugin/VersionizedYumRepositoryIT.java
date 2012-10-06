@@ -72,7 +72,7 @@ public class VersionizedYumRepositoryIT
     private String givenRepositoryWithRpm()
         throws URISyntaxException, InterruptedException
     {
-        final String repoName = createHostedRepo( client() );
+        final String repoName = createHostedRepo( client() ).getId();
         final MavenArtifact artifact = client().getSubsystem( MavenArtifact.class );
         artifact.upload( new UploadRequest( repoName, GROUP_ID, ARTIFACT_ID, VERSION, "pom", "", "rpm",
             resource( "/test-artifact-1.2.3-1.noarch.rpm" ) ) );

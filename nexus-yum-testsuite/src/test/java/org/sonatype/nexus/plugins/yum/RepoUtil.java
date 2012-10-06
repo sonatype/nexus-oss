@@ -20,11 +20,12 @@ import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
+import org.sonatype.nexus.rest.model.RepositoryResource;
 
 public final class RepoUtil
 {
 
-    public static String createHostedRepo( final NexusClient client )
+    public static RepositoryResource createHostedRepo( final NexusClient client )
     {
         final String repoName = uniqueName();
         final Repositories repositories = client.getSubsystem( Repositories.class );
@@ -32,8 +33,7 @@ public final class RepoUtil
         repo.settings().setId( repoName );
         repo.settings().setName( repoName );
         repo.withRepoPolicy( "RELEASE" ).withWritePolicy( "ALLOW_WRITE" );
-        repo.save();
-        return repoName;
+        return repo.save().settings();
     }
 
     public static RepositoryGroupMemberRepository memberRepo( String repo1 )
