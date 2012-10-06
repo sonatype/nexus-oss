@@ -46,7 +46,7 @@ import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * The Class AbstractProxyTestEnvironment.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractProxyTestEnvironment
@@ -97,7 +97,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Gets the repository registry.
-     *
+     * 
      * @return the repository registry
      */
     public RepositoryRegistry getRepositoryRegistry()
@@ -107,7 +107,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Sets the repository registry.
-     *
+     * 
      * @param repositoryRegistry the new repository registry
      */
     public void setRepositoryRegistry( RepositoryRegistry repositoryRegistry )
@@ -117,7 +117,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Gets the local repository storage.
-     *
+     * 
      * @return the local repository storage
      */
     public LocalRepositoryStorage getLocalRepositoryStorage()
@@ -127,7 +127,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Sets the local repository storage.
-     *
+     * 
      * @param localRepositoryStorage the new local repository storage
      */
     public void setLocalRepositoryStorage( LocalRepositoryStorage localRepositoryStorage )
@@ -137,7 +137,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Gets the remote repository storage.
-     *
+     * 
      * @return the remote repository storage
      */
     public RemoteRepositoryStorage getRemoteRepositoryStorage()
@@ -147,7 +147,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Sets the remote repository storage.
-     *
+     * 
      * @param remoteRepositoryStorage the new remote repository storage
      */
     public void setRemoteRepositoryStorage( RemoteRepositoryStorage remoteRepositoryStorage )
@@ -167,7 +167,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Gets the logger.
-     *
+     * 
      * @return the logger
      */
     public Logger getLogger()
@@ -177,7 +177,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Gets the root router.
-     *
+     * 
      * @return
      */
     public RepositoryRouter getRootRouter()
@@ -187,7 +187,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Gets the test event listener.
-     *
+     * 
      * @return
      */
     public TestItemEventListener getTestEventListener()
@@ -221,7 +221,8 @@ public abstract class AbstractProxyTestEnvironment
 
         remoteProviderHintFactory = lookup( RemoteProviderHintFactory.class );
 
-        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, remoteProviderHintFactory.getDefaultHttpRoleHint() );
+        remoteRepositoryStorage =
+            lookup( RemoteRepositoryStorage.class, remoteProviderHintFactory.getDefaultHttpRoleHint() );
 
         rootRouter = lookup( RepositoryRouter.class );
 
@@ -250,7 +251,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Gets the environment builder.
-     *
+     * 
      * @return the environment builder
      */
     protected abstract EnvironmentBuilder getEnvironmentBuilder()
@@ -258,7 +259,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Check for file and match contents.
-     *
+     * 
      * @param item the item
      * @return true, if successful
      */
@@ -285,7 +286,7 @@ public abstract class AbstractProxyTestEnvironment
 
     /**
      * Check for file and match contents.
-     *
+     * 
      * @param item the item
      * @param expected the wanted content
      * @throws Exception the exception

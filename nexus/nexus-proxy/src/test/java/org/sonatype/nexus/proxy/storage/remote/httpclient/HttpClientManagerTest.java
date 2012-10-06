@@ -14,7 +14,6 @@ package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import org.apache.http.HttpRequest;
@@ -24,28 +23,36 @@ import org.apache.http.ProtocolException;
 import org.apache.http.RequestLine;
 import org.apache.http.StatusLine;
 import org.apache.http.client.RedirectStrategy;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
+import org.sonatype.nexus.httpclient.Hc4Provider;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  *
  */
-public class HttpClientUtilTest
+public class HttpClientManagerTest
     extends TestSupport
 {
-
-    private DefaultHttpClient underTest;
+    @Mock
+    private ProxyRepository proxyRepository;
 
     @Mock
     private RemoteStorageContext ctx;
+
+    // ==
+
+    @Mock
+    private Hc4Provider hc4Provider;
+
+    @Mock
+    private UserAgentBuilder userAgentBuilder;
 
     @Mock
     private HttpRequest request;
@@ -62,47 +69,34 @@ public class HttpClientUtilTest
     @Mock
     private RequestLine requestLine;
 
-    @Mock
-    private RemoteConnectionSettings remoteConnectionSettings;
-
-    @Mock
-    private RemoteProxySettings remoteProxySettings;
+    private RedirectStrategy underTest;
 
     @Before
     public void before()
     {
-        when( ctx.getRemoteConnectionSettings() ).thenReturn( remoteConnectionSettings );
-        when( ctx.getRemoteProxySettings() ).thenReturn( remoteProxySettings );
-        underTest = (DefaultHttpClient) HttpClientUtil.configure( "ctx", ctx, logger );
-
+        when( proxyRepository.getId() ).thenReturn( "central" );
         when( response.getStatusLine() ).thenReturn( statusLine );
-
         when( request.getRequestLine() ).thenReturn( requestLine );
+        underTest = new HttpClientManagerImpl( hc4Provider, userAgentBuilder ).getProxyRepositoryRedirectStrategy( proxyRepository, ctx );
     }
 
     @Test
     public void doNotFollowRedirectsToDirIndex()
         throws ProtocolException
     {
-        when( requestLine.getMethod() ).thenReturn( "GET" );
-
-        final RedirectStrategy redirectStrategy = underTest.getRedirectStrategy();
-
         // no location header
-        assertThat( redirectStrategy.isRedirected( request, response, httpContext ), is( false ) );
-
-        when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_MOVED_TEMPORARILY );
+        when( requestLine.getMethod() ).thenReturn( "GET" );
+        assertThat( underTest.isRedirected( request, response, httpContext ), is( false ) );
 
         // redirect to file
+        when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_MOVED_TEMPORARILY );
         when( response.getFirstHeader( "location" ) ).thenReturn(
             new BasicHeader( "location", "http://localhost/dir/file" ) );
-        assertThat( redirectStrategy.isRedirected( request, response, httpContext ), is( true ) );
+        assertThat( underTest.isRedirected( request, response, httpContext ), is( true ) );
 
         // redirect to dir
-        when( response.getFirstHeader( "location" ) ).thenReturn(
-            new BasicHeader( "location", "http://localhost/dir/" ) );
-        assertThat( redirectStrategy.isRedirected( request, response, httpContext ), is( false ) );
+        when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_MOVED_TEMPORARILY );
+        when( response.getFirstHeader( "location" ) ).thenReturn( new BasicHeader( "location", "http://localhost/dir/" ) );
+        assertThat( underTest.isRedirected( request, response, httpContext ), is( false ) );
     }
-
-
 }

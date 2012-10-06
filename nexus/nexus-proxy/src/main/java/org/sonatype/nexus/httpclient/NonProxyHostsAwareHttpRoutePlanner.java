@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.storage.remote.httpclient;
+package org.sonatype.nexus.httpclient;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -30,8 +30,8 @@ import com.google.common.base.Preconditions;
 
 /**
  * An {@link HttpRoutePlanner} that bypasses proxy for specific hosts.
- *
- * @since 2.0
+ * 
+ * @since 2.2
  */
 class NonProxyHostsAwareHttpRoutePlanner
     extends DefaultHttpRoutePlanner
@@ -50,8 +50,7 @@ class NonProxyHostsAwareHttpRoutePlanner
     // Constructors
     // ----------------------------------------------------------------------
 
-    NonProxyHostsAwareHttpRoutePlanner( final SchemeRegistry schemeRegistry,
-                                        final Set<Pattern> nonProxyHostPatterns )
+    NonProxyHostsAwareHttpRoutePlanner( final SchemeRegistry schemeRegistry, final Set<Pattern> nonProxyHostPatterns )
     {
         super( schemeRegistry );
         this.nonProxyHostPatterns = Preconditions.checkNotNull( nonProxyHostPatterns );
@@ -61,14 +60,13 @@ class NonProxyHostsAwareHttpRoutePlanner
     // Public methods
     // ----------------------------------------------------------------------
 
-    public HttpRoute determineRoute( final HttpHost target,
-                                     final HttpRequest request,
-                                     final HttpContext context )
+    public HttpRoute determineRoute( final HttpHost target, final HttpRequest request, final HttpContext context )
         throws HttpException
     {
         if ( request.getParams() instanceof ClientParamsStack )
         {
-            request.setParams( new NonProxyHostParamsStack( (ClientParamsStack) request.getParams(), noProxyFor( target.getHostName() ) ) );
+            request.setParams( new NonProxyHostParamsStack( (ClientParamsStack) request.getParams(),
+                noProxyFor( target.getHostName() ) ) );
         }
         else
         {
@@ -102,18 +100,20 @@ class NonProxyHostsAwareHttpRoutePlanner
 
         /**
          * @param stack the parameter stack to delegate to
-         * @param filterProxy if {@code true}, always return null on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
+         * @param filterProxy if {@code true}, always return null on
+         *            {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
          */
         public NonProxyHostParamsStack( final ClientParamsStack stack, final boolean filterProxy )
         {
             super( stack.getApplicationParams(), stack.getClientParams(), stack.getRequestParams(),
-                   stack.getOverrideParams() );
+                stack.getOverrideParams() );
             this.filterProxy = filterProxy;
         }
 
         /**
          * @param params the parameters instance to delegate to
-         * @param filterProxy if {@code true}, always return null on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
+         * @param filterProxy if {@code true}, always return null on
+         *            {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
          */
         public NonProxyHostParamsStack( final HttpParams params, final boolean filterProxy )
         {
