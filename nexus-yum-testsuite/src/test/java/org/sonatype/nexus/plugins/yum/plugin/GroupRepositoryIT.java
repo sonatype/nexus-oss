@@ -14,25 +14,23 @@ package org.sonatype.nexus.plugins.yum.plugin;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.sonatype.nexus.plugins.yum.NameUtil.uniqueName;
+import static org.sonatype.nexus.plugins.yum.RepoUtil.createGroupRepository;
 
 import org.junit.Test;
-import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
+import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 
-public class GroupRepositoryIT extends AbstractIntegrationTestCase {
+public class GroupRepositoryIT
+    extends AbstractIntegrationTestCase
+{
 
-
-  @Test
-  public void shouldCreateAGroupRepository() throws Exception {
-    final Repositories repositories = client().getSubsystem(Repositories.class);
-    final String reponame = uniqueName();
-    final GroupRepository groupRepo = repositories.create(GroupRepository.class, reponame);
-    groupRepo.settings().setName(reponame);
-    groupRepo.settings().setProvider("maven2yum");
-    groupRepo.settings().setRepoType("group");
-    groupRepo.settings().setExposed(true);
-    assertThat(groupRepo.save().settings().getProvider(), is("maven2yum"));
-  }
+    @Test
+    public void shouldCreateAGroupRepository()
+        throws Exception
+    {
+        final Repositories repositories = client().getSubsystem( Repositories.class );
+        final RepositoryGroupResource groupRepo = createGroupRepository( repositories, "maven2yum" );
+        assertThat( groupRepo.getProvider(), is( "maven2yum" ) );
+    }
 
 }

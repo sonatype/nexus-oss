@@ -15,8 +15,11 @@ package org.sonatype.nexus.plugins.yum;
 import static org.sonatype.nexus.plugins.yum.NameUtil.uniqueName;
 
 import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
+import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
+import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 
 public final class RepoUtil
 {
@@ -31,6 +34,33 @@ public final class RepoUtil
         repo.withRepoPolicy( "RELEASE" ).withWritePolicy( "ALLOW_WRITE" );
         repo.save();
         return repoName;
+    }
+
+    public static RepositoryGroupMemberRepository memberRepo( String repo1 )
+    {
+        final RepositoryGroupMemberRepository repo = new RepositoryGroupMemberRepository();
+        repo.setId( repo1 );
+        return repo;
+    }
+
+    public static RepositoryGroupResource createGroupRepository( Repositories repositories, String provider,
+                                                                 String... memberRepoIds )
+    {
+        final String repoName = uniqueName();
+        final GroupRepository groupRepo = repositories.create( GroupRepository.class, repoName );
+        groupRepo.settings().setName( repoName );
+        groupRepo.settings().setProvider( provider );
+        groupRepo.settings().setRepoType( "group" );
+        groupRepo.settings().setExposed( true );
+        if ( memberRepoIds != null )
+        {
+            for ( String memberRepoId : memberRepoIds )
+            {
+                groupRepo.settings().addRepository( memberRepo( memberRepoId ) );
+            }
+        }
+
+        return groupRepo.save().settings();
     }
 
 }
