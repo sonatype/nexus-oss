@@ -12,16 +12,16 @@
  */
 package org.sonatype.nexus.test.os;
 
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class OsTestRule
-    implements MethodRule
+    implements TestRule
 {
 
     @Override
-    public Statement apply( final Statement statement, final FrameworkMethod method, final Object target )
+    public Statement apply( final Statement statement, final Description description )
     {
         return new Statement()
         {
@@ -30,7 +30,7 @@ public class OsTestRule
             public void evaluate()
                 throws Throwable
             {
-                IgnoreOn ignoreOn = method.getAnnotation( IgnoreOn.class );
+                IgnoreOn ignoreOn = description.getAnnotation( IgnoreOn.class );
                 if ( ignoreOn == null || !matches( ignoreOn.value() ) )
                 {
                     statement.evaluate();
