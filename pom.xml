@@ -74,6 +74,7 @@
     <app.lifecycle.version>1.6</app.lifecycle.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hamcrest.version>1.2.1</hamcrest.version>
+    <jersey.version>1.14</jersey.version>
     <skip.unittests>false</skip.unittests>
   </properties>
 
@@ -177,6 +178,16 @@
         <artifactId>mockito-core</artifactId>
         <version>1.9.0</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-multipart</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-compress</artifactId>
+        <version>1.4.1</version>
       </dependency>
       <!-- Pure Java RPM-library -->
       <dependency>
