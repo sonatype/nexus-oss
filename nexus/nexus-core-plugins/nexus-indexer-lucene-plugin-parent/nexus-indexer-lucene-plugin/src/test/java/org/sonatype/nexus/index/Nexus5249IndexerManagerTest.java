@@ -12,11 +12,17 @@
  */
 package org.sonatype.nexus.index;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -25,6 +31,10 @@ import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdater;
+import org.hamcrest.Description;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -35,6 +45,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.util.CompositeException;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 
 /**
  * Test for NEXUS-5249 and related ones (see linked issues). In general, we ensure that 404 happened during remote
@@ -203,7 +214,7 @@ public class Nexus5249IndexerManagerTest
         catch ( IOException e )
         {
             // ensure we fetched from one we wanted (failingRepository)
-            Assert.assertEquals( indexedProxyRepositories, fetchCountingInvocationHandler.getInvocationCount() );
+            assertThat( fetchCountingInvocationHandler, new InvocationMatcher( indexedProxyRepositories ) );
             // ensure we scanned all the repositories (minus the one failed, as it failed _BEFORE_ scan invocation)
             Assert.assertEquals( indexedRepositories - 1, scanCountingInvocationHandler.getInvocationCount() );
             // ensure we have composite exception
@@ -267,11 +278,18 @@ public class Nexus5249IndexerManagerTest
 
         private int count;
 
+        private List<Object[]> invocationsArguments;
+
+        private List<StackTraceElement[]> invocationsStackTraces;
+
+
         public CountingInvocationHandler( final InvocationHandler delegate, final Method countedMethod )
         {
             super( delegate );
             this.method = countedMethod;
             this.count = 0;
+            this.invocationsArguments = Lists.newArrayList();
+            this.invocationsStackTraces = Lists.newArrayList();
         }
 
         @Override
@@ -281,6 +299,13 @@ public class Nexus5249IndexerManagerTest
             if ( method.equals( this.method ) )
             {
                 count++;
+                invocationsArguments.add( args );
+
+                final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+                final StackTraceElement[] actualStackTrace = new StackTraceElement[stackTrace.length - 3];
+                System.arraycopy( stackTrace, 3, actualStackTrace, 0, stackTrace.length - 3 );
+
+                invocationsStackTraces.add( actualStackTrace );
             }
             return super.invoke( proxy, method, args );
         }
@@ -327,4 +352,83 @@ public class Nexus5249IndexerManagerTest
             }
         }
     }
+
+    private class InvocationMatcher
+        extends TypeSafeMatcher<CountingInvocationHandler>
+    {
+
+        private final int expectedCount;
+
+        InvocationMatcher( final int expectedCount )
+        {
+            this.expectedCount = expectedCount;
+        }
+
+        @Override
+        protected boolean matchesSafely( final CountingInvocationHandler item )
+        {
+            return item.getInvocationCount() == expectedCount;
+        }
+
+        @Override
+        public void describeTo( final Description description )
+        {
+            description.appendText( "to have " ).appendValue( expectedCount ).appendText( " invocations" );
+        }
+
+        @Override
+        protected void describeMismatchSafely( final CountingInvocationHandler item,
+                                               final Description mismatchDescription )
+        {
+            mismatchDescription
+                .appendText( "had " )
+                .appendValue( item.getInvocationCount() )
+                .appendText(" invocations of method " )
+                .appendText( item.method.getDeclaringClass().getName() )
+                .appendText( "#" )
+                .appendText( item.method.getName() )
+                .appendText( "\n" );
+
+            if ( item.invocationsArguments.size() > 0 )
+            {
+                for ( int i = 0; i < item.invocationsArguments.size(); i++ )
+                {
+                    mismatchDescription.appendText( "\n" ).appendText( "Invocation " ).appendValue( i + 1 ).appendText(
+                        ":\n" );
+                    mismatchDescription.appendText( "\t Arguments:\n" );
+                    for ( Object argument : item.invocationsArguments.get( i ) )
+                    {
+                        if ( argument instanceof IndexUpdateRequest )
+                        {
+                            IndexUpdateRequest arg = (IndexUpdateRequest) argument;
+                            mismatchDescription
+                                .appendText( "\t\t " )
+                                .appendText( IndexUpdateRequest.class.getSimpleName() )
+                                .appendText( "->" )
+                                .appendText( IndexingContext.class.getSimpleName() )
+                                .appendText( " repository=" ).appendValue( arg.getIndexingContext().getRepositoryId() )
+                                .appendText( "\n" );
+                        }
+                        else
+                        {
+                            mismatchDescription
+                                .appendText( "\t\t " )
+                                .appendText( argument.toString() )
+                                .appendText( "\n" );
+                        }
+                    }
+                    mismatchDescription.appendText( "\t Stack trace:\n" );
+                    for ( StackTraceElement element : item.invocationsStackTraces.get( i ) )
+                    {
+                        mismatchDescription
+                            .appendText( "\t\t " )
+                            .appendText( element.toString() )
+                            .appendText( "\n" );
+                    }
+                }
+                mismatchDescription.appendText( "\n" );
+            }
+        }
+    }
+
 }
