@@ -63,6 +63,7 @@
   <modules>
     <module>nexus-yum-plugin</module>
     <module>nexus-yum-testsuite</module>
+    <module>nexus-yum-testhelper</module>
   </modules>
 
   <properties>
@@ -189,8 +190,13 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
-        <version>2.2-SNAPSHOT</version>
+        <version>${project.version}</version>
         <type>nexus-plugin</type>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.yum</groupId>
+        <artifactId>nexus-yum-testhelper</artifactId>
+        <version>${project.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
