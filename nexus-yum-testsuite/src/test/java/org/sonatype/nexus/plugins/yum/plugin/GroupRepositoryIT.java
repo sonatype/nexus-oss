@@ -12,17 +12,32 @@
  */
 package org.sonatype.nexus.plugins.yum.plugin;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.plugins.yum.RepoUtil.createGroupRepository;
+import static org.sonatype.nexus.plugins.yum.RepoUtil.createHostedRepo;
+import static org.sonatype.nexus.plugins.yum.TimeUtil.sleep;
+import static org.sonatype.nexus.plugins.yum.plugin.client.subsystem.MetadataType.PRIMARY_XML;
 
+import java.net.URISyntaxException;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.sonatype.nexus.client.core.subsystem.artifact.MavenArtifact;
+import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
+import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.YumClient;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
+import org.sonatype.nexus.test.os.IgnoreOn;
+import org.sonatype.nexus.test.os.OsTestRule;
 
 public class GroupRepositoryIT
     extends AbstractIntegrationTestCase
 {
+    @Rule
+    public OsTestRule osTestRule = new OsTestRule();
 
     @Test
     public void shouldCreateAGroupRepository()
@@ -31,6 +46,35 @@ public class GroupRepositoryIT
         final Repositories repositories = client().getSubsystem( Repositories.class );
         final RepositoryGroupResource groupRepo = createGroupRepository( repositories, "maven2yum" );
         assertThat( groupRepo.getProvider(), is( "maven2yum" ) );
+    }
+
+    @Test
+    @IgnoreOn( "mac" )
+    public void shouldRegenerateRepoAfterUpload()
+        throws Exception
+    {
+        final RepositoryGroupResource groupRepo = givenGroupRepoWith2Rpms();
+        final YumClient yum = client().getSubsystem( YumClient.class );
+        final String primaryXml = yum.getGroupMetadata( groupRepo.getId(), PRIMARY_XML, String.class );
+        assertThat( primaryXml, containsString( "test-artifact" ) );
+        assertThat( primaryXml, containsString( "test-rpm" ) );
+    }
+
+    private RepositoryGroupResource givenGroupRepoWith2Rpms()
+        throws InterruptedException, URISyntaxException
+    {
+        final String repo1 = createHostedRepo( client() ).getId();
+        final String repo2 = createHostedRepo( client() ).getId();
+        final Repositories repositories = client().getSubsystem( Repositories.class );
+        final RepositoryGroupResource groupRepo = createGroupRepository( repositories, "maven2yum", repo1, repo2 );
+        sleep( 5, SECONDS );
+        final MavenArtifact artifact = client().getSubsystem( MavenArtifact.class );
+        artifact.upload( new UploadRequest( repo1, "a_group1", "an_artifact1", "1.0", "pom", "", "rpm",
+            resource( "/test-artifact-1.2.3-1.noarch.rpm" ) ) );
+        artifact.upload( new UploadRequest( repo2, "a_group2", "an_artifact2", "2.0", "pom", "", "rpm",
+            resource( "/test-rpm-5.6.7-1.noarch.rpm" ) ) );
+        sleep( 5, SECONDS );
+        return groupRepo;
     }
 
 }

@@ -25,6 +25,11 @@
       <artifactId>nexus-testsuite-client</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.nexus.yum</groupId>
+      <artifactId>nexus-yum-testhelper</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-multipart</artifactId>
     </dependency>

@@ -84,17 +84,6 @@ public class YumGroupRepositoryIT
 
     @Test
     @IgnoreOn( "mac" )
-    public void shouldRegenerateGroupRepoWhenRpmGetsUploaded()
-        throws Exception
-    {
-        givenGroupRepoWith2Rpms();
-        String primaryXml = getGroupRepoPrimaryXml();
-        assertThat( primaryXml, containsString( DUMMY_ARTIFACT1 ) );
-        assertThat( primaryXml, containsString( DUMMY_ARTIFACT2 ) );
-    }
-
-    @Test
-    @IgnoreOn( "mac" )
     public void shouldRegenerateGroupRepoWhenMemberRepoIsRemoved()
         throws Exception
     {
