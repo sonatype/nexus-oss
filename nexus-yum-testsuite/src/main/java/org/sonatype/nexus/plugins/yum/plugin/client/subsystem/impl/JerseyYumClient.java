@@ -21,6 +21,7 @@ import java.net.URLEncoder;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.repository.GenericRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.CompressionAdapter
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.CompressionType;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.MetadataType;
 import org.sonatype.nexus.plugins.yum.plugin.client.subsystem.YumClient;
+import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 
 import com.sun.jersey.api.client.ClientResponse;
@@ -73,6 +75,15 @@ public class JerseyYumClient
     {
         final String url = "yum/repos/" + repositoryId + "/" + version + metadataType.getPath();
         final ClientResponse clientResponse = getNexusClient().serviceResource( url ).get( ClientResponse.class );
+        return handleResponse( clientResponse, returnType, metadataType.getCompression() );
+    }
+
+    @Override
+    public <T> T getGroupMetadata( String groupRepositoryId, MetadataType metadataType, Class<T> returnType )
+    {
+        final Repository<GroupRepository, RepositoryGroupResource> repo = repositories.getGroup( groupRepositoryId );
+        final String url = repo.settings().getContentResourceURI() + metadataType.getPath();
+        final ClientResponse clientResponse = getNexusClient().getClient().resource( url ).get( ClientResponse.class );
         return handleResponse( clientResponse, returnType, metadataType.getCompression() );
     }
 

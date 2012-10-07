@@ -45,6 +45,7 @@ public interface YumClient
      * @param metadataType
      * @param typically {@link String} or <code>byte[].class</code>
      * @return the content of the metadata file. If the file is gzipped or bzipped the returning content is uncompressed
+     *         automatically
      */
     <T> T getMetadata( String repositoryId, MetadataType metadataType, Class<T> returnType );
 
@@ -56,6 +57,18 @@ public interface YumClient
      * @param metadataType
      * @param typically {@link String} or <code>byte[].class</code>
      * @return the content of the metadata file. If the file is gzipped or bzipped the returning content is uncompressed
+     *         automatically
      */
     <T> T getMetadata( String repositoryId, String version, MetadataType metadataType, Class<T> returnType );
+
+    /**
+     * Retrieves the given metadata type (primary.xml, repomd.xml, etc.) from the group repository
+     * 
+     * @param groupRepositoryId
+     * @param metadataType
+     * @param typically {@link String} or <code>byte[].class</code>
+     * @return the content of the metadata file. If the file is gzipped or bzipped the returning content is uncompressed
+     *         automatically
+     */
+    <T> T getGroupMetadata( String groupRepositoryId, MetadataType metadataType, Class<T> returnType );
 }
