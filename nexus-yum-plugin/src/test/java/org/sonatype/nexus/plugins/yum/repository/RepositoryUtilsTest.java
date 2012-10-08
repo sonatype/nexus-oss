@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.plugins.yum.repository;
 
-import static org.sonatype.nexus.plugins.yum.repository.RepositoryUtils.getBaseDir;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.yum.repository.RepositoryUtils.getBaseDir;
+
 import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -34,9 +34,8 @@ public class RepositoryUtilsTest
     private void assertConvertion( String localUrl, String expected )
         throws Exception
     {
-        Repository repo = createMock( Repository.class );
-        expect( repo.getLocalUrl() ).andReturn( localUrl ).anyTimes();
-        replay( repo );
+        final Repository repo = mock( Repository.class );
+        when( repo.getLocalUrl() ).thenReturn( localUrl );
         assertThat( getBaseDir( repo ).getAbsolutePath(), is( expected ) );
     }
 }

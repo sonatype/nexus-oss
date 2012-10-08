@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.plugins.yum.plugin.impl;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,10 +47,9 @@ public class DefaultRepositoryRegistryTest
     public void shouldScanRepository()
         throws Exception
     {
-        MavenRepository repository = createMock( MavenRepository.class );
-        expect( repository.getId() ).andReturn( REPO_ID ).anyTimes();
-        expect( repository.getLocalUrl() ).andReturn( new File( ".", "target/test-classes/repo" ).toURI().toString() ).anyTimes();
-        replay( repository );
+        final MavenRepository repository = mock( MavenRepository.class );
+        when( repository.getId() ).thenReturn( REPO_ID );
+        when( repository.getLocalUrl() ).thenReturn( new File( ".", "target/test-classes/repo" ).toURI().toString() );
 
         repositoryRegistry.registerRepository( repository );
         waitForAllTasksToBeDone();

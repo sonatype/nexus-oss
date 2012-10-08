@@ -12,12 +12,11 @@
  */
 package org.sonatype.nexus.plugins.yum;
 
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_DIR;
 import static org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils.BASE_TMP_FILE;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
@@ -86,31 +85,28 @@ public abstract class AbstractRepositoryTester
 
     protected MavenRepository createRepository( final boolean isMavenHostedRepository, final String repoId )
     {
-        RepositoryKind kind = createMock( RepositoryKind.class );
-        expect( kind.isFacetAvailable( MavenHostedRepository.class ) ).andReturn( isMavenHostedRepository );
+        final RepositoryKind kind = mock( RepositoryKind.class );
+        when( kind.isFacetAvailable( MavenHostedRepository.class ) ).thenReturn( isMavenHostedRepository );
 
-        MavenRepository repository = createMock( MavenRepository.class );
-        expect( repository.getRepositoryKind() ).andReturn( kind ).anyTimes();
-        expect( repository.getId() ).andReturn( repoId ).anyTimes();
+        final MavenRepository repository = mock( MavenRepository.class );
+        when( repository.getRepositoryKind() ).thenReturn( kind );
+        when( repository.getId() ).thenReturn( repoId );
 
-        File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );
+        final File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );
         repoDir.mkdirs();
-        expect( repository.getLocalUrl() ).andReturn( repoDir.toURI().toString() ).anyTimes();
-
-        replay( kind, repository );
+        when( repository.getLocalUrl() ).thenReturn( repoDir.toURI().toString() );
 
         return repository;
     }
 
     protected StorageItem createItem( String version, String filename )
     {
-        StorageItem item = createMock( StorageItem.class );
+        final StorageItem item = mock( StorageItem.class );
 
-        expect( item.getPath() ).andReturn( "blalu/" + version + "/" + filename ).anyTimes();
-        expect( item.getParentPath() ).andReturn( "blalu/" + version ).anyTimes();
-        expect( item.getItemContext() ).andReturn( new RequestContext() ).anyTimes();
+        when( item.getPath() ).thenReturn( "blalu/" + version + "/" + filename );
+        when( item.getParentPath() ).thenReturn( "blalu/" + version );
+        when( item.getItemContext() ).thenReturn( new RequestContext() );
 
-        replay( item );
         return item;
     }
 }

@@ -13,9 +13,8 @@
 package org.sonatype.nexus.plugins.yum.repository.service;
 
 import static junit.framework.Assert.assertNotSame;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URL;
@@ -110,10 +109,9 @@ public class DefaultYumServiceTest
 
     public static MavenRepository createRepository( String id )
     {
-        MavenRepository repo = createMock( MavenRepository.class );
-        expect( repo.getId() ).andReturn( id ).anyTimes();
-        expect( repo.getLocalUrl() ).andReturn( getTempUrl() ).anyTimes();
-        replay( repo );
+        final MavenRepository repo = mock( MavenRepository.class );
+        when( repo.getId() ).thenReturn( id );
+        when( repo.getLocalUrl() ).thenReturn( getTempUrl() );
         return repo;
     }
 

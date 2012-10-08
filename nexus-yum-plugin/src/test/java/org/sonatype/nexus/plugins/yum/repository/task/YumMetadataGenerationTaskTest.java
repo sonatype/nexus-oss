@@ -12,11 +12,6 @@
  */
 package org.sonatype.nexus.plugins.yum.repository.task;
 
-import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
-import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -24,6 +19,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
@@ -36,7 +33,8 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
-import org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask;
+import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.DefaultScheduledTask;
@@ -44,9 +42,6 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
-
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 
 @SuppressWarnings( "unchecked" )
 public class YumMetadataGenerationTaskTest
@@ -195,9 +190,8 @@ public class YumMetadataGenerationTaskTest
         task.setAddedFiles( null );
         task.setSingleRpmPerDirectory( true );
 
-        final YumConfiguration yumConfig = createMock( YumConfiguration.class );
-        expect( yumConfig.getMaxParallelThreadCount() ).andReturn( 10 ).anyTimes();
-        replay( yumConfig );
+        final YumConfiguration yumConfig = mock( YumConfiguration.class );
+        when( yumConfig.getMaxParallelThreadCount() ).thenReturn( 10 );
         setField( task, "yumConfig", yumConfig );
         return task;
     }

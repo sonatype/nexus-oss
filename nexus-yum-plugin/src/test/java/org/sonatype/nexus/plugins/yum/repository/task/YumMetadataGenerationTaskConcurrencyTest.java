@@ -33,15 +33,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.GZIPInputStream;
 
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.cglib.proxy.Enhancer;
+import org.mockito.cglib.proxy.MethodInterceptor;
+import org.mockito.cglib.proxy.MethodProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.repository.AbstractSchedulerTest;
@@ -150,12 +149,12 @@ public class YumMetadataGenerationTaskConcurrencyTest
     private YumMetadataGenerationTask createYumRepositoryTask( final int repositoryId )
         throws Exception
     {
-        YumTaskInterceptor interceptor =
+        final YumTaskInterceptor interceptor =
             new YumTaskInterceptor( nexusScheduler.createTaskInstance( YumMetadataGenerationTask.class ), threadNames );
-        Enhancer enhancer = new Enhancer();
+        final Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass( YumMetadataGenerationTask.class );
         enhancer.setCallback( interceptor );
-        YumMetadataGenerationTask task = (YumMetadataGenerationTask) enhancer.create();
+        final YumMetadataGenerationTask task = (YumMetadataGenerationTask) enhancer.create();
         setField( task, "applicationEventMulticaster", lookup( ApplicationEventMulticaster.class ) );
         setField( task, "logger", LoggerFactory.getLogger( YumMetadataGenerationTask.class ) );
         task.setRepositoryId( "REPO_" + repositoryId );

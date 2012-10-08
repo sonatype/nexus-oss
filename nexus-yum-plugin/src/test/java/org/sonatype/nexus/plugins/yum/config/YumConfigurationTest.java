@@ -12,21 +12,18 @@
  */
 package org.sonatype.nexus.plugins.yum.config;
 
-import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Thread.sleep;
 import static org.apache.commons.io.IOUtils.write;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,14 +42,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.plugins.yum.config.DefaultYumConfiguration;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.xml.sax.SAXException;
-
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.domain.XmlYumConfiguration;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
 import org.sonatype.nexus.plugins.yum.version.alias.domain.AliasMapping;
+import org.xml.sax.SAXException;
 
 /**
  * Created by IntelliJ IDEA. User: MKrautz Date: 7/8/11 Time: 3:02 PM To change this template use File | Settings | File
@@ -210,9 +204,8 @@ public class YumConfigurationTest
 
     private NexusConfiguration createNexusConfig( File tmpDir )
     {
-        NexusConfiguration nexusConfig = createMock( NexusConfiguration.class );
-        expect( nexusConfig.getConfigurationDirectory() ).andReturn( tmpDir ).anyTimes();
-        replay( nexusConfig );
+        final NexusConfiguration nexusConfig = mock( NexusConfiguration.class );
+        when( nexusConfig.getConfigurationDirectory() ).thenReturn( tmpDir );
         return nexusConfig;
     }
 

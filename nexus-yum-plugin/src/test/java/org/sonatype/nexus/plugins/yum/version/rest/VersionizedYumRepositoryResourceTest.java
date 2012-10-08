@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.plugins.yum.version.rest;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -186,7 +185,7 @@ public class VersionizedYumRepositoryResourceTest
 
     private Map<String, Object> createAttributes( String repository, String version )
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        final Map<String, Object> map = new HashMap<String, Object>();
         map.put( "repository", repository );
         map.put( "version", version );
         return map;
@@ -194,10 +193,9 @@ public class VersionizedYumRepositoryResourceTest
 
     public MavenRepository createRepository( String id )
     {
-        MavenRepository repo = createMock( MavenRepository.class );
-        expect( repo.getId() ).andReturn( id ).anyTimes();
-        expect( repo.getLocalUrl() ).andReturn( "file:" + RepositoryTestUtils.RPM_BASE_FILE.getAbsolutePath() ).anyTimes();
-        replay( repo );
+        final MavenRepository repo = mock( MavenRepository.class );
+        when( repo.getId() ).thenReturn( id );
+        when( repo.getLocalUrl() ).thenReturn( "file:" + RepositoryTestUtils.RPM_BASE_FILE.getAbsolutePath() );
         return repo;
     }
 }

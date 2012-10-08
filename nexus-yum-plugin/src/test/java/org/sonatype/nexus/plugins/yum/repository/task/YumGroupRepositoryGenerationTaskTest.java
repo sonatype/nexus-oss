@@ -13,9 +13,6 @@
 package org.sonatype.nexus.plugins.yum.repository.task;
 
 import static java.util.Arrays.asList;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -128,9 +125,8 @@ public class YumGroupRepositoryGenerationTaskTest
     {
         YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
         task.setGroupRepository( groupRepo );
-        final YumConfiguration yumConfig = createMock( YumConfiguration.class );
-        expect( yumConfig.isActive() ).andReturn( true ).anyTimes();
-        replay( yumConfig );
+        final YumConfiguration yumConfig = mock( YumConfiguration.class );
+        when( yumConfig.isActive() ).thenReturn( true );
         setField( task, "yumConfig", yumConfig );
         task.doRun();
     }
