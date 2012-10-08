@@ -19,7 +19,6 @@ import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
-import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 
 public final class RepoUtil
@@ -36,15 +35,15 @@ public final class RepoUtil
         return repo.save().settings();
     }
 
-    public static RepositoryGroupMemberRepository memberRepo( String repo1 )
+    public static RepositoryGroupMemberRepository memberRepo( String repositoryId )
     {
         final RepositoryGroupMemberRepository repo = new RepositoryGroupMemberRepository();
-        repo.setId( repo1 );
+        repo.setId( repositoryId );
         return repo;
     }
 
-    public static RepositoryGroupResource createGroupRepository( Repositories repositories, String provider,
-                                                                 String... memberRepoIds )
+    public static GroupRepository createGroupRepository( Repositories repositories, String provider,
+                                                         String... memberRepoIds )
     {
         final String repoName = uniqueName();
         final GroupRepository groupRepo = repositories.create( GroupRepository.class, repoName );
@@ -60,7 +59,7 @@ public final class RepoUtil
             }
         }
 
-        return groupRepo.save().settings();
+        return groupRepo.save();
     }
 
 }
