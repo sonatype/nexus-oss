@@ -111,6 +111,8 @@ public class YumMetadataGenerationTaskConcurrencyTest
         final Repository repository = mock( Repository.class );
         when( repository.getId() ).thenReturn( "REPO" );
         when( repository.getLocalUrl() ).thenReturn( tmpDir.getAbsolutePath() );
+        when( repository.getProviderRole() ).thenReturn( Repository.class.getName() );
+        when( repository.getProviderHint() ).thenReturn( "maven2" );
         final File rpm1 = RepositoryTestUtils.createDummyRpm( RPM_NAME_1, "1", new File( tmpDir, "rpm1" ) );
         final File rpm2 = RepositoryTestUtils.createDummyRpm( RPM_NAME_2, "2", new File( tmpDir, "rpm2" ) );
         // given executions blocking all thread of the scheduler

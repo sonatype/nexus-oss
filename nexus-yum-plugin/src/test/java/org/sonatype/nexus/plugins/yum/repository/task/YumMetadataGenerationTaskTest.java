@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,11 +33,11 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
@@ -122,7 +123,7 @@ public class YumMetadataGenerationTaskTest
         YumMetadataGenerationTask task = new YumMetadataGenerationTask();
         task.setRepositoryId( REPO );
         setField( task, "repositoryRegistry", repoRegistry() );
-        setField( task, "restApiSettings", restApiSettings() );
+        setField( task, "repositoryURLBuilder", repositoryURLBuilder() );
         // when
         task.setDefaults();
         // then
@@ -132,10 +133,10 @@ public class YumMetadataGenerationTaskTest
         assertThat( task.getRepoUrl(), is( RPM_URL ) );
     }
 
-    private GlobalRestApiSettings restApiSettings()
+    private RepositoryURLBuilder repositoryURLBuilder()
     {
-        GlobalRestApiSettings settings = mock( GlobalRestApiSettings.class );
-        when( settings.getBaseUrl() ).thenReturn( BASE_URL );
+        final RepositoryURLBuilder settings = mock( RepositoryURLBuilder.class );
+        when( settings.getRepositoryContentUrl( any( Repository.class ) ) ).thenReturn( RPM_URL );
         return settings;
     }
 

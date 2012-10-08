@@ -30,6 +30,7 @@ import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultYumServiceTest
     extends AbstractYumNexusTestCase
@@ -112,6 +113,8 @@ public class DefaultYumServiceTest
         final MavenRepository repo = mock( MavenRepository.class );
         when( repo.getId() ).thenReturn( id );
         when( repo.getLocalUrl() ).thenReturn( getTempUrl() );
+        when( repo.getProviderRole() ).thenReturn( Repository.class.getName() );
+        when( repo.getProviderHint() ).thenReturn( "maven2" );
         return repo;
     }
 

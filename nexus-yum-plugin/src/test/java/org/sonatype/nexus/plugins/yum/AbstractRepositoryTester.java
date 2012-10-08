@@ -31,6 +31,7 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
@@ -91,6 +92,8 @@ public abstract class AbstractRepositoryTester
         final MavenRepository repository = mock( MavenRepository.class );
         when( repository.getRepositoryKind() ).thenReturn( kind );
         when( repository.getId() ).thenReturn( repoId );
+        when( repository.getProviderRole() ).thenReturn( Repository.class.getName() );
+        when( repository.getProviderHint() ).thenReturn( "maven2" );
 
         final File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );
         repoDir.mkdirs();

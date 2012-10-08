@@ -29,15 +29,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.execution.CommandLineExecutor;
 import org.sonatype.nexus.plugins.yum.plugin.event.YumRepositoryGenerateEvent;
@@ -48,6 +45,7 @@ import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
@@ -109,8 +107,8 @@ public class YumMetadataGenerationTask
     @Requirement
     private YumConfiguration yumConfig;
 
-    @Inject
-    private GlobalRestApiSettings restApiSettings;
+    @Requirement
+    private RepositoryURLBuilder repositoryURLBuilder;
 
     @Override
     protected YumRepository doRun()
@@ -162,7 +160,7 @@ public class YumMetadataGenerationTask
         }
         if ( isBlank( getRpmUrl() ) && repository != null )
         {
-            setRpmUrl( getBaseUrl( repository ) );
+            setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
         }
         if ( isBlank( getParameter( PARAM_REPO_DIR ) ) && isNotBlank( getRpmDir() ) )
         {
@@ -172,11 +170,6 @@ public class YumMetadataGenerationTask
         {
             setRepoUrl( getRpmUrl() );
         }
-    }
-
-    private String getBaseUrl( Repository repository )
-    {
-        return String.format( "%s/content/repositories/%s", restApiSettings.getBaseUrl(), repository.getId() );
     }
 
     private Repository findRepository()

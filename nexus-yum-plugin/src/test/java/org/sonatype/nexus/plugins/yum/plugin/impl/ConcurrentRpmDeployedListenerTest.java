@@ -103,7 +103,7 @@ public class ConcurrentRpmDeployedListenerTest
     private void shouldCreateRepoForRpm( int index )
         throws URISyntaxException, MalformedURLException, NoSuchAlgorithmException, IOException
     {
-        MavenRepository repo = createRepository( true, "repo" + index );
+        final MavenRepository repo = createRepository( true, "repo" + index );
         repositoryRegistry.registerRepository( repo );
         for ( int version = 0; version < 5; version++ )
         {

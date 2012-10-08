@@ -20,11 +20,8 @@ import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerati
 import java.io.File;
 import java.net.URL;
 
-import javax.inject.Inject;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
@@ -33,6 +30,7 @@ import org.sonatype.nexus.plugins.yum.repository.task.YumGroupRepositoryGenerati
 import org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -41,8 +39,8 @@ public class DefaultYumService
     implements YumService
 {
 
-    @Inject
-    private GlobalRestApiSettings restApiSettings;
+    @Requirement
+    private RepositoryURLBuilder repositoryURLBuilder;
 
     @Requirement
     private NexusScheduler nexusScheduler;
@@ -51,11 +49,6 @@ public class DefaultYumService
     private YumConfiguration yumConfig;
 
     private final YumRepositoryCache cache = new YumRepositoryCache();
-
-    private String getBaseUrl( Repository repository )
-    {
-        return String.format( "%s/content/repositories/%s", restApiSettings.getBaseUrl(), repository.getId() );
-    }
 
     @Override
     public ScheduledTask<YumRepository> createYumRepository( File rpmBaseDir, String rpmBaseUrl, File yumRepoBaseDir,
@@ -94,7 +87,7 @@ public class DefaultYumService
             {
                 YumMetadataGenerationTask task = createTask();
                 task.setRpmDir( rpmBaseDir.getAbsolutePath() );
-                task.setRpmUrl( getBaseUrl( repository ) );
+                task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
                 task.setRepoDir( yumRepoBaseDir );
                 task.setRepoUrl( yumRepoUrl.toString() );
                 task.setRepositoryId( repository.getId() );
@@ -184,7 +177,7 @@ public class DefaultYumService
             {
                 YumMetadataGenerationTask task = createTask();
                 task.setRpmDir( rpmBaseDir.getAbsolutePath() );
-                task.setRpmUrl( getBaseUrl( repository ) );
+                task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
                 task.setRepositoryId( repository.getId() );
                 task.setAddedFiles( filePath );
                 return submitTask( task );

@@ -37,6 +37,7 @@ import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.google.code.tempusfugit.temporal.Condition;
@@ -196,6 +197,8 @@ public class VersionizedYumRepositoryResourceTest
         final MavenRepository repo = mock( MavenRepository.class );
         when( repo.getId() ).thenReturn( id );
         when( repo.getLocalUrl() ).thenReturn( "file:" + RepositoryTestUtils.RPM_BASE_FILE.getAbsolutePath() );
+        when( repo.getProviderRole() ).thenReturn( Repository.class.getName() );
+        when( repo.getProviderHint() ).thenReturn( "maven2" );
         return repo;
     }
 }
