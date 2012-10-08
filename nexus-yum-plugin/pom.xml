@@ -35,13 +35,6 @@
     <pluginName>Nexus : Plugins : Yum</pluginName>
     <pluginDescription>Allows Nexus to create yum repositories for uploaded RPM packages</pluginDescription>
     <pluginSiteUrl>https://github.com/sonatype/nexus-yum-plugin</pluginSiteUrl>
-    <nexus.start.command>start</nexus.start.command>
-    <nexus.root.dir>${project.build.directory}/nexus</nexus.root.dir>
-    <nexus.base.dir>${nexus.root.dir}/nexus-oss-webapp-${nexus.version}</nexus.base.dir>
-    <nexus.plugin.dir>${nexus.base.dir}/nexus/WEB-INF/plugin-repository</nexus.plugin.dir>
-    <nexus.exec>${nexus.base.dir}/bin/nexus</nexus.exec>
-    <nexus.work.dir>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</nexus.work.dir>
-    <nexus.port>8081</nexus.port>
   </properties>
 
   <dependencies>
@@ -61,11 +54,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.yum</groupId>
       <artifactId>nexus-yum-testhelper</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-testsuite-support</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -90,16 +78,6 @@
     <dependency>
       <groupId>com.google.code.tempus-fugit</groupId>
       <artifactId>tempus-fugit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -139,114 +117,6 @@
           <pluginDescription>${pluginDescription}</pluginDescription>
           <pluginSiteUrl>${pluginSiteUrl}</pluginSiteUrl>
         </configuration>
-      </plugin>
-
-      <!-- download and unpack Nexus Professional bundle -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-nexus-war-file</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-oss-webapp</artifactId>
-                  <version>${nexus.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>tar.gz</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${nexus.root.dir}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- copy jar to sonatype config dir -->
-      <!-- copy wrapper-override.conf -->
-      <!-- run nexus application -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <id>install-yum-plugin-and-start-nexus</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <phase>pre-integration-test</phase>
-            <configuration>
-              <target>
-                <delete dir="${nexus.plugin.dir}/${project.artifactId}*" />
-                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${nexus.plugin.dir}" />
-                <copy file="${project.build.directory}/test-classes/nexus/wrapper-override.conf" todir="${nexus.base.dir}/conf/" />
-                <exec executable="${nexus.exec}">
-                  <arg value="${nexus.start.command}" />
-                  <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
-                  <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
-                </exec>
-                <waitfor maxwait="2" maxwaitunit="minute" checkevery="10" checkeveryunit="second">
-                  <http url="http://localhost:${nexus.port}/nexus/index.html" />
-                </waitfor>
-              </target>
-            </configuration>
-          </execution>
-          <execution>
-            <id>shutdown-nexus</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <phase>post-integration-test</phase>
-            <configuration>
-              <target>
-                <exec executable="${nexus.exec}">
-                  <arg value="stop" />
-                  <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
-                  <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
-                </exec>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.redline-rpm</groupId>
-            <artifactId>redline</artifactId>
-            <version>1.1.9</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      
-      <!-- run integration tests -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <goals>
-              <goal>integration-test</goal>
-            </goals>
-            <configuration>
-              <systemPropertyVariables>
-                <nexus.port>${nexus.port}</nexus.port>
-              </systemPropertyVariables>
-            </configuration>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
