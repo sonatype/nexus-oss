@@ -12,291 +12,44 @@
  */
 package org.sonatype.nexus.error.reporting;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-import com.google.common.base.Preconditions;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.params.AuthPolicy;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.conn.params.ConnRouteParams;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.impl.client.ClientParamsStack;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.DefaultHttpRoutePlanner;
+import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.protocol.HttpContext;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.jira.connector.internal.HttpClientConnector;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
-import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
  * NexusConfiguration-aware connector for the attachment parts of sisu-problem-reporting.
  *
- * TODO: this is mostly c&p from remote storage, change this if NEXUS-4689 ever happens.
- *
  * @since 2.1
  */
 @Named
+@Singleton
 public class NexusPRConnector
     extends HttpClientConnector
-    implements Disposable
 {
 
-    private static final Logger logger = LoggerFactory.getLogger( NexusPRConnector.class );
-    
-    private NexusConfiguration config;
-
-    private final UserAgentBuilder uaBuilder;
+    private final org.sonatype.nexus.apachehttpclient.Hc4Provider httpClientProvider;
 
     @Inject
-    public NexusPRConnector( final NexusConfiguration config, final UserAgentBuilder uaBuilder )
+    public NexusPRConnector( final Hc4Provider httpClientProvider )
     {
-        this.config = config;
-        this.uaBuilder = uaBuilder;
+        this.httpClientProvider = httpClientProvider;
     }
 
     @Override
     protected HttpClient client()
     {
-        final DefaultHttpClient client = (DefaultHttpClient) super.client();
-
-        // always configure with current proxy and params... settings may have changed
-        client.setParams( createHttpParams( config.getGlobalRemoteStorageContext() ) );
-        configureProxy( client, config.getGlobalRemoteStorageContext() );
-
-        return client;
-    }
-
-    @Override
-    protected HttpParams requestParams()
-    {
-        final HttpParams params = super.requestParams();
-        HttpProtocolParams.setUserAgent( params, uaBuilder.formatUserAgentString( config.getGlobalRemoteStorageContext() ) + " (PROBLEMREPORTING)" );
-        return params;
-    }
-    
-    private static void configureProxy( final DefaultHttpClient httpClient,
-                                        final RemoteStorageContext ctx )
-    {
-        final RemoteProxySettings rps = ctx.getRemoteProxySettings();
-
-        if ( rps.isEnabled() )
-        {
-            final HttpHost proxy = new HttpHost( rps.getHostname(), rps.getPort() );
-            httpClient.getParams().setParameter( ConnRoutePNames.DEFAULT_PROXY, proxy );
-
-            // check if we have non-proxy hosts
-            if ( rps.getNonProxyHosts() != null && !rps.getNonProxyHosts().isEmpty() )
-            {
-                final Set<Pattern> nonProxyHostPatterns = new HashSet<Pattern>( rps.getNonProxyHosts().size() );
-                for ( String nonProxyHostRegex : rps.getNonProxyHosts() )
-                {
-                    try
-                    {
-                        nonProxyHostPatterns.add( Pattern.compile( nonProxyHostRegex, Pattern.CASE_INSENSITIVE ) );
-                    }
-                    catch ( PatternSyntaxException e )
-                    {
-                        logger.warn( "Invalid non proxy host regex: {}", nonProxyHostRegex, e );
-                    }
-                }
-                httpClient.setRoutePlanner(
-                    new NonProxyHostsAwareHttpRoutePlanner(
-                        httpClient.getConnectionManager().getSchemeRegistry(), nonProxyHostPatterns
-                    )
-                );
-            }
-
-            configureAuthentication( httpClient, rps.getHostname(), rps.getPort(), rps.getProxyAuthentication() );
-        }
-    }
-
-    private static void configureAuthentication( final DefaultHttpClient httpClient,
-                                                 final String proxyHost,
-                                                 final int proxyPort, 
-                                                 final RemoteAuthenticationSettings ras )
-    {
-        if ( ras != null )
-        {
-            List<String> authorisationPreference = new ArrayList<String>( 2 );
-            authorisationPreference.add( AuthPolicy.DIGEST );
-            authorisationPreference.add( AuthPolicy.BASIC );
-
-            Credentials credentials = null;
-
-            if ( ras instanceof NtlmRemoteAuthenticationSettings )
-            {
-                final NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
-
-                // Using NTLM auth, adding it as first in policies
-                authorisationPreference.add( 0, AuthPolicy.NTLM );
-
-                credentials = new NTCredentials(
-                    nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain()
-                );
-
-            }
-            else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
-            {
-                UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
-
-                credentials = new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() );
-            }
-
-            if ( credentials != null )
-            {
-                httpClient.getCredentialsProvider().setCredentials( new AuthScope(proxyHost, proxyPort), credentials );
-            }
-
-            httpClient.getParams().setParameter( AuthPNames.PROXY_AUTH_PREF, authorisationPreference );
-        }
-    }
-
-    private static HttpParams createHttpParams( final RemoteStorageContext ctx )
-    {
-        final HttpParams params = new BasicHttpParams();
-
-        // getting the timeout from RemoteStorageContext. The value we get depends on per-repo and global settings.
-        // The value will "cascade" from repo level to global level, see implementation.
-        int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
-
-        params.setParameter( CoreConnectionPNames.CONNECTION_TIMEOUT, timeout );
-        params.setParameter( CoreConnectionPNames.SO_TIMEOUT, timeout );
-        return params;
-    }
-
-    @Override
-    public void dispose()
-    {
-        super.dispose();
-    }
-
-    /**
-     * An {@link org.apache.http.conn.routing.HttpRoutePlanner} that bypasses proxy for specific hosts.
-     *
-     * @since 2.0
-     */
-    static class NonProxyHostsAwareHttpRoutePlanner
-        extends DefaultHttpRoutePlanner
-    {
-
-        // ----------------------------------------------------------------------
-        // Implementation fields
-        // ----------------------------------------------------------------------
-
-        /**
-         * Set of patterns for matching hosts names against. Never null.
-         */
-        private final Set<Pattern> nonProxyHostPatterns;
-
-        // ----------------------------------------------------------------------
-        // Constructors
-        // ----------------------------------------------------------------------
-
-        NonProxyHostsAwareHttpRoutePlanner( final SchemeRegistry schemeRegistry,
-                                            final Set<Pattern> nonProxyHostPatterns )
-        {
-            super( schemeRegistry );
-            this.nonProxyHostPatterns = Preconditions.checkNotNull( nonProxyHostPatterns );
-        }
-
-        // ----------------------------------------------------------------------
-        // Public methods
-        // ----------------------------------------------------------------------
-
-        public HttpRoute determineRoute( final HttpHost target,
-                                         final HttpRequest request,
-                                         final HttpContext context )
-            throws HttpException
-        {
-            if ( request.getParams() instanceof ClientParamsStack )
-            {
-                request.setParams( new NonProxyHostParamsStack( (ClientParamsStack) request.getParams(), noProxyFor( target.getHostName() ) ) );
-            }
-            else
-            {
-                request.setParams( new NonProxyHostParamsStack( request.getParams(), noProxyFor( target.getHostName() ) ) );
-            }
-
-            return super.determineRoute( target, request, context );
-        }
-
-        // ----------------------------------------------------------------------
-        // Implementation methods
-        // ----------------------------------------------------------------------
-
-        private boolean noProxyFor( final String hostName )
-        {
-            for ( final Pattern nonProxyHostPattern : nonProxyHostPatterns )
-            {
-                if ( nonProxyHostPattern.matcher( hostName ).matches() )
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static class NonProxyHostParamsStack
-            extends ClientParamsStack
-        {
-
-            private final boolean filterProxy;
-
-            /**
-             * @param stack the parameter stack to delegate to
-             * @param filterProxy if {@code true}, always return null on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
-             */
-            public NonProxyHostParamsStack( final ClientParamsStack stack, final boolean filterProxy )
-            {
-                super( stack.getApplicationParams(), stack.getClientParams(), stack.getRequestParams(),
-                       stack.getOverrideParams() );
-                this.filterProxy = filterProxy;
-            }
-
-            /**
-             * @param params the parameters instance to delegate to
-             * @param filterProxy if {@code true}, always return null on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
-             */
-            public NonProxyHostParamsStack( final HttpParams params, final boolean filterProxy )
-            {
-                super( null, null, params, null );
-                this.filterProxy = filterProxy;
-            }
-
-            @Override
-            public Object getParameter( final String name )
-            {
-                return filterProxy && ConnRouteParams.DEFAULT_PROXY.equals( name ) ? null : super.getParameter( name );
-            }
-        }
+        return httpClientProvider.createHttpClient();
     }
 }
 
