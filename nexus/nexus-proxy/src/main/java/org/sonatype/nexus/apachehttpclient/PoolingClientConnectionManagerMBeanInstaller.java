@@ -87,6 +87,9 @@ public class PoolingClientConnectionManagerMBeanInstaller
                     "Failed to unregister mbean {} due to {}:{}",
                     new Object[]{ jmxName, e.getClass(), e.getMessage() }
                 );
+            }
+            finally
+            {
                 jmxName = null;
             }
         }
