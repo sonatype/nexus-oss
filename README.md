@@ -3,6 +3,16 @@
 A plugin for Sonatype Nexus 1.9.2.x or 2.X which recognizes RPMs in Nexus Maven repositories and generates 
 Yum metadata, so that RedHat-compatible system can use Nexus as software repository. 
 
+## Content
+
+1. [Audience](#audience)
+1. [History](#history)
+1. [Features](#features)
+1. [Help & Issues](#help--issues)
+1. [Installation](#installation)
+1. [Configuration](#configuration)
+1. [How to Build](#how-to-build)
+
 ## Audience
 
 The Nexus Yum Plugin is for all guys, who are deploying Java application for RedHat-compatible (RHEL, Centos, Fedora) servers and deploy via RPM.
