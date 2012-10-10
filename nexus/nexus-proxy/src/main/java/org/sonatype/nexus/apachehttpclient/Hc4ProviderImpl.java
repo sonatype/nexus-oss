@@ -48,7 +48,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.params.SyncBasicHttpParams;
 import org.apache.http.protocol.BasicHttpProcessor;
-import org.sonatype.inject.Nullable;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -157,43 +156,21 @@ public class Hc4ProviderImpl
      * 
      * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}.
      * @param userAgentBuilder UA builder component.
-     */
-    public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
-                            final UserAgentBuilder userAgentBuilder )
-    {
-        this( applicationConfiguration, userAgentBuilder, null );
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}.
-     * @param userAgentBuilder UA builder component.
      * @param multicaster the event multicaster
      */
     @Inject
     public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
-                            final UserAgentBuilder userAgentBuilder,
-                            @Nullable final ApplicationEventMulticaster multicaster )
+                            final UserAgentBuilder userAgentBuilder, final ApplicationEventMulticaster multicaster )
     {
         this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
         this.userAgentBuilder = Preconditions.checkNotNull( userAgentBuilder );
         this.sharedConnectionManager = createClientConnectionManager();
         this.evictingThread = new EvictingThread( sharedConnectionManager, getConnectionPoolKeepalive() );
         this.evictingThread.start();
-        if ( multicaster != null )
-        {
-            this.applicationEventMulticaster = multicaster;
-            this.applicationEventMulticaster.addEventListener( this );
-            getLogger().info( "{} started up (keep-alive {} millis), listening for shutdown.",
-                getClass().getSimpleName(), getConnectionPoolKeepalive() );
-        }
-        else
-        {
-            this.applicationEventMulticaster = null;
-            getLogger().info( "{} started up (keep-alive {} millis).", getClass().getSimpleName(),
-                getConnectionPoolKeepalive() );
-        }
+        this.applicationEventMulticaster = Preconditions.checkNotNull( multicaster );
+        this.applicationEventMulticaster.addEventListener( this );
+        getLogger().info( "{} started up (keep-alive {} millis), listening for shutdown.", getClass().getSimpleName(),
+            getConnectionPoolKeepalive() );
     }
 
     // configuration
@@ -283,10 +260,7 @@ public class Hc4ProviderImpl
     {
         evictingThread.interrupt();
         sharedConnectionManager.shutdown();
-        if ( applicationEventMulticaster != null )
-        {
-            applicationEventMulticaster.removeEventListener( this );
-        }
+        applicationEventMulticaster.removeEventListener( this );
         getLogger().info( "{} shut down.", getClass().getSimpleName() );
     }
 

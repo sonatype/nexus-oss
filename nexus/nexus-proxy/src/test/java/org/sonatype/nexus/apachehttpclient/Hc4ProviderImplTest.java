@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class Hc4ProviderImplTest
@@ -42,6 +43,9 @@ public class Hc4ProviderImplTest
 
     @Mock
     private UserAgentBuilder userAgentBuilder;
+    
+    @Mock
+    private ApplicationEventMulticaster multicaster;
 
     @Mock
     private RemoteStorageContext globalRemoteStorageContext;
@@ -62,7 +66,7 @@ public class Hc4ProviderImplTest
         setParameters();
         try
         {
-            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder );
+            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster );
 
             final HttpClient client = testSubject.createHttpClient();
             // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
@@ -82,6 +86,7 @@ public class Hc4ProviderImplTest
         }
         finally
         {
+            testSubject.shutdown();
             unsetParameters();
         }
     }
@@ -92,7 +97,7 @@ public class Hc4ProviderImplTest
         setParameters();
         try
         {
-            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder );
+            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster );
 
             // Note: explicitly created instance (like in case of proxies), it does pool and
             // returns customized client
@@ -115,6 +120,7 @@ public class Hc4ProviderImplTest
         }
         finally
         {
+            testSubject.shutdown();
             unsetParameters();
         }
     }

@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -156,6 +157,7 @@ public class HttpClientRemoteStorageTest
         throws Exception
     {
         setParameters();
+        Hc4ProviderImpl hc4Provider = null;
         try
         {
             // the foreplay: setting up
@@ -168,8 +170,9 @@ public class HttpClientRemoteStorageTest
             when( applicationConfiguration.getGlobalRemoteStorageContext() ).thenReturn( globalRemoteStorageContext );
 
             // real provider and initializing it with NexusStarted event
-            final Hc4ProviderImpl hc4Provider =
-                new Hc4ProviderImpl( applicationConfiguration, mock( UserAgentBuilder.class ) );
+            hc4Provider =
+                new Hc4ProviderImpl( applicationConfiguration, mock( UserAgentBuilder.class ),
+                    mock( ApplicationEventMulticaster.class ) );
 
             // the RRS instance we test
             final HttpClientRemoteStorage underTest =
@@ -227,6 +230,10 @@ public class HttpClientRemoteStorageTest
         }
         finally
         {
+            if ( hc4Provider != null )
+            {
+                hc4Provider.shutdown();
+            }
             unsetParameters();
         }
     }
