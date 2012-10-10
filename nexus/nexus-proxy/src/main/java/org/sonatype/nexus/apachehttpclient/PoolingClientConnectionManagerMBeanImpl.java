@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.apachehttpclient;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 import javax.management.StandardMBean;
 
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.sonatype.appcontext.internal.Preconditions;
 
 /**
  * Default {@link PoolingClientConnectionManagerMBean} implementation.
@@ -28,104 +28,72 @@ class PoolingClientConnectionManagerMBeanImpl
     implements PoolingClientConnectionManagerMBean
 {
 
-    private final WeakReference<PoolingClientConnectionManager> reference;
+    private final PoolingClientConnectionManager connMgr;
 
-    PoolingClientConnectionManagerMBeanImpl( final WeakReference<PoolingClientConnectionManager> reference )
+    PoolingClientConnectionManagerMBeanImpl( final PoolingClientConnectionManager connMgr )
     {
         super( PoolingClientConnectionManagerMBean.class, false );
 
-        this.reference = reference;
-    }
-
-    @Override
-    public boolean isInUse()
-    {
-        return reference.get() != null;
+        this.connMgr = Preconditions.checkNotNull( connMgr );
     }
 
     @Override
     public int getMaxTotal()
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        return connMgr == null ? 0 : connMgr.getMaxTotal();
+        return connMgr.getMaxTotal();
     }
 
     @Override
     public int getDefaultMaxPerRoute()
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        return connMgr == null ? 0 : connMgr.getDefaultMaxPerRoute();
+        return connMgr.getDefaultMaxPerRoute();
     }
 
     @Override
     public int getLeased()
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        return connMgr == null ? 0 : connMgr.getTotalStats().getLeased();
+        return connMgr.getTotalStats().getLeased();
     }
 
     @Override
     public int getPending()
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        return connMgr == null ? 0 : connMgr.getTotalStats().getPending();
+        return connMgr.getTotalStats().getPending();
     }
 
     @Override
     public int getAvailable()
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        return connMgr == null ? 0 : connMgr.getTotalStats().getAvailable();
+        return connMgr.getTotalStats().getAvailable();
     }
 
     @Override
     public int getMax()
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        return connMgr == null ? 0 : connMgr.getTotalStats().getMax();
+        return connMgr.getTotalStats().getMax();
     }
 
     @Override
     public void closeIdleConnections( final long idleTimeoutInMillis )
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        if ( connMgr == null )
-        {
-            throw new IllegalStateException( "Already released" );
-        }
         connMgr.closeIdleConnections( idleTimeoutInMillis, TimeUnit.MILLISECONDS );
     }
 
     @Override
     public void closeExpiredConnections()
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        if ( connMgr == null )
-        {
-            throw new IllegalStateException( "Already released" );
-        }
         connMgr.closeExpiredConnections();
     }
 
     @Override
     public void setMaxTotal( final int max )
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        if ( connMgr == null )
-        {
-            throw new IllegalStateException( "Already released" );
-        }
         connMgr.setMaxTotal( max );
     }
 
     @Override
     public void setDefaultMaxPerRoute( final int max )
     {
-        final PoolingClientConnectionManager connMgr = reference.get();
-        if ( connMgr == null )
-        {
-            throw new IllegalStateException( "Already released" );
-        }
         connMgr.setDefaultMaxPerRoute( max );
     }
 

@@ -22,8 +22,6 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 public interface PoolingClientConnectionManagerMBean
 {
 
-    boolean isInUse();
-
     int getMaxTotal();
 
     int getDefaultMaxPerRoute();

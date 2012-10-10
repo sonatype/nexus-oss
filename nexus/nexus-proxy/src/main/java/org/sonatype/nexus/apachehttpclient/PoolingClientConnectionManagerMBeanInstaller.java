@@ -13,7 +13,6 @@
 package org.sonatype.nexus.apachehttpclient;
 
 import java.lang.management.ManagementFactory;
-import java.lang.ref.WeakReference;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
@@ -51,11 +50,8 @@ public class PoolingClientConnectionManagerMBeanInstaller
                     JMX_DOMAIN, "name", PoolingClientConnectionManager.class.getSimpleName()
                 );
 
-                final WeakReference<PoolingClientConnectionManager> reference =
-                    new WeakReference<PoolingClientConnectionManager>( connectionManager );
-
                 final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-                server.registerMBean( new PoolingClientConnectionManagerMBeanImpl( reference ), jmxName );
+                server.registerMBean( new PoolingClientConnectionManagerMBeanImpl( connectionManager ), jmxName );
             }
             catch ( final Exception e )
             {
