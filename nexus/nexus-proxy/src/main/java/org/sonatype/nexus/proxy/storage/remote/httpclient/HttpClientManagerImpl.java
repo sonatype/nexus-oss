@@ -25,7 +25,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
-import org.sonatype.nexus.httpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;

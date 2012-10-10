@@ -28,7 +28,7 @@ import org.apache.http.protocol.HttpContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.sonatype.nexus.httpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
