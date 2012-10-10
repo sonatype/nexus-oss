@@ -152,6 +152,11 @@ public class Hc4ProviderImpl
     private final EvictingThread evictingThread;
 
     /**
+     * Used to install created {@link PoolingClientConnectionManager} into jmx.
+     */
+    private final PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
+
+    /**
      * Constructor.
      * 
      * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}.
@@ -160,17 +165,20 @@ public class Hc4ProviderImpl
      */
     @Inject
     public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
-                            final UserAgentBuilder userAgentBuilder, final ApplicationEventMulticaster multicaster )
+                            final UserAgentBuilder userAgentBuilder, final ApplicationEventMulticaster multicaster,
+                            final PoolingClientConnectionManagerMBeanInstaller jmxInstaller )
     {
         this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
         this.userAgentBuilder = Preconditions.checkNotNull( userAgentBuilder );
+        this.jmxInstaller = Preconditions.checkNotNull( jmxInstaller );
         this.sharedConnectionManager = createClientConnectionManager();
         this.evictingThread = new EvictingThread( sharedConnectionManager, getConnectionPoolKeepalive() );
         this.evictingThread.start();
         this.applicationEventMulticaster = Preconditions.checkNotNull( multicaster );
         this.applicationEventMulticaster.addEventListener( this );
+        this.jmxInstaller.register( sharedConnectionManager );
         getLogger().info( "{} started up (keep-alive {} millis), listening for shutdown.", getClass().getSimpleName(),
-            getConnectionPoolKeepalive() );
+                          getConnectionPoolKeepalive() );
     }
 
     // configuration
@@ -259,6 +267,7 @@ public class Hc4ProviderImpl
     public synchronized void shutdown()
     {
         evictingThread.interrupt();
+        jmxInstaller.unregister();
         sharedConnectionManager.shutdown();
         applicationEventMulticaster.removeEventListener( this );
         getLogger().info( "{} shut down.", getClass().getSimpleName() );
