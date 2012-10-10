@@ -25,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.apachehttpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.apachehttpclient.Hc4ProviderImpl;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -172,7 +173,8 @@ public class HttpClientRemoteStorageTest
             // real provider and initializing it with NexusStarted event
             hc4Provider =
                 new Hc4ProviderImpl( applicationConfiguration, mock( UserAgentBuilder.class ),
-                    mock( ApplicationEventMulticaster.class ) );
+                    mock( ApplicationEventMulticaster.class ),
+                    mock( PoolingClientConnectionManagerMBeanInstaller.class ) );
 
             // the RRS instance we test
             final HttpClientRemoteStorage underTest =

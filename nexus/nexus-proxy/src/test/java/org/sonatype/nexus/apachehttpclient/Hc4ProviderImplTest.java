@@ -50,6 +50,9 @@ public class Hc4ProviderImplTest
     @Mock
     private RemoteStorageContext globalRemoteStorageContext;
 
+    @Mock
+    private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
+
     @Before
     public void prepare()
     {
@@ -66,7 +69,7 @@ public class Hc4ProviderImplTest
         setParameters();
         try
         {
-            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster );
+            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster, jmxInstaller );
 
             final HttpClient client = testSubject.createHttpClient();
             // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
@@ -97,7 +100,7 @@ public class Hc4ProviderImplTest
         setParameters();
         try
         {
-            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster );
+            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster, jmxInstaller );
 
             // Note: explicitly created instance (like in case of proxies), it does pool and
             // returns customized client
