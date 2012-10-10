@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.noelios.restlet.http.HttpResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -53,6 +51,7 @@ import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -81,8 +80,10 @@ import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.security.SecuritySystem;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.noelios.restlet.ext.servlet.ServletCall;
 import com.noelios.restlet.http.HttpRequest;
+import com.noelios.restlet.http.HttpResponse;
 
 /**
  * This is an abstract resource handler that uses ResourceStore implementor and publishes those over REST.
@@ -878,6 +879,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
             else if ( t instanceof IllegalArgumentException )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+            }
+            else if ( t instanceof RemoteStorageTransportOverloadedException )
+            {
+                throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t );
             }
             else if ( t instanceof RepositoryNotAvailableException )
             {

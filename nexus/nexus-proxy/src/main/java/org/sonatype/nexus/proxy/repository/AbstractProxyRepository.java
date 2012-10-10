@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
+import org.sonatype.nexus.proxy.RemoteStorageTransportException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -1193,17 +1194,19 @@ public abstract class AbstractProxyRepository
                             }
 
                         }
-                        catch ( RemoteAccessDeniedException ex )
-                        {
-                            // NEXUS-4593 do not autoblock, 403 is "ok"
-
-                            // do not go remote, but we did not mark it as "remote checked" also.
-                            // let the user do proper setup and probably it will try again
-                            shouldGetRemote = false;
-                        }
                         catch ( RemoteStorageException ex )
                         {
-                            autoBlockProxying( ex );
+                            // NEXUS-4593 HTTP status 403 should not lead to autoblock
+                            if ( !( ex instanceof RemoteAccessDeniedException )
+                                && !( ex instanceof RemoteStorageTransportException ) )
+                            {
+                                autoBlockProxying( ex );
+                            }
+
+                            if ( ex instanceof RemoteStorageTransportException )
+                            {
+                                throw ex;
+                            }
 
                             // do not go remote, but we did not mark it as "remote checked" also.
                             // let the user do proper setup and probably it will try again
@@ -1237,10 +1240,16 @@ public abstract class AbstractProxyRepository
                         catch ( StorageException ex )
                         {
                             if ( ex instanceof RemoteStorageException
-                            // NEXUS-4593 HTTP status 403 should not lead to autoblock
-                                && !( ex instanceof RemoteAccessDeniedException ) )
+                                // NEXUS-4593 HTTP status 403 should not lead to autoblock
+                                && !( ex instanceof RemoteAccessDeniedException )
+                                && !( ex instanceof RemoteStorageTransportException ) )
                             {
                                 autoBlockProxying( ex );
+                            }
+
+                            if ( ex instanceof RemoteStorageTransportException )
+                            {
+                                throw ex;
                             }
 
                             remoteItem = null;
@@ -1553,6 +1562,13 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( RemoteStorageException e )
                         {
+                            // in case when we were unable to make outbound request
+                            // at all, do not retry
+                            if ( e instanceof RemoteStorageTransportException )
+                            {
+                                throw e;
+                            }
+
                             lastException = e;
 
                             selector.feedbackFailure( mirror );
