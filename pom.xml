@@ -141,7 +141,7 @@
             <!--<arguments>-Prelease</arguments>-->
             <arguments>${arguments}</arguments>
             <preparationGoals /> 
-            <releaseProfiles>release</releaseProfiles>
+            <releaseProfiles>release,optimize-js</releaseProfiles>
             <tagNameFormat>nexus-@{version}</tagNameFormat>
           </configuration>
         </plugin>

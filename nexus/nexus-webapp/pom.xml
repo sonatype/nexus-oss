@@ -272,136 +272,114 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>net.sf.alchim</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>0.7.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>2.0.1</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
-            <id>jsfiles</id>
+            <id>aggregate</id>
+
             <goals>
               <goal>compress</goal>
             </goals>
+
             <configuration>
+              <nosuffix>true</nosuffix>
+              <outputDirectory>${project.build.directory}/generated-sources/yuicompressor</outputDirectory>
+              <sourceDirectory>${project.basedir}/src/main/webapp</sourceDirectory>
+
+              <includes>
+                <include>js/**/*.js</include>
+                <include>style/**/*.css</include>
+              </includes>
+
               <aggregations>
                 <aggregation>
+                  <insertNewLine>true</insertNewLine>
                   <output>${compressed-dir}/js/sonatype-all.js</output>
-                  <!-- files to include, path relative to output's directory or absolute path -->
+                  <inputDir>${project.build.directory}/generated-sources/yuicompressor/js</inputDir>
                   <includes>
                     <include>${basedir}/src/main/webapp/ext-2.3/adapter/ext/ext-base.js</include>
                     <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
-                    <include>${compressed-dir}/js/nexus/common.js</include>
-                    <include>${compressed-dir}/js/nexus/error/common.js</include>
-                    <include>${compressed-dir}/js/nexus/error/ErrorHandler.js</include>
-                    <include>${compressed-dir}/js/nexus/util/common.js</include>
-                    <include>${compressed-dir}/js/nexus/util/Format.js</include>
-                    <include>${compressed-dir}/js/extensions/ext-override.js</include>
-                    <include>${compressed-dir}/js/filetree/js/Ext.ux.form.BrowseButton.js</include>
-                    <include>${compressed-dir}/js/groupcombo/groupcombo.js</include>
-                    <include>${compressed-dir}/js/groupcombo/groupdataview.js</include>
-                    <include>${compressed-dir}/js/Sonatype.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.messagebox.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.form.js</include>
-                    <include>${compressed-dir}/js/extensions/SearchField.js</include>
-                    <include>${compressed-dir}/js/extensions/Sonatype.ext.FeedGrid.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.tree.js</include>
-                    <include>${compressed-dir}/js/extensions/ext.util.md5.js</include>
-                    <include>${compressed-dir}/js/extensions/MultiSelectTree.js</include>
-                    <include>${compressed-dir}/js/extensions/TwinPanelController.js</include>
-                    <include>${compressed-dir}/js/extensions/TextEntryList.js</include>
-                    <include>${compressed-dir}/js/extensions/Sonatype.events.js</include>
-                    <include>${compressed-dir}/js/extensions/Sonatype.navigation.js</include>
-                    <include>${compressed-dir}/js/extensions/Sonatype.panels.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.ux.form.LovCombo.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.ux.ThemeCombo.js</include>
-                    <include>${compressed-dir}/js/extensions/RoleSelector.js</include>
-                    <include>${compressed-dir}/js/nexus/form/common.js</include>
-                    <include>${compressed-dir}/js/nexus/form/LabelField.js</include>
-                    <include>${compressed-dir}/js/Sonatype.utils.js</include>
-                    <include>${compressed-dir}/js/Sonatype.config.js</include>
-                    <include>${compressed-dir}/js/Sonatype.lib.js</include>
-                    <include>${compressed-dir}/js/Sonatype.resources.js</include>
-                    <include>${compressed-dir}/js/Sonatype.headLinks.js</include>
-                    <include>${compressed-dir}/js/Sonatype.view.js</include>
-                    <include>${compressed-dir}/js/extensions/ZeroClipboard.js</include>
-                    <include>${compressed-dir}/js/formFieldGenerator.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.referenceData.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.resources.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.FeedViewPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.ArtifactContainer.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.LogsViewPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.ServerEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RoutesEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.SchedulesEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.UserEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RoleEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.PrivilegeEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.AbstractRepoPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.FileUploadPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoMaintPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepositoryBrowserContainer.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.GroupsEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoServer.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoTargetEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.helpAbout.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.Documentation.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.LogEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.MirrorConfigPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.UserBrowserPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoSummaryPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.Maven2InformationPanel.js</include>
-                    <include>${compressed-dir}/js/nexus/profile/common.js</include>
-                    <include>${compressed-dir}/js/nexus/profile/UserProfile.js</include>
-                    <include>${compressed-dir}/js/nexus/profile/Summary.js</include>
+                    <include>nexus/common.js</include>
+                    <include>nexus/error/common.js</include>
+                    <include>nexus/error/ErrorHandler.js</include>
+                    <include>nexus/util/common.js</include>
+                    <include>nexus/util/Format.js</include>
+                    <include>extensions/ext-override.js</include>
+                    <include>filetree/js/Ext.ux.form.BrowseButton.js</include>
+                    <include>groupcombo/groupcombo.js</include>
+                    <include>groupcombo/groupdataview.js</include>
+                    <include>Sonatype.js</include>
+                    <include>extensions/Ext.messagebox.js</include>
+                    <include>extensions/Ext.form.js</include>
+                    <include>extensions/SearchField.js</include>
+                    <include>extensions/Sonatype.ext.FeedGrid.js</include>
+                    <include>extensions/Ext.tree.js</include>
+                    <include>extensions/ext.util.md5.js</include>
+                    <include>extensions/MultiSelectTree.js</include>
+                    <include>extensions/TwinPanelController.js</include>
+                    <include>extensions/TextEntryList.js</include>
+                    <include>extensions/Sonatype.events.js</include>
+                    <include>extensions/Sonatype.navigation.js</include>
+                    <include>extensions/Sonatype.panels.js</include>
+                    <include>extensions/Ext.ux.form.LovCombo.js</include>
+                    <include>extensions/Ext.ux.ThemeCombo.js</include>
+                    <include>extensions/RoleSelector.js</include>
+                    <include>nexus/form/common.js</include>
+                    <include>nexus/form/LabelField.js</include>
+                    <include>Sonatype.utils.js</include>
+                    <include>Sonatype.config.js</include>
+                    <include>Sonatype.lib.js</include>
+                    <include>Sonatype.resources.js</include>
+                    <include>Sonatype.headLinks.js</include>
+                    <include>Sonatype.view.js</include>
+                    <include>extensions/ZeroClipboard.js</include>
+                    <include>formFieldGenerator.js</include>
+                    <include>repoServer/repoServer.referenceData.js</include>
+                    <include>repoServer/repoServer.resources.js</include>
+                    <include>repoServer/repoServer.FeedViewPanel.js</include>
+                    <include>repoServer/repoServer.ArtifactContainer.js</include>
+                    <include>repoServer/repoServer.LogsViewPanel.js</include>
+                    <include>repoServer/repoServer.ServerEditPanel.js</include>
+                    <include>repoServer/repoServer.RoutesEditPanel.js</include>
+                    <include>repoServer/repoServer.SchedulesEditPanel.js</include>
+                    <include>repoServer/repoServer.UserEditPanel.js</include>
+                    <include>repoServer/repoServer.RoleEditPanel.js</include>
+                    <include>repoServer/repoServer.PrivilegeEditPanel.js</include>
+                    <include>repoServer/repoServer.AbstractRepoPanel.js</include>
+                    <include>repoServer/repoServer.FileUploadPanel.js</include>
+                    <include>repoServer/repoServer.RepoMaintPanel.js</include>
+                    <include>repoServer/repoServer.RepositoryBrowserContainer.js</include>
+                    <include>repoServer/repoServer.RepoEditPanel.js</include>
+                    <include>repoServer/repoServer.GroupsEditPanel.js</include>
+                    <include>repoServer/repoServer.RepoServer.js</include>
+                    <include>repoServer/repoServer.RepoTargetEditPanel.js</include>
+                    <include>repoServer/repoServer.helpAbout.js</include>
+                    <include>repoServer/repoServer.Documentation.js</include>
+                    <include>repoServer/repoServer.LogEditPanel.js</include>
+                    <include>repoServer/repoServer.MirrorConfigPanel.js</include>
+                    <include>repoServer/repoServer.UserBrowserPanel.js</include>
+                    <include>repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
+                    <include>repoServer/repoServer.RepoSummaryPanel.js</include>
+                    <include>repoServer/repoServer.Maven2InformationPanel.js</include>
+                    <include>nexus/profile/common.js</include>
+                    <include>nexus/profile/UserProfile.js</include>
+                    <include>nexus/profile/Summary.js</include>
                   </includes>
                 </aggregation>
-              </aggregations>
-            </configuration>
-          </execution>
-          <execution>
-            <id>cssfiles</id>
-            <goals>
-              <goal>compress</goal>
-            </goals>
-            <configuration>
-              <aggregations>
                 <aggregation>
                   <output>${compressed-dir}/style/sonatype-all.css</output>
+                  <inputDir>${project.build.directory}/generated-sources/yuicompressor/style</inputDir>
                   <!-- files to include, path relative to output's directory or absolute path -->
                   <includes>
-                    <include>${compressed-dir}/style/Ext.ux.form.LovCombo.css</include>
-                    <include>${compressed-dir}/style/Sonatype.css</include>
+                    <include>Ext.ux.form.LovCombo.css</include>
+                    <include>Sonatype.css</include>
                   </includes>
                 </aggregation>
               </aggregations>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <outputDirectory>${compressed-dir}</outputDirectory>
-          <sourceDirectory>${basedir}/src/main/webapp</sourceDirectory>
-          <webappDirectory>${compressed-dir}</webappDirectory>
-          <nosuffix>true</nosuffix>
-          <nomunge>true</nomunge>
-          <jswarn>false</jswarn>
-          <excludes>
-            <exclude>**/ext-2.3/**/*.js</exclude>
-          </excludes>
-          <aggregations>
-            <aggregation>
-              <!-- insert new line after each concatenation (default: false) -->
-              <insertNewLine>true</insertNewLine>
-            </aggregation>
-          </aggregations>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -522,4 +500,35 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>jslint</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>net.alchim31.maven</groupId>
+            <artifactId>yuicompressor-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jslint</id>
+                <goals>
+                  <goal>jslint</goal>
+                </goals>
+                <configuration>
+                  <failOnWarning>true</failOnWarning>
+
+                  <!-- jslint goal will include sources in src/main/webapp by default -->
+                  <!-- only include new js resources following the Nexus.* namespace -->
+                  <includes>
+                    <include>js/nexus/**/*.js</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
