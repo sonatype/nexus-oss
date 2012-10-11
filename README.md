@@ -79,7 +79,7 @@ Default:
 ### Example
 
 Example *yum.xml*:
-
+```xml
 	<?xml version="1.0" encoding="UTF-8"?>
 	<configuration>
 	  <!-- timeout for requests for a filtered (versionized) repository -->
@@ -108,7 +108,8 @@ Example *yum.xml*:
 	    </aliasMapping>
 	  </aliasMappings>
 	</configuration>
-	
+```
+
 ## Getting Started
 
 Here we provide some typical scenarios in which the _nexus-yum-plugin_ is used.
@@ -120,6 +121,7 @@ Here we provide some typical scenarios in which the _nexus-yum-plugin_ is used.
 Assume you have a standard Java web application build with [Maven][3]. To build a RPM of your WAR file you could
 use the [rpm-maven-plugin][12] by Codehaus. Its goal _attached-rpm_ automatically attaches the RPM file as Maven 
 build artifact so that the RPM is uploaded to Nexus in the _deploy_ phase. A minimal _pom.xml_ would look like this:
+```xml
 	<?xml version="1.0" encoding="UTF-8"?>
 	<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	  <modelVersion>4.0.0</modelVersion>
@@ -174,6 +176,7 @@ build artifact so that the RPM is uploaded to Nexus in the _deploy_ phase. A min
 	    </repository>
 	  </distributionManagement>
 	</project>
+```
 	
 #### Deploy RPM to Nexus
 	
