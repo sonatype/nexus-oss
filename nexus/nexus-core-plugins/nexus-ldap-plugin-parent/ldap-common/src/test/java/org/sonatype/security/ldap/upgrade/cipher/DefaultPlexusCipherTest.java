@@ -12,14 +12,13 @@
  */
 package org.sonatype.security.ldap.upgrade.cipher;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 /**
  * Test the Plexus Cipher container
- *
+ * 
  * @author Oleg Gusakov
  * @version $Id$
  */
@@ -45,22 +44,6 @@ public class DefaultPlexusCipherTest
     }
 
     // -------------------------------------------------------------
-    @Test
-    public void testDefaultAlgorithmExists()
-        throws Exception
-    {
-        if ( StringUtils.isEmpty( pc.algorithm ) )
-            throw new Exception( "No default algoritm found in DefaultPlexusCipher" );
-
-        String[] res = CryptoUtils.getCryptoImpls( "Cipher" );
-        Assert.assertNotNull( "No Cipher providers found in the current environment", res );
-
-        for ( String provider : res )
-            if ( pc.algorithm.equalsIgnoreCase( provider ) )
-                return;
-
-        throw new Exception( "Cannot find default algorithm " + pc.algorithm + " in the current environment." );
-    }
 
     // intentionally not a test?
     public void stestFindDefaultAlgorithm()
