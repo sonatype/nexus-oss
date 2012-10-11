@@ -80,34 +80,34 @@ Default:
 
 Example *yum.xml*:
 ```xml
-	<?xml version="1.0" encoding="UTF-8"?>
-	<configuration>
-	  <!-- timeout for requests for a filtered (versionized) repository -->
-	  <repositoryCreationTimeout>150</repositoryCreationTimeout><!-- in seconds -->
-	  
-	  <!-- enables or disables the creation of a repository of repositories -->
-	  <repositoryOfRepositoryVersionsActive>true</repositoryOfRepositoryVersionsActive>
-	  
-	  <!-- enables or disables of delete rpm events via nexus -->
-	  <deleteProcessing>true</deleteProcessing>
-	  
-	  <!-- delay after which the rebuild of a repository is triggered in which one or more rpms got deleted -->
-	  <delayAfterDeletion>10</delayAfterDeletion><!-- in seconds -->
-	  
-	  <!-- configured aliases -->
-	  <aliasMappings>
-	    <aliasMapping>
-	      <repoId>releases</repoId>
-	      <alias>trunk</alias>
-	      <version>5.1.15-2</version>
-	    </aliasMapping>
-	    <aliasMapping>
-	      <repoId>releases</repoId>
-	      <alias>production</alias>
-	      <version>5.1.15-1</version>
-	    </aliasMapping>
-	  </aliasMappings>
-	</configuration>
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- timeout for requests for a filtered (versionized) repository -->
+  <repositoryCreationTimeout>150</repositoryCreationTimeout><!-- in seconds -->
+  
+  <!-- enables or disables the creation of a repository of repositories -->
+  <repositoryOfRepositoryVersionsActive>true</repositoryOfRepositoryVersionsActive>
+  
+  <!-- enables or disables of delete rpm events via nexus -->
+  <deleteProcessing>true</deleteProcessing>
+  
+  <!-- delay after which the rebuild of a repository is triggered in which one or more rpms got deleted -->
+  <delayAfterDeletion>10</delayAfterDeletion><!-- in seconds -->
+  
+  <!-- configured aliases -->
+  <aliasMappings>
+    <aliasMapping>
+      <repoId>releases</repoId>
+      <alias>trunk</alias>
+      <version>5.1.15-2</version>
+    </aliasMapping>
+    <aliasMapping>
+      <repoId>releases</repoId>
+      <alias>production</alias>
+      <version>5.1.15-1</version>
+    </aliasMapping>
+  </aliasMappings>
+</configuration>
 ```
 
 ## Getting Started
@@ -122,60 +122,60 @@ Assume you have a standard Java web application build with [Maven][3]. To build 
 use the [rpm-maven-plugin][12] by Codehaus. Its goal _attached-rpm_ automatically attaches the RPM file as Maven 
 build artifact so that the RPM is uploaded to Nexus in the _deploy_ phase. A minimal _pom.xml_ would look like this:
 ```xml
-	<?xml version="1.0" encoding="UTF-8"?>
-	<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	  <modelVersion>4.0.0</modelVersion>
-	  <groupId>org.sonatype.nexus.yum.its</groupId>
-	  <artifactId>war-rpm-test</artifactId>
-	  <version>1.0</version>
-	  <packaging>war</packaging>
-	  <build>
-	    <plugins>
-	      <!-- use rpm-maven-plugin to package the war into an rpm -->
-	      <plugin>
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>rpm-maven-plugin</artifactId>
-	        <version>2.1-alpha-2</version>
-	        <executions>
-	          <execution>
-	            <id>build-rpm</id>
-	            <goals>
-	           	  <!-- this goal automatically adds the rpm as Maven build artifact -->
-	              <goal>attached-rpm</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	        <configuration>
-	          <group>Applications/Internet</group>
-	          <copyright>EPL</copyright>
-	          <!-- require tomcat6 as webapp container -->
-	          <requires>
-	            <require>tomcat6</require>
-	          </requires>
-	          <mappings>
-	            <mapping>
-	              <!-- put webapp files to standard tomcat6 webapps directory -->
-	              <directory>/var/lib/tomcat6/webapps/${project.build.finalName}</directory>
-	              <sources>
-	                <source>
-	                  <location>${project.build.directory}/${project.build.finalName}</location>
-	                </source>
-	              </sources>
-	            </mapping>
-	          </mappings>
-	        </configuration>
-	      </plugin>
-	    </plugins>
-	  </build>
-	  <!-- deploy build artifacts (pom,war,rpm) to Nexus --> 
-	  <distributionManagement>
-	    <repository>
-	      <id>releases</id>
-	      <name>Releases Repository</name>
-	      <url>http://your.nexus.domain/nexus/content/repositories/releases</url>
-	    </repository>
-	  </distributionManagement>
-	</project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.nexus.yum.its</groupId>
+  <artifactId>war-rpm-test</artifactId>
+  <version>1.0</version>
+  <packaging>war</packaging>
+  <build>
+    <plugins>
+      <!-- use rpm-maven-plugin to package the war into an rpm -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>rpm-maven-plugin</artifactId>
+        <version>2.1-alpha-2</version>
+        <executions>
+          <execution>
+            <id>build-rpm</id>
+            <goals>
+           	  <!-- this goal automatically adds the rpm as Maven build artifact -->
+              <goal>attached-rpm</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <group>Applications/Internet</group>
+          <copyright>EPL</copyright>
+          <!-- require tomcat6 as webapp container -->
+          <requires>
+            <require>tomcat6</require>
+          </requires>
+          <mappings>
+            <mapping>
+              <!-- put webapp files to standard tomcat6 webapps directory -->
+              <directory>/var/lib/tomcat6/webapps/${project.build.finalName}</directory>
+              <sources>
+                <source>
+                  <location>${project.build.directory}/${project.build.finalName}</location>
+                </source>
+              </sources>
+            </mapping>
+          </mappings>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <!-- deploy build artifacts (pom,war,rpm) to Nexus --> 
+  <distributionManagement>
+    <repository>
+      <id>releases</id>
+      <name>Releases Repository</name>
+      <url>http://your.nexus.domain/nexus/content/repositories/releases</url>
+    </repository>
+  </distributionManagement>
+</project>
 ```
 	
 #### Deploy RPM to Nexus
