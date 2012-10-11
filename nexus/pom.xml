@@ -1619,30 +1619,49 @@
         </plugin>
 
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>0.0.2</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>aggregate</goal>
-              </goals>
-              <configuration>
-                <nosuffix>true</nosuffix>
-                <nomunge>true</nomunge>
-                <nominify>${debug-js}</nominify>
-                <jswarn>false</jswarn>
-                <insertNewLine>true</insertNewLine>
-                <disableOptimizations>true</disableOptimizations>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.3.2</version>
+          <configuration>
+            <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
+            <outputDirectory>${project.build.directory}/generated-sources/yuicompressor</outputDirectory>
+
+            <includes>
+              <include>js/**/*.js</include>
+              <include>css/**/*.css</include>
+            </includes>
+
+            <nosuffix>true</nosuffix>
+            <insertNewLine>true</insertNewLine>
+          </configuration>
+          <executions>
+            <execution>
+              <id>aggregate</id>
+
+              <goals>
+                <goal>compress</goal>
+              </goals>
+
+              <configuration>
+                <aggregations>
+                  <aggregation>
+                    <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
+                    <output>${project.build.directory}/classes/static/js/${project.artifactId}-all.js</output>
+                    <includes>
+                      <include>**/*.js</include>
+                    </includes>
+                  </aggregation>
+                  <aggregation>
+                    <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
+                    <output>${project.build.directory}/classes/static/css/${project.artifactId}-all.css</output>
+                    <includes>
+                      <include>**/*.css</include>
+                    </includes>
+                  </aggregation>
+                </aggregations>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
 
         <plugin>
@@ -2208,7 +2227,7 @@
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
-                <mojoExecution>org.sonatype.plugins:yuicompressor-maven-plugin::</mojoExecution>
+                <mojoExecution>net.alchim31.maven:yuicompressor-maven-plugin::</mojoExecution>
               </mojoExecutions>
             </configuration>
           </plugin>

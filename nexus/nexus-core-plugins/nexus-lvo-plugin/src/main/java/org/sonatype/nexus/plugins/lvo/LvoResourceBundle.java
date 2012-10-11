@@ -21,6 +21,10 @@ import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 
+/**
+ * Usually Nexus exports /static/... URLs by default, but only for nexus-plugin packaging.
+ * LVO is called plugin, but it's not (packaging=jar).
+ */
 @Component( role = NexusResourceBundle.class, hint = "LvoResourceBundle" )
 public class LvoResourceBundle
     extends AbstractNexusResourceBundle
@@ -30,8 +34,9 @@ public class LvoResourceBundle
     {
         List<StaticResource> result = new ArrayList<StaticResource>();
 
+        // explicitely add /static/js resource
         result.add( new DefaultStaticResource( getClass().getResource( "/static/js/nexus-lvo-plugin-all.js" ),
-                                               "/js/repoServer/nexus-lvo-plugin-all.js", "application/x-javascript" ) );
+                                               "/static/js/nexus-lvo-plugin-all.js", "application/x-javascript" ) );
 
         return result;
     }

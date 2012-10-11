@@ -283,8 +283,6 @@
             </goals>
 
             <configuration>
-              <nosuffix>true</nosuffix>
-              <outputDirectory>${project.build.directory}/generated-sources/yuicompressor</outputDirectory>
               <sourceDirectory>${project.basedir}/src/main/webapp</sourceDirectory>
 
               <includes>
