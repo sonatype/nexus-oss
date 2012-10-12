@@ -18,11 +18,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
@@ -41,6 +43,7 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
+import org.sonatype.security.rest.model.UserChangePasswordResource;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -300,4 +303,46 @@ public abstract class AbstractSecurityPlexusResource
         return value;
     }
 
+    @Override
+    public void configureXStream( final XStream xstream )
+    {
+        super.configureXStream( xstream );
+        xstream.registerLocalConverter( UserChangePasswordResource.class, "oldPassword", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( UserChangePasswordResource.class, "newPassword", new HtmlUnescapeStringConverter( true ) );
+    }
+
+    private class HtmlUnescapeStringConverter
+        extends StringConverter
+    {
+        /**
+         * A flag denoting should we ignore flakey clients or not.
+         */
+        private final boolean nullResilient;
+
+        public HtmlUnescapeStringConverter()
+        {
+            this( false );
+        }
+
+        public HtmlUnescapeStringConverter( boolean nullResilient )
+        {
+            this.nullResilient = nullResilient;
+        }
+
+        @Override
+        public boolean canConvert( Class type )
+        {
+            if ( nullResilient && type == null )
+            {
+                return true;
+            }
+            return super.canConvert( type );
+        }
+
+        @Override
+        public Object fromString( String str )
+        {
+            return StringEscapeUtils.unescapeHtml( str );
+        }
+    }
 }
