@@ -30,6 +30,15 @@ Nexus.profile.Summary = function(config) {
 
   items = [
     {
+      // NEXUS-5294 Disable Save for external users
+      xtype : 'panel',
+      cls : 'x-form-invalid-msg',
+      border : false,
+      html : 'Externally configured users are read-only (' + Sonatype.user.curr.loggedInUserSource + ')',
+      hidden : !isExternalUser,
+      width : this.FIELD_WIDTH * 2
+    },
+    {
       xtype : 'textfield',
       fieldLabel : 'User ID',
       itemCls : 'required-field',
@@ -130,6 +139,11 @@ Nexus.profile.Summary = function(config) {
   // otherwise, `payload.data.resourceUri` is used as is.
   this.payload = {
     id : this.username
+  };
+
+  // NEXUS-5294 Disable Save for external users
+  this.isValid = function() {
+    return !isExternalUser && Nexus.profile.Summary.superclass.isValid.apply(this, arguments);
   };
 
   // mandatory call
