@@ -55,7 +55,7 @@ public class UIDLockResource
     public static final String PATH = "path";
 
     public static final String RESOURCE_URI =
-        "/nexus-it-helper-plugin/uid/lock/{" + REPOSITORY + "}/{" + LOCK_TYPE + "}/{" + PATH + "}";
+        "/nexus-it-helper-plugin/uid/lock/{" + REPOSITORY + "}/{" + LOCK_TYPE + "}";
 
     private final RepositoryRegistry repositoryRegistry;
 
@@ -138,7 +138,7 @@ public class UIDLockResource
 
     private String getPath( final Request request )
     {
-        return request.getAttributes().get( PATH ).toString();
+        return request.getResourceRef().getRemainingPart( false, false );
     }
 
     private class LockThread
