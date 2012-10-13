@@ -322,20 +322,30 @@ public class Hc4ProviderImpl
 
     // ==
 
+    /**
+     * Sub-classed here to customize the http processor and to keep a sane logger name.
+     */
+    private static class DefaultHttpClientImpl
+        extends DefaultHttpClient
+    {
+        private DefaultHttpClientImpl( final ClientConnectionManager conman, final HttpParams params )
+        {
+            super( conman, params );
+        }
+
+        @Override
+        protected BasicHttpProcessor createHttpProcessor()
+        {
+            final BasicHttpProcessor result = super.createHttpProcessor();
+            result.addResponseInterceptor( new ResponseContentEncoding() );
+            return result;
+        }
+    }
+
     protected DefaultHttpClient createHttpClient( final RemoteStorageContext context,
                                                   final ClientConnectionManager clientConnectionManager )
     {
-        final DefaultHttpClient httpClient =
-            new DefaultHttpClient( clientConnectionManager, createHttpParams( context ) )
-            {
-                @Override
-                protected BasicHttpProcessor createHttpProcessor()
-                {
-                    final BasicHttpProcessor result = super.createHttpProcessor();
-                    result.addResponseInterceptor( new ResponseContentEncoding() );
-                    return result;
-                }
-            };
+        final DefaultHttpClient httpClient = new DefaultHttpClientImpl( clientConnectionManager, createHttpParams( context ) );
         configureAuthentication( httpClient, context.getRemoteAuthenticationSettings(), null );
         configureProxy( httpClient, context.getRemoteProxySettings() );
         return httpClient;
