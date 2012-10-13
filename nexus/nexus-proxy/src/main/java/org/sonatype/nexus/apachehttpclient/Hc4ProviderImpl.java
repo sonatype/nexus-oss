@@ -185,8 +185,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool max size.
-     * 
-     * @param context
+     *
      * @return pool max size
      */
     protected int getConnectionPoolMaxSize()
@@ -196,9 +195,8 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool size per route.
-     * 
-     * @param context
-     * @return pool per route sizw
+     *
+     * @return pool per route size
      */
     protected int getConnectionPoolSize()
     {
@@ -207,8 +205,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the keep alive (idle open) time in milliseconds.
-     * 
-     * @param context
+     *
      * @return keep alive in milliseconds.
      */
     protected long getConnectionPoolKeepalive()
@@ -218,8 +215,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool timeout in milliseconds.
-     * 
-     * @param context
+     *
      * @return pool timeout in milliseconds.
      */
     protected long getConnectionPoolTimeout()
