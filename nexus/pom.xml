@@ -153,8 +153,8 @@
     <sonatype.plugin.version>1.1.0</sonatype.plugin.version>
     
     <!-- Logging -->
-    <slf4j.version>1.6.4</slf4j.version>
-    <logback.version>1.0.0</logback.version>
+    <slf4j.version>1.7.2</slf4j.version>
+    <logback.version>1.0.7</logback.version>
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
 
     <aether.version>1.13.1</aether.version>
@@ -701,7 +701,7 @@
           </exclusion>
         </exclusions>
       </dependency>
-	
+
       <!-- Maven -->
       <dependency>
         <groupId>org.apache.maven</groupId>
