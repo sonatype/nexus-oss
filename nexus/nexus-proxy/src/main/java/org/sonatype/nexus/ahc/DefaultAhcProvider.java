@@ -30,6 +30,10 @@ import com.ning.http.client.AsyncHttpClientConfig.Builder;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
 
+/**
+ * @deprecated Use httpclient4 components instead
+ */
+@Deprecated
 @Component( role = AhcProvider.class )
 public class DefaultAhcProvider
     implements AhcProvider

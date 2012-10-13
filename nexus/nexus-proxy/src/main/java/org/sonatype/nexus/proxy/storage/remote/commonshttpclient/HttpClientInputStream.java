@@ -20,7 +20,10 @@ import org.sonatype.nexus.util.WrappingInputStream;
 
 /**
  * The Class HttpClientInputStream.
+ *
+ * @deprecated Use httpclient4 components instead
  */
+@Deprecated
 public class HttpClientInputStream
     extends WrappingInputStream
 {

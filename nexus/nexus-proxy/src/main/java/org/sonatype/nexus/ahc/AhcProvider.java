@@ -22,7 +22,10 @@ import com.ning.http.client.AsyncHttpClientConfig;
  * A provider component for AsyncHttpClient.
  * 
  * @author cstamas
+ *
+ * @deprecated Use httpclient4 components instead
  */
+@Deprecated
 public interface AhcProvider
 {
     /**

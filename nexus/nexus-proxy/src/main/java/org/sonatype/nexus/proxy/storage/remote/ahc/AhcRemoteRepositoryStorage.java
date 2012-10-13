@@ -48,7 +48,10 @@ import com.ning.http.client.Response;
  * AsyncHttpClient powered RemoteRepositoryStorage.
  *
  * @author cstamas
+ *
+ * @deprecated Use httpclient4 components instead
  */
+@Deprecated
 @Named( AhcRemoteRepositoryStorage.PROVIDER_STRING )
 @Singleton
 public class AhcRemoteRepositoryStorage

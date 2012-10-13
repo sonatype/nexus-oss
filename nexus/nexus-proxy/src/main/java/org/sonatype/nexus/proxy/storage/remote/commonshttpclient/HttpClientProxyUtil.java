@@ -37,6 +37,10 @@ import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationS
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
+/**
+ * @deprecated Use httpclient4 components instead
+ */
+@Deprecated
 public class HttpClientProxyUtil
 {
 

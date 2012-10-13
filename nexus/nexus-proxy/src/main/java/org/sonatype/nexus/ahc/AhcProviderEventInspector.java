@@ -29,7 +29,10 @@ import org.sonatype.plexus.appevents.Event;
  * lacks ("what" is changed).
  * 
  * @author cstamas
+ *
+ * @deprecated Use httpclient4 components instead
  */
+@Deprecated
 @Component( role = EventInspector.class, hint = "AhcProviderEventInspector" )
 public class AhcProviderEventInspector
     extends AbstractEventInspector
