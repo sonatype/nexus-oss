@@ -183,7 +183,7 @@
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
-    <shiro.version>1.2.0</shiro.version>
+    <shiro.version>1.2.1</shiro.version>
     <spice-timeline.version>2.1</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
     <surefire.version>2.10</surefire.version>
