@@ -357,8 +357,6 @@
             <type>zip</type>
             <classifier>bundle</classifier>
           </nexusBundleArtifact>
-          <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
-          <nexusVersion>${nexus.version}</nexusVersion>
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus.plugins</groupId>
