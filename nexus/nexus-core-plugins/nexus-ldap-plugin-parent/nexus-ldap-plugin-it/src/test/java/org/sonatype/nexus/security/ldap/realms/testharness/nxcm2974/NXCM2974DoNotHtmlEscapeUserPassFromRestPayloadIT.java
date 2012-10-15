@@ -58,14 +58,7 @@ public class NXCM2974DoNotHtmlEscapeUserPassFromRestPayloadIT
         responseConnInfo.setSystemPassword( "" );
         request.setSystemPassword( "" );
 
-        assertThat( responseConnInfo, equalTo( request ) );
-
-        // test for correct ldap config
-        File ldapConfigFile = new File( WORK_CONF_DIR, "/ldap.xml" );
-        assertThat( "cannot find ldap config", ldapConfigFile.exists() );
-        assertThat( FileUtils.readFileToString( ldapConfigFile ), containsString( "more&amp;more" ) );
-
-        connUtil.validateLdapConfig( getConnectionInfo() );
+        // LdapConnUtil is checking file config and response object
 
         Response response = connUtil.sendTestMessage( getConnectionInfo() );
         try
@@ -87,8 +80,6 @@ public class NXCM2974DoNotHtmlEscapeUserPassFromRestPayloadIT
 
         connUtil.updateConnectionInfo( getConnectionInfo() );
         LdapUserAndGroupConfigurationDTO userGroupConfig = userUtil.updateUserGroupConfig( getUserGroupConf() );
-
-        assertThat( userGroupConfig, equalTo( getUserGroupConf() ) );
 
         userUtil.validateLdapConfig( getUserGroupConf() );
         Response response = userUtil.sendTestMessage( getTestUserGroupRequest() );

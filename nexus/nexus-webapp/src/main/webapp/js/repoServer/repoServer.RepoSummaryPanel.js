@@ -10,8 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Sonatype.repoServer.AbstractRepositorySummaryPanel = function(config) {
-  var config = config || {};
+/*global Ext,Sonatype,Nexus*/
+Sonatype.repoServer.AbstractRepositorySummaryPanel = function(cfg) {
+  var config = cfg || {};
   var defaultConfig = {};
 
   Ext.apply(this, config, defaultConfig);
@@ -97,6 +98,7 @@ Sonatype.repoServer.HostedRepositorySummaryPanel = function(config) {
               hidden : true
             }, {
               xtype : 'textarea',
+              htmlDecode : false,
               name : 'distMgmtField',
               anchor : Sonatype.view.FIELD_OFFSET,
               readOnly : true,

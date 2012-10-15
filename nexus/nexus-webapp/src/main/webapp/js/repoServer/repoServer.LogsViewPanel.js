@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Sonatype.repoServer.LogsViewPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+
+/*global Ext,Sonatype,Nexus*/
+Sonatype.repoServer.LogsViewPanel = function(cfg) {
+  var config = cfg || {}, defaultConfig = {};
+
   Ext.apply(this, config, defaultConfig);
 
   this.currentLogUrl = null;
@@ -302,7 +304,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
             var uri = list[i].resourceURI;
 
             var existingItem = myMenu.items.find(function(o) {
-                  return o.logUri == uri;
+                  return o.logUri === uri;
                 });
 
             if (!existingItem)
@@ -423,7 +425,8 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       renderLog : function(options, success, response) {
         if (success)
         {
-          var newValue = this.currentSize == 0 ? response.responseText : this.logTextArea.getRawValue() + response.responseText;
+          var text = Ext.util.Format.htmlEncode(response.responseText);
+          var newValue = this.currentSize == 0 ? text : this.logTextArea.getRawValue() + text;
 
           var logDom = this.logTextArea.getEl().dom;
           var scrollTop = logDom.scrollTop;

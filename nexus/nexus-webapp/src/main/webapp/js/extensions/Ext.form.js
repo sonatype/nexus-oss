@@ -991,8 +991,10 @@ Ext.override(Ext.form.TextField, {
    * for example in the repository name. The REST layer will encode to html entities, which will be correct
    * for html rendering, but text fields without this configuration will display '&quot;test&quot;' instead
    * of the originally sent '"test"'.
+   * <p/>
+   * Default value is 'true'.
    */
-  htmlDecode : false,
+  htmlDecode : true,
 
   /**
    * @cfg {Boolean} htmlConvert
@@ -1007,6 +1009,8 @@ Ext.override(Ext.form.TextField, {
    * <p/>
    * when this config is set, the value has to be html-decoded again before sending it to the server, because the REST layer
    * will encode the string again.
+   * <p/>
+   * Default value is false.
    */
   htmlConvert : false,
   
@@ -1047,4 +1051,36 @@ Ext.override(Ext.form.TextField, {
   }
 });
 
+Ext.override(Ext.form.ComboBox, {
+  /**
+   * ComboBox field needs to encode it's value again, because the drop-down list is rendering HTML
+   * (so e.g. '1&amp;2' is displayed as '1&2' in the list). The field that holds the selected value
+   * is not rendering HTML, so we need to unescape the displayed value. That would lead to a mismatch
+   * between the selected value and the one in the list, if we do not encode the value again in the getter.
+   */
+  htmlConvert : true,
+  /**
+   * We need to override this because ComboBox would set the DOM value directly, circumventing the htmlDecode/Convert
+   * configuration.
+   */
+  beforeBlur : function() {
+    var val = this.getRawValue();
+    if (this.forceSelection) {
+      if (val.length > 0 && val !== this.emptyText) {
+        // do not set the DOM value directly, use #setRawValue to pick up htmlConvert setting
+        // this.el.dom.value = this.lastSelectionText === undefined ? '' : this.lastSelectionText;
+        this.setRawValue(this.lastSelectionText === undefined ? '' : this.lastSelectionText);
+        this.applyEmptyText();
+      } else {
+        this.clearValue();
+      }
+    } else {
+      var rec = this.findRecord(this.displayField, val);
+      if (rec) {
+        val = rec.get(this.valueField || this.displayField);
+      }
+      this.setValue(val);
+    }
+  }
+});
 

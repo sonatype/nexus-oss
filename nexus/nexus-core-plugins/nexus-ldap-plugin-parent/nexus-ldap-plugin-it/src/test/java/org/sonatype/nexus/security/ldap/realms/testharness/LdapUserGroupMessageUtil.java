@@ -14,6 +14,7 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -150,25 +151,24 @@ public class LdapUserGroupMessageUtil
     public void validateResourceResponse( LdapUserAndGroupConfigurationDTO expected, LdapUserAndGroupConfigurationDTO actual )
         throws Exception
     {
-
         // this object has an equals method, but it makes for not so easy debuging, so call it after each field compare to make
         // sure we didn't forget anything
-        Assert.assertEquals(expected.getGroupBaseDn(), actual.getGroupBaseDn());
-        Assert.assertEquals(expected.getGroupIdAttribute(), actual.getGroupIdAttribute());
-        Assert.assertEquals(expected.getGroupMemberAttribute(), actual.getGroupMemberAttribute());
-        Assert.assertEquals(expected.getGroupMemberFormat(), actual.getGroupMemberFormat());
-        Assert.assertEquals(expected.getGroupObjectClass(), actual.getGroupObjectClass());
-        Assert.assertEquals(expected.getUserBaseDn(), actual.getUserBaseDn());
-        Assert.assertEquals(expected.getUserIdAttribute(), actual.getUserIdAttribute());
-        Assert.assertEquals(expected.getUserObjectClass(), actual.getUserObjectClass());
-        Assert.assertEquals(expected.getUserPasswordAttribute(), actual.getUserPasswordAttribute());
-        Assert.assertEquals(expected.getUserRealNameAttribute(), actual.getUserRealNameAttribute());
-        Assert.assertEquals(expected.getEmailAddressAttribute(), actual.getEmailAddressAttribute());
+        Assert.assertEquals(expected.getGroupBaseDn(), StringEscapeUtils.unescapeHtml( actual.getGroupBaseDn() ) );
+        Assert.assertEquals(expected.getGroupIdAttribute(), StringEscapeUtils.unescapeHtml( actual.getGroupIdAttribute() ) );
+        Assert.assertEquals(expected.getGroupMemberAttribute(), StringEscapeUtils.unescapeHtml( actual.getGroupMemberAttribute() ) );
+        Assert.assertEquals(expected.getGroupMemberFormat(), StringEscapeUtils.unescapeHtml( actual.getGroupMemberFormat() ) );
+        Assert.assertEquals(expected.getGroupObjectClass(), StringEscapeUtils.unescapeHtml( actual.getGroupObjectClass() ) );
+        Assert.assertEquals(expected.getUserBaseDn(), StringEscapeUtils.unescapeHtml( actual.getUserBaseDn() ) );
+        Assert.assertEquals(expected.getUserIdAttribute(), StringEscapeUtils.unescapeHtml( actual.getUserIdAttribute() ) );
+        Assert.assertEquals(expected.getUserObjectClass(), StringEscapeUtils.unescapeHtml( actual.getUserObjectClass() ) );
+        Assert.assertEquals(expected.getUserPasswordAttribute(), StringEscapeUtils.unescapeHtml( actual.getUserPasswordAttribute() ) );
+        Assert.assertEquals(expected.getUserRealNameAttribute(), StringEscapeUtils.unescapeHtml( actual.getUserRealNameAttribute() ) );
+        Assert.assertEquals(expected.getEmailAddressAttribute(), StringEscapeUtils.unescapeHtml( actual.getEmailAddressAttribute() ) );
+        Assert.assertEquals(expected.getUserMemberOfAttribute(), StringEscapeUtils.unescapeHtml( actual.getUserMemberOfAttribute() ) );
+
         Assert.assertEquals(expected.isLdapGroupsAsRoles(), actual.isLdapGroupsAsRoles() );
-        Assert.assertEquals(expected.getUserMemberOfAttribute(), actual.getUserMemberOfAttribute() );
         Assert.assertEquals(expected.isGroupSubtree(), actual.isGroupSubtree() );
         Assert.assertEquals(expected.isUserSubtree(), actual.isUserSubtree() );
-        Assert.assertEquals( expected, actual );
 
         // also validate the file config
         this.validateLdapConfig( expected );

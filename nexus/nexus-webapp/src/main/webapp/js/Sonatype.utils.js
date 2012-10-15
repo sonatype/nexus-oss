@@ -867,7 +867,7 @@
     },
 
     parseFormattedAppName : function(formattedAppName) {
-      return formattedAppName;
+      return Nexus.util.Format.htmlDecode(formattedAppName);
     },
 
     loadNexusStatus : function(loggedInUserSource, versionOnly) {
