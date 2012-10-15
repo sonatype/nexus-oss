@@ -68,7 +68,10 @@ import com.google.common.base.Stopwatch;
  * The Class CommonsHttpClientRemoteStorage.
  * 
  * @author cstamas
+ *
+ * @deprecated Use httpclient4 components instead
  */
+@Deprecated
 @Named( CommonsHttpClientRemoteStorage.PROVIDER_STRING )
 @Singleton
 public class CommonsHttpClientRemoteStorage

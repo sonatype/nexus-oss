@@ -24,6 +24,10 @@ import com.ning.http.client.Response;
 import com.ning.http.util.DateUtil;
 import com.ning.http.util.DateUtil.DateParseException;
 
+/**
+ * @deprecated Use httpclient4 components instead
+ */
+@Deprecated
 public class AHCUtils
 {
     public static BodyDeferringInputStream fetchContent( final AsyncHttpClient client, final String itemUrl )
