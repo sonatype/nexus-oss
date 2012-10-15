@@ -359,13 +359,6 @@
           </nexusBundleArtifact>
           <nexusPluginsArtifacts>
             <plugin>
-              <groupId>org.sonatype.nexus.plugins</groupId>
-              <artifactId>nexus-capabilities-plugin</artifactId>
-              <version>${capabilities-plugin.version}</version>
-              <classifier>bundle</classifier>
-              <type>zip</type>
-            </plugin>
-            <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
               <version>${nexus.version}</version>
