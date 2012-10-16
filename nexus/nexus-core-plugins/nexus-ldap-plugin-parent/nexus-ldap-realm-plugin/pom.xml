@@ -207,22 +207,8 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/classes/static/js/nexus-ldap-realm-plugin-all.js</output>
-              <nosuffix>true</nosuffix>
-              <nomunge>true</nomunge>
-              <jswarn>false</jswarn>
-              <insertNewLine>true</insertNewLine>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
 
     </plugins>

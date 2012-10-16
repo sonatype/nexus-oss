@@ -30,7 +30,7 @@ Nexus.error.ErrorHandler = function() {
         lines[lines.length] = "Line Number: " + args[2];
       } else {
         lines = ["An unknown error has occurred."]; // purposely rebuild lines
-        lines[lines.length] = "The following information may be useful:"
+        lines[lines.length] = "The following information may be useful:";
         for (var x = 0; x < args.length; x++) {
           lines[lines.length] = Ext.encode(args[x]);
         }

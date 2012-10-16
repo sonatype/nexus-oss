@@ -27,7 +27,7 @@ public class PluginConsoleNexusIndexHtmlCustomizer
     {
         String version = getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-plugin-console-plugin/pom.properties" );
 
-        return "<script src=\"js/repoServer/nexus-plugin-console-plugin-all.js"
+        return "<script src=\"static/js/nexus-plugin-console-plugin-all.js"
             + ( version == null ? "" : "?" + version ) + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
     }
 }

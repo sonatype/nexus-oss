@@ -137,7 +137,12 @@
   </contributors>
 
   <properties>
-    <debug-js>false</debug-js>
+    <!-- Default debug friendly options -->
+    <maven.yuicompressor.jswarn>true</maven.yuicompressor.jswarn>
+    <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
+    <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+    <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
+
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -1614,21 +1619,46 @@
         </plugin>
 
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
+          <groupId>net.alchim31.maven</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>0.0.2</version>
+          <version>1.3.2</version>
+          <configuration>
+            <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
+            <outputDirectory>${project.build.directory}/generated-sources/yuicompressor</outputDirectory>
+
+            <includes>
+              <include>js/**/*.js</include>
+              <include>css/**/*.css</include>
+            </includes>
+
+            <nosuffix>true</nosuffix>
+            <insertNewLine>true</insertNewLine>
+          </configuration>
           <executions>
             <execution>
+              <id>aggregate</id>
+
               <goals>
-                <goal>aggregate</goal>
+                <goal>compress</goal>
               </goals>
+
               <configuration>
-                <nosuffix>true</nosuffix>
-                <nomunge>true</nomunge>
-                <nominify>${debug-js}</nominify>
-                <jswarn>false</jswarn>
-                <insertNewLine>true</insertNewLine>
-                <disableOptimizations>true</disableOptimizations>
+                <aggregations>
+                  <aggregation>
+                    <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
+                    <output>${project.build.directory}/classes/static/js/${project.artifactId}-all.js</output>
+                    <includes>
+                      <include>**/*.js</include>
+                    </includes>
+                  </aggregation>
+                  <aggregation>
+                    <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
+                    <output>${project.build.directory}/classes/static/css/${project.artifactId}-all.css</output>
+                    <includes>
+                      <include>**/*.css</include>
+                    </includes>
+                  </aggregation>
+                </aggregations>
               </configuration>
             </execution>
           </executions>
@@ -2197,7 +2227,7 @@
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
-                <mojoExecution>org.sonatype.plugins:yuicompressor-maven-plugin::</mojoExecution>
+                <mojoExecution>net.alchim31.maven:yuicompressor-maven-plugin::</mojoExecution>
               </mojoExecutions>
             </configuration>
           </plugin>
@@ -2327,6 +2357,18 @@
       <id>idea</id>
       <properties>
         <nexus-plugin.type>jar</nexus-plugin.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>optimize-js</id>
+
+      <properties>
+        <!-- 'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
+             understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now. -->
+        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+
+        <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
+        <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
       </properties>
     </profile>
   </profiles>
