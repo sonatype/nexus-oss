@@ -67,14 +67,21 @@ public abstract class AbstractIndexerManagerTest
             throw new IOException( "Huh?" );
         }
 
-        ArrayList<ArtifactInfo> results = new ArrayList<ArtifactInfo>( response.getTotalHits() );
-
-        for ( ArtifactInfo hit : response )
+        try
         {
-            results.add( hit );
+        ArrayList<ArtifactInfo> results = new ArrayList<ArtifactInfo>( response.getTotalHits() );
+    
+            for ( ArtifactInfo hit : response )
+            {
+                results.add( hit );
+            }
+    
+            assertEquals( "Query \"" + query + "\" returned wrong results: " + results + "!", expected, results.size() );
         }
-
-        assertEquals( "Query \"" + query + "\" returned wrong results: " + results + "!", expected, results.size() );
+        finally
+        {
+            response.close();
+        }
     }
 
     protected void searchForKeywordNG( String term, int expected )
@@ -111,15 +118,21 @@ public abstract class AbstractIndexerManagerTest
         Query q = indexerManager.constructQuery( MAVEN.GROUP_ID, groupId, SearchType.EXACT );
 
         IteratorSearchResponse response = indexerManager.searchQueryIterator( q, repoId, null, null, null, false, null );
-
-        ArrayList<ArtifactInfo> ais = new ArrayList<ArtifactInfo>( response.getTotalHits() );
-
-        for ( ArtifactInfo ai : response )
+        try
         {
-            ais.add( ai );
+            ArrayList<ArtifactInfo> ais = new ArrayList<ArtifactInfo>( response.getTotalHits() );
+    
+            for ( ArtifactInfo ai : response )
+            {
+                ais.add( ai );
+            }
+    
+            assertEquals( ais.toString(), expected, ais.size() );
         }
-
-        assertEquals( ais.toString(), expected, ais.size() );
+        finally
+        {
+            response.close();
+        }
     }
 
     protected void assertTemporatyContexts( final Repository repo )
