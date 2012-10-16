@@ -17,11 +17,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.appcontext.internal.Preconditions;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
@@ -60,7 +60,7 @@ public class LdapUserManager
     @VisibleForTesting
     LdapUserManager( final LdapManager ldapManager )
     {
-        this.ldapManager = Preconditions.checkNotNull( ldapManager );
+        this.ldapManager = Preconditions.checkNotNull(ldapManager);
     }
 
     public User getUser( String userId )
