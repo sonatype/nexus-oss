@@ -47,7 +47,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
     <nexus.version>2.2</nexus.version>
+    <nexus-testsuite-support.version>2.3-SNAPSHOT</nexus-testsuite-support.version>
 
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
@@ -66,7 +68,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-support</artifactId>
-        <version>${nexus.version}</version>
+        <version>${nexus-testsuite-support.version}</version>
       </dependency>
 
       <dependency>
