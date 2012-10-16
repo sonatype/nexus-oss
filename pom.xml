@@ -88,6 +88,23 @@
         </exclusions>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-app</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-configuration-model</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.sisu.litmus</groupId>
+        <artifactId>litmus-testsupport</artifactId>
+        <version>1.5-SNAPSHOT</version>
+      </dependency>
+
       <!-- TODO Drop this dependency when we have proper client for repository -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
