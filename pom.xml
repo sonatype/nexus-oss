@@ -57,7 +57,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <nexus.version>2.1</nexus.version>
-    <nexus-testsuite-support.version>2.2</nexus-testsuite-support.version>
+    <nexus-testsuite-support.version>2.3-SNAPSHOT</nexus-testsuite-support.version>
     <nexus-oss-webapp.version>2.2</nexus-oss-webapp.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
 
@@ -181,7 +181,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.4</version>
+        <version>1.5-SNAPSHOT</version>
       </dependency>
 
       <!-- Internal -->
