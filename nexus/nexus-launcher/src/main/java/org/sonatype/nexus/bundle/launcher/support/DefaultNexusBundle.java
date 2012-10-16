@@ -72,7 +72,7 @@ public class DefaultNexusBundle
 
     private static final Logger log = LoggerFactory.getLogger( DefaultNexusBundle.class );
 
-    private static final String USE_BUNDLE_PLUGINS_IF_PRESENT = "nexus.launcher.useBundlePluginsIfPresent";
+    private static final String USE_BUNDLE_PLUGINS_IF_PRESENT = "useBundlePluginsIfPresent";
 
     /**
      * File task builder.
