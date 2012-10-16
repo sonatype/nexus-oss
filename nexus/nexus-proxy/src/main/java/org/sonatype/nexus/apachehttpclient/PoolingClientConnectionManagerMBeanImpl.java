@@ -15,8 +15,8 @@ package org.sonatype.nexus.apachehttpclient;
 import java.util.concurrent.TimeUnit;
 import javax.management.StandardMBean;
 
+import com.google.common.base.Preconditions;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.sonatype.appcontext.internal.Preconditions;
 
 /**
  * Default {@link PoolingClientConnectionManagerMBean} implementation.
@@ -34,7 +34,7 @@ class PoolingClientConnectionManagerMBeanImpl
     {
         super( PoolingClientConnectionManagerMBean.class, false );
 
-        this.connMgr = Preconditions.checkNotNull( connMgr );
+        this.connMgr = Preconditions.checkNotNull(connMgr);
     }
 
     @Override
