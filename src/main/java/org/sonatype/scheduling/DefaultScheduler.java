@@ -27,26 +27,29 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * A simple facade to ScheduledThreadPoolExecutor as Plexus component.
  * 
  * @author cstamas
  */
-@Component( role = Scheduler.class )
+@Named
+@Singleton
 public class DefaultScheduler
     implements Scheduler
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Requirement
+    @Inject
     private TaskConfigManager taskConfig;
 
     private final AtomicInteger idGen;

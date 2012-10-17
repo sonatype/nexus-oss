@@ -3,14 +3,13 @@ package org.sonatype.scheduling;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSchedulerTask<T>
     implements SchedulerTask<T>
 {
-    @Requirement
-    protected Logger logger;
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     private Map<String, String> parameters;
 
