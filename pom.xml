@@ -8,6 +8,7 @@
     <version>18</version>
   </parent>
 
+  <!-- FIXME: Change these, this isn't plexus-based anymore -->
   <groupId>org.sonatype.plexus</groupId>
   <artifactId>plexus-task-scheduler</artifactId>
   <version>1.6.1-SNAPSHOT</version>
@@ -26,15 +27,18 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-      <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-              </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
+
+    <!-- FIXME: Remove plexus from tests -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
-        <scope>test</scope>
+      <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
