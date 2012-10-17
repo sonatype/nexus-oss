@@ -57,7 +57,7 @@ public abstract class SiteRepositoryITSupport
         return firstAvailableTestParameters(
             systemTestParameters(),
             testParameters(
-                $( "org.sonatype.nexus:nexus-oss-webapp:zip:bundle" )
+                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
             )
         ).load();
     }

@@ -51,6 +51,10 @@
     <nexus.version>2.2</nexus.version>
     <nexus-testsuite-support.version>2.3-SNAPSHOT</nexus-testsuite-support.version>
 
+    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.version>2.2</it.nexus.bundle.version>
+
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
 
@@ -114,11 +118,11 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-oss-webapp</artifactId>
+        <groupId>${it.nexus.bundle.groupId}</groupId>
+        <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+        <version>${it.nexus.bundle.version}</version>
         <type>zip</type>
         <classifier>bundle</classifier>
-        <version>${nexus.version}</version>
       </dependency>
 
       <dependency>
