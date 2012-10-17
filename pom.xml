@@ -51,21 +51,21 @@
     </dependency>
   </dependencies>
 
- <build>
-     <plugins>
-         <plugin>
-                         <groupId>org.sonatype.plugins</groupId>
-                         <artifactId>sisu-maven-plugin</artifactId>
-                         <executions>
-                             <execution>
-                                 <goals>
-                                     <goal>main-index</goal>
-                                     <goal>test-index</goal>
-                                 </goals>
-                             </execution>
-                         </executions>
-                     </plugin>
-                 </plugins>
-             </build>
-             
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>sisu-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>main-index</goal>
+                            <goal>test-index</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
