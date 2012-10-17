@@ -8,10 +8,9 @@
     <version>18</version>
   </parent>
 
-  <!-- FIXME: Change these, this isn't plexus-based anymore -->
-  <groupId>org.sonatype.plexus</groupId>
-  <artifactId>plexus-task-scheduler</artifactId>
-  <version>1.6.1-SNAPSHOT</version>
+  <groupId>org.sonatype.sisu</groupId>
+  <artifactId>sisu-task-scheduler</artifactId>
+  <version>1.7-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>SISU Task Scheduler</name>
