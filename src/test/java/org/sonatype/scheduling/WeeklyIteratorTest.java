@@ -16,12 +16,21 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.scheduling.iterators.WeeklySchedulerIterator;
 
 public class WeeklyIteratorTest
     extends PlexusTestCase
 {
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
+    {
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
+    }
+
     public void testWeeklyIterator()
         throws Exception
     {

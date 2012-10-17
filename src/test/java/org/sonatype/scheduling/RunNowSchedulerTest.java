@@ -14,12 +14,21 @@ package org.sonatype.scheduling;
 
 import java.util.concurrent.Callable;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.inject.BeanScanning;
 
 public class RunNowSchedulerTest
     extends PlexusTestCase
 {
     protected DefaultScheduler defaultScheduler;
+
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
+    {
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
+    }
 
     public void setUp()
         throws Exception

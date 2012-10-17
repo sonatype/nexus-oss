@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
@@ -16,6 +18,13 @@ public class TaskStopTest
     extends PlexusTestCase
 {
     protected DefaultScheduler defaultScheduler;
+
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
+    {
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
+    }
 
     public void setUp()
         throws Exception

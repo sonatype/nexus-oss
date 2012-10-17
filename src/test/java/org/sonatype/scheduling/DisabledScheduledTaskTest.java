@@ -6,7 +6,9 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
@@ -14,6 +16,13 @@ public class DisabledScheduledTaskTest
     extends PlexusTestCase
 {
     protected DefaultScheduler defaultScheduler;
+
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
+    {
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
+    }
 
     public void setUp()
         throws Exception

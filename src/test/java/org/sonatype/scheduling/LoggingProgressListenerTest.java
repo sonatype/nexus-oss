@@ -1,10 +1,19 @@
 package org.sonatype.scheduling;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.inject.BeanScanning;
 
 public class LoggingProgressListenerTest
     extends PlexusTestCase
 {
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
+    {
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
+    }
+
     public void testSimple()
     {
         LoggingProgressListener pl = new LoggingProgressListener( "foo" );
