@@ -12,6 +12,9 @@ Yum metadata, so that RedHat-compatible system can use Nexus as software reposit
 1. [Installation](#installation)
 1. [Configuration](#configuration)
 1. [Getting Started](#getting-started)
+	1. [Deploy Java Web Application via RPM](#deploy-java-web-application-via-rpm)
+	1. [Staging RPMs in Nexus Professional](#staging-rpms-in-nexus-professional)
+	1. [Staging RPMs in Nexus OSS](#staging-rpms-in-nexus-oss)
 1. [How to Build](#how-to-build)
 
 
@@ -238,6 +241,96 @@ The tomcat restart is optional depending on your webapp and configuration, but a
 The _nexus-yum-plugin_ makes deploying Java application to _real_ RHEL-compatible servers really easy and works as a 
 relyable platform for your deployments.  
 
+### Staging RPMs in Nexus Professional
+
+The [Staging Suite][13] in _Nexus Professional_ improves a stage-based release process a lot. The _Nexus Yum Plugin_ supports
+this staging configuration, but requires some fine tuning to use the full feature list.
+
+Image you want to configure a one-stage release process as described [in the Nexus book][14]. Follow the tutorial but use 
+_Maven2Yum_ as _Template_ for target repositories, staging profiles and group repositories. The advantage is that _Maven2Yum_ 
+group repository really merges their member yum repositories by using [_mergerepo_][15]. This allows you to use these group 
+repositories with their constant url for _\*.repo_ files on the server.
+
+### Staging RPMs in Nexus OSS 
+
+The open source verion of _Nexus_ doesn't contain such a nice [Staging Suite][13], but you can stage your RPMs 
+(without the jar, war, etc. files) anyway. 
+
+Image you have 3 stages for your RPMs:
+1. _development_
+1. _test & verification_
+1. _production_
+and already a RPM package in version 1.0 in your repository called _releases_.
+
+#### Create aliases
+
+First of all you create version aliases for each stage. These aliases allow you to have a canonical repository url for each stage. 
+You can use _curl_ for the initial creation:
+	curl -d "1.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/development/
+	curl -d "1.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/verification/
+	curl -d "1.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/production/   
+
+#### Prepare servers
+
+Now, you are able to add these alias repositories to your server.
+On your _development_ machine create a file named _/etc/yum.repos.d/nexus-dev.repo_ and the following content:
+	[nexus-dev]
+	name=Nexus Dev Repository
+	baseurl=http://your.nexus.domain/nexus/service/local/yum/repos/releases/development/
+	enabled=1
+	protect=0
+	gpgcheck=0
+	metadata_expire=30s
+	autorefresh=1
+	type=rpm-md
+On your _verification_ machine create a file named _/etc/yum.repos.d/nexus-verification.repo_ and the following content:
+	[nexus-verification]
+	name=Nexus Verification Repository
+	baseurl=http://your.nexus.domain/nexus/service/local/yum/repos/releases/verification/
+	enabled=1
+	protect=0
+	gpgcheck=0
+	metadata_expire=30s
+	autorefresh=1
+	type=rpm-md
+On your _production_ machine create a file named _/etc/yum.repos.d/nexus-production.repo_ and the following content:
+	[nexus-production]
+	name=Nexus Production Repository
+	baseurl=http://your.nexus.domain/nexus/service/local/yum/repos/releases/production/
+	enabled=1
+	protect=0
+	gpgcheck=0
+	metadata_expire=30s
+	autorefresh=1
+	type=rpm-md
+	
+#### Promote RPM through Stages
+
+Now, it's time to deploy version 2.0 of your software RPM to the _releases_ repository. To install this RPM on your
+_development_ machine, update your version alias first:
+
+	curl -d "2.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/development/
+	
+Afterwards, login to your machine and update your software RPM via
+
+	sudo yum update
+	
+After your integration or whatever tests verified the _development_ machine, you can promote the RPM to _verification_ stage:
+
+	curl -d "2.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/verification/
+	
+Run again _sudo yum update_ on the _verification_ machine and test your software RPM in that environment. 
+Finally, if everything is green, you can stage this RPM to _production_.
+
+	curl -d "2.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/production/
+
+and run _sudo yum update_ on your _production_ machine. 
+
+#### Summary
+
+Version aliases let you create versionized views on your Maven RPM repositories, which is useful your RPM staging, but
+don't let you stage your whole bunch of artifacts like RPMs, JARs, WARs, Docs, etc. together. For this you need _Nexus Professional_.
+
 ## How to build
 
 The build process is based on [Apache Maven 3][3]. You must have [createrepo][10] installed in order to execute all 
@@ -259,3 +352,8 @@ to run all tests and create a plugin bundle.
 [10]: http://createrepo.baseurl.org/
 [11]: http://code.google.com/p/nexus-yum-plugin/issues/detail?id=4
 [12]: http://mojo.codehaus.org/rpm-maven-plugin/
+[13]: http://www.sonatype.com/books/nexus-book/reference/staging-sect-intro.html
+[14]: http://www.sonatype.com/books/nexus-book/reference/staging-sect-prepare-nexus.html
+[15]: http://linux.die.net/man/1/mergerepo
+
+
