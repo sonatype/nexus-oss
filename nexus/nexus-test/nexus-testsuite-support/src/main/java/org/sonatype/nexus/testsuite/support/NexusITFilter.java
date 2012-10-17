@@ -87,6 +87,27 @@ public class NexusITFilter
         return filter( defaultContext, value );
     }
 
+    @Override
+    public String filter( final Map<String, String> context, final String value )
+    {
+        if ( value == null )
+        {
+            return null;
+        }
+
+        // filter the value until filters does not do any more changes
+        String previousValue;
+        String filteredValue = value;
+        do
+        {
+            previousValue = filteredValue;
+            filteredValue = super.filter( context, previousValue );
+        }
+        while ( filteredValue != null && !filteredValue.equals( previousValue ) );
+
+        return filteredValue;
+    }
+
     public static Map.Entry<String, String> contextEntry( final String key, final String value )
     {
         return new Map.Entry<String, String>()
