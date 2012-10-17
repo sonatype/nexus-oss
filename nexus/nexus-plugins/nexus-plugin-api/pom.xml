@@ -104,8 +104,8 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-task-scheduler</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-task-scheduler</artifactId>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>

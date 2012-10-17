@@ -56,8 +56,8 @@
       <artifactId>plexus-app-events-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-task-scheduler</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-task-scheduler</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.configuration</groupId>

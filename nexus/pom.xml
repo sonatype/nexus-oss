@@ -186,7 +186,7 @@
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.22</plexus.restlet.bridge.version>
     <plexus-security.version>2.8.3-SNAPSHOT</plexus-security.version>
-    <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
+    <sisu-task-scheduler.version>1.7-SNAPSHOT</sisu-task-scheduler.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <shiro.version>1.2.1</shiro.version>
     <spice-timeline.version>2.1</spice-timeline.version>
@@ -380,9 +380,9 @@
         <version>1.0</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>plexus-task-scheduler</artifactId>
-        <version>${plexus-task-scheduler.version}</version>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-task-scheduler</artifactId>
+        <version>${sisu-task-scheduler.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
