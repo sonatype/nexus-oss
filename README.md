@@ -257,15 +257,18 @@ The open source verion of _Nexus_ doesn't contain such a nice [Staging Suite][13
 (without the jar, war, etc. files) anyway. 
 
 Image you have 3 stages for your RPMs:
+
 1. _development_
 1. _test & verification_
 1. _production_
+
 and already a RPM package in version 1.0 in your repository called _releases_.
 
 #### Create aliases
 
 First of all you create version aliases for each stage. These aliases allow you to have a canonical repository url for each stage. 
 You can use _curl_ for the initial creation:
+
 	curl -d "1.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/development/
 	curl -d "1.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/verification/
 	curl -d "1.0" --header "Content-Type: text/plain" http://your.nexus.domain/nexus/service/local/yum/alias/releases/production/   
@@ -274,6 +277,7 @@ You can use _curl_ for the initial creation:
 
 Now, you are able to add these alias repositories to your server.
 On your _development_ machine create a file named _/etc/yum.repos.d/nexus-dev.repo_ and the following content:
+
 	[nexus-dev]
 	name=Nexus Dev Repository
 	baseurl=http://your.nexus.domain/nexus/service/local/yum/repos/releases/development/
@@ -283,7 +287,9 @@ On your _development_ machine create a file named _/etc/yum.repos.d/nexus-dev.re
 	metadata_expire=30s
 	autorefresh=1
 	type=rpm-md
+	
 On your _verification_ machine create a file named _/etc/yum.repos.d/nexus-verification.repo_ and the following content:
+
 	[nexus-verification]
 	name=Nexus Verification Repository
 	baseurl=http://your.nexus.domain/nexus/service/local/yum/repos/releases/verification/
@@ -293,7 +299,9 @@ On your _verification_ machine create a file named _/etc/yum.repos.d/nexus-verif
 	metadata_expire=30s
 	autorefresh=1
 	type=rpm-md
+	
 On your _production_ machine create a file named _/etc/yum.repos.d/nexus-production.repo_ and the following content:
+
 	[nexus-production]
 	name=Nexus Production Repository
 	baseurl=http://your.nexus.domain/nexus/service/local/yum/repos/releases/production/
