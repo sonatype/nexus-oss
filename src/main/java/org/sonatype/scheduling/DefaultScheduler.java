@@ -48,8 +48,7 @@ public class DefaultScheduler
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private TaskConfigManager taskConfig;
+    private final TaskConfigManager taskConfig;
 
     private final AtomicInteger idGen;
 
@@ -57,8 +56,10 @@ public class DefaultScheduler
 
     private final ConcurrentHashMap<String, List<ScheduledTask<?>>> tasksMap;
 
-    public DefaultScheduler()
+    @Inject
+    public DefaultScheduler(final TaskConfigManager taskConfig)
     {
+        this.taskConfig = taskConfig;
         idGen = new AtomicInteger( 0 );
         tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
         scheduledExecutorService =
@@ -66,13 +67,6 @@ public class DefaultScheduler
                 Thread.MIN_PRIORITY ) );
         scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
         scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
-    }
-
-    //@VisibleForTesting
-    public DefaultScheduler(final TaskConfigManager taskConfig)
-    {
-        this();
-        this.taskConfig = taskConfig;
     }
 
     protected Logger getLogger()
