@@ -189,6 +189,11 @@
     <surefire.version>2.10</surefire.version>
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
+
+    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
+
   </properties>
 
   <dependencyManagement>
