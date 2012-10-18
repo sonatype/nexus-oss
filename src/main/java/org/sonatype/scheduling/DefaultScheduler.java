@@ -37,7 +37,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * A simple facade to ScheduledThreadPoolExecutor as Plexus component.
+ * A simple facade to ScheduledThreadPoolExecutor.
  * 
  * @author cstamas
  */
@@ -62,7 +62,7 @@ public class DefaultScheduler
         idGen = new AtomicInteger( 0 );
         tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
         scheduledExecutorService =
-            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new PlexusThreadFactory(
+            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
                 Thread.MIN_PRIORITY ) );
         scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
         scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
