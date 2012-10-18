@@ -51,7 +51,7 @@ import com.ning.http.client.AsyncHttpClient;
  * 
  * @author bjorne
  */
-public class MavenRepositoryReaderTest
+public class MavenRepositoryReaderIT
 {
     MavenRepositoryReader reader; // The "class under test"
 
