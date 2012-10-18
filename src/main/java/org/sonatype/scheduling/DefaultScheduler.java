@@ -121,7 +121,7 @@ public class DefaultScheduler
                 if ( !runningTasks.isEmpty() )
                 {
                     getScheduledExecutorService().shutdownNow();
-                    getLogger().warn( "Scheduler shut down forcedly with tasks running." );
+                    getLogger().warn( "Scheduler shut down forcibly with tasks running." );
                 }
                 else
                 {
