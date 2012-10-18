@@ -167,7 +167,6 @@
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>8.1.7.v20120910</jetty.version>
-    <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <maven.version>3.0.4</maven.version>
     <micromailer.version>1.5</micromailer.version>
     <nexus.repository.metadata.version>1.2</nexus.repository.metadata.version>
@@ -177,8 +176,6 @@
     <plexus-digest.version>1.1</plexus-digest.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
-    <plexus-jetty6.version>1.7</plexus-jetty6.version>
-    <plexus-jetty7.version>1.2.1</plexus-jetty7.version>
     <sisu-jetty8.version>1.4</sisu-jetty8.version>
     <sisu-velocity.version>1.1</sisu-velocity.version>
     <sisu-problem-reporter.version>1.5.2</sisu-problem-reporter.version>
@@ -261,47 +258,9 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-        <artifactId>plexus-jsw-app-booter</artifactId>
-        <version>${plexus.appbooter.version}</version>
-        <scope>provided</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-        <artifactId>plexus-forked-app-booter</artifactId>
-        <version>${plexus.appbooter.version}</version>
-        <scope>compile</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-        <artifactId>plexus-platform-jsw</artifactId>
-        <version>${plexus.appbooter.version}</version>
-        <scope>provided</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>tanukisoft</groupId>
         <artifactId>wrapper</artifactId>
         <version>3.2.3</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.jsw-binaries</groupId>
-        <artifactId>jsw-binaries</artifactId>
-        <version>${jsw.binaries.version}</version>
-        <type>tar.gz</type>
-        <!--make sure this doesn't get into any classpaths -->
         <scope>provided</scope>
       </dependency>
 
@@ -401,22 +360,6 @@
             <artifactId>plexus-container-default</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>plexus-jetty6</artifactId>
-        <version>${plexus-jetty6.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>plexus-jetty7</artifactId>
-        <version>${plexus-jetty7.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
@@ -668,13 +611,6 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
-        <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>log4j-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
         <type>jar</type>
         <scope>runtime</scope>
@@ -1305,17 +1241,6 @@
           <exclusion>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>plexus-encryptor</artifactId>
-        <version>1.0</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
