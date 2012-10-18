@@ -24,8 +24,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent.MemberChange;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+/**
+ * Tests for {@link RepositoryGroupMembersChangedEvent}.
+ */
 public class RepositoryGroupMembersChangedEventTest
+    extends TestSupport
 {
     protected RepositoryGroupMembersChangedEvent createEvent( final List<String> currentMemberIds,
                                                               final List<String> newMemberIds )

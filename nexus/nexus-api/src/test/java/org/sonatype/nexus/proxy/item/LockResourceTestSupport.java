@@ -23,8 +23,13 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-public abstract class AbstractLockResourceTest
+/**
+ * Support for {@link LockResource} tests.
+ */
+public abstract class LockResourceTestSupport
+    extends TestSupport
 {
     private ExecutorService executor;
 
