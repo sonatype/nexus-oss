@@ -51,8 +51,7 @@ Sonatype.repoServer.PluginConsolePanel = function( config ) {
     { name: 'scmTimestamp' },
     { name: 'failureReason' },
     { name: 'site'},
-    { name: 'documentation'},
-    { name: 'restInfos'}
+    { name: 'documentation'}
     ],
     autoExpandColumn: 'status',
     rowClickEvent: 'pluginInfoInit'
