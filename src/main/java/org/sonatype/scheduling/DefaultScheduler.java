@@ -27,7 +27,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
@@ -67,6 +66,13 @@ public class DefaultScheduler
                 Thread.MIN_PRIORITY ) );
         scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
         scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
+    }
+
+    //@VisibleForTesting
+    public DefaultScheduler(final TaskConfigManager taskConfig)
+    {
+        this();
+        this.taskConfig = taskConfig;
     }
 
     protected Logger getLogger()
@@ -267,10 +273,15 @@ public class DefaultScheduler
         return result;
     }
 
+    private static boolean StringUtils_isEmpty( String str )
+    {
+        return ( ( str == null ) || ( str.trim().length() == 0 ) );
+    }
+
     public ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
-        if ( StringUtils.isEmpty( id ) )
+        if ( StringUtils_isEmpty(id) )
         {
             throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
         }

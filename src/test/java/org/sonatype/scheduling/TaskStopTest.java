@@ -7,33 +7,30 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.inject.BeanScanning;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TaskStopTest
-    extends PlexusTestCase
+    extends TestSupport
 {
     protected DefaultScheduler defaultScheduler;
 
-    @Override
-    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
-    {
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
-    }
-
+    @Before
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
-        defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
+        defaultScheduler = new DefaultScheduler(new SimpleTaskConfigManager());
     }
 
+    @Test
     public void testStopTask()
         throws Exception
     {
@@ -60,6 +57,7 @@ public class TaskStopTest
         assertTrue( callable.isAllDone() );
     }
 
+    @Test
     public void testCancelOnlyWaitForFinishExecution()
         throws Exception
     {
@@ -92,6 +90,7 @@ public class TaskStopTest
         assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
     }
 
+    @Test
     public void testCancelDoesNotRemoveRunningTask()
         throws Exception
     {
@@ -124,6 +123,7 @@ public class TaskStopTest
         assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
     }
 
+    @Test
     public void testCancelRemovesIdleTask()
     {
         RunForeverCallable callable = new RunForeverCallable( 500 );
@@ -144,6 +144,7 @@ public class TaskStopTest
         assertFalse( "task was killed immediately", callable.isAllDone() );
     }
 
+    @Test
     public void testCancelledRunningTaskWithScheduleIsRemovedLater()
         throws Exception
     {
@@ -177,6 +178,7 @@ public class TaskStopTest
         assertTrue( "task was killed immediately", callable.isAllDone() );
     }
 
+    @Test
     public void testCancelledRunningTaskWithPeriodicScheduleWhichFailsIsRemovedLater()
         throws Exception
     {
@@ -202,6 +204,7 @@ public class TaskStopTest
         assertEquals( TaskState.CANCELLED, task.getTaskState() );
     }
 
+    @Test
     public void testCancelRemovesBlockedOneShotTasks()
         throws Exception
     {
@@ -233,6 +236,7 @@ public class TaskStopTest
         Utils.awaitZeroTaskCount( defaultScheduler, 1000 );
     }
 
+    @Test
     public void testCancelReschedulesBlockedTasks()
         throws Exception
     {
@@ -273,6 +277,7 @@ public class TaskStopTest
         Utils.awaitZeroTaskCount( defaultScheduler, 1000 );
     }
 
+    @Test
     public void testCancellingStateBlocksTasks()
         throws Exception
     {
@@ -313,6 +318,7 @@ public class TaskStopTest
         assertEquals( 0, defaultScheduler.getAllTasks().size() );
     }
 
+    @Test
     public void testCancelBlockedTask()
         throws Exception
     {
@@ -364,6 +370,7 @@ public class TaskStopTest
         assertEquals( 0, defaultScheduler.getAllTasks().size() );
     }
 
+    @Test
     public void testDoNotCancelWaitingState()
         throws Exception
     {
@@ -416,6 +423,7 @@ public class TaskStopTest
         task.cancel();
     }
 
+    @Test
     public void testCancelManualRunStateIsSubmitted()
         throws Exception
     {

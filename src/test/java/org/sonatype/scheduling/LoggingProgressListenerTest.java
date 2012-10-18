@@ -1,19 +1,15 @@
 package org.sonatype.scheduling;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.inject.BeanScanning;
+import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+/**
+ * Tests for {@link LoggingProgressListener}.
+ */
 public class LoggingProgressListenerTest
-    extends PlexusTestCase
+    extends TestSupport
 {
-    @Override
-    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
-    {
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
-    }
-
+    @Test
     public void testSimple()
     {
         LoggingProgressListener pl = new LoggingProgressListener( "foo" );
@@ -38,6 +34,7 @@ public class LoggingProgressListenerTest
         pl.endTask( "Okay!" );
     }
 
+    @Test
     public void testSimpleUnknown()
     {
         LoggingProgressListener pl = new LoggingProgressListener( "foo" );

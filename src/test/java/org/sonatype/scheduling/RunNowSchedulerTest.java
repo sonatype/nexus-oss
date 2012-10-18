@@ -14,30 +14,25 @@ package org.sonatype.scheduling;
 
 import java.util.concurrent.Callable;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.inject.BeanScanning;
+import org.junit.Before;
+import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.junit.Assert.*;
 
 public class RunNowSchedulerTest
-    extends PlexusTestCase
+    extends TestSupport
 {
     protected DefaultScheduler defaultScheduler;
 
-    @Override
-    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
-    {
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
-    }
-
+    @Before
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
-        defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
+        defaultScheduler = new DefaultScheduler(new SimpleTaskConfigManager());
     }
 
+    @Test
     public void testRunNowRunnable()
         throws Exception
     {
@@ -61,6 +56,7 @@ public class RunNowSchedulerTest
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
+    @Test
     public void testRunNowCallable()
         throws Exception
     {

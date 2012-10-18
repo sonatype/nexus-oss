@@ -6,33 +6,28 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.inject.BeanScanning;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.Schedule;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.junit.Assert.*;
 
 public class DisabledScheduledTaskTest
-    extends PlexusTestCase
+    extends TestSupport
 {
     protected DefaultScheduler defaultScheduler;
 
-    @Override
-    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
-    {
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( BeanScanning.INDEX.name() );
-    }
-
+    @Before
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
-        defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
+        defaultScheduler = new DefaultScheduler(new SimpleTaskConfigManager());
     }
 
-    public void testRunDisabledTaske()
+    @Test
+    public void testRunDisabledTask()
         throws Exception
     {
         ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this
@@ -64,6 +59,7 @@ public class DisabledScheduledTaskTest
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
     }
 
+    @Test
     public void testDisabledTaskOnSchedule()
         throws Exception
     {
@@ -82,6 +78,7 @@ public class DisabledScheduledTaskTest
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
     }
 
+    @Test
     public void testRestoreDisabledTask()
         throws Exception
     {
