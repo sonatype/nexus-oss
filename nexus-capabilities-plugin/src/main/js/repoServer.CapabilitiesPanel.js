@@ -14,20 +14,23 @@
  * Capabilities Edit/Create panel layout and controller
  */
 
-/*global Ext, Sonatype*/
+/*global Ext, Sonatype, FormFieldGenerator*/
 
 (function() {
 
-var CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities';
-var CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes';
-var CAPABILITY_SETTINGS_PREFIX = '';
+var
+      CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities',
+      CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes',
+      CAPABILITY_SETTINGS_PREFIX = '';
 
-Sonatype.repoServer.CapabilitiesPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
+  var
+        config = cfg || {},
+        defaultConfig = {},
+        ht = Sonatype.repoServer.resources.help.capabilities;
+
   Ext.apply(this, config, defaultConfig);
 
-  var ht = Sonatype.repoServer.resources.help.capabilities;
 
   this.actions = {
     doRefresh : new Ext.Action({
@@ -578,15 +581,17 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
       saveHandler : function(formInfoObj) {
 
-        var allValid = false;
-        allValid = formInfoObj.formPanel.form.isValid();
-
-        if (allValid)
+        if (formInfoObj.formPanel.form.isValid())
         {
-          var isNew = formInfoObj.isNew;
-          var createUri = CAPABILITIES_SERVICE_PATH;
-          var updateUri = (formInfoObj.resourceURI) ? formInfoObj.resourceURI : '';
-          var form = formInfoObj.formPanel.form;
+          var
+                isNew = formInfoObj.isNew,
+                createUri = CAPABILITIES_SERVICE_PATH,
+                updateUri = '',
+                form = formInfoObj.formPanel.form;
+
+          if (formInfoObj.resourceURI) {
+            updateUri = formInfoObj.resourceURI;
+          }
 
           form.doAction('sonatypeSubmit', {
             method : (isNew) ? 'POST' : 'PUT',
@@ -615,9 +620,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       cancelHandler : function(formInfoObj) {
-        var formLayout = this.formCards.getLayout();
-        var gridSelectModel = this.capabilitiesGridPanel.getSelectionModel();
-        var store = this.capabilitiesGridPanel.getStore();
+        var
+              i,
+              formLayout = this.formCards.getLayout(),
+              gridSelectModel = this.capabilitiesGridPanel.getSelectionModel(),
+              store = this.capabilitiesGridPanel.getStore();
 
         this.formCards.remove(formInfoObj.formPanel.id, true);
 
@@ -625,7 +632,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         {
           formLayout.setActiveItem(this.formCards.items.length - 1);
           // select the coordinating row in the grid, or none if back to default
-          var i = store.indexOfId(formLayout.activeItem.id);
+          i = store.indexOfId(formLayout.activeItem.id);
           if (i >= 0)
           {
             gridSelectModel.selectRow(i);
@@ -651,15 +658,18 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
       addResourceHandler : function() {
 
-        var id = 'new_capability_' + new Date().getTime();
+        var
+              formPanel, buttonInfoObj, newRec,
+              sp = Sonatype.lib.Permissions,
+              id = 'new_capability_' + new Date().getTime(),
+              config = Ext.apply({}, this.formConfig.capability, {
+                id : id,
+                active : false
+              });
 
-        var config = Ext.apply({}, this.formConfig.capability, {
-              id : id,
-              active : false
-            });
         config = this.configUniqueIdHelper(id, config);
         Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customFieldTypes, this.COMBO_WIDTH));
-        var formPanel = new Ext.FormPanel(config);
+        formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
         formPanel.form.on('actionfailed', this.actionFailedHandler, this);
@@ -667,19 +677,13 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               single : true
             });
 
-        var capabilityTypeField = formPanel.find('name', 'typeId')[0];
-        capabilityTypeField.on('select', this.capabilityTypeSelectHandler, formPanel);
+        formPanel.find('name', 'typeId')[0].on('select', this.capabilityTypeSelectHandler, formPanel);
 
-        var settingsPanel = formPanel.findById(formPanel.id + '_settings-panel');
-        settingsPanel.hide();
+        formPanel.findById(formPanel.id + '_settings-panel').hide();
+        formPanel.find('name', 'status-panel')[0].hide();
+        formPanel.find('name', 'about-panel')[0].hide();
 
-        var statusPanel = formPanel.find('name', 'status-panel')[0];
-        statusPanel.hide();
-
-        var aboutPanel = formPanel.find('name', 'about-panel')[0];
-        aboutPanel.hide();
-
-        var buttonInfoObj = {
+        buttonInfoObj = {
           formPanel : formPanel,
           isNew : true
         };
@@ -689,7 +693,6 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         // cancel button event handler
         formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
 
-        var sp = Sonatype.lib.Permissions;
         if (sp.checkPermission('nexus:tasks', sp.EDIT))
         {
           formPanel.buttons[0].disabled = false;
@@ -699,7 +702,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         this.formCards.add(formPanel);
 
         // add place holder to grid
-        var newRec = new this.capabilityRecordConstructor({
+        newRec = new this.capabilityRecordConstructor({
               description : 'New Capability',
               resourceURI : 'new'
             }, id); // use "new_capability_" id instead of resourceURI like the
@@ -731,7 +734,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         {
           var rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
 
-          if (rec.data.resourceURI == 'new')
+          if (rec.data.resourceURI === 'new')
           {
             this.cancelHandler({
                   formPanel : Ext.getCmp(rec.id),
@@ -759,7 +762,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                   scope : this,
                   icon : Sonatype.MessageBox.QUESTION,
                   fn : function(btnName) {
-                    if (btnName == 'yes' || btnName == 'ok')
+                    if (btnName === 'yes' || btnName === 'ok')
                     {
                       Ext.Ajax.request({
                             callback : this.deleteCallback,
@@ -780,12 +783,14 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       deleteCallback : function(options, isSuccess, response) {
         if (isSuccess)
         {
-          var resourceId = options.cbPassThru.resourceId;
-          var formLayout = this.formCards.getLayout();
-          var gridSelectModel = this.capabilitiesGridPanel.getSelectionModel();
-          var store = this.capabilitiesGridPanel.getStore();
+          var
+                i,
+                resourceId = options.cbPassThru.resourceId,
+                formLayout = this.formCards.getLayout(),
+                gridSelectModel = this.capabilitiesGridPanel.getSelectionModel(),
+                store = this.capabilitiesGridPanel.getStore();
 
-          if (formLayout.activeItem.id == resourceId)
+          if (formLayout.activeItem.id === resourceId)
           {
             this.formCards.remove(resourceId, true);
             if (this.formCards.items.length > 0)
@@ -793,7 +798,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               formLayout.setActiveItem(this.formCards.items.length - 1);
               // select the coordinating row in the grid, or none if back to
               // default
-              var i = store.indexOfId(formLayout.activeItem.id);
+              i = store.indexOfId(formLayout.activeItem.id);
               if (i >= 0)
               {
                 gridSelectModel.selectRow(i);
@@ -828,14 +833,15 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       actionCompleteHandler : function(form, action) {
         // @todo: handle server error response here!!
 
-        if (action.type == 'sonatypeSubmit')
+        if (action.type === 'sonatypeSubmit')
         {
-          var isNew = action.options.isNew;
-          var receivedData = action.handleResponse( action.response ).data;
-          var rec;
-          if ( isNew ) {
+          var
+                i, rec, dataObj, sortState,
+                receivedData = action.handleResponse(action.response).data;
+
+          if ( action.options.isNew ) {
             // successful create
-            var dataObj = {
+            dataObj = {
               id:receivedData.id,
               description:receivedData.description,
               notes:receivedData.notes,
@@ -854,11 +860,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             this.capabilitiesDataStore.addSorted( rec );
           }
           else {
-            var i = this.capabilitiesDataStore.indexOfId( action.options.fpanel.id );
+            i = this.capabilitiesDataStore.indexOfId( action.options.fpanel.id );
             rec = this.capabilitiesDataStore.getAt( i );
 
             this.updateCapabilityRecord( rec, receivedData );
-            var sortState = this.capabilitiesDataStore.getSortState();
+            sortState = this.capabilitiesDataStore.getSortState();
             this.capabilitiesDataStore.sort( sortState.field, sortState.direction );
           }
 
@@ -892,7 +898,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
       // (Ext.form.BasicForm, Ext.form.Action)
       actionFailedHandler : function(form, action) {
-        if (action.failureType == Ext.form.Action.CLIENT_INVALID)
+        if (action.failureType === Ext.form.Action.CLIENT_INVALID)
         {
           Sonatype.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Sonatype.MessageBox.WARNING);
         }
@@ -902,11 +908,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         // Sonatype.MessageBox.alert('Invalid Fields', 'The server identified
         // invalid fields.').setIcon(Sonatype.MessageBox.ERROR);
         // }
-        else if (action.failureType == Ext.form.Action.CONNECT_FAILURE)
+        else if (action.failureType === Ext.form.Action.CONNECT_FAILURE)
         {
           Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.')
         }
-        else if (action.failureType == Ext.form.Action.LOAD_FAILURE)
+        else if (action.failureType === Ext.form.Action.LOAD_FAILURE)
         {
           Sonatype.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
         }
@@ -930,18 +936,21 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       rowSelect : function(selectionModel, index, rec) {
         this.formCards.setTitle((rec.data.typeName?rec.data.typeName+' - ':'') + rec.data.description);
 
-        var id = rec.id; // note: rec.id is unique for new resources and equal
-        // to resourceURI for existing ones
-        var formPanel = this.formCards.findById(id);
+        var
+              config, settingsPanel, emptySettings,capabilityType, aboutPanel, active, buttonInfoObj,
+              sp = Sonatype.lib.Permissions,
+              id = rec.id, // note: rec.id is unique for new resources and equal to resourceURI for existing ones
+              formPanel = this.formCards.findById(id);
 
         // assumption: new route forms already exist in formCards, so they won't
         // get into this case
         if (!formPanel)
         { // create form and populate current data
-          var config = Ext.apply({}, this.formConfig.capability, {
+          config = Ext.apply({}, this.formConfig.capability, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
+
           Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customFieldTypes));
           formPanel = new Ext.FormPanel(config);
 
@@ -952,10 +961,10 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               });
 
           // enable capability type panel fields
-          var settingsPanel = formPanel.findById(formPanel.id + '_settings-panel');
-          var emptySettings = true;
+          settingsPanel = formPanel.findById(formPanel.id + '_settings-panel');
+          emptySettings = true;
           settingsPanel.items.each(function(item, i, len) {
-                if (item.id == id + '_' + rec.data.typeId)
+                if (item.id === id + '_' + rec.data.typeId)
                 {
                   settingsPanel.activeItem = i;
                   if (item.items)
@@ -985,10 +994,10 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             formPanel.find('name', 'status-panel')[0].hide();
           }
 
-          var capabilityType = this.capabilityTypeDataStore.getById(rec.data.typeId);
-          formPanel.find('name', 'about')[0].html = capabilityType.data.about?capabilityType.data.about:'';
+          capabilityType = this.capabilityTypeDataStore.getById(rec.data.typeId);
+          formPanel.find('name', 'about')[0].html = capabilityType.data.about ? capabilityType.data.about:'';
 
-          var aboutPanel = formPanel.find('name', 'about-panel')[0];
+          aboutPanel = formPanel.find('name', 'about-panel')[0];
           if(capabilityType.data.about) {
             aboutPanel.show();
           }
@@ -996,11 +1005,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             aboutPanel.hide();
           }
 
-          var active = formPanel.find('name', 'active')[0];
+          active = formPanel.find('name', 'active')[0];
           active.checked = rec.data.active;
           active.afterText = rec.data.active && rec.data.stateDescription ? '' : ' ' + rec.data.stateDescription;
 
-          var buttonInfoObj = {
+          buttonInfoObj = {
             formPanel : formPanel,
             isNew : false, // not a new route form, see assumption
             resourceURI : rec.data.resourceURI
@@ -1009,7 +1018,6 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
           formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
 
-          var sp = Sonatype.lib.Permissions;
           if (sp.checkPermission('nexus:capabilities', sp.EDIT))
           {
             formPanel.buttons[0].disabled = false;
@@ -1028,15 +1036,15 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       contextClick : function(grid, index, e) {
         this.contextHide();
 
-        if (e.target.nodeName == 'A' || this.capabilitiesGridPanel.store.getAt(index).data.resourceURI == 'new')
+        if (e.target.nodeName === 'A' || this.capabilitiesGridPanel.store.getAt(index).data.resourceURI === 'new') {
           return; // no menu on links
+        }
 
         this.ctxRow = this.capabilitiesGridPanel.view.getRow(index);
         this.ctxRecord = this.capabilitiesGridPanel.store.getAt(index);
         Ext.fly(this.ctxRow).addClass('x-node-ctx');
 
-        // @todo: would be faster to pre-render the six variations of the menu
-        // for whole instance
+        // @todo: would be faster to pre-render the six variations of the menu for whole instance
         var menu = new Ext.menu.Menu({
               id : 'capability-grid-ctx',
               items : [this.actions.doRefresh]
@@ -1070,19 +1078,22 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       capabilityTypeSelectHandler : function(combo, record, index) {
-        var settingsPanel = this.findById(this.id + '_settings-panel');
+        var
+              about = this.find('name', 'about')[0],
+              aboutPanel = this.find('name', 'about-panel')[0],
+              settingsPanel = this.findById(this.id + '_settings-panel'),
+              formId = this.id,
+              emptySettings = true;
+
         // First disable all the items currently on screen, so they wont be
         // validated/submitted etc
         settingsPanel.getLayout().activeItem.items.each(function(item) {
           item.disable();
         });
-        // Then find the proper card to activate (based upon id of the
-        // capabilityType)
+        // Then find the proper card to activate (based upon id of the capabilityType)
         // Then enable the fields in that card
-        var formId = this.id;
-        var emptySettings = true;
         settingsPanel.items.each(function(item, i, len) {
-              if (item.id == formId + '_' + record.data.id)
+              if (item.id === formId + '_' + record.data.id)
               {
                 settingsPanel.getLayout().setActiveItem(item);
                 if(item.items && item.items.length > 0) {
@@ -1101,10 +1112,8 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           settingsPanel.show();
         }
 
-        var about = this.find('name', 'about')[0];
         about.body.update(record.data.about?record.data.about:'');
 
-        var aboutPanel = this.find('name', 'about-panel')[0];
         if(record.data.about) {
           aboutPanel.show();
         }
@@ -1127,9 +1136,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       assignItemIds : function(id, items) {
-        for (var i = 0; i < items.length; i++)
+        var i, item;
+
+        for (i = 0; i < items.length; i=i+1)
         {
-          var item = items[i];
+          item = items[i];
           if (item.id)
           {
             if (!item.originalId)
@@ -1165,11 +1176,13 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         return val;
       },
 
-      enableHandler : function(rec) {
+      enableHandler : function() {
         if (this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().hasSelection())
         {
-          var rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
-          var waitBox = Ext.MessageBox.wait('Enabling capability...','Please Wait...');
+          var
+                waitBox = Ext.MessageBox.wait('Enabling capability...','Please Wait...'),
+                rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
+
           Ext.Ajax.request({
             url : rec.data.resourceURI + '/status',
             jsonData : {
@@ -1191,8 +1204,10 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       disableHandler : function() {
         if (this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().hasSelection())
         {
-          var rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
-          var waitBox = Ext.MessageBox.wait('Disabling capability...','Please Wait...');
+          var
+                rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected(),
+                waitBox = Ext.MessageBox.wait('Disabling capability...','Please Wait...');
+
           Ext.Ajax.request({
             url : rec.data.resourceURI + '/status',
             waitMsg : 'Disabling capability...',
@@ -1258,4 +1273,4 @@ A capability descriptor form field with an ID of 'custom-type' will then be mapp
 */
 Sonatype.Events.fireEvent('capabilitiesCustomTypeInit', Sonatype.repoServer.CapabilitiesPanel.prototype.customFieldTypes);
 
-})();
+}());

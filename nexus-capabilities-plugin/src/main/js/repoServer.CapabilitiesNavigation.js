@@ -14,6 +14,7 @@
  * Capabilities navigation (menu) setup
  */
 
+/*global Ext,Sonatype,Nexus*/
 Sonatype.Events.addListener('nexusNavigationInit', function(nexusPanel) {
       nexusPanel.add({
             enabled : Sonatype.lib.Permissions.checkPermission('nexus:capabilities', Sonatype.lib.Permissions.READ),
