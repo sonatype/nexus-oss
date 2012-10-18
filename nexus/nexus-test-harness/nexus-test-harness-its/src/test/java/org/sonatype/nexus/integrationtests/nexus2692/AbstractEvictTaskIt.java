@@ -287,7 +287,7 @@ public class AbstractEvictTaskIt
 
     protected String prettyList( Set<String> list )
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for ( String string : list )
         {
             buffer.append( string ).append( "\n" );

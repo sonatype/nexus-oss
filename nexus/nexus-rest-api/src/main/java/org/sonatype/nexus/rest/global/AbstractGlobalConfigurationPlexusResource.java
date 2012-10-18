@@ -172,7 +172,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         
         settings.getRoles().addAll( target.getTargetRoles() );
         
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         for ( String email : target.getExternalTargets() )
         {

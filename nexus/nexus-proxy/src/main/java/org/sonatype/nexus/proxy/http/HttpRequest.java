@@ -47,7 +47,7 @@ public class HttpRequest
 
     public String getFirstLine()
     {
-        StringBuffer sb = new StringBuffer( getMethod() );
+        StringBuilder sb = new StringBuilder( getMethod() );
 
         sb.append( " " );
 

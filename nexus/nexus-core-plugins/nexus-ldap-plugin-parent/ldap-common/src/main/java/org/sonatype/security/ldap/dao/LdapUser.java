@@ -105,7 +105,7 @@ implements Comparable<LdapUser>
 
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         
         buffer.append( "User:" );
         buffer.append( "\n\tUsername: " ).append( username );

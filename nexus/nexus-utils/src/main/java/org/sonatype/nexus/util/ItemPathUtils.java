@@ -38,7 +38,7 @@ public class ItemPathUtils
      */
     public static String concatPaths( String... p )
     {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         for ( String path : p )
         {
@@ -154,9 +154,9 @@ public class ItemPathUtils
             return pathA;
         }
 
-        StringBuffer lcp = new StringBuffer();
+        StringBuilder lcp = new StringBuilder();
 
-        StringBuffer token = new StringBuffer();
+        StringBuilder token = new StringBuilder();
 
         int index = 0;
 

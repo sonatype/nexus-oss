@@ -51,7 +51,7 @@ public abstract class AbstractRemoteDiscoveryStrategy
     {
         SystemStatus status = getNexus().getSystemStatus();
 
-        StringBuffer userAgentPlatformInfo = new StringBuffer( "Nexus/" )
+        StringBuilder userAgentPlatformInfo = new StringBuilder( "Nexus/" )
             .append( status.getVersion() ).append( " (" ).append( status.getEditionShort() ).append( "; " ).append(
                 System.getProperty( "os.name" ) ).append( "; " ).append( System.getProperty( "os.version" ) ).append(
                 "; " ).append( System.getProperty( "os.arch" ) ).append( "; " ).append(

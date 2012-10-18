@@ -43,7 +43,7 @@ public class RepositoryEventProxyModeChangedInspector
     {
         RepositoryEventProxyModeChanged revt = (RepositoryEventProxyModeChanged) evt;
 
-        StringBuffer sb = new StringBuffer( "The proxy mode of repository '" );
+        StringBuilder sb = new StringBuilder( "The proxy mode of repository '" );
 
         sb.append( revt.getRepository().getName() );
 

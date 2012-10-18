@@ -32,7 +32,7 @@ public class MD5Crypt {
     private static final String itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private static String cryptTo64(int value, int length) {
-    StringBuffer output = new StringBuffer();
+    StringBuilder output = new StringBuilder();
 
     while (--length >= 0) {
         output.append(itoa64.substring(value & 0x3f, (value & 0x3f)+1));
@@ -51,7 +51,7 @@ public class MD5Crypt {
      */
     public final String crypt(String password) throws java.security.NoSuchAlgorithmException
     {
-        StringBuffer salt = new StringBuffer();
+        StringBuilder salt = new StringBuilder();
         SecureRandom randgen = new SecureRandom();
         while (salt.length() < 8)
         {
@@ -147,7 +147,7 @@ public class MD5Crypt {
     /* Set up the output string. It'll look something like
      * $1$salt$ to begin with
      */
-    StringBuffer output = new StringBuffer(magic);
+    StringBuilder output = new StringBuilder(magic);
     output.append(salt);
     output.append("$");
 

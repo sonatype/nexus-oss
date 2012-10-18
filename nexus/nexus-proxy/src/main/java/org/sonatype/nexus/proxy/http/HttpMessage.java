@@ -77,7 +77,7 @@ public abstract class HttpMessage
     public void write( OutputStream os, boolean flush )
         throws IOException
     {
-        StringBuffer sb = new StringBuffer( getFirstLine() );
+        StringBuilder sb = new StringBuilder( getFirstLine() );
 
         sb.append( "\n" );
 
@@ -117,7 +117,7 @@ public abstract class HttpMessage
     protected String readLine( InputStream in )
     {
         // reads a line of text from an InputStream
-        StringBuffer data = new StringBuffer( "" );
+        StringBuilder data = new StringBuilder( "" );
 
         int c;
 

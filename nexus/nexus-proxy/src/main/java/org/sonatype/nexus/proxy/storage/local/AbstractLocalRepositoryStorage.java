@@ -156,7 +156,7 @@ public abstract class AbstractLocalRepositoryStorage
     public URL getAbsoluteUrlFromBase( Repository repository, ResourceStoreRequest request )
         throws LocalStorageException
     {
-        StringBuffer urlStr = new StringBuffer( repository.getLocalUrl() );
+        StringBuilder urlStr = new StringBuilder( repository.getLocalUrl() );
 
         if ( request.getRequestPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {

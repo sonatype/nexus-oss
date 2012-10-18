@@ -25,7 +25,7 @@ public class DefaultVetoFormatter
 {
     public String format( VetoFormatterRequest request )
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         if ( request != null
             && request.getEvent() != null 

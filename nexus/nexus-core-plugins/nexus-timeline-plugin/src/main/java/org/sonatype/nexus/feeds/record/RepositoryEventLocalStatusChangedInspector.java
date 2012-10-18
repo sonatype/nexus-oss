@@ -43,7 +43,7 @@ public class RepositoryEventLocalStatusChangedInspector
     {
         RepositoryEventLocalStatusChanged revt = (RepositoryEventLocalStatusChanged) evt;
 
-        StringBuffer sb = new StringBuffer( "The repository '" );
+        StringBuilder sb = new StringBuilder( "The repository '" );
 
         sb.append( revt.getRepository().getName() );
 

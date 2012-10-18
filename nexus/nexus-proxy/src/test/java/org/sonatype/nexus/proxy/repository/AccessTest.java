@@ -178,7 +178,7 @@ public class AccessTest
 
     private String targetMatchToString( TargetMatch targetMatch )
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         buffer.append( "RepoId: " ).append( targetMatch.getRepository().getId() ).append( "\n" );
         Target target = targetMatch.getTarget();

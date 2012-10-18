@@ -242,8 +242,8 @@ public class MarshalUnmarchalTest
         // simple json string with an explicit null value (generated from the Nexus UI)
         String payload = "{\"data\":{\"ldapFilter\":null}}";
 
-        StringBuffer sb =
-            new StringBuffer( "{ \"" ).append( LdapUserAndGroupConfigTestRequest.class.getName() ).append( "\" : " ).append(
+        StringBuilder sb =
+            new StringBuilder( "{ \"" ).append( LdapUserAndGroupConfigTestRequest.class.getName() ).append( "\" : " ).append(
                 payload ).append( " }" );
         // validate this parses without error
         xstreamJSON.fromXML( sb.toString() );

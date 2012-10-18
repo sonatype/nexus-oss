@@ -57,7 +57,7 @@ public class HttpResponse
 
     public String getFirstLine()
     {
-        StringBuffer sb = new StringBuffer( getHttpVersion() );
+        StringBuilder sb = new StringBuilder( getHttpVersion() );
 
         sb.append( " " );
 

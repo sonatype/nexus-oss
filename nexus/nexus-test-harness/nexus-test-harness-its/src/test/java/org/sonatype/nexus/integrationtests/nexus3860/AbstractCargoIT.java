@@ -295,7 +295,7 @@ public abstract class AbstractCargoIT
             reader = new InputStreamReader( stream );
             bReader = new BufferedReader( reader );
 
-            StringBuffer downloadedLog = new StringBuffer();
+            StringBuilder downloadedLog = new StringBuilder();
 
             int lineCount = 10000;
             while ( bReader.ready() && lineCount-- > 0 )

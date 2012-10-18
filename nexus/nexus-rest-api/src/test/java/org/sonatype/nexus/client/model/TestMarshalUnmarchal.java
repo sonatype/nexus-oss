@@ -2192,7 +2192,7 @@ public class TestMarshalUnmarchal
 
         // do json
         String json =
-            new StringBuffer( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append( this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
+            new StringBuilder( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append( this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
         System.out.println( "json:\n " + json );
         try
         {
