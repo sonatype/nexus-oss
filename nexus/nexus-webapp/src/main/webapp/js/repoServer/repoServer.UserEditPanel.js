@@ -600,6 +600,9 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
       submit : {
         roles : function(value, fpanel) {
           return fpanel.find('name', 'roleManager')[0].getSelectedRoleIds();
+        },
+        email : function(value, fpanel) {
+          return Ext.util.Format.trim(value);
         }
       }
     }
