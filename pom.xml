@@ -415,7 +415,7 @@
             <configuration>
               <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
               <forkMode>always</forkMode>
-              <argLine>-Xmx512m</argLine>
+              <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
               <junitArtifactName>none:none</junitArtifactName>
               <testNGArtifactName>org.testng:testng</testNGArtifactName>
               <failIfNoTests>false</failIfNoTests>
