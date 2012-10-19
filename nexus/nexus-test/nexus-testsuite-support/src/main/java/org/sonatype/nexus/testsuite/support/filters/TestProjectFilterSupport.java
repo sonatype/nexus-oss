@@ -17,8 +17,7 @@ import static org.sonatype.sisu.maven.bridge.support.ModelBuildingRequestBuilder
 
 import java.io.File;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.Properties;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingException;
@@ -45,15 +44,21 @@ public abstract class TestProjectFilterSupport
     private final MavenModelResolver modelResolver;
 
     /**
+     * Properties used to resolve model.
+     */
+    private final Map<String, String> properties;
+
+    /**
      * Constructor.
      *
      * @param modelResolver Model resolver used to resolve effective model of test project (pom). Cannot be null.
+     * @param properties    used to resolve model
      */
-    @Inject
-    public TestProjectFilterSupport( @Named( "remote-model-resolver-using-settings" )
-                                     final MavenModelResolver modelResolver )
+    public TestProjectFilterSupport( final MavenModelResolver modelResolver,
+                                     final Map<String, String> properties )
     {
         this.modelResolver = checkNotNull( modelResolver );
+        this.properties = checkNotNull( properties );
     }
 
     /**
@@ -77,7 +82,12 @@ public abstract class TestProjectFilterSupport
         {
             try
             {
-                final Model model = modelResolver.resolveModel( model().pom( new File( testProjectPomFile ) ) );
+                final Properties userProperties = new Properties();
+                userProperties.putAll( properties );
+
+                final Model model = modelResolver.resolveModel(
+                    model().pom( new File( testProjectPomFile ) ).setUserProperties( userProperties )
+                );
 
                 return mappings( context, value, model );
             }
@@ -88,6 +98,11 @@ public abstract class TestProjectFilterSupport
         }
 
         return mappings;
+    }
+
+    protected Map<String, String> getProperties()
+    {
+        return properties;
     }
 
     /**

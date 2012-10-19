@@ -15,15 +15,20 @@ package org.sonatype.nexus.bundle.launcher.support;
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.sisu.bl.jsw.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
+import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -50,7 +55,9 @@ import org.sonatype.sisu.bl.support.TimedCondition;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.goodies.common.Time;
+import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 
 /**
  * Default Nexus bundle implementation.
@@ -65,11 +72,20 @@ public class DefaultNexusBundle
 
     private static final Logger log = LoggerFactory.getLogger( DefaultNexusBundle.class );
 
+    private static final String USE_BUNDLE_PLUGINS_IF_PRESENT = "useBundlePluginsIfPresent";
+
     /**
      * File task builder.
      * Cannot be null.
      */
     private final FileTaskBuilder fileTaskBuilder;
+
+    /**
+     * Whether plugins installed in "sonatype-work/nexus/plugin-repository" should not be used in case they are present
+     * in "nexus/WEB-INF/plugin-repository". This is mainly used by tests that wish to test against a bundle that
+     * already contains the plugins installed by tests.
+     */
+    private final Boolean useBundlePluginsIfPresent;
 
     /**
      * Port on which Nexus Command Monitor is running. 0 (zero) if application is not running.
@@ -92,10 +108,13 @@ public class DefaultNexusBundle
     public DefaultNexusBundle( final Provider<NexusBundleConfiguration> configurationProvider,
                                final RunningBundles runningBundles,
                                final FileTaskBuilder fileTaskBuilder,
-                               final PortReservationService portReservationService )
+                               final PortReservationService portReservationService,
+                               final @Named( "${" + USE_BUNDLE_PLUGINS_IF_PRESENT
+                                                 + ":-false}" ) Boolean useBundlePluginsIfPresent )
     {
         super( "nexus", configurationProvider, runningBundles, fileTaskBuilder, portReservationService );
         this.fileTaskBuilder = fileTaskBuilder;
+        this.useBundlePluginsIfPresent = useBundlePluginsIfPresent;
     }
 
     /**
@@ -195,7 +214,7 @@ public class DefaultNexusBundle
             protected boolean isSatisfied()
                 throws Exception
             {
-                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send(PingCommand.NAME);
+                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PingCommand.NAME );
                 return true;
             }
         }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
@@ -256,6 +275,122 @@ public class DefaultNexusBundle
         {
             return false;
         }
+    }
+
+    @Override
+    public void doPrepare()
+    {
+        super.doPrepare();
+        if ( useBundlePluginsIfPresent )
+        {
+            removePluginsPresentInBundle();
+        }
+    }
+
+    private void removePluginsPresentInBundle()
+    {
+        final Map<String, File> workDirPlugins = listPlugins(
+            new File( getWorkDirectory(), "plugin-repository" )
+        );
+        if ( workDirPlugins.size() > 0 )
+        {
+            final Map<String, File> bundlePlugins = listPlugins(
+                new File( getNexusDirectory(), "nexus/WEB-INF/plugin-repository" )
+            );
+            for ( final Map.Entry<String, File> entry : workDirPlugins.entrySet() )
+            {
+                if ( bundlePlugins.containsKey( entry.getKey() ) )
+                {
+                    log.info(
+                        "Removing plugin '{}' as is already present in extracted bundle", entry.getValue().getName()
+                    );
+                    fileTaskBuilder.delete().directory( file( entry.getValue() ) ).run();
+                }
+            }
+        }
+    }
+
+    private Map<String, File> listPlugins( final File pluginsDir )
+    {
+        final Map<String, File> plugins = Maps.newHashMap();
+        final File[] foundPlugins = pluginsDir.listFiles( new FileFilter()
+        {
+            @Override
+            public boolean accept( final File file )
+            {
+                return file.isDirectory();
+            }
+        } );
+        if ( foundPlugins != null && foundPlugins.length > 0 )
+        {
+            for ( final File plugin : foundPlugins )
+            {
+                final Optional<File> mainJar = getPluginMainJar( plugin );
+                if ( mainJar.isPresent() )
+                {
+                    final Optional<String> gaCoordinates = getPluginGACoordinates( mainJar.get() );
+                    if ( gaCoordinates.isPresent() )
+                    {
+                        plugins.put( gaCoordinates.get(), plugin );
+                    }
+                }
+            }
+        }
+        return plugins;
+    }
+
+    private Optional<String> getPluginGACoordinates( final File mainJar )
+    {
+        try
+        {
+            final ZipFile jarFile = new ZipFile( mainJar );
+            final Enumeration<? extends ZipEntry> entries = jarFile.entries();
+            if ( entries != null )
+            {
+                while ( entries.hasMoreElements() )
+                {
+                    final ZipEntry zipEntry = entries.nextElement();
+                    if ( zipEntry.getName().startsWith( "META-INF/maven" )
+                        && zipEntry.getName().endsWith( "pom.properties" ) )
+                    {
+                        final Properties props = new Properties();
+                        props.load( jarFile.getInputStream( zipEntry ) );
+                        return Optional.of( props.getProperty( "groupId" ) + ":" + props.getProperty( "artifactId" ) );
+                    }
+                }
+            }
+        }
+        catch ( IOException e )
+        {
+            throw Throwables.propagate( e );
+        }
+        return Optional.absent();
+    }
+
+    private Optional<File> getPluginMainJar( final File plugin )
+    {
+        final String[] mainJars = plugin.list( new FilenameFilter()
+        {
+            @Override
+            public boolean accept( final File dir, final String name )
+            {
+                return name.endsWith( ".jar" );
+            }
+        } );
+        if ( mainJars != null && mainJars.length > 0 )
+        {
+            if ( mainJars.length > 1 )
+            {
+                throw new IllegalStateException(
+                    "Plugin '" + plugin.getAbsolutePath() + "' contains more then one jar"
+                );
+            }
+            else
+            {
+                return Optional.of( new File( plugin, mainJars[0] ) );
+            }
+        }
+        return Optional.absent();
     }
 
     /**
@@ -385,7 +520,7 @@ public class DefaultNexusBundle
         log.debug( "Sending stop command to Nexus" );
         try
         {
-            new CommandMonitorTalker( LOCALHOST, commandPort ).send(StopApplicationCommand.NAME);
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( StopApplicationCommand.NAME );
         }
         catch ( Exception e )
         {
@@ -396,8 +531,9 @@ public class DefaultNexusBundle
         }
     }
 
-    private static void terminateRemoteNexus( final int commandPort ) {
-        log.debug("Attempting to terminate remote nexus");
+    private static void terminateRemoteNexus( final int commandPort )
+    {
+        log.debug( "Attempting to terminate remote nexus" );
 
         // First attempt graceful shutdown
         sendStopToNexus( commandPort );
@@ -408,35 +544,44 @@ public class DefaultNexusBundle
         long period = 1000;
 
         // Then ping for a bit and finally give up and ask it to halt
-        while (true) {
-            try {
+        while ( true )
+        {
+            try
+            {
                 talker.send( PingCommand.NAME );
             }
-            catch (ConnectException e) {
+            catch ( ConnectException e )
+            {
                 // likely its shutdown already
                 break;
             }
-            catch (Exception e) {
+            catch ( Exception e )
+            {
                 // ignore, not sure there is much we can do
             }
 
             // If we have waited long enough, then ask remote to halt
-            if (System.currentTimeMillis() - started > max) {
-                try {
+            if ( System.currentTimeMillis() - started > max )
+            {
+                try
+                {
                     talker.send( HaltCommand.NAME );
                     break;
                 }
-                catch (Exception e) {
+                catch ( Exception e )
+                {
                     // ignore, not sure there is much we can do
                     break;
                 }
             }
 
             // Wait a wee bit and try again
-            try {
-                Thread.sleep(period);
+            try
+            {
+                Thread.sleep( period );
             }
-            catch (InterruptedException e) {
+            catch ( InterruptedException e )
+            {
                 // ignore
             }
         }
