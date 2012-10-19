@@ -6,9 +6,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.eclipse.jetty.server.Server;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.sisu.jetty.mangler.ContextAttributeSetterMangler;
@@ -23,8 +20,6 @@ import org.sonatype.sisu.jetty.util.JettyUtils;
  * 
  * @author cstamas
  */
-@Named
-@Singleton
 public class Jetty8
 {
     private final Server server;
