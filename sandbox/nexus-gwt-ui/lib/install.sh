@@ -1,1 +1,0 @@
-mvn install:install-file -Dfile=gxt.jar -DgroupId=com.extjs.gxt -DartifactId=gxt -Dversion=1.0-rc2 -Dpackaging=jar -DgeneratePom=true -DgenerateChecksum=true
