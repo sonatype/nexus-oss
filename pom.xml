@@ -13,7 +13,7 @@
   <version>1.7-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>SISU Task Scheduler</name>
+  <name>Sisu Task Scheduler</name>
 
   <scm>
     <connection>scm:git:git://github.com/sonatype/sisu-task-scheduler.git</connection>
@@ -21,22 +21,27 @@
     <url>https://github.com/sonatype/sisu-task-scheduler</url>
   </scm>
 
+  <ciManagement>
+      <system>hudson</system>
+      <url>https://builds.sonatype.org/job/sisu-task-scheduler/</url>
+  </ciManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
       <optional>true</optional>
     </dependency>
 
-    <!-- Test -->
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
