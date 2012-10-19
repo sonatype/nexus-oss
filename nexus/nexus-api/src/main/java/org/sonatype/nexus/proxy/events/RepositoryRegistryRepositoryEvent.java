@@ -43,4 +43,10 @@ public abstract class RepositoryRegistryRepositoryEvent
         return this.repository;
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "repositoryId=" + repository.getId() +
+            '}';
+    }
 }
