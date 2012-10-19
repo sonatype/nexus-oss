@@ -75,27 +75,7 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- SISU, needed if you use this library as a SISU component -->
-    <!-- Then you will have to add this to SISUized environment anyway -->
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-bean</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-guice</artifactId>
-      <classifier>no_aop</classifier>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- JSW, needed if you use this library as Jetty JSW enabled booter -->
-    <!-- JSW as optional dependency too, used for JSW support -->
     <dependency>
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
@@ -106,8 +86,10 @@
 
     <!-- Test -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

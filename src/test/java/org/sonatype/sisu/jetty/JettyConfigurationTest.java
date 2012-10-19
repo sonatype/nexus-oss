@@ -20,6 +20,8 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.eclipse.jetty.server.Server;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.sonatype.appcontext.internal.ContextStringDumper;
 import org.sonatype.sisu.jetty.mangler.ContextAttributeGetterMangler;
 import org.sonatype.sisu.jetty.mangler.ContextGetterMangler;
@@ -30,6 +32,7 @@ import org.sonatype.sisu.jetty.util.JettyUtils;
 public class JettyConfigurationTest
     extends AbstractJettyConfigurationTest
 {
+    @Test
     public void testKeyInclusion()
         throws Exception
     {
@@ -47,6 +50,7 @@ public class JettyConfigurationTest
         Assert.assertFalse( subject.getAppContext().containsKey( "none" ) );
     }
 
+    @Test
     public void testKeyInclusionIsOverriddenByDirectMap()
         throws Exception
     {
@@ -66,6 +70,7 @@ public class JettyConfigurationTest
         Assert.assertFalse( subject.getAppContext().containsKey( "none" ) );
     }
 
+    @Test
     public void testSimpleStart1()
         throws Exception
     {
@@ -90,6 +95,8 @@ public class JettyConfigurationTest
     }
 
     // skip this for now
+    @Test
+    @Ignore
     public void NOtestSimpleStart2()
         throws Exception
     {
@@ -114,6 +121,8 @@ public class JettyConfigurationTest
     }
 
     // skip this for now
+    @Test
+    @Ignore
     public void NOtestSimpleStart3()
         throws Exception
     {
@@ -137,6 +146,7 @@ public class JettyConfigurationTest
         subject.stopJetty();
     }
 
+    @Test
     public void testSimpleStartWithExtraContext()
         throws Exception
     {
@@ -168,6 +178,7 @@ public class JettyConfigurationTest
         Assert.assertEquals( "Context is not correctly set!", 6, subject.getAppContext().size() );
     }
 
+    @Test
     public void testSimpleStartWithInstrumentedThreadPool()
         throws Exception
     {
@@ -186,6 +197,7 @@ public class JettyConfigurationTest
         subject.stopJetty();
     }
 
+    @Test
     public void testStartStopConsecutively()
         throws Exception
     {
@@ -198,6 +210,7 @@ public class JettyConfigurationTest
         // we should get here without exception
     }
 
+    @Test
     public void testStartStopConsecutivelyWrongOrder1()
         throws Exception
     {
@@ -221,6 +234,7 @@ public class JettyConfigurationTest
         }
     }
 
+    @Test
     public void testStartStopConsecutivelyWrongOrder2()
         throws Exception
     {
@@ -238,6 +252,7 @@ public class JettyConfigurationTest
         }
     }
 
+    @Test
     public void testStartStopConsecutivelyWrongOrder3()
         throws Exception
     {
@@ -259,6 +274,7 @@ public class JettyConfigurationTest
         }
     }
 
+    @Test
     public void testCanStopAfterStartupFailure()
         throws Exception
     {
