@@ -143,6 +143,10 @@
     <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
     <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
 
+    <tattletale.failOnInfo>false</tattletale.failOnInfo>
+    <tattletale.failOnWarn>false</tattletale.failOnWarn>
+    <tattletale.failOnError>true</tattletale.failOnError>
+
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -1522,6 +1526,11 @@
           <groupId>org.jboss.tattletale</groupId>
           <artifactId>tattletale-maven</artifactId>
           <version>1.1.2.Final</version>
+          <configuration>
+            <failOnInfo>${tattletale.failOnInfo}</failOnInfo>
+            <failOnWarn>${tattletale.failOnWarn}</failOnWarn>
+            <failOnError>${tattletale.failOnError}</failOnError>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
@@ -1808,16 +1817,6 @@
   </modules>
 
   <profiles>
-    <profile>
-      <id>tattletale</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>nexus-oss-webapp-tattletale</module>
-      </modules>
-    </profile>
-
     <profile>
       <id>debug</id>
       <activation>
