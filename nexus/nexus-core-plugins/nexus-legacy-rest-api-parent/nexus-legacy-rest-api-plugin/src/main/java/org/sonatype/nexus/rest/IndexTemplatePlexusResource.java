@@ -40,12 +40,12 @@ import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.sisu.velocity.Velocity;
 
 @Component( role = ManagedPlexusResource.class, hint = "indexTemplate" )
 public class IndexTemplatePlexusResource
     extends AbstractPlexusResource
-    implements ManagedPlexusResource,
-        Initializable
+    implements ManagedPlexusResource, Initializable
 {
     @Requirement
     private Nexus nexus;
@@ -53,6 +53,9 @@ public class IndexTemplatePlexusResource
     @Requirement( role = NexusIndexHtmlCustomizer.class )
     private Map<String, NexusIndexHtmlCustomizer> bundles;
     
+    @Requirement
+    private Velocity velocity;
+
     @Configuration( value = "${index.template.file}" )
     String templateFilename;
 
@@ -115,11 +118,6 @@ public class IndexTemplatePlexusResource
 
         templatingContext.put( "nexusRoot", request.getRootRef().toString() );
 
-        VelocityRepresentation templateRepresentation = new VelocityRepresentation(
-            context,
-            templateFilename,
-            MediaType.TEXT_HTML );
-
         // gather plugin stuff
 
         Map<String, Object> topContext = new HashMap<String, Object>( templatingContext );
@@ -144,43 +142,31 @@ public class IndexTemplatePlexusResource
 
             String preHeadTemplate = bundle.getPreHeadContribution( pluginContext );
 
-            evaluateIfNeeded(
-                templateRepresentation.getEngine(),
-                pluginContext,
-                preHeadTemplate,
+            evaluateIfNeeded( pluginContext, preHeadTemplate,
                 pluginPreHeadContributions );
 
             // post HEAD
 
             String postHeadTemplate = bundle.getPostHeadContribution( pluginContext );
 
-            evaluateIfNeeded(
-                templateRepresentation.getEngine(),
-                pluginContext,
-                postHeadTemplate,
+            evaluateIfNeeded( pluginContext, postHeadTemplate,
                 pluginPostHeadContributions );
 
             // pre BODY
 
             String preBodyTemplate = bundle.getPreBodyContribution( pluginContext );
 
-            evaluateIfNeeded(
-                templateRepresentation.getEngine(),
-                pluginContext,
-                preBodyTemplate,
+            evaluateIfNeeded( pluginContext, preBodyTemplate,
                 pluginPreBodyContributions );
 
             // post BODY
 
             String postBodyTemplate = bundle.getPostBodyContribution( pluginContext );
 
-            evaluateIfNeeded(
-                templateRepresentation.getEngine(),
-                pluginContext,
-                postBodyTemplate,
+            evaluateIfNeeded( pluginContext, postBodyTemplate,
                 pluginPostBodyContributions );
         }
-        
+
         templatingContext.put( "appName", nexus.getSystemStatus().getAppName() );
         templatingContext.put( "formattedAppName", nexus.getSystemStatus().getFormattedAppName() );
 
@@ -190,13 +176,15 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "pluginPreBodyContributions", pluginPreBodyContributions );
         templatingContext.put( "pluginPostBodyContributions", pluginPostBodyContributions );
 
-        templateRepresentation.setDataModel( templatingContext );
+        final VelocityRepresentation templateRepresentation =
+            new VelocityRepresentation( context, templateFilename, getClass().getClassLoader(), templatingContext,
+                MediaType.TEXT_HTML );
 
         return templateRepresentation;
     }
 
-    protected void evaluateIfNeeded( VelocityEngine engine, Map<String, Object> context, String template,
-        List<String> results )
+    protected void evaluateIfNeeded( Map<String, Object> context, String template,
+                                     List<String> results )
         throws ResourceException
     {
         if ( !StringUtils.isEmpty( template ) )
@@ -205,14 +193,13 @@ public class IndexTemplatePlexusResource
 
             try
             {
-                if ( engine.evaluate( new VelocityContext( context ), result, getClass().getName(), template ) )
+                if ( velocity.getEngine().evaluate( new VelocityContext( context ), result, getClass().getName(), template ) )
                 {
                     results.add( result.toString() );
                 }
                 else
                 {
-                    throw new ResourceException(
-                        Status.SERVER_ERROR_INTERNAL,
+                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
                         "Was not able to interpolate (check the logs for Velocity messages about the reason)!" );
                 }
             }
@@ -225,11 +212,11 @@ public class IndexTemplatePlexusResource
             }
         }
     }
-    
+
     public void initialize()
         throws InitializationException
     {
-        //Hasn't been interpolated
+        // Hasn't been interpolated
         if ( "${index.template.file}".equals( templateFilename ) )
         {
             templateFilename = "templates/index.vm";

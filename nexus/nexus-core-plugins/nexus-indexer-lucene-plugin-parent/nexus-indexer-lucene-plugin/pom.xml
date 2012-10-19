@@ -72,6 +72,14 @@
       <artifactId>aether-util</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins.rest</groupId>
+      <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <type>${nexus-plugin.type}</type>
+    </dependency>
+
     <!-- Is in core -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -105,10 +113,8 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <scope>provided</scope>
+      <artifactId>nexus-test-common</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration-model</artifactId>
@@ -156,8 +162,9 @@
 
     <!-- FIXME: This dependency is here only for TestMarshalUnmarchal via TestLuceneRestMarshalUnmarchal -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <groupId>org.sonatype.nexus.plugins.rest</groupId>
+      <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+      <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>

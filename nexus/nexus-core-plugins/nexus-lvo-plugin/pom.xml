@@ -22,6 +22,7 @@
   </parent>
 
   <artifactId>nexus-lvo-plugin</artifactId>
+  <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : LVO Plugin</name>
 
   <properties>
@@ -31,10 +32,18 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <groupId>org.sonatype.nexus.plugins.rest</groupId>
+      <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <type>${nexus-plugin.type}</type>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-app</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>

@@ -1121,22 +1121,6 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-rest-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-rest-api-model</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-rest-api</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1769,8 +1753,6 @@
     <module>nexus-configuration</module>
     <module>nexus-proxy</module>
     <module>nexus-app</module>
-    <module>nexus-rest-api-model</module>
-    <module>nexus-rest-api</module>
     <module>nexus-migration-tool</module>
     <module>nexus-core-plugins</module>
     <module>nexus-webapp</module>

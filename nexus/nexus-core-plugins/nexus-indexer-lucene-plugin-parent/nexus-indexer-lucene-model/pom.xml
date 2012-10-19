@@ -34,8 +34,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api-model</artifactId>
+      <groupId>org.sonatype.nexus.plugins.rest</groupId>
+      <artifactId>nexus-legacy-rest-api-model</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>

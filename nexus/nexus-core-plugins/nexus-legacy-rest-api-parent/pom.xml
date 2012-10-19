@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -15,43 +14,21 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-core-plugins</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-core-documentation-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
-  <name>Nexus : Core Plugins : Core Documentation</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.nexus.plugins.rest</groupId>
+  <artifactId>nexus-legacy-rest-api-parent</artifactId>
+  <name>Nexus : Core Plugins : Legacy REST API</name>
+  <packaging>pom</packaging>
 
-  <properties>
-    <nexus.plugin.name>Nexus Core Documentation Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Exposes Nexus core documentation.</nexus.plugin.description>
-  </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins.rest</groupId>
-      <artifactId>nexus-legacy-rest-api-plugin</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-      <type>${nexus-plugin.type}</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>nexus-legacy-rest-api-model</module>
+    <module>nexus-legacy-rest-api-plugin</module>
+  </modules>
 
 </project>

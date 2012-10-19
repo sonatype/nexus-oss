@@ -17,6 +17,7 @@ import java.util.Enumeration;
 import javax.inject.Singleton;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import org.sonatype.plexus.rest.PlexusServerServlet;
 
@@ -41,6 +42,22 @@ class NexusRestletServlet
     NexusRestletServlet()
     {
         servletConfig = new DelegatingServletConfig();
+    }
+
+    @Override
+    public void init()
+        throws ServletException
+    {
+        final ClassLoader original = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
+        try
+        {
+            super.init();
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( original );
+        }
     }
 
     @Override

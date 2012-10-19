@@ -90,8 +90,9 @@ public class OpenSearchTemplatePlexusResource
         map.put( "nexusRoot", nexusRoot );
         map.put( "nexusHost", nexusRef.getHostDomain() );
 
-        VelocityRepresentation templateRepresentation =
-            new VelocityRepresentation( context, "/templates/opensearch.vm", map, MediaType.TEXT_XML );
+        final VelocityRepresentation templateRepresentation =
+            new VelocityRepresentation( context, "/templates/opensearch.vm", getClass().getClassLoader(), map,
+                MediaType.TEXT_XML );
 
         return templateRepresentation;
     }

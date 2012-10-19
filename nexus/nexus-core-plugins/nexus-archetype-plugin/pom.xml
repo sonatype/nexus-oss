@@ -59,9 +59,11 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <groupId>org.sonatype.nexus.plugins.rest</groupId>
+      <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+      <version>${project.version}</version>
       <scope>provided</scope>
+      <type>${nexus-plugin.type}</type>
     </dependency>
 
     <dependency>

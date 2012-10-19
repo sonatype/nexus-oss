@@ -118,7 +118,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     @VisibleForTesting
     AbstractResourceStoreContentPlexusResource( final SecuritySystem securitySystem,
-                                                          final Map<String, ArtifactViewProvider> viewProviders )
+                                                final Map<String, ArtifactViewProvider> viewProviders )
     {
         this();
         this.securitySystem = securitySystem;
@@ -135,7 +135,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         try
         {
-            // #getRemainingPart(true, true) would use Restlet decoding, that relies 
+            // #getRemainingPart(true, true) would use Restlet decoding, that relies
             // on same URLDecoder as below, but without this "trick" below
             // source: http://stackoverflow.com/questions/2632175/java-decoding-uri-query-string
             final String remainingPart = request.getResourceRef().getRemainingPart( false, false );
@@ -196,7 +196,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     private void addNoCacheHeaders( final Response response )
     {
         // NXCM-5155 Force browsers to not cache this page
-        final Series<Parameter> headers = ((HttpResponse) response).getHttpCall().getResponseHeaders();
+        final Series<Parameter> headers = ( (HttpResponse) response ).getHttpCall().getResponseHeaders();
         headers.add( "Pragma", "no-cache" );
         headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
     }
@@ -407,8 +407,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     @VisibleForTesting
-    Object renderStorageCollectionItem(final Context context, final Request req, final Response res,
-                                          final Variant variant, final ResourceStore store, final StorageCollectionItem coll )
+    Object renderStorageCollectionItem( final Context context, final Request req, final Response res,
+                                        final Variant variant, final ResourceStore store,
+                                        final StorageCollectionItem coll )
         throws IOException, NoSuchResourceStoreException, IllegalOperationException, ItemNotFoundException,
         AccessDeniedException, ResourceException
     {
@@ -439,8 +440,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         for ( StorageItem child : children )
         {
-            if ( child.isVirtual()
-                || !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
+            if ( child.isVirtual() || !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
             {
                 if ( !uniqueNames.contains( child.getName() ) )
                 {
@@ -457,7 +457,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
                     resource.setLastModified( new Date( child.getModified() ) );
 
-                    resource.setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child ).getLength() : -1 );
+                    resource.setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child ).getLength()
+                        : -1 );
 
                     response.addData( resource );
 
@@ -481,8 +482,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     @VisibleForTesting
-    Object renderStorageLinkItem( final Context context, final Request req, final Response res,
-                                          final Variant variant, final ResourceStore store, final StorageLinkItem item )
+    Object renderStorageLinkItem( final Context context, final Request req, final Response res, final Variant variant,
+                                  final ResourceStore store, final StorageLinkItem item )
         throws ResourceException
     {
         // we have a link, dereference it
@@ -597,11 +598,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             dataModel.put( "nexusRoot", getContextRoot( req ).toString() );
 
-            // Load up the template, and pass in the data
-            VelocityRepresentation representation =
-                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm", dataModel,
-                    variant.getMediaType() );
-
+            final VelocityRepresentation representation =
+                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm",
+                    getClass().getClassLoader(), dataModel, variant.getMediaType() );
             return representation;
         }
 

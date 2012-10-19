@@ -15,6 +15,7 @@ package org.sonatype.nexus.security.filter;
 import javax.inject.Named;
 import javax.servlet.Filter;
 
+import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authc.NexusContentAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter;
@@ -39,6 +40,8 @@ public class NexusSecurityFilterModule
     @Override
     protected void configure()
     {
+        requireBinding( FilterChainResolver.class );
+
         bindAuthcFilter( "authcBasic", false, "Sonatype Nexus Repository Manager API" );
         bindAuthcFilter( "authcNxBasic", true, "Sonatype Nexus Repository Manager API (specialized auth)" );
 

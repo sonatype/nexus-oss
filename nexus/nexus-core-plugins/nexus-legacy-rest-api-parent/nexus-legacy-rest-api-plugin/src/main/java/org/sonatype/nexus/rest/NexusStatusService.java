@@ -44,7 +44,7 @@ public class NexusStatusService
 
     @Requirement
     private Nexus nexus;
-    
+
     public Representation getRepresentation( final Status status, final Request request, final Response response )
     {
         final HashMap<String, Object> dataModel = new HashMap<String, Object>();
@@ -62,10 +62,10 @@ public class NexusStatusService
             dataModel.put( "errorStackTrace",
                 StringEscapeUtils.escapeHtml( ExceptionUtils.getStackTrace( status.getThrowable() ) ) );
         }
-        
-        // Load up the template, and pass in the data
-        VelocityRepresentation representation =
-            new VelocityRepresentation( Context.getCurrent(), "/templates/errorPageContentHtml.vm", dataModel, MediaType.TEXT_HTML );
+
+        final VelocityRepresentation representation =
+            new VelocityRepresentation( Context.getCurrent(), "/templates/errorPageContentHtml.vm",
+                getClass().getClassLoader(), dataModel, MediaType.TEXT_HTML );
 
         return representation;
     }
