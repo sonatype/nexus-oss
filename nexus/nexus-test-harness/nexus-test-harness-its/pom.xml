@@ -26,13 +26,6 @@
   <name>Nexus : Test Harness : Core ITs</name>
 
   <properties>
-    <!-- Below is the "product", the subject of the ITs -->
-    <product-groupId>org.sonatype.nexus</product-groupId>
-    <product-artifactId>nexus-oss-webapp</product-artifactId>
-    <product-version>${project.version}</product-version>
-    <product-classifier>bundle</product-classifier>
-    <product-type>zip</product-type>
-
     <cargo.version>1.0.4</cargo.version>
   </properties>
 
@@ -124,13 +117,12 @@
           <setupEmma>true</setupEmma>
           <setupMaven>true</setupMaven>
           <nexusBundleArtifact>
-            <groupId>${product-groupId}</groupId>
-            <artifactId>${product-artifactId}</artifactId>
-            <version>${product-version}</version>
-            <classifier>${product-classifier}</classifier>
-            <type>${product-type}</type>
+            <groupId>${it.nexus.bundle.groupId}</groupId>
+            <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+            <version>${it.nexus.bundle.version}</version>
+            <type>zip</type>
+            <classifier>bundle</classifier>
           </nexusBundleArtifact>
-          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>

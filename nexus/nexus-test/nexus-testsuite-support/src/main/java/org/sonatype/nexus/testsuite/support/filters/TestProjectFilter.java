@@ -18,6 +18,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.Model;
+import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.testsuite.support.Filter;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 import com.google.common.collect.Maps;
@@ -43,10 +44,10 @@ public class TestProjectFilter
      * @param modelResolver Model resolver used to resolve effective model of test project (pom). Cannot be null.
      */
     @Inject
-    public TestProjectFilter( @Named( "remote-model-resolver-using-settings" )
-                              final MavenModelResolver modelResolver )
+    public TestProjectFilter( @Named( "remote-model-resolver-using-settings" ) final MavenModelResolver modelResolver,
+                              @Parameters final Map<String, String> properties )
     {
-        super( modelResolver );
+        super( modelResolver, properties );
     }
 
     /**
@@ -70,6 +71,8 @@ public class TestProjectFilter
         {
             mappings.putAll( Maps.fromProperties( model.getProperties() ) );
         }
+
+        mappings.putAll( getProperties() );
 
         return mappings;
     }

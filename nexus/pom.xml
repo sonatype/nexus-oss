@@ -143,6 +143,10 @@
     <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
     <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
 
+    <tattletale.failOnInfo>false</tattletale.failOnInfo>
+    <tattletale.failOnWarn>false</tattletale.failOnWarn>
+    <tattletale.failOnError>true</tattletale.failOnError>
+
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -167,7 +171,6 @@
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>8.1.7.v20120910</jetty.version>
-    <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <maven.version>3.0.4</maven.version>
     <micromailer.version>1.5</micromailer.version>
     <nexus.repository.metadata.version>1.2</nexus.repository.metadata.version>
@@ -177,15 +180,12 @@
     <plexus-digest.version>1.1</plexus-digest.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
-    <plexus-jetty6.version>1.7</plexus-jetty6.version>
-    <plexus-jetty7.version>1.2.1</plexus-jetty7.version>
     <sisu-jetty8.version>1.4</sisu-jetty8.version>
     <sisu-velocity.version>1.1</sisu-velocity.version>
     <sisu-problem-reporter.version>1.5.2</sisu-problem-reporter.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.22</plexus.restlet.bridge.version>
     <plexus-security.version>2.8.3-SNAPSHOT</plexus-security.version>
-    <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <shiro.version>1.2.1</shiro.version>
@@ -194,6 +194,11 @@
     <surefire.version>2.10</surefire.version>
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
+
+    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
+
   </properties>
 
   <dependencyManagement>
@@ -261,47 +266,9 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-        <artifactId>plexus-jsw-app-booter</artifactId>
-        <version>${plexus.appbooter.version}</version>
-        <scope>provided</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-        <artifactId>plexus-forked-app-booter</artifactId>
-        <version>${plexus.appbooter.version}</version>
-        <scope>compile</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-        <artifactId>plexus-platform-jsw</artifactId>
-        <version>${plexus.appbooter.version}</version>
-        <scope>provided</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>tanukisoft</groupId>
         <artifactId>wrapper</artifactId>
         <version>3.2.3</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.jsw-binaries</groupId>
-        <artifactId>jsw-binaries</artifactId>
-        <version>${jsw.binaries.version}</version>
-        <type>tar.gz</type>
-        <!--make sure this doesn't get into any classpaths -->
         <scope>provided</scope>
       </dependency>
 
@@ -401,22 +368,6 @@
             <artifactId>plexus-container-default</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>plexus-jetty6</artifactId>
-        <version>${plexus-jetty6.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>plexus-jetty7</artifactId>
-        <version>${plexus-jetty7.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
@@ -668,13 +619,6 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
-        <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>log4j-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
         <type>jar</type>
         <scope>runtime</scope>
@@ -1102,7 +1046,8 @@
         <scope>test</scope>
       </dependency>
 
-      <!-- The modules -->
+      <!-- INTERNAL -->
+
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
@@ -1264,6 +1209,14 @@
         <version>${project.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-oss-webapp</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+      </dependency>
+
       <!-- Plugins -->
 
       <dependency>
@@ -1280,33 +1233,6 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-manager</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>plexus-swizzle</artifactId>
-        <version>${plexus-swizzle.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>velocity</groupId>
-            <artifactId>velocity</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.spice</groupId>
@@ -1584,6 +1510,16 @@
 
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.jboss.tattletale</groupId>
+          <artifactId>tattletale-maven</artifactId>
+          <version>1.1.2.Final</version>
+          <configuration>
+            <failOnInfo>${tattletale.failOnInfo}</failOnInfo>
+            <failOnWarn>${tattletale.failOnWarn}</failOnWarn>
+            <failOnError>${tattletale.failOnError}</failOnError>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>sisu-maven-plugin</artifactId>
@@ -1863,14 +1799,12 @@
     <module>nexus-client-core</module>
     <module>nexus-clients</module>
     <module>nexus-oss-webapp</module>
-    <module>nexus-oss-webapp-tattletale</module>
     <module>nexus-stories</module>
     <module>nexus-test</module>
     <module>nexus-test-harness</module>
   </modules>
 
   <profiles>
-
     <profile>
       <id>debug</id>
       <activation>
@@ -2054,7 +1988,6 @@
         <invoker.skip>true</invoker.skip>
         <source.skip>true</source.skip>
         <enunciate.skip>true</enunciate.skip>
-        <tattletale.skip>true</tattletale.skip>
         <test-env.skip>true</test-env.skip>
         <license.skip>true</license.skip>
         <!-- FIXME there are still some dependency unpacking going on that could be removed somehow -->

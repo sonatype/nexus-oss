@@ -13,8 +13,10 @@
 package org.sonatype.plugin.nexus.testenvironment;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -66,10 +68,13 @@ import org.sonatype.plugin.nexus.testenvironment.filter.TestScopeFilter;
 import org.sonatype.plugins.portallocator.Port;
 import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Throwables;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.MapConstraints;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class AbstractEnvironmentMojo
@@ -290,6 +295,11 @@ public class AbstractEnvironmentMojo
      */
     private String[] exclusions;
 
+    /**
+     * @parameter expression="${useBundlePluginsIfPresent}"
+     */
+    protected boolean useBundlePluginsIfPresent;
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -365,7 +375,7 @@ public class AbstractEnvironmentMojo
         Collection<MavenArtifact> npas = getNexusPluginsArtifacts();
         if ( npas != null )
         {
-            setupPlugins( nexusBaseDir, npas, libFolder, pluginFolder );
+            setupPlugins( npas, libFolder, pluginFolder );
         }
 
         // promote any plugins included in the bundle to the runtime install
@@ -913,8 +923,7 @@ public class AbstractEnvironmentMojo
         copy( artifact.getFile(), pluginFolder );
     }
 
-    private void setupPlugins( File nexusBaseDir, Collection<MavenArtifact> nexusPluginsArtifacts, File libsFolder,
-                               File pluginsFolder )
+    private void setupPlugins( Collection<MavenArtifact> nexusPluginsArtifacts, File libsFolder, File pluginsFolder )
         throws MojoFailureException, MojoExecutionException
     {
 
@@ -937,6 +946,8 @@ public class AbstractEnvironmentMojo
         }
 
         nexusPluginsArtifacts = filterOutExcludedPlugins( nexusPluginsArtifacts );
+
+        final Map<String, File> bundlePlugins = useBundlePluginsIfPresent ? listPlugins( pluginsFolder ) : null;
 
         for ( MavenArtifact plugin : nexusPluginsArtifacts )
         {
@@ -976,7 +987,11 @@ public class AbstractEnvironmentMojo
                     throw new MojoFailureException( "Could not properly resolve artifact " + pluginArtifact + ", got "
                         + file );
                 }
-                unpack( file, dest, type );
+                final String pluginKey = pluginArtifact.getGroupId() + ":" + pluginArtifact.getArtifactId();
+                if ( !useBundlePluginsIfPresent || !bundlePlugins.containsKey( pluginKey ) )
+                {
+                    unpack( file, dest, type );
+                }
             }
             else
             {
@@ -1324,6 +1339,89 @@ public class AbstractEnvironmentMojo
                 "Failed to create marker file: " + marker.getAbsolutePath()
                     + " bundle will be extracted every time you run the build." );
         }
+    }
+
+    private Map<String, File> listPlugins( final File pluginsDir )
+    {
+        final Map<String, File> plugins = Maps.newHashMap();
+        final File[] foundPlugins = pluginsDir.listFiles( new FileFilter()
+        {
+            @Override
+            public boolean accept( final File file )
+            {
+                return file.isDirectory();
+            }
+        } );
+        if ( foundPlugins != null && foundPlugins.length > 0 )
+        {
+            for ( final File plugin : foundPlugins )
+            {
+                final Optional<File> mainJar = getPluginMainJar( plugin );
+                if ( mainJar.isPresent() )
+                {
+                    final Optional<String> gaCoordinates = getPluginGACoordinates( mainJar.get() );
+                    if ( gaCoordinates.isPresent() )
+                    {
+                        plugins.put( gaCoordinates.get(), plugin );
+                    }
+                }
+            }
+        }
+        return plugins;
+    }
+
+    private Optional<String> getPluginGACoordinates( final File mainJar )
+    {
+        try
+        {
+            final ZipFile jarFile = new ZipFile( mainJar );
+            final Enumeration<? extends ZipEntry> entries = jarFile.entries();
+            if ( entries != null )
+            {
+                while ( entries.hasMoreElements() )
+                {
+                    final ZipEntry zipEntry = entries.nextElement();
+                    if ( zipEntry.getName().startsWith( "META-INF/maven" )
+                        && zipEntry.getName().endsWith( "pom.properties" ) )
+                    {
+                        final Properties props = new Properties();
+                        props.load( jarFile.getInputStream( zipEntry ) );
+                        return Optional.of( props.getProperty( "groupId" ) + ":" + props.getProperty( "artifactId" ) );
+                    }
+                }
+            }
+        }
+        catch ( IOException e )
+        {
+            throw Throwables.propagate( e );
+        }
+        return Optional.absent();
+    }
+
+    private Optional<File> getPluginMainJar( final File plugin )
+    {
+        final String[] mainJars = plugin.list( new FilenameFilter()
+        {
+            @Override
+            public boolean accept( final File dir, final String name )
+            {
+                return name.endsWith( ".jar" );
+            }
+        } );
+        if ( mainJars != null && mainJars.length > 0 )
+        {
+            if ( mainJars.length > 1 )
+            {
+                throw new IllegalStateException(
+                    "Plugin '" + plugin.getAbsolutePath() + "' contains more then one jar"
+                );
+            }
+            else
+            {
+                return Optional.of( new File( plugin, mainJars[0] ) );
+            }
+        }
+        return Optional.absent();
     }
 
 }

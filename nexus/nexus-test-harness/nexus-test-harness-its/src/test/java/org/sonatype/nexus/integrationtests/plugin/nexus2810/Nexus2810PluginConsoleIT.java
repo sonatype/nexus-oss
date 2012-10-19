@@ -62,7 +62,6 @@ public class Nexus2810PluginConsoleIT
             assertPropertyValid( "SCM Timestamp", pluginConsolePlugin.getScmTimestamp() );
         }
         Assert.assertTrue( StringUtils.isEmpty( pluginConsolePlugin.getFailureReason() ) );
-        Assert.assertTrue( !pluginConsolePlugin.getRestInfos().isEmpty() );
 
         PluginInfoDTO pgpPlugin = this.getPluginInfoByName( pluginInfos, "Nexus Broken Plugin" );
         assertPropertyValid( "Name", pgpPlugin.getName() );
@@ -73,6 +72,5 @@ public class Nexus2810PluginConsoleIT
         Assert.assertEquals( "N/A", pgpPlugin.getScmTimestamp() );
         assertPropertyValid( "Site", pgpPlugin.getSite() );
         Assert.assertFalse( StringUtils.isEmpty( pgpPlugin.getFailureReason() ) );
-        Assert.assertTrue( pgpPlugin.getRestInfos().isEmpty() );
     }
 }
