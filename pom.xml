@@ -1,50 +1,51 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.sonatype.spice</groupId>
-    <artifactId>spice-parent</artifactId>
-    <version>18</version>
-  </parent>
+    <parent>
+        <groupId>org.sonatype.spice</groupId>
+        <artifactId>spice-parent</artifactId>
+        <version>18</version>
+    </parent>
 
-  <groupId>org.sonatype.sisu</groupId>
-  <artifactId>sisu-task-scheduler</artifactId>
-  <version>1.7-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <groupId>org.sonatype.sisu</groupId>
+    <artifactId>sisu-task-scheduler</artifactId>
+    <version>1.7-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-  <name>Sisu Task Scheduler</name>
+    <name>Sisu Task Scheduler</name>
 
-  <scm>
-    <connection>scm:git:git://github.com/sonatype/sisu-task-scheduler.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/sisu-task-scheduler.git</developerConnection>
-    <url>https://github.com/sonatype/sisu-task-scheduler</url>
-  </scm>
+    <scm>
+        <connection>scm:git:git://github.com/sonatype/sisu-task-scheduler.git</connection>
+        <developerConnection>scm:git:git@github.com:sonatype/sisu-task-scheduler.git</developerConnection>
+        <url>https://github.com/sonatype/sisu-task-scheduler</url>
+    </scm>
 
-  <ciManagement>
-      <system>hudson</system>
-      <url>https://builds.sonatype.org/job/sisu-task-scheduler/</url>
-  </ciManagement>
+    <ciManagement>
+        <system>hudson</system>
+        <url>https://builds.sonatype.org/job/sisu-task-scheduler/</url>
+    </ciManagement>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <optional>true</optional>
-    </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <optional>true</optional>
+        </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
-      <version>1.4</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>org.sonatype.sisu.litmus</groupId>
+            <artifactId>litmus-testsupport</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
