@@ -87,14 +87,11 @@ public class LoggingProgressListener
         {
             if ( UNKNOWN_WORKUNITS != wu.getToDo() )
             {
-                log(
-                    "{}: {} ({}/{})",
-                    new Object[] { getStackedWorkunitNames(), nvl( message ), String.valueOf( wu.getDone() ),
-                        String.valueOf( wu.getToDo() ) } );
+                log( "{}: {} ({}/{})", getStackedWorkunitNames(), nvl( message ), String.valueOf( wu.getDone() ), String.valueOf( wu.getToDo() ));
             }
             else
             {
-                log( "{}: {} ({})", new Object[] { getStackedWorkunitNames(), nvl( message ), wu.getDone() } );
+                log( "{}: {} ({})", getStackedWorkunitNames(), nvl( message ), wu.getDone());
             }
         }
     }
