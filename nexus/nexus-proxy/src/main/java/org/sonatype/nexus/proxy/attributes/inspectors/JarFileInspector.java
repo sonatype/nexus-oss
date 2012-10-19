@@ -77,7 +77,7 @@ public class JarFileInspector
         JarFile jFile = new JarFile( file );
         try
         {
-            StringBuffer classes = new StringBuffer( jFile.size() );
+            StringBuilder classes = new StringBuilder( jFile.size() );
 
             for ( Enumeration<JarEntry> e = jFile.entries(); e.hasMoreElements(); )
             {
@@ -100,7 +100,7 @@ public class JarFileInspector
             Manifest mf = jFile.getManifest();
             if ( mf != null )
             {
-                StringBuffer mfEntries = new StringBuffer( jFile.getManifest().getMainAttributes().size() );
+                StringBuilder mfEntries = new StringBuilder( jFile.getManifest().getMainAttributes().size() );
                 Attributes mAttr = mf.getMainAttributes();
                 for ( Iterator<Object> i = mAttr.keySet().iterator(); i.hasNext(); )
                 {

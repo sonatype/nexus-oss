@@ -71,7 +71,7 @@ public class ZipFileInspector
         ZipFile zFile = new ZipFile( file );
         try
         {
-            StringBuffer files = new StringBuffer( zFile.size() );
+            StringBuilder files = new StringBuilder( zFile.size() );
 
             for ( Enumeration e = zFile.entries(); e.hasMoreElements(); )
             {

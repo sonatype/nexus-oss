@@ -60,7 +60,7 @@ public class IndexBrowserTreeNodeFactory
             return "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append( "?r=" );
         sb.append( node.getRepositoryId() );
         sb.append( "&g=" );
@@ -82,7 +82,7 @@ public class IndexBrowserTreeNodeFactory
             return "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append( "?r=" );
         sb.append( node.getRepositoryId() );
         sb.append( "&g=" );

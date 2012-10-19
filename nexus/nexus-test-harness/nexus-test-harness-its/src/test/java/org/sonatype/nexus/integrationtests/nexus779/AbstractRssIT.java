@@ -46,7 +46,7 @@ public abstract class AbstractRssIT
             return "No entries";
         }
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         for ( SyndEntry syndEntry : entries )
         {

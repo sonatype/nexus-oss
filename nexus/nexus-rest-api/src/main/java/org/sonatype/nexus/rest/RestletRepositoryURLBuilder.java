@@ -105,7 +105,7 @@ public class RestletRepositoryURLBuilder
             return null;
         }
 
-        StringBuffer url = new StringBuffer( baseURL );
+        StringBuilder url = new StringBuilder( baseURL );
 
         if ( !baseURL.endsWith( "/" ) )
         {

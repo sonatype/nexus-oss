@@ -24,7 +24,7 @@ public class CommandLineRunner
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( CommandLineRunner.class );
-    private final StringBuffer buffer = new StringBuffer();
+    private final StringBuilder buffer = new StringBuilder();
 
 
     public int executeAndWait( Commandline cli ) throws CommandLineException, InterruptedException

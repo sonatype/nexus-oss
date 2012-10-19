@@ -81,15 +81,15 @@ public class SearchMessageUtil
                                  Matcher<Response>... matchers )
         throws IOException
     {
-        StringBuffer serviceURI = null;
+        StringBuilder serviceURI = null;
 
         if ( repositoryId == null )
         {
-            serviceURI = new StringBuffer( "service/local/data_index?" );
+            serviceURI = new StringBuilder( "service/local/data_index?" );
         }
         else
         {
-            serviceURI = new StringBuffer( "service/local/data_index/repositories/" + repositoryId + "?" );
+            serviceURI = new StringBuilder( "service/local/data_index/repositories/" + repositoryId + "?" );
         }
 
         for ( Entry<String, String> entry : queryArgs.entrySet() )
@@ -437,7 +437,7 @@ public class SearchMessageUtil
     private String doNGSearchForR( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
         throws IOException
     {
-        StringBuffer serviceURI = new StringBuffer( "service/local/lucene/search?" );
+        StringBuilder serviceURI = new StringBuilder( "service/local/lucene/search?" );
 
         if ( StringUtils.isNotBlank( repositoryId ) )
         {

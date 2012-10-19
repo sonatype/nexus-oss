@@ -40,10 +40,10 @@ public class RepositoryEventProxyModeMessage
         this.user = user;
 
         // we will reuse this
-        StringBuffer sb = null;
+        StringBuilder sb = null;
 
         // -- Title
-        sb = new StringBuffer( "Proxy repository  \"" );
+        sb = new StringBuilder( "Proxy repository  \"" );
 
         sb.append( revt.getRepository().getName() );
 
@@ -70,7 +70,7 @@ public class RepositoryEventProxyModeMessage
 
         // -- Body
 
-        sb = new StringBuffer( "Howdy,\n\n" );
+        sb = new StringBuilder( "Howdy,\n\n" );
 
         sb.append( "the proxy mode of repository \"" );
 

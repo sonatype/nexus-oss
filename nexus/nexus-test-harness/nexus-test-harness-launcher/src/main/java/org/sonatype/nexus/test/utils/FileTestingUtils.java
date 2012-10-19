@@ -138,7 +138,7 @@ public class FileTestingUtils
             }
 
             bytes = digest.digest();
-            StringBuffer sb = new StringBuffer( bytes.length * 2 );
+            StringBuilder sb = new StringBuilder( bytes.length * 2 );
             for ( int i = 0; i < bytes.length; i++ )
             {
                 int n = bytes[i] & 0xFF;

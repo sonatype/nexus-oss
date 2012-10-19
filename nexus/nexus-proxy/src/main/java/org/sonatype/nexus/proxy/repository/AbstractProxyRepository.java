@@ -1021,7 +1021,7 @@ public abstract class AbstractProxyRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            StringBuffer db = new StringBuffer( request.toString() );
+            StringBuilder db = new StringBuilder( request.toString() );
 
             db.append( " :: localOnly=" ).append( request.isRequestLocalOnly() );
             db.append( ", remoteOnly=" ).append( request.isRequestRemoteOnly() );

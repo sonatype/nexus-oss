@@ -50,7 +50,7 @@ public class ConfigurationChangeEventInspector
             return;
         }
 
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
 
         msg.append( "Nexus server configuration was changed: " );
 

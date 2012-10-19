@@ -68,7 +68,7 @@ public class DefaultLdapConfigurationValidatorTest
 
     private String getDebugStringFromResponse( ValidationResponse response )
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         if ( !response.getValidationErrors().isEmpty() )
         {
             buffer.append( "Errors:" );

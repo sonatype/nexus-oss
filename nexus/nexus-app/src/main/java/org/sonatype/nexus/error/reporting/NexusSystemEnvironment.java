@@ -42,7 +42,7 @@ public class NexusSystemEnvironment
     @Override
     public String asDiagnosticsFormat()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append( "Nexus Version: " );
         sb.append( applicationStatus.getSystemStatus().getVersion() );
         sb.append( LINE_SEPERATOR );

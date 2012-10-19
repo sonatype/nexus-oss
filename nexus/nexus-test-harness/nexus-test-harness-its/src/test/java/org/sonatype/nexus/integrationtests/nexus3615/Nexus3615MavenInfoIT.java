@@ -185,7 +185,7 @@ public class Nexus3615MavenInfoIT
 
     private String buildExpectedDepBlock( Gav gav )
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         buffer.append( "<dependency>\n" );
         buffer.append( "  <groupId>" ).append( gav.getGroupId() ).append( "</groupId>\n" );
