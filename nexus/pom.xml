@@ -1038,7 +1038,8 @@
         <scope>test</scope>
       </dependency>
 
-      <!-- The modules -->
+      <!-- INTERNAL -->
+
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
@@ -1198,6 +1199,14 @@
         <groupId>org.sonatype.nexus.restlight</groupId>
         <artifactId>nexus-restlight-client-common</artifactId>
         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-oss-webapp</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
       </dependency>
 
       <!-- Plugins -->
@@ -1510,6 +1519,11 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.jboss.tattletale</groupId>
+          <artifactId>tattletale-maven</artifactId>
+          <version>1.1.2.Final</version>
+        </plugin>
+        <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>sisu-maven-plugin</artifactId>
           <version>1.1</version>
@@ -1788,13 +1802,21 @@
     <module>nexus-client-core</module>
     <module>nexus-clients</module>
     <module>nexus-oss-webapp</module>
-    <module>nexus-oss-webapp-tattletale</module>
     <module>nexus-stories</module>
     <module>nexus-test</module>
     <module>nexus-test-harness</module>
   </modules>
 
   <profiles>
+    <profile>
+      <id>tattletale</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>nexus-oss-webapp-tattletale</module>
+      </modules>
+    </profile>
 
     <profile>
       <id>debug</id>
@@ -1979,7 +2001,6 @@
         <invoker.skip>true</invoker.skip>
         <source.skip>true</source.skip>
         <enunciate.skip>true</enunciate.skip>
-        <tattletale.skip>true</tattletale.skip>
         <test-env.skip>true</test-env.skip>
         <license.skip>true</license.skip>
         <!-- FIXME there are still some dependency unpacking going on that could be removed somehow -->
