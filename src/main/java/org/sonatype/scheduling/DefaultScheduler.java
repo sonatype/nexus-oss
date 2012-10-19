@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
+/*
+ * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -27,27 +27,28 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
- * A simple facade to ScheduledThreadPoolExecutor as Plexus component.
+ * A simple facade to ScheduledThreadPoolExecutor.
  * 
  * @author cstamas
  */
-@Component( role = Scheduler.class )
+@Named
+@Singleton
 public class DefaultScheduler
     implements Scheduler
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Requirement
-    private TaskConfigManager taskConfig;
+    private final TaskConfigManager taskConfig;
 
     private final AtomicInteger idGen;
 
@@ -55,12 +56,14 @@ public class DefaultScheduler
 
     private final ConcurrentHashMap<String, List<ScheduledTask<?>>> tasksMap;
 
-    public DefaultScheduler()
+    @Inject
+    public DefaultScheduler(final TaskConfigManager taskConfig)
     {
+        this.taskConfig = taskConfig;
         idGen = new AtomicInteger( 0 );
         tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
         scheduledExecutorService =
-            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new PlexusThreadFactory(
+            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new ThreadFactoryImpl(
                 Thread.MIN_PRIORITY ) );
         scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
         scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
@@ -118,7 +121,7 @@ public class DefaultScheduler
                 if ( !runningTasks.isEmpty() )
                 {
                     getScheduledExecutorService().shutdownNow();
-                    getLogger().warn( "Scheduler shut down forcedly with tasks running." );
+                    getLogger().warn( "Scheduler shut down forcibly with tasks running." );
                 }
                 else
                 {
@@ -264,10 +267,15 @@ public class DefaultScheduler
         return result;
     }
 
+    private static boolean StringUtils_isEmpty( String str )
+    {
+        return ( ( str == null ) || ( str.trim().length() == 0 ) );
+    }
+
     public ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
-        if ( StringUtils.isEmpty( id ) )
+        if ( StringUtils_isEmpty(id) )
         {
             throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
         }

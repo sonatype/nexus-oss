@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
 package org.sonatype.scheduling;
 
 import java.util.ArrayDeque;
@@ -31,6 +43,9 @@ public class LoggingProgressListener
 
     public LoggingProgressListener( final Logger logger )
     {
+        if (logger == null) {
+            throw new NullPointerException();
+        }
         this.logger = logger;
         this.workunits = new ArrayDeque<Workunit>( Arrays.asList( ROOT ) );
         this.canceled = false;
@@ -45,13 +60,15 @@ public class LoggingProgressListener
     {
         workunits.push( new Workunit( name, toDo ) );
 
-        if ( UNKNOWN_WORKUNITS != toDo )
-        {
-            log( "{}: started ({} steps).", getStackedWorkunitNames(), toDo );
-        }
-        else
-        {
-            log( "{}: started.", getStackedWorkunitNames() );
+        if (logger.isInfoEnabled()) {
+            if ( UNKNOWN_WORKUNITS != toDo )
+            {
+                logger.info( "{}: started ({} steps).", getStackedWorkunitNames(), toDo );
+            }
+            else
+            {
+                logger.info( "{}: started.", getStackedWorkunitNames() );
+            }
         }
     }
 
@@ -71,25 +88,24 @@ public class LoggingProgressListener
 
         wu.done( workDone );
 
-        if ( message != null && message.trim().length() > 0 )
+        if ( logger.isInfoEnabled() && message != null && message.trim().length() > 0 )
         {
             if ( UNKNOWN_WORKUNITS != wu.getToDo() )
             {
-                log(
-                    "{}: {} ({}/{})",
-                    new Object[] { getStackedWorkunitNames(), nvl( message ), String.valueOf( wu.getDone() ),
-                        String.valueOf( wu.getToDo() ) } );
+                logger.info( "{}: {} ({}/{})", getStackedWorkunitNames(), message, wu.getDone(), wu.getToDo() );
             }
             else
             {
-                log( "{}: {} ({})", new Object[] { getStackedWorkunitNames(), nvl( message ), wu.getDone() } );
+                logger.info( "{}: {} ({})", getStackedWorkunitNames(), message, wu.getDone());
             }
         }
     }
 
     public void endTask( final String message )
     {
-        log( "{}: finished: {}", getStackedWorkunitNames(), nvl( message ) );
+        if (logger.isInfoEnabled()) {
+            logger.info( "{}: finished: {}", getStackedWorkunitNames(), message );
+        }
 
         if ( workunits.size() > 1 )
         {
@@ -106,13 +122,15 @@ public class LoggingProgressListener
     {
         final String wus = getStackedWorkunitNames();
 
-        if ( wus != null && wus.trim().length() > 0 )
-        {
-            log( "{}: canceled, bailing out (may take a while).", wus );
-        }
-        else
-        {
-            log( "Task canceled, bailing out (may take a while)." );
+        if (logger.isDebugEnabled()) {
+            if ( wus != null && wus.trim().length() > 0 )
+            {
+                logger.info( "{}: canceled, bailing out (may take a while).", wus );
+            }
+            else
+            {
+                logger.info( "Task canceled, bailing out (may take a while)." );
+            }
         }
 
         this.canceled = true;
@@ -120,6 +138,7 @@ public class LoggingProgressListener
 
     // ==
 
+    @Deprecated
     protected String nvl( final String str )
     {
         return String.valueOf( str );
@@ -146,17 +165,6 @@ public class LoggingProgressListener
         else
         {
             return "";
-        }
-    }
-
-    protected void log( final String message, Object... param )
-    {
-        if ( logger != null )
-        {
-            if ( logger.isInfoEnabled() )
-            {
-                logger.info( message, param );
-            }
         }
     }
 

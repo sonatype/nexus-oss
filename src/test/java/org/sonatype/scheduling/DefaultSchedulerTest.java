@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
+/*
+ * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -17,25 +17,31 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import static org.junit.Assert.*;
+
+/**
+ * Tests for {@link DefaultScheduler}.
+ */
 public class DefaultSchedulerTest
-    extends PlexusTestCase
+    extends TestSupport
 {
     protected DefaultScheduler defaultScheduler;
 
-    @Override
+    @Before
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
-        defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
+        defaultScheduler = new DefaultScheduler(new SimpleTaskConfigManager());
     }
 
+    @Test
     public void testSimpleRunnable()
         throws Exception
     {
@@ -59,6 +65,7 @@ public class DefaultSchedulerTest
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
+    @Test
     public void testSimpleCallable()
         throws Exception
     {
@@ -84,6 +91,7 @@ public class DefaultSchedulerTest
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
+    @Test
     public void testManual()
         throws Exception
     {
@@ -123,6 +131,7 @@ public class DefaultSchedulerTest
         }
     }
 
+    @Test
     public void testSecondsRunnable()
         throws Exception
     {
@@ -150,6 +159,7 @@ public class DefaultSchedulerTest
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
+    @Test
     public void testSecondsCallable()
         throws Exception
     {
@@ -189,6 +199,7 @@ public class DefaultSchedulerTest
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
+    @Test
     public void testCancelRunnable()
         throws Exception
     {
@@ -215,6 +226,7 @@ public class DefaultSchedulerTest
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
+    @Test
     public void testCancelCallable()
         throws Exception
     {
@@ -241,6 +253,7 @@ public class DefaultSchedulerTest
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
+    @Test
     public void testBrokenCallable()
         throws Exception
     {
@@ -268,6 +281,7 @@ public class DefaultSchedulerTest
      * 
      * @throws Exception
      */
+    @Test
     public void testChangeScheduleDuringRunCallable()
         throws Exception
     {
@@ -299,6 +313,7 @@ public class DefaultSchedulerTest
         task.cancel( true );
     }
 
+    @Test
     public void testCallableStepOnEachOtherToe()
         throws Exception
     {

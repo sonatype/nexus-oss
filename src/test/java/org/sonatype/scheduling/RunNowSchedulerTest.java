@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
+/*
+ * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -14,21 +14,25 @@ package org.sonatype.scheduling;
 
 import java.util.concurrent.Callable;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.junit.Assert.*;
 
 public class RunNowSchedulerTest
-    extends PlexusTestCase
+    extends TestSupport
 {
     protected DefaultScheduler defaultScheduler;
 
+    @Before
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
-        defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
+        defaultScheduler = new DefaultScheduler(new SimpleTaskConfigManager());
     }
 
+    @Test
     public void testRunNowRunnable()
         throws Exception
     {
@@ -52,6 +56,7 @@ public class RunNowSchedulerTest
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
+    @Test
     public void testRunNowCallable()
         throws Exception
     {

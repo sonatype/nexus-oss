@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
+/*
+ * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -16,11 +16,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.scheduling.iterators.WeeklySchedulerIterator;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Tests for {@link WeeklySchedulerIterator}.
+ */
 public class WeeklyIteratorTest
-    extends PlexusTestCase
+    extends TestSupport
 {
     public void testWeeklyIterator()
         throws Exception

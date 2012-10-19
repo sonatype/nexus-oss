@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
 package org.sonatype.scheduling;
 
 import java.util.Calendar;
@@ -6,24 +18,28 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.Schedule;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.junit.Assert.*;
 
 public class DisabledScheduledTaskTest
-    extends PlexusTestCase
+    extends TestSupport
 {
     protected DefaultScheduler defaultScheduler;
 
+    @Before
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
-        defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
+        defaultScheduler = new DefaultScheduler(new SimpleTaskConfigManager());
     }
 
-    public void testRunDisabledTaske()
+    @Test
+    public void testRunDisabledTask()
         throws Exception
     {
         ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this
@@ -55,6 +71,7 @@ public class DisabledScheduledTaskTest
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
     }
 
+    @Test
     public void testDisabledTaskOnSchedule()
         throws Exception
     {
@@ -73,6 +90,7 @@ public class DisabledScheduledTaskTest
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
     }
 
+    @Test
     public void testRestoreDisabledTask()
         throws Exception
     {
