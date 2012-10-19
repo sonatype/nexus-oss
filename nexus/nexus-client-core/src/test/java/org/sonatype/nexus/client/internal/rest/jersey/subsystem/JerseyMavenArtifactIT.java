@@ -28,7 +28,7 @@ import org.sonatype.nexus.client.rest.jersey.subsystem.JerseyArtifactMavenSubsys
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import junit.framework.Assert;
 
-public class JerseyMavenArtifactTest
+public class JerseyMavenArtifactIT
     extends TestSupport
 {
 

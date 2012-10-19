@@ -71,7 +71,7 @@ import com.google.common.collect.Lists;
  * 
  * @author cstamas
  */
-public class Nexus5249IndexerManagerTest
+public class Nexus5249IndexerManagerIT
     extends AbstractIndexerManagerTest
 {
     protected int indexedRepositories;
