@@ -28,7 +28,9 @@
     <packaging>pom</packaging>
 
     <properties>
+        <tattletale.failOnInfo>false</tattletale.failOnInfo>
         <tattletale.failOnWarn>false</tattletale.failOnWarn>
+        <tattletale.failOnError>true</tattletale.failOnError>
     </properties>
 
     <build>
@@ -92,8 +94,9 @@
                                 <!--<report>noversion</report>-->
                                 <report>jar</report>
                             </reports>
+                            <failOnInfo>${tattletale.failOnInfo}</failOnInfo>
                             <failOnWarn>${tattletale.failOnWarn}</failOnWarn>
-                            <failOnError>true</failOnError>
+                            <failOnError>${tattletale.failOnError}</failOnError>
                             <excludes>
                                 <!-- FIXME: I hate this too, but other pattern did not help (ie. xmlpull-*.jar) At least build will fail anyway if version changes... -->
                                 <exclude>**/xmlpull-1.1.3.1.jar</exclude>
