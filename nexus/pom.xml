@@ -1907,16 +1907,6 @@
       </build>
     </profile>
 
-    <!-- grid quick deploy 20 to 25 mins avoiding ITs -->
-    <profile>
-      <id>grid-deploy</id>
-      <properties>
-        <it.test>void</it.test>
-        <invoker.skip>true</invoker.skip>
-        <test-env.skip>true</test-env.skip>
-      </properties>
-    </profile>
-
     <!-- dummy profile for activating integration tests -->
     <profile>
       <id>it</id>
