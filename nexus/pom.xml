@@ -1671,7 +1671,11 @@
             <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <forkMode>once</forkMode>
             <argLine>-ea</argLine>
-            <workingDirectory>${project.build.directory}</workingDirectory>
+            <!--
+            FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
+            https://issues.sonatype.org/browse/NEXUS-5345
+            -->
+            <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
             <systemPropertyVariables>
               <java.awt.headless>true</java.awt.headless>
               <!-- start junit benchmarks config -->
@@ -1710,7 +1714,11 @@
             <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <forkMode>once</forkMode>
             <argLine>-ea</argLine>
-            <workingDirectory>${project.build.directory}</workingDirectory>
+            <!--
+            FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
+            https://issues.sonatype.org/browse/NEXUS-5345
+            -->
+            <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
             <excludes combine.children="append">
               <exclude>**/Abstract*</exclude>
             </excludes>
