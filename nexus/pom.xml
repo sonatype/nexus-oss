@@ -150,6 +150,8 @@
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+
     <nexus.version>${project.version}</nexus.version>
 
     <!-- logging configuration used in logback config files to control test logging -->
@@ -1665,7 +1667,13 @@
           <version>${surefire.version}</version>
           <configuration>
             <failIfNoTests>false</failIfNoTests>
+            <!-- force use of property -->
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <forkMode>once</forkMode>
+            <argLine>-ea</argLine>
+            <workingDirectory>${project.build.directory}</workingDirectory>
             <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
               <!-- start junit benchmarks config -->
               <jub.consumers>H2,CONSOLE</jub.consumers>
               <jub.db.file>.benchmarks</jub.db.file>
@@ -1697,9 +1705,16 @@
             </execution>
           </executions>
           <configuration>
+            <failIfNoTests>false</failIfNoTests>
+            <!-- force use of property -->
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <forkMode>once</forkMode>
+            <argLine>-ea</argLine>
+            <workingDirectory>${project.build.directory}</workingDirectory>
             <excludes combine.children="append">
               <exclude>**/Abstract*</exclude>
             </excludes>
+            <!-- FIXME: Move all testng bits to modules where used, this is limited to the longrunning testsuite IIUC -->
             <properties>
               <property>
                 <name>usedefaultlisteners</name>
@@ -1711,6 +1726,7 @@
               </property>
             </properties>
             <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
               <!-- logging configuration properties, see logback*.xml files -->
               <test.log.level>${test.log.level}</test.log.level>
               <it.test.log.level>${it.test.log.level}</it.test.log.level>
