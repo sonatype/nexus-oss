@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -102,7 +103,7 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
@@ -202,7 +203,12 @@
   <profiles>
     <profile>
       <id>it</id>
-
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
@@ -549,7 +555,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-            <!-- for Yourkit session, we left more memory intentionally -->
+              <!-- for Yourkit session, we left more memory intentionally -->
               <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError -agentpath:"${yourkit.agent}"</argLine>
             </configuration>
           </plugin>

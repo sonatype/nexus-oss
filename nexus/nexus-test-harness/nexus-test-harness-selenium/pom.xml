@@ -206,7 +206,12 @@
   <profiles>
     <profile>
       <id>it</id>
-
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>

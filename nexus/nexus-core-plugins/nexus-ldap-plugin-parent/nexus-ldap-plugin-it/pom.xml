@@ -141,9 +141,6 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-        <goals>
-          <goal>generate-test-metadata</goal>
-        </goals>
       </plugin>
 
     </plugins>
@@ -167,7 +164,12 @@
 
     <profile>
       <id>it</id>
-
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
