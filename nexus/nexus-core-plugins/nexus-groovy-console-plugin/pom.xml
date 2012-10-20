@@ -52,40 +52,6 @@
           </execution>
         </executions>
       </plugin>
-      <!--
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>setup-nexus-plugin-environment</goal>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <nexusBundleArtifact>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-oss-webapp</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-            <classifier>bundle</classifier>
-          </nexusBundleArtifact>
-          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
-          <nexusVersion>${project.version}</nexusVersion>
-          <nexusPluginsArtifacts>
-            <plugin>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-test-harness-launcher</artifactId>
-            </plugin>
-          </nexusPluginsArtifacts>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-      </plugin>
- -->
     </plugins>
   </build>
 
