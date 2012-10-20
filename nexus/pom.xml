@@ -1685,6 +1685,7 @@
           <version>1.2</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>${surefire.version}</version>
           <executions>
