@@ -1917,23 +1917,6 @@
       </properties>
     </profile>
 
-    <!-- pre code push profile to be run by a developer before push to scm, eventually the default profile without a profile -->
-    <profile>
-      <id>prepush</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <!-- FIXME only run a select group of unit tests possibly to speeed the build -->
-        <it.test>void</it.test>
-        <failIfNoTests>false</failIfNoTests>
-        <invoker.skip>true</invoker.skip>
-        <!-- <source.skip>true</source.skip>
-        <enunciate.skip>true</enunciate.skip> -->
-        <test-env.skip>true</test-env.skip>
-      </properties>
-    </profile>
-
     <!-- dummy profile for activating integration tests -->
     <profile>
       <id>it</id>
