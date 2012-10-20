@@ -1822,24 +1822,6 @@
     </profile>
 
     <profile>
-      <id>skipBenchmarks</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <systemPropertyVariables>
-                  <jub.ignore.annotations>true</jub.ignore.annotations>
-                </systemPropertyVariables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
-    <profile>
       <id>enunciate</id>
       <activation>
         <!-- A plugin is "enunciated" when enunciate.xml config file is present -->
