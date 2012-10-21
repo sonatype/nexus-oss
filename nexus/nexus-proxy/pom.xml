@@ -231,8 +231,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>ahc-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>
@@ -249,7 +247,7 @@
       </build>
     </profile>
     <profile>
-      <id>apacheHttpClient4x-provider</id>
+      <id>hc4-provider</id>
       <build>
         <plugins>
           <plugin>
@@ -257,8 +255,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>apacheHttpClient4x-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>
@@ -275,7 +271,7 @@
       </build>
     </profile>
     <profile>
-      <id>apacheHttpClient3x-provider</id>
+      <id>hc3-provider</id>
       <build>
         <plugins>
           <plugin>
@@ -283,8 +279,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>apacheHttpClient3x-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>

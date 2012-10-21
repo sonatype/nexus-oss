@@ -359,7 +359,7 @@
     </profile>
 
     <profile>
-      <id>apacheHttpClient4x-provider</id>
+      <id>hc4-provider</id>
       <activation>
         <property>
           <name>rrs</name>
@@ -383,7 +383,7 @@
     </profile>
 
     <profile>
-      <id>apacheHttpClient3x-provider</id>
+      <id>hc3-provider</id>
       <activation>
         <property>
           <name>rrs</name>
