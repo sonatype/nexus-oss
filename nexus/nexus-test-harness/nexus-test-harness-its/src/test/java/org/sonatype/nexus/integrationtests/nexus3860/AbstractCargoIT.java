@@ -61,6 +61,7 @@ import org.sonatype.nexus.test.utils.NexusWebappLayout;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -68,16 +69,9 @@ import org.testng.annotations.Test;
 import static org.hamcrest.Matchers.*;
 
 public abstract class AbstractCargoIT
+    extends TestSupport
 {
-
-    protected Logger log = LoggerFactory.getLogger( getClass() );
-
     private InstalledLocalContainer container;
-
-    public AbstractCargoIT()
-    {
-        super();
-    }
 
     public abstract String getContainer();
 
@@ -85,7 +79,7 @@ public abstract class AbstractCargoIT
 
     public File getWarFile()
     {
-        return new File( "target/nexus/war" );
+        return util.resolveFile( "target/nexus-webapp" );
     }
 
     @BeforeClass
