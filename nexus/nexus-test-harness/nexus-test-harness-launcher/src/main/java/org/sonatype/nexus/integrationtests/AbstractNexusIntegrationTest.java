@@ -152,6 +152,9 @@ public abstract class AbstractNexusIntegrationTest
 
     static
     {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
         // Install the file preferences, to have them used from IT but also from embedded Nexus too.
         System.setProperty( "java.util.prefs.PreferencesFactory", FilePreferencesFactory.class.getName() );
 
@@ -171,9 +174,6 @@ public abstract class AbstractNexusIntegrationTest
         baseNexusUrl = nexusBaseUrl;
 
         TestContainer.getInstance().getTestContext().setNexusUrl( nexusBaseUrl );
-
-        // configure the logging
-        SLF4JBridgeHandler.install();
     }
 
     // == instance utils
@@ -758,8 +758,6 @@ public abstract class AbstractNexusIntegrationTest
     protected void startNexus()
         throws Exception
     {
-        log.info( "Starting Nexus" );
-
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         try
@@ -777,15 +775,12 @@ public abstract class AbstractNexusIntegrationTest
     protected static void stopNexus()
         throws Exception
     {
-        staticLog.info( "Stopping Nexus" );
-
         getNexusStatusUtil().stop();
     }
 
     protected void restartNexus()
         throws Exception
     {
-        log.info( "RESTARTING Nexus" );
         stopNexus();
         startNexus();
     }
