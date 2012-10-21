@@ -27,7 +27,7 @@
   <name>Nexus : Test Harness : Core ITs</name>
 
   <properties>
-    <cargo.version>1.0.4</cargo.version>
+    <cargo.version>1.3.0</cargo.version>
   </properties>
 
   <build>
@@ -183,13 +183,14 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- for Cargo ITs -->
+    <!-- nexus3860/* (cargo) tests -->
     <dependency>
       <groupId>org.codehaus.cargo</groupId>
       <artifactId>cargo-core-api-generic</artifactId>
       <version>${cargo.version}</version>
       <scope>test</scope>
       <exclusions>
+        <!-- Omit these dependencies due to enforce rules banning them -->
         <exclusion>
           <groupId>xml-apis</groupId>
           <artifactId>xml-apis</artifactId>
@@ -294,7 +295,10 @@
                       <type>war</type>
                       <outputDirectory>${project.build.directory}/nexus-webapp</outputDirectory>
                     </artifactItem>
-                    <!-- Versions here must be kept in sync with nexus3860/* (cargo) tests -->
+                    <!--
+                    Versions here must be kept in sync with nexus3860/* (cargo) tests
+                    This might be better off done by assembly plugin, so that unneeded docs/junk in these distributions can be excluded
+                    -->
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
                       <artifactId>apache-tomcat</artifactId>
@@ -384,6 +388,14 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
+              <!--
+              NOTE: Using forkMode=always here for a few reasons...
+              Since ATM these are testNG-based tests, when using forkMode=always, instead of surefire reporting a single TestSuite execution it will show each test-class.
+              This means that the output (both to console and in the reports directory) are closer to junit (.txt, -output.txt and .xml per test).
+              The cargo-based tests (before, not sure if they currently due with updated cargo) required this forkmode and were put into a separate profile to execute.
+              This ended up becoming unmaintained and the cargo tests had not been running for a long time because of that.
+              The main side-effect is that the testsuite will take a little longer to execute given it has to fork a JVM 650+ times.
+              -->
               <forkMode>always</forkMode>
               <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
               <excludes>
