@@ -297,7 +297,7 @@
                     </artifactItem>
                     <!--
                     Versions here must be kept in sync with nexus3860/* (cargo) tests
-                    This might be better off done by assembly plugin, so that unneeded docs/junk in these distributions can be excluded
+                    This might be better off done by assembly plugin, so that unneeded docs/junk in these distributions can be excluded, asis this takes a while to run.
                     -->
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
@@ -340,16 +340,10 @@
             <artifactId>nexus-test-environment-maven-plugin</artifactId>
             <executions>
               <execution>
-                <id>env</id>
-                <phase>initialize</phase>
                 <goals>
                   <goal>setup-environment</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>package</id>
-                <goals>
-                  <goal>package</goal>
+                  <!-- FIXME: Sort out what this goal is used for, and why its needed to execute -->
+                  <!--<goal>package</goal>-->
                 </goals>
               </execution>
             </executions>
@@ -402,12 +396,6 @@
                 <exclude>**Suite*</exclude>
                 <exclude>**/*$*.*</exclude>
               </excludes>
-              <properties>
-                <property>
-                  <name>listener</name>
-                  <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
-                </property>
-              </properties>
             </configuration>
           </plugin>
         </plugins>
