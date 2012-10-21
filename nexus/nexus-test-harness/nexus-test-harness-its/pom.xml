@@ -269,7 +269,7 @@
             </configuration>
             <executions>
               <execution>
-                <phase>initialize</phase>
+                <phase>pre-integration-test</phase>
                 <goals>
                   <goal>install</goal>
                 </goals>
@@ -280,6 +280,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.5.1</version>
             <executions>
               <execution>
                 <phase>pre-integration-test</phase>
@@ -288,7 +289,7 @@
                 </goals>
                 <configuration>
                   <artifactItems>
-                    <!-- Required for nexus3860/* (cargo) tests, unsure why this shouldn't be using the unpacked distro's nexus directory -->
+                    <!-- Required for nexus3860/* (cargo) tests -->
                     <artifactItem>
                       <groupId>org.sonatype.nexus</groupId>
                       <artifactId>nexus-webapp</artifactId>
@@ -297,7 +298,7 @@
                     </artifactItem>
                     <!--
                     Versions here must be kept in sync with nexus3860/* (cargo) tests
-                    This might be better off done by assembly plugin, so that unneeded docs/junk in these distributions can be excluded, asis this takes a while to run.
+                    The Tomcat distributions referenced are not actually available in central.
                     -->
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
@@ -306,6 +307,8 @@
                       <classifier>bundle</classifier>
                       <type>tar.gz</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
+                      <!-- Excludes do not function with tar.gz bundles, and tar.gz bundle unpacking is very sloooooow -->
+                      <!--<excludes>**/webapps/**</excludes>-->
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
@@ -314,20 +317,24 @@
                       <classifier>bundle</classifier>
                       <type>tar.gz</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
+                      <!-- Excludes do not function with tar.gz bundles, and tar.gz bundle unpacking is very sloooooow -->
+                      <!--<excludes>webapps</excludes>-->
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
                       <artifactId>jetty-distribution</artifactId>
                       <version>8.1.1.v20120215</version>
-                      <type>tar.gz</type>
+                      <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
+                      <excludes>*/javadoc/**,*/contexts/**,*/contexts-available/**</excludes>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
                       <artifactId>jetty-distribution</artifactId>
                       <version>7.6.0.v20120127</version>
-                      <type>tar.gz</type>
+                      <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
+                      <excludes>*/javadoc/**,*/contexts/**,*/contexts-available/**</excludes>
                     </artifactItem>
                   </artifactItems>
                 </configuration>
