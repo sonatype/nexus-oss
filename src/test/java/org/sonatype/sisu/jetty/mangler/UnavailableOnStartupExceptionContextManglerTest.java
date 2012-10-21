@@ -1,15 +1,16 @@
 package org.sonatype.sisu.jetty.mangler;
 
-import java.io.File;
-
 import junit.framework.Assert;
-
+import org.junit.Test;
 import org.sonatype.sisu.jetty.AbstractJettyConfigurationTest;
 import org.sonatype.sisu.jetty.Jetty8;
+
+import java.io.File;
 
 public class UnavailableOnStartupExceptionContextManglerTest
     extends AbstractJettyConfigurationTest
 {
+    @Test
     public void testNoPreconfiguredWars()
         throws Exception
     {
@@ -18,6 +19,7 @@ public class UnavailableOnStartupExceptionContextManglerTest
         Assert.assertEquals( "Config contains no WebApps!", 0, affected );
     }
 
+    @Test
     public void testOneWar()
         throws Exception
     {
@@ -26,6 +28,7 @@ public class UnavailableOnStartupExceptionContextManglerTest
         Assert.assertEquals( "One WAR needs to be set!", 1, affected );
     }
 
+    @Test
     public void testTwoWars()
         throws Exception
     {

@@ -15,10 +15,12 @@ package org.sonatype.sisu.jetty;
 import java.io.File;
 import java.net.URL;
 
-import junit.framework.TestCase;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import static org.junit.Assert.fail;
 
 public abstract class AbstractJettyConfigurationTest
-    extends TestCase
+    extends TestSupport
 {
     protected String getJettyXmlPath( String jettyXmlName )
     {
@@ -33,8 +35,8 @@ public abstract class AbstractJettyConfigurationTest
 
             if ( !f.isFile() )
             {
-                fail( "Cannot find Jetty configuration file: " + jettyXmlName
-                    + " (tried classpath and base-path src/test/resources/jetty-xmls)" );
+                fail("Cannot find Jetty configuration file: " + jettyXmlName
+                    + " (tried classpath and base-path src/test/resources/jetty-xmls)");
             }
 
             result = f.getAbsolutePath();
