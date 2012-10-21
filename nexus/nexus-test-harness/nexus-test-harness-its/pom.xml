@@ -288,12 +288,12 @@
                 </goals>
                 <configuration>
                   <artifactItems>
-                    <!-- Required for nexus3860/* (cargo) tests -->
+                    <!-- Required for nexus3860/* (cargo) tests, unsure why this shouldn't be using the unpacked distro's nexus directory -->
                     <artifactItem>
                       <groupId>org.sonatype.nexus</groupId>
                       <artifactId>nexus-webapp</artifactId>
                       <type>war</type>
-                      <outputDirectory>${project.build.directory}/nexus-webapp</outputDirectory>
+                      <outputDirectory>${project.build.directory}/nexus/webapp</outputDirectory>
                     </artifactItem>
                     <!--
                     Versions here must be kept in sync with nexus3860/* (cargo) tests
