@@ -318,7 +318,7 @@
                       <type>tar.gz</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
                       <!-- Excludes do not function with tar.gz bundles, and tar.gz bundle unpacking is very sloooooow -->
-                      <!--<excludes>webapps</excludes>-->
+                      <!--<excludes>**/webapps/**</excludes>-->
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
