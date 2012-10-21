@@ -15,42 +15,55 @@
 -->
 <included>
 
-  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+  <!--<appender name="console" class="ch.qos.logback.core.ConsoleAppender">-->
+    <!--<encoder>-->
+      <!--<pattern>%d %p [%c] - %m%n</pattern>-->
+    <!--</encoder>-->
+  <!--</appender>-->
+
+  <!--<appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+    <!--&lt;!&ndash;See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender&ndash;&gt;-->
+    <!--<File>${project.build.directory}/logs/${test-id}/nexus.log</File>-->
+    <!--<Append>true</Append>-->
+    <!--<encoder>-->
+      <!--<pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n</pattern>-->
+    <!--</encoder>-->
+    <!--<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">-->
+      <!--<maxIndex>12</maxIndex>-->
+      <!--<FileNamePattern>${project.build.directory}/logs/${test-id}/nexus.log.%i</FileNamePattern>-->
+    <!--</rollingPolicy>-->
+    <!--<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">-->
+      <!--<MaxFileSize>10MB</MaxFileSize>-->
+    <!--</triggeringPolicy>-->
+  <!--</appender>-->
+
+  <!--<logger name="httpclient" level="WARN"/>-->
+  <!--<logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN">-->
+    <!--<appender-ref ref="console"/>-->
+  <!--</logger>-->
+  <!--<logger name="org.apache.http" level="WARN"/>-->
+  <!--<logger name="org.restlet" level="${it.nexus.log.level:-WARN}">-->
+    <!--<appender-ref ref="console"/>-->
+    <!--<appender-ref ref="logfile" />-->
+  <!--</logger>-->
+  <!--<logger name="org.apache.commons" level="WARN"/>-->
+  <!--<logger name="eu.medsea.mimeutil" level="WARN"/>-->
+
+  <!--<root level="${it.nexus.log.level:-INFO}">-->
+    <!--<appender-ref ref="logfile"/>-->
+  <!--</root>-->
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <target>System.out</target>
     <encoder>
-      <pattern>%d %p [%c] - %m%n</pattern>
+      <pattern>NEXUS: %date{HH:mm:ss.SSS} %level [%thread%X{DC}] %logger - %msg%n</pattern>
     </encoder>
   </appender>
 
-  <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
-    <File>${project.build.directory}/logs/${test-id}/nexus.log</File>
-    <Append>true</Append>
-    <encoder>
-      <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <maxIndex>12</maxIndex>
-      <FileNamePattern>${project.build.directory}/logs/${test-id}/nexus.log.%i</FileNamePattern>
-    </rollingPolicy>
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy>
-  </appender>
+  <logger name="Sisu" level="INFO"/>
 
-  <logger name="httpclient" level="WARN"/>
-  <logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN">
-    <appender-ref ref="console"/>
-  </logger>
-  <logger name="org.apache.http" level="WARN"/>
-  <logger name="org.restlet" level="${it.nexus.log.level:-WARN}">
-    <appender-ref ref="console"/>
-    <appender-ref ref="logfile" />
-  </logger>
-  <logger name="org.apache.commons" level="WARN"/>
-  <logger name="eu.medsea.mimeutil" level="WARN"/>
-
-  <root level="${it.nexus.log.level:-INFO}">
-    <appender-ref ref="logfile"/>
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
   </root>
-  
+
 </included>

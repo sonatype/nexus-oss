@@ -15,29 +15,18 @@
 -->
 <configuration>
 
-  <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>${project.build.directory}/logs/tests.log</File>
-    <Append>true</Append>
-    <encoder>
-      <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p - %m [%c]%n</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <maxIndex>12</maxIndex>
-      <FileNamePattern>${project.build.directory}/logs/tests.log.%i</FileNamePattern>
-    </rollingPolicy>
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <target>System.out</target>
+      <encoder>
+          <!--<pattern>[%level] %logger{0} - %msg%n</pattern>-->
+          <pattern>TEST: %date{HH:mm:ss.SSS} %level [%thread%X{DC}] %logger - %msg%n</pattern>
+      </encoder>
   </appender>
-  
-  <logger name="httpclient" level="WARN"/>
-  <logger name="org.apache.commons.httpclient" level="WARN"/>
-  <logger name="org.sonatype.guice.plexus" level="INFO"/>
-  <logger name="org.sonatype.security.configuration.source.FileSecurityConfigurationSource" level="WARN"/>
-  <logger name="org.sonatype.nexus.test.utils.NexusStatusUtil" level="INFO"/>
 
-  <root level="${it.test.log.level:-INFO}">
-    <appender-ref ref="logfile" />
+  <logger name="Sisu" level="INFO"/>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
   </root>
-  
+
 </configuration>
