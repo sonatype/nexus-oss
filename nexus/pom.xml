@@ -193,7 +193,7 @@
     <shiro.version>1.2.1</shiro.version>
     <spice-timeline.version>2.1</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
-    <surefire.version>2.10</surefire.version>
+    <surefire.version>2.12.4</surefire.version>
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
@@ -1716,17 +1716,6 @@
             <excludes combine.children="append">
               <exclude>**/Abstract*</exclude>
             </excludes>
-            <!-- FIXME: Move all testng bits to modules where used, this is limited to the longrunning testsuite IIUC -->
-            <properties>
-              <property>
-                <name>usedefaultlisteners</name>
-                <value>true</value>
-              </property>
-              <property>
-                <name>reporter</name>
-                <value>org.testng.reporters.JUnitXMLReporter</value>
-              </property>
-            </properties>
             <systemPropertyVariables>
               <java.awt.headless>true</java.awt.headless>
               <!-- logging configuration properties, see logback*.xml files -->
