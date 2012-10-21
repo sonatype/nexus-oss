@@ -119,9 +119,11 @@ public class Jetty8NexusBooter
     public Jetty8NexusBooter( final File bundleBasedir, final int port )
         throws Exception
     {
-        this.bundleBasedir = bundleBasedir;
+        this.bundleBasedir = bundleBasedir.getCanonicalFile();
+        log.info("Bundle base directory: {}", bundleBasedir);
 
         this.sharedLibs = new File( bundleBasedir.getParentFile(), "shared" );
+        log.info("Shared library directory: {}", sharedLibs);
 
         // modify the properties
         tamperJettyConfiguration( bundleBasedir, port );
@@ -137,6 +139,9 @@ public class Jetty8NexusBooter
         // needed since NEXUS-4515
         System.setProperty( "jettyContext", "nexus.properties" );
         System.setProperty( "jettyPlexusCompatibility", "true" );
+
+        // Configure bootstrap logback configuration
+        System.setProperty("logback.configurationFile", new File(bundleBasedir, "conf/logback.xml").getAbsolutePath());
 
         // guice finalizer
         System.setProperty( "guice.executor.class", "NONE" );
@@ -189,6 +194,8 @@ public class Jetty8NexusBooter
             final Class<?> appContextClass = sharedClassloader.loadClass( "org.sonatype.appcontext.AppContext" );
             final Class<?> jetty8Class = sharedClassloader.loadClass( "org.sonatype.sisu.jetty.Jetty8" );
 
+            log.info("Starting Nexus[{}]", testId);
+
             jetty8 =
                 jetty8Class.getConstructor( File.class, ClassLoader.class, appContextClass, Map[].class ).newInstance(
                     new File( bundleBasedir, "conf/jetty.xml" ), nexusClassloader, null,
@@ -214,6 +221,8 @@ public class Jetty8NexusBooter
     {
         try
         {
+            log.info("Stopping Nexus");
+
             if ( jetty8 != null )
             {
                 jetty8.getClass().getMethod( "stopJetty" ).invoke( jetty8 );
@@ -273,8 +282,10 @@ public class Jetty8NexusBooter
 
         ClassRealm realm = world.newRealm( "it-shared", null );
 
+        log.info("Shared ClassPath:");
         for ( URL url : urls )
         {
+            log.info("  {}", url);
             realm.addURL( url );
         }
 
@@ -315,8 +326,10 @@ public class Jetty8NexusBooter
 
         ClassRealm realm = world.newRealm( IT_REALM_ID + "-" + testId, sharedClassloader );
 
+        log.info("Nexus ClassPath:");
         for ( URL url : urls )
         {
+            log.info("  {}", url);
             realm.addURL( url );
         }
 
@@ -436,6 +449,9 @@ public class Jetty8NexusBooter
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-interpolation-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-classworlds-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "appcontext-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "slf4j-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "nexus-logging-extras-appender-*.jar" );
     }
 
     /**
