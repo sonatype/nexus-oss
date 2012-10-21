@@ -408,6 +408,12 @@
 
     <profile>
       <id>cargo</id>
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
@@ -499,12 +505,12 @@
         </plugins>
       </build>
       <dependencies>
-        <!-- cargo tests -->
         <dependency>
           <groupId>saxpath</groupId>
           <artifactId>saxpath</artifactId>
           <version>1.0-FCS</version>
         </dependency>
+
         <dependency>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-webapp</artifactId>
@@ -517,12 +523,12 @@
           <artifactId>cargo-core-container-tomcat</artifactId>
           <version>${cargo.version}</version>
         </dependency>
+
         <dependency>
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-core-container-jetty</artifactId>
           <version>${cargo.version}</version>
         </dependency>
-        <!-- END cargo tests -->
       </dependencies>
     </profile>
 
