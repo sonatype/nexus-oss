@@ -407,7 +407,7 @@
     </profile>
 
     <profile>
-      <id>cargo</id>
+      <id>it-cargo</id>
       <activation>
         <property>
           <name>it</name>
@@ -429,7 +429,7 @@
                 </goals>
                 <configuration>
                   <forkMode>always</forkMode>
-                  <reportsDirectory>${project.build.directory}/forked-failsafe-reports</reportsDirectory>
+                  <reportsDirectory>${project.build.directory}/cargo-failsafe-reports</reportsDirectory>
                   <includes>
                     <include>**/Nexus3860*IT.*</include>
                   </includes>
