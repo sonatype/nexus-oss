@@ -269,41 +269,24 @@
                   <includes>
                     <include>${basedir}/src/main/webapp/ext-2.3/adapter/ext/ext-base.js</include>
                     <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
-                    <include>nexus/common.js</include>
-                    <include>nexus/error/common.js</include>
+                    <include>sonatype/common.js</include>
+                    <include>nexus/**/common.js</include>
+                    <include>nexus/messagebox.js</include>
+                    <include>ext/**/*.js</include>
+                    <include>nexus/ext/**/*.js</include>
                     <include>nexus/error/ErrorHandler.js</include>
-                    <include>nexus/util/common.js</include>
-                    <include>nexus/util/Format.js</include>
-                    <include>extensions/ext-override.js</include>
-                    <include>filetree/js/Ext.ux.form.BrowseButton.js</include>
+                    <include>nexus/util/**/*.js</include>
                     <include>groupcombo/groupcombo.js</include>
                     <include>groupcombo/groupdataview.js</include>
-                    <include>Sonatype.js</include>
-                    <include>extensions/Ext.messagebox.js</include>
-                    <include>extensions/Ext.form.js</include>
-                    <include>extensions/SearchField.js</include>
-                    <include>extensions/Sonatype.ext.FeedGrid.js</include>
-                    <include>extensions/Ext.tree.js</include>
-                    <include>extensions/ext.util.md5.js</include>
-                    <include>extensions/MultiSelectTree.js</include>
-                    <include>extensions/TwinPanelController.js</include>
-                    <include>extensions/TextEntryList.js</include>
-                    <include>extensions/Sonatype.events.js</include>
-                    <include>extensions/Sonatype.navigation.js</include>
-                    <include>extensions/Sonatype.panels.js</include>
-                    <include>extensions/Ext.ux.form.LovCombo.js</include>
-                    <include>extensions/Ext.ux.ThemeCombo.js</include>
-                    <include>extensions/RoleSelector.js</include>
-                    <include>nexus/form/common.js</include>
-                    <include>nexus/form/LabelField.js</include>
+                    <include>nexus/form/**/*.js</include>
+                    <include>nexus/navigation/**/*.js</include>
+                    <include>nexus/panels/**/*.js</include>
                     <include>Sonatype.utils.js</include>
-                    <include>Sonatype.config.js</include>
+                    <include>nexus/config.js</include>
                     <include>Sonatype.lib.js</include>
                     <include>Sonatype.resources.js</include>
                     <include>Sonatype.headLinks.js</include>
                     <include>Sonatype.view.js</include>
-                    <include>extensions/ZeroClipboard.js</include>
-                    <include>formFieldGenerator.js</include>
                     <include>repoServer/repoServer.referenceData.js</include>
                     <include>repoServer/repoServer.resources.js</include>
                     <include>repoServer/repoServer.FeedViewPanel.js</include>
@@ -331,7 +314,6 @@
                     <include>repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
                     <include>repoServer/repoServer.RepoSummaryPanel.js</include>
                     <include>repoServer/repoServer.Maven2InformationPanel.js</include>
-                    <include>nexus/profile/common.js</include>
                     <include>nexus/profile/UserProfile.js</include>
                     <include>nexus/profile/Summary.js</include>
                   </includes>
@@ -359,7 +341,13 @@
               <!-- only include new js resources following the Nexus.* namespace -->
               <includes>
                 <include>js/nexus/**/*.js</include>
+                <include>js/ext/**/*.js</include>
+                <include>js/sonatype/**/*.js</include>
               </includes>
+              <excludes>
+                <!-- do not check third party extensions -->
+                <exclude>js/ext/ux/**/*.js</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>
@@ -385,21 +373,10 @@
         <configuration>
           <warSourceIncludes>
             *,
-            ext-2.3/ext-all-debug.js,
-            ext-2.3/ext-all.js,
-            ext-2.3/adapter/ext/ext-base.js,
             ext-2.3/resources/css/ext-all.css,
             ext-2.3/resources/css/xtheme-gray.css,
             ext-2.3/resources/images/**,
             images/**,
-            js/*,
-            js/extensions/*,
-            js/filetree/js/Ext.ux.form.BrowseButton.js,
-            js/groupcombo/*,
-            js/repoServer/*,
-            style/Sonatype.css,
-            style/Sonatype-content.css,
-            style/Ext.ux.form.LovCombo.css,
             WEB-INF/*,
             js/sonatype-all.js,
             style/sonatype-all.css

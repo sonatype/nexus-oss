@@ -107,6 +107,7 @@
               <exclude>**/.idea/**</exclude>
               <exclude>**/atlassian-ide-plugin.xml</exclude>
               <exclude>nexus-plugin-archetype/src/main/resources/archetype-resources/**</exclude>
+              <exclude>nexus/nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
             </excludes>
             <mapping>
               <vm>SHARPSTAR_STYLE</vm>

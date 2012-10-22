@@ -11,6 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
+/*global Nexus, Ext*/
+
 /**
  * A field using a label to display the value.
  */

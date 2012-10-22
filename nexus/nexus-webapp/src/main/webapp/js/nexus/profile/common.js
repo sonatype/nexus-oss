@@ -11,6 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
+/*global Ext*/
 Ext.namespace('Nexus.profile');
 
 

@@ -11,5 +11,26 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Ext*/
-Ext.namespace('Nexus.form');
+/*global Ext, Nexus, Sonatype*/
+// Extend message box, so that we can get ids on the buttons for testing
+Nexus.MessageBox = (function() {
+  var O, F = function() {};
+  F.prototype = Ext.MessageBox;
+  O = function() {};
+  O.prototype = new F();
+  O.superclass = F.prototype;
+
+  Ext.override(O, (function() {
+        return {
+          show : function(options) {
+            O.superclass.show.call(this, options);
+            this.getDialog().getEl().select('button').each(function(el) {
+                  el.dom.id = el.dom.innerHTML;
+                });
+          }
+        };
+      }()));
+  return new O();
+}());
+
+Sonatype.MessageBox = Nexus.MessageBox;

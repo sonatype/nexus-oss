@@ -10,6 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 /*global Ext*/
-Ext.namespace('Nexus.form');
+Ext.override(Ext.tree.TreeDropZone, {
+  completeDrop : function(de) {
+    var ns = de.dropNode, p = de.point, t = de.target, i, len, n, node, ins = false;
+
+    if (!Ext.isArray(ns))
+    {
+      ns = [ns];
+    }
+    if (p !== 'append')
+    {
+      ins = true;
+      node = (p === 'above') ? t : t.nextSibling;
+    }
+    for (i = 0, len = ns.length; i < len; i=i+1)
+    {
+      n = ns[i];
+      if (ins)
+      {
+        t.parentNode.insertBefore(n, node);
+      }
+      else
+      {
+        t.appendChild(n);
+      }
+      if (Ext.enableFx && this.tree.hlDrop)
+      {
+        n.ui.highlight();
+      }
+    }
+    ns[0].ui.focus();
+    t.ui.endDrop();
+    this.tree.fireEvent("nodedrop", de);
+  }
+
+});

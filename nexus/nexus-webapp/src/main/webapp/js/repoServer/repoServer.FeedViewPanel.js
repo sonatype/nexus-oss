@@ -151,7 +151,7 @@ Sonatype.repoServer.FeedViewPanel = function(config) {
   // listeners: this.LinkInterceptor
   // });
 
-  this.grid = new Sonatype.ext.FeedGrid({});
+  this.grid = new Nexus.ext.FeedGrid({});
 
   Sonatype.repoServer.FeedViewPanel.superclass.constructor.call(this, {
         // id:'feed-view-' + this.title,
