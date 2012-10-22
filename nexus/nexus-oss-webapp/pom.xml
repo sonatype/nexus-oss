@@ -221,7 +221,7 @@
                                             <artifactId>nexus-oss-webapp</artifactId>
                                             <classifier>bundle</classifier>
                                             <type>zip</type>
-                                            <outputDirectory>${project.build.directory}/dist</outputDirectory>
+                                            <outputDirectory>${project.build.directory}/tattletale/dist</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -238,8 +238,8 @@
                                     <goal>report</goal>
                                 </goals>
                                 <configuration>
-                                    <source>${project.build.directory}/dist/nexus-oss-webapp-${project.version}</source>
-                                    <destination>${project.build.directory}/tattletale</destination>
+                                    <source>${project.build.directory}/tattletale/dist</source>
+                                    <destination>${project.build.directory}/tattletale/report</destination>
                                     <reports>
                                         <!-- FIXME: There are some reports disable here, probably shouldn't be -->
                                         <report>classdependants</report>
