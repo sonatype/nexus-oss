@@ -14,8 +14,6 @@ package org.sonatype.security.web.guice;
 
 import java.lang.reflect.Constructor;
 import java.util.Enumeration;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,6 +41,9 @@ import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.sonatype.guice.bean.locators.BeanLocator;
+import org.sonatype.inject.BeanEntry;
+import org.sonatype.inject.Mediator;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 import org.sonatype.security.web.ProtectedPathManager;
@@ -173,29 +174,36 @@ public class SecurityWebModule
      * Constructs a {@link DefaultFilterChainManager} from an injected {@link Filter} map.
      */
     private static final class FilterChainManagerProvider
-        implements Provider<FilterChainManager>
+        implements Provider<FilterChainManager>, Mediator<Named, Filter, FilterChainManager>
     {
         private final FilterConfig filterConfig;
 
-        private final Map<String, Filter> filterMap;
+        private final BeanLocator beanLocator;
 
         @Inject
         private FilterChainManagerProvider( @Named( "SHIRO" ) ServletContext servletContext,
-                                            Map<String, Filter> filterMap )
+                                            BeanLocator beanLocator )
         {
             // simple configuration so we can initialize filters as we add them
             this.filterConfig = new SimpleFilterConfig( "SHIRO", servletContext );
-            this.filterMap = filterMap;
+            this.beanLocator = beanLocator;
         }
 
         public FilterChainManager get()
         {
             FilterChainManager filterChainManager = new DefaultFilterChainManager( filterConfig );
-            for ( Entry<String, Filter> entry : filterMap.entrySet() )
-            {
-                filterChainManager.addFilter( entry.getKey(), entry.getValue(), true );
-            }
+            beanLocator.watch( Key.get( Filter.class ), this, filterChainManager );
             return filterChainManager;
+        }
+
+        public void add( final BeanEntry<Named, Filter> entry, final FilterChainManager manager )
+        {
+            manager.addFilter( entry.getKey().value(), entry.getValue(), true );
+        }
+
+        public void remove( final BeanEntry<Named, Filter> filter, final FilterChainManager manager )
+        {
+            // no-op
         }
     }
 
