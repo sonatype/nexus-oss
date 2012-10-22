@@ -58,8 +58,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
         }
     }
 
-    // FIXME: This test depends on logging output... grrrrr
-    @Test(enabled = false)
+    @Test
     public void downloadSnapshotPlugin()
         throws Throwable
     {
