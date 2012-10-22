@@ -79,7 +79,7 @@ public abstract class AbstractCargoIT
 
     public File getWarFile()
     {
-        return util.resolveFile( "target/nexus-webapp" );
+        return util.resolveFile( "target/nexus/webapp" );
     }
 
     @BeforeClass
