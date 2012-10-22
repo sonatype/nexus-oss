@@ -180,7 +180,7 @@
     <plexus-digest.version>1.1</plexus-digest.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
-    <sisu-jetty8.version>1.4</sisu-jetty8.version>
+    <sisu-jetty8.version>1.4.1</sisu-jetty8.version>
     <sisu-velocity.version>1.1</sisu-velocity.version>
     <sisu-problem-reporter.version>1.5.2</sisu-problem-reporter.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
