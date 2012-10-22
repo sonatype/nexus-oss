@@ -12,17 +12,20 @@
  */
 package org.sonatype.nexus.plugins.rest;
 
+import org.sonatype.nexus.mime.DefaultMimeSupport;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component( role = NexusResourceBundle.class, hint = "simpleTest" )
 public class SimpleDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
+    public SimpleDocumentationResourceBundle() {
+        super(new DefaultMimeSupport());
+    }
+
     @Override
     public String getPluginId()
     {

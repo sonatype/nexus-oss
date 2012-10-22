@@ -12,23 +12,24 @@
  */
 package org.sonatype.nexus.mime;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import org.junit.Test;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
-
+/**
+ * Tests for {@link DefaultMimeSupport}.
+ */
 public class DefaultMimeSupportTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
+    private MimeSupport mimeSupport;
 
-    protected MimeSupport mimeSupport;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        mimeSupport = lookup( MimeSupport.class );
+    @Before
+    public void setUp() throws Exception {
+        mimeSupport = new DefaultMimeSupport();
     }
 
     /**

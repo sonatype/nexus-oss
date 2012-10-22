@@ -20,9 +20,11 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 // This is an IT just because it runs longer then 15 seconds
 public class DefaultRepositoryItemUidIT
+    extends TestSupport
 {
     private DummyRepositoryItemUidFactory factory;
 
