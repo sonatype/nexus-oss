@@ -15,6 +15,11 @@
 -->
 <included>
 
+  <!--
+  FIXME: Have to enable a log file here, NX tests as well as server functionality
+  (ie. service/local/logs) depends on this to be here... fucking awesome
+  -->
+
   <!--<appender name="console" class="ch.qos.logback.core.ConsoleAppender">-->
     <!--<encoder>-->
       <!--<pattern>%d %p [%c] - %m%n</pattern>-->
