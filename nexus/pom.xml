@@ -1655,11 +1655,6 @@
           <version>1.0-alpha-2</version>
         </plugin>
         <plugin>
-          <artifactId>plx-maven-plugin</artifactId>
-          <groupId>org.sonatype.plugins</groupId>
-          <version>1.3</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${surefire.version}</version>
