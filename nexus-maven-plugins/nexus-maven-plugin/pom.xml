@@ -225,7 +225,7 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.6.3</version>
+      <version>1.7.1</version>
     </dependency>
     <!-- Maven and Maven plugin related stuff -->
     <dependency>

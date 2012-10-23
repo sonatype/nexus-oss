@@ -38,10 +38,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>server-provider</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

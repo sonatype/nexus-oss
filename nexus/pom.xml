@@ -1019,31 +1019,6 @@
         <version>1.3.154</version>
         <scope>test</scope>
       </dependency>
-      <!-- TODO move http testing related libs to their own module or testsuite-support -->
-      <dependency>
-        <groupId>org.sonatype.http-testing-harness</groupId>
-        <artifactId>server-provider</artifactId>
-        <version>0.5.3</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.http-testing-harness</groupId>
-        <artifactId>junit-runner</artifactId>
-        <version>0.5.3</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.http-testing-harness</groupId>
-        <artifactId>testng-runner</artifactId>
-        <version>0.5.3</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.jsoup</groupId>
-        <artifactId>jsoup</artifactId>
-        <version>1.6.3</version>
-        <scope>test</scope>
-      </dependency>
 
       <!-- INTERNAL -->
 

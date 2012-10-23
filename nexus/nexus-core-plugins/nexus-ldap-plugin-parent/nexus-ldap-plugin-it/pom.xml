@@ -69,6 +69,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
       <version>${project.version}</version>
@@ -100,15 +106,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- TODO plexus-ldap-testsuite requires JUNIT???, fix it -->
-    <!--
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <version>4.10</version>
-      <scope>runtime</scope>
-    </dependency>
-    -->
     
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -123,10 +120,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-pr-testutil</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>server-provider</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
