@@ -1003,7 +1003,6 @@
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>1.6.3</version>
-        <scope>test</scope>
       </dependency>
 
       <!-- INTERNAL -->
