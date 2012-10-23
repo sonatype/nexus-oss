@@ -28,8 +28,14 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.sonatype.nexus.restlight</groupId>
+      <artifactId>nexus-restlight-client-common</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -43,25 +49,10 @@
       <artifactId>plexus-jetty-testsuite</artifactId>
       <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus.restlight</groupId>
-      <artifactId>nexus-restlight-client-common</artifactId>
     </dependency>
   </dependencies>
 </project>

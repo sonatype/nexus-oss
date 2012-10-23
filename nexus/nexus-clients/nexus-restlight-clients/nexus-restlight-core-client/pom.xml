@@ -30,30 +30,11 @@
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-client-common</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-test-harness</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jaxen</groupId>
-      <artifactId>jaxen</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
     </dependency>
   </dependencies>
 

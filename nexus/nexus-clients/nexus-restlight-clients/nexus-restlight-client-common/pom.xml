@@ -27,12 +27,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId> org.jdom</groupId>
+      <groupId>org.jdom</groupId>
       <artifactId>jdom</artifactId>
     </dependency>
     <dependency>
@@ -58,6 +53,12 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-util</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
