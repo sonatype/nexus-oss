@@ -169,7 +169,6 @@
 
 
   <profiles>
-  
     <profile>
       <id>nexus-maven-plugins</id>
       <!-- HACK we leave out nexus-maven-plugins by default because when we release with it as part of aggregator -->
@@ -178,63 +177,6 @@
         <module>nexus-maven-plugins</module>
       </modules>
     </profile>
-    
-    <!-- produce code coverage reports -->
-    <profile>
-      <id>coverage</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.sonatype.maven.plugin</groupId>
-            <artifactId>emma4it-maven-plugin</artifactId>
-            <version>1.3</version>
-            <executions>
-              <execution>
-                <id>merge</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>merge</goal>
-                </goals>
-                <configuration>
-                  <searchPath>${basedir}</searchPath>
-                </configuration>
-              </execution>
-              <execution>
-                <id>report</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>report</goal>
-                </goals>
-                <configuration>
-                  <sourceSets>
-                    <sourceSet>
-                      <directory>${basedir}</directory>
-                      <includes>
-                        <include>**/src/main/java/</include>
-                      </includes>
-                    </sourceSet>
-                  </sourceSets>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <artifactId>maven-clean-plugin</artifactId>
-            <configuration>
-              <filesets>
-                <fileset>
-                  <directory>${basedir}</directory>
-                  <includes>
-                    <include>/coverage.ec</include>
-                  </includes>
-                  <followSymlinks>true</followSymlinks>
-                </fileset>
-              </filesets>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
   </profiles>
+
 </project>

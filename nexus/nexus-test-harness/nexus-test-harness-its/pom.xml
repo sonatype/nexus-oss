@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -32,54 +33,6 @@
   <build>
 
     <plugins>
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <version>1.6-SONATYPE-r940877</version>
-        <configuration>
-          <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
-          <extraArtifacts>
-            <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.3:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.4:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-install-plugin:2.0:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-install-plugin:2.3.1:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-jar-plugin:2.0:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-jar-plugin:2.3.1:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-resources-plugin:2.0:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-resources-plugin:2.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-resources-plugin:2.4:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-resources-plugin:2.4.3:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.0:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.5:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.7.2:maven-plugin</xml>
-            <xml>org.apache.maven.surefire:surefire-junit3:2.7.2</xml>
-            <!-- nexus4218 -->
-            <xml>org.apache.maven:apache-maven:3.0.3:tar.gz:bin</xml>
-            <xml>org.apache.maven:apache-maven:2.0.6:tar.gz:bin</xml>
-            <xml>org.apache.ivy:apache-ivy:2.2.0:tar.gz:bin</xml>
-            <xml>org.codehaus.groovy:groovy:1.7.8</xml>
-          </extraArtifacts>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>install</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- To "recognize" nexus-plugin packaging -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -96,81 +49,10 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>env</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>setup-environment</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>package</id>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <setupEmma>true</setupEmma>
-          <setupMaven>true</setupMaven>
-          <nexusBundleArtifact>
-            <groupId>${it.nexus.bundle.groupId}</groupId>
-            <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-            <version>${it.nexus.bundle.version}</version>
-            <type>zip</type>
-            <classifier>bundle</classifier>
-          </nexusBundleArtifact>
-          <nexusPluginsArtifacts>
-            <plugin>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-it-helper-plugin</artifactId>
-              <classifier>cp</classifier>
-              <type>jar</type>
-            </plugin>
-            <plugin>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-it-helper-plugin</artifactId>
-              <classifier>bundle</classifier>
-              <type>zip</type>
-            </plugin>
-            <jar>
-              <groupId>org.sonatype.security.realms</groupId>
-              <artifactId>security-url-realm</artifactId>
-            </jar>
-          </nexusPluginsArtifacts>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <skipTests>true</skipTests>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <forkMode>once</forkMode> <!-- "always" for the latest resort, "once" is actually what we want -->
-          <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
-          <excludes>
-            <exclude>**Suite*</exclude>
-            <!-- cargo tests, run on a separated profile -->
-            <exclude>**/Nexus3860*</exclude>
-            <!-- inner classes -->
-            <exclude>**/*$*.*</exclude>
-          </excludes>
-          <properties>
-            <property>
-              <name>listener</name>
-              <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
-            </property>
-          </properties>
         </configuration>
       </plugin>
     </plugins>
@@ -221,7 +103,7 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
@@ -319,6 +201,138 @@
   </dependencies>
 
   <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <version>1.6-SONATYPE-r940877</version>
+            <configuration>
+              <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
+              <extraArtifacts>
+                <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-deploy-plugin:2.3:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-deploy-plugin:2.4:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-install-plugin:2.0:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-install-plugin:2.3.1:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-jar-plugin:2.0:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-jar-plugin:2.3.1:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.0:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.4:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-resources-plugin:2.4.3:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.0:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.2:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.5:maven-plugin</xml>
+                <xml>org.apache.maven.plugins:maven-surefire-plugin:2.7.2:maven-plugin</xml>
+                <xml>org.apache.maven.surefire:surefire-junit3:2.7.2</xml>
+                <!-- nexus4218 -->
+                <xml>org.apache.maven:apache-maven:3.0.3:tar.gz:bin</xml>
+                <xml>org.apache.maven:apache-maven:2.0.6:tar.gz:bin</xml>
+                <xml>org.apache.ivy:apache-ivy:2.2.0:tar.gz:bin</xml>
+                <xml>org.codehaus.groovy:groovy:1.7.8</xml>
+              </extraArtifacts>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.sonatype.nexus.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>env</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>setup-environment</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>package</id>
+                <goals>
+                  <goal>package</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <setupEmma>true</setupEmma>
+              <setupMaven>true</setupMaven>
+              <nexusBundleArtifact>
+                <groupId>${it.nexus.bundle.groupId}</groupId>
+                <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+                <version>${it.nexus.bundle.version}</version>
+                <type>zip</type>
+                <classifier>bundle</classifier>
+              </nexusBundleArtifact>
+              <nexusPluginsArtifacts>
+                <plugin>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-it-helper-plugin</artifactId>
+                  <classifier>cp</classifier>
+                  <type>jar</type>
+                </plugin>
+                <plugin>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-it-helper-plugin</artifactId>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </plugin>
+                <jar>
+                  <groupId>org.sonatype.security.realms</groupId>
+                  <artifactId>security-url-realm</artifactId>
+                </jar>
+              </nexusPluginsArtifacts>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <forkMode>once</forkMode>
+              <!-- "always" for the latest resort, "once" is actually what we want -->
+              <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
+              <excludes>
+                <exclude>**Suite*</exclude>
+                <!-- cargo tests, run on a separated profile -->
+                <exclude>**/Nexus3860*</exclude>
+                <!-- inner classes -->
+                <exclude>**/*$*.*</exclude>
+              </excludes>
+              <properties>
+                <property>
+                  <name>listener</name>
+                  <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
+                </property>
+              </properties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
     <profile>
       <id>ahc-provider</id>
@@ -397,6 +411,7 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <executions>
               <execution>
@@ -528,20 +543,6 @@
     </profile>
 
     <profile>
-      <id>skip-test-harness-tests</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>yourkit-profile</id>
       <activation>
         <property>
@@ -554,7 +555,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-            <!-- for Yourkit session, we left more memory intentionally -->
+              <!-- for Yourkit session, we left more memory intentionally -->
               <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError -agentpath:"${yourkit.agent}"</argLine>
             </configuration>
           </plugin>

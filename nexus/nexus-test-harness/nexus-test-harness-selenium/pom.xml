@@ -49,58 +49,7 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>setup-environment</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
 
-          <nexusBundleArtifact>
-            <groupId>${it.nexus.bundle.groupId}</groupId>
-            <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-            <version>${it.nexus.bundle.version}</version>
-            <type>zip</type>
-            <classifier>bundle</classifier>
-          </nexusBundleArtifact>
-          <!-- | Remove the non-AOP Guice JAR from the unpacked Nexus distro -->
-          <nexusBundleExcludes>
-            **/sisu-guice-*.jar
-          </nexusBundleExcludes>
-
-          <nexusPluginsArtifacts>
-            <!-- not sure where this went - is it still needed? -?- <plugin> <groupId>${project.groupId}</groupId> <artifactId>nexus-simple-memory-realm</artifactId>
-              </plugin> -->
-
-            <!-- | Add the AOP enabled Guice JAR to the unpacked Nexus distro -->
-            <jar>
-              <groupId>org.sonatype.sisu</groupId>
-              <artifactId>sisu-guice</artifactId>
-            </jar>
-            <!-- | Activate PlexusResource interception via Guice AOP -->
-            <jar>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-mock</artifactId>
-            </jar>
-          </nexusPluginsArtifacts>
-          <extraResourcesArtifacts>
-            <artifact>
-              <groupId>com.getfirebug</groupId>
-              <artifactId>firebug-lite</artifactId>
-              <version>1.2</version>
-              <type>js</type>
-              <classifier>compressed</classifier>
-              <outputDirectory>${basedir}/target/nexus/nexus-oss-webapp-${project.version}/nexus</outputDirectory>
-            </artifact>
-          </extraResourcesArtifacts>
-        </configuration>
-      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
@@ -111,49 +60,6 @@
         <groupId>org.sonatype.maven.plugin</groupId>
         <artifactId>selenium-grid-maven-plugin</artifactId>
         <version>1.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-          <excludes>
-            <exclude>**/*$*.java</exclude>
-          </excludes>
-          <systemPropertyVariables>
-            <seleniumPort>${selenium.hubPort}</seleniumPort>
-            <seleniumServer>${remote-selenium-url}</seleniumServer>
-            <seleniumBrowser>${selenium.environment}</seleniumBrowser>
-            <jscoverage>false</jscoverage>
-          </systemPropertyVariables>
-          <properties>
-            <property>
-              <name>objectfactory</name>
-              <value>org.sonatype.nexus.testng.PlexusObjectFactory</value>
-            </property>
-            <property>
-              <name>reporter</name>
-              <value>org.uncommons.reportng.HTMLReporter</value>
-            </property>
-            <property>
-              <name>listener</name>
-              <value>org.sonatype.nexus.testng.ScreenShotListener,org.sonatype.nexus.testng.PriorityInterceptor,org.sonatype.nexus.integrationtests.report.ProgressListener</value>
-            </property>
-          </properties>
-          <parallel>true</parallel>
-          <threadCount>${threads}</threadCount>
-          <argLine>-Xmx512M</argLine>
-          <forkMode>always</forkMode>
-        </configuration>
       </plugin>
 
       <plugin>
@@ -298,7 +204,114 @@
   </dependencies>
 
   <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.nexus.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>setup-environment</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <nexusBundleArtifact>
+                <groupId>${it.nexus.bundle.groupId}</groupId>
+                <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+                <version>${it.nexus.bundle.version}</version>
+                <type>zip</type>
+                <classifier>bundle</classifier>
+              </nexusBundleArtifact>
+              <!-- | Remove the non-AOP Guice JAR from the unpacked Nexus distro -->
+              <nexusBundleExcludes>
+                **/sisu-guice-*.jar
+              </nexusBundleExcludes>
 
+              <nexusPluginsArtifacts>
+                <!-- | Add the AOP enabled Guice JAR to the unpacked Nexus distro -->
+                <jar>
+                  <groupId>org.sonatype.sisu</groupId>
+                  <artifactId>sisu-guice</artifactId>
+                </jar>
+                <!-- | Activate PlexusResource interception via Guice AOP -->
+                <jar>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-mock</artifactId>
+                </jar>
+              </nexusPluginsArtifacts>
+              <extraResourcesArtifacts>
+                <artifact>
+                  <groupId>com.getfirebug</groupId>
+                  <artifactId>firebug-lite</artifactId>
+                  <version>1.2</version>
+                  <type>js</type>
+                  <classifier>compressed</classifier>
+                  <outputDirectory>${basedir}/target/nexus/nexus-oss-webapp-${project.version}/nexus</outputDirectory>
+                </artifact>
+              </extraResourcesArtifacts>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <includes>
+                <include>**/*Test.java</include>
+              </includes>
+              <excludes>
+                <exclude>**/*$*.java</exclude>
+              </excludes>
+              <systemPropertyVariables>
+                <seleniumPort>${selenium.hubPort}</seleniumPort>
+                <seleniumServer>${remote-selenium-url}</seleniumServer>
+                <seleniumBrowser>${selenium.environment}</seleniumBrowser>
+                <jscoverage>false</jscoverage>
+              </systemPropertyVariables>
+              <properties>
+                <property>
+                  <name>objectfactory</name>
+                  <value>org.sonatype.nexus.testng.PlexusObjectFactory</value>
+                </property>
+                <property>
+                  <name>reporter</name>
+                  <value>org.uncommons.reportng.HTMLReporter</value>
+                </property>
+                <property>
+                  <name>listener</name>
+                  <value>
+                    org.sonatype.nexus.testng.ScreenShotListener,org.sonatype.nexus.testng.PriorityInterceptor,org.sonatype.nexus.integrationtests.report.ProgressListener
+                  </value>
+                </property>
+              </properties>
+              <parallel>true</parallel>
+              <threadCount>${threads}</threadCount>
+              <argLine>-Xmx512M</argLine>
+              <forkMode>always</forkMode>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
     <profile>
       <id>jscoverage</id>
@@ -405,6 +418,7 @@
             </configuration>
           </plugin>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
@@ -415,8 +429,6 @@
         </plugins>
       </build>
     </profile>
-
-
 
     <profile>
       <activation>
@@ -465,6 +477,7 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <argLine>-agentpath:"${yourkit.home}\bin\win64\yjpagent.dll"</argLine>

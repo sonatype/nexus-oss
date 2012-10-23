@@ -29,7 +29,9 @@
   <modules>
     <module>nexus-it-helper-plugin</module>   
     <module>nexus-test-environment-maven-plugin</module>
-    <module>nexus-test-utils</module>  
+    <module>nexus-test-utils</module>
+    <module>nexus-test-harness-launcher</module>
+    <module>nexus-test-harness-its</module>
   </modules>
 
   <profiles>
@@ -37,18 +39,6 @@
       <id>selenium-tests</id>
       <modules>
         <module>nexus-test-harness-selenium</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>its</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <modules>
-        <module>nexus-test-harness-launcher</module>
-        <module>nexus-test-harness-its</module>
       </modules>
     </profile>
   </profiles>
