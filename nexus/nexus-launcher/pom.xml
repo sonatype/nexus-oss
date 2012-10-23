@@ -43,6 +43,9 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
+    FIXME: Remove dep on HC3 https://issues.sonatype.org/browse/NEXUS-5349
+    -->
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
