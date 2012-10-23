@@ -1168,11 +1168,6 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-host-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-manager</artifactId>
         <version>${project.version}</version>
       </dependency>
