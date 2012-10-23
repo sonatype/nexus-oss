@@ -15,13 +15,7 @@
 -->
 <included>
 
-  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>%d %p [%c] - %m%n</pattern>
-    </encoder>
-  </appender>
-
-  <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <File>${project.build.directory}/logs/${test-id}/nexus.log</File>
     <Append>true</Append>
@@ -37,20 +31,22 @@
     </triggeringPolicy>
   </appender>
 
-  <logger name="httpclient" level="WARN"/>
-  <logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN">
-    <appender-ref ref="console"/>
-  </logger>
-  <logger name="org.apache.http" level="WARN"/>
-  <logger name="org.restlet" level="${it.nexus.log.level:-WARN}">
-    <appender-ref ref="console"/>
-    <appender-ref ref="logfile" />
-  </logger>
-  <logger name="org.apache.commons" level="WARN"/>
-  <logger name="eu.medsea.mimeutil" level="WARN"/>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <target>System.out</target>
+    <encoder>
+      <pattern>NEXUS: %date{HH:mm:ss.SSS} %level [%thread%X{DC}] %logger - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!--
+  FILE and CONSOLE appenders are both enabled here on purpose.
+  The CONSOLE appender is used to allow TEST and NEXUS logs to be interleaved in the test exception output for better correlation of test logs to server logs.
+  The FILE appender is enabled, as some tests (and NX functionality ie. service/local/logs) expect the logs files to exist.
+  -->
 
   <root level="${it.nexus.log.level:-INFO}">
-    <appender-ref ref="logfile"/>
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
   </root>
-  
+
 </included>

@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+// WTF is up with this package name????!!!
 package repo;
 
 import java.io.File;
@@ -29,15 +31,16 @@ import util.GroovyConsoleMessageUtil;
 
 import com.sonatype.nexus.plugin.groovyconsole.rest.dto.GroovyScriptDTO;
 
-public class CreateRepoScriptIT
+// FIXME: Apparently this test wasn't being run by default either... and its got issues.
+
+public class CreateRepoScriptIT_WTF
     extends AbstractNexusIntegrationTest
 {
-
     private RepositoryMessageUtil messageUtil;
 
     private static File scriptsDir;
 
-    public CreateRepoScriptIT()
+    public CreateRepoScriptIT_WTF()
         throws Exception
     {
         this.messageUtil = new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
