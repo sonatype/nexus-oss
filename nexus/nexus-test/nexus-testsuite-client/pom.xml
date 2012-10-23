@@ -23,14 +23,12 @@
   </parent>
 
   <artifactId>nexus-testsuite-client</artifactId>
-
   <name>Nexus : Test : Test Suite Client</name>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus.client</groupId>
       <artifactId>nexus-client-core</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>javax.inject</groupId>

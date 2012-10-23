@@ -40,7 +40,6 @@
       <artifactId>security-rest-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
   </dependencies>
 
   <build>
