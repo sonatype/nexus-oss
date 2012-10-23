@@ -78,7 +78,6 @@
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
-      <version>1.4.2</version>
     </dependency>
 
     <!-- Version (for now all of Aether API/UTIL) -->
