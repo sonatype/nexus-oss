@@ -33,15 +33,22 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>spice-utils</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>server-provider</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

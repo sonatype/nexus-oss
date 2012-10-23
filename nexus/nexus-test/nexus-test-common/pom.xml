@@ -64,27 +64,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>server-provider</artifactId>
-      <version>0.5.3</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>junit-runner</artifactId>
-      <version>0.5.3</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.http-testing-harness</groupId>-->
-      <!--<artifactId>testng-runner</artifactId>-->
-      <!--<version>0.5.3</version>-->
-      <!--<scope>compile</scope>-->
-    <!--</dependency>-->
-
-    <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
       <version>1.6.3</version>
