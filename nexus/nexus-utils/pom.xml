@@ -13,39 +13,25 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-  <!-- the version of maven's project object model -->
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <!-- a unique name for this project -->
   <artifactId>nexus-utils</artifactId>
-
-  <!-- POM packaging -->
-  <packaging>jar</packaging>
-
-  <!-- a short but descriptive name for the project -->
   <name>Nexus : Utilities</name>
 
   <dependencies>
-
-    <!-- To move away from, it's "legacy" from oldie Plexus times -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <scope>compile</scope>
     </dependency>
-    <!-- Target to move to -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <!-- Testing -->
@@ -54,12 +40,6 @@
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
 </project>
