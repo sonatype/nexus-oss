@@ -14,8 +14,13 @@ package org.sonatype.nexus.proxy;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+/**
+ * Tests for {@link RequestContext}.
+ */
 public class RequestContextTest
+    extends TestSupport
 {
     @Test
     public void testNullParent()

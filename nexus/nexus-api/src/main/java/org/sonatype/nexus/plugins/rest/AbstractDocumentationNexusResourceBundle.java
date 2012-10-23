@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
@@ -30,10 +31,18 @@ import org.sonatype.nexus.mime.MimeSupport;
 public abstract class AbstractDocumentationNexusResourceBundle
     implements NexusDocumentationBundle
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger(getClass());
 
     @Requirement
     private MimeSupport mimeSupport;
+
+    protected AbstractDocumentationNexusResourceBundle() {
+    }
+
+    @VisibleForTesting
+    protected AbstractDocumentationNexusResourceBundle(final MimeSupport mimeSupport) {
+        this.mimeSupport = mimeSupport;
+    }
 
     protected Logger getLogger()
     {

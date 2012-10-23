@@ -20,6 +20,7 @@ import java.util.List;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Tests for ParentOMatic class.
@@ -27,6 +28,7 @@ import org.junit.Test;
  * @author cstamas
  */
 public class ParentOMaticTest
+    extends TestSupport
 {
     protected void printListPerLine( final List<String> strings )
     {

@@ -39,4 +39,11 @@ public abstract class RepositoryEvent
     {
         return getEventSender();
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "repositoryId=" + getRepository().getId() +
+            '}';
+    }
 }

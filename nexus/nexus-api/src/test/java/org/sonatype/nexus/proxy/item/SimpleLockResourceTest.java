@@ -18,7 +18,7 @@ package org.sonatype.nexus.proxy.item;
  * @author cstamas
  */
 public class SimpleLockResourceTest
-    extends AbstractLockResourceTest
+    extends LockResourceTestSupport
 {
 
     @Override

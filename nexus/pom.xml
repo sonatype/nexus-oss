@@ -182,13 +182,13 @@
     <plexus-digest.version>1.1</plexus-digest.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
-    <sisu-jetty8.version>1.4</sisu-jetty8.version>
+    <sisu-jetty8.version>1.4.1</sisu-jetty8.version>
     <sisu-velocity.version>1.1</sisu-velocity.version>
     <sisu-problem-reporter.version>1.5.2</sisu-problem-reporter.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.22</plexus.restlet.bridge.version>
     <plexus-security.version>2.8.3-SNAPSHOT</plexus-security.version>
-    <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
+    <sisu-task-scheduler.version>1.7</sisu-task-scheduler.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <shiro.version>1.2.1</shiro.version>
     <spice-timeline.version>2.1</spice-timeline.version>
@@ -382,9 +382,9 @@
         <version>1.0</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>plexus-task-scheduler</artifactId>
-        <version>${plexus-task-scheduler.version}</version>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-task-scheduler</artifactId>
+        <version>${sisu-task-scheduler.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -1649,11 +1649,6 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>retrotranslator-maven-plugin</artifactId>
           <version>1.0-alpha-2</version>
-        </plugin>
-        <plugin>
-          <artifactId>plx-maven-plugin</artifactId>
-          <groupId>org.sonatype.plugins</groupId>
-          <version>1.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
