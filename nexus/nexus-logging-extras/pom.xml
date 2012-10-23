@@ -81,20 +81,21 @@
       <scope>test</scope>
     </dependency>
 
+    <!--
+    FIXME: All of these dependencies are needed so that LogbackLogManagerTest can extend from org.sonatype.nexus.AbstractNexusTestCase
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
