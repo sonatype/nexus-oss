@@ -39,15 +39,4 @@
     <module>nexus-metadata-rebuild-tool</module>
   </modules>
 
-
-  <!-- build information for the project -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>
