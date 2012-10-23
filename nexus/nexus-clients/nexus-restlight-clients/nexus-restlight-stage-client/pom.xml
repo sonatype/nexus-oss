@@ -27,15 +27,15 @@
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-client-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-test-harness</artifactId>
     </dependency>
     <dependency>
-      <groupId> org.jdom</groupId>
+      <groupId>org.jdom</groupId>
       <artifactId>jdom</artifactId>
     </dependency>
     <dependency>
