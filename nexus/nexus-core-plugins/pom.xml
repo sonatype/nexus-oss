@@ -45,9 +45,6 @@
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
         <extensions>true</extensions>
-        <configuration>
-          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
-        </configuration>
       </plugin>
     </plugins>
   </build>

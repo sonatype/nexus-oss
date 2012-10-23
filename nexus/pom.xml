@@ -1562,6 +1562,7 @@
           <configuration>
             <pluginName>${nexus.plugin.name}</pluginName>
             <pluginDescription>${nexus.plugin.description}</pluginDescription>
+            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
           </configuration>
           <dependencies>
             <dependency>
