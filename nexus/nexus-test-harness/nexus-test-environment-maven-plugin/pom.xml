@@ -28,10 +28,6 @@
 
   <name>Nexus : Test Harness : Test Environment Setup Plugin</name>
 
-  <prerequisites>
-    <maven>2.0.9</maven>
-  </prerequisites>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
