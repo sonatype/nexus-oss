@@ -26,7 +26,11 @@
   <artifactId>nexus-core-documentation-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Core Documentation</name>
-  <description>Exposes Nexus core documentation.</description>
+
+  <properties>
+    <nexus.plugin.name>Nexus Core Documentation Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Exposes Nexus core documentation.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -45,15 +49,5 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <!-- Needed to make Maven "know" nexus-plugin packaging -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

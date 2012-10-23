@@ -25,10 +25,13 @@
   <artifactId>nexus-plugin-console-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Plugin Console</name>
-  <description>Adds a UI to view installed plugins.</description>
+
+  <properties>
+    <nexus.plugin.name>Nexus Plugin Console Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds a UI to view installed plugins.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
-
     <!-- Because this is a nexus-plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -66,11 +69,6 @@
 
   <build>
     <plugins>
-      <!-- Remove this plugin (it's already in parent!) when fixed MNGECLIPSE-2574 -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>

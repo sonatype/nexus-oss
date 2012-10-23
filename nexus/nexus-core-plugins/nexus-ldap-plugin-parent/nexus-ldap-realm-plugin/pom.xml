@@ -13,6 +13,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins.ldap</groupId>
@@ -20,15 +21,15 @@
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
   <artifactId>nexus-ldap-realm-plugin</artifactId>
   <name>Nexus : Core Plugins : OSS LDAP : LDAP Plugin</name>
-  <description>Adds a LDAP security realm to Nexus.</description>
   <packaging>nexus-plugin</packaging>
 
   <properties>
     <commons-collections.version>3.2.1</commons-collections.version>
     <ldap.js>${project.build.directory}/classes/static/js/nexus-ldap-realm-plugin-all.js</ldap.js>
+    <nexus.plugin.name>Nexus OSS LDAP Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds a LDAP security realm to Nexus.</nexus.plugin.description>
   </properties>
 
   <dependencyManagement>
@@ -186,13 +187,6 @@
 
   <build>
     <plugins>
-
-      <!-- Remove this plugin (it's already in parent!) when fixed MNGECLIPSE-2574 -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -206,9 +200,7 @@
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
-
     </plugins>
-
   </build>
 
 </project>

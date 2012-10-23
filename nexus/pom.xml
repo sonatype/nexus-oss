@@ -201,6 +201,8 @@
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
 
+    <nexus.plugin.name>${project.name}</nexus.plugin.name>
+    <nexus.plugin.description>${project.description}</nexus.plugin.description>
   </properties>
 
   <dependencyManagement>
@@ -1550,6 +1552,24 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>app-lifecycle-maven-plugin</artifactId>
+          <version>${applifecycle.version}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <pluginName>${nexus.plugin.name}</pluginName>
+            <pluginDescription>${nexus.plugin.description}</pluginDescription>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.sonatype.plugins</groupId>
+              <artifactId>app-lifecycle-nexus</artifactId>
+              <version>${applifecycle.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
 
         <plugin>

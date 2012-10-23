@@ -130,17 +130,6 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-
-      <!-- Needed to make Maven "know" nexus-plugin packaging -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
   <profiles>
     <profile>
       <id>it</id>

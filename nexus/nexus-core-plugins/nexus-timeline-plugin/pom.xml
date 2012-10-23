@@ -25,14 +25,13 @@
   <artifactId>nexus-timeline-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Timeline</name>
-  <description>Adds timeline and feeds based on it.</description>
 
   <properties>
-    <truezip.version>7.0-rc1</truezip.version>
+    <nexus.plugin.name>Nexus Timeline Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds timeline and feeds based on it.</nexus.plugin.description>
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
@@ -98,13 +97,11 @@
 
   <build>
     <plugins>
-      <!-- We must exclude indexer-core from bundling as classpath dependency, since we are shading it to make it shared -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>default-generate-metadata</id>
             <configuration>
               <sharedDependencies>
                 <sharedDependencies>org.sonatype.spice:spice-timeline</sharedDependencies>

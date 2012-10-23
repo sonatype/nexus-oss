@@ -25,20 +25,14 @@
 
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Groovy Console</name>
-  <description>Adds running groovy scripts in tasks and on events.</description>
 
-  <build>
-    <plugins>
-      <!-- Remove this plugin (it's already in parent!) when fixed MNGECLIPSE-2574 -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <properties>
+    <!-- FIXME: This is a misleading name -->
+    <nexus.plugin.name>Nexus Groovy Console Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds running groovy scripts in tasks and on events.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration-model</artifactId>

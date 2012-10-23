@@ -26,7 +26,11 @@
   <artifactId>nexus-rrb-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Remote Repository Browsing</name>
-  <description>Adds browsing support for proxied remote repositories</description>
+
+  <properties>
+    <nexus.plugin.name>Nexus Remote Repository Browsing Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds browsing support for browsing remote proxy remote repositories.</nexus.plugin.description>
+  </properties>
 
   <developers>
     <developer>
@@ -158,11 +162,6 @@
 
   <build>
     <plugins>
-      <!-- Needed to make Maven "know" nexus-plugin packaging -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>

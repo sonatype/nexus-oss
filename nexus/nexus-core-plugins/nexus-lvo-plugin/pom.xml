@@ -23,7 +23,11 @@
 
   <artifactId>nexus-lvo-plugin</artifactId>
   <name>Nexus : Core Plugins : LVO Plugin</name>
-  <description>Reminds about newer Nexus versions.</description>
+
+  <properties>
+    <nexus.plugin.name>Nexus LVO Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Reminds about newer Nexus versions.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -47,11 +51,6 @@
 
   <build>
     <plugins>
-      <!-- Needed to make Maven "know" nexus-plugin packaging -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
