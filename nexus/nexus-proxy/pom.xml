@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,12 +28,12 @@
   <name>Nexus : Proxy</name>
 
   <dependencies>
-<!-- 
-    <dependency>
-      <groupId>org.apache.maven.indexer</groupId>
-      <artifactId>indexer-artifact</artifactId>
-    </dependency>
--->
+    <!--
+        <dependency>
+          <groupId>org.apache.maven.indexer</groupId>
+          <artifactId>indexer-artifact</artifactId>
+        </dependency>
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
@@ -78,7 +79,7 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <scope>compile</scope>
     </dependency>
-    
+
     <!-- Local and remote storage techs -->
     <dependency>
       <groupId>com.ning</groupId>
@@ -211,7 +212,9 @@
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

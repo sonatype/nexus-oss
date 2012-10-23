@@ -1664,30 +1664,6 @@
             </systemPropertyVariables>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>attach-test-jar</id>
-              <goals>
-                <goal>test-jar</goal>
-              </goals>
-              <configuration>
-                <includes>
-                  <include>**/*.class</include>
-                </includes>
-                <excludes>
-                  <exclude>**/*Test.class</exclude>
-                  <exclude>**/*Test$*.class</exclude>
-                  <exclude>**/*IT.class</exclude>
-                  <exclude>**/*IT$*.class</exclude>
-                  <exclude>**/internal/*.class</exclude>
-                </excludes>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
