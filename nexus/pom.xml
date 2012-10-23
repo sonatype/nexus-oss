@@ -610,43 +610,31 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
         <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
         <version>${logback.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>${logback.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-slf4j-logging</artifactId>
         <version>${plexus-slf4j-logging.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
