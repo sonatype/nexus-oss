@@ -975,6 +975,33 @@
         <version>1.6.3</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>enunciate-core</artifactId>
+        <version>${enunciate.version}</version>
+        <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
+        <!-- But nothing is using that annotation after build happened, and doco is generated -->
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>3.2.1</version>
+      </dependency>
+
       <!-- INTERNAL -->
 
       <dependency>
@@ -1138,8 +1165,6 @@
         <type>zip</type>
       </dependency>
 
-      <!-- Plugins -->
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-api</artifactId>
@@ -1151,32 +1176,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>enunciate-core</artifactId>
-        <version>${enunciate.version}</version>
-        <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
-        <!-- But nothing is using that annotation after build happened, and doco is generated -->
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>3.2.1</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
