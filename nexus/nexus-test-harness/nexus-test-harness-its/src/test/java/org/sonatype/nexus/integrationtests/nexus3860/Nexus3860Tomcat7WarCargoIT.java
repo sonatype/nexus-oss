@@ -10,11 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.integrationtests.report;
+package org.sonatype.nexus.integrationtests.nexus3860;
 
-import java.util.List;
+import java.io.File;
 
-public interface TestReport
+public class Nexus3860Tomcat7WarCargoIT
+    extends AbstractCargoIT
 {
-    public void writeReport( List<ReportBean> beans );
+    @Override
+    public File getContainerLocation()
+    {
+        return util.resolveFile( "target/containers/apache-tomcat-7.0.32" );
+    }
+
+    @Override
+    public String getContainer()
+    {
+        return "tomcat7x";
+    }
 }

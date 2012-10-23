@@ -287,22 +287,18 @@
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
                       <artifactId>apache-tomcat</artifactId>
-                      <version>6.0.29</version>
-                      <classifier>bundle</classifier>
-                      <type>tar.gz</type>
+                      <version>6.0.36</version>
+                      <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <!-- Excludes do not function with tar.gz bundles, and tar.gz bundle unpacking is very sloooooow -->
-                      <!--<excludes>**/webapps/**</excludes>-->
+                      <excludes>**/webapps/examples,**/webapps/docs,**webapps/ROOT,**/webapps/host-manager</excludes>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
                       <artifactId>apache-tomcat</artifactId>
-                      <version>5.5.31</version>
-                      <classifier>bundle</classifier>
-                      <type>tar.gz</type>
+                      <version>7.0.32</version>
+                      <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <!-- Excludes do not function with tar.gz bundles, and tar.gz bundle unpacking is very sloooooow -->
-                      <!--<excludes>**/webapps/**</excludes>-->
+                      <excludes>**/webapps/examples,**/webapps/docs,**webapps/ROOT,**/webapps/host-manager</excludes>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
