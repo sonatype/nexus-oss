@@ -105,27 +105,6 @@
       </exclusions>
     </dependency>
 
-    <!-- ReportWriter et al -->
-    <dependency>
-      <groupId>com.thoughtworks.qdox</groupId>
-      <artifactId>qdox</artifactId>
-      <version>1.6.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit-dep</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>junit</artifactId>
-          <groupId>junit</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>ant</artifactId>
-          <groupId>ant</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- Test frameworks: we use TestNG but some tests refers to JUnit annos still -->
     <dependency>
       <groupId>org.testng</groupId>

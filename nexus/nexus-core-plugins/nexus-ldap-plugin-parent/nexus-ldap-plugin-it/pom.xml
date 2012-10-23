@@ -202,12 +202,6 @@
               <argLine>-Xmx256M</argLine>
               <!-- LDAP NEEDS tests to be forked or they get broken, do not remove this! -->
               <forkMode>always</forkMode>
-              <properties>
-                <property>
-                  <name>listener</name>
-                  <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
-                </property>
-              </properties>
             </configuration>
           </plugin>
         </plugins>
