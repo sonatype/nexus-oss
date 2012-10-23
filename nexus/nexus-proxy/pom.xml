@@ -29,10 +29,10 @@
 
   <dependencies>
     <!--
-        <dependency>
-          <groupId>org.apache.maven.indexer</groupId>
-          <artifactId>indexer-artifact</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.maven.indexer</groupId>
+      <artifactId>indexer-artifact</artifactId>
+    </dependency>
     -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -148,21 +148,7 @@
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.carrotsearch</groupId>
-      <artifactId>junit-benchmarks</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-jetty-testsuite</artifactId>
@@ -178,6 +164,7 @@
       <artifactId>shiro-web</artifactId>
       <scope>test</scope>
     </dependency>
+
     <!-- For the Jackson XML Marshaller that is slower than JSON and will remain in test to not pollute core -->
     <dependency>
       <groupId>com.fasterxml</groupId>
