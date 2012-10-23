@@ -18,7 +18,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
@@ -27,6 +26,7 @@ import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.PassivateCapabilityDuringUpdateCondition;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * Factory of {@link Condition}s related to capabilities.
@@ -86,6 +86,17 @@ public class CapabilityConditions
     public Condition passivateCapabilityDuringUpdate( final CapabilityIdentity id )
     {
         return new PassivateCapabilityDuringUpdateCondition( eventBus, id );
+    }
+
+    /**
+     * Creates a new condition that is becoming unsatisfied before an capability is updated and becomes satisfied after
+     * capability was updated.
+     *
+     * @return created condition
+     */
+    public Condition passivateCapabilityDuringUpdate()
+    {
+        return new PassivateCapabilityDuringUpdateCondition( eventBus );
     }
 
 }
