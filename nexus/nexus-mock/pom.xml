@@ -12,66 +12,25 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <!-- the version of maven's project object model -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <!-- Parent POM -->
+
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
-  <!-- a unique name for this project -->
+
   <artifactId>nexus-mock</artifactId>
-  <!--we don't need this to be a jar except that the app assembler crashes if it's not -->
-  <packaging>jar</packaging>
-  <!-- a short but descriptive name for the project -->
   <name>Nexus : Mock Application Frontend</name>
 
   <properties>
     <nexus.bundlebase>nexus-oss-webapp</nexus.bundlebase>
   </properties>
 
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-bundle</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <includeArtifactIds>nexus-oss-webapp</includeArtifactIds>
-              <outputDirectory>target/nexus-ui</outputDirectory>
-              <!-- The bundle we test -->
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-oss-webapp</artifactId>
-                  <version>${project.version}</version>
-                  <type>zip</type>
-                  <classifier>bundle</classifier>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
   <dependencies>
-
-    <!-- | Make sure Guice is compile scope (we compile against it here), and AOP enabled Guice JAR appears first -->
+    <!-- Make sure Guice is compile scope (we compile against it here), and AOP enabled Guice JAR appears first -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
@@ -98,12 +57,6 @@
       <groupId>ch.ethz.ganymed</groupId>
       <artifactId>ganymed-ssh2</artifactId>
       <version>build210</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -175,7 +128,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-webapp</artifactId>
-      <version>${project.version}</version>
       <type>zip</type>
       <classifier>bundle</classifier>
       <exclusions>
@@ -186,6 +138,46 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-bundle</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/nexus-ui</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-oss-webapp</artifactId>
+                  <type>zip</type>
+                  <classifier>bundle</classifier>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
