@@ -12,7 +12,11 @@
  */
 package org.sonatype.nexus.capabilities.client.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.sonatype.nexus.capabilities.client.Capabilities;
@@ -21,10 +25,15 @@ import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
@@ -57,6 +66,51 @@ public class JerseyCapabilities
         return getNexusClient().serviceResource( "capabilities", queryParams )
             .get( CapabilitiesListResponseResource.class )
             .getData();
+    }
+
+    @Override
+    public List<CapabilityListItemResource> list( final String type, final CapabilityPropertyResource... props )
+    {
+        checkNotNull( type );
+        final List<CapabilityListItemResource> capabilities = list( true );
+        if ( capabilities != null && !capabilities.isEmpty() )
+        {
+            return Lists.newArrayList( Collections2.filter( capabilities, new Predicate<CapabilityListItemResource>()
+            {
+                @Override
+                public boolean apply( @Nullable final CapabilityListItemResource input )
+                {
+                    if ( input == null )
+                    {
+                        return false;
+                    }
+                    if ( !type.equals( input.getTypeId() ) )
+                    {
+                        return false;
+                    }
+                    if ( props != null && props.length > 0 )
+                    {
+                        Map<String, String> toHave = Maps.newHashMap();
+                        Map<String, String> has = Maps.newHashMap();
+                        for ( final CapabilityPropertyResource prop : props )
+                        {
+                            toHave.put( prop.getKey(), prop.getValue() );
+                        }
+                        final CapabilityResource capability = get( input.getId() );
+                        if ( capability.getProperties() != null )
+                        {
+                            for ( CapabilityPropertyResource prop : capability.getProperties() )
+                            {
+                                has.put( prop.getKey(), prop.getValue() );
+                            }
+                        }
+                        return Maps.difference( toHave, has ).entriesInCommon().size() == toHave.size();
+                    }
+                    return true;
+                }
+            } ) );
+        }
+        return Lists.newArrayList();
     }
 
     @Override
