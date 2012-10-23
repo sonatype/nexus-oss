@@ -13,15 +13,21 @@
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
+import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Support class for repository conditions.
@@ -30,6 +36,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public abstract class RepositoryConditionSupport
     extends ConditionSupport
+    implements CapabilityContextAware
 {
 
     private final RepositoryRegistry repositoryRegistry;
@@ -37,6 +44,10 @@ public abstract class RepositoryConditionSupport
     private final RepositoryConditions.RepositoryId repositoryId;
 
     private final ReentrantReadWriteLock bindLock;
+
+    private CapabilityIdentity capabilityIdentity;
+
+    private String repositoryBeforeLastUpdate;
 
     public RepositoryConditionSupport( final EventBus eventBus,
                                        final RepositoryRegistry repositoryRegistry,
@@ -46,6 +57,16 @@ public abstract class RepositoryConditionSupport
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.repositoryId = checkNotNull( repositoryId );
         bindLock = new ReentrantReadWriteLock();
+    }
+
+    @Override
+    public RepositoryConditionSupport setContext( final CapabilityContext context )
+    {
+        checkState( !isActive(), "Cannot contextualize when already bounded" );
+        checkState( capabilityIdentity == null, "Already contextualized with id '" + capabilityIdentity + "'" );
+        capabilityIdentity = context.id();
+
+        return this;
     }
 
     @Override
@@ -85,6 +106,38 @@ public abstract class RepositoryConditionSupport
         finally
         {
             bindLock.readLock().unlock();
+        }
+    }
+
+    @Subscribe
+    public void handle( final CapabilityEvent.BeforeUpdate event )
+    {
+        if ( event.getReference().context().id().equals( capabilityIdentity ) )
+        {
+            repositoryBeforeLastUpdate = getRepositoryId();
+        }
+    }
+
+    @Subscribe
+    public void handle( final CapabilityEvent.AfterUpdate event )
+    {
+        if ( event.getReference().context().id().equals( capabilityIdentity ) )
+        {
+            if ( !sameRepositoryAs( repositoryBeforeLastUpdate ) )
+            {
+                try
+                {
+                    bindLock.writeLock().lock();
+                    for ( final Repository repository : repositoryRegistry.getRepositories() )
+                    {
+                        handle( new RepositoryRegistryEventAdd( repositoryRegistry, repository ) );
+                    }
+                }
+                finally
+                {
+                    bindLock.writeLock().unlock();
+                }
+            }
         }
     }
 
