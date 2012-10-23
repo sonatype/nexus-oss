@@ -1002,17 +1002,18 @@
         <version>3.2.1</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-repository-metadata-api</artifactId>
+        <version>${nexus.repository.metadata.version}</version>
+      </dependency>
+
       <!-- INTERNAL -->
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-repository-metadata-api</artifactId>
-        <version>${nexus.repository.metadata.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1105,6 +1106,11 @@
         <type>${nexus-plugin.type}</type>
       </dependency>
       <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-indexer-lucene-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
         <version>${project.version}</version>
@@ -1187,7 +1193,6 @@
         <artifactId>nexus-test-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
 
