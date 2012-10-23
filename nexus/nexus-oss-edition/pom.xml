@@ -23,16 +23,12 @@
   </parent>
 
   <artifactId>nexus-oss-edition</artifactId>
-
-  <packaging>jar</packaging>
-
   <name>Nexus : OSS Edition</name>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-api</artifactId>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 
