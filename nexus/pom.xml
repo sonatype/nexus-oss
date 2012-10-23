@@ -498,13 +498,11 @@
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-velocity</artifactId>
         <version>${sisu-velocity.version}</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>org.apache.velocity</groupId>
         <artifactId>velocity</artifactId>
         <version>1.5</version>
-        <type>jar</type>
       </dependency>
 
       <!-- locks -->
@@ -737,7 +735,6 @@
         <groupId>rome</groupId>
         <artifactId>rome</artifactId>
         <version>0.9</version>
-        <type>jar</type>
       </dependency>
       
       <!-- Jackson -->
@@ -745,13 +742,11 @@
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-core-asl</artifactId>
         <version>1.9.4</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-mapper-asl</artifactId>
         <version>1.9.4</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>com.fasterxml</groupId>
@@ -769,19 +764,16 @@
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
         <version>1.4.2</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
         <version>1.2.1</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>eu.medsea.mimeutil</groupId>
         <artifactId>mime-util</artifactId>
         <version>2.1.2</version>
-        <type>jar</type>
       </dependency>
 
       <dependency>
@@ -853,7 +845,6 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>4.2.1</version>
-        <type>jar</type>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -865,20 +856,17 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
         <version>4.2.1</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
         <version>4.2.2</version>
-        <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>commons-httpclient</groupId>
         <artifactId>commons-httpclient</artifactId>
         <version>3.1.SONATYPE</version>
-        <type>jar</type>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -891,19 +879,16 @@
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>1.4</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>commons-transaction</groupId>
         <artifactId>commons-transaction</artifactId>
         <version>1.2</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>commons-cli</groupId>
         <artifactId>commons-cli</artifactId>
         <version>1.0</version>
-        <type>jar</type>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -915,13 +900,11 @@
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
         <version>1.4</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>2.3</version>
-        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>org.sonatype.spice</groupId>
@@ -934,7 +917,6 @@
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-jetty-testsuite</artifactId>
         <version>${plexus-jetty-testsuite.version}</version>
-        <type>jar</type>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -978,7 +960,6 @@
         <groupId>org.objenesis</groupId>
         <artifactId>objenesis</artifactId>
         <version>1.2</version>
-        <type>jar</type>
         <!-- scope>test</scope -->
       </dependency>
       <dependency>
@@ -993,7 +974,6 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <version>2.4</version>
-        <type>jar</type>
         <scope>test</scope>
       </dependency>
       
