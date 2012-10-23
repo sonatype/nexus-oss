@@ -36,9 +36,6 @@ import java.util.List;
 public class NexusContentAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
-    // NOTE: Using field-injection due to issues with org.codehaus.plexus:plexus-component-metadata:1.5.5 (caused by qdox 1.9.2)
-    // NOTE: ... which can't handle annotated parameters apparently.
-
     @Inject
     @Nullable
     private List<NexusContentRestrictionConstituent> constituents;
