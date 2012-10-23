@@ -33,23 +33,22 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
       <scope>compile</scope>
     </dependency>
+
+    <!--
+    FIXME: Try and get rid of this framework, use mockito instead.
+    -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>compile</scope>
     </dependency>
-    
+
     <!-- TODO move benchmarking libs out into another module since we should not force as dependency here -->
     <dependency>
       <groupId>com.carrotsearch</groupId>
@@ -91,7 +90,6 @@
       <version>1.6.3</version>
       <scope>compile</scope>
     </dependency>
-
   </dependencies>
 
 </project>
