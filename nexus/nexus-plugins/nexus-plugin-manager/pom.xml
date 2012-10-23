@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-plugin-manager</artifactId>
-
   <name>Nexus : Plugins : Manager</name>
 
   <dependencies>
