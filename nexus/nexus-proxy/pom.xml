@@ -144,6 +144,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.carrotsearch</groupId>
@@ -186,7 +187,20 @@
       <artifactId>jackson-xml-databind</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-api</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -209,28 +223,6 @@
 
   <profiles>
     <profile>
-      <id>with-tests</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-configuration</artifactId>
-          <classifier>tests</classifier>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-api</artifactId>
-          <classifier>tests</classifier>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
       <id>ahc-provider</id>
       <build>
         <plugins>
@@ -239,8 +231,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>ahc-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>
@@ -257,7 +247,7 @@
       </build>
     </profile>
     <profile>
-      <id>apacheHttpClient4x-provider</id>
+      <id>hc4-provider</id>
       <build>
         <plugins>
           <plugin>
@@ -265,8 +255,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>apacheHttpClient4x-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>
@@ -283,7 +271,7 @@
       </build>
     </profile>
     <profile>
-      <id>apacheHttpClient3x-provider</id>
+      <id>hc3-provider</id>
       <build>
         <plugins>
           <plugin>
@@ -291,8 +279,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>apacheHttpClient3x-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>

@@ -37,6 +37,7 @@
   <modules>
     <module>nexus-plugin-manager</module>
     <module>nexus-plugin-api</module>
+    <module>nexus-plugin-test-api</module>
   </modules>
 
   <dependencyManagement>
@@ -58,19 +59,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <profiles>
-    <profile>
-      <id>with-tests</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <modules>
-        <module>nexus-plugin-test-api</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>

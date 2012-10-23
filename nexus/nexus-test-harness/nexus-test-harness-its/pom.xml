@@ -359,7 +359,7 @@
     </profile>
 
     <profile>
-      <id>apacheHttpClient4x-provider</id>
+      <id>hc4-provider</id>
       <activation>
         <property>
           <name>rrs</name>
@@ -383,7 +383,7 @@
     </profile>
 
     <profile>
-      <id>apacheHttpClient3x-provider</id>
+      <id>hc3-provider</id>
       <activation>
         <property>
           <name>rrs</name>
@@ -540,27 +540,6 @@
           <version>${project.version}</version>
         </dependency>
       </dependencies>
-    </profile>
-
-    <profile>
-      <id>yourkit-profile</id>
-      <activation>
-        <property>
-          <name>yourkit.agent</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <!-- for Yourkit session, we left more memory intentionally -->
-              <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError -agentpath:"${yourkit.agent}"</argLine>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 
