@@ -140,9 +140,8 @@
     </dependency>
 
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${project.version}</version>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
