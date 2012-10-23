@@ -20,7 +20,7 @@ public class Nexus3860Tomcat5WarCargoIT
     @Override
     public File getContainerLocation()
     {
-        return new File( "target/nexus/apache-tomcat-5.5.31" );
+        return util.resolveFile( "target/containers/apache-tomcat-5.5.31" );
     }
 
     @Override
