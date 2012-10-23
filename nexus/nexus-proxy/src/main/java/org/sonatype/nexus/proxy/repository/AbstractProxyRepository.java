@@ -1496,7 +1496,10 @@ public abstract class AbstractProxyRepository
 
                     if ( getRemoteStorageContext() != null )
                     {
-                        retryCount = getRemoteStorageContext().getRemoteConnectionSettings().getRetrievalRetryCount();
+                        RemoteConnectionSettings settings = getRemoteStorageContext().getRemoteConnectionSettings();
+                        if (settings != null) {
+                            retryCount = settings.getRetrievalRetryCount();
+                        }
                     }
 
                     if ( getLogger().isDebugEnabled() )
