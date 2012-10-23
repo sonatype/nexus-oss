@@ -986,7 +986,6 @@
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>1.3.154</version>
-        <scope>test</scope>
       </dependency>
       <!-- TODO move http testing related libs to their own module or testsuite-support -->
       <dependency>
