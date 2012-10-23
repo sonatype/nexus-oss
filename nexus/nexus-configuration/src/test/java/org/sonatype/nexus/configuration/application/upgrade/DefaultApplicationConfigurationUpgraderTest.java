@@ -22,16 +22,16 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Test;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
-import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.configuration.source.FileSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 public class DefaultApplicationConfigurationUpgraderTest
-    extends AbstractNexusTestCase
+    extends NexusTestSupport
 {
     protected ApplicationConfigurationUpgrader configurationUpgrader;
 

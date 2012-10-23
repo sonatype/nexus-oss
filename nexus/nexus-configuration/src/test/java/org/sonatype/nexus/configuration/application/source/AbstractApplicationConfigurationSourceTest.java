@@ -17,11 +17,11 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
-import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 public abstract class AbstractApplicationConfigurationSourceTest
-    extends AbstractNexusTestCase
+    extends NexusTestSupport
 {
     protected ApplicationConfigurationSource configurationSource;
 
