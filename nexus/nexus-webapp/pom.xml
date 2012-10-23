@@ -468,27 +468,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <plugin>
-        <groupId>org.simplericity.jettyconsole</groupId>
-        <artifactId>jetty-console-maven-plugin</artifactId>
-        <version>1.42</version>
-        <executions>
-          <execution>
-            <configuration>
-              <backgroundImage>${basedir}/src/main/jettyconsole/background-image-nexus.jpg</backgroundImage>
-              <additionalDependencies>
-                <additionalDependency>
-                  <artifactId>jetty-console-jettyxml-plugin</artifactId>
-                </additionalDependency>
-              </additionalDependencies>
-            </configuration>
-            <goals>
-              <goal>createconsole</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
