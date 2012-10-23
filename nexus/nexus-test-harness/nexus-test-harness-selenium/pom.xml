@@ -82,6 +82,7 @@
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
       <version>2.1.1</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

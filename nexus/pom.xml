@@ -261,7 +261,6 @@
         <groupId>org.sonatype.appbooter.plexus-booters</groupId>
         <artifactId>plexus-app-booter</artifactId>
         <version>${plexus.appbooter.version}</version>
-        <scope>provided</scope>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -269,11 +268,11 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>tanukisoft</groupId>
         <artifactId>wrapper</artifactId>
         <version>3.2.3</version>
-        <scope>provided</scope>
       </dependency>
 
       <!-- Jetty -->
@@ -281,7 +280,6 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>3.0.1</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
@@ -538,7 +536,6 @@
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-core</artifactId>
         <version>${shiro.version}</version>
-        <scope>compile</scope>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -729,7 +726,6 @@
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>rome</groupId>
