@@ -1495,6 +1495,7 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
           <version>1.5.5</version>
+          <!-- qdox included in ^^^ is old and not compatible with latest sources -->
           <dependencies>
             <dependency>
               <groupId>com.thoughtworks.qdox</groupId>
