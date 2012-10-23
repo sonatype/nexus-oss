@@ -25,10 +25,6 @@
   <artifactId>nexus-mock</artifactId>
   <name>Nexus : Mock Application Frontend</name>
 
-  <properties>
-    <nexus.bundlebase>nexus-oss-webapp</nexus.bundlebase>
-  </properties>
-
   <dependencies>
     <!-- Make sure Guice is compile scope (we compile against it here), and AOP enabled Guice JAR appears first -->
     <dependency>
