@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-testsuite-support</artifactId>
-
   <name>Nexus : Test : Test Suite Support</name>
 
   <properties>
@@ -54,37 +53,29 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-launcher</artifactId>
-      <version>2.3-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.client</groupId>
       <artifactId>nexus-client-core</artifactId>
-      <version>2.3-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-testsuite-client</artifactId>
-      <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-marshal</artifactId>
       <version>1.4</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-asl</artifactId>
       <version>1.9.4</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
       <version>1.9.4</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
@@ -92,19 +83,6 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-
-  <!-- FIXME: Sort out what this is for, its pointing at an invalid version -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-oss-webapp</artifactId>
-        <version>2.0</version>
-        <type>zip</type>
-        <classifier>bundle</classifier>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <profiles>
     <profile>
