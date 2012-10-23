@@ -157,6 +157,7 @@
       <!-- FIXME why is this the 5.10 version and not 5.11 -->
       <version>5.10</version>
       <classifier>jdk15</classifier>
+      <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
@@ -169,6 +170,7 @@
     <dependency>
       <groupId>org.uncommons</groupId>
       <artifactId>reportng</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

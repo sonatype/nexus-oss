@@ -925,13 +925,11 @@
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
         <version>1.5-SNAPSHOT</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
         <version>6.1.1</version>
-        <scope>test</scope>
         <exclusions>
           <exclusion>
             <groupId>junit</groupId>
@@ -943,7 +941,6 @@
         <groupId>org.uncommons</groupId>
         <artifactId>reportng</artifactId>
         <version>1.1.2</version>
-        <scope>test</scope>
         <exclusions>
           <exclusion>
             <artifactId>velocity</artifactId>
@@ -956,13 +953,11 @@
         <groupId>org.objenesis</groupId>
         <artifactId>objenesis</artifactId>
         <version>1.2</version>
-        <!-- scope>test</scope -->
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu.pr</groupId>
         <artifactId>sisu-pr-testutil</artifactId>
         <version>${sisu-problem-reporter.version}</version>
-        <scope>test</scope>
       </dependency>
       
       <!-- TODO remove easymock -->
@@ -970,7 +965,6 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <version>2.4</version>
-        <scope>test</scope>
       </dependency>
       
       <!-- TODO remove carrotsearch and replace with contiperf -->
@@ -979,7 +973,6 @@
         <groupId>com.carrotsearch</groupId>
         <artifactId>junit-benchmarks</artifactId>
         <version>0.3.0-SONATYPE</version>
-        <scope>test</scope>
       </dependency>
       <!-- h2 used by junit benchmarks to store perf data -->
       <dependency>
