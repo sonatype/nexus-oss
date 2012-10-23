@@ -17,12 +17,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.Test;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Testing RegexpMimeRulesSource, a handy class for it's wanted behavior. While everyone is free to reimplement the
  * MimeRulesSource as they want, this class is just a general utility since probably it fits almost always.
  */
 public class RegexpMimeRulesSourceTest
+    extends TestSupport
 {
     @Test
     public void testRegectMimeRulesSourceTest()

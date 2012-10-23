@@ -53,4 +53,11 @@ public final class PluginDeactivatedEvent
     {
         return getEventSender();
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "gav=" + descriptor.getPluginCoordinates() +
+            '}';
+    }
 }

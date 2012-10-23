@@ -32,4 +32,13 @@ public class NexusAuthenticationEvent
     {
         return successful;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "userId='" + getClientInfo().getUserid() + "'," +
+            "remoteIp='" + getClientInfo().getRemoteIP() + "'," +
+            "successful=" + successful +
+            '}';
+    }
 }

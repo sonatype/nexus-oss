@@ -22,7 +22,7 @@ import org.sonatype.sisu.locks.ResourceLockFactory;
  * @author cstamas
  */
 public class SisuLockResourceTest
-    extends AbstractLockResourceTest
+    extends LockResourceTestSupport
 {
     protected ResourceLockFactory resourceLockFactory = new LocalResourceLockFactory();
 

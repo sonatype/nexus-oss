@@ -61,4 +61,12 @@ public final class PluginRejectedEvent
     {
         return getEventSender();
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "gav=" + gav +
+            ", reason=" + (reason != null ? reason.getMessage() : null) +
+            '}';
+    }
 }

@@ -21,6 +21,7 @@ import org.sonatype.nexus.proxy.walker.WalkerThrottleController.ThrottleInfo;
 import org.sonatype.nexus.util.ConstantNumberSequence;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  * Test for fixed rate walker throttle controller.
@@ -28,6 +29,7 @@ import org.sonatype.nexus.util.NumberSequence;
  * @author cstamas
  */
 public class FixedRateWalkerThrottleControllerTest
+    extends TestSupport
 {
     protected FixedRateWalkerThrottleController fixedRateWalkerThrottleController;
 
