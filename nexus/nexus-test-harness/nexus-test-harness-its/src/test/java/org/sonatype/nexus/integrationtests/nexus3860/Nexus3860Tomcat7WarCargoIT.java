@@ -14,18 +14,18 @@ package org.sonatype.nexus.integrationtests.nexus3860;
 
 import java.io.File;
 
-public class Nexus3860Tomcat5WarCargoIT
+public class Nexus3860Tomcat7WarCargoIT
     extends AbstractCargoIT
 {
     @Override
     public File getContainerLocation()
     {
-        return util.resolveFile( "target/containers/apache-tomcat-5.5.31" );
+        return util.resolveFile( "target/containers/apache-tomcat-7.0.32" );
     }
 
     @Override
     public String getContainer()
     {
-        return "tomcat5x";
+        return "tomcat7x";
     }
 }
