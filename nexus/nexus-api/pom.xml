@@ -46,10 +46,12 @@
       <groupId>org.sonatype.plexus.appevents</groupId>
       <artifactId>plexus-app-events-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-task-scheduler</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.configuration</groupId>
       <artifactId>base-configuration</artifactId>
@@ -65,13 +67,11 @@
       <artifactId>mime-util</artifactId>
     </dependency>
 
-    <!-- for marking extensions -->
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-host-api</artifactId>
     </dependency>
 
-    <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
