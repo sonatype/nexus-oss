@@ -58,6 +58,11 @@ public abstract class ConditionSupport
         return satisfied;
     }
 
+    public boolean isActive()
+    {
+        return active;
+    }
+
     @Override
     public final Condition bind()
     {

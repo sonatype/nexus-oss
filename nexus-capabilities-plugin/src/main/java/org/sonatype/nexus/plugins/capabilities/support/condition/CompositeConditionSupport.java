@@ -15,9 +15,11 @@ package org.sonatype.nexus.plugins.capabilities.support.condition;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -27,6 +29,7 @@ import com.google.common.eventbus.Subscribe;
  */
 public abstract class CompositeConditionSupport
     extends ConditionSupport
+    implements CapabilityContextAware
 {
 
     private final Condition[] conditions;
@@ -83,6 +86,19 @@ public abstract class CompositeConditionSupport
         {
             setSatisfied( reevaluate( conditions ) );
         }
+    }
+
+    @Override
+    public CompositeConditionSupport setContext( final CapabilityContext context )
+    {
+        for ( final Condition condition : conditions )
+        {
+            if ( condition instanceof CapabilityContextAware )
+            {
+                ( (CapabilityContextAware) condition ).setContext( context );
+            }
+        }
+        return this;
     }
 
     @Override

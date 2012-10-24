@@ -16,13 +16,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.UnsatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 
@@ -86,6 +87,10 @@ public class ActivationConditionHandler
             try
             {
                 activationCondition = reference.capability().activationCondition();
+                if ( activationCondition instanceof CapabilityContextAware )
+                {
+                    ( (CapabilityContextAware) activationCondition ).setContext( reference.context() );
+                }
             }
             catch ( Exception e )
             {

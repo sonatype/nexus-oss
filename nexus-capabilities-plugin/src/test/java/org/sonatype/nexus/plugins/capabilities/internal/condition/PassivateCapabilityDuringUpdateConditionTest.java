@@ -18,7 +18,9 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
@@ -35,6 +37,9 @@ import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 public class PassivateCapabilityDuringUpdateConditionTest
     extends EventBusTestSupport
 {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Mock
     private CapabilityReference reference;
@@ -82,6 +87,62 @@ public class PassivateCapabilityDuringUpdateConditionTest
         underTest.release();
 
         verify( eventBus ).unregister( underTest );
+    }
+
+    /**
+     * Verify that binding fails if id was not set before.
+     */
+    @Test
+    public void bindWithoutIdBeingSet()
+    {
+        thrown.expect( IllegalStateException.class );
+        thrown.expectMessage( "Capability identity not specified" );
+        new PassivateCapabilityDuringUpdateCondition( eventBus ).bind();
+    }
+
+    /**
+     * Verify that binding succeeds after contextualization.
+     */
+    @Test
+    public void bindAfterContextualization()
+    {
+        new PassivateCapabilityDuringUpdateCondition( eventBus ).setContext( reference.context() ).bind();
+    }
+
+    /**
+     * Verify that contextualization fails if already bounded.
+     */
+    @Test
+    public void contextualizationWhenAlreadyBounded()
+    {
+        thrown.expect( IllegalStateException.class );
+        thrown.expectMessage( "Cannot contextualize when already bounded" );
+        underTest.setContext( reference.context() );
+    }
+
+    /**
+     * Verify that contextualization fails if already contextualized.
+     */
+    @Test
+    public void contextualizationWhenAlreadyContextualized()
+    {
+        thrown.expect( IllegalStateException.class );
+        thrown.expectMessage( "Already contextualized" );
+        new PassivateCapabilityDuringUpdateCondition( eventBus )
+            .setContext( reference.context() )
+            .setContext( reference.context() );
+    }
+
+    /**
+     * Verify that contextualization fails if capability id already specified.
+     */
+    @Test
+    public void contextualizationWhenIdAlreadySpecified()
+    {
+        thrown.expect( IllegalStateException.class );
+        thrown.expectMessage( "Already contextualized" );
+        new PassivateCapabilityDuringUpdateCondition( eventBus, capabilityIdentity( "test" ) )
+            .setContext( reference.context() );
     }
 
 }

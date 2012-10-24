@@ -13,11 +13,14 @@
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -28,9 +31,10 @@ import com.google.common.eventbus.Subscribe;
  */
 public class PassivateCapabilityDuringUpdateCondition
     extends ConditionSupport
+    implements CapabilityContextAware
 {
 
-    private final CapabilityIdentity id;
+    private CapabilityIdentity id;
 
     public PassivateCapabilityDuringUpdateCondition( final EventBus eventBus,
                                                      final CapabilityIdentity id )
@@ -39,9 +43,25 @@ public class PassivateCapabilityDuringUpdateCondition
         this.id = checkNotNull( id );
     }
 
+    public PassivateCapabilityDuringUpdateCondition( final EventBus eventBus )
+    {
+        super( eventBus, true );
+    }
+
+    @Override
+    public PassivateCapabilityDuringUpdateCondition setContext( final CapabilityContext context )
+    {
+        checkState( !isActive(), "Cannot contextualize when already bounded" );
+        checkState( id == null, "Already contextualized with id '" + id + "'" );
+        id = context.id();
+
+        return this;
+    }
+
     @Override
     protected void doBind()
     {
+        checkState( id != null, "Capability identity not specified" );
         getEventBus().register( this );
     }
 
@@ -86,4 +106,5 @@ public class PassivateCapabilityDuringUpdateCondition
     {
         return "Capability is not currently being updated";
     }
+
 }
