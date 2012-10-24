@@ -278,7 +278,7 @@
                       <version>6.0.36</version>
                       <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <excludes>**/webapps/examples,**/webapps/docs,**webapps/ROOT,**/webapps/host-manager</excludes>
+                      <excludes>**/webapps/**</excludes>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
@@ -286,7 +286,7 @@
                       <version>7.0.32</version>
                       <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <excludes>**/webapps/examples,**/webapps/docs,**webapps/ROOT,**/webapps/host-manager</excludes>
+                      <excludes>**/webapps/**</excludes>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
