@@ -15,6 +15,7 @@ package org.sonatype.nexus.capabilities.client;
 import java.util.List;
 
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 
 /**
@@ -39,6 +40,13 @@ public interface Capabilities
      * @return all capabilities
      */
     List<CapabilityListItemResource> list( boolean includeHidden );
+
+    /**
+     * Retrieve all capabilities of specified type and having specified properties.
+     *
+     * @return all capabilities of specified type and having specified properties
+     */
+    List<CapabilityListItemResource> list( String type, CapabilityPropertyResource... props);
 
     /**
      * Retrieve a capability given its id.
