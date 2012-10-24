@@ -30,6 +30,7 @@ import org.sonatype.nexus.restlight.common.RESTLightClientException;
  * Nexus Professional base URL with which the client instance was constructed.</li>
  * </ul>
  */
+@Deprecated
 public class M2SettingsClient
 extends AbstractRESTLightClient
 {

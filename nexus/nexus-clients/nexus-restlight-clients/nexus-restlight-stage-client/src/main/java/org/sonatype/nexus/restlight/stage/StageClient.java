@@ -32,6 +32,7 @@ import org.sonatype.nexus.restlight.common.RESTLightClientException;
 /**
  * REST client to access the functions of the nexus-staging-plugin, available in Nexus Professional.
  */
+@Deprecated
 public class StageClient
     extends AbstractRESTLightClient
 {

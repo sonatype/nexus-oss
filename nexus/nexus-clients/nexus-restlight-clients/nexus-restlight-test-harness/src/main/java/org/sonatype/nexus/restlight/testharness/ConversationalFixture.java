@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  * a response. Each traversed fixture is tracked, allowing this fixture to determine whether the
  * full expected conversation took place, as an additional validation step for the client test.
  */
+@Deprecated
 public class ConversationalFixture
     extends AbstractRESTTestFixture
 {
