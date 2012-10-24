@@ -159,12 +159,8 @@
     <!-- version properties -->
     <applifecycle.version>1.6</applifecycle.version>
     <sonatype.plugin.version>1.1.0</sonatype.plugin.version>
-    
-    <!-- Logging -->
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
-    <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
-
     <aether.version>1.13.1</aether.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
@@ -607,7 +603,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-slf4j-logging</artifactId>
-        <version>${plexus-slf4j-logging.version}</version>
+        <version>1.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
