@@ -33,6 +33,7 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 
+@Deprecated
 @Component(role=NexusClient.class, instantiationStrategy="per-lookup")
 public class NexusRestClient
     implements NexusClient

@@ -15,6 +15,7 @@ package org.sonatype.nexus.client;
 /**
  *  Thrown when unexpected problem occur on the client side. 
  */
+@Deprecated
 public class NexusClientException
     extends Exception
 {

@@ -20,6 +20,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 /**
  * Thrown when a NexusClient cannot connect to a Nexus instance, or the Nexus instance returns a non success response.
  */
+@Deprecated
 public class NexusConnectionException
     extends Exception
 {
