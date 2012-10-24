@@ -33,7 +33,7 @@ import java.io.IOException;
 // Copied from nexus-configuration to avoid needing to depend on its test-jar
 
 // DO NOT mark as component
-public class SimpleApplicationConfiguration
+public abstract class SimpleApplicationConfiguration
     implements ApplicationConfiguration, Contextualizable
 {
 
