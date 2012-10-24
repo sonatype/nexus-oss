@@ -32,6 +32,7 @@
       <artifactId>shiro-core</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
@@ -43,6 +44,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>
@@ -55,40 +57,12 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-url-realm</artifactId>
-      <version>${plexus-security.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.security.realms</groupId>
-          <artifactId>security-xml-realm</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-annotations</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.restlet</groupId>
-          <artifactId>org.restlet</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.noelios.restlet</groupId>
-          <artifactId>com.noelios.restlet</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.noelios.restlet</groupId>
-          <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency> -->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
