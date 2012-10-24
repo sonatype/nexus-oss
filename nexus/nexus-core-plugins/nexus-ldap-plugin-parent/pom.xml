@@ -12,7 +12,9 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
@@ -20,21 +22,46 @@
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.nexus.plugins.ldap</groupId>
   <artifactId>nexus-ldap-plugin-parent</artifactId>
   <name>Nexus : Core Plugins : OSS LDAP</name>
   <packaging>pom</packaging>
 
-  <!--
-  FIXME: Remove version properties here.  Use parent, or move this entire shit to a plugin project.
-  -->
-  <properties>
-    <commons-collections.version>3.2</commons-collections.version>
-    <plexus-ldap-testsuite.version>1.5</plexus-ldap-testsuite.version>
-    <plexus.version>1.2.1.3</plexus.version>
-    <commons-lang.version>2.3</commons-lang.version>
-  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-ldap-testsuite</artifactId>
+        <version>1.5</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- INTERNAL -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+        <artifactId>ldap-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <modules>
     <module>nexus-ldap-realm-plugin</module>
