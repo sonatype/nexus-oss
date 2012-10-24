@@ -55,14 +55,14 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-ehcache</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
       <version>${plexus-security.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-ehcache</artifactId>
     </dependency>
 
     <dependency>
