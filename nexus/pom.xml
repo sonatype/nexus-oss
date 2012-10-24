@@ -1759,7 +1759,6 @@
                   <includes>
                     <include>log4j:*</include>
                   </includes>
-
                   <message>Do not use log4j api directly in tests. Use slf4j api instead.</message>
                 </bannedDependencies>
                 <bannedDependencies>
@@ -1779,8 +1778,6 @@
                   </excludes>
                   <message>Use the org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache!</message>
                 </bannedDependencies>
-
-                <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
               <fail>true</fail>
             </configuration>
