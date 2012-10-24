@@ -308,7 +308,6 @@
         <version>${jetty.version}</version>
       </dependency>
 
-      <!-- Plexus et al -->
       <dependency>
         <groupId>org.sonatype.plexus.appevents</groupId>
         <artifactId>plexus-app-events-api</artifactId>
@@ -320,6 +319,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.plexus.appevents</groupId>
         <artifactId>simple-event-multicaster</artifactId>
@@ -331,6 +331,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-archiver</artifactId>
@@ -346,6 +347,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-cipher</artifactId>
@@ -357,16 +359,19 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-jetty8</artifactId>
         <version>1.4.1</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>classworlds-configuration-io</artifactId>
         <version>1.0</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-task-scheduler</artifactId>
@@ -378,6 +383,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-restlet-bridge</artifactId>
