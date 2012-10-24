@@ -52,14 +52,6 @@
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-      <classifier>tests</classifier>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
   </dependencies>
 
 </project>

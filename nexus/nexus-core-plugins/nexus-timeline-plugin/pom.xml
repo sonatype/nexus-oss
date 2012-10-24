@@ -86,13 +86,6 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
