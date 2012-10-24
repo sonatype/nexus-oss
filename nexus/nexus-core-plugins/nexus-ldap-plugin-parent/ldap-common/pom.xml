@@ -136,13 +136,6 @@
         <configuration>
           <packageWithVersion>false</packageWithVersion>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>${commons-collections.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>
