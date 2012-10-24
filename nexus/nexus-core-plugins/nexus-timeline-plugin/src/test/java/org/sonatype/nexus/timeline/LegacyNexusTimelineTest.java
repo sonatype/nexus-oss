@@ -13,7 +13,6 @@
 package org.sonatype.nexus.timeline;
 
 import java.io.File;
-import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
@@ -33,9 +32,9 @@ public class LegacyNexusTimelineTest
 
         NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
-        List<Entry> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
-
-        assertTrue( !result.isEmpty() );
+        final EntryListCallback cb = new EntryListCallback();
+        nexusTimeline.retrieve( 0, 10, null, null, null, cb );
+        assertTrue( !cb.getEntries().isEmpty() );
     }
 
     @Test
@@ -56,8 +55,8 @@ public class LegacyNexusTimelineTest
 
         NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
-        List<Entry> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
-
-        assertEquals( 4, result.size() );
+        final EntryListCallback cb = new EntryListCallback();
+        nexusTimeline.retrieve( 0, 10, null, null, null, cb );
+        assertEquals( 4, cb.getEntries().size() );
     }
 }

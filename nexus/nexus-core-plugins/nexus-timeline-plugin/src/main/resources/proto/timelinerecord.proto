@@ -1,0 +1,20 @@
+package timeline;
+
+option java_package = "org.sonatype.timeline.proto";
+option java_outer_classname = "TimeLineRecordProtos";
+
+message TimeLineRecord {
+
+	optional int64 timestamp = 1;
+	optional string type = 2;
+	optional string subType = 3; 
+
+	message Data {
+		required string key = 1;
+		optional string value = 2;
+	}
+	
+	repeated Data data = 4;
+    repeated Data keywords = 5;
+
+}

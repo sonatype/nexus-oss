@@ -10,20 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
+package org.sonatype.timeline;
+
+import java.io.IOException;
 
 /**
- * Iterable of Timeline Entries.
- *
- * @author: cstamas
- * @since 2.0
+ * Callback to receive and process timeline records.
+ * 
+ * @author cstamas
+ * @since 3.0
  */
-public interface Entries
-    extends Iterable<Entry>
+public interface TimelineCallback
 {
-
     /**
-     * This method must be called to release underlying resources (implementation dependant).
+     * Method to process next constructed {@link TimelineRecord}. Should return {@code false} if no more records are
+     * needed. or simply the processing should stop.
+     * 
+     * @param rec
+     * @return {@code true} if next record is awaited, {@code false} if no more records needed.
+     * @throws IOException
      */
-    void release();
+    boolean processNext( TimelineRecord rec )
+        throws IOException;
 }

@@ -44,13 +44,24 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- TimelinePersistor uses Protobuf -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+    <!-- TimelineIndexer uses Lucene -->
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>3.6.1</version>
+    </dependency>
+
+    <!-- RSS feeds -->
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-timeline</artifactId>
     </dependency>
 
     <!-- Stuff already in core -->

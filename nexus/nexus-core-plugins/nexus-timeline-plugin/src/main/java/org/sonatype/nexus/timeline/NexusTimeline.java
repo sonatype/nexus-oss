@@ -15,6 +15,8 @@ package org.sonatype.nexus.timeline;
 import java.util.Map;
 import java.util.Set;
 
+import org.sonatype.timeline.TimelineCallback;
+
 import com.google.common.base.Predicate;
 
 /**
@@ -44,9 +46,9 @@ public interface NexusTimeline
      * @param types the types you want to fetch or null if "all" (do not filter by types).
      * @param subtypes the subtypes you want to fetch or null if "all" (do not filter by subtypes).
      * @param filter filter, may be null.
-     * @return the found records as result.
+     * @param cb the callback.
      */
-    Entries retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes, Predicate<Entry> filter );
+    void retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes, Predicate<Entry> filter, TimelineCallback cb );
 
     /**
      * Purges all records from timeline that are older than timestamp, has one of the types and subtypes passed in, and
