@@ -572,6 +572,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk16</artifactId>
+        <version>1.45</version>
+      </dependency>
+
+      <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils-core</artifactId>
         <version>${commons-beanutils.version}</version>
@@ -604,6 +610,7 @@
         <artifactId>jul-to-slf4j</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
+
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
@@ -614,6 +621,7 @@
         <artifactId>logback-classic</artifactId>
         <version>${logback.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-slf4j-logging</artifactId>
@@ -732,6 +740,7 @@
         <artifactId>jackson-mapper-asl</artifactId>
         <version>1.9.4</version>
       </dependency>
+
       <dependency>
         <groupId>com.fasterxml</groupId>
         <artifactId>jackson-xml-databind</artifactId>
@@ -755,6 +764,7 @@
         <artifactId>commons-fileupload</artifactId>
         <version>1.2.1</version>
       </dependency>
+
       <dependency>
         <groupId>eu.medsea.mimeutil</groupId>
         <artifactId>mime-util</artifactId>
@@ -819,6 +829,7 @@
         <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
         <version>${restlet.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>org.json</artifactId>
@@ -1022,6 +1033,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
