@@ -26,19 +26,16 @@
   <name>Nexus : Logging Extras</name>
 
   <dependencies>
-    <!-- The appender -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras-appender</artifactId>
     </dependency>
-    
-    <!-- We have components in here -->
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
-    <!-- Need some classes from here -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-utils</artifactId>
@@ -48,7 +45,6 @@
       <artifactId>nexus-app</artifactId>
     </dependency>
 
-    <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
@@ -62,14 +58,12 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
 
-    <!-- We have servlet util classes too -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>

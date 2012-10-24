@@ -62,18 +62,9 @@
       </exclusions>
     </dependency>
 
-    <!-- TestNG used on runtime -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.1.1</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -202,7 +193,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.6-SONATYPE-r940877</version>
             <configuration>
               <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
               <extraArtifacts>
@@ -251,7 +241,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.5.1</version>
             <executions>
               <execution>
                 <phase>pre-integration-test</phase>

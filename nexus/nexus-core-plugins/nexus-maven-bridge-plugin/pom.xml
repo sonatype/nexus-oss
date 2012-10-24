@@ -24,9 +24,8 @@
   </parent>
 
   <artifactId>nexus-maven-bridge-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
-
   <name>Nexus : Core Plugins : Maven Bridge</name>
+  <packaging>nexus-plugin</packaging>
 
   <properties>
     <nexus.plugin.name>Nexus Maven Bridge Plugin</nexus.plugin.name>

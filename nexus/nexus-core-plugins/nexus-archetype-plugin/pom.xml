@@ -24,9 +24,8 @@
   </parent>
 
   <artifactId>nexus-archetype-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
-
   <name>Nexus : Core Plugins : Maven Archetype Catalog</name>
+  <packaging>nexus-plugin</packaging>
 
   <properties>
     <nexus.plugin.name>Nexus Maven Archetype Catalog Plugin</nexus.plugin.name>
@@ -51,12 +50,14 @@
       <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
       <scope>provided</scope>
       <type>${nexus-plugin.type}</type>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>

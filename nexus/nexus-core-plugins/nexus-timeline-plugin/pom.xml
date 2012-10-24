@@ -23,8 +23,8 @@
   </parent>
 
   <artifactId>nexus-timeline-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Timeline</name>
+  <packaging>nexus-plugin</packaging>
 
   <properties>
     <nexus.plugin.name>Nexus Timeline Plugin</nexus.plugin.name>

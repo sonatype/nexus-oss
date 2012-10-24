@@ -26,7 +26,6 @@
   <name>Nexus : Test Harness : Test Harness Launcher</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-utils</artifactId>
@@ -258,15 +257,6 @@
     </dependency>
 
     <!-- Deps needed by some *Util classes (they use classes from these below) -->
-
-    <!-- The IT Helper Plugin for Simple realm -->
-<!--
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-it-helper-plugin</artifactId>
-      <version>${project.version}</version>
-    </dependency>
--->
     <!-- To redirect j.u.Preferences -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

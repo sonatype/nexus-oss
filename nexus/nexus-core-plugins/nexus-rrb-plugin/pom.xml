@@ -24,8 +24,8 @@
   </parent>
 
   <artifactId>nexus-rrb-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Remote Repository Browsing</name>
+  <packaging>nexus-plugin</packaging>
 
   <properties>
     <nexus.plugin.name>Nexus Remote Repository Browsing Plugin</nexus.plugin.name>
