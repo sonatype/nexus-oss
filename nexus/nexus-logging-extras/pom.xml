@@ -82,7 +82,7 @@
     </dependency>
 
     <!--
-    FIXME: All of these dependencies are needed so that LogbackLogManagerTest can extend from org.sonatype.nexus.AbstractNexusTestCase
+    FIXME: All of these dependencies are needed so that LogbackLogManagerTest can extend from NexusAppTestSupport
     -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

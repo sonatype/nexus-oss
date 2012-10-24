@@ -15,14 +15,22 @@ package org.sonatype.nexus.proxy;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import com.google.inject.Module;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.nexus.security.NexusSecurityTestSupport;
+import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.security.guice.SecurityModule;
 
 public abstract class NexusProxyTestSupport
-    extends NexusSecurityTestSupport
+    extends NexusTestSupport
 {
 
     public static final String PROXY_SERVER_PORT = "proxy.server.port";
+
+    @Override
+    protected Module[] getTestCustomModules()
+    {
+        return new Module[] { new SecurityModule() };
+    }
 
     @Override
     protected void customizeContext( Context ctx )

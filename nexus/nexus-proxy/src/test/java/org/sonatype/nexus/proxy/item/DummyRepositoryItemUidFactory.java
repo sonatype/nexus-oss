@@ -10,19 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security;
+package org.sonatype.nexus.proxy.item;
 
-import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
-import com.google.inject.Module;
-import org.sonatype.nexus.test.NexusTestSupport;
-
-public abstract class NexusSecurityTestSupport
-    extends NexusTestSupport
+public class DummyRepositoryItemUidFactory
+    extends AbstractRepositoryItemUidFactory
 {
-    @Override
-    protected Module[] getTestCustomModules()
+    public DefaultRepositoryItemUid createUid( String uidStr )
+        throws IllegalArgumentException, NoSuchRepositoryException
     {
-        return new Module[] { new SecurityModule() };
+        throw new UnsupportedOperationException(
+            "This dummy factory does not supports this method (it needs repo registry et al)" );
     }
 }
