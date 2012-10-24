@@ -297,8 +297,11 @@
                       <outputDirectory>${project.build.directory}/nexus/webapp</outputDirectory>
                     </artifactItem>
                     <!--
-                    Versions here must be kept in sync with nexus3860/* (cargo) tests
-                    The Tomcat distributions referenced are not actually available in central.
+                    Versions here must be kept in sync with nexus3860/* (cargo) tests.
+                    Including/excluding only the bits needed for the container tests to function, keep out all other ancillary crud.
+
+                    The Tomcat distributions referenced are not actually available in central, but are in the third-party repository on RSO:
+                    https://repository.sonatype.org/content/repositories/third-party/org/apache/tomcat/apache-tomcat/
                     -->
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
@@ -306,7 +309,7 @@
                       <version>6.0.36</version>
                       <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <excludes>**/webapps/examples,**/webapps/docs,**webapps/ROOT,**/webapps/host-manager</excludes>
+                      <includes>*/bin/**,*/conf/**,*/lib/**,*/webapps/*manager/**</includes>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
@@ -314,7 +317,7 @@
                       <version>7.0.32</version>
                       <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <excludes>**/webapps/examples,**/webapps/docs,**webapps/ROOT,**/webapps/host-manager</excludes>
+                      <includes>*/bin/**,*/conf/**,*/lib/**,*/webapps/*manager/**</includes>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
@@ -322,7 +325,7 @@
                       <version>8.1.1.v20120215</version>
                       <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <excludes>*/javadoc/**,*/contexts/**,*/contexts-available/**</excludes>
+                      <includes>*/start*,*/bin/**,*/etc/**,*/lib/**</includes>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
@@ -330,7 +333,7 @@
                       <version>7.6.0.v20120127</version>
                       <type>zip</type>
                       <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <excludes>*/javadoc/**,*/contexts/**,*/contexts-available/**</excludes>
+                      <includes>*/start*,*/bin/**,*/etc/**,*/lib/**</includes>
                     </artifactItem>
                   </artifactItems>
                 </configuration>
