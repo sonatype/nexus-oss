@@ -180,7 +180,6 @@
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <sisu-jetty8.version>1.4.1</sisu-jetty8.version>
     <sisu-velocity.version>1.1</sisu-velocity.version>
-    <sisu-problem-reporter.version>1.5.2</sisu-problem-reporter.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.22</plexus.restlet.bridge.version>
     <plexus-security.version>2.8.3-SNAPSHOT</plexus-security.version>
@@ -961,7 +960,21 @@
       <dependency>
         <groupId>org.sonatype.sisu.pr</groupId>
         <artifactId>sisu-pr-testutil</artifactId>
-        <version>${sisu-problem-reporter.version}</version>
+        <version>1.5.2</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-xmlrpc-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.swizzle</groupId>
+            <artifactId>swizzle-jira</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       
       <!-- TODO remove easymock -->

@@ -77,25 +77,12 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-mailer</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-problem-reporter</artifactId>
-      <version>${sisu-problem-reporter.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.inject</groupId>
-          <artifactId>javax.inject</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-xmlrpc-client</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.swizzle</groupId>
-          <artifactId>swizzle-jira</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.codehaus.swizzle</groupId>
       <artifactId>swizzle-jira</artifactId>
