@@ -17,8 +17,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.digest.Hex;
-import org.sonatype.plexus.components.cipher.Base64;
+import org.apache.shiro.codec.Base64;
 
 /**
  * @author cstamas
@@ -69,7 +68,7 @@ public class SHA1PasswordEncoder
                 }
             }
             while ( numRead != -1 );
-            result = new String( Base64.encodeBase64( md.digest() ) );
+            result = Base64.encodeToString( md.digest() );
         }
         catch ( Exception e )
         {

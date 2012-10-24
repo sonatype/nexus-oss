@@ -426,6 +426,9 @@
         </exclusions>
       </dependency>
 
+      <!--
+      FIXME: This is used by a few tests in nexus-proxy (org.codehaus.plexus.digest.{Md5|Sha1}Digester).
+      -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-digest</artifactId>
