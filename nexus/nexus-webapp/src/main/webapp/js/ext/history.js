@@ -10,8 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, top*/
-
+/*global define, top*/
+define(['extjs'], function(Ext){
 // needed to override whole history singleton to make 1 simple change (see
 // comment in startUp method)
 Ext.History = (function() {
@@ -183,3 +183,4 @@ Ext.History = (function() {
   };
 }());
 Ext.apply(Ext.History, new Ext.util.Observable());
+});

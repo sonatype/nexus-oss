@@ -14,6 +14,7 @@
  * Repository Maintenance panel layout and controller
  */
 
+define(['sonatype/all'], function(){
 /*
  * config options: { id: the is of this panel instance [required] title: title
  * of this panel (shows in tab) }
@@ -352,27 +353,31 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
             Sonatype.utils.replaceHistory(this);
           }
 
-          if (parts.length > 1)
+          if (parts.length > 2)
           {
-            var panel = this.cardPanel.getLayout().activeItem.tabPanel;
-            var tab = panel.find('name', parts[1])[0];
-            if (tab)
-            {
-              panel.setActiveTab(tab);
-            }
-            else if (Sonatype.user.curr.isLoggedIn)
-            {
-              this.currentBookmark[1] = panel.getActiveTab().name;
-              Sonatype.utils.replaceHistory(this);
-            }
-            else
-            {
-              var token = Ext.History.getToken();
-              Sonatype.view.historyDisabled = false;
-              Sonatype.view.afterLoginToken = token;
-              Sonatype.repoServer.RepoServer.loginHandler();
-              this.currentBookmark[1] = panel.getActiveTab().name;
-              return;
+            var tab, panel = this.cardPanel.getLayout().activeItem.tabPanel;
+
+            if ( panel ) {
+              tab = panel.find('name', parts[1])[0];
+
+              if (tab)
+              {
+                panel.setActiveTab(tab);
+              }
+              else if (Sonatype.user.curr.isLoggedIn)
+              {
+                this.currentBookmark[1] = panel.getActiveTab().name;
+                Sonatype.utils.replaceHistory(this);
+              }
+              else
+              {
+                var token = Ext.History.getToken();
+                Sonatype.view.historyDisabled = false;
+                Sonatype.view.afterLoginToken = token;
+                Sonatype.repoServer.RepoServer.loginHandler();
+                this.currentBookmark[1] = panel.getActiveTab().name;
+                return;
+              }
             }
 
             if (parts && parts.length > 2 && parts[1] == 'browsestorage' && selected != null)
@@ -904,3 +909,5 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       }
 
     });
+});
+

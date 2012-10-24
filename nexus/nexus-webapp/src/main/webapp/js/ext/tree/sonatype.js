@@ -11,10 +11,12 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Ext*/
+/*global define*/
 // allow eval statement because it's used for uiProvider attribute, not sure where that is set so we cannot drop it
 // without potentially breaking things
 /*jslint evil:true*/
+
+define(['extjs'], function(Ext){
 Ext.tree.SonatypeTreeLoader = function(config) {
   config.requestMethod = "GET";
 
@@ -169,3 +171,4 @@ Ext.extend(Ext.tree.SonatypeTreeSorter, Ext.tree.TreeSorter, {
         this.doSort(tree.root);
       }
     });
+ });

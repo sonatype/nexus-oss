@@ -10,6 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
+define(['extjs', 'nexus'], function(Ext, Nexus) {
+Ext.namespace('Nexus.form');
 /**
  * A RoleManager is used to display assigned roles and privileges (optional) in a grid, with a toolbar
  * that has options to add roles/privileges (which will open up a new window that will show a specialized role/privilege list
@@ -223,7 +226,7 @@ Ext.extend(Nexus.form.RoleManager, Ext.grid.GridPanel, {
       append : function (roleIds, to) {
         var i, roleId;
 
-        if (roleIds !== null)
+        if (roleIds)
         {
           if (!Ext.isArray(roleIds))
           {
@@ -233,7 +236,7 @@ Ext.extend(Nexus.form.RoleManager, Ext.grid.GridPanel, {
           for (i = 0; i < roleIds.length; i=i+1)
           {
             roleId = this.getIdFromObject(roleIds[i]);
-            if (!roleId)
+            if (roleId)
             {
               to.push(roleId);
             }
@@ -264,14 +267,7 @@ Ext.extend(Nexus.form.RoleManager, Ext.grid.GridPanel, {
         
         this.append(roleIds, this.selectedRoleIds);
 
-        if (this.selectedRoleIds.length === 0)
-        {
-          this.noRolesOnStart = true;
-        }
-        else
-        {
-          this.noRolesOnStart = false;
-        }
+        this.noRolesOnStart = this.selectedRoleIds.length === 0;
 
         this.validate();
 
@@ -305,7 +301,7 @@ Ext.extend(Nexus.form.RoleManager, Ext.grid.GridPanel, {
           for (i = 0; i < roleIds.length; i=i+1)
           {
             roleId = this.getIdFromObject(roleIds[i]);
-            if (!roleId)
+            if (roleId)
             {
               this.selectedRoleIds.push(roleId);
             }
@@ -332,7 +328,7 @@ Ext.extend(Nexus.form.RoleManager, Ext.grid.GridPanel, {
           for (i = 0; i < privilegeIds.length; i=i+1)
           {
             privilegeId = this.getIdFromObject(privilegeIds[i]);
-            if (!privilegeId)
+            if (privilegeId)
             {
               this.selectedPrivilegeIds.push(privilegeId);
             }
@@ -451,8 +447,7 @@ Nexus.form.RoleSelectorGrid = function(cfg) {
           hiddenPrivilegeIds : [],
           selectedRoleIds : [],
           selectedPrivilegeIds : []
-        },
-        columns = [this.sm];
+        }, columns;
   //apply the config and defaults to 'this'
   Ext.apply(this, config, defaultConfig);
 
@@ -583,6 +578,7 @@ Nexus.form.RoleSelectorGrid = function(cfg) {
         }
       });
 
+  columns = [this.sm];
 
   columns.push({
         id : 'name',
@@ -765,7 +761,7 @@ Ext.extend(Nexus.form.RoleSelectorGrid, Ext.grid.GridPanel, {
 
         this.selectedPrivilegeIds = [];
 
-        if (!privilegeIds)
+        if (privilegeIds)
         {
           if (!Ext.isArray(privilegeIds))
           {
@@ -816,23 +812,9 @@ Ext.extend(Nexus.form.RoleSelectorGrid, Ext.grid.GridPanel, {
           this.storeProxy.conn.jsonData.data.onlySelected = false;
         }
 
-        if (!this.rolesFilter.pressed)
-        {
-          this.storeProxy.conn.jsonData.data.noRoles = true;
-        }
-        else
-        {
-          this.storeProxy.conn.jsonData.data.noRoles = false;
-        }
+        this.storeProxy.conn.jsonData.data.noRoles = !this.rolesFilter.pressed;
 
-        if (!this.privilegesFilter.pressed || !this.usePrivileges)
-        {
-          this.storeProxy.conn.jsonData.data.noPrivileges = true;
-        }
-        else
-        {
-          this.storeProxy.conn.jsonData.data.noPrivileges = false;
-        }
+        this.storeProxy.conn.jsonData.data.noPrivileges = !this.privilegesFilter.pressed || !this.usePrivileges;
 
         this.store.load({
               params : {
@@ -867,3 +849,4 @@ top.RoleManager = Nexus.form.RoleManager;
 top.RoleSelectorGrid = Nexus.form.RoleSelectorGrid;
 
 Ext.reg('roleselector', Nexus.form.RoleSelectorGrid);
+});

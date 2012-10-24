@@ -11,7 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Nexus, Ext*/
+/*global define*/
+define(['extjs', 'nexus'], function(Ext, Nexus) {
+Ext.namespace('Nexus.form');
 
 /**
  * A field using a label to display the value.
@@ -48,3 +50,5 @@ Nexus.form.LabelField = Ext.extend( Ext.form.Field, {
 });
 
 Ext.reg('labelfield', Nexus.form.LabelField);
+});
+

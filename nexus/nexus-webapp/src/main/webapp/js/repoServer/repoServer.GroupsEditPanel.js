@@ -14,6 +14,7 @@
  * Repository Groups Edit/Create panel layout and controller
  */
 
+define(['sonatype/all'], function(){
 Sonatype.repoServer.RepositoryGroupEditor = function(config) {
   var config = config || {};
   var defaultConfig = {
@@ -341,3 +342,6 @@ Sonatype.Events.addListener('repositoryAddMenuInit', function(menu) {
             });
       }
     });
+
+});
+

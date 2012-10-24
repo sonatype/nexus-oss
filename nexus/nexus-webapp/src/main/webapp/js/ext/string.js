@@ -10,15 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+define(function(){
 String.prototype.replaceAll = function(strTarget, strSubString) {
-  var strText = this;
-  var intIndexOfMatch = strText.indexOf(strTarget);
+  var
+        strText = this,
+        intIndexOfMatch = strText.indexOf(strTarget);
 
-  while (intIndexOfMatch != -1)
+  while (intIndexOfMatch !== -1)
   {
-    strText = strText.replace(strTarget, strSubString)
+    strText = strText.replace(strTarget, strSubString);
     intIndexOfMatch = strText.indexOf(strTarget);
   }
 
   return (strText);
 };
+});

@@ -10,6 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
+
+define(['extjs'], function(Ext) {
 /**
  * @class Ext.form.DisplayField
  * @extends Ext.form.Field A display-only text field which is not validated and
@@ -147,3 +150,4 @@ Ext.form.ByteDisplayField = Ext.extend(Ext.form.DisplayField, {
 
 Ext.reg('byteDisplayField', Ext.form.ByteDisplayField);
 
+});

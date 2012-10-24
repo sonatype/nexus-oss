@@ -11,8 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Nexus, Sonatype, Ext*/
+/*global define*/
 
+define(['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype){
 Ext.namespace('Nexus.ext');
 
 /*
@@ -222,6 +223,8 @@ Ext.extend(Nexus.ext.TextEntryList, Ext.Panel, {
     });
 
 Ext.reg('textentrylist', Nexus.ext.TextEntryList);
+});
 
-// FIXME legacy
-Sonatype.ext.TextEntryList = Nexus.ext.TextEntryList;
+define('sonatype/ext/TextEntryList', ['sonatype', 'nexus/ext/TextEntryList'], function(Sonatype, Nexus){
+  Sonatype.ext.TextEntryList = Nexus.ext.TextEntryList;
+});

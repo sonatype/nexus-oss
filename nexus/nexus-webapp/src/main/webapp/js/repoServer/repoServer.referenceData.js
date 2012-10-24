@@ -16,6 +16,7 @@
  * to the service.
  */
 
+define(['sonatype/all'], function(){
 (function() {
 
   Sonatype.repoServer.referenceData = {
@@ -350,3 +351,6 @@
   };
 
 })();
+
+});
+

@@ -1,3 +1,4 @@
+define(['extjs'], function(Ext){
 /**
  * @class Ext.ux.form.GroupComboBox
  * @extends Ext.form.ComboBox This class extends a combobox to allow grouping to
@@ -95,3 +96,4 @@ Ext.ux.form.GroupComboBox = Ext.extend(Ext.form.ComboBox, {
       }
     });
 Ext.reg('uxgroupcombo', Ext.ux.form.GroupComboBox);
+});

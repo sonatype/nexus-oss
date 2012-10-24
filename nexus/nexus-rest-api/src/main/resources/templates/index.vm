@@ -30,12 +30,13 @@
   #end
   ## Plugin pre HEAD contributions ends here
 
-  <link rel="stylesheet" href="ext-2.3/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="ext-2.3/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="ext-3.4.0/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="ext-3.4.0/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="style/sonatype-all.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
 
-  <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
-  
+##  <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+    <script data-main="js/nexus-init.js" src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
+
   ## Plugin post HEAD contributions start here
   #foreach( $pluginPostHeadContribution in $pluginPostHeadContributions )
     $pluginPostHeadContribution
@@ -43,7 +44,11 @@
   ## Plugin post HEAD contributions ends here
 
   <script type="text/javascript" charset="utf-8">
-    Ext.onReady(Sonatype.init);
+    requirejs(['extjs', 'sonatype', 'nexus/ui'], function(Ext, Sonatype) {
+        // document is already loaded at this point, but Ext does not know that.
+        Ext.isReady = true;
+        Sonatype.init();
+    });
   </script>
 </head>
 

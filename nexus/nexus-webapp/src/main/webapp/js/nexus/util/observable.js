@@ -11,7 +11,10 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Nexus,Ext,Sonatype*/
+/*global define*/
+
+define(['extjs', 'nexus'], function(Ext, Nexus) {
+  Ext.namespace('Nexus.util');
 Nexus.util.Observable = function() {
   this.addEvents({
         /*
@@ -97,5 +100,6 @@ Nexus.util.Observable = function() {
 };
 Ext.extend(Nexus.util.Observable, Ext.util.Observable);
 
-// FIXME this initialization should be done somewhere else
-Sonatype.Events = new Nexus.util.Observable();
+  return Nexus;
+});
+

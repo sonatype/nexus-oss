@@ -1,4 +1,5 @@
-/*global Ext*/
+/*global define*/
+define(['extjs'], function(Ext){
 // handy grid validation from
 // http://www.extjs.com/forum/showthread.php?t=21158
 Ext.namespace('Ext.ux', 'Ext.ux.plugins');
@@ -79,3 +80,4 @@ Ext.ux.plugins.GridValidator = function(config) {
     });
   };
 };
+});

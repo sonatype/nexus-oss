@@ -10,9 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global top,Nexus*/
+/*global top, define*/
+define(['extjs', 'sonatype/view', 'nexus'], function(Ext, Sonatype, Nexus) {
+
+Ext.namespace('Nexus.util');
 Nexus.util.FormFieldUtil = {
-  generate : function(panelId, fieldSetName, fieldNamePrefix, typeStore, repoStore, groupStore, repoOrGroupStore, customTypes, width) {
+  generateForm : function(panelId, fieldSetName, fieldNamePrefix, typeStore, repoStore, groupStore, repoOrGroupStore,
+        customTypes, width) {
     var allTypes = [];
 
     if (!width) {
@@ -34,15 +38,15 @@ Nexus.util.FormFieldUtil = {
 
     // Now add the dynamic content
     typeStore.each(function(item, i, len) {
-      var items = [];
+      var j, items = [], curRec;
       if (item.data.formFields.length > 0) {
-        for (var j = 0; j < item.data.formFields.length; j++) {
-          var curRec = item.data.formFields[j];
+        for (j = 0; j < item.data.formFields.length; j = j + 1) {
+          curRec = item.data.formFields[j];
           // Note that each item is disabled initially, this is because
           // the select handler for the capabilityType
           // combo box handles enabling/disabling as necessary, so each
           // inactive card isn't also included in the form
-          if (curRec.type == 'string') {
+          if (curRec.type === 'string') {
             items[j] = {
               xtype : 'textfield',
               htmlDecode : true,
@@ -56,7 +60,7 @@ Nexus.util.FormFieldUtil = {
               regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
             };
           }
-          else if (curRec.type == 'number') {
+          else if (curRec.type === 'number') {
             items[j] = {
               xtype : 'numberfield',
               fieldLabel : curRec.label,
@@ -69,7 +73,7 @@ Nexus.util.FormFieldUtil = {
               regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
             };
           }
-          else if (curRec.type == 'text-area') {
+          else if (curRec.type === 'text-area') {
             items[j] = {
               xtype : 'textarea',
               htmlDecode : true,
@@ -84,7 +88,7 @@ Nexus.util.FormFieldUtil = {
               regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
             };
           }
-          else if (curRec.type == 'checkbox') {
+          else if (curRec.type === 'checkbox') {
             items[j] = {
               xtype : 'checkbox',
               fieldLabel : curRec.label,
@@ -93,7 +97,7 @@ Nexus.util.FormFieldUtil = {
               disabled : true
             };
           }
-          else if (curRec.type == 'date') {
+          else if (curRec.type === 'date') {
             items[j] = {
               xtype : 'datefield',
               fieldLabel : curRec.label,
@@ -105,7 +109,7 @@ Nexus.util.FormFieldUtil = {
               value : new Date()
             };
           }
-          else if (curRec.type == 'repo') {
+          else if (curRec.type === 'repo') {
             items[j] = {
               xtype : 'combo',
               fieldLabel : curRec.label,
@@ -127,7 +131,7 @@ Nexus.util.FormFieldUtil = {
               minListWidth : width
             };
           }
-          else if (curRec.type == 'group') {
+          else if (curRec.type === 'group') {
             items[j] = {
               xtype : 'combo',
               fieldLabel : curRec.label,
@@ -149,7 +153,7 @@ Nexus.util.FormFieldUtil = {
               minListWidth : width
             };
           }
-          else if (curRec.type == 'repo-or-group') {
+          else if (curRec.type === 'repo-or-group') {
             items[j] = {
               xtype : 'combo',
               fieldLabel : curRec.label,
@@ -209,35 +213,33 @@ Nexus.util.FormFieldUtil = {
     }, this);
 
     return allTypes;
-  }, export : function(formPanel, panelIdSuffix, formFieldPrefix, customTypes) {
-    var outputArr = [];
+  }, "exportForm" : function(formPanel, panelIdSuffix, formFieldPrefix, customTypes) {
+    var outputArr = [], i = 0, formFieldPanel = formPanel.findById(formPanel.id + panelIdSuffix);
 
-    var formFieldPanel = formPanel.findById(formPanel.id + panelIdSuffix);
-    var i = 0;
     // These are dynamic fields here, so some pretty straightforward generic
     // logic below
     formFieldPanel.getLayout().activeItem.items.each(function(item, i, len) {
       var value;
 
-      if (item.xtype == 'datefield') {
+      if (item.xtype === 'datefield') {
         // long representation is used, not actual date
         // force to a string, as that is what the current api requires
-        value = '' + item.getValue().getTime();
+        value = String(item.getValue().getTime());
       }
-      else if (item.xtype == 'textfield') {
+      else if (item.xtype === 'textfield') {
         value = item.getValue();
       }
-      else if (item.xtype == 'numberfield') {
+      else if (item.xtype === 'numberfield') {
         // force to a string, as that is what the current api requires
-        value = '' + item.getValue();
+        value = String(item.getValue());
       }
-      else if (item.xtype == 'textarea') {
+      else if (item.xtype === 'textarea') {
         value = item.getValue();
       }
-      else if (item.xtype == 'checkbox') {
-        value = '' + item.getValue();
+      else if (item.xtype === 'checkbox') {
+        value = String(item.getValue());
       }
-      else if (item.xtype == 'combo') {
+      else if (item.xtype === 'combo') {
         value = item.getValue();
       }
       else if (customTypes && customTypes[item.xtype]) {
@@ -248,35 +250,36 @@ Nexus.util.FormFieldUtil = {
         key : item.getName().substring(formFieldPrefix.length),
         value : value
       };
-      i++;
+      i = i + 1;
     }, formFieldPanel.getLayout().activeItem);
 
     return outputArr;
-  }, import : function(jsonObject, formPanel, formFieldPrefix, customTypes) {
+  }, "importForm" : function(jsonObject, formPanel, formFieldPrefix, customTypes) {
+    var i, j, formFields, formField;
     // Maps the incoming json properties to the generic component
-    for (var i = 0; i < jsonObject.properties.length; i++) {
-      var formFields = formPanel.find('name', formFieldPrefix + jsonObject.properties[i].key);
-      for (var j = 0; j < formFields.length; j++) {
-        var formField = formFields[j];
+    for (i = 0; i < jsonObject.properties.length; i = i + 1) {
+      formFields = formPanel.find('name', formFieldPrefix + jsonObject.properties[i].key);
+      for (j = 0; j < formFields.length; j = j + 1) {
+        formField = formFields[j];
 
-        if (formField != null) {
+        if (formField !== null) {
           if (!formField.disabled && !Ext.isEmpty(jsonObject.properties[i].value)) {
-            if (formField.xtype == 'datefield') {
+            if (formField.xtype === 'datefield') {
               formField.setValue(new Date(Number(jsonObject.properties[i].value)));
             }
-            else if (formField.xtype == 'textfield') {
+            else if (formField.xtype === 'textfield') {
               formField.setValue(jsonObject.properties[i].value);
             }
-            else if (formField.xtype == 'numberfield') {
+            else if (formField.xtype === 'numberfield') {
               formField.setValue(Number(jsonObject.properties[i].value));
             }
-            else if (formField.xtype == 'textarea') {
+            else if (formField.xtype === 'textarea') {
               formField.setValue(jsonObject.properties[i].value);
             }
-            else if (formField.xtype == 'checkbox') {
-              formField.setValue(Boolean('true' == jsonObject.properties[i].value));
+            else if (formField.xtype === 'checkbox') {
+              formField.setValue(Boolean('true' === jsonObject.properties[i].value));
             }
-            else if (formField.xtype == 'combo') {
+            else if (formField.xtype === 'combo') {
               formField.setValue(jsonObject.properties[i].value);
             }
             else if (customTypes && customTypes[formField.xtype]) {
@@ -291,6 +294,8 @@ Nexus.util.FormFieldUtil = {
 };
 
 // FIXME legacy
-top.FormFieldGenerator = Nexus.util.FormFieldUtil.generate;
-top.FormFieldImporter = Nexus.util.FormFieldUtil.import;
-top.FormFieldExporter = Nexus.util.FormFieldUtil.export;
+top.FormFieldGenerator = Nexus.util.FormFieldUtil.generateForm;
+top.FormFieldImporter = Nexus.util.FormFieldUtil.importForm;
+top.FormFieldExporter = Nexus.util.FormFieldUtil.exportForm;
+
+});

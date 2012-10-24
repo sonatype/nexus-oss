@@ -10,8 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+/*global require*/
 
+define(['extjs'], function(Ext){
 // Extension to the store to allow for multi field sorting
 // from http://www.extjs.com/forum/showthread.php?t=48324
 Ext.override(Ext.data.Store, {
@@ -61,4 +62,4 @@ Ext.override(Ext.data.Store, {
     this.fireEvent("datachanged", this);
   }
 });
-
+});

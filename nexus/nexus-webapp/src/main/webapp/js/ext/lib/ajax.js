@@ -10,7 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext,Sonatype*/
+/*global define*/
+define(['extjs'], function(Ext){
 Ext.lib.Ajax.setHeader = function(o) {
   var combinedHeaders, prop;
 
@@ -81,7 +82,7 @@ Ext.lib.Ajax.handleTransactionResponse = function(o, callback, isAbort) {
     httpStatus = 13030;
   }
 
-  if ((httpStatus >= 200 && httpStatus < 300) || httpStatus == 1223)
+  if ((httpStatus >= 200 && httpStatus < 300) || httpStatus === 1223)
   {
     responseObject = this.createResponseObject(o, callback.argument);
     if (callback.success)
@@ -96,19 +97,15 @@ Ext.lib.Ajax.handleTransactionResponse = function(o, callback, isAbort) {
         callback.success.apply(callback.scope, [responseObject]);
       }
     }
-  }
-  else
-  {
-    switch (httpStatus)
-    {
-
+  } else {
+    switch (httpStatus) {
       case 12002 :
       case 12029 :
       case 12030 :
       case 12031 :
       case 12152 :
       case 13030 :
-        responseObject = this.createExceptionObject(o.tId, callback.argument, (isAbort ? isAbort : false));
+        responseObject = this.createExceptionObject(o.tId, callback.argument, (isAbort || false));
         if (callback.failure)
         {
           if (!callback.scope)
@@ -140,4 +137,4 @@ Ext.lib.Ajax.handleTransactionResponse = function(o, callback, isAbort) {
   this.releaseObject(o);
   responseObject = null;
 };
-
+});

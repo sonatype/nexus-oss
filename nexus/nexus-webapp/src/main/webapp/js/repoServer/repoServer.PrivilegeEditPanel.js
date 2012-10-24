@@ -14,6 +14,7 @@
  * Privilege Edit/Create panel layout and controller
  */
 
+define(['sonatype/all'], function(){
 Sonatype.repoServer.PrivilegeEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {
@@ -557,3 +558,6 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditor, Sonatype.ext.FormPanel, {
         }
       }
     });
+
+});
+

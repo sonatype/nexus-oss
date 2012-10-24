@@ -264,11 +264,13 @@
               <aggregations>
                 <aggregation>
                   <insertNewLine>true</insertNewLine>
-                  <output>${compressed-dir}/js/sonatype-all.js</output>
+                  <output>${compressed-dir}/js/nexus-init.js</output>
                   <inputDir>${project.build.directory}/generated-sources/yuicompressor/js</inputDir>
                   <includes>
-                    <include>${basedir}/src/main/webapp/ext-2.3/adapter/ext/ext-base.js</include>
-                    <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
+                    <include>${basedir}/src/main/webapp/ext-3.4.0/adapter/ext/ext-base.js</include>
+                    <include>${basedir}/src/main/webapp/ext-3.4.0/ext-all.js</include>
+                    <include>**/*.js</include>
+                  <!-- requirejs will create a main file for us
                     <include>sonatype/common.js</include>
                     <include>nexus/**/common.js</include>
                     <include>nexus/messagebox.js</include>
@@ -276,8 +278,6 @@
                     <include>nexus/ext/**/*.js</include>
                     <include>nexus/error/ErrorHandler.js</include>
                     <include>nexus/util/**/*.js</include>
-                    <include>groupcombo/groupcombo.js</include>
-                    <include>groupcombo/groupdataview.js</include>
                     <include>nexus/form/**/*.js</include>
                     <include>nexus/navigation/**/*.js</include>
                     <include>nexus/panels/**/*.js</include>
@@ -316,7 +316,8 @@
                     <include>repoServer/repoServer.Maven2InformationPanel.js</include>
                     <include>nexus/profile/UserProfile.js</include>
                     <include>nexus/profile/Summary.js</include>
-                  </includes>
+                  -->
+                  </includes> 
                 </aggregation>
                 <aggregation>
                   <output>${compressed-dir}/style/sonatype-all.css</output>
@@ -378,7 +379,7 @@
             ext-2.3/resources/images/**,
             images/**,
             WEB-INF/*,
-            js/sonatype-all.js,
+            js/nexus-init.js,
             style/sonatype-all.css
           </warSourceIncludes>
           <webResources>
@@ -416,6 +417,31 @@
           </execution>
         </executions>
       </plugin>
+      <!--
+      <plugin>
+        <groupId>com.github.mcheely</groupId>
+        <artifactId>requirejs-maven-plugin</artifactId>
+        <version>1.0.4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>optimize</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <configFile>
+            ${basedir}/src/main/config/buildconfig.js
+          </configFile>
+          <filterConfig>
+            true
+          </filterConfig>
+          <skip>
+            false
+          </skip>
+        </configuration>
+      </plugin>
+      -->
     </plugins>
   </build>
 

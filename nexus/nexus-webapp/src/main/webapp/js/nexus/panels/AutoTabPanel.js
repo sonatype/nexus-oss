@@ -10,40 +10,46 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
+
+define(['extjs', 'sonatype'], function(Ext, Sonatype){
 Ext.namespace('Sonatype.panels');
 
 /*
  * A helper panel creating a tabbed container inside itself if more than one
  * component is added.
  */
-Sonatype.panels.AutoTabPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {
-    layout : 'card',
-    activeItem : 0,
-    deferredRender : false,
-    autoScroll : false,
-    frame : false,
-    border : false,
-    activeTab : 0,
-    hideMode : 'offsets',
-    tools : [{
-      id : 'refresh',
-      qtip : 'Refresh data',
-      hidden : true,
-      handler : function(evt, toolEl, panel) {
-        var active;
-        if ( panel.tabPanel ) {
-          active = panel.tabPanel.getActiveTab();
-        } else {
-          active = panel.getComponent(0);
-        }
-        if (active && active.refreshContent) {
-          active.refreshContent();
-        }
-      }
-    }]
-  };
+Sonatype.panels.AutoTabPanel = function(cfg) {
+  var
+        config = cfg || {},
+        defaultConfig = {
+          layout : 'card',
+          activeItem : 0,
+          deferredRender : false,
+          autoScroll : false,
+          frame : false,
+          border : false,
+          activeTab : 0,
+          hideMode : 'offsets',
+          tools : [
+            {
+              id : 'refresh',
+              qtip : 'Refresh data',
+              hidden : true,
+              handler : function(evt, toolEl, panel) {
+                var active;
+                if (panel.tabPanel) {
+                  active = panel.tabPanel.getActiveTab();
+                } else {
+                  active = panel.getComponent(0);
+                }
+                if (active && active.refreshContent) {
+                  active.refreshContent();
+                }
+              }
+            }
+          ]
+        };
   Ext.apply(this, config, defaultConfig);
   Sonatype.panels.AutoTabPanel.superclass.constructor.call(this, {
         collapseMode : 'mini'
@@ -95,7 +101,7 @@ Ext.extend(Sonatype.panels.AutoTabPanel, Ext.Panel, {
         first.setTitle(first.tabTitle);
 
         this.tabPanel = new Ext.TabPanel({
-              activeItem : this.activeTab == -1 ? null : this.activeTab,
+              activeItem : this.activeTab === -1 ? null : this.activeTab,
               deferredRender : false,
               enableTabScroll : true,
               autoScroll : false,
@@ -106,7 +112,7 @@ Ext.extend(Sonatype.panels.AutoTabPanel, Ext.Panel, {
               hideMode : 'offsets',
               listeners : {
                 tabchange : function(panel, tab) {
-                  var tool = this.tools && this.tools['refresh'];
+                  var tool = this.tools && this.tools.refresh;
                   if ( tool ) {
                     if ( tab.refreshContent ) {
                       tool.show();
@@ -128,4 +134,4 @@ Ext.extend(Sonatype.panels.AutoTabPanel, Ext.Panel, {
     });
 
 
-
+});

@@ -10,7 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, Sonatype, Nexus*/
+/*global define*/
+define(['extjs', 'nexus', 'nexus/messagebox', 'sonatype/utils'], function(Ext, Nexus, messagebox, Sonatype) {
+
+Ext.namespace('Nexus.form');
 
 /**
  * @class Ext.form.Action.sonatypeSubmit
@@ -36,6 +39,19 @@ Ext.form.Action.sonatypeSubmit = function(form, options) {
   }
   Ext.form.Action.sonatypeSubmit.superclass.constructor.call(this, form, options);
 };
+
+  function setUnpacked(obj, flatName, value) {
+    var ctx = obj, id = flatName;
+
+    Ext.each( flatName.split('.'), function(part) {
+      ctx = obj;
+      id = part;
+      obj = obj[part];
+    });
+
+    ctx[id] = value;
+  }
+
 
 Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
   /**
@@ -134,11 +150,11 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
 
       if (result.errors.length === 1 && result.errors[0].id === '*')
       {
-        Sonatype.MessageBox.show({
+        messagebox.show({
           title : 'Configuration Error',
           msg : result.errors[0].msg,
-          buttons : Sonatype.MessageBox.OK,
-          icon : Sonatype.MessageBox.ERROR
+          buttons : messagebox.OK,
+          icon : messagebox.ERROR
         });
         return;
       }
@@ -152,7 +168,7 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
     // hide dialog
     if (result.errors)
     {
-      Sonatype.MessageBox.hide();
+      messagebox.hide();
     }
   },
 
@@ -212,18 +228,6 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
     // this function goes through flatName and 'unpacks' the objects in the path
     // and sets the value
     // was written as "eval('accObj.' + flatName + '=' + fieldValue)" before
-    function setUnpacked(obj, flatName, value) {
-      var ctx = obj, id = flatName;
-
-      Ext.each( flatName.split('.'), function(part) {
-        ctx = obj;
-        id = part;
-        obj = obj[part];
-      });
-
-      ctx[id] = value;
-    }
-
     if (this.options.dataModifiers && this.options.dataModifiers.rootData)
     {
       return (this.options.dataModifiers.rootData)(fieldValue, fpanel);
@@ -427,6 +431,8 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
       {
         return false;
       }
+
+      // flatName is correct here, because we're selecting field ids with it
       accObj[flatName] = value;
       return true;
     }
@@ -436,3 +442,4 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
 Ext.form.Action.ACTION_TYPES.sonatypeLoad = Ext.form.Action.sonatypeLoad;
 Ext.form.Action.ACTION_TYPES.sonatypeSubmit = Ext.form.Action.sonatypeSubmit;
 
+});

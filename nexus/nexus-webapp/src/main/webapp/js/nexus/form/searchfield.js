@@ -10,8 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, Nexus*/
+/*global define*/
+define(['extjs', 'nexus'], function(Ext, Nexus) {
 Ext.namespace('Nexus.form');
+
 Nexus.form.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
       initComponent : function() {
         Ext.app.SearchField.superclass.initComponent.call(this);
@@ -82,3 +84,7 @@ Ext.reg('nexussearchfield', Nexus.form.SearchField);
 
 // FIXME: legacy
 Ext.app.SearchField = Nexus.form.SearchField;
+
+
+});
+

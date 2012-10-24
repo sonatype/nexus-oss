@@ -10,11 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
+define(['extjs', 'sonatype'], function(Ext, Sonatype){
 Ext.namespace('Sonatype.navigation');
 
-Sonatype.navigation.NavigationPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+Sonatype.navigation.NavigationPanel = function(cfg) {
+  var
+        config = cfg || {},
+        defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
 
   this.delayedItems = {};
@@ -29,23 +32,27 @@ Sonatype.navigation.NavigationPanel = function(config) {
 
 Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
   insert : function(sectionIndex, container) {
-    if (sectionIndex == null || sectionIndex == undefined)
+    if (!sectionIndex) {
       sectionIndex = 0;
-    if (container == null)
+    }
+    if (!container) {
       return;
+    }
+
+    var panel;
 
     // check if this is an attempt to add a navigation item to an existing
     // section
     if (container.sectionId)
     {
-      var panel = this.findById(container.sectionId);
+      panel = this.findById(container.sectionId);
       if (panel)
       {
         return panel.insert(sectionIndex, container);
       }
       else
       {
-        if (this.delayedItems[container.sectionId] == null)
+        if (!this.delayedItems[container.sectionId])
         {
           this.delayedItems[container.sectionId] = [];
         }
@@ -54,7 +61,7 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
       }
     }
 
-    var panel = new Sonatype.navigation.Section(container);
+    panel = new Sonatype.navigation.Section(container);
     panel = Sonatype.navigation.NavigationPanel.superclass.insert.call(this, sectionIndex, panel);
     if (panel.id && this.delayedItems[panel.id])
     {
@@ -64,8 +71,8 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
     return panel;
   },
   add : function(c) {
-    var arr = null;
-    var a = arguments;
+    var i, arr = null, a = arguments, panel;
+
     if (a.length > 1)
     {
       arr = a;
@@ -74,23 +81,24 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
     {
       arr = c;
     }
-    if (arr != null)
+    if (arr !== null)
     {
-      for (var i = 0; i < arr.length; i++)
+      for (i = 0; i < arr.length; i=i+1)
       {
         this.add(arr[i]);
       }
       return;
     }
 
-    if (c == null)
+    if (!c) {
       return;
+    }
 
     // check if this is an attempt to add a navigation item to an existing
     // section
     if (c.sectionId)
     {
-      var panel = this.findById(c.sectionId);
+      panel = this.findById(c.sectionId);
       if (panel)
       {
         panel.add(c);
@@ -98,7 +106,7 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
       }
       else
       {
-        if (this.delayedItems[c.sectionId] == null)
+        if (!this.delayedItems[c.sectionId])
         {
           this.delayedItems[c.sectionId] = [];
         }
@@ -107,7 +115,7 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
       }
     }
 
-    var panel = new Sonatype.navigation.Section(c);
+    panel = new Sonatype.navigation.Section(c);
     panel = Sonatype.navigation.NavigationPanel.superclass.add.call(this, panel);
     if (panel.id && this.delayedItems[panel.id])
     {
@@ -117,4 +125,5 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
     }
     return panel;
   }
+});
 });

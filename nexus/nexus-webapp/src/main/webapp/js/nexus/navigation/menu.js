@@ -10,11 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
+define(['extjs', 'sonatype'], function(Ext, Sonatype){
+
 Ext.namespace('Sonatype.menu');
 
-Sonatype.menu.Menu = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
+Sonatype.menu.Menu = function(cfg) {
+  var
+        config = cfg || {},
+        defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
 
   Sonatype.menu.Menu.superclass.constructor.call(this);
@@ -22,11 +26,12 @@ Sonatype.menu.Menu = function(config) {
 
 Ext.extend(Sonatype.menu.Menu, Ext.menu.Menu, {
   add : function(c) {
-    if (c == null)
+    if (!c) {
       return null;
+    }
 
-    var arr = null;
-    var a = arguments;
+    var i, item, param, arr = null, a = arguments;
+
     if (a.length > 1)
     {
       arr = a;
@@ -35,17 +40,17 @@ Ext.extend(Sonatype.menu.Menu, Ext.menu.Menu, {
     {
       arr = c;
     }
-    if (arr != null)
+    if (arr)
     {
-      for (var i = 0; i < arr.length; i++)
+      for (i = 0; i < arr.length; i=i+1)
       {
         this.add(arr[i]);
       }
       return;
     }
 
-    var item = Sonatype.menu.Menu.superclass.add.call(this, c);
-    var param = c.payload ? c.payload : this.payload;
+    item = Sonatype.menu.Menu.superclass.add.call(this, c);
+    param = c.payload || this.payload;
     if (c.handler && param)
     {
       // create a delegate to pass the payload object to the handler
@@ -54,3 +59,5 @@ Ext.extend(Sonatype.menu.Menu, Ext.menu.Menu, {
     return item;
   }
 });
+});
+

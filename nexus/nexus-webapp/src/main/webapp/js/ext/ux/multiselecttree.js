@@ -40,6 +40,8 @@
  * fixed key events to respect shift/ctrl keys Enjoy
  */
 
+define(['extjs'], function(Ext){
+
 Ext.ux.FixedMultiSelectionModel = Ext.extend(Ext.tree.MultiSelectionModel, {
       // disabled tracking of mouse clicks because it doubles up drag
       // selection...
@@ -348,7 +350,7 @@ Ext.ux.FixedMultiSelectionModel = Ext.extend(Ext.tree.MultiSelectionModel, {
               this.select(s.parentNode, e, e.shiftKey || e.ctrlKey);
             }
             break;
-        };
+        }
       }
 
     });
@@ -798,3 +800,4 @@ Ext.ux.MultiSelectTreePanel = Ext.extend(Ext.tree.TreePanel, {
     });
 
 Ext.reg('multiselecttreepanel', Ext.ux.MultiSelectTreePanel);
+});

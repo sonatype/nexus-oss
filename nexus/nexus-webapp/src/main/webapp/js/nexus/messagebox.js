@@ -11,7 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Ext, Nexus, Sonatype*/
+/*global define*/
+define(['extjs', 'nexus', 'sonatype'], function(Ext, Nexus, Sonatype) {
 // Extend message box, so that we can get ids on the buttons for testing
 Nexus.MessageBox = (function() {
   var O, F = function() {};
@@ -33,4 +34,10 @@ Nexus.MessageBox = (function() {
   return new O();
 }());
 
-Sonatype.MessageBox = Nexus.MessageBox;
+  // legacy
+  Sonatype.MessageBox = Nexus.MessageBox;
+
+  return Nexus.MessageBox;
+});
+
+

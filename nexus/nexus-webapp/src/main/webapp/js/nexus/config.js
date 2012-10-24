@@ -10,8 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext,Sonatype,Nexus*/
-(function() {
+/*global define*/
+define(['extjs', 'nexus/messagebox', 'sonatype'], function(Ext, mbox, Sonatype) {
 
   // ********* Set ExtJS options
   // *************************************************
@@ -27,7 +27,7 @@
   // set Sonatype defaults for Ext widgets
   Ext.form.Field.prototype.msgTarget = 'under';
 
-  Nexus.MessageBox.minWidth = 200;
+  mbox.minWidth = 200;
 
   Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
 
@@ -152,6 +152,24 @@
     repoServer : {}
   };
 
-  Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
+  // FIXME c/p from Sonatype.utils to break circular dependency between config and utils
+  function cloneObj(o) {
+    if (typeof(o) !== 'object' || o === null)
+    {
+      return o;
+    }
 
-}());
+    var i, newObj = {};
+
+    for (i in o)
+    {
+      newObj[i] = cloneObj(o[i]);
+    }
+
+    return newObj;
+  }
+
+  Sonatype.user.curr = cloneObj(Sonatype.user.anon);
+
+  return Sonatype;
+});

@@ -18,6 +18,7 @@
  * the field label.
  */
 
+define(['sonatype/all'], function(){
 (function() {
 
   // Nexus default help text values for re-use in child forms
@@ -241,3 +242,5 @@
   };
 
 })();
+});
+

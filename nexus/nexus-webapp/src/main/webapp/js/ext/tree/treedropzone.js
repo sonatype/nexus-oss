@@ -10,7 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+/*global define*/
+define(['extjs'], function(Ext){
 Ext.override(Ext.tree.TreeDropZone, {
   completeDrop : function(de) {
     var ns = de.dropNode, p = de.point, t = de.target, i, len, n, node, ins = false;
@@ -45,4 +46,5 @@ Ext.override(Ext.tree.TreeDropZone, {
     this.tree.fireEvent("nodedrop", de);
   }
 
+});
 });

@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-/*global Sonatype, Ext */
-(function() {
+/*global define*/
+define(['../extjs', 'nexus/config', 'nexus/util/Format'], function(Ext, Sonatype, format) {
 
   Sonatype.utils = {
     passwordPlaceholder : '|$|N|E|X|U|S|$|',
@@ -66,7 +65,7 @@
       return '';
     },
     returnValidStr : function(str) {
-      if (str != null)
+      if (str)
       {
         return str;
       }
@@ -77,7 +76,7 @@
     },
 
     validateNoSpaces : function(value) {
-      if (value && value.indexOf(' ') != -1)
+      if (value && value.indexOf(' ') !== -1)
       {
         return 'Spaces are not allowed in ID';
       }
@@ -123,14 +122,14 @@
     },
     // deep copy of an object. All references independent from object passed in.
     cloneObj : function(o) {
-      if (typeof(o) != 'object' || o === null)
+      if (typeof(o) !== 'object' || o === null)
       {
         return o;
       }
 
-      var newObj = {};
+      var i, newObj = {};
 
-      for (var i in o)
+      for (i in o)
       {
         newObj[i] = Sonatype.utils.cloneObj(o[i]);
       }
@@ -867,7 +866,7 @@
     },
 
     parseFormattedAppName : function(formattedAppName) {
-      return Nexus.util.Format.htmlDecode(formattedAppName);
+      return format.htmlDecode(formattedAppName);
     },
 
     loadNexusStatus : function(loggedInUserSource, versionOnly) {
@@ -1299,17 +1298,6 @@
 
   };
 
-})();
+  return Sonatype;
+});
 
-Ext.apply(Ext.form.VTypes, {
-      password : function(val, field) {
-        if (field.initialPasswordField != null && field.initialPasswordField != 'undefined')
-        {
-          var pwd = field.ownerCt.find('name', field.initialPasswordField)[0].getValue();
-          return (val == pwd);
-        }
-        return true;
-      },
-
-      passwordText : 'Passwords do not match.'
-    });

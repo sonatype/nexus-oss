@@ -11,9 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Sonatype, Ext, Nexus*/
-(function () {
-
+/*global define*/
+define(['extjs', 'sonatype', 'sonatype/lib', 'nexus/config', 'sonatype/utils', 'sonatype/view', 'nexus/navigation'], function(Ext, Sonatype){
   // Repository main Controller(conglomerate) Singleton
   Sonatype.repoServer.RepoServer = (function() {
     var cfg = Sonatype.config.repos,
@@ -155,7 +154,7 @@
         this.loginWindow = new Ext.Window({
               id : 'login-window',
               title : 'Nexus Log In',
-              animateTarget : 'head-link-r',
+              animateTarget : Ext.get('head-link-r'),
               closable : true,
               closeAction : 'hide',
               onEsc : function() {
@@ -560,4 +559,4 @@
     };
   })();
 
-})();
+});

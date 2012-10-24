@@ -14,6 +14,7 @@
  * View Nexus serer XML configuration file
  */
 
+define(['sonatype/all'], function(){
 Sonatype.repoServer.ConfigViewPanel = function(config) {
   var config = config || {};
   var defaultConfig = {};
@@ -87,3 +88,5 @@ Ext.extend(Sonatype.repoServer.ConfigViewPanel, Ext.form.FormPanel, {
       }
 
     });
+});
+

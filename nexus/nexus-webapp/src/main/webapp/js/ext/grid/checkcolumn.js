@@ -10,8 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
-
+/*global define*/
+define(['extjs'], function(Ext) {
 Ext.grid.CheckColumn = function(config) {
   Ext.apply(this, config);
   if (!this.id)
@@ -47,4 +47,4 @@ Ext.grid.CheckColumn.prototype = {
     return '<div class="x-grid3-check-col' + (v ? '-on' : '') + ' x-grid3-cc-' + this.id + '">&#160;</div>';
   }
 };
-
+});

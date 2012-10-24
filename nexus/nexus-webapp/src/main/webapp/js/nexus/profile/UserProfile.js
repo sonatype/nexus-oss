@@ -11,7 +11,12 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Sonatype, Ext, Nexus*/
+/*global define*/
+
+define('nexus/profile', ['extjs', 'sonatype/view'], function(Ext, Sonatype){
+Ext.namespace('Nexus.profile');
+
+var Nexus = window.Nexus;
 
 /**
  * The user profile tab.
@@ -105,7 +110,7 @@ Nexus.profile.UserProfile = function(cfg) {
         }
       });
       return viewArray;
-    })()
+    }())
   });
 
   this.refreshContent = function() {
@@ -243,4 +248,5 @@ Nexus.profile.register = function(name, panelCls, views) {
   }
 };
 
-
+  return Nexus.profile;
+});

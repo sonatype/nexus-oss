@@ -10,22 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, Sonatype, Nexus*/
+/*global define*/
+define(['extjs', 'sonatype'], function(Ext, Sonatype){
 Ext.namespace('Sonatype.navigation');
 
-Sonatype.navigation.Section = function(config) {
-  var config = config || {};
-  var defaultConfig = {
-    collapsible : true,
-    titleCollapse: true,
-    collapsed : false
-  };
+Sonatype.navigation.Section = function(cfg) {
+  var
+        config = cfg || {},
+        defaultConfig = {
+          collapsible : true,
+          titleCollapse : true,
+          collapsed : false
+        };
 
   if (config.items)
   {
     config.items = this.transformItem(config.items);
   }
-  if (!config.items || config.items.length == 0)
+  if (!config.items || config.items.length === 0)
   {
     config.hidden = true;
   }
@@ -54,15 +56,18 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
       },
 
       transformItem : function(c) {
-        if (!c)
+        if (!c) {
           return null;
+        }
+
+        var i, item, c2;
 
         if (Ext.isArray(c))
         {
-          var c2 = [];
-          for (var i = 0; i < c.length; i++)
+          c2 = [];
+          for (i = 0; i < c.length; i=i+1)
           {
-            var item = this.transformItem(c[i]);
+            item = this.transformItem(c[i]);
             if (item)
             {
               c2.push(item);
@@ -82,7 +87,7 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
               html : '<ul class="group-links"><li><a href="' + c.href + '" target="' + c.href + '"' +
                     (c.style ? ' style="' + c.style + '"' : '') +
                     '>' + c.title + '</a></li></ul>'
-            }
+            };
           }
           else if (c.tabCode || c.handler)
           {
@@ -92,7 +97,7 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
               Sonatype.view.supportedNexusTabs[c.tabId] = true;
             }
             // panel open action
-            return c.enabled == false ? null : {
+            return (!c.enabled) ? null : {
               sortable_title : c.title,
               autoHeight : true,
               id : 'navigation-' + c.tabId,
@@ -113,7 +118,7 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
                           else
                           {
                             Sonatype.view.mainTabPanel.addOrShowTab(c.tabId, c.tabCode, {
-                                  title : c.tabTitle ? c.tabTitle : c.title
+                                  title : c.tabTitle || c.title
                                 });
                           }
                         }, c.scope, {
@@ -124,15 +129,15 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
                 }
               },
               html : '<ul class="group-links"><li><a href="#">' + c.title + '</a></li></ul>'
-            }
+            };
           }
         }
         return c;
       },
 
       add : function(c) {
-        var arr = null;
-        var a = arguments;
+        var
+              i, arr = null, a = arguments;
         if (a.length > 1)
         {
           arr = a;
@@ -141,18 +146,19 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
         {
           arr = c;
         }
-        if (arr != null)
+        if (arr !== null)
         {
-          for (var i = 0; i < arr.length; i++)
+          for (i = 0; i < arr.length; i=i+1)
           {
             this.add(arr[i]);
           }
           return;
         }
 
-        var c = this.transformItem(c);
-        if (c == null)
+        c = this.transformItem(c);
+        if (!c) {
           return;
+        }
 
         if (this.hidden)
         {
@@ -167,11 +173,12 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
             return;
         }
           
-        _fSorter = function(obj1, obj2) {
+        var _fSorter = function(obj1, obj2) {
            var fieldName = "sortable_title";
-           return Sonatype.utils.sortFn(obj1[fieldName], obj2[fieldName])
+           return Sonatype.utils.sortFn(obj1[fieldName], obj2[fieldName]);
         };
         this.items.sort(asOrder || 'ASC', _fSorter);
       }
     });
 
+});

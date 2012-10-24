@@ -14,6 +14,7 @@
  * Role Edit/Create panel layout and controller
  */
 
+define(['sonatype/all'], function(){
 Sonatype.repoServer.RoleEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {
@@ -504,3 +505,6 @@ Sonatype.Events.addListener('roleViewInit', function(cardPanel, rec, gridPanel) 
 
       cardPanel.add(new Sonatype.repoServer.DefaultRoleEditor(config));
     });
+
+});
+

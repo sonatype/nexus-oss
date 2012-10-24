@@ -13,7 +13,8 @@
 /*
  * Target Edit/Create panel layout and controller
  */
-/*global Sonatype,Ext,Nexus*/
+/*global define*/
+define(['extjs', 'nexus'], function(Ext, Nexus) {
 
 Ext.namespace('Nexus.ext');
 
@@ -560,6 +561,12 @@ Ext.extend(Nexus.ext.TwinPanelChooser, Ext.Panel, {
     });
 
 Ext.reg('twinpanelchooser', Nexus.ext.TwinPanelChooser);
+return Nexus;
+});
 
+define('sonatype/ext/twinpanelcontroller', ['sonatype', 'nexus/ext/twinpanelcontroller'], function(Sonatype, Nexus){
 Sonatype.ext.TwinPanelChooser = Nexus.ext.TwinPanelChooser;
 Sonatype.ext.TwinPanelController = Nexus.ext.TwinPanelController;
+return Sonatype;
+});
+

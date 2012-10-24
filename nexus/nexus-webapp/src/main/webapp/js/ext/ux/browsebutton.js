@@ -1,3 +1,4 @@
+define(['extjs'], function(Ext){
 /*
  * Public Domain
  * http://www.sencha.com/forum/showthread.php?29032-Ext.ux.form.BrowseButton
@@ -269,7 +270,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * Returns an offset based on this.BROWSERS_OFFSET 
      * If currently using Ext 3.x, tries to find a value for 3.x and if there is none for 3.x, it
      * returns a value for 2.x
-     * @param {string} the desired offset. Can be one of the following: 'left', 'top', 'width', 'height' 
+     * @param {string} which the desired offset. Can be one of the following: 'left', 'top', 'width', 'height'
      * @param {string} browser the browser for which to return the offset
      * @return {int} the desired offset
      * @author 4Him
@@ -450,7 +451,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
     /**
      * Detaches the input file associated with this BrowseButton so that it can be used for other purposed (e.g. uplaoding).
      * The returned input file has all listeners and tooltips applied to it by this class removed.
-     * @param {Boolean} whether to create a new input file element for this BrowseButton after detaching.
+     * @param {Boolean} noCreate whether to create a new input file element for this BrowseButton after detaching.
      * True will prevent creation.  Defaults to false.
      * @return {Ext.Element} the detached input file element.
      */
@@ -505,3 +506,5 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
 Ext.applyIf(Ext.ux.form.BrowseButton.prototype, Ext.BoxComponent.prototype);
 
 Ext.reg('browsebutton', Ext.ux.form.BrowseButton);
+
+});

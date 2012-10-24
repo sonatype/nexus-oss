@@ -10,3 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
+define('ext/ux',
+      ['extjs', 'ext/ux/groupcombo/groupcombo', 'ext/ux/groupcombo/groupdataview', 'ext/ux/browsebutton',
+        'ext/ux/gridvalidator', 'ext/ux/lovcombo', 'ext/ux/multiselecttree', 'ext/ux/TabCloseMenu'],
+      function(Ext) {
+        Ext.namespace('Ext.ux');
+        return Ext;
+      });

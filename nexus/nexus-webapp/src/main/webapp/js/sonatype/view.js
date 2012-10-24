@@ -10,23 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, Sonatype, Nexus*/
+/*global define*/
+define(['../extjs', 'sonatype/headlinks', 'nexus/log', 'sonatype/utils'], function(Ext, Sonatype, Nexus) {
 Sonatype.view = {
-  FIELD_OFFSET_WITH_SCROLL : (3 + 16 + 3 + 30) * (-1) + '', // (help icon
-  // margin) + (help
-  // icon) + margin +
-  // (scrollbar)
-  FIELD_OFFSET : (3 + 16) * (-1) + '', // extra padding on right of icon not
-  // needed
-  FIELDSET_OFFSET : (3 + 18) * (-1) + '', // (extra room between border and
-  // scrollbar) + (scrollbar)
-  FIELDSET_OFFSET_WITH_SCROLL : (3 + 18 + 3 + 30) * (-1) + '', // (extra room
-  // between
-  // border and
-  // scrollbar) +
-  // (scrollbar) +
-  // margin +
-  // (scrollbar)
+  FIELD_OFFSET_WITH_SCROLL : String((3 + 16 + 3 + 30) * (-1)), // (help icon margin) + (help icon) + margin + (scrollbar)
+  FIELD_OFFSET : String((3 + 16) * (-1)), // extra padding on right of icon not needed
+  FIELDSET_OFFSET : String((3 + 18) * (-1)), // (extra room between border and scrollbar) + (scrollbar)
+  FIELDSET_OFFSET_WITH_SCROLL : String((3 + 18 + 3 + 30) * (-1)), // (extra room between border and scrollbar) + (scrollbar) + margin + (scrollbar)
   HISTORY_DELIMITER : ';',
 
   headLinks : new Sonatype.headLinks(),
@@ -189,69 +179,6 @@ Sonatype.view = {
   // }
 };
 
-/**
- * Very simple plugin for adding a close context menu to tabs.
- *
- * Copied from ExtJS 2.3 examples/tabs/TabCloseMenu.js
- *
- * @constructor
- */
-Ext.ux.TabCloseMenu = function () {
-    var tabs, menu, ctxItem;
-    this.init = function (tp) {
-        tabs = tp;
-        tabs.on('contextmenu', onContextMenu);
-    }
-
-    function onContextMenu(ts, item, e) {
-        // create context menu on first right click
-        if (!menu) {
-            menu = new Ext.menu.Menu([
-                {
-                    id: tabs.id + '-close',
-                    text: 'Close Tab',
-                    handler: function () {
-                        tabs.remove(ctxItem);
-                    }
-                },
-                {
-                    id: tabs.id + '-close-others',
-                    text: 'Close Other Tabs',
-                    handler: function () {
-                        tabs.items.each(function (item) {
-                            if (item.closable && item != ctxItem) {
-                                tabs.remove(item);
-                            }
-                        });
-                    }
-                }
-            ]);
-        }
-        ctxItem = item;
-        var items = menu.items;
-        items.get(tabs.id + '-close').setDisabled(!item.closable);
-
-        // Disable close others options if there are no tabs which can be closed
-        var disableCloseOthers = true;
-        tabs.items.each(function () {
-            if (this != item && this.closable) {
-                disableCloseOthers = false;
-                return false;
-            }
-        });
-        items.get(tabs.id + '-close-others').setDisabled(disableCloseOthers);
-
-        // If there is only one tab, then disable close (close others will also be disabled by ^^^)
-        // FIXME: This is partially faulty since all tabs are closeable but really should disable closable for the last tab
-        var disableClose = false;
-        if (tabs.items.length === 1) {
-            disableClose = true;
-        }
-        items.get(tabs.id + '-close').setDisabled(disableClose);
-
-        menu.showAt(e.getPoint());
-    }
-};
 
 Sonatype.view.MainTabPanel = Ext.extend(Ext.TabPanel, {
       plugins: new Ext.ux.TabCloseMenu(),
@@ -279,6 +206,9 @@ Sonatype.view.MainTabPanel = Ext.extend(Ext.TabPanel, {
 
 Sonatype.Events.addListener('nexusNavigationInit', function(panel) {
       Sonatype.view.viewport.doLayout();
+      Sonatype.utils.updateGlobalTimeout();
     });
 
-Sonatype.utils.updateGlobalTimeout();
+
+  return Sonatype;
+});

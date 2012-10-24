@@ -12,7 +12,9 @@
  */
 // must pass in feedUrl that's local to our domain
 // config: feedUrl required
-/*global Sonatype, Nexus, Ext*/
+/*global define*/
+define(['extjs', 'nexus'], function(Ext, Nexus){
+  Ext.namespace('Nexus.ext');
 Nexus.ext.FeedGrid = function(config) {
   Ext.apply(this, config);
 
@@ -155,3 +157,4 @@ Ext.extend(Nexus.ext.FeedGrid, Ext.grid.GridPanel, {
         return String.format('<div class="topic"><b><a href="{1}" target="_blank">{0}</a></b><span class="author">{2}</span></div>', value, record.data.link, record.data.author);
       }
     });
+  });

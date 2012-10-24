@@ -10,7 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Nexus, Ext, Sonatype*/
+/*global define*/
+
+define(['extjs', 'sonatype', 'nexus', 'nexus/messagebox'], function(Ext, Sonatype, Nexus, mbox) {
 
 Ext.namespace('Nexus.ext');
 
@@ -232,7 +234,7 @@ Ext.extend(Nexus.ext.FormPanel, Ext.FormPanel, {
   actionFailedHandler : function(form, action) {
     if (action.failureType === Ext.form.Action.CLIENT_INVALID)
     {
-      Nexus.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Nexus.MessageBox.WARNING);
+      mbox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(mbox.WARNING);
     }
     else if (action.failureType === Ext.form.Action.CONNECT_FAILURE || action.response)
     {
@@ -240,7 +242,7 @@ Ext.extend(Nexus.ext.FormPanel, Ext.FormPanel, {
     }
     else if (action.failureType === Ext.form.Action.LOAD_FAILURE)
     {
-      Nexus.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Nexus.MessageBox.ERROR);
+      mbox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Nexus.MessageBox.ERROR);
     }
   },
 
@@ -337,4 +339,6 @@ Ext.extend(Nexus.ext.FormPanel, Ext.FormPanel, {
 });
 
 Sonatype.ext.FormPanel = Nexus.ext.FormPanel;
+
+});
 

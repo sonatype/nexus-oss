@@ -10,5 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
-Ext.BLANK_IMAGE_URL = "ext-2.3/resources/images/default/s.gif";
+/*global define*/
+define('nexus/util', ['extjs', 'nexus', 'nexus/util/Format', 'nexus/util/FormFieldUtil', 'nexus/util/observable'], function(Ext, Nexus){
+  return Nexus;
+});

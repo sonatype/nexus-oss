@@ -11,6 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
+define(['sonatype/all'], function(){
 /*global Ext,Sonatype,Nexus*/
 Sonatype.repoServer.LogsViewPanel = function(cfg) {
   var config = cfg || {}, defaultConfig = {};
@@ -576,3 +577,5 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
             });
       }
     });
+});
+

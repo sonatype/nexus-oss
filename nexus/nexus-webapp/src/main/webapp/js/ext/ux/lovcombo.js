@@ -14,7 +14,9 @@
  * License details: http://www.gnu.org/licenses/lgpl.html
  */
  
-/*global Ext */
+/*global define*/
+
+define(['extjs'], function(Ext){
 
 // add RegExp.escape if it has not been already added
 if('function' !== typeof RegExp.escape) {
@@ -281,5 +283,4 @@ Ext.ux.form.LovCombo = Ext.extend(Ext.form.ComboBox, {
  
 // register xtype
 Ext.reg('lovcombo', Ext.ux.form.LovCombo); 
- 
-// eof
+});

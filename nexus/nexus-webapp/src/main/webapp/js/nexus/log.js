@@ -10,11 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-/*global Ext, Nexus, Sonatype, console*/
-
-Ext.namespace('Nexus');
-
+/*global define*/
+define(['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype){
 /**
  * Nexus logging utility.
  *
@@ -75,3 +72,5 @@ Nexus.Log = (function() {
  * @see Nexus.Log.debug
  */
 Nexus.log = Nexus.Log.debug;
+
+});

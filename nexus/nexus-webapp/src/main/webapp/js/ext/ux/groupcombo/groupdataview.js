@@ -1,3 +1,4 @@
+define(['extjs'], function(Ext){
 /**
  * @class Ext.ux.GroupDataView
  * @extends Ext.DataView This class extends a DataView to allow grouping similar
@@ -40,7 +41,7 @@ Ext.ux.GroupDataView = Ext.extend(Ext.DataView, {
           this.all.clear();
           return;
         }
-        this.el.dom.innerHTML = this.doRender(records)
+        this.el.dom.innerHTML = this.doRender(records);
         this.all.fill(Ext.query(this.itemSelector, this.el.dom));
         this.updateIndexes(0);
       },
@@ -149,3 +150,4 @@ Ext.ux.GroupDataView = Ext.extend(Ext.DataView, {
       }
     });
 Ext.reg('uxgroupdataview', Ext.ux.GroupDataView);
+});

@@ -13,6 +13,7 @@
 /*
  * Target Edit/Create panel layout and controller
  */
+define(['sonatype/all'], function(){
 
 Sonatype.repoServer.RepoTargetEditPanel = function(config) {
   var config = config || {};
@@ -878,3 +879,6 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
       }
 
     });
+
+});
+

@@ -10,23 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext,Sonatype,Nexus*/
+/*jslint evil:true*/
+define(['extjs', 'nexus/config'], function(Ext, Sonatype) {
 Ext.namespace('Sonatype.panels');
 
-Sonatype.panels.TreePanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {
-    titleColumn : 'name',
-    nodeIconClass : null,
-    useNodeIconClassParam : null,
-    nodeClass : null,
-    useNodeClassParam : null,
-    nodePathPrepend : '',
-    appendPathToRoot : true,
-    leafClickEvent : null,
-    resetRootNodeText : true,
-    autoExpandRoot : true,
-    appendAttributeToId : null
-  };
+Sonatype.panels.TreePanel = function(cfg) {
+  var
+        config = cfg || {},
+        defaultConfig = {
+          titleColumn : 'name',
+          nodeIconClass : null,
+          useNodeIconClassParam : null,
+          nodeClass : null,
+          useNodeClassParam : null,
+          nodePathPrepend : '',
+          appendPathToRoot : true,
+          leafClickEvent : null,
+          resetRootNodeText : true,
+          autoExpandRoot : true,
+          appendAttributeToId : null
+        },
+        root;
   Ext.apply(this, config, defaultConfig);
 
   this.tbar = [{
@@ -71,7 +76,7 @@ Sonatype.panels.TreePanel = function(config) {
           this.transId = Ext.Ajax.request({
             method : this.requestMethod,
             // Sonatype: nodes contain a relative request path
-            url : this.url + ((this.appendPathToRoot || node.attributes.path != '/') ? (this.nodePathPrepend + node.attributes.path) : ''),
+            url : this.url + ((this.appendPathToRoot || node.attributes.path !== '/') ? (this.nodePathPrepend + node.attributes.path) : ''),
             success : this.handleResponse,
             params : this.baseParams,
             failure : this.handleFailure,
@@ -84,7 +89,7 @@ Sonatype.panels.TreePanel = function(config) {
         }
         else
         {
-          if (typeof callback == "function")
+          if (typeof callback === "function")
           {
             callback();
           }
@@ -99,7 +104,7 @@ Sonatype.panels.TreePanel = function(config) {
         {
           attr.loader = this;
         }
-        if (typeof attr.uiProvider == 'string')
+        if (typeof attr.uiProvider === 'string')
         {
           attr.uiProvider = this.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
         }
@@ -124,17 +129,17 @@ Sonatype.panels.TreePanel = function(config) {
           attr.singleClickExpand = true;
         }
 
-        if (this.nodeIconClass != null)
+        if (!this.nodeIconClass)
         {
-          if (this.useNodeIconClassParam == null || attr[this.useNodeIconClassParam])
+          if (!this.useNodeIconClassParam || attr[this.useNodeIconClassParam])
           {
             attr.iconCls = this.nodeIconClass;
           }
         }
 
-        if (this.nodeClass != null)
+        if (!this.nodeClass)
         {
-          if (this.useNodeClassParam == null || attr[this.useNodeClassParam])
+          if (!this.useNodeClassParam || attr[this.useNodeClassParam])
           {
             attr.cls = this.nodeClass;
           }
@@ -152,10 +157,10 @@ Sonatype.panels.TreePanel = function(config) {
         }
       },
       processResponse : function(response, node, callback) {
-        var json = response.responseText;
+        var i, len, n, o, json = response.responseText;
         try
         {
-          var o = eval("(" + json + ")");
+          o = Ext.decode(json);
           if (o.data)
           {
             o = o.data;
@@ -170,9 +175,9 @@ Sonatype.panels.TreePanel = function(config) {
               node.setText(o.nodeName);
               Ext.apply(node.attributes, o, {});
             }
-            for (var i = 0, len = o.children.length; i < len; i++)
+            for (i = 0, len = o.children.length; i < len; i=i+1)
             {
-              var n = this.createNode(o.children[i]);
+              n = this.createNode(o.children[i]);
               if (n)
               {
                 node.appendChild(n);
@@ -182,7 +187,7 @@ Sonatype.panels.TreePanel = function(config) {
             node.endUpdate();
           }
 
-          if (typeof callback == "function")
+          if (typeof callback === "function")
           {
             callback(this, node);
           }
@@ -205,14 +210,14 @@ Sonatype.panels.TreePanel = function(config) {
     }
   });
 
-  new Ext.tree.TreeSorter(this, {
+  this.sorter = new Ext.tree.TreeSorter(this, {
     folderSort : true
   });
 
   if (!this.getRootNode())
   {
 
-    var root = new Ext.tree.AsyncTreeNode({
+    root = new Ext.tree.AsyncTreeNode({
       text : this.payload ? this.payload.get(this.titleColumn) : '/',
       path : '/',
       singleClickExpand : true,
@@ -225,8 +230,9 @@ Sonatype.panels.TreePanel = function(config) {
 
 Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
   nodeClickHandler : function(node, e) {
-    if (e.target.nodeName == 'A')
+    if (e.target.nodeName === 'A') {
       return; // no menu on links
+    }
 
     if (this.nodeClickEvent)
     {
@@ -239,8 +245,9 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
   },
 
   nodeContextMenuHandler : function(node, e) {
-    if (e.target.nodeName == 'A')
+    if (e.target.nodeName === 'A') {
       return; // no menu on links
+    }
 
     if (this.nodeContextMenuEvent)
     {
@@ -253,8 +260,9 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
       });
 
       Sonatype.Events.fireEvent(this.nodeContextMenuEvent, menu, node);
-      if (!menu.items.first())
+      if (!menu.items.first()) {
         return;
+      }
 
       e.stopEvent();
       menu.showAt(e.getXY());
@@ -274,7 +282,7 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
   },
 
   treeLoadExceptionHandler : function(treeLoader, node, response) {
-    if (response.status == 503)
+    if (response.status === 503)
     {
       if (Sonatype.MessageBox.isVisible())
       {
@@ -282,7 +290,7 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
       }
       node.setText(node.text + ' (Out of Service)');
     }
-    else if (response.status == 404)
+    else if (response.status === 404)
     {
       if (Sonatype.MessageBox.isVisible())
       {
@@ -290,7 +298,7 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
       }
       node.setText(node.text + (node.isRoot ? ' (Not Available)' : ' (Not Found)'));
     }
-    else if (response.status == 401)
+    else if (response.status === 401)
     {
       if (Sonatype.MessageBox.isVisible())
       {
@@ -299,4 +307,5 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
       node.setText(node.text + ' (Access Denied)');
     }
   }
+});
 });

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+define(['sonatype/all'], function(){
 /*
  * User Edit/Create panel layout and controller
  */
@@ -1153,3 +1154,6 @@ Sonatype.Events.addListener('userViewInit', function(cardPanel, rec) {
     }
   });
 })();
+
+});
+

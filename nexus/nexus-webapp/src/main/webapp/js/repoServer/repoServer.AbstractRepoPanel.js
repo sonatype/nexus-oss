@@ -13,6 +13,7 @@
 /*
  * Repository panel superclass
  */
+define(['sonatype/all'], function(){
 
 /*
  * config options: { id: the is of this panel instance [required] title: title
@@ -474,3 +475,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 Sonatype.repoServer.DefaultRepoHandler = new Sonatype.repoServer.AbstractRepoPanel();
 Sonatype.Events.addListener('repositoryMenuInit', Sonatype.repoServer.DefaultRepoHandler.onRepositoryMenuInit, Sonatype.repoServer.DefaultRepoHandler);
 Sonatype.Events.addListener('repositoryContentMenuInit', Sonatype.repoServer.DefaultRepoHandler.onRepositoryContentMenuInit, Sonatype.repoServer.DefaultRepoHandler);
+
+});
+

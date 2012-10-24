@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-(function() {
-
-  window.Sonatype = function() {
+ /*global define*/
+define(['extjs', 'nexus/util/observable'], function(Ext, Nexus) {
+  var Sonatype = (function() {
     return {
       init : function() {
         Ext.QuickTips.init();
@@ -28,24 +28,29 @@
         Ext.get('header').hide();
         Ext.get('welcome-tab').hide();
 
-        Sonatype.state.CookieProvider = new Sonatype.lib.CookieProvider({
+        window.Sonatype.state.CookieProvider = new window.Sonatype.lib.CookieProvider({
           expires : new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 365))
             // expires in 1 year
           });
 
-        var cp = Sonatype.state.CookieProvider;
+        var cp = window.Sonatype.state.CookieProvider;
         var username = cp.get('username', null);
         // Sonatype.utils.clearCookie('JSESSIONID');
 
-        Sonatype.view.init();
+        window.Sonatype.view.init();
 
-        Sonatype.utils.loadNexusStatus();
+        window.Sonatype.utils.loadNexusStatus();
+        window.Sonatype.resources.help = {};
       }
 
     };
-  }();
+  }());
+
+  window.Sonatype = Sonatype;
 
   // Define all second level namespaces
   Ext.namespace('Sonatype.state', 'Sonatype.ext', 'Sonatype.lib', 'Sonatype.utils', 'Sonatype.config', 'Sonatype.user', 'Sonatype.resources', 'Sonatype.repoServer', 'Sonatype.repoServer.resources');
 
-})();
+  Sonatype.Events = new Nexus.util.Observable();
+  return Sonatype;
+});

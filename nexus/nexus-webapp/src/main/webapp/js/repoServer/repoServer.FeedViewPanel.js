@@ -14,6 +14,7 @@
  * config object: { feedUrl ; required title }
  */
 
+define(['sonatype/all'], function(){
 Sonatype.repoServer.FeedViewPanel = function(config) {
   var config = config || {};
   var defaultConfig = {
@@ -181,3 +182,6 @@ Ext.extend(Sonatype.repoServer.FeedViewPanel, Ext.Panel, {
       }
 
     });
+
+});
+

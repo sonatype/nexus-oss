@@ -14,6 +14,7 @@
  * Repository Edit/Create panel layout and controller
  */
 
+define(['sonatype/all'], function(){
 var REPO_REMOTE_STORAGE_REGEXP = /^(?:http|https|ftp):\/\//i;
 
 Sonatype.repoServer.AbstractRepositoryEditor = function(config) {
@@ -1457,3 +1458,6 @@ Sonatype.Events.addListener('repositoryAddMenuInit', function(menu) {
             }]);
       }
     });
+
+});
+
