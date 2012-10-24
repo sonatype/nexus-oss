@@ -27,7 +27,6 @@
   <name>Nexus : Application</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
