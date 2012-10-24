@@ -54,14 +54,12 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>provided</scope>
@@ -76,8 +74,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
       <scope>test</scope>
     </dependency>
 
@@ -109,7 +105,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-webapp</artifactId>
-      <version>${project.version}</version>
       <type>zip</type>
       <classifier>bundle</classifier>
       <scope>test</scope>

@@ -38,20 +38,22 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-digest</artifactId>
         <version>${plexus-digest.version}</version>
-        <scope>compile</scope>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
         <version>${plexus-security.version}</version>
         <scope>provided</scope>
       </dependency>
+
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-core</artifactId>
         <version>${shiro.version}</version>
         <scope>provided</scope>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-system</artifactId>
@@ -71,7 +73,6 @@
         <version>${commons-lang.version}</version>
         <scope>provided</scope>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
 
@@ -177,6 +178,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
@@ -189,7 +191,6 @@
       <version>2.5</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>

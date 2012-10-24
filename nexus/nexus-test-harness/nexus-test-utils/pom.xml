@@ -26,7 +26,6 @@
   <name>Nexus : Test Harness : Test Utils</name>
 
   <dependencies>
-
      <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
@@ -49,12 +48,11 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <scope>compile</scope>
     </dependency>
-    
 
     <!-- We use Wagon to deploy WagonUtil etc -->
     <dependency>
@@ -80,7 +78,6 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
-
   </dependencies>
 
 </project>

@@ -93,11 +93,10 @@
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-web</artifactId>
     </dependency>
-    <!-- This module does depend as "compile", also, plugin depending on this module needs it too -->
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>

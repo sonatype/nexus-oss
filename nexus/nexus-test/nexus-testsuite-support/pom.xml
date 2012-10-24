@@ -58,10 +58,10 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <version>1.9.4</version>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 

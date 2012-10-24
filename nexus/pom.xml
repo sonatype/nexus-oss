@@ -172,7 +172,6 @@
     <jetty.version>8.1.7.v20120910</jetty.version>
     <maven.version>3.0.4</maven.version>
     <micromailer.version>1.5</micromailer.version>
-    <nexus.repository.metadata.version>1.2</nexus.repository.metadata.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <plexus-app-events.version>1.2</plexus-app-events.version>
     <plexus-cli.version>1.2</plexus-cli.version>
@@ -1016,7 +1015,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-api</artifactId>
-        <version>${nexus.repository.metadata.version}</version>
+        <version>1.2</version>
       </dependency>
 
       <!-- INTERNAL -->
@@ -1117,6 +1116,18 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+        <artifactId>nexus-ldap-realm-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+        <artifactId>nexus-ldap-realm-plugin</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>

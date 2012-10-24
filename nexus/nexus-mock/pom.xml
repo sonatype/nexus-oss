@@ -30,12 +30,11 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
-      <scope>compile</scope>
       <exclusions>
         <exclusion>
           <groupId>org.sonatype.sisu</groupId>
