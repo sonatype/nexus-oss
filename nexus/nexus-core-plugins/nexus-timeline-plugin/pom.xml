@@ -94,16 +94,12 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <configuration>
-              <sharedDependencies>
-                <sharedDependencies>org.sonatype.spice:spice-timeline</sharedDependencies>
-                <sharedDependencies>rome:rome</sharedDependencies>
-              </sharedDependencies>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <sharedDependencies>
+            <sharedDependencies>org.sonatype.spice:spice-timeline</sharedDependencies>
+            <sharedDependencies>rome:rome</sharedDependencies>
+          </sharedDependencies>
+        </configuration>
       </plugin>
     </plugins>
   </build>

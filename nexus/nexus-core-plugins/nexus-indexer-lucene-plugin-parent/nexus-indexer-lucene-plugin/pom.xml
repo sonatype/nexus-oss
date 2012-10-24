@@ -168,22 +168,18 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <configuration>
-              <sharedDependencies>
-                <sharedDependencies>org.sonatype.nexus.indexer-lucene:nexus-indexer-lucene-model</sharedDependencies>
-                <sharedDependencies>org.apache.maven.indexer:indexer-artifact</sharedDependencies>
-                <sharedDependencies>org.apache.maven.indexer:indexer-core</sharedDependencies>
-                <sharedDependencies>org.apache.lucene:lucene-core</sharedDependencies>
-                <sharedDependencies>org.apache.lucene:lucene-highlighter</sharedDependencies>
-                <sharedDependencies>org.apache.lucene:lucene-memory</sharedDependencies>
-                <sharedDependencies>org.sonatype.aether:aether-api</sharedDependencies>
-                <sharedDependencies>org.sonatype.aether:aether-util</sharedDependencies>
-              </sharedDependencies>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <sharedDependencies>
+            <sharedDependencies>org.sonatype.nexus.indexer-lucene:nexus-indexer-lucene-model</sharedDependencies>
+            <sharedDependencies>org.apache.maven.indexer:indexer-artifact</sharedDependencies>
+            <sharedDependencies>org.apache.maven.indexer:indexer-core</sharedDependencies>
+            <sharedDependencies>org.apache.lucene:lucene-core</sharedDependencies>
+            <sharedDependencies>org.apache.lucene:lucene-highlighter</sharedDependencies>
+            <sharedDependencies>org.apache.lucene:lucene-memory</sharedDependencies>
+            <sharedDependencies>org.sonatype.aether:aether-api</sharedDependencies>
+            <sharedDependencies>org.sonatype.aether:aether-util</sharedDependencies>
+          </sharedDependencies>
+        </configuration>
       </plugin>
 
       <plugin>
