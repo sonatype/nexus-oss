@@ -269,7 +269,8 @@
                     </artifactItem>
                     <!--
                     Versions here must be kept in sync with nexus3860/* (cargo) tests
-                    The Tomcat distributions referenced are not actually available in central.
+                    The Tomcat distributions referenced are not actually available in central, but are installed into RSO:
+                    https://repository.sonatype.org/content/repositories/third-party/org/apache/tomcat/apache-tomcat/
                     -->
                     <artifactItem>
                       <groupId>org.apache.tomcat</groupId>
