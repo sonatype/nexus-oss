@@ -171,7 +171,6 @@
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>8.1.7.v20120910</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <micromailer.version>1.5</micromailer.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <plexus-app-events.version>1.2</plexus-app-events.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
@@ -471,7 +470,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>${micromailer.version}</version>
+        <version>1.5</version>
         <exclusions>
           <exclusion>
             <groupId>javax.inject</groupId>
