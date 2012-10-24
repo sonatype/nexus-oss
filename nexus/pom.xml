@@ -1460,6 +1460,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.2.2</version>
+          <!--
+          FIXME: Sort out what this is for, and nuke it if is really not needed for anything, if it is then document it here for clarity.
+          -->
           <dependencies>
             <dependency>
               <groupId>org.sonatype.spice</groupId>
