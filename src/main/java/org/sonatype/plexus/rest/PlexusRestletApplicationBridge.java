@@ -232,9 +232,14 @@ public class PlexusRestletApplicationBridge
             // attach all PlexusResources
             if ( isStarted )
             {
-                for ( PlexusResource resource : plexusResources.values() )
-                {
-                    attach( applicationRouter, false, resource );
+                for (Map.Entry<String,PlexusResource> entry : plexusResources.entrySet()) {
+                    try {
+                        PlexusResource resource = entry.getValue();
+                        attach( applicationRouter, false, resource );
+                    }
+                    catch (Exception e) {
+                        getLogger().log(Level.WARNING, "Failed to attach resource: " + entry.getKey(), e);
+                    }
                 }
             }
 
@@ -289,9 +294,14 @@ public class PlexusRestletApplicationBridge
         xstream = doConfigureXstream( xstream );
 
         // then apply all the needed stuff from Resources
-        for ( PlexusResource resource : plexusResources.values() )
-        {
-            resource.configureXStream( xstream );
+        for (Map.Entry<String,PlexusResource> entry : plexusResources.entrySet()) {
+            try {
+                PlexusResource resource = entry.getValue();
+                resource.configureXStream( xstream );
+            }
+            catch (Exception e) {
+                getLogger().log(Level.WARNING, "Failed to configure xstream for resource: " + entry.getKey(), e);
+            }
         }
 
         // and return it
