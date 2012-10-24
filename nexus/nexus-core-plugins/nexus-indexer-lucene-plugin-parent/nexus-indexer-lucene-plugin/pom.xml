@@ -37,7 +37,6 @@
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus.indexer-lucene</groupId>
       <artifactId>nexus-indexer-lucene-model</artifactId>
@@ -166,13 +165,14 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
+
+    <!-- FIXME: This dependency is here only for TestMarshalUnmarchal via TestLuceneRestMarshalUnmarchal -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
