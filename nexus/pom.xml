@@ -946,6 +946,7 @@
         </exclusions>
       </dependency>
 
+      <!-- FIXME: Sort out what this is for... nuke if not needed -->
       <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
       <dependency>
         <groupId>org.objenesis</groupId>
