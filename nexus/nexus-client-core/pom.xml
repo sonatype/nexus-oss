@@ -67,11 +67,9 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <!-- Needed for all Modello generated models (Nexus Core and others) -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.0</version>
     </dependency>
 
     <!-- For XML/JSON marshalling -->
