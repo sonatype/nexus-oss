@@ -866,6 +866,9 @@
         <version>${restlet.version}</version>
       </dependency>
 
+      <!--
+      FIXME: This is pulled in by the restlet bridge, and this configuration should be moved there, nothing else inside of NX uses this.
+      -->
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>org.json</artifactId>
