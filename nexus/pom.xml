@@ -174,10 +174,7 @@
     <micromailer.version>1.5</micromailer.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <plexus-app-events.version>1.2</plexus-app-events.version>
-    <plexus-cli.version>1.2</plexus-cli.version>
-    <plexus-digest.version>1.1</plexus-digest.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
-    <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <sisu-jetty8.version>1.4.1</sisu-jetty8.version>
     <sisu-velocity.version>1.1</sisu-velocity.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
@@ -405,7 +402,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-digest</artifactId>
-        <version>${plexus-digest.version}</version>
+        <version>1.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -420,7 +417,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-cli</artifactId>
-        <version>${plexus-cli.version}</version>
+        <version>1.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -435,7 +432,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
-        <version>${plexus-interpolation.version}</version>
+        <version>1.14</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
