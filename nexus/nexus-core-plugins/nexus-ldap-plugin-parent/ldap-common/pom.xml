@@ -26,9 +26,13 @@
   <name>Nexus : Core Plugins : OSS LDAP : Common</name>
 
   <dependencies>
+    <!--
+    FIXME: If this is promoted to DM in nexus/pom.xml, then tests will start to fail with JCE exceptions.
+    -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk16</artifactId>
+      <version>1.45</version>
     </dependency>
 
     <dependency>
