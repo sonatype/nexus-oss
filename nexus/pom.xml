@@ -157,7 +157,6 @@
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
     <!-- version properties -->
-    <applifecycle.version>1.6</applifecycle.version>
     <sonatype.plugin.version>1.1.0</sonatype.plugin.version>
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
@@ -1553,7 +1552,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>${applifecycle.version}</version>
+          <version>1.6</version>
           <extensions>true</extensions>
           <configuration>
             <pluginName>${nexus.plugin.name}</pluginName>
@@ -1564,7 +1563,7 @@
             <dependency>
               <groupId>org.sonatype.plugins</groupId>
               <artifactId>app-lifecycle-nexus</artifactId>
-              <version>${applifecycle.version}</version>
+              <version>1.6</version>
             </dependency>
           </dependencies>
         </plugin>
