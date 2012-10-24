@@ -24,7 +24,6 @@ import java.util.HashMap;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.junit.Assert;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
@@ -95,9 +94,6 @@ public abstract class AbstractNexusLdapTestCase
     {
         super.setUp();
 
-        // configure the logging
-        SLF4JBridgeHandler.install();
-
         // startup the LDAP server.
         ldapServer = (LdapServer) lookup( LdapServer.ROLE );
 
@@ -116,9 +112,6 @@ public abstract class AbstractNexusLdapTestCase
             ldapServer.stop();
             ldapServer = null;
         }
-
-        // configure the logging
-        SLF4JBridgeHandler.uninstall();
 
         super.tearDown();
     }
