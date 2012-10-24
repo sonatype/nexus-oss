@@ -344,7 +344,11 @@ public class AbstractEnvironmentMojo
         {
             nexusBaseDir = new File( destination, nexusBundleName );
         }
+        getLog().info("Nexus bundle directory: " + nexusBaseDir);
+
         File nexusWorkDir = new File( destination, "nexus-work-dir" );
+        getLog().info("Nexus work directory: " + nexusWorkDir);
+
         project.getProperties().put( PROP_NEXUS_BASE_DIR, getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( nexusWorkDir ) );
 
@@ -503,6 +507,7 @@ public class AbstractEnvironmentMojo
     protected void deleteFromDirectory( final File baseDirectory, final String patternsToDelete )
         throws MojoExecutionException
     {
+        getLog().info("Deleting from: " + baseDirectory + "; pattern: " + patternsToDelete);
         try
         {
             final List<String> filesToDelete =
@@ -951,6 +956,8 @@ public class AbstractEnvironmentMojo
 
         for ( MavenArtifact plugin : nexusPluginsArtifacts )
         {
+            getLog().info("Setting up plugin: " + plugin);
+
             Artifact pluginArtifact = getMavenArtifact( plugin );
 
             File dest;
@@ -1003,7 +1010,7 @@ public class AbstractEnvironmentMojo
     private void copy( File sourceFile, File destinationDir )
         throws MojoExecutionException
     {
-        getLog().debug( "Copying file '" + sourceFile + "'" );
+        getLog().info( "Copying " + sourceFile + " to: " + destinationDir );
 
         try
         {
@@ -1032,6 +1039,7 @@ public class AbstractEnvironmentMojo
     {
         destDirectory.mkdirs();
 
+        getLog().info("Unpacking (" + type + ") " + sourceFile + " to: " + destDirectory);
         UnArchiver unarchiver;
         try
         {
