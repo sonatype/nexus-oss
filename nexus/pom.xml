@@ -177,8 +177,8 @@
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
 
-    <nexus.plugin.name>${project.name}</nexus.plugin.name>
-    <nexus.plugin.description>${project.description}</nexus.plugin.description>
+    <nexus.plugin.name>CHANGEME-PLUGIN-NAME-NOT-CONFIGURED</nexus.plugin.name>
+    <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
   </properties>
 
   <dependencyManagement>
