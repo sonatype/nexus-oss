@@ -878,7 +878,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
             else if ( t instanceof IllegalArgumentException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
             }
             else if ( t instanceof RemoteStorageTransportOverloadedException )
             {
@@ -890,31 +890,31 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
             else if ( t instanceof IllegalRequestException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
             }
             else if ( t instanceof IllegalOperationException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
             }
             else if ( t instanceof UnsupportedStorageOperationException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
             }
             else if ( t instanceof NoSuchRepositoryAccessException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_FORBIDDEN, t ), t );
             }
             else if ( t instanceof NoSuchRepositoryException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof NoSuchResourceStoreException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof ItemNotFoundException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof AccessDeniedException )
             {
@@ -947,6 +947,15 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 handleErrorConstructLogMessage( req, res, t, shouldLogInfoStackTrace );
             }
         }
+    }
+
+    private Status getStatus( final Status status, final Exception e )
+    {
+        if ( e == null || e.getMessage() == null )
+        {
+            return status;
+        }
+        return new Status( status, e.getMessage() );
     }
 
     protected void handleErrorConstructLogMessage( final Request req, final Response res, final Exception t,
