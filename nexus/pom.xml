@@ -171,7 +171,6 @@
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>8.1.7.v20120910</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <plexus-app-events.version>1.2</plexus-app-events.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
     <sisu-jetty8.version>1.4.1</sisu-jetty8.version>
@@ -250,7 +249,7 @@
       <dependency>
         <groupId>org.sonatype.appbooter.plexus-booters</groupId>
         <artifactId>plexus-app-booter</artifactId>
-        <version>${plexus.appbooter.version}</version>
+        <version>2.1.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
