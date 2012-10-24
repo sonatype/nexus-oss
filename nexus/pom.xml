@@ -1457,6 +1457,7 @@
         </plugin>
 
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.2.2</version>
           <dependencies>
