@@ -47,7 +47,6 @@
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
-      <version>${plexus-security.version}</version>
       <scope>test</scope>
     </dependency>
 

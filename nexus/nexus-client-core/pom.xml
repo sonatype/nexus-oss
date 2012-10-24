@@ -34,13 +34,13 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api-model</artifactId>
     </dependency>
+
     <!-- Security Models -->
     <!-- Sadly, littered over Core models, so even if we do not publicize any "security related" client ops -->
     <!-- we still drag this along with Core Models -->
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-model</artifactId>
-      <version>${plexus-security.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.xml.bind</groupId>

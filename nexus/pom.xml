@@ -496,16 +496,19 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
         <version>${plexus-security.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-web</artifactId>
         <version>${plexus-security.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-core</artifactId>
@@ -521,6 +524,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-rest-api</artifactId>
@@ -536,16 +540,25 @@
           </exclusion>
         </exclusions>
       </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.security</groupId>
+        <artifactId>security-rest-model</artifactId>
+        <version>${plexus-security.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-configuration</artifactId>
         <version>${plexus-security.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-url-realm</artifactId>
         <version>${plexus-security.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-web</artifactId>
@@ -557,6 +570,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils-core</artifactId>
@@ -931,15 +945,17 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
       <dependency>
         <groupId>org.objenesis</groupId>
         <artifactId>objenesis</artifactId>
         <version>1.2</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu.pr</groupId>
-        <artifactId>sisu-pr-testutil</artifactId>
+        <artifactId>sisu-problem-reporter</artifactId>
         <version>1.5.2</version>
         <exclusions>
           <exclusion>
@@ -955,6 +971,12 @@
             <artifactId>swizzle-jira</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.sisu.pr</groupId>
+        <artifactId>sisu-pr-testutil</artifactId>
+        <version>1.5.2</version>
       </dependency>
       
       <!-- TODO remove easymock -->

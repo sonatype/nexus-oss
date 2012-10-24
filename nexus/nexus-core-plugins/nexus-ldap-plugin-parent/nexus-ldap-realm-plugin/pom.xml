@@ -42,7 +42,6 @@
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
-        <version>${plexus-security.version}</version>
         <scope>provided</scope>
       </dependency>
 
@@ -56,14 +55,7 @@
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-system</artifactId>
-        <version>${plexus-security.version}</version>
         <scope>provided</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.spice</groupId>
-            <artifactId>plexus-ehcache</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
@@ -99,7 +91,6 @@
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
-      <version>${plexus-security.version}</version>
       <scope>provided</scope>
     </dependency>
 
