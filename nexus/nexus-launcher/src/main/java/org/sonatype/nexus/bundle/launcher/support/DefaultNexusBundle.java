@@ -267,14 +267,7 @@ public class DefaultNexusBundle
     @Override
     protected boolean applicationAlive()
     {
-        try
-        {
-            return RequestUtils.isNexusRESTStarted( getUrl().toExternalForm() );
-        }
-        catch ( IOException ignore )
-        {
-            return false;
-        }
+        return RequestUtils.isNexusRESTStarted( getUrl().toExternalForm() );
     }
 
     @Override
