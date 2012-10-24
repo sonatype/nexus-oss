@@ -14,15 +14,17 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>nexus</artifactId>
     <groupId>org.sonatype.nexus</groupId>
     <version>2.3-SNAPSHOT</version>
   </parent>
+
   <artifactId>nexus-clients</artifactId>
-  <packaging>pom</packaging>
   <name>Nexus : Clients</name>
-  <description />
+  <packaging>pom</packaging>
+
   <modules>
     <module>nexus-rest-client-java</module>
     <module>nexus-restlight-clients</module>
