@@ -996,7 +996,7 @@
         </exclusions>
       </dependency>
 
-      <!-- FIXME: Sort out what this is for... nuke if not needed -->
+      <!-- FIXME: This _should_ be sorted out in litmus already, need to check if we have any straggling deps locally which pull this in however -->
       <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
       <dependency>
         <groupId>org.objenesis</groupId>
@@ -1577,6 +1577,10 @@
           <artifactId>maven-dependency-plugin</artifactId>
           <version>2.5.1</version>
         </plugin>
+
+        <!--
+        FIXME: Can probably use latest version, as the issue which we think this was for ( http://jira.codehaus.org/browse/MINVOKER-102 ) appears to have been fixed in version 1.6
+        -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-invoker-plugin</artifactId>
