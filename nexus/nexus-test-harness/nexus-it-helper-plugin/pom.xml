@@ -24,7 +24,11 @@
   <artifactId>nexus-it-helper-plugin</artifactId>
   <name>Nexus : Test Harness : Helper Plugin</name>
   <packaging>nexus-plugin</packaging>
-  <description>This plugin injects some extra functionalities into nexus that are used when running ITs.</description>
+
+  <properties>
+    <nexus.plugin.name>Nexus Test Helper Plugin</nexus.plugin.name>
+    <nexus.plugin.description>This plugin injects some extra functionality into Nexus that are used when running ITs.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
     <dependency>
