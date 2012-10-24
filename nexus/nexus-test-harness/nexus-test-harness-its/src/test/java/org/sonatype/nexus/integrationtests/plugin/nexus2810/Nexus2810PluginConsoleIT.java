@@ -45,14 +45,16 @@ public class Nexus2810PluginConsoleIT
     public void testListPluginInfos()
         throws Exception
     {
+        String pluginName = "Nexus Plugin Console Plugin";
+
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
         MatcherAssert.assertThat( getPluginsNames( pluginInfos ),
-            hasItems( "Nexus : Core Plugins : Plugin Console", "Nexus Broken Plugin" ) );
+            hasItems( pluginName, "Nexus Broken Plugin" ) );
 
         PluginInfoDTO pluginConsolePlugin =
-            this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console" );
-        assertPropertyValid( "Name", pluginConsolePlugin.getName(), "Nexus : Core Plugins : Plugin Console" );
+            this.getPluginInfoByName( pluginInfos, pluginName );
+        assertPropertyValid( "Name", pluginConsolePlugin.getName(), pluginName );
         assertPropertyValid( "Version", pluginConsolePlugin.getVersion() );
         assertPropertyValid( "Description", pluginConsolePlugin.getDescription(), "Adds a UI to view installed plugins." );
         assertPropertyValid( "Status", pluginConsolePlugin.getStatus(), "ACTIVATED" );
