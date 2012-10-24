@@ -174,7 +174,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
-      <version>${nexus.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
@@ -182,7 +181,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
-      <version>${nexus.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
