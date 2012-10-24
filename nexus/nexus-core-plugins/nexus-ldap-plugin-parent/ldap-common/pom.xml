@@ -24,14 +24,11 @@
 
   <artifactId>ldap-common</artifactId>
   <name>Nexus : Core Plugins : OSS LDAP : Common</name>
-  <description />
-
 
   <dependencies>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk16</artifactId>
-      <version>1.45</version>
     </dependency>
 
     <dependency>
@@ -43,6 +40,7 @@
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-core</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
@@ -72,6 +70,7 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
+
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
@@ -99,22 +98,7 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-ldap-testsuite</artifactId>
-      <version>${plexus-ldap-testsuite.version}</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>junit</artifactId>
-          <groupId>junit</groupId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 
