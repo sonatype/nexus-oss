@@ -17,13 +17,13 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
 public class DownloadIndexesTaskTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     protected NexusScheduler nexusScheduler;
 

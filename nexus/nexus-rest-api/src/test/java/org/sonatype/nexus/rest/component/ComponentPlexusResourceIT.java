@@ -19,14 +19,14 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 // This is an IT just because it runs longer then 15 seconds
 public class ComponentPlexusResourceIT
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private AbstractComponentListPlexusResource getComponentPlexusResource()
         throws Exception

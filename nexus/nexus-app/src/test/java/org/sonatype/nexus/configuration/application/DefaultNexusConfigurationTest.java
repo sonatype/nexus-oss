@@ -22,7 +22,7 @@ import java.util.Map;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.email.NexusEmailer;
@@ -30,7 +30,7 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.security.SecuritySystem;
 
 public class DefaultNexusConfigurationTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     protected DefaultNexusConfiguration nexusConfiguration;
 

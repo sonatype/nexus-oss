@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.security.AbstractNexusTestCase;
+import org.sonatype.nexus.security.NexusSecurityTestSupport;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -39,7 +39,7 @@ import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
 public class DefaultTaskConfigManagerTest
-    extends AbstractNexusTestCase
+    extends NexusSecurityTestSupport
 {
     private DefaultScheduler defaultScheduler;
 

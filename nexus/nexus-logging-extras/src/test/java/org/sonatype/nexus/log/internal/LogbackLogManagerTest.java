@@ -23,11 +23,10 @@ import java.util.Set;
 
 import org.codehaus.plexus.context.Context;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.log.DefaultLogConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogManager;
-import org.sonatype.nexus.log.internal.LogbackLogManager;
 
 /**
  * @author juven
@@ -35,7 +34,7 @@ import org.sonatype.nexus.log.internal.LogbackLogManager;
  */
 @SuppressWarnings( "unused" )
 public class LogbackLogManagerTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private LogManager manager;
 

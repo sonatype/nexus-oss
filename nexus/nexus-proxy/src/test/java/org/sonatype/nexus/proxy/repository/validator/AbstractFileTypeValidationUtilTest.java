@@ -19,7 +19,7 @@ import org.junit.Assert;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.proxy.AbstractNexusTestCase;
+import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenFileTypeValidator;
@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
  * specific tests.
  */
 public abstract class AbstractFileTypeValidationUtilTest
-    extends AbstractNexusTestCase
+    extends NexusProxyTestSupport
 {
     /**
      * Override this method if your test files are located elsewhere.

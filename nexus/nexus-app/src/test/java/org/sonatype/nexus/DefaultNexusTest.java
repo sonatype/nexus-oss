@@ -21,20 +21,16 @@ import static org.mockito.Matchers.endsWith;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Matchers.startsWith;
-import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.contains;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.io.File;
 import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -59,7 +55,7 @@ import org.sonatype.security.SecuritySystem;
 
 @RunWith( MockitoJUnitRunner.class )
 public class DefaultNexusTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
 
     private DefaultNexus injectedDefaultNexus;

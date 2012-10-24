@@ -25,7 +25,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.security.AbstractNexusTestCase;
+import org.sonatype.nexus.security.NexusSecurityTestSupport;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
@@ -35,7 +35,7 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate;
  * @author cstamas
  */
 public class Nexus4807Test
-    extends AbstractNexusTestCase
+    extends NexusSecurityTestSupport
 {
     @Test
     public void testDisposeInvoked()

@@ -17,11 +17,12 @@ import java.util.Map;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
+import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
-public abstract class AbstractNexusTestCase
-    extends org.sonatype.nexus.proxy.AbstractNexusTestCase
+public abstract class NexusAppTestSupport
+    extends NexusProxyTestSupport
 {
 
     private NexusScheduler nexusScheduler;

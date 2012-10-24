@@ -27,7 +27,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven1ProxyRepositoryTemplate;
 
 public class GroupUpdateTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     Nexus nexus;
     RepositoryRegistry repoRegistry;

@@ -17,7 +17,7 @@ import org.sonatype.security.guice.SecurityModule;
 import com.google.inject.Module;
 import org.sonatype.nexus.test.NexusTestSupport;
 
-public abstract class AbstractNexusTestCase
+public abstract class NexusSecurityTestSupport
     extends NexusTestSupport
 {
     @Override

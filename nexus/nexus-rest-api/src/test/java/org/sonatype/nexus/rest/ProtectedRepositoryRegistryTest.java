@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -45,7 +45,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
 public class ProtectedRepositoryRegistryTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
 
     private RepositoryRegistry repositoryRegistry = null;

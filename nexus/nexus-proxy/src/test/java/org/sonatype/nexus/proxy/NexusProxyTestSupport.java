@@ -16,9 +16,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 
 import org.codehaus.plexus.context.Context;
+import org.sonatype.nexus.security.NexusSecurityTestSupport;
 
-public abstract class AbstractNexusTestCase
-    extends org.sonatype.nexus.security.AbstractNexusTestCase
+public abstract class NexusProxyTestSupport
+    extends NexusSecurityTestSupport
 {
 
     public static final String PROXY_SERVER_PORT = "proxy.server.port";
