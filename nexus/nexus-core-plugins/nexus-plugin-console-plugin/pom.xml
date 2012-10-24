@@ -32,15 +32,12 @@
   </properties>
 
   <dependencies>
-    <!-- Because this is a nexus-plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Because we extend current "ugly" REST API -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
@@ -53,7 +50,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- We use oldie plexus annos, so we have to declare it explicitly -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
@@ -65,7 +61,6 @@
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -96,7 +91,6 @@
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
-
     </plugins>
   </build>
 

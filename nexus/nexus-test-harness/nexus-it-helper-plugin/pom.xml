@@ -71,10 +71,10 @@
         <artifactId>app-lifecycle-maven-plugin</artifactId>
         <extensions>true</extensions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
         <configuration>
           <excludes>
             <exclude>org/sonatype/nexus/rt/**</exclude>

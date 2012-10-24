@@ -110,10 +110,8 @@
         </dependencies>
       </plugin>
       <plugin>
-        <!-- TODO remove when upgrade generator is merged into modello -->
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>modello-plugin-upgrade</artifactId>
-        <version>1.0</version>
         <executions>
           <execution>
             <goals>
