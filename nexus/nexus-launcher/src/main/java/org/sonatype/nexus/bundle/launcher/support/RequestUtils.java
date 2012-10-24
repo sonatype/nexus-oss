@@ -12,24 +12,22 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.SimpleHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthPolicy;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import java.io.IOException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.base.Preconditions;
 
 /**
  * TODO
@@ -41,171 +39,48 @@ public class RequestUtils
 
     private static final Logger LOG = LoggerFactory.getLogger( RequestUtils.class );
 
-    /**
-     * Execute HttpMethod with default Nexus admin credentials
-     *
-     * @param method
-     * @return
-     * @throws HttpException
-     * @throws IOException
-     */
-    public static HttpMethod executeHTTPClientMethodAsAdmin( final HttpMethod method )
-        throws HttpException, IOException
-    {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
-        httpClient.getHttpConnectionManager().getParams().setSoTimeout( 5000 );
-
-        httpClient.getState().setCredentials( AuthScope.ANY,
-                                              new UsernamePasswordCredentials( "admin", "admin123" ) );
-        List<String> authPrefs = new ArrayList<String>( 1 );
-        authPrefs.add( AuthPolicy.BASIC );
-        httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
-        httpClient.getParams().setAuthenticationPreemptive( true );
-
-        try
-        {
-            httpClient.executeMethod( method );
-            method.getResponseBodyAsString(); // forced consumption of response I guess
-            return method;
-        }
-        finally
-        {
-            method.releaseConnection();
-
-            // force socket cleanup
-            HttpConnectionManager mgr = httpClient.getHttpConnectionManager();
-
-            if ( mgr instanceof SimpleHttpConnectionManager )
-            {
-                ( (SimpleHttpConnectionManager) mgr ).shutdown();
-
-            }
-        }
-    }
-
     public static boolean isNexusRESTStarted( final String nexusBaseURI )
-        throws IOException, HttpException
     {
-        Preconditions.checkNotNull( nexusBaseURI );
-        final String serviceStatusURI = nexusBaseURI.endsWith( "/" )
+        final String serviceStatusURI = checkNotNull( nexusBaseURI ).endsWith( "/" )
             ? nexusBaseURI + "service/local/status"
             : nexusBaseURI + "/service/local/status";
-        org.apache.commons.httpclient.HttpMethod method = null;
+
+        final HttpParams params = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout( params, 2000 );
+        HttpConnectionParams.setSoTimeout( params, 2000 );
+
+        final DefaultHttpClient client = new DefaultHttpClient( params );
+        client.getCredentialsProvider().setCredentials(
+            AuthScope.ANY,
+            new UsernamePasswordCredentials( "admin", "admin123" )
+        );
+        final HttpGet request = new HttpGet( serviceStatusURI );
         try
         {
-            method = new GetMethod( serviceStatusURI );
-            // only try once makes sense by default
-            DefaultHttpMethodRetryHandler oneRetry = new DefaultHttpMethodRetryHandler( 1, true );
-            method.getParams().setParameter( HttpMethodParams.RETRY_HANDLER, oneRetry );
-
-            method = executeHTTPClientMethodAsAdmin( method );
-            final int statusCode = method.getStatusCode();
+            final HttpResponse response = client.execute( request );
+            final int statusCode = response.getStatusLine().getStatusCode();
             if ( statusCode != 200 )
             {
-                LOG.debug( "Status check returned status " + statusCode );
+                LOG.debug( "Nexus Status Check: Returned status: " + statusCode );
                 return false;
             }
-
-            final String entityText = method.getResponseBodyAsString();
-            if ( entityText == null || !entityText.contains( "<state>STARTED</state>" ) )
+            final String responseAsString = new BasicResponseHandler().handleResponse( response );
+            if ( responseAsString == null || !responseAsString.contains( "<state>STARTED</state>" ) )
             {
-                LOG.debug( "Status check returned invalid system state. Status: " + entityText );
+                LOG.debug( "Nexus Status Check: Invalid system state. Status: " + responseAsString );
                 return false;
             }
-
-            return true;
+        }
+        catch ( IOException e )
+        {
+            LOG.debug( "Nexus Status Check: Failed with: " + e.getMessage() );
+            return false;
         }
         finally
         {
-            if ( method != null )
-            {
-                method.releaseConnection(); // request facade does this but just making sure
-            }
+            HttpClientUtils.closeQuietly( client );
         }
+        return true;
     }
 
-    public static boolean waitForNexusToStart( final String nexusBaseURI )
-    {
-        return waitFor( new Condition()
-        {
-            @Override
-            public boolean isTrue()
-            {
-                try
-                {
-                    return isNexusRESTStarted( nexusBaseURI );
-                }
-                catch ( IOException ex )
-                {
-                    LOG.trace( "Problem testing REST start", ex );
-                    return false;
-                }
-            }
-        }, 30000, 700 ); // 30 seconds
-    }
-
-    /**
-     * Used by {@link #waitFor(RequestUtils.Condition, int, int) } as a Condition to wait for
-     */
-    public abstract static class Condition
-    {
-
-        public abstract boolean isTrue();
-    }
-
-    public static boolean waitFor( final Condition condition, final int pollTimeoutMs, final int pollIntervalMs )
-    {
-        Preconditions.checkNotNull( condition );
-
-        if ( !( pollTimeoutMs >= pollIntervalMs ) )
-        {
-            throw new IllegalArgumentException(
-                "Poll timeout should be greater than or equal to the interval at which to poll" );
-        }
-
-        boolean completed = false;
-        int count = 0;
-        final int attempts = (int) pollTimeoutMs / pollIntervalMs;
-        LOG.info( "Waiting - checking every {}ms, for up to approx. {}ms", pollIntervalMs, pollTimeoutMs );
-        try
-        {
-            while ( count < attempts )
-            {
-                count++;
-
-                completed = condition.isTrue();
-                if ( completed )
-                {
-                    break;
-                }
-
-                sleep( pollIntervalMs );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new RuntimeException( e );
-        }
-        LOG.info( "Wait - condition:{} , checked {} times, took approx. {}ms",
-                  new Object[]{ completed, count, pollIntervalMs * count } );
-        return completed;
-    }
-
-    /**
-     * Sleep the current thread for the specified milliseconds.
-     *
-     * @param millis the amount of milliseconds to sleep
-     */
-    public static void sleep( final long millis )
-    {
-        try
-        {
-            Thread.sleep( millis );
-        }
-        catch ( InterruptedException e )
-        {
-            System.err.println( "Sleep of " + millis + "ms interrupted" );
-        }
-    }
 }
