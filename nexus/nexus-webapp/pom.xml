@@ -167,15 +167,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-groovy-console-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>httpunit</groupId>
       <artifactId>httpunit</artifactId>
       <version>1.6.2</version>
@@ -251,14 +242,6 @@
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-groovy-console-plugin</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                  <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
