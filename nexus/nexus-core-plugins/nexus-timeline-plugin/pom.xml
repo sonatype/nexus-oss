@@ -27,10 +27,6 @@
   <name>Nexus : Core Plugins : Timeline</name>
   <description>Adds timeline and feeds based on it.</description>
 
-  <properties>
-    <truezip.version>7.0-rc1</truezip.version>
-  </properties>
-
   <dependencies>
 
     <dependency>
@@ -62,6 +58,7 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
+      <version>0.9</version>
     </dependency>
 
     <!-- Stuff already in core -->
@@ -85,6 +82,8 @@
       <artifactId>sisu-inject-plexus</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <!-- Tests -->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -109,7 +108,6 @@
 
   <build>
     <plugins>
-      <!-- We must exclude indexer-core from bundling as classpath dependency, since we are shading it to make it shared -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
@@ -118,7 +116,6 @@
             <id>default-generate-metadata</id>
             <configuration>
               <sharedDependencies>
-                <sharedDependencies>org.sonatype.spice:spice-timeline</sharedDependencies>
                 <sharedDependencies>rome:rome</sharedDependencies>
               </sharedDependencies>
             </configuration>
