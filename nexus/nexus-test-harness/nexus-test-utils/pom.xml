@@ -26,7 +26,7 @@
   <name>Nexus : Test Harness : Test Utils</name>
 
   <dependencies>
-     <dependency>
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <exclusions>
@@ -37,10 +37,12 @@
       </exclusions>
     </dependency>
 
+    <!--
+    FIXME: Should not depend on a plugin here... !!!!!!  This is needed for TasksNexusRestClient via XStreamFactory.
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
