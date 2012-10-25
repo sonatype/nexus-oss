@@ -319,13 +319,7 @@ public class Hc4ProviderImpl
     @Override
     public DefaultHttpClient createHttpClient( final RemoteStorageContext context )
     {
-        final DefaultHttpClient httpClient = createHttpClient( context, sharedConnectionManager );
-        // obey the given retries count and apply it to client.
-        final int retries =
-            context.getRemoteConnectionSettings() != null ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
-                : 0;
-        httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( retries, false ) );
-        return httpClient;
+        return createHttpClient( context, sharedConnectionManager );
     }
 
     // ==
@@ -357,6 +351,11 @@ public class Hc4ProviderImpl
             new DefaultHttpClientImpl( clientConnectionManager, createHttpParams( context ) );
         configureAuthentication( httpClient, context.getRemoteAuthenticationSettings(), null );
         configureProxy( httpClient, context.getRemoteProxySettings() );
+        // obey the given retries count and apply it to client.
+        final int retries =
+            context.getRemoteConnectionSettings() != null ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
+                : 0;
+        httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( retries, false ) );
         return httpClient;
     }
 
