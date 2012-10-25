@@ -390,12 +390,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>classworlds-configuration-io</artifactId>
-        <version>1.0</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-task-scheduler</artifactId>
         <version>1.7</version>

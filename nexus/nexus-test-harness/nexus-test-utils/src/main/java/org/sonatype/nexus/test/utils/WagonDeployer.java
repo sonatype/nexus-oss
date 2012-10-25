@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import java.io.File;
-import java.util.Arrays;
-
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -24,21 +20,12 @@ import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.repository.Repository;
-import org.codehaus.classworlds.ClassWorld;
-import org.codehaus.classworlds.Launcher;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.Commandline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.plexus.classworlds.io.ClassworldsConfWriter;
-import org.sonatype.plexus.classworlds.io.ClassworldsIOException;
-import org.sonatype.plexus.classworlds.model.ClassworldsAppConfiguration;
-import org.sonatype.plexus.classworlds.model.ClassworldsRealmConfiguration;
-import org.sonatype.plexus.classworlds.validator.ClassworldsModelValidator;
-import org.sonatype.plexus.classworlds.validator.ClassworldsValidationResult;
+
+import java.io.File;
 
 /**
  * Due to a <a href='http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4941958'>bug</a> ( i wouldn't call this a
@@ -132,188 +119,6 @@ public class WagonDeployer
 
     }
 
-    public void forkDeploy( PlexusContainer container )
-        throws InterruptedException, CommandLineException, ConnectionException, ComponentLookupException,
-        TransferFailedException, AuthorizationException, ResourceDoesNotExistException, AuthenticationException
-    {
-
-        if ( true )
-        {
-            // warn people that this does not work. I would like to make something like this work later... but for now.
-            // I need to move on...
-            throw new NotImplementedException(
-                "This method does not work due to some classworlds problem, most likely its my fault." );
-        }
-
-        String classPath = System.getProperty( "java.class.path" );
-        String sureFireClassPath = null;
-        File classworldsConf = null;
-        if ( System.getProperty( "surefire.test.class.path" ) != null )
-        {
-            sureFireClassPath = System.getProperty( "surefire.test.class.path" );
-            classworldsConf = this.writeClassworlds( sureFireClassPath );
-        }
-        else
-        {
-            classworldsConf = this.writeClassworlds( classPath );
-        }
-
-        Commandline cli = new Commandline();
-
-        cli.setExecutable( "java" );
-        cli.createArg().setLine( "-cp" );
-        cli.createArg().setLine( classPath );
-        cli.createArg().setLine( "-Dclassworlds.conf=\'" + classworldsConf.getAbsolutePath() + "\'" );
-        cli.createArg().setLine( Launcher.class.getName() );
-
-        cli.createArg().setLine( protocol );
-        cli.createArg().setLine( username );
-        cli.createArg().setLine( password );
-        cli.createArg().setLine( repositoryUrl );
-        cli.createArg().setLine( fileToDeploy.getAbsolutePath() );
-        cli.createArg().setLine( artifactPath );
-
-        this.executeCli( cli );
-
-    }
-
-    private void executeCli( Commandline cli )
-        throws CommandLineException, ConnectionException, ComponentLookupException, TransferFailedException,
-        AuthorizationException, ResourceDoesNotExistException, AuthenticationException, InterruptedException
-    {
-
-        CommandLineRunner runner = new CommandLineRunner();
-
-        int status = runner.executeAndWait( cli );
-        String consoleOutput = runner.getConsoleOutput();
-        if ( status != 0 )
-        {
-            switch ( status )
-            {
-                case 1:
-                    throw new CommandLineException(
-                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
-                    );
-                case 2:
-                    throw new ConnectionException(
-                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
-                    );
-                case 3:
-                    throw new AuthenticationException(
-                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
-                    );
-                case 4:
-                    throw new TransferFailedException(
-                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
-                    );
-                case 5:
-                    throw new ResourceDoesNotExistException(
-                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
-                    );
-                case 6:
-                    throw new AuthorizationException(
-                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
-                    );
-                case 7:
-                    throw new ComponentLookupException(
-                        "Process exit status was: " + status + "Process output:\n" + consoleOutput, Wagon.ROLE, protocol
-                    );
-                default:
-                    break;
-            }
-        }
-
-    }
-
-    private File writeClassworlds( String rawClassPath )
-    {
-        ClassworldsRealmConfiguration rootRealmConfig = new ClassworldsRealmConfiguration( "wagon" );
-
-        rootRealmConfig.addLoadPatterns( Arrays.asList( rawClassPath.split( File.pathSeparator ) ) );
-
-        ClassworldsAppConfiguration config = new ClassworldsAppConfiguration();
-
-        config.setMainClass( WagonDeployer.class.toString() );
-        config.addRealmConfiguration( rootRealmConfig );
-        config.setMainRealm( rootRealmConfig.getRealmId() );
-
-        ClassworldsValidationResult vr = new ClassworldsModelValidator().validate( config );
-        if ( vr.hasErrors() )
-        {
-            throw new RuntimeException( vr.render() );
-        }
-
-        File classWorldsConfig = new File( "target/wagonDeploy/", "classworlds.conf" );
-        classWorldsConfig.getParentFile().mkdirs();
-        try
-        {
-            new ClassworldsConfWriter().write( classWorldsConfig, config );
-        }
-        catch ( ClassworldsIOException e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
-        return classWorldsConfig;
-    }
-
-    public static void main( String[] args, ClassWorld world )
-    {
-        main( args );
-    }
-
-    public static void main( String[] args )
-    {
-        LOG.debug( "sweet!" );
-
-        if ( args == null || args.length != 6 )
-        {
-            LOG.debug(
-                "Usage: java " + WagonDeployer.class.getName()
-                    + " <protocol> <username> <password> <repositoryUrl> <fileToDeploy> <artifactPath>"
-            );
-            System.exit( 1 );
-        }
-
-        // try
-        // {
-        try
-        {
-            new WagonDeployer(
-                null, args[0], args[1], args[2], args[3], new File( args[4] ), args[5], new TestContext()
-            ).deploy();
-        }
-        catch ( ConnectionException e )
-        {
-            e.printStackTrace();
-            System.exit( 2 );
-        }
-        catch ( AuthenticationException e )
-        {
-            e.printStackTrace();
-            System.exit( 3 );
-        }
-        catch ( TransferFailedException e )
-        {
-            e.printStackTrace();
-            System.exit( 4 );
-        }
-        catch ( ResourceDoesNotExistException e )
-        {
-            e.printStackTrace();
-            System.exit( 5 );
-        }
-        catch ( AuthorizationException e )
-        {
-            e.printStackTrace();
-            System.exit( 6 );
-        }
-        catch ( ComponentLookupException e )
-        {
-            e.printStackTrace();
-            System.exit( 7 );
-        }
-    }
-
     public AuthenticationInfo getWagonAuthenticationInfo()
     {
         AuthenticationInfo authInfo = null;
@@ -329,9 +134,6 @@ public class WagonDeployer
 
     public static interface Factory
     {
-
         Wagon get( String protocol );
-
     }
-
 }
