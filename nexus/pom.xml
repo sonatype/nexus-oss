@@ -1819,55 +1819,34 @@
     <profile>
       <id>enunciate</id>
       <activation>
-        <!-- A plugin is "enunciated" when enunciate.xml config file is present -->
         <file>
           <exists>enunciate.xml</exists>
         </file>
       </activation>
-      <properties>
-        <enunciate.plugin.version>1.20-SONATYPE-r919</enunciate.plugin.version>
-      </properties>
       <dependencies>
-        <!-- Dependencies needed to annotate classes -->
+        <!--
+        FIXME: This is really horrible to have a profile enable dependencies like this which are actually required for compilation.
+        FIXME: If normal JAX-RS annotations are added to methods, with adapters to restlet crud, then this is not needed at all.
+        -->
         <dependency>
           <groupId>org.codehaus.enunciate</groupId>
           <artifactId>enunciate-core</artifactId>
-          <scope>provided</scope>
-          <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
-          <!-- But nothing is using that annotation after build happened, and doco is generated -->
-        </dependency>
-        <dependency>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils-core</artifactId>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.codehaus.jackson</groupId>
-          <artifactId>jackson-xc</artifactId>
-          <version>1.9.10</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.ws.rs</groupId>
-          <artifactId>jsr311-api</artifactId>
-          <version>1.1.1</version>
-          <scope>provided</scope>
-        </dependency>
-        <!-- this dependency contains an annotation mentioned in com.google.common... package-infos. enunciate will report an error if it is missing. -->
-        <dependency>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-          <version>1.3.9</version>
           <scope>provided</scope>
         </dependency>
       </dependencies>
       <build>
         <plugins>
-          <!-- Enunciate plugin (RT deps are above, plugin execution deps are below as plugin deps) -->
           <plugin>
             <groupId>org.codehaus.enunciate</groupId>
             <artifactId>maven-enunciate-plugin</artifactId>
-            <version>${enunciate.plugin.version}</version>
+            <version>1.20-SONATYPE-r919</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>enunciate-docs</artifactId>
+                <version>${enunciate.version}</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <phase>process-classes</phase>
@@ -1875,28 +1854,11 @@
                   <goal>docs</goal>
                 </goals>
                 <configuration>
-                  <!-- the directory where to put the docs -->
                   <docsDir>${project.build.outputDirectory}/docs</docsDir>
+                  <configFile>enunciate.xml</configFile>
                 </configuration>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.codehaus.enunciate</groupId>
-                <artifactId>enunciate-docs</artifactId>
-                <version>${enunciate.version}</version>
-              </dependency>
-              <!-- Skin disabled, until we come up with a proper skin -->
-              <!--dependency> <groupId>org.sonatype.templates</groupId> <artifactId>enunciate-doc-template</artifactId><version>1.0</version> </dependency -->
-            </dependencies>
-            <configuration>
-              <configFile>enunciate.xml</configFile>
-            </configuration>
-          </plugin>
-
-          <plugin>
-            <groupId>com.mycila.maven-license-plugin</groupId>
-            <artifactId>maven-license-plugin</artifactId>
           </plugin>
         </plugins>
       </build>
