@@ -1804,7 +1804,6 @@
   <modules>
     <module>nexus-bootstrap</module>
     <module>nexus-plugins</module>
-    <module>nexus-mock</module>
     <module>nexus-utils</module>
     <module>nexus-web-utils</module>
     <module>nexus-logging-extras</module>
