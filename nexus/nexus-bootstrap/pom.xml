@@ -39,8 +39,8 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-jetty8</artifactId>
-    </dependency
-      >
+    </dependency>
+
     <dependency>
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
