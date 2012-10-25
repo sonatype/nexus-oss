@@ -23,6 +23,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
@@ -68,6 +69,8 @@ public class HttpClientManagerImpl
         Preconditions.checkNotNull( proxyRepository );
         Preconditions.checkNotNull( ctx );
         final DefaultHttpClient httpClient = (DefaultHttpClient) hc4Provider.createHttpClient( ctx );
+        // RRS/Proxy repositories handle retries manually, so kill the retry handler set by Hc4Provider
+        httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( 0, false ) );
         configure( proxyRepository, ctx, httpClient );
         return httpClient;
     }

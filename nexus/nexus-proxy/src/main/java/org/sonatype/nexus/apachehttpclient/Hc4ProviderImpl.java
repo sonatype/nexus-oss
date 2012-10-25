@@ -42,6 +42,7 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -162,6 +163,7 @@ public class Hc4ProviderImpl
      * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}.
      * @param userAgentBuilder UA builder component.
      * @param multicaster the event multicaster
+     * @param jmxInstaller installer to expose pool information over JMX.
      */
     @Inject
     public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
@@ -178,14 +180,14 @@ public class Hc4ProviderImpl
         this.applicationEventMulticaster.addEventListener( this );
         this.jmxInstaller.register( sharedConnectionManager );
         getLogger().info( "{} started up (keep-alive {} millis), listening for shutdown.", getClass().getSimpleName(),
-                          getConnectionPoolKeepalive() );
+            getConnectionPoolKeepalive() );
     }
 
     // configuration
 
     /**
      * Returns the pool max size.
-     *
+     * 
      * @return pool max size
      */
     protected int getConnectionPoolMaxSize()
@@ -195,7 +197,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool size per route.
-     *
+     * 
      * @return pool per route size
      */
     protected int getConnectionPoolSize()
@@ -205,7 +207,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the keep alive (idle open) time in milliseconds.
-     *
+     * 
      * @return keep alive in milliseconds.
      */
     protected long getConnectionPoolKeepalive()
@@ -215,7 +217,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool timeout in milliseconds.
-     *
+     * 
      * @return pool timeout in milliseconds.
      */
     protected long getConnectionPoolTimeout()
@@ -317,7 +319,13 @@ public class Hc4ProviderImpl
     @Override
     public DefaultHttpClient createHttpClient( final RemoteStorageContext context )
     {
-        return createHttpClient( context, sharedConnectionManager );
+        final DefaultHttpClient httpClient = createHttpClient( context, sharedConnectionManager );
+        // obey the given retries count and apply it to client.
+        final int retries =
+            context.getRemoteConnectionSettings() != null ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
+                : 0;
+        httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( retries, false ) );
+        return httpClient;
     }
 
     // ==
@@ -345,7 +353,8 @@ public class Hc4ProviderImpl
     protected DefaultHttpClient createHttpClient( final RemoteStorageContext context,
                                                   final ClientConnectionManager clientConnectionManager )
     {
-        final DefaultHttpClient httpClient = new DefaultHttpClientImpl( clientConnectionManager, createHttpParams( context ) );
+        final DefaultHttpClient httpClient =
+            new DefaultHttpClientImpl( clientConnectionManager, createHttpParams( context ) );
         configureAuthentication( httpClient, context.getRemoteAuthenticationSettings(), null );
         configureProxy( httpClient, context.getRemoteProxySettings() );
         return httpClient;
