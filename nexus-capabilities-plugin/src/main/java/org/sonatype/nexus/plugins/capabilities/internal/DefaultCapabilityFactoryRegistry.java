@@ -31,6 +31,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import com.google.common.collect.Maps;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Key;
 
@@ -48,6 +49,8 @@ class DefaultCapabilityFactoryRegistry
 
     private final Map<String, CapabilityFactory> factories;
 
+    private final Map<String, CapabilityFactory> dynamicFactories;
+
     private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
     private final BeanLocator beanLocator;
@@ -60,6 +63,7 @@ class DefaultCapabilityFactoryRegistry
         this.beanLocator = checkNotNull( beanLocator );
         this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
         this.factories = checkNotNull( factories );
+        this.dynamicFactories = Maps.newConcurrentMap();
     }
 
     @Override
@@ -67,8 +71,9 @@ class DefaultCapabilityFactoryRegistry
     {
         checkNotNull( factory );
         checkArgument( !factories.containsKey( type ), "Factory already registered for %s", type );
+        checkArgument( !dynamicFactories.containsKey( type ), "Factory already registered for %s", type );
 
-        factories.put( type.toString(), factory );
+        dynamicFactories.put( type.toString(), factory );
         getLogger().debug( "Added {} -> {}", type, factory );
 
         return this;
@@ -79,7 +84,7 @@ class DefaultCapabilityFactoryRegistry
     {
         if ( type != null )
         {
-            final CapabilityFactory factory = factories.remove( type );
+            final CapabilityFactory factory = dynamicFactories.remove( type );
             getLogger().debug( "Removed {} -> {}", type, factory );
         }
 
@@ -90,6 +95,10 @@ class DefaultCapabilityFactoryRegistry
     public CapabilityFactory get( final CapabilityType type )
     {
         CapabilityFactory factory = factories.get( checkNotNull( type ).toString() );
+        if ( factory == null )
+        {
+            factory = dynamicFactories.get( checkNotNull( type ).toString() );
+        }
         if ( factory == null )
         {
             final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
