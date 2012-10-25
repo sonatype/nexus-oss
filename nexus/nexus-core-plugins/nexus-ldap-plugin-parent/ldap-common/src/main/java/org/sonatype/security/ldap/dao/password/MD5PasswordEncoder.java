@@ -16,8 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
+import org.apache.shiro.codec.Hex;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.digest.Hex;
 
 /**
  * @author cstamas

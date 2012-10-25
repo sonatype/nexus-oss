@@ -13,6 +13,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins.ldap</groupId>
@@ -20,62 +21,16 @@
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
   <artifactId>nexus-ldap-realm-plugin</artifactId>
   <name>Nexus : Core Plugins : OSS LDAP : LDAP Plugin</name>
-  <description>Adds a LDAP security realm to Nexus.</description>
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <commons-collections.version>3.2.1</commons-collections.version>
-    <ldap.js>${project.build.directory}/classes/static/js/nexus-ldap-realm-plugin-all.js</ldap.js>
+    <nexus.plugin.name>Nexus OSS LDAP Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds a LDAP security realm to Nexus.</nexus.plugin.description>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-digest</artifactId>
-        <version>${plexus-digest.version}</version>
-        <scope>compile</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.security.realms</groupId>
-        <artifactId>security-xml-realm</artifactId>
-        <version>${plexus-security.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-core</artifactId>
-        <version>${shiro.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.security</groupId>
-        <artifactId>security-system</artifactId>
-        <version>${plexus-security.version}</version>
-        <scope>provided</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.spice</groupId>
-            <artifactId>plexus-ehcache</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>${commons-lang.version}</version>
-        <scope>provided</scope>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
@@ -85,7 +40,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -98,14 +52,12 @@
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
-      <version>${plexus-security.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>ldap-common</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -127,13 +79,6 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>${commons-collections.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <scope>provided</scope>
@@ -143,60 +88,36 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>server-provider</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-ldap-testsuite</artifactId>
-      <version>${plexus-ldap-testsuite.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>slf4j-log4j12</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>junit</artifactId>
-          <groupId>junit</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-
-      <!-- Remove this plugin (it's already in parent!) when fixed MNGECLIPSE-2574 -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -210,9 +131,7 @@
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
-
     </plugins>
-
   </build>
 
 </project>

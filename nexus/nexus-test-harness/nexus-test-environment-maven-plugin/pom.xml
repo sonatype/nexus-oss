@@ -23,10 +23,8 @@
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-test-environment-maven-plugin</artifactId>
-
-  <packaging>maven-plugin</packaging>
-
   <name>Nexus : Test Harness : Test Environment Setup Plugin</name>
+  <packaging>maven-plugin</packaging>
 
   <dependencies>
     <dependency>
@@ -97,22 +95,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-shade-plugin</artifactId>
-      <version>1.2.1</version>
-      <type>jar</type>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-project</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -128,7 +110,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>2.9</version>
         <executions>
           <execution>
             <id>generate-helpmojo</id>

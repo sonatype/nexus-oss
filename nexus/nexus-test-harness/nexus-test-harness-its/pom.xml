@@ -31,23 +31,7 @@
   </properties>
 
   <build>
-
     <plugins>
-      <!-- To "recognize" nexus-plugin packaging -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>${applifecycle.version}</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>${applifecycle.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -64,7 +48,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -79,35 +62,14 @@
       </exclusions>
     </dependency>
 
-    <!-- TestNG used on runtime -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.1.1</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!-- Matchers et al -->
-    <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>server-provider</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -231,7 +193,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.6-SONATYPE-r940877</version>
             <configuration>
               <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
               <extraArtifacts>
@@ -280,7 +241,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.5.1</version>
             <executions>
               <execution>
                 <phase>pre-integration-test</phase>
@@ -296,7 +256,6 @@
                       <type>war</type>
                       <outputDirectory>${project.build.directory}/nexus/webapp</outputDirectory>
                     </artifactItem>
-                    <!--
                     Versions here must be kept in sync with nexus3860/* (cargo) tests.
                     Including/excluding only the bits needed for the container tests to function, keep out all other ancillary crud.
 

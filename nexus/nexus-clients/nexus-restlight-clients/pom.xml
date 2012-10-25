@@ -25,43 +25,17 @@
 
   <groupId>org.sonatype.nexus.restlight</groupId>
   <artifactId>nexus-restlight-clients</artifactId>
-  <packaging>pom</packaging>
-
   <name>Nexus : Clients : Lightweight REST</name>
-  <url>http://nexus.sonatype.org</url>
-
-  <modules>
-    <module>nexus-restlight-client-common</module>
-    <module>nexus-restlight-stage-client</module>
-    <module>nexus-restlight-m2-settings-client</module>
-    <module>nexus-restlight-test-harness</module>
-    <module>nexus-restlight-core-client</module>
-  </modules>
+  <packaging>pom</packaging>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>nexus-restlight-client-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId> org.jdom</groupId>
+        <groupId>org.jdom</groupId>
         <artifactId>jdom</artifactId>
         <version>1.1</version>
       </dependency>
-      <!-- We don't want to use a "nexus only" patched HttpClient 3.1 that is not in Central -->
-      <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>3.1</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>commons-logging</artifactId>
-            <groupId>commons-logging</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
+
       <dependency>
         <groupId>jaxen</groupId>
         <artifactId>jaxen</artifactId>
@@ -73,29 +47,31 @@
           </exclusion>
         </exclusions>
       </dependency>
+
+      <!-- INTERNAL -->
+
+      <!-- FIXME: Remove project.version use and use actual version -->
+
       <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>1.5.8</version>
+        <groupId>org.sonatype.nexus.restlight</groupId>
+        <artifactId>nexus-restlight-client-common</artifactId>
+        <version>${project.version}</version>
       </dependency>
+
       <dependency>
-        <groupId>${project.groupId}</groupId>
+        <groupId>org.sonatype.nexus.restlight</groupId>
         <artifactId>nexus-restlight-test-harness</artifactId>
         <version>${project.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-container-default</artifactId>
-        <scope>provided</scope>
-        <version>${plexus-container-default.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <modules>
+    <module>nexus-restlight-client-common</module>
+    <module>nexus-restlight-stage-client</module>
+    <module>nexus-restlight-m2-settings-client</module>
+    <module>nexus-restlight-test-harness</module>
+    <module>nexus-restlight-core-client</module>
+  </modules>
+
 </project>

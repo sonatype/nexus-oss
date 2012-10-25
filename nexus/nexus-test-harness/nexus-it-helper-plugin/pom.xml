@@ -24,7 +24,11 @@
   <artifactId>nexus-it-helper-plugin</artifactId>
   <name>Nexus : Test Harness : Helper Plugin</name>
   <packaging>nexus-plugin</packaging>
-  <description>This plugin injects some extra functionalities into nexus that are used when running ITs.</description>
+
+  <properties>
+    <nexus.plugin.name>Nexus Test Helper Plugin</nexus.plugin.name>
+    <nexus.plugin.description>This plugin injects some extra functionality into Nexus that are used when running ITs.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -32,6 +36,7 @@
       <artifactId>shiro-core</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
@@ -43,10 +48,10 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>
-      <version>${plexus-security.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -55,47 +60,25 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-url-realm</artifactId>
-      <version>${plexus-security.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.security.realms</groupId>
-          <artifactId>security-xml-realm</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-annotations</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.restlet</groupId>
-          <artifactId>org.restlet</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.noelios.restlet</groupId>
-          <artifactId>com.noelios.restlet</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.noelios.restlet</groupId>
-          <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency> -->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
         <configuration>
           <excludes>
             <exclude>org/sonatype/nexus/rt/**</exclude>
@@ -119,23 +102,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>${applifecycle.version}</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>${applifecycle.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
       </plugin>
     </plugins>
   </build>

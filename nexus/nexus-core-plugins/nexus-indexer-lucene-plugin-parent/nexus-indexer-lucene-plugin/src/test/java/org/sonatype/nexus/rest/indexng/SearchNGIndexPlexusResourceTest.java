@@ -30,7 +30,7 @@ import org.apache.maven.index.SearchType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
@@ -40,7 +40,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
  * Test for SearchNGIndexPlexusResource
  */
 public class SearchNGIndexPlexusResourceTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
 
     @Before

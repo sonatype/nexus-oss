@@ -23,9 +23,7 @@
       </encoder>
   </appender>
 
-  <logger name="Sisu" level="INFO"/>
-
-  <root level="INFO">
+  <root level="${it.test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>
   </root>
 

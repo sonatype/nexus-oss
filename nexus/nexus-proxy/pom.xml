@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -23,16 +24,15 @@
   </parent>
 
   <artifactId>nexus-proxy</artifactId>
-
   <name>Nexus : Proxy</name>
 
   <dependencies>
-<!-- 
+    <!--
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-artifact</artifactId>
     </dependency>
--->
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
@@ -66,6 +66,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
+      <scope>provided</scope>
     </dependency>
     <!-- Components impl -->
     <dependency>
@@ -75,9 +76,8 @@
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
-      <scope>compile</scope>
     </dependency>
-    
+
     <!-- Local and remote storage techs -->
     <dependency>
       <groupId>com.ning</groupId>
@@ -147,28 +147,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.carrotsearch</groupId>
-      <artifactId>junit-benchmarks</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>server-provider</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-jetty-testsuite</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>server-provider</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -181,24 +166,11 @@
       <artifactId>shiro-web</artifactId>
       <scope>test</scope>
     </dependency>
+
     <!-- For the Jackson XML Marshaller that is slower than JSON and will remain in test to not pollute core -->
     <dependency>
       <groupId>com.fasterxml</groupId>
       <artifactId>jackson-xml-databind</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
-      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -206,15 +178,13 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
@@ -246,6 +216,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>hc4-provider</id>
       <build>
@@ -270,6 +241,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>hc3-provider</id>
       <build>

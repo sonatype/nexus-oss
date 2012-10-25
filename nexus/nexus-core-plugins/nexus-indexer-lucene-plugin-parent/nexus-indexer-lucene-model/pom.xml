@@ -28,23 +28,21 @@
   <name>Nexus Maven Indexer :: Model</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api-model</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
       <scope>provided</scope>
     </dependency>
-
   </dependencies>
 
   <build>

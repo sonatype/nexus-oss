@@ -38,6 +38,9 @@
     </encoder>
   </appender>
 
+  <logger name="org.eclipse.jetty.webapp.WebAppClassLoader" level="INFO"/>
+  <logger name="eu.medsea.mimeutil.MimeUtil2" level="INFO"/>
+
   <!--
   FILE and CONSOLE appenders are both enabled here on purpose.
   The CONSOLE appender is used to allow TEST and NEXUS logs to be interleaved in the test exception output for better correlation of test logs to server logs.

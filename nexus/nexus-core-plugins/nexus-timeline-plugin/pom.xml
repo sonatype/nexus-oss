@@ -23,12 +23,15 @@
   </parent>
 
   <artifactId>nexus-timeline-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Timeline</name>
-  <description>Adds timeline and feeds based on it.</description>
+  <packaging>nexus-plugin</packaging>
+
+  <properties>
+    <nexus.plugin.name>Nexus Timeline Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds timeline and feeds based on it.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
@@ -90,20 +93,6 @@
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -111,23 +100,12 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-generate-metadata</id>
-            <configuration>
-              <sharedDependencies>
-                <sharedDependencies>rome:rome</sharedDependencies>
-              </sharedDependencies>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <sharedDependencies>
+            <sharedDependencies>rome:rome</sharedDependencies>
+          </sharedDependencies>
+        </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      
     </plugins>
   </build>
 

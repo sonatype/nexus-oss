@@ -36,12 +36,14 @@ public class NXCM2124CheckConsoleDocumentationIT
     public void checkDoc()
         throws IOException
     {
+        String pluginName = "Nexus Core Documentation Plugin";
+
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
-        assertThat( getPluginsNames( pluginInfos ), hasItem( "Nexus : Core Plugins : Plugin Console" ) );
+        assertThat( getPluginsNames( pluginInfos ), hasItem( pluginName ) );
 
         PluginInfoDTO pluginConsolePlugin =
-            this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console" );
+            this.getPluginInfoByName( pluginInfos, pluginName );
         Assert.assertNotNull( pluginConsolePlugin.getDocumentation() );
         Assert.assertFalse( pluginConsolePlugin.getDocumentation().isEmpty() );
 

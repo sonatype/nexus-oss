@@ -39,26 +39,13 @@
   </modules>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>${applifecycle.version}</version>
-          <extensions>true</extensions>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.plugins</groupId>
-              <artifactId>app-lifecycle-nexus</artifactId>
-              <version>${applifecycle.version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
   </build>
 
 </project>

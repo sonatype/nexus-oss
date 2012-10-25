@@ -16,12 +16,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 public class DefaultNexusSchedulerTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private NexusScheduler nexusScheduler;
 

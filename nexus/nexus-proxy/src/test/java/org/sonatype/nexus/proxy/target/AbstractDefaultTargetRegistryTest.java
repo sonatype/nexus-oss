@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.target;
 import java.util.Arrays;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.AbstractNexusTestCase;
+import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -26,7 +26,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * @author Marvin Froeder ( velo at sonatype.com )
  */
 public abstract class AbstractDefaultTargetRegistryTest
-    extends AbstractNexusTestCase
+    extends NexusProxyTestSupport
 {
 
     protected ApplicationConfiguration applicationConfiguration;

@@ -16,11 +16,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 
 public class RemoteMirrorDownloadTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private ServletServer server;
 

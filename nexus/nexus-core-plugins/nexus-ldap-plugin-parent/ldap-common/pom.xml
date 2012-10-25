@@ -24,11 +24,11 @@
 
   <artifactId>ldap-common</artifactId>
   <name>Nexus : Core Plugins : OSS LDAP : Common</name>
-  <description />
-
 
   <dependencies>
-
+    <!--
+    FIXME: If this is promoted to DM in nexus/pom.xml, then tests will start to fail with JCE exceptions.
+    -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk16</artifactId>
@@ -44,43 +44,22 @@
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-core</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-core</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>
-      <version>${plexus-security.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-ehcache</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
-      <version>${plexus-security.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-digest</artifactId>
-      <version>${plexus-digest.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
+
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
@@ -108,33 +87,12 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-ldap-testsuite</artifactId>
-      <version>${plexus-ldap-testsuite.version}</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>junit</artifactId>
-          <groupId>junit</groupId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -167,13 +125,6 @@
         <configuration>
           <packageWithVersion>false</packageWithVersion>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>${commons-collections.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>

@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-bootstrap</artifactId>
-
   <name>Nexus : Bootstrap</name>
 
   <dependencies>
@@ -31,22 +30,27 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.appcontext</groupId>
       <artifactId>appcontext</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-jetty8</artifactId>
     </dependency>
+
     <dependency>
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

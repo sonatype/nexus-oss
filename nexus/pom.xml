@@ -157,40 +157,19 @@
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
     <!-- version properties -->
-    <applifecycle.version>1.6</applifecycle.version>
     <sonatype.plugin.version>1.1.0</sonatype.plugin.version>
-    
-    <!-- Logging -->
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
-    <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
-
     <aether.version>1.13.1</aether.version>
-    <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>8.1.7.v20120910</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <micromailer.version>1.5</micromailer.version>
-    <nexus.repository.metadata.version>1.2</nexus.repository.metadata.version>
-    <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
-    <plexus-app-events.version>1.2</plexus-app-events.version>
-    <plexus-cli.version>1.2</plexus-cli.version>
-    <plexus-digest.version>1.1</plexus-digest.version>
-    <sisu-ehcache.version>1.1</sisu-ehcache.version>
-    <plexus-interpolation.version>1.14</plexus-interpolation.version>
-    <sisu-jetty8.version>1.4.1</sisu-jetty8.version>
-    <sisu-velocity.version>1.1</sisu-velocity.version>
-    <sisu-problem-reporter.version>1.5.2</sisu-problem-reporter.version>
-    <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
-    <plexus.restlet.bridge.version>1.22</plexus.restlet.bridge.version>
     <plexus-security.version>2.8.3-SNAPSHOT</plexus-security.version>
-    <sisu-task-scheduler.version>1.7</sisu-task-scheduler.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <shiro.version>1.2.1</shiro.version>
-    <spice-timeline.version>2.1</spice-timeline.version>
-    <spice-utils.version>1.0.0</spice-utils.version>
     <surefire.version>2.12.4</surefire.version>
+
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
@@ -198,6 +177,8 @@
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
 
+    <nexus.plugin.name>CHANGEME-PLUGIN-NAME-NOT-CONFIGURED</nexus.plugin.name>
+    <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
   </properties>
 
   <dependencyManagement>
@@ -255,8 +236,7 @@
       <dependency>
         <groupId>org.sonatype.appbooter.plexus-booters</groupId>
         <artifactId>plexus-app-booter</artifactId>
-        <version>${plexus.appbooter.version}</version>
-        <scope>provided</scope>
+        <version>2.1.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -264,11 +244,11 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>tanukisoft</groupId>
         <artifactId>wrapper</artifactId>
         <version>3.2.3</version>
-        <scope>provided</scope>
       </dependency>
 
       <!-- Jetty -->
@@ -276,11 +256,15 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>3.0.1</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-webapp</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-continuation</artifactId>
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
@@ -318,12 +302,36 @@
         <artifactId>jetty-servlets</artifactId>
         <version>${jetty.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-http</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-io</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-xml</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-jmx</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-rewrite</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
 
-      <!-- Plexus et al -->
       <dependency>
         <groupId>org.sonatype.plexus.appevents</groupId>
         <artifactId>plexus-app-events-api</artifactId>
-        <version>${plexus-app-events.version}</version>
+        <version>1.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -331,10 +339,11 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.plexus.appevents</groupId>
         <artifactId>simple-event-multicaster</artifactId>
-        <version>${plexus-app-events.version}</version>
+        <version>1.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -342,6 +351,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-archiver</artifactId>
@@ -357,6 +367,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-cipher</artifactId>
@@ -368,20 +379,23 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-jetty8</artifactId>
-        <version>${sisu-jetty8.version}</version>
+        <version>1.4.1</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>classworlds-configuration-io</artifactId>
         <version>1.0</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-task-scheduler</artifactId>
-        <version>${sisu-task-scheduler.version}</version>
+        <version>1.7</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -389,10 +403,17 @@
           </exclusion>
         </exclusions>
       </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.0</version>
+      </dependency>
+
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-restlet-bridge</artifactId>
-        <version>${plexus.restlet.bridge.version}</version>
+        <version>1.22</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -404,10 +425,14 @@
           </exclusion>
         </exclusions>
       </dependency>
+
+      <!--
+      FIXME: This is used by a few tests in nexus-proxy (org.codehaus.plexus.digest.{Md5|Sha1}Digester).
+      -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-digest</artifactId>
-        <version>${plexus-digest.version}</version>
+        <version>1.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -419,10 +444,11 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-cli</artifactId>
-        <version>${plexus-cli.version}</version>
+        <version>1.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -434,10 +460,11 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
-        <version>${plexus-interpolation.version}</version>
+        <version>1.14</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -445,17 +472,7 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>spice-timeline</artifactId>
-        <version>${spice-timeline.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
+
       <dependency>
         <groupId>org.sonatype.configuration</groupId>
         <artifactId>base-configuration</artifactId>
@@ -468,16 +485,16 @@
         </exclusions>
       </dependency>
 
-      <!-- Sisu -->
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-charger</artifactId>
         <version>1.1</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>${micromailer.version}</version>
+        <version>1.5</version>
         <exclusions>
           <exclusion>
             <groupId>javax.inject</groupId>
@@ -489,20 +506,19 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-velocity</artifactId>
-        <version>${sisu-velocity.version}</version>
-        <type>jar</type>
+        <version>1.2-SNAPSHOT</version>
       </dependency>
+
       <dependency>
         <groupId>org.apache.velocity</groupId>
         <artifactId>velocity</artifactId>
-        <version>1.5</version>
-        <type>jar</type>
+        <version>1.7</version>
       </dependency>
 
-      <!-- locks -->
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-locks</artifactId>
@@ -521,21 +537,23 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
         <version>${plexus-security.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-web</artifactId>
         <version>${plexus-security.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-core</artifactId>
         <version>${shiro.version}</version>
-        <scope>compile</scope>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -547,6 +565,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-rest-api</artifactId>
@@ -562,16 +581,25 @@
           </exclusion>
         </exclusions>
       </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.security</groupId>
+        <artifactId>security-rest-model</artifactId>
+        <version>${plexus-security.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-configuration</artifactId>
         <version>${plexus-security.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-url-realm</artifactId>
         <version>${plexus-security.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-web</artifactId>
@@ -583,6 +611,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils-core</artifactId>
@@ -594,6 +623,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils-bean-collections</artifactId>
@@ -605,43 +635,33 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
         <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
       </dependency>
+
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
         <version>${logback.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>${logback.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-slf4j-logging</artifactId>
-        <version>${plexus-slf4j-logging.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
+        <version>1.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -733,27 +753,24 @@
         <version>${aether.version}</version>
       </dependency>
 
-      <!-- Various commonly used deps -->
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
-        <scope>provided</scope>
       </dependency>
       
       <!-- Jackson -->
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-core-asl</artifactId>
-        <version>1.9.4</version>
-        <type>jar</type>
+        <version>1.9.10</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-mapper-asl</artifactId>
-        <version>1.9.4</version>
-        <type>jar</type>
+        <version>1.9.10</version>
       </dependency>
+
       <dependency>
         <groupId>com.fasterxml</groupId>
         <artifactId>jackson-xml-databind</artifactId>
@@ -769,27 +786,37 @@
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
-        <version>1.4.2</version>
-        <type>jar</type>
+        <version>1.4.3</version>
       </dependency>
+
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.2.1</version>
-        <type>jar</type>
+        <version>1.2.2</version>
       </dependency>
+
       <dependency>
         <groupId>eu.medsea.mimeutil</groupId>
         <artifactId>mime-util</artifactId>
         <version>2.1.2</version>
-        <type>jar</type>
+        <exclusions>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-ehcache</artifactId>
-        <version>${sisu-ehcache.version}</version>
+        <version>1.1</version>
       </dependency>
+
       <dependency>
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache-core</artifactId>
@@ -818,11 +845,6 @@
         <version>${restlet.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.restlet</groupId>
-        <artifactId>org.restlet.ext.wadl</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.noelios.restlet</groupId>
         <artifactId>com.noelios.restlet</artifactId>
         <version>${restlet.version}</version>
@@ -837,6 +859,10 @@
         <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
         <version>${restlet.version}</version>
       </dependency>
+
+      <!--
+      FIXME: This is pulled in by the restlet bridge, and this configuration should be moved there, nothing else inside of NX uses this.
+      -->
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>org.json</artifactId>
@@ -854,7 +880,6 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>4.2.1</version>
-        <type>jar</type>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -862,24 +887,23 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
         <version>4.2.1</version>
-        <type>jar</type>
       </dependency>
+
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
         <version>4.2.2</version>
-        <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>commons-httpclient</groupId>
         <artifactId>commons-httpclient</artifactId>
         <version>3.1.SONATYPE</version>
-        <type>jar</type>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -892,19 +916,12 @@
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>1.4</version>
-        <type>jar</type>
       </dependency>
-      <dependency>
-        <groupId>commons-transaction</groupId>
-        <artifactId>commons-transaction</artifactId>
-        <version>1.2</version>
-        <type>jar</type>
-      </dependency>
+
       <dependency>
         <groupId>commons-cli</groupId>
         <artifactId>commons-cli</artifactId>
         <version>1.0</version>
-        <type>jar</type>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -912,31 +929,29 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.4</version>
-        <type>jar</type>
+        <version>1.7</version>
       </dependency>
+
       <dependency>
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
-        <version>2.3</version>
-        <type>jar</type>
+        <version>2.6</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.spice</groupId>
         <artifactId>spice-utils</artifactId>
-        <version>${spice-utils.version}</version>
+        <version>1.0.0</version>
       </dependency>
 
-      <!-- Tests -->
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-jetty-testsuite</artifactId>
-        <version>${plexus-jetty-testsuite.version}</version>
-        <type>jar</type>
-        <scope>test</scope>
+        <version>2.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -944,17 +959,35 @@
           </exclusion>
         </exclusions>
       </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.http-testing-harness</groupId>
+        <artifactId>server-provider</artifactId>
+        <version>0.5.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.http-testing-harness</groupId>
+        <artifactId>junit-runner</artifactId>
+        <version>0.5.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>httpunit</groupId>
+        <artifactId>httpunit</artifactId>
+        <version>1.6.2</version>
+      </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
         <version>1.5-SNAPSHOT</version>
-        <scope>test</scope>
       </dependency>
+
       <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
         <version>6.1.1</version>
-        <scope>test</scope>
         <exclusions>
           <exclusion>
             <groupId>junit</groupId>
@@ -962,31 +995,39 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <dependency>
-        <groupId>org.uncommons</groupId>
-        <artifactId>reportng</artifactId>
-        <version>1.1.2</version>
-        <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <artifactId>velocity</artifactId>
-            <groupId>velocity</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
+
+      <!-- FIXME: This _should_ be sorted out in litmus already, need to check if we have any straggling deps locally which pull this in however -->
       <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
       <dependency>
         <groupId>org.objenesis</groupId>
         <artifactId>objenesis</artifactId>
         <version>1.2</version>
-        <type>jar</type>
-        <!-- scope>test</scope -->
       </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.sisu.pr</groupId>
+        <artifactId>sisu-problem-reporter</artifactId>
+        <version>1.5.2</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-xmlrpc-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.swizzle</groupId>
+            <artifactId>swizzle-jira</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu.pr</groupId>
         <artifactId>sisu-pr-testutil</artifactId>
-        <version>${sisu-problem-reporter.version}</version>
-        <scope>test</scope>
+        <version>1.5.2</version>
       </dependency>
       
       <!-- TODO remove easymock -->
@@ -994,8 +1035,6 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <version>2.4</version>
-        <type>jar</type>
-        <scope>test</scope>
       </dependency>
       
       <!-- TODO remove carrotsearch and replace with contiperf -->
@@ -1003,53 +1042,59 @@
       <dependency>
         <groupId>com.carrotsearch</groupId>
         <artifactId>junit-benchmarks</artifactId>
-        <version>0.3.0-SONATYPE</version>
-        <scope>test</scope>
+        <version>0.4.0</version>
       </dependency>
       <!-- h2 used by junit benchmarks to store perf data -->
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>1.3.154</version>
-        <scope>test</scope>
       </dependency>
-      <!-- TODO move http testing related libs to their own module or testsuite-support -->
+
       <dependency>
-        <groupId>org.sonatype.http-testing-harness</groupId>
-        <artifactId>server-provider</artifactId>
-        <version>0.5.3</version>
-        <scope>test</scope>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>enunciate-core</artifactId>
+        <version>${enunciate.version}</version>
+        <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
+        <!-- But nothing is using that annotation after build happened, and doco is generated -->
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
+
       <dependency>
-        <groupId>org.sonatype.http-testing-harness</groupId>
-        <artifactId>junit-runner</artifactId>
-        <version>0.5.3</version>
-        <scope>test</scope>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>3.2.1</version>
       </dependency>
+
       <dependency>
-        <groupId>org.sonatype.http-testing-harness</groupId>
-        <artifactId>testng-runner</artifactId>
-        <version>0.5.3</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.jsoup</groupId>
-        <artifactId>jsoup</artifactId>
-        <version>1.6.3</version>
-        <scope>test</scope>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-repository-metadata-api</artifactId>
+        <version>1.2</version>
       </dependency>
 
       <!-- INTERNAL -->
+
+      <!--
+      FIXME: Replace project.version with actual version used.
+      -->
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-repository-metadata-api</artifactId>
-        <version>${nexus.repository.metadata.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1059,6 +1104,11 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-web-utils</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-launcher</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1077,20 +1127,8 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-api</artifactId>
-          <version>${project.version}</version>
-          <classifier>tests</classifier>
-          <scope>test</scope>
-        </dependency>
-      <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-configuration</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1102,8 +1140,6 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration</artifactId>
         <version>${project.version}</version>
-        <classifier>tests</classifier>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1115,7 +1151,6 @@
         <artifactId>nexus-proxy</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1127,7 +1162,6 @@
         <artifactId>nexus-app</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
@@ -1138,14 +1172,34 @@
         <groupId>org.sonatype.nexus.indexer-lucene</groupId>
         <artifactId>nexus-indexer-lucene-model</artifactId>
         <version>${project.version}</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
         <version>${project.version}</version>
         <type>${nexus-plugin.type}</type>
-        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-indexer-lucene-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+        <artifactId>nexus-ldap-realm-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+        <artifactId>nexus-ldap-realm-plugin</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-lvo-plugin</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1173,13 +1227,11 @@
         <artifactId>nexus-rest-api</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
         <version>${project.version}</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.tools</groupId>
@@ -1210,16 +1262,9 @@
         <type>zip</type>
       </dependency>
 
-      <!-- Plugins -->
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-host-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1228,49 +1273,333 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>plexus-encryptor</artifactId>
-        <version>1.0</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-test-api</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>enunciate-core</artifactId>
-        <version>${enunciate.version}</version>
-        <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
-        <!-- But nothing is using that annotation after build happened, and doco is generated -->
-        <scope>provided</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-harness-launcher</artifactId>
+        <version>${project.version}</version>
       </dependency>
+
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>3.2.1</version>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-utils</artifactId>
+        <version>${project.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
-  <!-- build information for the project -->
   <build>
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/main/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/src/main/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+    </resources>
+
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+    </testResources>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>2.9</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jboss.tattletale</groupId>
+          <artifactId>tattletale-maven</artifactId>
+          <version>1.1.2.Final</version>
+          <configuration>
+            <failOnInfo>${tattletale.failOnInfo}</failOnInfo>
+            <failOnWarn>${tattletale.failOnWarn}</failOnWarn>
+            <failOnError>${tattletale.failOnError}</failOnError>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>1.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>1.5.5</version>
+          <!-- qdox included in ^^^ is old and not compatible with latest sources -->
+          <dependencies>
+            <dependency>
+              <groupId>com.thoughtworks.qdox</groupId>
+              <artifactId>qdox</artifactId>
+              <version>1.12</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate-metadata</goal>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>app-lifecycle-maven-plugin</artifactId>
+          <version>1.6</version>
+          <extensions>true</extensions>
+          <configuration>
+            <pluginName>${nexus.plugin.name}</pluginName>
+            <pluginDescription>${nexus.plugin.description}</pluginDescription>
+            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.sonatype.plugins</groupId>
+              <artifactId>app-lifecycle-nexus</artifactId>
+              <version>1.6</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.modello</groupId>
+          <artifactId>modello-maven-plugin</artifactId>
+          <version>1.4.1</version>
+          <configuration>
+            <useJava5>true</useJava5>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>modello-plugin-upgrade</artifactId>
+          <version>1.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>net.alchim31.maven</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.3.2</version>
+          <configuration>
+            <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
+            <outputDirectory>${project.build.directory}/generated-sources/yuicompressor</outputDirectory>
+            <includes>
+              <include>js/**/*.js</include>
+              <include>css/**/*.css</include>
+            </includes>
+            <nosuffix>true</nosuffix>
+            <insertNewLine>true</insertNewLine>
+          </configuration>
+          <executions>
+            <execution>
+              <id>aggregate</id>
+              <goals>
+                <goal>compress</goal>
+              </goals>
+              <configuration>
+                <aggregations>
+                  <aggregation>
+                    <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
+                    <output>${project.build.directory}/classes/static/js/${project.artifactId}-all.js</output>
+                    <includes>
+                      <include>**/*.js</include>
+                    </includes>
+                  </aggregation>
+                  <aggregation>
+                    <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
+                    <output>${project.build.directory}/classes/static/css/${project.artifactId}-all.css</output>
+                    <includes>
+                      <include>**/*.css</include>
+                    </includes>
+                  </aggregation>
+                </aggregations>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2.2</version>
+          <!--
+          FIXME: Sort out what this is for, and nuke it if is really not needed for anything, if it is then document it here for clarity.
+          -->
+          <dependencies>
+            <dependency>
+              <groupId>org.sonatype.spice</groupId>
+              <artifactId>maven-assembly-helpers</artifactId>
+              <version>1.0</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <tarLongFileMode>gnu</tarLongFileMode>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.6</version>
+          <configuration>
+            <escapeWindowsPaths>true</escapeWindowsPaths>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.6</version>
+          <configuration>
+            <downloadSources>true</downloadSources>
+            <downloadJavadocs>true</downloadJavadocs>
+            <projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
+            <wtpmanifest>true</wtpmanifest>
+            <wtpapplicationxml>true</wtpapplicationxml>
+            <wtpversion>2.0</wtpversion>
+            <manifest>${basedir}/src/main/resources/META-INF/MANIFEST.MF</manifest>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${surefire.version}</version>
+          <configuration>
+            <failIfNoTests>false</failIfNoTests>
+            <!-- force use of property -->
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <forkMode>once</forkMode>
+            <argLine>-ea</argLine>
+            <!--
+            FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
+            https://issues.sonatype.org/browse/NEXUS-5345
+            -->
+            <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+              <!-- start junit benchmarks config -->
+              <jub.consumers>H2,CONSOLE</jub.consumers>
+              <jub.db.file>.benchmarks</jub.db.file>
+              <jub.customkey>${os.name}</jub.customkey>
+              <jub.charts.dir>${project.build.directory}/junit-benchmarks</jub.charts.dir>
+              <!-- end junit benchmarks config -->
+              <!-- logging configuration properties, see logback*.xml files -->
+              <test.log.level>${test.log.level}</test.log.level>
+              <it.test.log.level>${it.test.log.level}</it.test.log.level>
+              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${surefire.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <failIfNoTests>false</failIfNoTests>
+            <!-- force use of property -->
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <forkMode>once</forkMode>
+            <argLine>-ea</argLine>
+            <!--
+            FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
+            https://issues.sonatype.org/browse/NEXUS-5345
+            -->
+            <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
+            <excludes combine.children="append">
+              <exclude>**/Abstract*</exclude>
+            </excludes>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+              <!-- logging configuration properties, see logback*.xml files -->
+              <test.log.level>${test.log.level}</test.log.level>
+              <it.test.log.level>${it.test.log.level}</it.test.log.level>
+              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>provided-dependencies-maven-plugin</artifactId>
+          <version>1.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>2.1-alpha-2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.5.1</version>
+        </plugin>
+
+        <!--
+        FIXME: Can probably use latest version, as the issue which we think this was for ( http://jira.codehaus.org/browse/MINVOKER-102 ) appears to have been fixed in version 1.6
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>1.6-SONATYPE-r940877</version>
+        </plugin>
+
+        <!-- INTERNAL -->
+
+        <plugin>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-test-environment-maven-plugin</artifactId>
+          <version>${project.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1304,10 +1633,10 @@
               <rules>
                 <bannedDependencies>
                   <excludes>
-                    <exclude>velocity:velocity:jar:1.4</exclude>
-                    <exclude>velocity:velocity-dep:jar:1.4</exclude>
+                    <exclude>velocity:velocity</exclude>
+                    <exclude>velocity:velocity-dep</exclude>
                   </excludes>
-                  <message>Velocity 1.4 is banned, Velocity 1.5 should be used!
+                  <message>Velocity 1.4 is banned, org.apache.velocity:velocity should be used instead.
                     You probably added a dependency that is missing the exclusions.
                   </message>
                 </bannedDependencies>
@@ -1437,7 +1766,6 @@
                   <includes>
                     <include>log4j:*</include>
                   </includes>
-
                   <message>Do not use log4j api directly in tests. Use slf4j api instead.</message>
                 </bannedDependencies>
                 <bannedDependencies>
@@ -1457,8 +1785,6 @@
                   </excludes>
                   <message>Use the org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache!</message>
                 </bannedDependencies>
-
-                <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
               <fail>true</fail>
             </configuration>
@@ -1480,6 +1806,11 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.5.1</version>
         <configuration>
@@ -1487,240 +1818,11 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
     </plugins>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.jboss.tattletale</groupId>
-          <artifactId>tattletale-maven</artifactId>
-          <version>1.1.2.Final</version>
-          <configuration>
-            <failOnInfo>${tattletale.failOnInfo}</failOnInfo>
-            <failOnWarn>${tattletale.failOnWarn}</failOnWarn>
-            <failOnError>${tattletale.failOnError}</failOnError>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>sisu-maven-plugin</artifactId>
-          <version>1.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-metadata</artifactId>
-          <version>1.5.5</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>generate-metadata</goal>
-                <goal>generate-test-metadata</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.modello</groupId>
-          <artifactId>modello-maven-plugin</artifactId>
-          <version>1.4.1</version>
-          <configuration>
-            <useJava5>true</useJava5>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>net.alchim31.maven</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>1.3.2</version>
-          <configuration>
-            <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
-            <outputDirectory>${project.build.directory}/generated-sources/yuicompressor</outputDirectory>
-
-            <includes>
-              <include>js/**/*.js</include>
-              <include>css/**/*.css</include>
-            </includes>
-
-            <nosuffix>true</nosuffix>
-            <insertNewLine>true</insertNewLine>
-          </configuration>
-          <executions>
-            <execution>
-              <id>aggregate</id>
-
-              <goals>
-                <goal>compress</goal>
-              </goals>
-
-              <configuration>
-                <aggregations>
-                  <aggregation>
-                    <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
-                    <output>${project.build.directory}/classes/static/js/${project.artifactId}-all.js</output>
-                    <includes>
-                      <include>**/*.js</include>
-                    </includes>
-                  </aggregation>
-                  <aggregation>
-                    <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
-                    <output>${project.build.directory}/classes/static/css/${project.artifactId}-all.css</output>
-                    <includes>
-                      <include>**/*.css</include>
-                    </includes>
-                  </aggregation>
-                </aggregations>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.sonatype.nexus.plugins</groupId>
-          <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>${project.version}</version>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2.2</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.spice</groupId>
-              <artifactId>maven-assembly-helpers</artifactId>
-              <version>1.0</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <tarLongFileMode>gnu</tarLongFileMode>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4</version>
-          <configuration>
-            <escapeWindowsPaths>true</escapeWindowsPaths>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-eclipse-plugin</artifactId>
-          <version>2.6</version>
-          <configuration>
-            <downloadSources>true</downloadSources>
-            <downloadJavadocs>true</downloadJavadocs>
-            <projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
-            <wtpmanifest>true</wtpmanifest>
-            <wtpapplicationxml>true</wtpapplicationxml>
-            <wtpversion>2.0</wtpversion>
-            <manifest>${basedir}/src/main/resources/META-INF/MANIFEST.MF</manifest>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>retrotranslator-maven-plugin</artifactId>
-          <version>1.0-alpha-2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${surefire.version}</version>
-          <configuration>
-            <failIfNoTests>false</failIfNoTests>
-            <!-- force use of property -->
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
-            <forkMode>once</forkMode>
-            <argLine>-ea</argLine>
-            <!--
-            FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
-            https://issues.sonatype.org/browse/NEXUS-5345
-            -->
-            <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
-            <systemPropertyVariables>
-              <java.awt.headless>true</java.awt.headless>
-              <!-- start junit benchmarks config -->
-              <jub.consumers>H2,CONSOLE</jub.consumers>
-              <jub.db.file>.benchmarks</jub.db.file>
-              <jub.customkey>${os.name}</jub.customkey>
-              <jub.charts.dir>${project.build.directory}/junit-benchmarks</jub.charts.dir>
-              <!-- end junit benchmarks config -->
-              <!-- logging configuration properties, see logback*.xml files -->
-              <test.log.level>${test.log.level}</test.log.level>
-              <it.test.log.level>${it.test.log.level}</it.test.log.level>
-              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
-            </systemPropertyVariables>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>1.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${surefire.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>integration-test</goal>
-                <goal>verify</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <failIfNoTests>false</failIfNoTests>
-            <!-- force use of property -->
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
-            <forkMode>once</forkMode>
-            <argLine>-ea</argLine>
-            <!--
-            FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
-            https://issues.sonatype.org/browse/NEXUS-5345
-            -->
-            <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
-            <excludes combine.children="append">
-              <exclude>**/Abstract*</exclude>
-            </excludes>
-            <systemPropertyVariables>
-              <java.awt.headless>true</java.awt.headless>
-              <!-- logging configuration properties, see logback*.xml files -->
-              <test.log.level>${test.log.level}</test.log.level>
-              <it.test.log.level>${it.test.log.level}</it.test.log.level>
-              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
-            </systemPropertyVariables>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>attach-test-jar</id>
-              <goals>
-                <goal>test-jar</goal>
-              </goals>
-              <configuration>
-                <includes>
-                  <include>**/*.class</include>
-                </includes>
-                <excludes>
-                  <exclude>**/*Test.class</exclude>
-                  <exclude>**/*Test$*.class</exclude>
-                  <exclude>**/*IT.class</exclude>
-                  <exclude>**/*IT$*.class</exclude>
-                  <exclude>**/internal/*.class</exclude>
-                </excludes>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
   <modules>
@@ -1796,7 +1898,7 @@
         <dependency>
           <groupId>org.codehaus.jackson</groupId>
           <artifactId>jackson-xc</artifactId>
-          <version>1.2.0</version>
+          <version>1.9.10</version>
           <scope>provided</scope>
         </dependency>
         <dependency>

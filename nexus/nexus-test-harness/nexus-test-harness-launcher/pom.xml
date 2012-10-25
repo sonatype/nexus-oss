@@ -26,11 +26,9 @@
   <name>Nexus : Test Harness : Test Harness Launcher</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-utils</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <!-- All of Nexus needed on classpath -->
@@ -70,6 +68,7 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -86,10 +85,10 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
-      <version>${plexus-security.version}</version>
     </dependency>
 
     <!-- MailUtil et al -->
@@ -109,17 +108,16 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <scope>compile</scope>
     </dependency>
     
 
@@ -127,7 +125,6 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-jetty-testsuite</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <!-- We use Wagon to deploy WagonUtil etc -->
@@ -170,13 +167,13 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -261,15 +258,6 @@
     </dependency>
 
     <!-- Deps needed by some *Util classes (they use classes from these below) -->
-
-    <!-- The IT Helper Plugin for Simple realm -->
-<!--
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-it-helper-plugin</artifactId>
-      <version>${project.version}</version>
-    </dependency>
--->
     <!-- To redirect j.u.Preferences -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

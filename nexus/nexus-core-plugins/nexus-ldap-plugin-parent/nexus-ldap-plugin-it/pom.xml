@@ -24,7 +24,6 @@
 
   <artifactId>nexus-ldap-plugin-it</artifactId>
   <name>Nexus : Core Plugins : OSS LDAP : Plugin ITs</name>
-  <description>Nexus LDAP Realm Plugin ITs</description>
 
   <dependencies>
     <dependency>
@@ -34,8 +33,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -48,74 +52,40 @@
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
-      <version>${plexus-security.version}</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-ldap-testsuite</artifactId>
-      <version>${plexus-ldap-testsuite.version}</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>junit</artifactId>
-          <groupId>junit</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>slf4j-log4j12</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
-    <!-- TODO plexus-ldap-testsuite requires JUNIT???, fix it -->
-    <!--
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <version>4.10</version>
-      <scope>runtime</scope>
-    </dependency>
-    -->
     
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-webapp</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
       <classifier>bundle</classifier>
+      <type>zip</type>
       <scope>test</scope>
     </dependency>
 
@@ -123,28 +93,9 @@
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-pr-testutil</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>server-provider</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-
-      <!-- Needed to make Maven "know" nexus-plugin packaging -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-
-    </plugins>
-  </build>
 
   <profiles>
     <profile>

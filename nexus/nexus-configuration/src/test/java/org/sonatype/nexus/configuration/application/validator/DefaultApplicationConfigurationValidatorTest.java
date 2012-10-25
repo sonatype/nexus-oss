@@ -41,7 +41,6 @@ import org.junit.Test;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -52,10 +51,11 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.configuration.validator.DefaultApplicationConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.nexus.util.ExternalConfigUtil;
 
 public class DefaultApplicationConfigurationValidatorTest
-    extends AbstractNexusTestCase
+    extends NexusTestSupport
 {
 
     protected DefaultApplicationConfigurationValidator underTest;

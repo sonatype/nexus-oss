@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repositories;
 
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -23,7 +23,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 
 public class IndexableRepositoryTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
 
     private Nexus nexus;

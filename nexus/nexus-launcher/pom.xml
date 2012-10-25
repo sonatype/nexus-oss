@@ -23,9 +23,6 @@
   </parent>
 
   <artifactId>nexus-launcher</artifactId>
-
-  <packaging>jar</packaging>
-
   <name>Nexus : Launcher</name>
 
   <dependencies>
@@ -33,21 +30,22 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-bundle-launcher</artifactId>
       <version>1.4</version>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-bootstrap</artifactId>
     </dependency>
+
     <dependency>
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 

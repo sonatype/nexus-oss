@@ -15,10 +15,10 @@ package org.sonatype.nexus.configuration.application;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sonatype.nexus.configuration.AbstractNexusTestCase;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 public class DefaultGlobalRestApiConfigurationTest
-    extends AbstractNexusTestCase
+    extends NexusTestSupport
 {
 
     @Test

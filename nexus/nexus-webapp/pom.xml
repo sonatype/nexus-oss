@@ -13,23 +13,17 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-  <!-- the version of maven's project object model -->
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <!-- a unique name for this project -->
   <artifactId>nexus-webapp</artifactId>
-  <!--we don't need this to be a jar except that the app assembler crashes if it's not -->
-  <packaging>war</packaging>
-  <!-- a short but descriptive name for the project -->
   <name>Nexus : Web Application</name>
+  <packaging>war</packaging>
 
   <properties>
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
@@ -42,7 +36,6 @@
   </properties>
 
   <dependencies>
-  
     <!-- This is here to prevent it coming into WAR -->
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -53,7 +46,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <!-- The bundle -->
@@ -92,6 +84,10 @@
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-api</artifactId>
     </dependency>
+
+    <!--
+    FIXME: Put these into DM
+    -->
 
     <!-- There are problems with the Maven reactor that would require these modules However if we include as a test scope the reactor will be happy and the dependency pom will be correct -->
     <dependency>
@@ -169,14 +165,14 @@
     <dependency>
       <groupId>httpunit</groupId>
       <artifactId>httpunit</artifactId>
-      <version>1.6.2</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
@@ -256,6 +252,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
@@ -382,6 +379,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
@@ -395,9 +393,10 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.1-alpha-2</version>
         <configuration>
           <warSourceIncludes>
             *,
@@ -435,7 +434,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <version>1.5</version>
         <executions>
           <execution>
             <id>generate-dependency-poms</id>
@@ -449,26 +447,6 @@
             <phase>verify</phase>
             <goals>
               <goal>attach-signatures</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.simplericity.jettyconsole</groupId>
-        <artifactId>jetty-console-maven-plugin</artifactId>
-        <version>1.42</version>
-        <executions>
-          <execution>
-            <configuration>
-              <backgroundImage>${basedir}/src/main/jettyconsole/background-image-nexus.jpg</backgroundImage>
-              <additionalDependencies>
-                <additionalDependency>
-                  <artifactId>jetty-console-jettyxml-plugin</artifactId>
-                </additionalDependency>
-              </additionalDependencies>
-            </configuration>
-            <goals>
-              <goal>createconsole</goal>
             </goals>
           </execution>
         </executions>

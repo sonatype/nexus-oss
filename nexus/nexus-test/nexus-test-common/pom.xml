@@ -33,34 +33,37 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
-      <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <scope>compile</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <scope>compile</scope>
     </dependency>
+
+    <!--
+    FIXME: Try and get rid of this framework, use mockito instead.
+    -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
     </dependency>
-    
+
     <!-- TODO move benchmarking libs out into another module since we should not force as dependency here -->
     <dependency>
       <groupId>com.carrotsearch</groupId>
       <artifactId>junit-benchmarks</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <!-- h2 used by junit benchmarks to store perf data -->
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.7.1</version>
     </dependency>
   </dependencies>
 

@@ -16,11 +16,11 @@ import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.security.SecuritySystem;
 
 public class DefaultNexusSecurityUpgradeTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
 
     private static final String ORG_CONFIG_FILE = "target/test-classes/org/sonatype/nexus/jsecurity/security.xml";

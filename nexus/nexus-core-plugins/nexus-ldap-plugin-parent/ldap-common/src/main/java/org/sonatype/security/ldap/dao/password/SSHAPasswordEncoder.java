@@ -18,8 +18,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
+import org.apache.shiro.codec.Base64;
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.plexus.components.cipher.Base64;
 
 /**
  * @author bdemers
@@ -80,7 +80,7 @@ public class SSHAPasswordEncoder
             System.arraycopy( digested, 0, toBeEncoded, 0, digested.length );
             System.arraycopy( saltBytes, 0, toBeEncoded, digested.length, saltBytes.length );
 
-            return "{SSHA}" + new String( Base64.encodeBase64( toBeEncoded ) );
+            return "{SSHA}" + Base64.encodeToString(toBeEncoded);
 
         }
         catch ( UnsupportedEncodingException e )
@@ -106,7 +106,7 @@ public class SSHAPasswordEncoder
 
         try
         {
-            byte[] decodedBytes = Base64.decodeBase64( encryptedPassword.getBytes( "UTF-8" ) );
+            byte[] decodedBytes = Base64.decode( encryptedPassword.getBytes( "UTF-8" ) );
 
             // strip the first 20 char, but make sure it is valie
             if ( decodedBytes.length - 20 <= 0 )

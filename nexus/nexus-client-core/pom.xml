@@ -29,24 +29,18 @@
   <name>Nexus : Client</name>
 
   <dependencies>
-
-    <!-- = Models = -->
-    <!-- These will be later modularized -->
-
     <!-- Core API Models -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api-model</artifactId>
-      <scope>compile</scope>
     </dependency>
+
     <!-- Security Models -->
     <!-- Sadly, littered over Core models, so even if we do not publicize any "security related" client ops -->
     <!-- we still drag this along with Core Models -->
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-model</artifactId>
-      <version>${plexus-security.version}</version>
-      <scope>compile</scope>
       <exclusions>
         <exclusion>
           <groupId>javax.xml.bind</groupId>
@@ -68,51 +62,41 @@
     </dependency>
 
     <!-- = Other client dependencies = -->
-    <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <!-- Needed for all Modello generated models (Nexus Core and others) -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.0</version>
-      <scope>compile</scope>
     </dependency>
 
     <!-- For XML/JSON marshalling -->
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
-      <version>1.4.2</version>
-      <scope>compile</scope>
     </dependency>
 
     <!-- Version (for now all of Aether API/UTIL) -->
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-util</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <!-- Needed by Model/XStream configuration -->
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-core</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <!-- For Jersey client -->
@@ -120,14 +104,12 @@
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
       <version>1.12</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
       <version>1.12</version>
-      <scope>compile</scope>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -158,6 +140,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- @Inject, optional -->
@@ -171,6 +154,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

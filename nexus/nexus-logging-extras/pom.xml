@@ -26,67 +26,53 @@
   <name>Nexus : Logging Extras</name>
 
   <dependencies>
-    <!-- The appender -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras-appender</artifactId>
     </dependency>
-    
-    <!-- We have components in here -->
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
-    <!-- Need some classes from here -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-utils</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
-      <scope>compile</scope>
     </dependency>
 
-    <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>compile</scope>
     </dependency>
 
-    <!-- We have servlet util classes too -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
 
-    <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-
+    <!--
+    FIXME: All of these dependencies are needed so that LogbackLogManagerTest can extend from NexusAppTestSupport
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
@@ -101,14 +87,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
