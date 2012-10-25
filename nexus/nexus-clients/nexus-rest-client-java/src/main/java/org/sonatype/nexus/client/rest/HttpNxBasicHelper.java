@@ -29,6 +29,7 @@ import com.noelios.restlet.util.Base64;
  * 
  * @author cstamas
  */
+@Deprecated
 public class HttpNxBasicHelper
     extends AuthenticationHelper
 {

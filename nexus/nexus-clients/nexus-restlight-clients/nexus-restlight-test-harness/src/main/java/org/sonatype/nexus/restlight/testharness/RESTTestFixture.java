@@ -26,6 +26,7 @@ import org.eclipse.jetty.server.Server;
  * response code, and logging the specific nature of the failure to STDOUT.
  * </p>
  */
+@Deprecated
 public interface RESTTestFixture
 {
 

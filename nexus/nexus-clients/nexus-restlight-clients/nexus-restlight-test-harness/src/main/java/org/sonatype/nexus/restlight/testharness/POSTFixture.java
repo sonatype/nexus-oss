@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
  * the client upon successful request validation. This implementation also provides a POST-validating {@link Handler}
  * implementation for use in the HTTP {@link Server} instance, which is managed by the abstract base class.
  */
+@Deprecated
 public class POSTFixture
 extends AbstractRESTTestFixture
 {

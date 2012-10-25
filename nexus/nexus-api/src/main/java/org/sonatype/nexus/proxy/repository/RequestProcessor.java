@@ -14,9 +14,13 @@ package org.sonatype.nexus.proxy.repository;
 
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.plugin.ExtensionPoint;
 
 /**
@@ -37,6 +41,18 @@ public interface RequestProcessor
      * @param action
      */
     boolean process( Repository repository, ResourceStoreRequest request, Action action );
+
+    /**
+     * Should the item be retrieved?
+     *
+     * @param repository from which the item is retrieved (not null)
+     * @param request    retrieval request (not null)
+     * @param item       item to be retrieved (not null
+     * @return true if item is allowed to be retrieved, false if item should be blocked. In case of false an generic
+     *         {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown.
+     */
+    boolean shouldRetrieve( Repository repository, ResourceStoreRequest request, StorageItem item )
+        throws IllegalOperationException, ItemNotFoundException, AccessDeniedException;
 
     /**
      * Request processor is able to override generic behaviour of Repositories in aspect of proxying.

@@ -15,6 +15,7 @@ package org.sonatype.nexus.restlight.core;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class UserToRole
 {
     private String userId;

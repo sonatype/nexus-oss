@@ -43,21 +43,25 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- TimelinePersistor uses Protobuf -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+    <!-- TimelineIndexer uses Lucene -->
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>3.6.1</version>
+    </dependency>
+
+    <!-- RSS feeds -->
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-timeline</artifactId>
-      <version>2.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>0.9</version>
     </dependency>
 
     <!-- Stuff already in core -->
@@ -81,6 +85,8 @@
       <artifactId>sisu-inject-plexus</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <!-- Tests -->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -96,7 +102,6 @@
         <artifactId>app-lifecycle-maven-plugin</artifactId>
         <configuration>
           <sharedDependencies>
-            <sharedDependencies>org.sonatype.spice:spice-timeline</sharedDependencies>
             <sharedDependencies>rome:rome</sharedDependencies>
           </sharedDependencies>
         </configuration>

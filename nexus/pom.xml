@@ -758,12 +758,6 @@
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
       </dependency>
-
-      <dependency>
-        <groupId>rome</groupId>
-        <artifactId>rome</artifactId>
-        <version>0.9</version>
-      </dependency>
       
       <!-- Jackson -->
       <dependency>

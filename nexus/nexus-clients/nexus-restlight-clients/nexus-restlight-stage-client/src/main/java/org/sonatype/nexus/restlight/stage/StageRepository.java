@@ -19,6 +19,7 @@ import java.util.Locale;
  * Simple container for details of a staging repository. This minimal model is used in queries for staging-repository
  * information, and for feeding back into finish/drop/promote actions within the {@link StageClient}.
  */
+@Deprecated
 public class StageRepository
 {
 

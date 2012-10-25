@@ -17,6 +17,7 @@ package org.sonatype.nexus.restlight.stage;
  * 
  * @author Brian Demers
  */
+@Deprecated
 public class StageProfile
 {
     /**

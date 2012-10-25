@@ -47,6 +47,7 @@ import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
 
+@Deprecated
 public class RestClientHelper
 {
     private final Context restContext;

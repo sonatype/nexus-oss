@@ -24,6 +24,7 @@ import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
 import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 
+@Deprecated
 public class CoreClient
     extends AbstractRESTLightClient
 {

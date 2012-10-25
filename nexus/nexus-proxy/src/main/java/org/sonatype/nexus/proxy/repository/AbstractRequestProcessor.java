@@ -12,9 +12,13 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * A helper base class that makes it easier to create processors. Note: despite it's name, this class is not abstract
@@ -26,6 +30,15 @@ public abstract class AbstractRequestProcessor
     implements RequestProcessor
 {
     public boolean process( Repository repository, ResourceStoreRequest request, Action action )
+    {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRetrieve( final Repository repository,
+                                   final ResourceStoreRequest request,
+                                   final StorageItem item )
+        throws IllegalOperationException, ItemNotFoundException, AccessDeniedException
     {
         return true;
     }

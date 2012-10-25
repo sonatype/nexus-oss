@@ -32,6 +32,7 @@ import org.sonatype.jettytestsuite.BlockingServer;
  * request headers. Additionally, this base class manages the response headers which will be injected into the response
  * if the client request validates.
  */
+@Deprecated
 public abstract class AbstractRESTTestFixture
     implements RESTTestFixture
 {

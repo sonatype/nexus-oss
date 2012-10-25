@@ -27,20 +27,4 @@ public abstract class AbstractTimelineTest
     {
         return new Module[] { new SecurityModule() };
     }
-
-    /**
-     * Handy method that does what was done before: keeps all in memory, but this is usable for small amount of data,
-     * like these in UT. This should NOT be used in production code, unless you want app that kills itself with OOM.
-     */
-    protected List<Entry> asList( Entries result )
-    {
-        ArrayList<Entry> records = new ArrayList<Entry>();
-
-        for ( Entry rec : result )
-        {
-            records.add( rec );
-        }
-
-        return records;
-    }
 }
