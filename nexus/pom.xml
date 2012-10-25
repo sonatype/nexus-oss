@@ -769,12 +769,12 @@
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-core-asl</artifactId>
-        <version>1.9.4</version>
+        <version>1.9.10</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-mapper-asl</artifactId>
-        <version>1.9.4</version>
+        <version>1.9.10</version>
       </dependency>
 
       <dependency>
@@ -1904,7 +1904,7 @@
         <dependency>
           <groupId>org.codehaus.jackson</groupId>
           <artifactId>jackson-xc</artifactId>
-          <version>1.2.0</version>
+          <version>1.9.10</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
