@@ -170,6 +170,7 @@
     <shiro.version>1.2.1</shiro.version>
     <surefire.version>2.12.4</surefire.version>
     <jackson.version>1.9.10</jackson.version>
+    <goodies.version>1.5-SNAPSHOT</goodies.version>
 
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -253,6 +254,18 @@
         <groupId>tanukisoft</groupId>
         <artifactId>wrapper</artifactId>
         <version>3.2.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.sisu.goodies</groupId>
+        <artifactId>goodies-common</artifactId>
+        <version>${goodies.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.sisu.goodies</groupId>
+        <artifactId>goodies-marshal</artifactId>
+        <version>${goodies.version}</version>
       </dependency>
 
       <!-- Jetty -->
