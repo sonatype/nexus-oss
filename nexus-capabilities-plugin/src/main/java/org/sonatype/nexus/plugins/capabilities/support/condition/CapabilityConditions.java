@@ -23,8 +23,10 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.Evaluable;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeExistsCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.condition.EvaluableCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.PassivateCapabilityDuringUpdateCondition;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -97,6 +99,18 @@ public class CapabilityConditions
     public Condition passivateCapabilityDuringUpdate()
     {
         return new PassivateCapabilityDuringUpdateCondition( eventBus );
+    }
+
+    /**
+     * Creates a new condition that delegates to provided {@link Evaluable} for checking if the condition is satisfied.
+     * {@link Evaluable#isSatisfied()} is reevaluated after each update of capability the condition is used for.
+     *
+     * @param condition delegate
+     * @return created condition
+     */
+    public Condition evaluable( final Evaluable condition )
+    {
+        return new EvaluableCondition( eventBus, condition );
     }
 
 }
