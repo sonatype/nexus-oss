@@ -510,13 +510,13 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-velocity</artifactId>
-        <version>1.1</version>
+        <version>1.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.velocity</groupId>
         <artifactId>velocity</artifactId>
-        <version>1.5</version>
+        <version>1.7</version>
       </dependency>
 
       <dependency>
@@ -1639,10 +1639,10 @@
               <rules>
                 <bannedDependencies>
                   <excludes>
-                    <exclude>velocity:velocity:jar:1.4</exclude>
-                    <exclude>velocity:velocity-dep:jar:1.4</exclude>
+                    <exclude>velocity:velocity</exclude>
+                    <exclude>velocity:velocity-dep</exclude>
                   </excludes>
-                  <message>Velocity 1.4 is banned, Velocity 1.5 should be used!
+                  <message>Velocity 1.4 is banned, org.apache.velocity:velocity should be used instead.
                     You probably added a dependency that is missing the exclusions.
                   </message>
                 </bannedDependencies>

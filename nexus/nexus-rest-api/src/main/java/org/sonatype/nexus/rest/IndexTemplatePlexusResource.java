@@ -220,13 +220,6 @@ public class IndexTemplatePlexusResource
                         "Was not able to interpolate (check the logs for Velocity messages about the reason)!" );
                 }
             }
-            catch ( IOException e )
-            {
-                throw new ResourceException(
-                    Status.SERVER_ERROR_INTERNAL,
-                    "Got IO exception during Velocity invocation!",
-                    e );
-            }
             catch ( ParseErrorException e )
             {
                 throw new ResourceException(
