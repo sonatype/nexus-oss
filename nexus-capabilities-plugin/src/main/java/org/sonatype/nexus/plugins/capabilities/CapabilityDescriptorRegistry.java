@@ -15,6 +15,10 @@ package org.sonatype.nexus.plugins.capabilities;
 public interface CapabilityDescriptorRegistry
 {
 
+    CapabilityDescriptorRegistry register( CapabilityDescriptor capabilityDescriptor );
+
+    CapabilityDescriptorRegistry unregister( CapabilityDescriptor capabilityDescriptor );
+
     CapabilityDescriptor get( CapabilityType capabilityType );
 
     CapabilityDescriptor[] getAll();
