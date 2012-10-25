@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -81,6 +82,7 @@ import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.security.SecuritySystem;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Maps;
 import com.noelios.restlet.ext.servlet.ServletCall;
 import com.noelios.restlet.http.HttpRequest;
 import com.noelios.restlet.http.HttpResponse;
@@ -793,7 +795,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
         result.addProperty( "virtual=" + item.isVirtual() );
 
         // attributes
-        for ( Map.Entry<String, String> entry : item.getRepositoryItemAttributes().asMap().entrySet() )
+        final TreeMap<String, String> sortedAttributes = Maps.newTreeMap();
+        sortedAttributes.putAll( item.getRepositoryItemAttributes().asMap() );
+        for ( Map.Entry<String, String> entry : sortedAttributes.entrySet() )
         {
             result.addAttribute( entry.toString() );
         }
