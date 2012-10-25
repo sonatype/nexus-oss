@@ -66,7 +66,7 @@ class DefaultCapabilityDescriptorRegistry
         {
             return get( dynamicDescriptors, capabilityType );
         }
-        return null;
+        return descriptor;
     }
 
     @Override
