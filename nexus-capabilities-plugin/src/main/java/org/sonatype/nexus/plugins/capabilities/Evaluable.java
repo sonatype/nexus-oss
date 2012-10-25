@@ -13,29 +13,32 @@
 package org.sonatype.nexus.plugins.capabilities;
 
 /**
- * An evaluable condition.
+ * A logical condition.
+ *
+ * @since 2.2
  */
-public interface Condition
-    extends Evaluable
+public interface Evaluable
 {
 
     /**
-     * Binds (eventual) resources used by condition. Before binding, condition should not be used.
-     * <p/>
-     * Calling this method multiple times should not fail, eventually should log a warning.
+     * Whether or not the condition is satisfied.
      *
-     * @return itself, for fluent api usage
+     * @return true, if condition is satisfied
      */
-    Condition bind();
+    boolean isSatisfied();
 
     /**
-     * Releases (eventual) resources used by condition. After releasing, condition should not be used until not binding
-     * it again.
-     * <p/>
-     * Calling this method multiple times should not fail, eventually should log a warning.
+     * Describe condition in case that it is satisfied.
      *
-     * @return itself, for fluent api usage
+     * @return description
      */
-    Condition release();
+    String explainSatisfied();
+
+    /**
+     * Describe condition in case that it is not satisfied.
+     *
+     * @return description
+     */
+    String explainUnsatisfied();
 
 }
