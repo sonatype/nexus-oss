@@ -23,6 +23,10 @@
     <relativePath />
   </parent>
 
+  <!--
+  FIXME: This does not actually provide deps on the Nexus runtime, but only on the sisu/guice/plexus and basic support libraries.
+  -->
+
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-runtime-platform</artifactId>
   <name>Nexus : Runtime Platform</name>
@@ -38,9 +42,15 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-inject-bean</artifactId>
-        <version>${sisu-inject.version}</version>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>13.0.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>2.0.1</version>
       </dependency>
 
       <dependency>
@@ -63,28 +73,29 @@
       </dependency>
 
       <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>13.0.1</version>
+        <groupId>org.sonatype.sisu.inject</groupId>
+        <artifactId>guice-multibindings</artifactId>
+        <version>${sisu-guice.version}</version>
       </dependency>
 
-      <!-- javax.annotation support -->
       <dependency>
-        <groupId>com.google.code.findbugs</groupId>
-        <artifactId>jsr305</artifactId>
-        <version>2.0.1</version>
+        <groupId>org.sonatype.sisu.inject</groupId>
+        <artifactId>guice-assistedinject</artifactId>
+        <version>${sisu-guice.version}</version>
       </dependency>
 
-      <!--
-      FIXME: This is actually provided by sisu-inject-bean.
-      -->
       <dependency>
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
         <version>1</version>
       </dependency>
 
-      <!-- Plexus support (the version should be tied to SISU used ones!) -->
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-bean</artifactId>
+        <version>${sisu-inject.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-inject-plexus</artifactId>
@@ -106,7 +117,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>3.0</version>
+        <version>3.0.8</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
