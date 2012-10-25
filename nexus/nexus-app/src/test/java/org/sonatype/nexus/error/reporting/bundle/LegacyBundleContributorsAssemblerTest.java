@@ -23,9 +23,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -36,6 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import javax.annotation.Nullable;
 import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
 import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;

@@ -15,7 +15,7 @@ package org.sonatype.nexus.bundle.launcher.support;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.inject.Nullable;
+import javax.annotation.Nullable;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 

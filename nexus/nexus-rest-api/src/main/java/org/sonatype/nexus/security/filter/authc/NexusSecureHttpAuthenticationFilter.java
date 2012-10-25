@@ -15,7 +15,7 @@ package org.sonatype.nexus.security.filter.authc;
 import javax.inject.Inject;
 
 import org.apache.shiro.authc.AuthenticationToken;
-import org.sonatype.inject.Nullable;
+import javax.annotation.Nullable;
 
 public class NexusSecureHttpAuthenticationFilter
     extends NexusHttpAuthenticationFilter
