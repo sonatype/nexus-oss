@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
  * validation. This implementation also provides a GET-validating {@link Handler} implementation for use in the HTTP
  * {@link Server} instance, which is managed by the abstract base class.
  */
+@Deprecated
 public class GETFixture
 extends AbstractRESTTestFixture
 {

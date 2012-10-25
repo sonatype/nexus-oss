@@ -65,6 +65,7 @@ import org.sonatype.aether.version.Version;
  * new version requires an extra API call that an older version didn't require).
  * </p>
  */
+@Deprecated
 public abstract class AbstractRESTLightClient
 {
 

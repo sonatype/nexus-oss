@@ -18,6 +18,7 @@ import org.jdom.Document;
  * Exception indicating a failure to communicate with the Nexus server. This normally means either an 
  * I/O failure or a failure to parse the response message.
  */
+@Deprecated
 public class RESTLightClientException
     extends Exception
 {

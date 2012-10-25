@@ -20,6 +20,7 @@ import org.apache.commons.httpclient.auth.BasicScheme;
  * HTTP authentication scheme. This is just an extension of {@link BasicScheme} that uses the name
  * 'NxBASIC' for registration with httpclient.
  */
+@Deprecated
 public class NxBasicScheme
     extends BasicScheme
 {
