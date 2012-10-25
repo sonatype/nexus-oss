@@ -233,21 +233,6 @@
         <version>3.2</version>
       </dependency>
 
-      <!--
-      FIXME: This might be unused now...
-      -->
-      <dependency>
-        <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-        <artifactId>plexus-app-booter</artifactId>
-        <version>2.1.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
       <dependency>
         <groupId>tanukisoft</groupId>
         <artifactId>wrapper</artifactId>
