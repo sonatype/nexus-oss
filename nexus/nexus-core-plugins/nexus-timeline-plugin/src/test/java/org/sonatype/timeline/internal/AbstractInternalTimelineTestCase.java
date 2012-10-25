@@ -10,11 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
+package org.sonatype.timeline.internal;
 
-import org.sonatype.nexus.security.AbstractNexusTestCase;
+import org.sonatype.timeline.AbstractTimelineTestCase;
 
-public abstract class AbstractTimelineTest
-    extends AbstractNexusTestCase
+public abstract class AbstractInternalTimelineTestCase
+    extends AbstractTimelineTestCase
 {
+    protected DefaultTimelinePersistor persistor;
+
+    protected DefaultTimelineIndexer indexer;
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        persistor = timeline.getPersistor();
+        indexer = timeline.getIndexer();
+    }
+
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+    }
 }

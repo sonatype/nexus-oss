@@ -29,14 +29,15 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.sonatype.nexus.feeds.record.NexusItemInfo;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
-import org.sonatype.nexus.timeline.Entries;
 import org.sonatype.nexus.timeline.Entry;
+import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.NexusTimeline;
+
 import com.google.common.base.Predicate;
 
 /**
  * A feed recorder that uses DefaultNexus to record feeds.
- *
+ * 
  * @author cstamas
  */
 @Component( role = FeedRecorder.class )
@@ -155,7 +156,7 @@ public class DefaultFeedRecorder
         return eventDate;
     }
 
-    protected List<NexusArtifactEvent> getAisFromMaps( Entries data )
+    protected List<NexusArtifactEvent> getAisFromMaps( List<Entry> data )
     {
         List<NexusArtifactEvent> result = new ArrayList<NexusArtifactEvent>();
 
@@ -212,7 +213,7 @@ public class DefaultFeedRecorder
         return this.feedArtifactEventFilter.filterArtifactEventList( result );
     }
 
-    protected List<SystemEvent> getSesFromMaps( Entries data )
+    protected List<SystemEvent> getSesFromMaps( List<Entry> data )
     {
         List<SystemEvent> result = new ArrayList<SystemEvent>();
 
@@ -240,7 +241,7 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    protected List<AuthcAuthzEvent> getAaesFromMaps( Entries data )
+    protected List<AuthcAuthzEvent> getAaesFromMaps( List<Entry> data )
     {
         List<AuthcAuthzEvent> result = new ArrayList<AuthcAuthzEvent>();
 
@@ -269,7 +270,7 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    protected List<ErrorWarningEvent> getEwesFromMaps( Entries data )
+    protected List<ErrorWarningEvent> getEwesFromMaps( List<Entry> data )
     {
         List<ErrorWarningEvent> result = new ArrayList<ErrorWarningEvent>();
 
@@ -289,7 +290,7 @@ public class DefaultFeedRecorder
 
             ErrorWarningEvent evt =
                 new ErrorWarningEvent( getEventDate( map ), map.get( ACTION ), map.get( MESSAGE ),
-                                       map.get( STACK_TRACE ) );
+                    map.get( STACK_TRACE ) );
 
             evt.addEventContext( ctx );
 
@@ -301,94 +302,52 @@ public class DefaultFeedRecorder
 
     // ==
 
-    protected void releaseResult( Entries result )
-    {
-        if ( result != null )
-        {
-            result.release();
-        }
-    }
-
-    public Entries getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
-                              Predicate<Entry> filter )
+    public List<Entry> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
+                                  Predicate<Entry> filter )
     {
         int cnt = count != null ? count : DEFAULT_PAGE_SIZE;
 
+        final EntryListCallback cb = new EntryListCallback();
         if ( from != null )
         {
-            return nexusTimeline.retrieve( from, cnt, types, subtypes, filter );
+            nexusTimeline.retrieve( from, cnt, types, subtypes, filter, cb );
         }
         else
         {
-            return nexusTimeline.retrieve( 0, cnt, types, subtypes, filter );
+            nexusTimeline.retrieve( 0, cnt, types, subtypes, filter, cb );
         }
+        return cb.getEntries();
     }
 
     public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
                                                             Predicate<Entry> filter )
     {
-        Entries result = null;
+        List<Entry> result = getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter );
 
-        try
-        {
-            result = getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter );
-
-            return getAisFromMaps( result );
-        }
-        finally
-        {
-            releaseResult( result );
-        }
+        return getAisFromMaps( result );
     }
 
     public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter )
     {
-        Entries result = null;
+        List<Entry> result = getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count, filter );
 
-        try
-        {
-            result = getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count, filter );
-
-            return getSesFromMaps( result );
-        }
-        finally
-        {
-            releaseResult( result );
-        }
+        return getSesFromMaps( result );
     }
 
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
                                                       Predicate<Entry> filter )
     {
-        Entries result = null;
+        List<Entry> result = getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter );
 
-        try
-        {
-            result = getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter );
-
-            return getAaesFromMaps( result );
-        }
-        finally
-        {
-            releaseResult( result );
-        }
+        return getAaesFromMaps( result );
     }
 
     public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
                                                           Predicate<Entry> filter )
     {
-        Entries result = null;
+        List<Entry> result = getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, from, count, filter );
 
-        try
-        {
-            result = getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, from, count, filter );
-
-            return getEwesFromMaps( result );
-        }
-        finally
-        {
-            releaseResult( result );
-        }
+        return getEwesFromMaps( result );
     }
 
     // ==
