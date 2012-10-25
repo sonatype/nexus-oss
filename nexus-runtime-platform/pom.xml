@@ -25,78 +25,63 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-runtime-platform</artifactId>
+  <name>Nexus : Runtime Platform</name>
+  <packaging>pom</packaging>
+
   <version>2.3-SNAPSHOT</version>
 
-  <packaging>pom</packaging>
-  <name>Nexus : Runtime Platform</name>
-
   <properties>
-    <sisu-inject.version>2.3.0</sisu-inject.version>
-    <sisu-guice.version>3.1.1</sisu-guice.version>
+    <sisu-inject.version>2.3.1</sisu-inject.version>
+    <sisu-guice.version>3.1.2</sisu-guice.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-inject-bean</artifactId>
         <version>${sisu-inject.version}</version>
-        <scope>compile</scope>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-guice</artifactId>
         <version>${sisu-guice.version}</version>
         <classifier>no_aop</classifier>
-        <scope>compile</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guava</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-guice</artifactId>
         <version>${sisu-guice.version}</version>
-        <scope>compile</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guava</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-servlet</artifactId>
         <version>${sisu-guice.version}</version>
-        <scope>compile</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guava</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guice</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>10.0.1</version>
-        <scope>compile</scope>
+        <version>13.0.1</version>
       </dependency>
+
+      <!-- javax.annotation support -->
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>2.0.1</version>
+      </dependency>
+
+      <!--
+      FIXME: This is actually provided by sisu-inject-bean.
+      -->
       <dependency>
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
         <version>1</version>
-        <scope>compile</scope>
       </dependency>
 
       <!-- Plexus support (the version should be tied to SISU used ones!) -->
@@ -104,34 +89,37 @@
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-inject-plexus</artifactId>
         <version>${sisu-inject.version}</version>
-        <scope>compile</scope>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-annotations</artifactId>
         <version>1.5.5</version>
-        <scope>compile</scope>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
         <version>2.4</version>
-        <scope>compile</scope>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>3.0</version>
-        <scope>compile</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
+  <!--
+  FIXME: Sort out if this should be here or not, looks unused, given use of scope=import only applies to DM
+  -->
   <dependencies>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
