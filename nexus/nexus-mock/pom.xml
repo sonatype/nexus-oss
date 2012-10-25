@@ -153,7 +153,7 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
-              <outputDirectory>target/nexus-ui</outputDirectory>
+              <outputDirectory>${project.build.directory}/nexus-ui</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.sonatype.nexus</groupId>
