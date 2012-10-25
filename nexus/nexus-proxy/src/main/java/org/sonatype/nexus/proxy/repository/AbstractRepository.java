@@ -653,6 +653,11 @@ public abstract class AbstractRepository
             throw new ItemNotFoundException( request, this );
         }
 
+        if ( !checkPostConditions( request, item ) )
+        {
+            throw new ItemNotFoundException( request, this );
+        }
+
         return item;
     }
 
@@ -1299,6 +1304,23 @@ public abstract class AbstractRepository
             for ( RequestProcessor processor : getRequestProcessors().values() )
             {
                 if ( !processor.process( this, request, action ) )
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    protected boolean checkPostConditions( final ResourceStoreRequest request, final StorageItem item )
+        throws IllegalOperationException, ItemNotFoundException, AccessDeniedException
+    {
+        if ( getRequestProcessors().size() > 0 )
+        {
+            for ( RequestProcessor processor : getRequestProcessors().values() )
+            {
+                if ( !processor.shouldRetrieve( this, request, item ) )
                 {
                     return false;
                 }
