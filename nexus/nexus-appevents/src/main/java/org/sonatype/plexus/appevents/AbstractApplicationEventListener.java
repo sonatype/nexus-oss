@@ -19,7 +19,7 @@ import javax.inject.Inject;
  *
  * @since 2.3
  *
- * @deprecated Sisu should detect listeners if bound properly.
+ * @deprecated Sisu should detect listeners if bound properly (ie. @Named or explicit module binding to EventListener.class).
  */
 @Deprecated
 public abstract class AbstractApplicationEventListener
