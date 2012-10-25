@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -22,60 +23,18 @@
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-api</artifactId>
-  <name>Nexus : API</name>
+  <artifactId>nexus-appevents</artifactId>
 
   <dependencies>
     <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-utils</artifactId>
-    </dependency>
-
-    <!-- Here for "compatibility" reason only! -->
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-appevents</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-task-scheduler</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.configuration</groupId>
-      <artifactId>base-configuration</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-locks</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>eu.medsea.mimeutil</groupId>
-      <artifactId>mime-util</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-host-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 

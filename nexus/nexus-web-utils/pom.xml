@@ -85,8 +85,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus.appevents</groupId>
-      <artifactId>simple-event-multicaster</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-appevents</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
