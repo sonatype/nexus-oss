@@ -184,6 +184,10 @@
     <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
   </properties>
 
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
+
   <dependencyManagement>
     <dependencies>
 
