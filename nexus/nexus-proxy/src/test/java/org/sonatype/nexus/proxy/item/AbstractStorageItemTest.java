@@ -12,31 +12,27 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import static org.easymock.EasyMock.createMock;
-
-import org.easymock.EasyMock;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.mockito.Mock;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.sisu.litmus.testsupport.mock.MockitoRule;
 
 public abstract class AbstractStorageItemTest
     extends AbstractNexusTestEnvironment
 {
+    @Rule
+    public TestRule mockitoRule = new MockitoRule(this);
+
+    @Mock
     protected Repository repository;
 
+    @Mock
     protected RepositoryRouter router;
-
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        repository = EasyMock.createNiceMock( Repository.class );
-
-        router = createMock( RepositoryRouter.class );
-    }
 
     public void checkAbstractStorageItem( ResourceStore store, AbstractStorageItem item, boolean isVirtual,
                                           String shouldBeName, String shouldBePath, String shouldBeParentPath )

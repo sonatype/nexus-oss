@@ -12,15 +12,16 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
-import org.easymock.IAnswer;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class DefaultStorageFileItemTest
     extends AbstractStorageItemTest
@@ -29,20 +30,12 @@ public class DefaultStorageFileItemTest
     public void testNonVirtualFileSimple()
         throws Exception
     {
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a.txt" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
-        {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
-            }
-        } );
-
-        replay( repository );
-
-        //
+        doReturn( "dummy" ).when( repository ).getId();
+        doAnswer( new Answer<RepositoryItemUid>() {
+            public RepositoryItemUid answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
+            }}).when( repository ).createUid( "/a.txt" );
 
         DefaultStorageFileItem file =
             new DefaultStorageFileItem( repository, "/a.txt", true, true, new StringContentLocator( "/a.txt" ) );
@@ -58,20 +51,12 @@ public class DefaultStorageFileItemTest
     public void testNonVirtualFileWithContentSimple()
         throws Exception
     {
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a.txt" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
-        {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
-            }
-        } );
-
-        replay( repository );
-
-        //
+        doReturn( "dummy" ).when( repository ).getId();
+        doAnswer( new Answer<RepositoryItemUid>() {
+            public RepositoryItemUid answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
+            }}).when( repository ).createUid( "/a.txt" );
 
         DefaultStorageFileItem file =
             new DefaultStorageFileItem( repository, "/a.txt", true, true, new StringContentLocator( "THIS IS CONTENT" ) );
@@ -86,20 +71,12 @@ public class DefaultStorageFileItemTest
     public void testNonVirtualFileDeep()
         throws Exception
     {
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
-        {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" );
-            }
-        } );
-
-        replay( repository );
-
-        //
+        doReturn( "dummy" ).when( repository ).getId();
+        doAnswer( new Answer<RepositoryItemUid>() {
+            public RepositoryItemUid answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
+            }}).when( repository ).createUid( "/some/dir/hierarchy/a.txt" );
 
         DefaultStorageFileItem file =
             new DefaultStorageFileItem( repository, "/some/dir/hierarchy/a.txt", true, true, new StringContentLocator(
@@ -116,20 +93,12 @@ public class DefaultStorageFileItemTest
     public void testNonVirtualFileWithContentDeep()
         throws Exception
     {
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
-        {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" );
-            }
-        } );
-
-        replay( repository );
-
-        //
+        doReturn( "dummy" ).when( repository ).getId();
+        doAnswer( new Answer<RepositoryItemUid>() {
+            public RepositoryItemUid answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
+            }}).when( repository ).createUid( "/some/dir/hierarchy/a.txt" );
 
         DefaultStorageFileItem file =
             new DefaultStorageFileItem( repository, "/some/dir/hierarchy/a.txt", true, true, new StringContentLocator(

@@ -12,15 +12,15 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.easymock.EasyMock;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -60,49 +60,33 @@ public class DefaultRepositoryRegistryTest
     public void testSimple()
         throws Exception
     {
-        HostedRepository repoA = createMock( HostedRepository.class );
-        HostedRepository repoB = createMock( HostedRepository.class );
-        HostedRepository repoC = createMock( HostedRepository.class );
+        HostedRepository repoA = mock( HostedRepository.class );
+        HostedRepository repoB = mock( HostedRepository.class );
+        HostedRepository repoC = mock( HostedRepository.class );
 
-        EasyMock.makeThreadSafe( repoA, true );
-        EasyMock.makeThreadSafe( repoB, true );
-        EasyMock.makeThreadSafe( repoC, true );
 
-        // id will be called twice
-        expect( repoA.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoB.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoC.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoA.getProviderHint() ).andReturn( "maven2" ).anyTimes();
-        expect( repoB.getProviderHint() ).andReturn( "maven2" ).anyTimes();
-        expect( repoC.getProviderHint() ).andReturn( "maven2" ).anyTimes();
+        Map<String,Repository> repoMap = new HashMap<String,Repository>();
+        repoMap.put( "A", repoA );
+        repoMap.put( "B", repoB );
+        repoMap.put( "C", repoC );
 
-        expect( repoA.getId() ).andReturn( "A" ).anyTimes();
-        expect( repoB.getId() ).andReturn( "B" ).anyTimes();
-        expect( repoC.getId() ).andReturn( "C" ).anyTimes();
-        expect( repoA.getName() ).andReturn( "AName" ).anyTimes();
-        expect( repoB.getName() ).andReturn( "BName" ).anyTimes();
-        expect( repoC.getName() ).andReturn( "CName" ).anyTimes();
+        ArrayList<String> testgroup = new ArrayList<String>();
 
-        expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
-        expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
-        expect( repoC.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+        for ( Map.Entry<String, Repository> entry : repoMap.entrySet() )
+        {
+            doReturn( Repository.class.getName()).when( entry.getValue() ).getProviderRole() ;
+            doReturn( "maven2").when( entry.getValue() ).getProviderHint();
+            doReturn( entry.getKey()).when( entry.getValue() ).getId();
+            doReturn( entry.getKey() + "Name").when( entry.getValue() ).getName();
+            doReturn( new Maven2ContentClass() ).when( entry.getValue() ).getRepositoryContentClass();
+            doReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).when( entry.getValue() ).getRepositoryKind();
 
-        expect( repoA.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoB.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoC.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+            doReturn(entry.getValue()).when( entry.getValue() ).adaptToFacet( HostedRepository.class  );
+            doReturn(null).when( entry.getValue() ).adaptToFacet( ProxyRepository.class  );
 
-        expect( repoA.adaptToFacet( HostedRepository.class ) ).andReturn( repoA ).anyTimes();
-        expect( repoB.adaptToFacet( HostedRepository.class ) ).andReturn( repoB ).anyTimes();
-        expect( repoC.adaptToFacet( HostedRepository.class ) ).andReturn( repoC ).anyTimes();
-        expect( repoA.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-        expect( repoB.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-        expect( repoC.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-
-        replay( repoA, repoB, repoC );
-
-        repositoryRegistry.addRepository( repoA );
-        repositoryRegistry.addRepository( repoB );
-        repositoryRegistry.addRepository( repoC );
+            doReturn( true ).when( entry.getValue() ).isUserManaged();
+            repositoryRegistry.addRepository( entry.getValue() );
+        }
 
         List<String> gl = new ArrayList<String>();
         gl.add( "A" );

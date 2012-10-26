@@ -12,16 +12,14 @@
  */
 package org.sonatype.nexus.proxy.target;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.Repository;
-
 /**
  * Simple DefaultTargetRegistry creation test
  */
@@ -32,11 +30,9 @@ public class DefaultTargetRegistryTest
     public void testSimpleM2()
     {
         // create a dummy
-        Repository repository = createMock( Repository.class );
-        expect( repository.getRepositoryContentClass() ).andReturn( maven2 ).anyTimes();
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-
-        replay( repository );
+        Repository repository = mock( Repository.class );
+        doReturn( "dummy" ).when( repository ).getId();
+        doReturn( maven2 ).when( repository ).getRepositoryContentClass();
 
         TargetSet ts =
             targetRegistry.getTargetsForRepositoryPath( repository,
@@ -67,11 +63,9 @@ public class DefaultTargetRegistryTest
     public void testSimpleM1()
     {
         // create a dummy
-        Repository repository = createMock( Repository.class );
-        expect( repository.getRepositoryContentClass() ).andReturn( maven1 ).anyTimes();
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-
-        replay( repository );
+        Repository repository = mock( Repository.class );
+        doReturn( "dummy" ).when( repository ).getId();
+        doReturn( maven1 ).when( repository ).getRepositoryContentClass();
 
         TargetSet ts =
             targetRegistry.getTargetsForRepositoryPath( repository, "/org.apache.maven/jars/maven-model-v3-2.0.jar" );
