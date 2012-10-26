@@ -443,7 +443,7 @@ public class Jetty8NexusBooter
 
         // move jetty (actualy, all that is level up in real bundle too) level up, it is isolated anyway in real bundle
         tamperJarsForSharedClasspath( basedir, sharedLibs, "jetty-*.jar" );
-        tamperJarsForSharedClasspath( basedir, sharedLibs, "javax.servlet-api-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "javax.servlet-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "sisu-jetty8-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-utils-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-interpolation-*.jar" );
