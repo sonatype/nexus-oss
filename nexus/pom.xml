@@ -25,10 +25,12 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus</artifactId>
-  <packaging>pom</packaging>
   <name>Nexus</name>
-  <version>2.3-SNAPSHOT</version>
   <description>Sonatype Nexus Repository Manager</description>
+  <packaging>pom</packaging>
+
+  <version>2.3-SNAPSHOT</version>
+
   <inceptionYear>2007</inceptionYear>
 
   <scm>
@@ -37,13 +39,13 @@
     <url>https://github.com/sonatype/nexus</url>
   </scm>
 
-  <mailingLists />
   <licenses>
     <license>
       <name>Eclipse Public License</name>
       <url>http://www.eclipse.org/legal/epl-v10.html</url>
     </license>
   </licenses>
+
   <developers>
     <developer>
       <id>cstamas</id>
@@ -126,6 +128,7 @@
       <timezone>+3</timezone>
     </developer>
   </developers>
+
   <contributors>
     <contributor>
       <name>John Casey</name>
@@ -1522,6 +1525,43 @@
           <version>2.5.1</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>1.1.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.5.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>animal-sniffer-maven-plugin</artifactId>
+          <version>1.8</version>
+          <configuration>
+            <signature>
+              <groupId>org.codehaus.mojo.signature</groupId>
+              <artifactId>java16</artifactId>
+              <version>1.0</version>
+            </signature>
+          </configuration>
+        </plugin>
+
         <!--
         FIXME: Can probably use latest version, as the issue which we think this was for ( http://jira.codehaus.org/browse/MINVOKER-102 ) appears to have been fixed in version 1.6
         -->
@@ -1545,7 +1585,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.1.1</version>
         <executions>
           <execution>
             <id>enforce-java</id>
@@ -1759,12 +1798,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -1819,6 +1864,25 @@
         <it.test.log.level>DEBUG</it.test.log.level>
         <it.nexus.log.level>DEBUG</it.nexus.log.level>
       </properties>
+    </profile>
+
+    <profile>
+      <id>sniff</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>animal-sniffer-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <profile>
