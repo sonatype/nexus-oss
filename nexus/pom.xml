@@ -241,9 +241,9 @@
 
       <!-- Jetty -->
       <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.0.1</version>
+        <groupId>org.eclipse.jetty.orbit</groupId>
+        <artifactId>javax.servlet</artifactId>
+        <version>3.0.0.v201112011016</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
@@ -733,12 +733,6 @@
         <version>${aether.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
-      </dependency>
-      
       <!-- Jackson -->
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
@@ -1035,6 +1029,10 @@
           <exclusion>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1579,7 +1577,6 @@
             <goals>
               <goal>enforce</goal>
             </goals>
-            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. <phase>compile</phase> -->
             <configuration>
               <rules>
                 <bannedDependencies>
@@ -1602,13 +1599,16 @@
                   <excludes>
                     <exclude>commons-vfs:commons-vfs</exclude>
                   </excludes>
-                  <message>commons-vfs 1.0 has a potential security vulnerability (osvdb-58760). Use org.apache.commons:commons-vfs2:2.0 or greater</message>
+                  <message>commons-vfs 1.0 has a potential security vulnerability (osvdb-58760).
+                    Use org.apache.commons:commons-vfs2:2.0 or greater
+                  </message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
                     <exclude>xmlrpc:*</exclude>
                   </excludes>
-                  <message>Apache commons xmlrpc with versions less than 3.1.3 expose a potential security vulnerability (osvdb-68314). Use org.apache.commons:xmlrpc-* 3.1.3 or greater</message>
+                  <message>Apache commons xmlrpc with versions less than 3.1.3 expose a potential security vulnerability (osvdb-68314).
+                    Use org.apache.commons:xmlrpc-* 3.1.3 or greater</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
@@ -1620,8 +1620,8 @@
                   <excludes>
                     <exclude>*:plexus-component-api</exclude>
                   </excludes>
-                  <message>plexus-component-api conflicts with newer plexus-container-default. You probably added a dependency that is plexus component made with older plexus
-                    container.
+                  <message>plexus-component-api conflicts with newer plexus-container-default.
+                    You probably a plexus component made with older plexus container.
                   </message>
                 </bannedDependencies>
                 <bannedDependencies>
@@ -1659,14 +1659,15 @@
                   <excludes>
                     <exclude>junit:junit</exclude>
                   </excludes>
-                  <message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead.</message>
+                  <message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
                   <excludes>
                     <exclude>junit:junit-dep:(,4.9]</exclude>
                   </excludes>
-                  <message>junit:junit-dep 4.9 wrongly includes hamcrest api in jar, 4.10 or greater required due to TestRule changes over earlier versions</message>
+                  <message>junit:junit-dep 4.9 wrongly includes hamcrest api in jar,
+                    4.10 or greater required due to TestRule changes over earlier versions</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
@@ -1717,7 +1718,7 @@
                   <includes>
                     <include>log4j:*</include>
                   </includes>
-                  <message>Do not use log4j api directly in tests. Use slf4j api instead.</message>
+                  <message>Do not use log4j api directly in tests. Use slf4j api instead</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
@@ -1732,9 +1733,18 @@
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
                   <excludes>
+                    <exclude>javax.servlet:servlet-api</exclude>
+                    <exclude>org.mortbay.jetty:servlet-api</exclude>
+                    <exclude>org.mortbay.jetty:servlet-api-2.5</exclude>
+                  </excludes>
+                  <message>Use servlet API from Jetty 8.x (org.eclipse.jetty.orbit:javax.servlet)</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
                     <exclude>org.sonatype.spice:plexus-ehcache</exclude>
                   </excludes>
-                  <message>Use the org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache!</message>
+                  <message>Use org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache</message>
                 </bannedDependencies>
               </rules>
               <fail>true</fail>
@@ -1896,7 +1906,6 @@
       <build>
         <pluginManagement>
           <plugins>
-            <!-- "new" M2E like 1.0 "IndIgor" -->
             <plugin>
               <groupId>org.eclipse.m2e</groupId>
               <artifactId>lifecycle-mapping</artifactId>
@@ -2027,7 +2036,7 @@
       </build>
     </profile>
 
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
+    <!-- Workaround for issue with IDEA loading nexus-plugins -->
     <profile>
       <id>idea</id>
       <properties>
@@ -2039,10 +2048,11 @@
       <id>optimize-js</id>
 
       <properties>
-        <!-- 'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
-             understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now. -->
+        <!--
+        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
+        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
+        -->
         <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
-
         <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
         <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
       </properties>

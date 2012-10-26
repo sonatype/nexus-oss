@@ -27,6 +27,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras-appender</artifactId>
     </dependency>
