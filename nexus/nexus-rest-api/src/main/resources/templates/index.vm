@@ -45,22 +45,11 @@
   ## Plugin post HEAD contributions ends here
 
   #if ($debug)
-  ## no data-main script defined, so requirejs will load the single sources
-  <script src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
-  <script type="text/javascript" charset="utf-8">
-      Ext.onReady(
-        requirejs.config({
-            baseUrl: 'js'
-        });
-        requirejs(['extjs', 'sonatype', 'nexus/ui'], function(Ext, Sonatype) {
-            // document is already loaded at this point, but Ext does not know that.
-            Sonatype.init();
-        });
-      );
-  </script>
+  ## let requirejs load the single source files
+      <script data-main="js/nexus-init.js" src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
   #else
-  ## load global script only when we're not in debug mode
-  <script data-main="js/nexus-init.js" src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
+  ## nexus-all.js is the aggregated file
+      <script data-main="js/sonatype-all.js" src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
   #end
 
 </head>
