@@ -101,13 +101,6 @@
         <configuration>
           <packageWithVersion>false</packageWithVersion>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
-          </dependency>
-        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -140,13 +133,6 @@
         <configuration>
           <packageWithVersion>false</packageWithVersion>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>
