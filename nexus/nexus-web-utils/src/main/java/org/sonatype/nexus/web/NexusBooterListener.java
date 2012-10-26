@@ -42,7 +42,7 @@ public class NexusBooterListener
             context.setAttribute(Nexus.class.getName(), nexus);
 
             NexusConfiguration configuration = plexus.lookup( NexusConfiguration.class );
-            context.setAttribute(NexusConfiguration.class.getName(), nexusConfiguration);
+            context.setAttribute(NexusConfiguration.class.getName(), configuration);
         }
         catch ( Exception e )
         {
