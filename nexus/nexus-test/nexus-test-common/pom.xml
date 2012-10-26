@@ -40,6 +40,11 @@
       <artifactId>litmus-testsupport</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+
     <!--
     FIXME: Try and get rid of this framework, use mockito instead.
     -->
