@@ -44,8 +44,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus.appevents</groupId>
-      <artifactId>plexus-app-events-api</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-appevents</artifactId>
       <scope>provided</scope>
     </dependency>
 

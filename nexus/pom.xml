@@ -332,30 +332,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.plexus.appevents</groupId>
-        <artifactId>plexus-app-events-api</artifactId>
-        <version>1.2</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.plexus.appevents</groupId>
-        <artifactId>simple-event-multicaster</artifactId>
-        <version>1.2</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-archiver</artifactId>
         <version>2.1.1</version>
@@ -1088,6 +1064,11 @@
       FIXME: Replace project.version with actual version used.
       -->
 
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-appevents</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
@@ -1823,6 +1804,7 @@
   </build>
 
   <modules>
+    <module>nexus-appevents</module>
     <module>nexus-bootstrap</module>
     <module>nexus-plugins</module>
     <module>nexus-mock</module>

@@ -105,20 +105,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
-      <groupId>org.sonatype.plexus.appevents</groupId>
-      <artifactId>plexus-app-events-api</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-annotations</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-appevents</artifactId>
+      <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-mailer</artifactId>

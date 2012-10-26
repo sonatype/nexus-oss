@@ -54,14 +54,12 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>org.sonatype.plexus.appevents</groupId>
-      <artifactId>plexus-app-events-api</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-appevents</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.plexus.appevents</groupId>
-      <artifactId>simple-event-multicaster</artifactId>
-    </dependency>
+
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
