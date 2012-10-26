@@ -1427,13 +1427,13 @@
           <!--
           FIXME: Sort out what this is for, and nuke it if is really not needed for anything, if it is then document it here for clarity.
           -->
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.spice</groupId>
-              <artifactId>maven-assembly-helpers</artifactId>
-              <version>1.0</version>
-            </dependency>
-          </dependencies>
+          <!--<dependencies>-->
+            <!--<dependency>-->
+              <!--<groupId>org.sonatype.spice</groupId>-->
+              <!--<artifactId>maven-assembly-helpers</artifactId>-->
+              <!--<version>1.0</version>-->
+            <!--</dependency>-->
+          <!--</dependencies>-->
           <configuration>
             <tarLongFileMode>gnu</tarLongFileMode>
           </configuration>
@@ -1874,6 +1874,10 @@
               </execution>
             </executions>
           </plugin>
+
+          <!--
+          TODO: Configure yui-compression on relevant files here.
+          -->
         </plugins>
       </build>
     </profile>
