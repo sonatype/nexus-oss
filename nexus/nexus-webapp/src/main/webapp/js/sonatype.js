@@ -11,46 +11,10 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
  /*global define*/
-define('sonatype',['extjs', 'nexus/util/observable', 'sonatype/view'], function(Ext, Nexus) {
-  var Sonatype = (function() {
-    return {
-      init : function() {
-        Ext.QuickTips.init();
-        Ext.apply(Ext.QuickTips.getQuickTip(), {
-          showDelay : 250,
-          hideDelay : 300,
-          dismissDelay : 0
-            // don't automatically hide quicktip
-          });
-
-        Ext.History.init();
-
-        Ext.get('header').hide();
-        Ext.get('welcome-tab').hide();
-
-        window.Sonatype.state.CookieProvider = new window.Sonatype.lib.CookieProvider({
-          expires : new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 365))
-            // expires in 1 year
-          });
-
-        var cp = window.Sonatype.state.CookieProvider;
-        var username = cp.get('username', null);
-        // Sonatype.utils.clearCookie('JSESSIONID');
-
-        window.Sonatype.view.init();
-
-        window.Sonatype.utils.loadNexusStatus();
-        window.Sonatype.resources.help = {};
-      }
-
-    };
-  }());
-
-  window.Sonatype = Sonatype;
-
+define('sonatype', ['extjs'], function(Ext) {
   // Define all second level namespaces
-  Ext.namespace('Sonatype.state', 'Sonatype.ext', 'Sonatype.lib', 'Sonatype.utils', 'Sonatype.config', 'Sonatype.user', 'Sonatype.resources', 'Sonatype.repoServer', 'Sonatype.repoServer.resources');
+  Ext.namespace('Sonatype', 'Sonatype.state', 'Sonatype.ext', 'Sonatype.lib', 'Sonatype.utils', 'Sonatype.config', 'Sonatype.user', 'Sonatype.resources', 'Sonatype.repoServer', 'Sonatype.repoServer.resources');
 
-  Sonatype.Events = new Nexus.util.Observable();
   return Sonatype;
 });
+

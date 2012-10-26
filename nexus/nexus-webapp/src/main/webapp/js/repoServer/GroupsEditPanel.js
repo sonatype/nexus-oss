@@ -14,7 +14,7 @@
  * Repository Groups Edit/Create panel layout and controller
  */
 
-define('repoServer/GroupsEditPanel',['sonatype/all'], function(){
+define('repoServer/GroupsEditPanel',['sonatype/all', 'nexus/ext/formpanel'], function(){
 Sonatype.repoServer.RepositoryGroupEditor = function(config) {
   var config = config || {};
   var defaultConfig = {

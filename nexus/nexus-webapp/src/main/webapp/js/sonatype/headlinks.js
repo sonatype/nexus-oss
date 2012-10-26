@@ -13,43 +13,5 @@
 /*global define*/
 
 define('sonatype/headlinks',['../extjs', 'sonatype'], function(Ext, Sonatype){
-Sonatype.headLinks = Ext.emptyFn;
-
-Ext.apply(Sonatype.headLinks.prototype, {
-      /**
-       * Update the head links based on the current status of Nexus
-       */
-      updateLinks : function() {
-        var right = Ext.get('head-link-r');
-
-        var loggedIn = Sonatype.user.curr.isLoggedIn;
-        if (loggedIn)
-        {
-          this.updateRightWhenLoggedIn(right);
-        }
-        else
-        {
-          this.updateRightWhenLoggedOut(right);
-        }
-      },
-
-      updateRightWhenLoggedIn : function(linkEl) {
-        linkEl.update(Sonatype.user.curr.username);
-        linkEl.addClass('head-link-logged-in');
-        linkEl.un('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer)
-        linkEl.on('click', Sonatype.repoServer.RepoServer.showProfileMenu);
-      },
-      updateRightWhenLoggedOut : function(linkEl) {
-        linkEl.un('click', Sonatype.repoServer.RepoServer.showProfileMenu);
-        linkEl.update('Log In');
-
-        this.setClickLink(linkEl);
-        linkEl.removeClass('head-link-logged-in');
-      },
-      setClickLink : function(el) {
-        el.removeAllListeners();
-        el.on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
-      }
-    });
   return Sonatype;
 });
