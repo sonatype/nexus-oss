@@ -40,14 +40,6 @@
       <artifactId>litmus-testsupport</artifactId>
     </dependency>
 
-    <!--
-    FIXME: Try and get rid of this framework, use mockito instead.
-    -->
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-    </dependency>
-
     <!-- TODO move benchmarking libs out into another module since we should not force as dependency here -->
     <dependency>
       <groupId>com.carrotsearch</groupId>
