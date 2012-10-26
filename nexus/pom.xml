@@ -1545,8 +1545,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0.1</version>
-        <!--$NO-MVN-MAN-VER$-->
+        <version>1.1.1</version>
         <executions>
           <execution>
             <id>enforce-java</id>
