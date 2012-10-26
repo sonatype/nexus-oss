@@ -369,10 +369,13 @@
         </exclusions>
       </dependency>
 
+      <!--
+      FIXME: This is only used by nexus-test-environment-maven-plugin and nexus-test-harness-its.
+      -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-archiver</artifactId>
-        <version>2.1.1</version>
+        <version>2.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -388,13 +391,7 @@
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-cipher</artifactId>
-        <version>1.5</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.7</version>
       </dependency>
 
       <dependency>
@@ -450,10 +447,13 @@
         </exclusions>
       </dependency>
 
+      <!--
+      FIXME: This is only used by nexus-migration-tool modules.
+      -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-cli</artifactId>
-        <version>1.2</version>
+        <version>1.6</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
