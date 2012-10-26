@@ -56,7 +56,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <nexus.version>2.1</nexus.version>
+    <nexus.version>2.3-SNAPSHOT</nexus.version>
     <nexus-testsuite-support.version>2.3-SNAPSHOT</nexus-testsuite-support.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
 
@@ -108,13 +108,6 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration</artifactId>
         <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-configuration</artifactId>
-        <version>${nexus.version}</version>
-        <classifier>tests</classifier>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
