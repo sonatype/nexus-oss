@@ -855,6 +855,9 @@
         <version>4.2.2</version>
       </dependency>
 
+      <!--
+      FIXME: Get rid of this dependency.
+      -->
       <dependency>
         <groupId>commons-httpclient</groupId>
         <artifactId>commons-httpclient</artifactId>
