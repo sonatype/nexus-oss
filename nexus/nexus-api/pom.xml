@@ -36,7 +36,6 @@
       <artifactId>nexus-utils</artifactId>
     </dependency>
 
-    <!-- Here for "compatibility" reason only! -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
