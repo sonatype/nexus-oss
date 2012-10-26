@@ -185,7 +185,7 @@
   </properties>
 
   <prerequisites>
-    <maven>3.0</maven>
+    <maven>3.0.4</maven>
   </prerequisites>
 
   <dependencyManagement>
@@ -1354,7 +1354,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>1.6</version>
+          <version>1.7</version>
           <extensions>true</extensions>
           <configuration>
             <pluginName>${nexus.plugin.name}</pluginName>
@@ -1365,7 +1365,7 @@
             <dependency>
               <groupId>org.sonatype.plugins</groupId>
               <artifactId>app-lifecycle-nexus</artifactId>
-              <version>1.6</version>
+              <version>1.7</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -1373,7 +1373,7 @@
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>1.4.1</version>
+          <version>1.5</version>
           <configuration>
             <useJava5>true</useJava5>
           </configuration>
@@ -1521,7 +1521,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
-          <version>2.1-alpha-2</version>
+          <version>2.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1554,9 +1554,15 @@
         </plugin>
 
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.5.1</version>
+        </plugin>
+
+        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>animal-sniffer-maven-plugin</artifactId>
-          <version>1.8</version>
+          <version>1.9</version>
           <configuration>
             <signature>
               <groupId>org.codehaus.mojo.signature</groupId>
