@@ -26,6 +26,26 @@
   <name>Nexus : Migration Tools</name>
   <packaging>pom</packaging>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-cli</artifactId>
+        <version>1.6</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <modules>
     <module>nexus-repository-conversion-tool</module>
     <module>nexus-metadata-rebuild-tool</module>
