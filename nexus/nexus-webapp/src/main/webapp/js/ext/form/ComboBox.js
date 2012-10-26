@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext) {
+define('ext/form/ComboBox',['extjs'], function(Ext) {
   Ext.override(Ext.form.ComboBox, {
     /**
      * ComboBox field needs to encode it's value again, because the drop-down list is rendering HTML

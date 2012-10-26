@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext) {
+define('ext/form/basicform',['extjs'], function(Ext) {
 Ext.override(Ext.form.BasicForm, {
   clearInvalid : function() {
     // same as before, but ignore items without clearInvalid (== non-form-items)

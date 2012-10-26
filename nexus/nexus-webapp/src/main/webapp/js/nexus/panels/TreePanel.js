@@ -12,7 +12,7 @@
  */
 /*global Ext,Sonatype,Nexus*/
 /*jslint evil:true*/
-define(['extjs', 'nexus/config'], function(Ext, Sonatype) {
+define('nexus/panels/TreePanel',['extjs', 'nexus/config'], function(Ext, Sonatype) {
 Ext.namespace('Sonatype.panels');
 
 Sonatype.panels.TreePanel = function(cfg) {

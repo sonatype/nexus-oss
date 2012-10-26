@@ -13,7 +13,7 @@
 
 /*global define*/
 
-define(['extjs', 'sonatype/view'], function(Ext, Sonatype) {
+define('nexus/profile/UserProfile',['extjs', 'sonatype/view'], function(Ext, Sonatype) {
 Ext.namespace('Nexus.profile');
 
 var Nexus = window.Nexus;

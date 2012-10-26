@@ -12,7 +12,7 @@
  */
 /*global define*/
 
-define(['extjs'], function(Ext) {
+define('ext/form/displayfield',['extjs'], function(Ext) {
 /**
  * @class Ext.form.DisplayField
  * @extends Ext.form.Field A display-only text field which is not validated and

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype){
+define('nexus/log',['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype){
 /**
  * Nexus logging utility.
  *

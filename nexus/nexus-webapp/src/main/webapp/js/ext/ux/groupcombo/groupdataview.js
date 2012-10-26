@@ -1,4 +1,4 @@
-define(['extjs'], function(Ext){
+define('ext/ux/groupcombo/groupdataview',['extjs'], function(Ext){
 /**
  * @class Ext.ux.GroupDataView
  * @extends Ext.DataView This class extends a DataView to allow grouping similar

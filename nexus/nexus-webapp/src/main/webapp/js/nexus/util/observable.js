@@ -13,7 +13,7 @@
 
 /*global define*/
 
-define(['extjs', 'nexus'], function(Ext, Nexus) {
+define('nexus/util/observable',['extjs', 'nexus'], function(Ext, Nexus) {
   Ext.namespace('Nexus.util');
 Nexus.util.Observable = function() {
   this.addEvents({

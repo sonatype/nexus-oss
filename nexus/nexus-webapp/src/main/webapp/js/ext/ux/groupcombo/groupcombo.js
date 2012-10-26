@@ -1,4 +1,4 @@
-define(['extjs'], function(Ext){
+define('ext/ux/groupcombo/groupcombo',['extjs'], function(Ext){
 /**
  * @class Ext.ux.form.GroupComboBox
  * @extends Ext.form.ComboBox This class extends a combobox to allow grouping to

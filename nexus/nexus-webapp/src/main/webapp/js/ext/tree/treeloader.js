@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext){
+define('ext/tree/treeloader',['extjs'], function(Ext){
 Ext.tree.TreeLoader.override({
   requestData : function(node, callback) {
     if (this.fireEvent("beforeload", this, node, callback) !== false)

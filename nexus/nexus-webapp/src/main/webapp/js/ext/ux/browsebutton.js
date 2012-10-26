@@ -1,4 +1,4 @@
-define(['extjs'], function(Ext){
+define('ext/ux/browsebutton',['extjs'], function(Ext){
 /*
  * Public Domain
  * http://www.sencha.com/forum/showthread.php?29032-Ext.ux.form.BrowseButton

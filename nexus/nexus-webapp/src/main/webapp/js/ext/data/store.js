@@ -12,7 +12,7 @@
  */
 /*global require*/
 
-define(['extjs'], function(Ext){
+define('ext/data/store',['extjs'], function(Ext){
 // Extension to the store to allow for multi field sorting
 // from http://www.extjs.com/forum/showthread.php?t=48324
 Ext.override(Ext.data.Store, {

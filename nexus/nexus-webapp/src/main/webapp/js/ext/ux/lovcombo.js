@@ -16,7 +16,7 @@
  
 /*global define*/
 
-define(['extjs'], function(Ext){
+define('ext/ux/lovcombo',['extjs'], function(Ext){
 
 // add RegExp.escape if it has not been already added
 if('function' !== typeof RegExp.escape) {

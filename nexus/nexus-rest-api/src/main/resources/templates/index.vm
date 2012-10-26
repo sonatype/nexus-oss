@@ -44,12 +44,21 @@
   #end
   ## Plugin post HEAD contributions ends here
 
+    <script type="text/javascript">
+        var require = {
+            baseUrl : 'js',
+            urlArgs : "cache=$nexusVersion"
+        };
+    </script>
+
+    <script src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
+
   #if ($debug)
   ## let requirejs load the single source files
-      <script data-main="js/nexus-init.js" src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
+      <script src="js/nexus-init.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   #else
   ## nexus-all.js is the aggregated file
-      <script data-main="js/sonatype-all.js" src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
+      <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   #end
 
 </head>

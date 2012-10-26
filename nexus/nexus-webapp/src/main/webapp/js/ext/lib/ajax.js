@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext){
+define('ext/lib/ajax',['extjs'], function(Ext){
 Ext.lib.Ajax.setHeader = function(o) {
   var combinedHeaders, prop;
 

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs', 'nexus'], function(Ext, Nexus) {
+define('nexus/form/roleselector',['extjs', 'nexus'], function(Ext, Nexus) {
 Ext.namespace('Nexus.form');
 /**
  * A RoleManager is used to display assigned roles and privileges (optional) in a grid, with a toolbar

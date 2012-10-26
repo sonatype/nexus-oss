@@ -1,5 +1,5 @@
 /*global define*/
-define(['extjs'], function(Ext){
+define('ext/ux/gridvalidator',['extjs'], function(Ext){
 // handy grid validation from
 // http://www.extjs.com/forum/showthread.php?t=21158
 Ext.namespace('Ext.ux', 'Ext.ux.plugins');

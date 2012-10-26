@@ -12,7 +12,7 @@
  */
 /*global define*/
 
-define(['extjs'], function(Ext) {
+define('ext/form/textarea',['extjs'], function(Ext) {
 Ext.override(Ext.form.TextArea, {
   wordWrap : true,
   onRender : function(ct, position) {

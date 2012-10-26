@@ -13,7 +13,7 @@
 /*
  * Repository panel superclass
  */
-define(['sonatype/all'], function(){
+define('repoServer/AbstractRepoPanel',['sonatype/all'], function(){
 
 /*
  * config options: { id: the is of this panel instance [required] title: title

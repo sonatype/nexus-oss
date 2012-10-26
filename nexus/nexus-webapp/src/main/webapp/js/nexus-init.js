@@ -10,13 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Ext.onReady(function() {
-        requirejs.config({
-          baseUrl : 'js'
-        });
-        requirejs(['extjs', 'sonatype', 'nexus/ui'], function(Ext, Sonatype) {
-          Sonatype.init();
-        });
+(function() {
+  var alreadyDone = false;
+  function init() {
+    requirejs(['extjs', 'sonatype/init', 'nexus/ui', 'sonatype/utils'], function(Ext, Sonatype) {
+      if (!Ext.isReady || alreadyDone) {
+        return;
       }
-);
+      alreadyDone = true;
+      Sonatype.init();
+      Sonatype.view.init();
+      Sonatype.utils.loadNexusStatus();
+    });
+  }
+
+  // Ext is weird about onReady event
+  Ext.onReady(init);
+  init();
+}());
 

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define(['sonatype/all'], function(){
+define('repoServer/RepositoryBrowserContainer',['sonatype/all'], function(){
 // This container will host both the repository browser and the artifact
 // information panel
 Sonatype.repoServer.RepositoryBrowserContainer = function(config) {

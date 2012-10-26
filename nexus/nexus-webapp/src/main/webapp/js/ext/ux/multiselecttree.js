@@ -40,7 +40,7 @@
  * fixed key events to respect shift/ctrl keys Enjoy
  */
 
-define(['extjs'], function(Ext){
+define('ext/ux/multiselecttree',['extjs'], function(Ext){
 
 Ext.ux.FixedMultiSelectionModel = Ext.extend(Ext.tree.MultiSelectionModel, {
       // disabled tracking of mouse clicks because it doubles up drag

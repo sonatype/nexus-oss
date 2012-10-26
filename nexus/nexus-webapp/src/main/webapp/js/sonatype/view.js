@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['../extjs', 'sonatype/headlinks', 'nexus/log', 'sonatype/utils', 'ext/ux/TabCloseMenu'], function(Ext, Sonatype, Nexus) {
+define('sonatype/view',['../extjs', 'sonatype/headlinks', 'nexus/log', 'sonatype/utils', 'ext/ux/TabCloseMenu'], function(Ext, Sonatype, Nexus) {
 Sonatype.view = {
   FIELD_OFFSET_WITH_SCROLL : String((3 + 16 + 3 + 30) * (-1)), // (help icon margin) + (help icon) + margin + (scrollbar)
   FIELD_OFFSET : String((3 + 16) * (-1)), // extra padding on right of icon not needed

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext){
+define('ext/tooltip',['extjs'], function(Ext){
 // some special tooltip config to reuse same tooltip for whole grid
 Ext.override(Ext.ToolTip, {
   onTargetOver : function(e) {

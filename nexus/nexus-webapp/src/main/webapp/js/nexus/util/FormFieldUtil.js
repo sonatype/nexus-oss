@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global top, define*/
-define(['extjs', 'sonatype/view', 'nexus'], function(Ext, Sonatype, Nexus) {
+define('nexus/util/FormFieldUtil',['extjs', 'sonatype/view', 'nexus'], function(Ext, Sonatype, Nexus) {
 
 Ext.namespace('Nexus.util');
 Nexus.util.FormFieldUtil = {

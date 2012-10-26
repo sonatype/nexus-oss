@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext){
+define('ext/grid/gridview',['extjs'], function(Ext){
 Ext.override(Ext.grid.GridView, {
   initTemplates : function() {
     var

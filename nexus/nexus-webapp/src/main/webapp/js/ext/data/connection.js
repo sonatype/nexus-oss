@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global require*/
-define(['extjs'], function(Ext) {
+define('ext/data/connection',['extjs'], function(Ext) {
 Ext.override(Ext.data.Connection, {
   request : function(o) {
     var effectiveForm, params, url, extras, form, headers, options, method, enctype;

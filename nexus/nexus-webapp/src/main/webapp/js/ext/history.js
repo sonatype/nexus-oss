@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define, top*/
-define(['extjs'], function(Ext){
+define('ext/history',['extjs'], function(Ext){
 // needed to override whole history singleton to make 1 simple change (see
 // comment in startUp method)
 Ext.History = (function() {

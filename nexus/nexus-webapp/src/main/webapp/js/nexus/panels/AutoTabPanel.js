@@ -12,7 +12,7 @@
  */
 /*global define*/
 
-define(['extjs', 'sonatype'], function(Ext, Sonatype){
+define('nexus/panels/AutoTabPanel',['extjs', 'sonatype'], function(Ext, Sonatype){
 Ext.namespace('Sonatype.panels');
 
 /*

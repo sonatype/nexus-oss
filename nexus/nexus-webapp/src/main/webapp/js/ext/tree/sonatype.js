@@ -16,7 +16,7 @@
 // without potentially breaking things
 /*jslint evil:true*/
 
-define(['extjs'], function(Ext){
+define('ext/tree/sonatype',['extjs'], function(Ext){
 Ext.tree.SonatypeTreeLoader = function(config) {
   config.requestMethod = "GET";
 

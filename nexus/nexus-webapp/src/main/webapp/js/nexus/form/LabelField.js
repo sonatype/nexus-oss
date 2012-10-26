@@ -12,7 +12,7 @@
  */
 
 /*global define*/
-define(['extjs', 'nexus'], function(Ext, Nexus) {
+define('nexus/form/LabelField',['extjs', 'nexus'], function(Ext, Nexus) {
 Ext.namespace('Nexus.form');
 
 /**

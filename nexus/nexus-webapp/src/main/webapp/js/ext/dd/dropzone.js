@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext) {
+define('ext/dd/dropzone',['extjs'], function(Ext) {
 Ext.dd.DropZone = function(el, config) {
   Ext.dd.DropZone.superclass.constructor.call(this, el, config);
 };

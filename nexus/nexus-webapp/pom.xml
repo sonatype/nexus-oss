@@ -264,59 +264,13 @@
               <aggregations>
                 <aggregation>
                   <insertNewLine>true</insertNewLine>
-                  <output>${compressed-dir}/js/nexus-init.js</output>
+                  <output>${compressed-dir}/js/sonatype-all.js</output>
                   <inputDir>${project.build.directory}/generated-sources/yuicompressor/js</inputDir>
+                  <excludes>
+                    <exclude>lib/require*.js</exclude>
+                  </excludes>
                   <includes>
-                    <include>${basedir}/src/main/webapp/ext-3.4.0/adapter/ext/ext-base.js</include>
-                    <include>${basedir}/src/main/webapp/ext-3.4.0/ext-all.js</include>
                     <include>**/*.js</include>
-                  <!-- requirejs will create a main file for us
-                    <include>sonatype/common.js</include>
-                    <include>nexus/**/common.js</include>
-                    <include>nexus/messagebox.js</include>
-                    <include>ext/**/*.js</include>
-                    <include>nexus/ext/**/*.js</include>
-                    <include>nexus/error/ErrorHandler.js</include>
-                    <include>nexus/util/**/*.js</include>
-                    <include>nexus/form/**/*.js</include>
-                    <include>nexus/navigation/**/*.js</include>
-                    <include>nexus/panels/**/*.js</include>
-                    <include>Sonatype.utils.js</include>
-                    <include>nexus/config.js</include>
-                    <include>Sonatype.lib.js</include>
-                    <include>Sonatype.resources.js</include>
-                    <include>Sonatype.headLinks.js</include>
-                    <include>Sonatype.view.js</include>
-                    <include>repoServer/repoServer.referenceData.js</include>
-                    <include>repoServer/repoServer.resources.js</include>
-                    <include>repoServer/repoServer.FeedViewPanel.js</include>
-                    <include>repoServer/repoServer.ArtifactContainer.js</include>
-                    <include>repoServer/repoServer.LogsViewPanel.js</include>
-                    <include>repoServer/repoServer.ServerEditPanel.js</include>
-                    <include>repoServer/repoServer.RoutesEditPanel.js</include>
-                    <include>repoServer/repoServer.SchedulesEditPanel.js</include>
-                    <include>repoServer/repoServer.UserEditPanel.js</include>
-                    <include>repoServer/repoServer.RoleEditPanel.js</include>
-                    <include>repoServer/repoServer.PrivilegeEditPanel.js</include>
-                    <include>repoServer/repoServer.AbstractRepoPanel.js</include>
-                    <include>repoServer/repoServer.FileUploadPanel.js</include>
-                    <include>repoServer/repoServer.RepoMaintPanel.js</include>
-                    <include>repoServer/repoServer.RepositoryBrowserContainer.js</include>
-                    <include>repoServer/repoServer.RepoEditPanel.js</include>
-                    <include>repoServer/repoServer.GroupsEditPanel.js</include>
-                    <include>repoServer/repoServer.RepoServer.js</include>
-                    <include>repoServer/repoServer.RepoTargetEditPanel.js</include>
-                    <include>repoServer/repoServer.helpAbout.js</include>
-                    <include>repoServer/repoServer.Documentation.js</include>
-                    <include>repoServer/repoServer.LogEditPanel.js</include>
-                    <include>repoServer/repoServer.MirrorConfigPanel.js</include>
-                    <include>repoServer/repoServer.UserBrowserPanel.js</include>
-                    <include>repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
-                    <include>repoServer/repoServer.RepoSummaryPanel.js</include>
-                    <include>repoServer/repoServer.Maven2InformationPanel.js</include>
-                    <include>nexus/profile/UserProfile.js</include>
-                    <include>nexus/profile/Summary.js</include>
-                  -->
                   </includes> 
                 </aggregation>
                 <aggregation>

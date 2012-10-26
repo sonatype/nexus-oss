@@ -11,12 +11,12 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*
- * /js/repoServer/repoServer.referenceData.js Reference service data objects
+ * /js/repoServer/referenceData.js Reference service data objects
  * used for reading form data and compiling resource state objects to send back
  * to the service.
  */
 
-define(['sonatype/all'], function(){
+define('repoServer/referenceData',['sonatype/all'], function(){
 (function() {
 
   Sonatype.repoServer.referenceData = {

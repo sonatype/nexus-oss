@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
  /*global define*/
-define(['extjs', 'nexus/util/observable'], function(Ext, Nexus) {
+define('sonatype',['extjs', 'nexus/util/observable', 'sonatype/view'], function(Ext, Nexus) {
   var Sonatype = (function() {
     return {
       init : function() {

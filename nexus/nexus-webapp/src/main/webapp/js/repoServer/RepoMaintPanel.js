@@ -14,7 +14,7 @@
  * Repository Maintenance panel layout and controller
  */
 
-define(['sonatype/all'], function(){
+define('repoServer/RepoMaintPanel',['sonatype/all'], function(){
 /*
  * config options: { id: the is of this panel instance [required] title: title
  * of this panel (shows in tab) }

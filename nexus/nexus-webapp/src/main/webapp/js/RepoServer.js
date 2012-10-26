@@ -12,7 +12,7 @@
  */
 
 /*global define*/
-define(['extjs', 'sonatype', 'sonatype/lib', 'nexus/config', 'sonatype/utils', 'sonatype/view', 'nexus/navigation'], function(Ext, Sonatype){
+define('RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/config', 'sonatype/utils', 'sonatype/view', 'nexus/navigation'], function(Ext, Sonatype){
   // Repository main Controller(conglomerate) Singleton
   Sonatype.repoServer.RepoServer = (function() {
     var cfg = Sonatype.config.repos,

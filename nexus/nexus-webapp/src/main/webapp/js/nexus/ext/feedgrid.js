@@ -13,7 +13,7 @@
 // must pass in feedUrl that's local to our domain
 // config: feedUrl required
 /*global define*/
-define(['extjs', 'nexus'], function(Ext, Nexus){
+define('nexus/ext/feedgrid',['extjs', 'nexus'], function(Ext, Nexus){
   Ext.namespace('Nexus.ext');
 Nexus.ext.FeedGrid = function(config) {
   Ext.apply(this, config);

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global require*/
-define(['extjs'], function(Ext) {
+define('ext/data/node',['extjs'], function(Ext) {
 Ext.override(Ext.data.Node, {
   hasChildNodes : function() {
     // Sonatype [NEXUS-77]: null check added

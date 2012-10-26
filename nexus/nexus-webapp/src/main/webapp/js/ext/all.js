@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(
+define('ext/all',
       ['extjs', 'ext/ux', 'ext/data', 'ext/dd', 'ext/form', 'ext/grid',
         'ext/layout', 'ext/lib', 'ext/tree', 'ext/component', 'ext/history',
         'ext/string', 'ext/tooltip'],

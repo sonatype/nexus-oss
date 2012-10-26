@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext) {
+define('ext/grid/checkcolumn',['extjs'], function(Ext) {
 Ext.grid.CheckColumn = function(config) {
   Ext.apply(this, config);
   if (!this.id)

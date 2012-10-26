@@ -14,7 +14,7 @@
  * Service Schedule Edit/Create panel layout and controller
  */
 
-define(['sonatype/all'], function(){
+define('repoServer/SchedulesEditPanel',['sonatype/all'], function(){
 Sonatype.repoServer.SchedulesEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {};

@@ -13,6 +13,6 @@
 /*global define, Ext*/
 
 // just give extjs file a name
-define([], function() {
+define('extjs',[], function() {
   return Ext;
 });

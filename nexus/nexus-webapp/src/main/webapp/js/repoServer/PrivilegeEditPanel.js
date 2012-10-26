@@ -14,7 +14,7 @@
  * Privilege Edit/Create panel layout and controller
  */
 
-define(['sonatype/all'], function(){
+define('repoServer/PrivilegeEditPanel',['sonatype/all'], function(){
 Sonatype.repoServer.PrivilegeEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs', 'nexus', 'nexus/messagebox', 'sonatype/utils'], function(Ext, Nexus, messagebox, Sonatype) {
+define('nexus/form/action',['extjs', 'nexus', 'nexus/messagebox', 'sonatype/utils'], function(Ext, Nexus, messagebox, Sonatype) {
 
 Ext.namespace('Nexus.form');
 

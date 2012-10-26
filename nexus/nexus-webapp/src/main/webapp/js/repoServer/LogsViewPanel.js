@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-define(['sonatype/all'], function(){
+define('repoServer/LogsViewPanel',['sonatype/all'], function(){
 /*global Ext,Sonatype,Nexus*/
 Sonatype.repoServer.LogsViewPanel = function(cfg) {
   var config = cfg || {}, defaultConfig = {};

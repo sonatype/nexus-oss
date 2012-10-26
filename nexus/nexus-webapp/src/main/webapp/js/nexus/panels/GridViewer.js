@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs', 'sonatype/view', 'nexus/config', 'nexus/navigation', 'sonatype/utils'], function(Ext, Sonatype){
+define('nexus/panels/GridViewer',['extjs', 'sonatype/view', 'nexus/config', 'nexus/navigation', 'sonatype/utils'], function(Ext, Sonatype){
 Ext.namespace('Sonatype.panels');
 
 (function() {

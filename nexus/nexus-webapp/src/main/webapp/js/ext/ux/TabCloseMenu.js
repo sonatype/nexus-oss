@@ -6,7 +6,7 @@
  * @constructor
  */
 /*global define*/
-define(['extjs'], function(Ext){
+define('ext/ux/TabCloseMenu',['extjs'], function(Ext){
 Ext.ux.TabCloseMenu = function () {
   var tabs, menu, ctxItem;
 

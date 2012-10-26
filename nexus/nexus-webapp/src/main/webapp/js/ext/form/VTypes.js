@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext) {
+define('ext/form/VTypes',['extjs'], function(Ext) {
 Ext.apply(Ext.form.VTypes, {
   password : function(val, field) {
     if (field.initialPasswordField !== undefined && field.initialPasswordField !== null && field.initialPasswordField !== 'undefined')

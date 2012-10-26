@@ -13,7 +13,7 @@
 
 /*global define*/
 
-define(['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype){
+define('nexus/ext/TextEntryList',['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype){
 Ext.namespace('Nexus.ext');
 
 /*

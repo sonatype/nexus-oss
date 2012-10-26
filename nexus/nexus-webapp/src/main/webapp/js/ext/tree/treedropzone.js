@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext){
+define('ext/tree/treedropzone',['extjs'], function(Ext){
 Ext.override(Ext.tree.TreeDropZone, {
   completeDrop : function(de) {
     var ns = de.dropNode, p = de.point, t = de.target, i, len, n, node, ins = false;

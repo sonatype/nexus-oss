@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs'], function(Ext){
+define('ext/layout/formlayout',['extjs'], function(Ext){
 Ext.override(Ext.layout.FormLayout, {
   renderItem : function(c, position, target) {
     if (c && !c.rendered && c.isFormField && c.inputType !== 'hidden')

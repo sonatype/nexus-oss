@@ -12,7 +12,7 @@
  */
 
 /*global define*/
-define(['extjs', 'nexus', 'sonatype'], function(Ext, Nexus, Sonatype) {
+define('nexus/messagebox',['extjs', 'nexus', 'sonatype'], function(Ext, Nexus, Sonatype) {
 // Extend message box, so that we can get ids on the buttons for testing
 Nexus.MessageBox = (function() {
   var O, F = function() {};

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-define(['sonatype/all'], function(){
+define('repoServer/LogEditPanel',['sonatype/all'], function(){
 /*global Ext, Sonatype*/
 Sonatype.repoServer.LogEditPanel = function(cfg) {
   var

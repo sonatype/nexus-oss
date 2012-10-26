@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs', 'nexus'], function(Ext, Nexus) {
+define('nexus/form/searchfield',['extjs', 'nexus'], function(Ext, Nexus) {
 Ext.namespace('Nexus.form');
 
 Nexus.form.SearchField = Ext.extend(Ext.form.TwinTriggerField, {

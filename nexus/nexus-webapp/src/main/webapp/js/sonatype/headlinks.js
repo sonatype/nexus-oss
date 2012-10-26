@@ -12,7 +12,7 @@
  */
 /*global define*/
 
-define(['../extjs', 'sonatype'], function(Ext, Sonatype){
+define('sonatype/headlinks',['../extjs', 'sonatype'], function(Ext, Sonatype){
 Sonatype.headLinks = Ext.emptyFn;
 
 Ext.apply(Sonatype.headLinks.prototype, {

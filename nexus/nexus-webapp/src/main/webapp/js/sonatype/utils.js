@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['../extjs', 'nexus/config', 'nexus/util/Format'], function(Ext, Sonatype, format) {
+define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], function(Ext, Sonatype, format) {
 
   Sonatype.utils = {
     passwordPlaceholder : '|$|N|E|X|U|S|$|',

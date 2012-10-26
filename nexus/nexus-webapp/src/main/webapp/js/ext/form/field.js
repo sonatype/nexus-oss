@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define(['extjs','sonatype'], function(Ext, Sonatype) {
+define('ext/form/field',['extjs','sonatype'], function(Ext, Sonatype) {
 Ext.override(Ext.form.Field, {
   adjustWidth : function(tag, w) {
     tag = tag.toLowerCase();

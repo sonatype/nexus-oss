@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-define(['extjs'], function(Ext){
+define('nexus/error/ErrorHandler',['extjs'], function(Ext){
   Ext.namespace('Nexus.error');
 
 Nexus.error.ErrorHandler = function() {
