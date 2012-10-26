@@ -190,6 +190,12 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "pluginPreBodyContributions", pluginPreBodyContributions );
         templatingContext.put( "pluginPostBodyContributions", pluginPostBodyContributions );
 
+        final String query = request.getResourceRef().getQuery();
+        if ( query != null && query.contains( "debug" ) )
+        {
+            templatingContext.put( "debug", "-debug" );
+        }
+
         templateRepresentation.setDataModel( templatingContext );
 
         return templateRepresentation;

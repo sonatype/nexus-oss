@@ -35,7 +35,8 @@
   <link rel="stylesheet" href="style/sonatype-all.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
 
 ##  <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
-    <script data-main="js/nexus-init.js" src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
+    <script src="ext-3.4.0/adapter/ext/ext-base$!{debug}.js" type="text/javascript" charset="utf-8"></script>
+    <script src="ext-3.4.0/ext-all$!{debug}.js" type="text/javascript" charset="utf-8"></script>
 
   ## Plugin post HEAD contributions start here
   #foreach( $pluginPostHeadContribution in $pluginPostHeadContributions )
@@ -43,13 +44,25 @@
   #end
   ## Plugin post HEAD contributions ends here
 
+  #if ($debug)
+  ## no data-main script defined, so requirejs will load the single sources
+  <script src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8">
-    requirejs(['extjs', 'sonatype', 'nexus/ui'], function(Ext, Sonatype) {
-        // document is already loaded at this point, but Ext does not know that.
-        Ext.isReady = true;
-        Sonatype.init();
-    });
+      Ext.onReady(
+        requirejs.config({
+            baseUrl: 'js'
+        });
+        requirejs(['extjs', 'sonatype', 'nexus/ui'], function(Ext, Sonatype) {
+            // document is already loaded at this point, but Ext does not know that.
+            Sonatype.init();
+        });
+      );
   </script>
+  #else
+  ## load global script only when we're not in debug mode
+  <script data-main="js/nexus-init.js" src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
+  #end
+
 </head>
 
 <body>
