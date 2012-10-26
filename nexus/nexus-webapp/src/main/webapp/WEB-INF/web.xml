@@ -18,13 +18,7 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
   <display-name>Sonatype Nexus</display-name>
-  
-  <!-- Booter -->
-  <!--
-    TODO: we have a chicken and egg problem: this produces WARNINGs in
-    log, since logger is not yet set up, but logger needs properties set
-    that are coming from Plexus boot sequence!
-  -->
+
   <listener>
     <listener-class>org.sonatype.nexus.web.PlexusContainerContextListener</listener-class>
   </listener>
