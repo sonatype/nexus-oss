@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.web;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -30,28 +31,30 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 public class NexusBooterListener
     implements ServletContextListener
 {
-    public void contextInitialized( ServletContextEvent sce )
+    public void contextInitialized( ServletContextEvent event )
     {
+        ServletContext context = event.getServletContext();
         try
         {
-            PlexusContainer plexus =
-                (PlexusContainer) sce.getServletContext().getAttribute( PlexusConstants.PLEXUS_KEY );
+            PlexusContainer plexus = (PlexusContainer) context.getAttribute(PlexusConstants.PLEXUS_KEY);
 
-            final Nexus nexus = plexus.lookup( Nexus.class );
+            Nexus nexus = plexus.lookup( Nexus.class );
+            context.setAttribute(Nexus.class.getName(), nexus);
 
-            sce.getServletContext().setAttribute( Nexus.class.getName(), nexus );
-
-            NexusConfiguration nexusConfiguration = plexus.lookup( NexusConfiguration.class );
-
-            sce.getServletContext().setAttribute( NexusConfiguration.class.getName(), nexusConfiguration );
+            NexusConfiguration configuration = plexus.lookup( NexusConfiguration.class );
+            context.setAttribute(NexusConfiguration.class.getName(), nexusConfiguration);
         }
         catch ( Exception e )
         {
-            throw new IllegalStateException( "Could not initialize Nexus.", e );
+            throw new IllegalStateException( "Could not initialize Nexus", e );
         }
     }
 
-    public void contextDestroyed( ServletContextEvent sce )
+    public void contextDestroyed( ServletContextEvent event )
     {
+        ServletContext context = event.getServletContext();
+
+        context.removeAttribute(Nexus.class.getName());
+        context.removeAttribute(NexusConfiguration.class.getName());
     }
 }
