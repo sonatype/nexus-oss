@@ -24,10 +24,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -36,7 +36,7 @@ import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.security.SecuritySystem;
 
 public class P2ProxyMirrorsTest
-    extends AbstractNexusTestCase
+    extends NexusProxyTestSupport
 {
     protected Nexus nexus;
 

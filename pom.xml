@@ -166,13 +166,6 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
