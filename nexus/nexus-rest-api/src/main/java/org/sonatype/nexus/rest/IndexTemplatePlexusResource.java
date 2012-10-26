@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -55,6 +57,8 @@ public class IndexTemplatePlexusResource
     
     @Configuration( value = "${index.template.file}" )
     String templateFilename;
+
+    private final Pattern scriptPattern = Pattern.compile( ".*<script src=['\"]([^'\"]*)['\"].*" );
 
     public IndexTemplatePlexusResource()
     {
@@ -132,6 +136,8 @@ public class IndexTemplatePlexusResource
         List<String> pluginPreBodyContributions = new ArrayList<String>();
         List<String> pluginPostBodyContributions = new ArrayList<String>();
 
+        List<String> pluginJsFiles = new ArrayList<String>();
+
         for ( String key : bundles.keySet() )
         {
             pluginContext = new HashMap<String, Object>( topContext );
@@ -153,6 +159,12 @@ public class IndexTemplatePlexusResource
             // post HEAD
 
             String postHeadTemplate = bundle.getPostHeadContribution( pluginContext );
+            final Matcher matcher = scriptPattern.matcher( postHeadTemplate );
+            if ( matcher.matches() )
+            {
+                pluginJsFiles.add( matcher.group(1) );
+                continue;
+            }
 
             evaluateIfNeeded(
                 templateRepresentation.getEngine(),
@@ -189,6 +201,8 @@ public class IndexTemplatePlexusResource
 
         templatingContext.put( "pluginPreBodyContributions", pluginPreBodyContributions );
         templatingContext.put( "pluginPostBodyContributions", pluginPostBodyContributions );
+
+        templatingContext.put( "pluginJsFiles", pluginJsFiles );
 
         final String query = request.getResourceRef().getQuery();
         if ( query != null && query.contains( "debug" ) )
