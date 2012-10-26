@@ -350,6 +350,7 @@
           </execution>
           <execution>
             <id>jslint</id>
+            <phase>verify</phase>
             <goals>
               <goal>jslint</goal>
             </goals>
