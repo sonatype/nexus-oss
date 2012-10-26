@@ -37,6 +37,7 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -115,17 +116,18 @@ public class DefaultFSLocalRepositoryStoragePerformanceIT
 
         // prime the retrieve
         originalLastAccessTime = primeLastRequestedTimestamp();
-
-        // sleep so we are sure the clock is different when we validate the last update time.
-        Thread.sleep( 11 );
     }
 
     protected long primeLastRequestedTimestamp()
-        throws LocalStorageException, ItemNotFoundException
+        throws IOException, ItemNotFoundException
     {
         ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );
-        resourceRequest.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, "127.0.0.1" );
-        return localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
+        StorageItem item = localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest );
+        // set it way in the past, to make sure we will have threshold hit
+        final long lastRequested = System.currentTimeMillis() - 10000;
+        item.getRepositoryItemAttributes().setLastRequested( lastRequested );
+        repository.getAttributesHandler().storeAttributes( item );
+        return lastRequested;
     }
 
     @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
