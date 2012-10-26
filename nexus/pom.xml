@@ -162,7 +162,7 @@
     <logback.version>1.0.7</logback.version>
     <aether.version>1.13.1</aether.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
-    <enunciate.version>1.20</enunciate.version>
+    <enunciate.version>1.26</enunciate.version>
     <jetty.version>8.1.7.v20120910</jetty.version>
     <maven.version>3.0.4</maven.version>
     <plexus-security.version>2.8.3-SNAPSHOT</plexus-security.version>
@@ -179,6 +179,8 @@
 
     <nexus.plugin.name>CHANGEME-PLUGIN-NAME-NOT-CONFIGURED</nexus.plugin.name>
     <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
+
+    <copyright.year>2012</copyright.year>
   </properties>
 
   <dependencyManagement>
@@ -1017,8 +1019,10 @@
         <groupId>org.codehaus.enunciate</groupId>
         <artifactId>enunciate-core</artifactId>
         <version>${enunciate.version}</version>
-        <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
-        <!-- But nothing is using that annotation after build happened, and doco is generated -->
+        <!--
+        Only used for generated REST API documentation, and only used for @ResourceMethodSignature.
+        FIXME: This can be removed if plugins implement proper JAX-RS apis, and delegate to restlet crud.
+        -->
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1029,8 +1033,12 @@
             <artifactId>commons-beanutils</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>net.sf.apt-jelly</groupId>
+            <artifactId>apt-jelly-freemarker</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1053,6 +1061,11 @@
       FIXME: Replace project.version with actual version used.
       -->
 
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-enunciate-theme</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
@@ -1773,6 +1786,7 @@
   </build>
 
   <modules>
+    <module>nexus-enunciate-theme</module>
     <module>nexus-bootstrap</module>
     <module>nexus-plugins</module>
     <module>nexus-utils</module>
@@ -1823,28 +1837,43 @@
           <exists>enunciate.xml</exists>
         </file>
       </activation>
-      <dependencies>
-        <!--
-        FIXME: This is really horrible to have a profile enable dependencies like this which are actually required for compilation.
-        FIXME: If normal JAX-RS annotations are added to methods, with adapters to restlet crud, then this is not needed at all.
-        -->
-        <dependency>
-          <groupId>org.codehaus.enunciate</groupId>
-          <artifactId>enunciate-core</artifactId>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.sonatype.nexus</groupId>
+                      <artifactId>nexus-enunciate-theme</artifactId>
+                      <outputDirectory>${project.build.directory}/enunciate-theme</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.codehaus.enunciate</groupId>
             <artifactId>maven-enunciate-plugin</artifactId>
-            <version>1.20-SONATYPE-r919</version>
+            <version>${enunciate.version}</version>
             <dependencies>
               <dependency>
                 <groupId>org.codehaus.enunciate</groupId>
                 <artifactId>enunciate-docs</artifactId>
                 <version>${enunciate.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.sonatype.nexus</groupId>
+                <artifactId>nexus-enunciate-style</artifactId>
+                <version>2.3-SNAPSHOT</version>
               </dependency>
             </dependencies>
             <executions>
@@ -1854,8 +1883,8 @@
                   <goal>docs</goal>
                 </goals>
                 <configuration>
-                  <docsDir>${project.build.outputDirectory}/docs</docsDir>
                   <configFile>enunciate.xml</configFile>
+                  <docsDir>${project.build.outputDirectory}/docs</docsDir>
                 </configuration>
               </execution>
             </executions>
