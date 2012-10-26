@@ -327,7 +327,7 @@ Ext.namespace('Sonatype.panels');
 
         removeDanglingSeparators(menu);
 
-        if (!menu.item || menu.items.length === 0) {
+        if (!menu.items || menu.items.length === 0) {
           return; // quit if empty
         }
 

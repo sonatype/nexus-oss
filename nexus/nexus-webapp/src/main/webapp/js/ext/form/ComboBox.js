@@ -36,10 +36,8 @@ define(['extjs'], function(Ext) {
           this.clearValue();
         }
       } else {
-        this.setValue(Ext.value(
-              this.findRecord(this.displayField, val),
-              rec.get(this.valueField || this.displayField))
-        );
+        rec = this.findRecord(this.displayField, val);
+        this.setRawValue( rec.get(this.valueField || this.displayField) );
       }
     }
   });
