@@ -911,12 +911,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>spice-utils</artifactId>
-        <version>1.0.0</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-jetty-testsuite</artifactId>
         <version>2.1</version>

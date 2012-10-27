@@ -16,10 +16,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
-import org.sonatype.spice.utils.proxyserver.ProxyServerConfigurator;
 
 public class NexusProxyServerConfigurator
-    implements ProxyServerConfigurator
 {
     private Logger logger;
     private RemoteStorageContext ctx;
