@@ -451,12 +451,8 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.5</version>
+        <version>1.6-SNAPSHOT</version>
         <exclusions>
-          <exclusion>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
           <exclusion>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
