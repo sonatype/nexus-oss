@@ -39,6 +39,10 @@
     <sisu-guice.version>3.1.2</sisu-guice.version>
   </properties>
 
+  <prerequisites>
+    <maven>3.0.4</maven>
+  </prerequisites>
+
   <dependencyManagement>
     <dependencies>
       <dependency>

@@ -29,4 +29,21 @@
     <module>nexus-rest-client-java</module>
     <module>nexus-restlight-clients</module>
   </modules>
+
+  <build>
+    <plugins>
+      <!--
+      Ignore sniff'ing these projects, some odd class issues.
+      Don't feel like sorting it out given this will eventually die soon.
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

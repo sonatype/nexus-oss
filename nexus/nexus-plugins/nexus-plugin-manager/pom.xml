@@ -31,14 +31,17 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-host-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-model-api</artifactId>
