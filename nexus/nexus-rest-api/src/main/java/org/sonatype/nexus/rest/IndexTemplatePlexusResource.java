@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.rest;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +20,6 @@ import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -220,25 +216,11 @@ public class IndexTemplatePlexusResource
                         "Was not able to interpolate (check the logs for Velocity messages about the reason)!" );
                 }
             }
-            catch ( ParseErrorException e )
+            catch ( Exception e )
             {
                 throw new ResourceException(
                     Status.SERVER_ERROR_INTERNAL,
-                    "Got ParseErrorException exception during Velocity invocation!",
-                    e );
-            }
-            catch ( MethodInvocationException e )
-            {
-                throw new ResourceException(
-                    Status.SERVER_ERROR_INTERNAL,
-                    "Got MethodInvocationException exception during Velocity invocation!",
-                    e );
-            }
-            catch ( ResourceNotFoundException e )
-            {
-                throw new ResourceException(
-                    Status.SERVER_ERROR_INTERNAL,
-                    "Got ResourceNotFoundException exception during Velocity invocation!",
+                    "Got Exception exception during Velocity invocation!",
                     e );
             }
         }
