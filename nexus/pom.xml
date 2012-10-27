@@ -202,6 +202,9 @@
         <scope>import</scope>
       </dependency>
 
+      <!--
+      FIXME: These should be removed, but until then update to 1.1.1-SNAPSHOT and avoid needing to exclude javax.inject here.
+      -->
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-api</artifactId>
@@ -665,12 +668,6 @@
 
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-api</artifactId>
-        <version>${maven.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
         <version>${maven.version}</version>
       </dependency>
@@ -825,16 +822,6 @@
         <version>${restlet.version}</version>
       </dependency>
 
-      <!--
-      FIXME: This is pulled in by the restlet bridge, and this configuration should be moved there, nothing else inside of NX uses this.
-      -->
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>org.json</artifactId>
-        <version>2.0-NEXUS-3758</version>
-      </dependency>
-
-      <!-- Various deps -->
       <dependency>
         <groupId>com.ning</groupId>
         <artifactId>async-http-client</artifactId>
@@ -946,6 +933,9 @@
         <version>1.5-SNAPSHOT</version>
       </dependency>
 
+      <!--
+      FIXME: Get rid of this dependency.
+      -->
       <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
@@ -1360,7 +1350,7 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
           <version>1.5.5</version>
-          <!-- qdox included in ^^^ is old and not compatible with latest sources -->
+          <!-- qdox included in plexus-component-metadata is old and not compatible with latest sources -->
           <dependencies>
             <dependency>
               <groupId>com.thoughtworks.qdox</groupId>
@@ -1458,16 +1448,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.3</version>
-          <!--
-          FIXME: Sort out what this is for, and nuke it if is really not needed for anything, if it is then document it here for clarity.
-          -->
-          <!--<dependencies>-->
-            <!--<dependency>-->
-              <!--<groupId>org.sonatype.spice</groupId>-->
-              <!--<artifactId>maven-assembly-helpers</artifactId>-->
-              <!--<version>1.0</version>-->
-            <!--</dependency>-->
-          <!--</dependencies>-->
           <configuration>
             <tarLongFileMode>gnu</tarLongFileMode>
           </configuration>
@@ -1596,13 +1576,10 @@
           </configuration>
         </plugin>
 
-        <!--
-        FIXME: Can probably use latest version, as the issue which we think this was for ( http://jira.codehaus.org/browse/MINVOKER-102 ) appears to have been fixed in version 1.6
-        -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-invoker-plugin</artifactId>
-          <version>1.6-SONATYPE-r940877</version>
+          <version>1.7</version>
         </plugin>
 
         <!-- INTERNAL -->
@@ -2134,7 +2111,7 @@
                       <pluginExecutionFilter>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-invoker-plugin</artifactId>
-                        <versionRange>[1.6,)</versionRange>
+                        <versionRange>[1.7,)</versionRange>
                         <goals>
                           <goal>install</goal>
                         </goals>
