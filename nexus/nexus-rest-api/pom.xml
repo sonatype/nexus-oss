@@ -100,6 +100,15 @@
       <artifactId>shiro-web</artifactId>
     </dependency>
 
+    <!--
+    FIXME: See note on DM entry.
+    -->
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- For testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
