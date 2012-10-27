@@ -1990,11 +1990,6 @@
                 <artifactId>enunciate-docs</artifactId>
                 <version>${enunciate.version}</version>
               </dependency>
-              <dependency>
-                <groupId>org.sonatype.nexus</groupId>
-                <artifactId>nexus-enunciate-style</artifactId>
-                <version>${project.version}</version>
-              </dependency>
             </dependencies>
             <executions>
               <execution>
