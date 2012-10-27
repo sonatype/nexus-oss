@@ -1913,7 +1913,7 @@
               <dependency>
                 <groupId>org.sonatype.nexus</groupId>
                 <artifactId>nexus-enunciate-style</artifactId>
-                <version>2.3-SNAPSHOT</version>
+                <version>${project.version}</version>
               </dependency>
             </dependencies>
             <executions>
