@@ -97,6 +97,25 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <!--
+      FIXME: This is needed by nexus-nuget-plugin tests :-(
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>it</id>
