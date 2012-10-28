@@ -57,12 +57,11 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <nexus.version>2.3-SNAPSHOT</nexus.version>
-    <nexus-testsuite-support.version>2.3-SNAPSHOT</nexus-testsuite-support.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
 
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
-    <it.nexus.bundle.version>2.2</it.nexus.bundle.version>
+    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
@@ -112,7 +111,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-support</artifactId>
-        <version>${nexus-testsuite-support.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>${it.nexus.bundle.groupId}</groupId>
@@ -182,7 +181,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>10.0.1</version>
+        <version>13.0.1</version>
       </dependency>
 
       <!-- Internal -->
