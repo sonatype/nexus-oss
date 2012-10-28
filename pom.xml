@@ -49,7 +49,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <nexus.version>2.3-SNAPSHOT</nexus.version>
-    <capabilities-plugin.version>2.0.2</capabilities-plugin.version>
+    <capabilities-plugin.version>2.2-SNAPSHOT</capabilities-plugin.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
 
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
@@ -204,13 +204,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
-      <artifactId>nexus-capabilities-plugin-it</artifactId>
-      <version>${capabilities-plugin.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
       <version>1.3</version>
@@ -222,6 +215,12 @@
       <artifactId>litmus-testsupport</artifactId>
       <version>1.0</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.capabilities</groupId>
+      <artifactId>nexus-capabilities-client</artifactId>
+      <version>${capabilities-plugin.version}</version>
     </dependency>
 
   </dependencies>

@@ -120,7 +120,7 @@ public class P2MetadataGeneratorCapability
                     return configuration != null ? configuration.repositoryId() : null;
                 }
             } ),
-            conditions.capabilities().passivateCapabilityDuringUpdate( context().id() )
+            conditions.capabilities().passivateCapabilityDuringUpdate()
         );
     }
 

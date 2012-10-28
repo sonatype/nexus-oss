@@ -12,16 +12,22 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.ARTIFACTS_XML;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
-import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.capabilities.client.Capabilities;
+import org.sonatype.nexus.capabilities.client.rest.JerseyCapabilitiesSubsystemFactory;
+import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
+import org.sonatype.nexus.client.rest.jersey.JerseyNexusClientFactory;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
-import org.sonatype.nexus.plugins.capabilities.test.CapabilitiesNexusRestClient;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
@@ -29,30 +35,45 @@ import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapabilityDescriptor;
 import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor;
+import com.google.common.base.Throwables;
 
 public abstract class AbstractNexusP2GeneratorIT
     extends AbstractNexusP2IT
 {
 
-    private CapabilitiesNexusRestClient capabilitiesNRC;
-
     private String p2RepositoryAggregatorCapabilityId;
+
+    private NexusClient nexusClient;
 
     public AbstractNexusP2GeneratorIT( final String repoId )
     {
         super( repoId );
     }
 
-    public CapabilitiesNexusRestClient getCapabilitiesNRC()
+    protected NexusClient client()
     {
-        if ( capabilitiesNRC == null )
+        if ( nexusClient == null )
         {
-            capabilitiesNRC = new CapabilitiesNexusRestClient(
-                RequestFacade.getNexusRestClient()
-            );
+            try
+            {
+                nexusClient = new JerseyNexusClientFactory(
+                    new JerseyCapabilitiesSubsystemFactory()
+                ).createFor(
+                    baseUrlFrom( nexusBaseUrl ),
+                    new UsernamePasswordAuthenticationInfo( checkNotNull( "admin" ), checkNotNull( "admin123" ) )
+                );
+            }
+            catch ( MalformedURLException e )
+            {
+                throw Throwables.propagate( e );
+            }
         }
+        return nexusClient;
+    }
 
-        return capabilitiesNRC;
+    public Capabilities capabilities()
+    {
+        return client().getSubsystem( Capabilities.class );
     }
 
     protected void createP2MetadataGeneratorCapability()
@@ -68,7 +89,7 @@ public abstract class AbstractNexusP2GeneratorIT
 
         capability.addProperty( repoProp );
 
-        getCapabilitiesNRC().create( capability );
+        capabilities().add( capability );
     }
 
     protected void createP2RepositoryAggregatorCapability()
@@ -84,21 +105,21 @@ public abstract class AbstractNexusP2GeneratorIT
 
         capability.addProperty( repoProp );
 
-        p2RepositoryAggregatorCapabilityId = getCapabilitiesNRC().create( capability ).getId();
+        p2RepositoryAggregatorCapabilityId = capabilities().add( capability ).getId();
     }
 
     protected void removeP2RepositoryAggregatorCapability()
         throws Exception
     {
-        getCapabilitiesNRC().delete( p2RepositoryAggregatorCapabilityId );
+        capabilities().delete( p2RepositoryAggregatorCapabilityId );
     }
 
     protected void passivateP2RepositoryAggregatorCapability()
         throws Exception
     {
-        final CapabilityResource capabilityResource = getCapabilitiesNRC().read( p2RepositoryAggregatorCapabilityId );
+        final CapabilityResource capabilityResource = capabilities().get( p2RepositoryAggregatorCapabilityId );
         capabilityResource.setEnabled( false );
-        getCapabilitiesNRC().update( capabilityResource );
+        capabilities().update( capabilityResource );
     }
 
     protected void deployArtifact( final String repoId, final File fileToDeploy, final String path )

@@ -125,7 +125,7 @@ public class P2RepositoryAggregatorCapability
                     return configuration != null ? configuration.repositoryId() : null;
                 }
             } ),
-            conditions.capabilities().passivateCapabilityDuringUpdate( context().id() )
+            conditions.capabilities().passivateCapabilityDuringUpdate()
         );
     }
 
