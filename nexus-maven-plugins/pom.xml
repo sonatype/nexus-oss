@@ -40,6 +40,10 @@
     <nexus.version>2.2-SNAPSHOT</nexus.version>
   </properties>
 
+  <prerequisites>
+    <maven>3.0.4</maven>
+  </prerequisites>
+
   <scm>
     <connection>scm:git:git://github.com/sonatype/nexus.git</connection>
     <developerConnection>scm:git:git@github.com:sonatype/nexus.git</developerConnection>

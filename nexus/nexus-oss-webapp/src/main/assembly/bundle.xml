@@ -27,65 +27,73 @@
   <fileSets>
     <fileSet>
       <directory>src/main/resources/content</directory>
+      <outputDirectory>${project.build.finalName}</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
       <excludes>
-        <exclude>**/.placeholder</exclude>
+        <exclude>**/sonatype-work/**</exclude>
         <exclude>**/nexus</exclude>
         <exclude>**/*.bat</exclude>
         <exclude>**/wrapper*</exclude>
       </excludes>
-      <outputDirectory>${project.build.finalName}</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
     </fileSet>
 
+    <!-- chmod +x all JSW wrapper bits -->
     <fileSet>
       <directory>src/main/resources/content</directory>
-      <includes>
-        <include>**/wrapper*</include>
-      </includes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
+      <includes>
+        <include>**/wrapper*</include>
+      </includes>
     </fileSet>
 
+    <!-- chmod +x unix scripts -->
     <fileSet>
       <directory>src/main/resources/content</directory>
-      <includes>
-        <include>**/nexus</include>
-      </includes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
       <lineEnding>unix</lineEnding>
+      <includes>
+        <include>**/nexus</include>
+      </includes>
     </fileSet>
 
+    <!-- batch files -->
     <fileSet>
       <directory>src/main/resources/content</directory>
-      <includes>
-        <include>**/*.bat</include>
-      </includes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
       <lineEnding>dos</lineEnding>
+      <includes>
+        <include>**/*.bat</include>
+      </includes>
     </fileSet>
 
+    <!-- sonatype-work directory -->
     <fileSet>
       <directory>src/main/resources/sonatype-work</directory>
+      <outputDirectory>sonatype-work</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
       <excludes>
         <exclude>**/.placeholder</exclude>
       </excludes>
-      <outputDirectory>sonatype-work</outputDirectory>
-      <directoryMode>0755</directoryMode>
     </fileSet>
   </fileSets>
 
   <dependencySets>
     <dependencySet>
+      <outputDirectory>${project.build.finalName}/nexus</outputDirectory>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useStrictFiltering>true</useStrictFiltering>
       <includes>
         <include>*:nexus-webapp:war</include>
       </includes>
-      <useProjectArtifact>false</useProjectArtifact>
       <unpack>true</unpack>
       <unpackOptions>
         <excludes>
@@ -98,15 +106,17 @@
           <exclude>WEB-INF/classes/logback.xml</exclude>
         </excludes>
       </unpackOptions>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>${project.build.finalName}/nexus</outputDirectory>
     </dependencySet>
 
     <dependencySet>
+      <outputDirectory>${project.build.finalName}/lib</outputDirectory>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useStrictFiltering>true</useStrictFiltering>
       <includes>
         <include>org.sonatype.nexus:nexus-bootstrap</include>
         <include>org.sonatype.nexus:nexus-logging-extras-appender</include>
-        <include>javax.servlet:*</include>
+        <include>org.eclipse.jetty.orbit:javax.servlet</include>
         <include>org.eclipse.jetty:*</include>
         <include>org.codehaus.plexus:*</include>
         <include>org.sonatype.sisu:*</include>
@@ -114,10 +124,6 @@
         <include>org.slf4j:*</include>
         <include>ch.qos.logback:*</include>
       </includes>
-      <useProjectArtifact>false</useProjectArtifact>
-      <unpack>false</unpack>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>${project.build.finalName}/lib</outputDirectory>
     </dependencySet>
   </dependencySets>
 

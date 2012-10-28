@@ -13,41 +13,42 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
-
-  <!-- Off for now -->
-  <!-- 
-  <api-classes>
-    <include pattern="org.sonatype.nexus.remote.*" />
-  </api-classes>
-
-  <namespaces>
-    <namespace id="api" uri="http://nexus.sonatype.org/api/1.0.0" />
-    <namespace id="domain" uri="http://nexus.sonatype.org/domain/1.0.0" />
-  </namespaces>
-  -->
+<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.26.xsd">
 
   <services>
     <rest defaultRestSubcontext="service/local"/>
   </services>
 
   <modules>
+    <!--
+    Disable *everything* except docs... stupid that these have to be enabled by default.
+    -->
+    <csharp disabled="true"/>
+    <c disabled="true"/>
+    <jersey disabled="true"/>
+    <ruby disabled="true"/>
+    <amf disabled="true"/>
+    <cxf disabled="true"/>
+    <gwt disabled="true"/>
+    <jboss disabled="true"/>
+    <jaxws disabled="true"/>
+    <jaxws-client disabled="true"/>
+    <jaxws-ri disabled="true"/>
+    <obj-c disabled="true"/>
+    <java-client disabled="true"/>
+    <spring-app disabled="true"/>
+    <xfire disabled="true"/>
+    <xfire-client disabled="true"/>
+    <xml disabled="true"/>
 
-    <jersey usePathBasedConneg="false"  />
-    
-  <!-- Off for now -->
-  <!-- 
-    <jersey disabled="true" />
-    <jaxws disabled="true" />
-    <jaxws-client disabled="true" />
-    <jaxws-support disabled="true" />
-    <jaxws-ri disabled="true" />
-    <gwt disabled="true" />
-    <jaxws-client disabled="true" />
-  -->
-
-    <docs disabled="false" title="Sonatype Nexus Indexer Lucene REST API" includeExampleXml="true" includeExampleJson="true" >
-      <war docsDir="apidocs" />
+    <docs disabled="false"
+          title="${nexus.plugin.name} REST API"
+          copyright="Sonatype, Inc. ${copyright.year}"
+          includeExampleXml="true"
+          includeExampleJson="true"
+          includeDefaultDownloads="false">
+      <additional-css file="${project.build.directory}/enunciate-theme/css/custom.css"/>
     </docs>
 
   </modules>

@@ -140,12 +140,6 @@
       </exclusions>
     </dependency>
 
-    <!-- Classworlds IO -->
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>classworlds-configuration-io</artifactId>
-    </dependency>
-
     <!-- MavenDeployer and AbstractMavenNexusIT -->
     <dependency>
       <groupId>org.apache.maven.shared</groupId>

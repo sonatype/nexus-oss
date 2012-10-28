@@ -68,12 +68,6 @@
       </exclusions>
     </dependency>
 
-    <!-- Classworlds IO -->
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>classworlds-configuration-io</artifactId>
-    </dependency>
-
     <!-- Logging -->
     <dependency>
       <groupId>ch.qos.logback</groupId>

@@ -26,6 +26,17 @@
   <packaging>pom</packaging>
   <name>Nexus : Core Plugins</name>
 
+  <dependencies>
+    <!--
+    FIXME: See note on DM entry.
+    -->
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
   <modules>
     <module>nexus-indexer-lucene-plugin-parent</module>
     <module>nexus-timeline-plugin</module>

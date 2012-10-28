@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.tools.ant.taskdefs.condition.Os;
-import org.sonatype.inject.Nullable;
+import javax.annotation.Nullable;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;

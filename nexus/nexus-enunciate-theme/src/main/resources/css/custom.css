@@ -10,28 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+/*
+TODO: Customize style...
 
-import org.slf4j.bridge.SLF4JBridgeHandler;
-
-/**
- * Simple listener that installs and uninstalls the SLF4j bridge, used to redirect Java Util logging to the SLF4J API.
- * 
- * @author cstamas
- */
-public class Slf4jBooterListener
-    implements ServletContextListener
-{
-    public void contextInitialized( ServletContextEvent sce )
-    {
-        SLF4JBridgeHandler.install();
-    }
-
-    public void contextDestroyed( ServletContextEvent sce )
-    {
-        SLF4JBridgeHandler.uninstall();
-    }
+.xbreadcrumbs {
+    color: white;
+    background: black;
+    width: 100%;
 }
+*/
