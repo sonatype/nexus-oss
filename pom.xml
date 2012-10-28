@@ -76,7 +76,7 @@
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
-        <version>1.4.2</version>
+        <version>1.4.3</version>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
@@ -91,7 +91,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>3.0</version>
+        <version>3.0.8</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -156,12 +156,12 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-inject-plexus</artifactId>
-        <version>2.3.0</version>
+        <version>2.3.1</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-assistedinject</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.sonatype.sisu</groupId>
@@ -172,7 +172,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.goodies</groupId>
         <artifactId>goodies-eventbus</artifactId>
-        <version>1.2</version>
+        <version>1.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
