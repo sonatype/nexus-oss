@@ -82,18 +82,6 @@ public class CapabilityConditions
      * Creates a new condition that is becoming unsatisfied before an capability is updated and becomes satisfied after
      * capability was updated.
      *
-     * @param id id of capability that should be passivated during update updated
-     * @return created condition
-     */
-    public Condition passivateCapabilityDuringUpdate( final CapabilityIdentity id )
-    {
-        return new PassivateCapabilityDuringUpdateCondition( eventBus, id );
-    }
-
-    /**
-     * Creates a new condition that is becoming unsatisfied before an capability is updated and becomes satisfied after
-     * capability was updated.
-     *
      * @return created condition
      */
     public Condition passivateCapabilityDuringUpdate()

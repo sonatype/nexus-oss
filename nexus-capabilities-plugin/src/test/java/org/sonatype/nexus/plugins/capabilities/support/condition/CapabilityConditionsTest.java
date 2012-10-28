@@ -81,7 +81,7 @@ public class CapabilityConditionsTest
     public void reactivateCapabilityOnUpdate()
     {
         assertThat(
-            underTest.passivateCapabilityDuringUpdate( capabilityIdentity( "foo" ) ),
+            underTest.passivateCapabilityDuringUpdate(),
             is( Matchers.<Condition>instanceOf( PassivateCapabilityDuringUpdateCondition.class ) )
         );
     }

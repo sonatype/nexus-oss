@@ -36,13 +36,6 @@ public class PassivateCapabilityDuringUpdateCondition
 
     private CapabilityIdentity id;
 
-    public PassivateCapabilityDuringUpdateCondition( final EventBus eventBus,
-                                                     final CapabilityIdentity id )
-    {
-        super( eventBus, true );
-        this.id = checkNotNull( id );
-    }
-
     public PassivateCapabilityDuringUpdateCondition( final EventBus eventBus )
     {
         super( eventBus, true );

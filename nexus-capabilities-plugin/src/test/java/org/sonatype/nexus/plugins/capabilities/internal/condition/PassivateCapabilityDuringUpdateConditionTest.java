@@ -60,7 +60,8 @@ public class PassivateCapabilityDuringUpdateConditionTest
 
         when( reference.context() ).thenReturn( context );
 
-        underTest = new PassivateCapabilityDuringUpdateCondition( eventBus, id );
+        underTest = new PassivateCapabilityDuringUpdateCondition( eventBus );
+        underTest.setContext( context );
         underTest.bind();
 
         verify( eventBus ).register( underTest );
@@ -130,18 +131,6 @@ public class PassivateCapabilityDuringUpdateConditionTest
         thrown.expectMessage( "Already contextualized" );
         new PassivateCapabilityDuringUpdateCondition( eventBus )
             .setContext( reference.context() )
-            .setContext( reference.context() );
-    }
-
-    /**
-     * Verify that contextualization fails if capability id already specified.
-     */
-    @Test
-    public void contextualizationWhenIdAlreadySpecified()
-    {
-        thrown.expect( IllegalStateException.class );
-        thrown.expectMessage( "Already contextualized" );
-        new PassivateCapabilityDuringUpdateCondition( eventBus, capabilityIdentity( "test" ) )
             .setContext( reference.context() );
     }
 
