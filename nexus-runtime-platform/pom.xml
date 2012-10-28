@@ -70,22 +70,44 @@
         <version>${sisu-guice.version}</version>
       </dependency>
 
+      <!--
+      NOTE: sisu-guice exclusions here to avoid getting both no_aop and default sisu-guice included.
+      -->
+
       <dependency>
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-servlet</artifactId>
         <version>${sisu-guice.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-multibindings</artifactId>
         <version>${sisu-guice.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-assistedinject</artifactId>
         <version>${sisu-guice.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
