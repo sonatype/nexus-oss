@@ -99,7 +99,6 @@ Sonatype.repoServer.HostedRepositorySummaryPanel = function(config) {
               hidden : true
             }, {
               xtype : 'textarea',
-              htmlDecode : false,
               name : 'distMgmtField',
               anchor : Sonatype.view.FIELD_OFFSET,
               readOnly : true,

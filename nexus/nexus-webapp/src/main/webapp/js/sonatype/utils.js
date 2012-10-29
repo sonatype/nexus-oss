@@ -866,7 +866,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
     },
 
     parseFormattedAppName : function(formattedAppName) {
-      return format.htmlDecode(formattedAppName);
+      return formattedAppName;
     },
 
     loadNexusStatus : function(loggedInUserSource, versionOnly) {

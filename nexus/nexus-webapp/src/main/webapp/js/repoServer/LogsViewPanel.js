@@ -426,7 +426,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       renderLog : function(options, success, response) {
         if (success)
         {
-          var text = Ext.util.Format.htmlEncode(response.responseText);
+          var text = response.responseText;
           var newValue = this.currentSize == 0 ? text : this.logTextArea.getRawValue() + text;
 
           var logDom = this.logTextArea.getEl().dom;

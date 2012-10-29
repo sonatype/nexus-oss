@@ -14,7 +14,6 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.hamcrest.Matcher;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -185,9 +184,9 @@ public class LdapConnMessageUtil
         Assert.assertEquals( expected.getHost(), actual.getHost() );
         Assert.assertEquals( expected.getPort(), actual.getPort() );
         Assert.assertEquals( expected.getProtocol(), actual.getProtocol() );
-        Assert.assertEquals( expected.getRealm(), StringEscapeUtils.unescapeHtml( actual.getRealm() ) );
-        Assert.assertEquals( expected.getSearchBase(), StringEscapeUtils.unescapeHtml( actual.getSearchBase() ) );
-        Assert.assertEquals( expected.getSystemUsername(), StringEscapeUtils.unescapeHtml( actual.getSystemUsername() ) );
+        Assert.assertEquals( expected.getRealm(), actual.getRealm() );
+        Assert.assertEquals( expected.getSearchBase(), actual.getSearchBase() );
+        Assert.assertEquals( expected.getSystemUsername(), actual.getSystemUsername() );
 
         // if the expectedPassword == null then the actual should be null
         // if its anything else the actual password should be "--FAKE-PASSWORD--"

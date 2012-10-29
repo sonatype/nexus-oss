@@ -23,10 +23,8 @@ Ext.override(Ext.form.TextField, {
    * for example in the repository name. The REST layer will encode to html entities, which will be correct
    * for html rendering, but text fields without this configuration will display '&quot;test&quot;' instead
    * of the originally sent '"test"'.
-   * <p/>
-   * Default value is 'true'.
    */
-  htmlDecode : true,
+  htmlDecode : false,
 
   /**
    * @cfg {Boolean} htmlConvert
