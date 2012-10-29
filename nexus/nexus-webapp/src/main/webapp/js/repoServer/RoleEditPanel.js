@@ -64,6 +64,7 @@ Sonatype.repoServer.RoleEditPanel = function(config) {
                 }
               }
 
+              /* ext-3.4.0
               if (this.sp.checkPermission('security:roles', this.sp.CREATE) && store.getCount() > 0 && this.toolbarAddButton.menu.items.length == 1)
               {
                 this.toolbarAddButton.menu.add({
@@ -72,6 +73,7 @@ Sonatype.repoServer.RoleEditPanel = function(config) {
                       scope : this
                     });
               }
+              */
             },
             scope : this
           }
@@ -165,6 +167,14 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Sonatype.panels.GridViewer, {
                 },
                 scope : this
               });
+        }
+        /* ext 3.4.0 */
+        if (this.sp.checkPermission('security:roles', this.sp.CREATE) && this.sourceStore.getCount() > 0 ) {
+          this.toolbarAddButton.menu.add({
+            text : 'External Role Mapping',
+            handler : this.mapExternalRoles,
+            scope : this
+          });
         }
       },
 

@@ -68,30 +68,28 @@ button.st-icon-refresh {
 }
 
 /* Ext theme overrides */
-.x-form-invalid, textarea.x-form-invalid {
-    /* make three browsers consistent */
-    background: #fee;
-    border: 1px solid #dd7870;
+.x-form-invalid,textarea.x-form-invalid{ /* make three browsers consistent */
+  background:#fee;
+  border:1px solid #dd7870;
 }
 
-.ext-safari .x-form-invalid {
-    /* @note could remove from source */
-    background: #fee;
-    border: 1px solid #dd7870;
+.ext-safari .x-form-invalid{ /* @note could remove from source */ 
+  background:#fee;
+  border:1px solid #dd7870;
 }
 
-.x-form-focus, textarea.x-form-focus {
-    outline: auto 0px -webkit-focus-ring-color; /* add Safari focus ring override, so consistent across browsers */
+.x-form-focus,textarea.x-form-focus{
+  outline: auto 0px -webkit-focus-ring-color; /* add Safari focus ring override, so consistent across browsers */
 }
 
-.loading-indicator {
-    font-size: 11px;
-    background-image: url(../ext-2.3/resources/images/default/grid/loading.gif);
-    background-repeat: no-repeat;
-    background-position: 3px center;
-    padding-left: 22px;
-    line-height: 16px;
-    margin: 3px;
+.loading-indicator{
+  font-size:11px;
+    background-image:url(../ext-3.4.0/resources/images/default/grid/loading.gif);
+    background-repeat:no-repeat;
+    background-position:3px center;
+    padding-left:22px;
+    line-height:16px;
+    margin:3px;
 }
 
 /* correct safari fieldset toggle icons */

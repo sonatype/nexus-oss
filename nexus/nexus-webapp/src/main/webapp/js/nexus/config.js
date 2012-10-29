@@ -51,7 +51,7 @@ define('nexus/config',['extjs', 'nexus/messagebox', 'sonatype/init'], function(E
       host : host,
       servicePath : servicePath,
       resourcePath : resourcePath,
-      extPath : resourcePath + '/ext-2.3',
+      extPath : resourcePath + '/ext-3.4.0',
       contentPath : contentPath,
       cssPath : '/styles',
       jsPath : '/js',

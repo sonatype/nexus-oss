@@ -12,6 +12,7 @@
  */
 /*global define*/
 define('ext/layout/formlayout',['extjs'], function(Ext){
+  /* ext-3.4.0
 Ext.override(Ext.layout.FormLayout, {
   renderItem : function(c, position, target) {
     if (c && !c.rendered && c.isFormField && c.inputType !== 'hidden')
@@ -41,4 +42,5 @@ Ext.override(Ext.layout.FormLayout, {
     }
   }
 });
+*/
 });

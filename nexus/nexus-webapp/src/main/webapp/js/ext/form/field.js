@@ -105,6 +105,10 @@ Ext.override(Ext.form.Field, {
     // @todo: afterText doesn't work with combo boxes!
     if (this.afterText)
     {
+      if ( !wrapDiv ) {
+        wrapDiv = this.getEl().wrap({cls:'x-form-element'});
+      }
+
       wrapDiv.createChild({
         tag : 'span',
         cls : 'form-label-after-field',
@@ -114,6 +118,10 @@ Ext.override(Ext.form.Field, {
 
     if (this.helpText)
     {
+      if ( !wrapDiv ) {
+        wrapDiv = this.getEl().wrap({cls:'x-form-element'});
+      }
+
       helpMark = wrapDiv.createChild({
         tag : 'img',
         src : Sonatype.config.resourcePath + '/images/icons/help.png',
@@ -131,7 +139,7 @@ Ext.override(Ext.form.Field, {
     }
 
     // original method
-    this.afterRenderOrig(arguments);
+    this.afterRenderOrig.apply(this, arguments);
   }
 
 });

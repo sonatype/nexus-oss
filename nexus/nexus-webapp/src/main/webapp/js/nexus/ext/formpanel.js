@@ -313,7 +313,7 @@ Ext.extend(Nexus.ext.FormPanel, Ext.FormPanel, {
 
   optionalFieldsetExpandHandler : function(panel) {
     panel.items.each(function(item, i, len) {
-      if (item.getEl().up('div.required-field', 3))
+      if (item.rendered && item.getEl().up('div.required-field', 3))
       {
         item.allowBlank = false;
       }

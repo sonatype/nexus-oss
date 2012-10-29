@@ -80,8 +80,8 @@ Nexus.profile.UserProfile = function(cfg) {
     listeners : {
       'select' : {
         fn : function(combo, record, index) {
-          this.bookmark = record.get('text');
-          this.content.display(record.get('value'), this);
+          this.bookmark = record.get(combo.displayField);
+          this.content.display(record.get(combo.valueField), this);
           Sonatype.utils.updateHistory(this);
         },
         scope : this
@@ -92,10 +92,10 @@ Nexus.profile.UserProfile = function(cfg) {
             return;
           }
           var rec = combo.store.getAt(0);
-          this.bookmark = rec.get('text');
+          this.bookmark = rec.get(combo.displayField);
 
-          combo.setValue(rec.get('text'));
-          this.content.display(rec.get('value'), this);
+          combo.setValue(rec.get(combo.displayField));
+          this.content.display(rec.get(combo.valueField), this);
         },
         scope : this
       }
@@ -153,13 +153,14 @@ Nexus.profile.UserProfile = function(cfg) {
 
     token = decodeURIComponent(token);
 
-    idx = combo.store.find('text', token);
+    // FIXME should use combo.findRecord?
+    idx = combo.store.find(combo.displayField, token);
 
     if (idx !== -1) {
       this.bookmark = token;
       rec = combo.store.getAt(idx);
-      combo.setValue(rec.get('text'));
-      this.content.display(rec.get('value'), this);
+      combo.setValue(rec.get(combo.valueField));
+      this.content.display(rec.get(combo.valueField), this);
     }
   };
 
