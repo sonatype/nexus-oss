@@ -25,7 +25,7 @@
 
   <groupId>org.sonatype.nexus.repository.site</groupId>
   <artifactId>nexus-site-repository</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Nexus Site Repository (Parent)</name>
@@ -129,7 +129,7 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-site-repository-plugin</artifactId>
         <type>nexus-plugin</type>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
       </dependency>
 
     </dependencies>
