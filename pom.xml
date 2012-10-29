@@ -158,17 +158,6 @@
         <version>2.3.1</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.sisu.inject</groupId>
-        <artifactId>guice-assistedinject</artifactId>
-        <version>3.1.2</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guice</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.sonatype.sisu.goodies</groupId>
         <artifactId>goodies-eventbus</artifactId>
         <version>1.5-SNAPSHOT</version>
