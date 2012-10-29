@@ -51,6 +51,7 @@
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
+
     <!-- More for UTs -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -61,12 +62,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>

@@ -83,7 +83,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>1.6-SONATYPE-r940877</version>
+        <version>1.7</version>
         <executions>
           <execution>
             <id>maven-fake-repo</id>
