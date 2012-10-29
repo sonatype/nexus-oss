@@ -12,6 +12,7 @@
  */
 /*global define*/
 define('ext/grid/gridview',['extjs'], function(Ext){
+  /* extjs 3.4
 Ext.override(Ext.grid.GridView, {
   initTemplates : function() {
     var
@@ -134,4 +135,5 @@ Ext.override(Ext.grid.GridView, {
     return buf.join("");
   }
 });
+*/
   });
