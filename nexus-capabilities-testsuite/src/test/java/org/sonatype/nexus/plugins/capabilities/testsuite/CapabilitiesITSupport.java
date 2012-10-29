@@ -63,14 +63,16 @@ public abstract class CapabilitiesITSupport
     @Override
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
-        return configuration.addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
-            ),
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.capabilities", "nexus-capabilities-testsuite-helper"
-            )
-        );
+        return configuration
+            .setLogLevel( "org.sonatype.nexus.plugins.capabilities", "DEBUG" )
+            .addPlugins(
+                artifactResolver().resolvePluginFromDependencyManagement(
+                    "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
+                ),
+                artifactResolver().resolvePluginFromDependencyManagement(
+                    "org.sonatype.nexus.capabilities", "nexus-capabilities-testsuite-helper"
+                )
+            );
     }
 
     @Before
