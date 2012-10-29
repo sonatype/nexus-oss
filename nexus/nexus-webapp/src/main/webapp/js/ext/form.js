@@ -14,7 +14,6 @@
 define('ext/form',
       [
         'ext/form/basicform',
-        'ext/form/ComboBox',
         'ext/form/displayfield',
         'ext/form/field',
         'ext/form/textarea',
