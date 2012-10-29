@@ -59,7 +59,7 @@
     <script type="text/javascript" charset="utf-8">
     #foreach( $js in $pluginJsFiles )
 ##        define('$js', ['$nexusRoot/$js']);
-        requirejs(['nexus/ui', 'sonatype/all', 'require'], function(Nexus, Sonatype, require) {
+        requirejs(['nexus/ui', 'sonatype/init', 'require'], function(Nexus, Sonatype, require) {
             require(['$nexusRoot/$js'], function() {
                 Nexus.Log.debug('Loaded $js')
             });

@@ -580,6 +580,12 @@
         <version>${commons-beanutils.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>1.7.1</version>
+      </dependency>
+
       <!-- SLF4J Logging -->
       <dependency>
         <groupId>org.slf4j</groupId>

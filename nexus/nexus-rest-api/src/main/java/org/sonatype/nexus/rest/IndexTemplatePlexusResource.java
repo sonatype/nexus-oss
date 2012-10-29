@@ -28,6 +28,10 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -57,8 +61,6 @@ public class IndexTemplatePlexusResource
     
     @Configuration( value = "${index.template.file}" )
     String templateFilename;
-
-    private final Pattern scriptPattern = Pattern.compile( ".*<script src=['\"]([^'\"]*)['\"].*" );
 
     public IndexTemplatePlexusResource()
     {
@@ -159,12 +161,19 @@ public class IndexTemplatePlexusResource
             // post HEAD
 
             String postHeadTemplate = bundle.getPostHeadContribution( pluginContext );
-            final Matcher matcher = scriptPattern.matcher( postHeadTemplate );
-            if ( matcher.matches() )
+
+            final Document html = Jsoup.parse( postHeadTemplate );
+            final Elements scripts = html.select( "script" );
+            for ( Element script : scripts )
             {
-                pluginJsFiles.add( matcher.group(1) );
-                continue;
+                final String src = script.attr( "src" );
+                if ( !src.isEmpty() )
+                {
+                    pluginJsFiles.add( src );
+                    script.remove();
+                }
             }
+            postHeadTemplate = html.head().children().toString();
 
             evaluateIfNeeded(
                 templateRepresentation.getEngine(),
