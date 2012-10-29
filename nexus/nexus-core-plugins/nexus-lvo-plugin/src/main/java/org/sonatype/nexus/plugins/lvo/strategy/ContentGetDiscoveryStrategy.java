@@ -16,8 +16,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
@@ -29,39 +32,40 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import com.google.common.base.Preconditions;
+
 /**
  * This is a "local" strategy, uses Nexus content for information fetch.
  * 
  * @author cstamas
  */
-@Component( role = DiscoveryStrategy.class, hint = "content-get" )
+@Singleton
+@Named( "content-get" )
+@Typed( DiscoveryStrategy.class )
 public class ContentGetDiscoveryStrategy
     extends AbstractDiscoveryStrategy
 {
-    @Requirement
-    private RepositoryRegistry repositoryRegistry;
+    private final RepositoryRegistry repositoryRegistry;
+
+    @Inject
+    public ContentGetDiscoveryStrategy( RepositoryRegistry repositoryRegistry )
+    {
+        this.repositoryRegistry = Preconditions.checkNotNull( repositoryRegistry );
+    }
 
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException,
-            IOException
+        throws NoSuchRepositoryException, IOException
     {
-        DiscoveryResponse dr = new DiscoveryResponse( request );
-
-        // handle
-        StorageFileItem response = handleRequest( request );
-
+        final DiscoveryResponse dr = new DiscoveryResponse( request );
+        final StorageFileItem response = handleRequest( request );
         if ( response != null )
         {
-            InputStream is = response.getInputStream();
-
+            final InputStream is = response.getInputStream();
             try
             {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 IOUtil.copy( is, bos );
-
                 dr.setVersion( bos.toString() );
-
                 dr.setSuccessful( true );
             }
             finally
@@ -78,11 +82,11 @@ public class ContentGetDiscoveryStrategy
         try
         {
             // NoSuchRepository if the repoId is not known
-            Repository repository = repositoryRegistry.getRepository( request.getLvoKey().getRepositoryId() );
+            final Repository repository = repositoryRegistry.getRepository( request.getLvoKey().getRepositoryId() );
 
             // ItemNotFound if the path does not exists
-            StorageItem item = repository.retrieveItem( false, new ResourceStoreRequest( request
-                .getLvoKey().getLocalPath() ) );
+            final StorageItem item =
+                repository.retrieveItem( false, new ResourceStoreRequest( request.getLvoKey().getLocalPath() ) );
 
             // return only if item is a file, nuke it otherwise
             if ( item instanceof StorageFileItem )
@@ -98,7 +102,6 @@ public class ContentGetDiscoveryStrategy
         {
             // we are very rude about exceptions here ;)
             getLogger().warn( "Could not retrieve content!", e );
-
             return null;
         }
     }
