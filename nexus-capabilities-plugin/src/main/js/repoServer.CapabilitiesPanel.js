@@ -14,7 +14,8 @@
  * Capabilities Edit/Create panel layout and controller
  */
 
-/*global Ext, Sonatype, FormFieldGenerator*/
+/*global Ext, Sonatype, FormFieldGenerator, FormFieldExporter, FormFieldImporter*/
+/*jslint newcap:true*/
 
 (function() {
 
@@ -559,7 +560,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               'background-color' : '#fee',
               border : '1px solid #dd7870'
             });
-        Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);
+        Ext.form.Field.msgFx.normal.show(tree.errorEl, tree);
       },
 
       saveHandler : function(formInfoObj) {
@@ -715,7 +716,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       deleteHandler : function() {
         if (this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().hasSelection())
         {
-          var rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
+          var rec = this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().getSelected();
 
           if (rec.data.resourceURI === 'new')
           {
@@ -893,7 +894,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         // }
         else if (action.failureType === Ext.form.Action.CONNECT_FAILURE)
         {
-          Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.')
+          Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.');
         }
         else if (action.failureType === Ext.form.Action.LOAD_FAILURE)
         {
@@ -978,7 +979,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           }
 
           capabilityType = this.capabilityTypeDataStore.getById(rec.data.typeId);
-          formPanel.find('name', 'about')[0].html = capabilityType.data.about ? capabilityType.data.about:'';
+          formPanel.find('name', 'about')[0].html = capabilityType.data.about || '';
 
           aboutPanel = formPanel.find('name', 'about-panel')[0];
           if(capabilityType.data.about) {
@@ -1095,7 +1096,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           settingsPanel.show();
         }
 
-        about.body.update(record.data.about?record.data.about:'');
+        about.body.update(record.data.about || '');
 
         if(record.data.about) {
           aboutPanel.show();
@@ -1164,7 +1165,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         {
           var
                 waitBox = Ext.MessageBox.wait('Enabling capability...','Please Wait...'),
-                rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
+                rec = this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().getSelected();
 
           Ext.Ajax.request({
             url : rec.data.resourceURI + '/status',
@@ -1188,7 +1189,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         if (this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().hasSelection())
         {
           var
-                rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected(),
+                rec = this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().getSelected(),
                 waitBox = Ext.MessageBox.wait('Disabling capability...','Please Wait...');
 
           Ext.Ajax.request({
