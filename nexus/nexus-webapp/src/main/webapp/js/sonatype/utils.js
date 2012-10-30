@@ -131,7 +131,9 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
 
       for (i in o)
       {
-        newObj[i] = Sonatype.utils.cloneObj(o[i]);
+        if (o.hasOwnProperty(i)) {
+          newObj[i] = Sonatype.utils.cloneObj(o[i]);
+        }
       }
 
       return newObj;
@@ -141,10 +143,9 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
     // array to join, name of element of contained object, seperator (defaults
     // to ", ")
     joinArrayObject : function(arr, child, seperator) {
-      var sOut = '';
-      var sep = (seperator) ? seperator : ', ';
+      var i, sOut = '', sep = seperator || ', ';
 
-      for (var i = 0; i < arr.length; i++)
+      for (i = 0; i < arr.length; i=i+1)
       {
         if ((arr[i])[child])
         {
@@ -152,7 +153,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
         }
       }
 
-      if (sOut != "")
+      if (sOut !== "")
       {
         return sOut.substring(0, sOut.length - sep.length);
       }
@@ -185,19 +186,21 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
       // prime options object if necessary
       options = options || {};
 
-      var serverMessage = '';
-      var r = response.responseText;
+      var
+            i, errorResponse,
+            serverMessage = '',
+            r = response.responseText;
 
       if (r)
       {
         if (options.decodeErrorResponse && r.toLowerCase().indexOf('"errors"') > -1)
         {
-          var errorResponse = Ext.decode(response.responseText);
+          errorResponse = Ext.decode(r);
 
-          for (var i = 0; i < errorResponse.errors.length; i++)
+          for (i = 0; i < errorResponse.errors.length; i=i+1)
           {
             serverMessage += '<br /><br />';
-            serverMessage += Ext.decode(response.responseText).errors[i].msg;
+            serverMessage += Ext.decode(r).errors[i].msg;
           }
         }
         else

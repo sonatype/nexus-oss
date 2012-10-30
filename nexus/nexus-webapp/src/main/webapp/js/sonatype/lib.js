@@ -10,6 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define, escape, unescape*/
+/*jslint eqeq: true*/
+///* jslint bitwise: true, eqeq: true*/
 define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
 
   Sonatype.lib.Permissions = {
@@ -24,12 +27,12 @@ define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
     // all values are base 10 representations of the n-bit representation
     // Example: for 4-bit permissions: 3 (base to) represents 0011 (base 2)
     checkPermission : function(value, perm /* , perm... */) {
-      var p = perm;
+      var p = perm, perms;
 
       if (Sonatype.user.curr.repoServer)
       {
         Ext.each(Sonatype.user.curr.repoServer, function(item, i, arr) {
-              if (item.id == value)
+              if (item.id === value)
               {
                 value = item.value;
                 return false;
@@ -39,7 +42,7 @@ define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
 
       if (arguments.length > 2)
       {
-        var perms = [].slice.call(arguments, 2);
+        perms = [].slice.call(arguments, 2);
         Ext.each(perms, function(item, i, arr) {
               p = p | item;
             });
@@ -86,12 +89,12 @@ define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
      * @return {Mixed} The state data
      */
     get : function(name, defaultValue) {
-      return typeof this.state[name] == "undefined" ? defaultValue : this.state[name];
+      return this.state[name] || defaultValue;
     },
 
     // private
     set : function(name, value) {
-      if (typeof value == "undefined" || value === null)
+      if (!value)
       {
         this.clear(name);
         return;
@@ -108,15 +111,18 @@ define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
 
     // private
     readCookies : function() {
-      var cookies = {};
-      var c = document.cookie + ";";
-      var re = /\s?(.*?)=(.*?);/g;
-      var matches;
+      var
+            cookies = {},
+            c = document.cookie + ";",
+            re = /\s?(.*?)=(.*?);/g,
+            matches, name, value;
+
       while ((matches = re.exec(c)) != null)
       {
-        var name = matches[1];
-        var value = matches[2];
-        if (name && name.substring(0, 3) == this.namePrefix)
+        name = matches[1];
+        value = matches[2];
+
+        if (name && name.substring(0, 3) === this.namePrefix)
         {
           cookies[name.substr(3)] = this.decodeValue(value);
         }
@@ -143,13 +149,15 @@ define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
      * @return {Mixed} The decoded value
      */
     decodeValue : function(cookie) {
-      var re = /^(a|n|d|b|s|o)\:(.*)$/;
-      var matches = re.exec(unescape(cookie));
+      var all, values, i, len, kv, re, matches, type, v;
+      re = /^(a|n|d|b|s|o)\:(.*)$/;
+      matches = re.exec(unescape(cookie));
       if (!matches || !matches[1]) {
         return null; // non state cookie
       }
-      var type = matches[1];
-      var v = matches[2];
+      type = matches[1];
+      v = matches[2];
+
       switch (type)
       {
         case "n" :
@@ -157,21 +165,21 @@ define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
         case "d" :
           return new Date(Date.parse(v));
         case "b" :
-          return (v == "1");
+          return (v === "1");
         case "a" :
-          var all = [];
-          var values = v.split("^");
-          for (var i = 0, len = values.length; i < len; i++)
+                all = [];
+                values = v.split("^");
+          for (i = 0, len = values.length; i < len; i=i+1)
           {
             all.push(this.decodeValue(values[i]));
           }
           return all;
         case "o" :
-          var all = {};
-          var values = v.split("^");
-          for (var i = 0, len = values.length; i < len; i++)
+          all = {};
+          values = v.split("^");
+          for (i = 0, len = values.length; i < len; i=i+1)
           {
-            var kv = values[i].split("=");
+            kv = values[i].split("=");
             all[kv[0]] = this.decodeValue(kv[1]);
           }
           return all;
@@ -189,12 +197,12 @@ define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
      * @return {String} The encoded value
      */
     encodeValue : function(v) {
-      var enc;
-      if (typeof v == "number")
+      var enc, i, flat = "", key, len;
+      if (typeof v === "number")
       {
         enc = "n:" + v;
       }
-      else if (typeof v == "boolean")
+      else if (typeof v === "boolean")
       {
         enc = "b:" + (v ? "1" : "0");
       }
@@ -204,21 +212,20 @@ define('sonatype/lib',['../extjs', 'sonatype'], function(Ext, Sonatype) {
       }
       else if (Ext.isArray(v))
       {
-        var flat = "";
-        for (var i = 0, len = v.length; i < len; i++)
+        for (i = 0, len = v.length; i < len; i=i+1)
         {
           flat += this.encodeValue(v[i]);
-          if (i != len - 1)
+          if (i !== len - 1) {
             flat += "^";
+          }
         }
         enc = "a:" + flat;
       }
-      else if (typeof v == "object")
+      else if (typeof v === "object")
       {
-        var flat = "";
-        for (var key in v)
+        for (key in v)
         {
-          if (typeof v[key] != "function" && v[key] !== undefined)
+          if (v.hasOwnProperty(key) && typeof v[key] !== "function" && v[key] !== undefined)
           {
             flat += key + "=" + this.encodeValue(v[key]) + "^";
           }

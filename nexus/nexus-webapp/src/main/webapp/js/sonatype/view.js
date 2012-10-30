@@ -22,7 +22,7 @@ Sonatype.view = {
   headLinks : new Sonatype.headLinks(),
 
   init : function() {
-    var dq = Ext.DomQuery;
+    var viewport, size, srv, availSvrs;
 
     Sonatype.Events.addListener('initHeadLinks', function() {
           Sonatype.view.headLinks.updateLinks();
@@ -94,7 +94,7 @@ Sonatype.view = {
           }
         });
 
-    var viewport = new Ext.Viewport({
+    viewport = new Ext.Viewport({
           layout : 'border',
           items : [Sonatype.view.headerPanel, {
                 region : 'west',
@@ -143,16 +143,18 @@ Sonatype.view = {
     Sonatype.view.mainTabPanel = viewport.findById('st-main-tab-panel');
     Sonatype.view.supportedNexusTabs = {};
 
-    var size = Sonatype.view.serverTabPanel.getSize();
+    size = Sonatype.view.serverTabPanel.getSize();
     Sonatype.view.serverTabPanel.setHeight(size.height - 20);
 
     // allow each included sonatype server to setup its tab and events
-    var availSvrs = Sonatype.config.installedServers;
-    for (var srv in availSvrs)
+    availSvrs = Sonatype.config.installedServers;
+    for (srv in availSvrs)
     {
-      if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined')
-      {
-        Sonatype[srv][Sonatype.utils.capitalize(srv)].initServerTab();
+      if (availSvrs.hasOwnProperty(srv)) {
+        if (availSvrs[srv] && typeof(Sonatype[srv]) !== 'undefined')
+        {
+          Sonatype[srv][Sonatype.utils.capitalize(srv)].initServerTab();
+        }
       }
     }
 
@@ -183,18 +185,18 @@ Sonatype.view = {
 Sonatype.view.MainTabPanel = Ext.extend(Ext.TabPanel, {
       plugins: new Ext.ux.TabCloseMenu(),
 
-      addOrShowTab : function(id, panelClass, panelClassParams) {
-        var panelClassParams = panelClassParams || {};
-        var tab = this.getComponent(id);
+      addOrShowTab : function(id, PanelClass, panelClassParams) {
+        var  tab = this.getComponent(id);
+
         if (tab)
         {
           this.setActiveTab(tab);
         }
         else
         {
-          tab = new panelClass(Ext.apply({
+          tab = new PanelClass(Ext.apply({
                 id : id
-              }, panelClassParams));
+              }, panelClassParams||{}));
           this.add(tab);
         }
 

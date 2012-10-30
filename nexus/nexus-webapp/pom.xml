@@ -297,7 +297,6 @@
               <includes>
                 <include>js/nexus/**/*.js</include>
                 <include>js/ext/**/*.js</include>
-                <include>js/sonatype/**/*.js</include>
               </includes>
               <excludes>
                 <!-- do not check third party extensions -->

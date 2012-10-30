@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
 define('sonatype/init',['extjs', 'sonatype', 'nexus/util/observable', 'sonatype'], function(Ext, Sonatype, Nexus) {
   Ext.apply(Sonatype, {
           init : function() {
@@ -31,10 +32,6 @@ define('sonatype/init',['extjs', 'sonatype', 'nexus/util/observable', 'sonatype'
               // expires in 1 year
             });
 
-            var cp = window.Sonatype.state.CookieProvider;
-            var username = cp.get('username', null);
-            // Sonatype.utils.clearCookie('JSESSIONID');
-
             Sonatype.resources.help = {};
           }
         }
@@ -50,9 +47,10 @@ define('sonatype/init',['extjs', 'sonatype', 'nexus/util/observable', 'sonatype'
      * Update the head links based on the current status of Nexus
      */
     updateLinks : function() {
-      var right = Ext.get('head-link-r');
+      var
+            right = Ext.get('head-link-r'),
+            loggedIn = Sonatype.user.curr.isLoggedIn;
 
-      var loggedIn = Sonatype.user.curr.isLoggedIn;
       if (loggedIn)
       {
         this.updateRightWhenLoggedIn(right);
@@ -66,7 +64,7 @@ define('sonatype/init',['extjs', 'sonatype', 'nexus/util/observable', 'sonatype'
     updateRightWhenLoggedIn : function(linkEl) {
       linkEl.update(Sonatype.user.curr.username);
       linkEl.addClass('head-link-logged-in');
-      linkEl.un('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer)
+      linkEl.un('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
       linkEl.on('click', Sonatype.repoServer.RepoServer.showProfileMenu);
     },
     updateRightWhenLoggedOut : function(linkEl) {

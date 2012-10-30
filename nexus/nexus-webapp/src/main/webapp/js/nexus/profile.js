@@ -14,6 +14,6 @@
 define('nexus/profile',
       [
         'nexus/profile/UserProfile',
-        'nexus/profile/Summary',
+        'nexus/profile/Summary'
       ],
       function() {});
