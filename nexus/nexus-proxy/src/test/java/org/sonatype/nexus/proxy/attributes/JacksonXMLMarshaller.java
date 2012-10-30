@@ -25,8 +25,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 
-import com.fasterxml.jackson.xml.XmlMapper;
-
 /**
  * Jackson XML backed Attribute marshaller. Part of NEXUS-4628 "alternate" AttributeStorage implementations.
  */
@@ -37,7 +35,7 @@ public class JacksonXMLMarshaller
 
     public JacksonXMLMarshaller()
     {
-        this.objectMapper = new XmlMapper();
+        this.objectMapper = new ObjectMapper();
         objectMapper.writerWithDefaultPrettyPrinter();
     }
 
