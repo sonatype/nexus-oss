@@ -415,6 +415,9 @@
         </configuration>
       </plugin>
 
+      <!--
+      NOTE: This makes a new artifact (not attached w/classifier) with artifactId nexus-webapp-dependencies :-(
+      -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>provided-dependencies-maven-plugin</artifactId>
