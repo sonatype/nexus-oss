@@ -47,24 +47,39 @@
 
     <script src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
 
-  #if ($debug)
-  ## let requirejs load the single source files
-      <script src="js/nexus-init.js?$nexusVersion" type="text/javascript" charset="utf-8">
-      </script>
-  #else
-  ## nexus-all.js is the aggregated file
-      <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8">
-  </script>
+  #if ($!debug == "")
+      ## load aggregated module definitions
+      <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   #end
+
     <script type="text/javascript" charset="utf-8">
-    #foreach( $js in $pluginJsFiles )
-##        define('$js', ['$nexusRoot/$js']);
-        requirejs(['nexus/ui', 'sonatype/init', 'require'], function(Nexus, Sonatype, require) {
-            require(['$nexusRoot/$js'], function() {
-                Nexus.Log.debug('Loaded $js')
+        requirejs(['require', 'extjs', 'nexus/ui', 'sonatype/all'], function(require) {
+            // repeating nexus/sonatype dependencies to have them as local variables
+            require([ 'extjs', 'nexus/ui', 'sonatype/all',
+            #foreach( $js in $pluginJsFiles )
+                '$nexusRoot/$js' ,
+            #end
+            ], function(Ext, Nexus, Sonatype) {
+                var alreadyDone = false;
+                function init() {
+                    if (!Ext.isReady || alreadyDone) {
+                        return;
+                    }
+                    alreadyDone = true;
+                    requirejs(['extjs', 'sonatype/init', 'nexus/ui', 'sonatype/utils'], function(Ext, Sonatype, Nexus) {
+                        Nexus.Log.debug('Initializing UI...');
+                        Sonatype.init();
+                        Sonatype.view.init();
+                        Nexus.Log.debug('Loading Nexus Status...');
+                        Sonatype.utils.loadNexusStatus();
+                    });
+                }
+
+                Nexus.Log.debug('Loaded plugins');
+                Ext.onReady(init);
+                init();
             });
         });
-    #end
     </script>
 
 ## Plugin post HEAD contributions start here

@@ -337,7 +337,6 @@
             ext-2.3/resources/images/**,
             images/**,
             WEB-INF/*,
-            js/nexus-init.js,
             js/lib/*,
             style/sonatype-all.css
           </warSourceIncludes>
