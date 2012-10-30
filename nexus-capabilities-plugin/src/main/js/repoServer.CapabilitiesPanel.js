@@ -203,9 +203,9 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         autoLoad : true,
         listeners : {
           'load' : {
-            fn : function() {
+            fn : function(store, records, options) {
               var addBtn = Ext.getCmp('capability-add-btn');
-              if(addBtn.hasPermission && this.data.items.length > 0) {
+              if(addBtn.hasPermission && records.length > 0) {
                 addBtn.enable();
               }
               else {
@@ -516,6 +516,14 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       reloadAll : function() {
         Ext.getCmp('capability-add-btn').disable();
 
+        var
+              selectId, grid = this.capabilitiesGridPanel,
+              selected = grid.getSelectionModel().getSelected();
+
+        if ( selected ) {
+          selectId = selected.id;
+        }
+
         this.repoOrGroupDataStore.removeAll();
         this.repositoryDataStore.removeAll();
         this.repositoryGroupDataStore.removeAll();
@@ -541,6 +549,27 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         );
 
         this.formCards.getLayout().setActiveItem(0);
+
+        if (selectId) {
+          this.capabilitiesDataStore.on('load',
+                // listener
+                function(store, records, options) {
+                  grid.getSelectionModel().selectRecords(records.filter(function(rec) {
+                    return rec.id === selectId;
+                  }));
+                },
+                // scope
+                this,
+                // options
+                {
+                  single : true,
+                  // need to delay listener execution, because although records are already there,
+                  // store.getById, store.findRecord etc. won't work immediately
+                  delay : 100
+                }
+          );
+        }
+
       },
 
       markTreeInvalid : function(tree) {
