@@ -15,68 +15,38 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
+
+import com.google.common.base.Preconditions;
 
 public abstract class AbstractRemoteDiscoveryStrategy
     extends AbstractDiscoveryStrategy
 {
+    private final Hc4Provider hc4Provider;
 
-    @Requirement
-    private NexusConfiguration nexusConfig;
-
-    /**
-     * For plexus injection.
-     */
-    protected AbstractRemoteDiscoveryStrategy()
+    public AbstractRemoteDiscoveryStrategy( final Hc4Provider hc4Provider )
     {
+        this.hc4Provider = Preconditions.checkNotNull( hc4Provider );
     }
 
-    AbstractRemoteDiscoveryStrategy( final NexusConfiguration nexusConfig )
+    protected RequestResult handleRequest( String url )
     {
-        this.nexusConfig = nexusConfig;
-    }
+        final HttpClient client = hc4Provider.createHttpClient();
+        final HttpGet method = new HttpGet( url );
 
-    /**
-     * Format's the user agent string for remote discoveries, if needed. TODO: this method is a copy+paste of the one in
-     * AbstractRemoteRepositoryStorage, fix this
-     */
-    protected String formatUserAgent()
-    {
-        SystemStatus status = getNexus().getSystemStatus();
-
-        StringBuilder userAgentPlatformInfo = new StringBuilder( "Nexus/" )
-            .append( status.getVersion() ).append( " (" ).append( status.getEditionShort() ).append( "; " ).append(
-                System.getProperty( "os.name" ) ).append( "; " ).append( System.getProperty( "os.version" ) ).append(
-                "; " ).append( System.getProperty( "os.arch" ) ).append( "; " ).append(
-                System.getProperty( "java.version" ) ).append( ") " ).append( "LVOPlugin/1.0" );
-
-        return userAgentPlatformInfo.toString();
-    }
-
-    protected HttpGetDiscoveryStrategy.RequestResult handleRequest( String url )
-    {
-        HttpClient client = new HttpClient();
-        HttpClientProxyUtil.applyProxyToHttpClient(client, nexusConfig.getGlobalRemoteStorageContext(), getLogger());
-
-        GetMethod method = new GetMethod( url );
-
-        HttpGetDiscoveryStrategy.RequestResult result = null;
-
+        RequestResult result = null;
         try
         {
-            int status = client.executeMethod( method );
-
-            if ( HttpStatus.SC_OK == status )
+            final HttpResponse response = client.execute( method );
+            if ( HttpStatus.SC_OK == response.getStatusLine().getStatusCode() )
             {
-                result = new HttpGetDiscoveryStrategy.RequestResult( method );
+                result = new RequestResult( method, response );
             }
         }
         catch ( IOException e )
@@ -94,31 +64,29 @@ public abstract class AbstractRemoteDiscoveryStrategy
 
     protected static final class RequestResult
     {
+        private final HttpGet method;
 
-        private InputStream is;
+        private final HttpResponse response;
 
-        private GetMethod method;
+        private final InputStream is;
 
-        public RequestResult( GetMethod method )
+        public RequestResult( HttpGet method, HttpResponse response )
             throws IOException
         {
-            this.is = method.getResponseBodyAsStream();
-            this.method = method;
+            this.response = Preconditions.checkNotNull( response );
+            this.method = Preconditions.checkNotNull( method );
+            this.is = response.getEntity().getContent();
         }
 
         public InputStream getInputStream()
         {
-            return this.is;
+            return is;
         }
 
         public void close()
         {
             IOUtil.close( is );
-
-            if ( this.method != null )
-            {
-                this.method.releaseConnection();
-            }
+            method.releaseConnection();
         }
     }
 }
