@@ -13,64 +13,50 @@
 package org.sonatype.timeline.internal;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.timeline.TimelineConfiguration;
 
-public abstract class AbstractStartable
+public abstract class AbstractLockingStartable
+    extends AbstractStartable
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final ReentrantReadWriteLock timelineLock;
 
-    private TimelineConfiguration configuration;
-
-    private volatile boolean started;
-
-    protected AbstractStartable()
+    protected AbstractLockingStartable()
     {
-        this.started = false;
+        this.timelineLock = new ReentrantReadWriteLock();
     }
 
     public void start( TimelineConfiguration config )
         throws IOException
     {
-        this.configuration = config;
-        doStart();
-        this.started = true;
+        getTimelineLock().writeLock().lock();
+        try
+        {
+            super.start( config );
+        }
+        finally
+        {
+            getTimelineLock().writeLock().unlock();
+        }
     }
 
     public void stop()
         throws IOException
     {
-        if ( started )
+        getTimelineLock().writeLock().lock();
+        try
         {
-            this.started = false;
-            doStop();
+            super.stop();
+        }
+        finally
+        {
+            getTimelineLock().writeLock().unlock();
         }
     }
 
-    protected boolean isStarted()
+    protected ReentrantReadWriteLock getTimelineLock()
     {
-        return started;
+        return timelineLock;
     }
-
-    // ==
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
-    protected TimelineConfiguration getConfiguration()
-    {
-        return configuration;
-    }
-
-    // ==
-
-    protected abstract void doStart()
-        throws IOException;
-
-    protected abstract void doStop()
-        throws IOException;
 }
