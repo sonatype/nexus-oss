@@ -1,46 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
+    Copyright (c) 2008-2012 Sonatype, Inc.
 
-    This program is licensed to you under the Apache License Version 2.0,
-    and you may not use this file except in compliance with the Apache License Version 2.0.
-    You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the Apache License Version 2.0 is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/pro/attributions
+    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
+    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.26.xsd">
+<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.26.xsd">
 
   <services>
     <rest defaultRestSubcontext="service/local"/>
   </services>
 
   <modules>
-    <!--
-    Disable *everything* except docs... stupid that these have to be enabled by default.
-    -->
-    <csharp disabled="true"/>
-    <c disabled="true"/>
-    <jersey disabled="true"/>
-    <ruby disabled="true"/>
-    <amf disabled="true"/>
-    <cxf disabled="true"/>
-    <gwt disabled="true"/>
-    <jboss disabled="true"/>
-    <jaxws disabled="true"/>
-    <jaxws-client disabled="true"/>
-    <jaxws-ri disabled="true"/>
-    <obj-c disabled="true"/>
-    <java-client disabled="true"/>
-    <spring-app disabled="true"/>
-    <xfire disabled="true"/>
-    <xfire-client disabled="true"/>
-    <xml disabled="true"/>
-
     <docs disabled="false"
           title="Sonatype Security REST API"
           copyright="Sonatype, Inc. 2012"
