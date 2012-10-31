@@ -12,56 +12,46 @@
  */
 package org.sonatype.security.events;
 
-import javax.annotation.Nullable;
-
-import org.sonatype.plexus.appevents.AbstractEvent;
-
 /**
  * An event fired when a user is removed from the system, so cached principals can be expired.
- * 
+ *
  * @since 2.8
  */
-public class UserPrincipalsExpiredEvent
-    extends AbstractEvent<Object>
+public class UserPrincipalsExpired
 {
+
     private final String userId;
 
     private final String source;
 
     /**
      * Applies to any cached user principals that have the given userId and UserManager source.
-     * 
-     * @param component The sending component
+     *
      * @param userId The removed user's id
      * @param source The UserManager source
      */
-    public UserPrincipalsExpiredEvent( Object component, String userId, String source )
+    public UserPrincipalsExpired( final String userId, final String source )
     {
-        super( component );
-
         this.userId = userId;
         this.source = source;
     }
 
     /**
      * Applies to all cached user principals that have an invalid userId or UserManager source.
-     * 
-     * @param component The sending component
      */
-    public UserPrincipalsExpiredEvent( Object component )
+    public UserPrincipalsExpired()
     {
-        this( component, null, null );
+        this( null, null );
     }
 
-    public @Nullable
-    String getUserId()
+    public String getUserId()
     {
         return userId;
     }
 
-    public @Nullable
-    String getSource()
+    public String getSource()
     {
         return source;
     }
+
 }

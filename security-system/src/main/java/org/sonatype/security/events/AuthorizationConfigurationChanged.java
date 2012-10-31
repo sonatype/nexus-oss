@@ -12,20 +12,12 @@
  */
 package org.sonatype.security.events;
 
-import org.sonatype.plexus.appevents.AbstractEvent;
-
 /**
- * An event fired when the security configuration has changed.
- * 
+ * An event fired when the authorization configuration has changed.
+ *
  * @author Brian Demers
  */
-public class SecurityConfigurationChangedEvent
-    extends AbstractEvent<Object>
+public class AuthorizationConfigurationChanged
 {
-
-    public SecurityConfigurationChangedEvent( Object component )
-    {
-        super( component );
-    }
 
 }

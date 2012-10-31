@@ -42,7 +42,7 @@
   <properties>
     <shiro.version>1.2.1</shiro.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
-    <plexus-events.version>1.2</plexus-events.version>
+    <goodies.version>1.5-SNAPSHOT</goodies.version>
     <base-configuration.version>1.0</base-configuration.version>
     <plexus-cipher.version>1.6</plexus-cipher.version>
     <plugin-host-api.version>1.0.0</plugin-host-api.version>
@@ -131,7 +131,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>10.0.1</version>
+        <version>13.0.1</version>
         <scope>compile</scope>
       </dependency>
       <dependency>
@@ -193,14 +193,9 @@
         <version>${sisu-ehcache.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.plexus.appevents</groupId>
-        <artifactId>plexus-app-events-api</artifactId>
-        <version>${plexus-events.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.plexus.appevents</groupId>
-        <artifactId>simple-event-multicaster</artifactId>
-        <version>${plexus-events.version}</version>
+        <groupId>org.sonatype.sisu.goodies</groupId>
+        <artifactId>goodies-eventbus</artifactId>
+        <version>${goodies.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.configuration</groupId>
