@@ -33,11 +33,6 @@ public class DefaultTimeline
     extends AbstractLockingStartable
     implements Timeline
 {
-    /**
-     * A safeguard, for maximum retries.
-     */
-    private static final int MAX_RETRIES = 1;
-
     private final DefaultTimelinePersistor persistor;
 
     private final DefaultTimelineIndexer indexer;
@@ -131,7 +126,7 @@ public class DefaultTimeline
             try
             {
                 persistor.persist( records );
-                addToIndexer( 0, records );
+                addToIndexer( records );
             }
             catch ( IOException e )
             {
@@ -147,7 +142,7 @@ public class DefaultTimeline
     @Override
     public int purge( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter )
     {
-        return purgeFromIndexer( 0, timestamp, types, subTypes, filter );
+        return purgeFromIndexer( timestamp, types, subTypes, filter );
     }
 
     @Override
@@ -161,20 +156,16 @@ public class DefaultTimeline
     public void retrieve( long fromTime, long toTime, int from, int count, Set<String> types, Set<String> subTypes,
                           TimelineFilter filter, TimelineCallback callback )
     {
-        retrieveFromIndexer( 0, fromTime, toTime, from, count, types, subTypes, filter, callback );
+        retrieveFromIndexer( fromTime, toTime, from, count, types, subTypes, filter, callback );
     }
 
     // ==
 
-    protected void addToIndexer( int retry, final TimelineRecord... records )
+    protected void addToIndexer( final TimelineRecord... records )
     {
         getTimelineLock().readLock().lock();
         try
         {
-            if ( retry > MAX_RETRIES )
-            {
-                return;
-            }
             if ( !isStarted() )
             {
                 return;
@@ -190,7 +181,10 @@ public class DefaultTimeline
                     catch ( IOException e )
                     {
                         repairTimelineIndexer( e );
-                        addToIndexer( retry + 1, records );
+                        if ( isIndexerHealthy() )
+                        {
+                            indexer.addAll( records );
+                        }
                     }
                 }
             }
@@ -205,16 +199,11 @@ public class DefaultTimeline
         }
     }
 
-    protected int purgeFromIndexer( int retry, long timestamp, Set<String> types, Set<String> subTypes,
-                                    TimelineFilter filter )
+    protected int purgeFromIndexer( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter )
     {
         getTimelineLock().readLock().lock();
         try
         {
-            if ( retry > MAX_RETRIES )
-            {
-                return 0;
-            }
             if ( !isStarted() )
             {
                 return 0;
@@ -230,7 +219,14 @@ public class DefaultTimeline
                     catch ( IOException e )
                     {
                         repairTimelineIndexer( e );
-                        return purgeFromIndexer( retry + 1, timestamp, types, subTypes, filter );
+                        if ( isIndexerHealthy() )
+                        {
+                            return indexer.purge( 0l, timestamp, types, subTypes );
+                        }
+                        else
+                        {
+                            return 0;
+                        }
                     }
                 }
                 else
@@ -250,16 +246,12 @@ public class DefaultTimeline
         }
     }
 
-    protected void retrieveFromIndexer( int retry, long fromTime, long toTime, int from, int count, Set<String> types,
+    protected void retrieveFromIndexer( long fromTime, long toTime, int from, int count, Set<String> types,
                                         Set<String> subTypes, TimelineFilter filter, TimelineCallback callback )
     {
         getTimelineLock().readLock().lock();
         try
         {
-            if ( retry > MAX_RETRIES )
-            {
-                return;
-            }
             if ( !isStarted() )
             {
                 return;
@@ -275,8 +267,10 @@ public class DefaultTimeline
                     catch ( IOException e )
                     {
                         repairTimelineIndexer( e );
-                        retrieveFromIndexer( retry + 1, fromTime, toTime, from, count, types, subTypes, filter,
-                            callback );
+                        if ( isIndexerHealthy() )
+                        {
+                            indexer.retrieve( fromTime, toTime, types, subTypes, from, count, filter, callback );
+                        }
                     }
                 }
                 else
