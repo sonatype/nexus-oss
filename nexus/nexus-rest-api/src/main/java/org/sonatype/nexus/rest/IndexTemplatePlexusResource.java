@@ -214,10 +214,12 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "pluginJsFiles", pluginJsFiles );
 
         final String query = request.getResourceRef().getQuery();
+        String debug = null;
         if ( query != null && query.contains( "debug" ) )
         {
-            templatingContext.put( "debug", "-debug" );
+            debug = "-debug";
         }
+        templatingContext.put( "debug", debug );
 
         templateRepresentation.setDataModel( templatingContext );
 
