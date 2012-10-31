@@ -909,9 +909,8 @@ public class AbstractEnvironmentMojo
         destination.mkdirs();
         resourcesDestinationLocation.mkdirs();
 
-        if ( nexusBundleArtifact == null )
-        {
-            nexusBundleArtifact = new MavenArtifact( "org.sonatype.nexus", "nexus-webapp", "bundle", "tar.gz" );
+        if (nexusBundleArtifact == null) {
+            throw new RuntimeException("Missing 'nexusBundleArtifact' configuration");
         }
 
         if ( setupEmma && emmaArtifact == null )
