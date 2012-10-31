@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
+import org.sonatype.nexus.repository.site.client.ObrHostedRepository;
 
 public class ObrHostedIT
     extends ObrITSupport
@@ -29,7 +30,7 @@ public class ObrHostedIT
     {
         final String hRId = repositoryIdForTest() + "-hosted";
 
-        createObrHostedRepository( hRId );
+        repositories().create( ObrHostedRepository.class, hRId ).save();
 
         upload( hRId, FELIX_WEBCONSOLE );
         upload( hRId, OSGI_COMPENDIUM );
@@ -45,7 +46,7 @@ public class ObrHostedIT
     {
         final String hRId = repositoryIdForTest() + "-hosted";
 
-        createObrHostedRepository( hRId );
+        repositories().create( ObrHostedRepository.class, hRId ).save();
 
         deployUsingMaven( "helloworld-hs", hRId );
     }

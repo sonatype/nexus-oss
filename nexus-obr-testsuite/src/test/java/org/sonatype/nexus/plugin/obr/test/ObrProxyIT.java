@@ -26,8 +26,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.junit.Test;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
+import org.sonatype.nexus.repository.site.client.ObrHostedRepository;
+import org.sonatype.nexus.repository.site.client.ObrProxyRepository;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -47,17 +47,16 @@ public class ObrProxyIT
         final String hRId = repositoryIdForTest() + "-hosted";
         final String pRId = repositoryIdForTest() + "-proxy";
 
-        createObrHostedRepository( hRId );
+        repositories().create( ObrHostedRepository.class, hRId ).save();
 
         upload( hRId, FELIX_WEBCONSOLE );
         upload( hRId, OSGI_COMPENDIUM );
         upload( hRId, GERONIMO_SERVLET );
         upload( hRId, PORTLET_API );
 
-        createObrProxyRepository(
-            pRId,
-            format( "%scontent/repositories/%s/.meta/obr.xml", nexus().getUrl().toExternalForm(), hRId )
-        );
+        repositories().create( ObrProxyRepository.class, pRId )
+            .asProxyOf( format( "%scontent/repositories/%s/.meta/obr.xml", nexus().getUrl().toExternalForm(), hRId ) )
+            .save();
 
         deployUsingObrIntoFelix( pRId );
 
@@ -81,64 +80,33 @@ public class ObrProxyIT
     public void validateOBRProxyUrlChanges()
         throws Exception
     {
-        final RepositoryProxyResource proxyRepo = new RepositoryProxyResource();
-        proxyRepo.setRepoType( "proxy" );
-        proxyRepo.setId( repositoryIdForTest() + "-proxy" );
-        proxyRepo.setName( proxyRepo.getId() );
-        proxyRepo.setBrowseable( true );
-        proxyRepo.setIndexable( false );
-        proxyRepo.setNotFoundCacheTTL( 1440 );
-        proxyRepo.setArtifactMaxAge( -1 );
-        proxyRepo.setMetadataMaxAge( 1440 );
-        proxyRepo.setRepoPolicy( "RELEASE" );
-        proxyRepo.setProvider( "obr-proxy" );
-        proxyRepo.setProviderRole( "org.sonatype.nexus.proxy.repository.Repository" );
-        proxyRepo.setOverrideLocalStorageUrl( null );
-        proxyRepo.setDefaultLocalStorageUrl( null );
-        proxyRepo.setDownloadRemoteIndexes( false );
-        proxyRepo.setExposed( true );
-        proxyRepo.setChecksumPolicy( "WARN" );
-
-        final RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-        remoteStorage.setRemoteStorageUrl( "http://sigil.codecauldron.org/spring-external.obr" );
-        remoteStorage.setAuthentication( null );
-        remoteStorage.setConnectionSettings( null );
-        remoteStorage.setHttpProxySettings( null );
-
-        proxyRepo.setRemoteStorage( remoteStorage );
+        final String rId = repositoryIdForTest() + "-proxy";
 
         // create the repo
-        repositories().createRepository( proxyRepo );
+        final ObrProxyRepository proxyRepository = repositories().create( ObrProxyRepository.class, rId )
+            .asProxyOf( "http://sigil.codecauldron.org/spring-external.obr" )
+            .save();
 
         // check for equality here
-        assertObrPath( proxyRepo.getId(), "http://sigil.codecauldron.org/", "/spring-external.obr" );
+        assertObrPath( rId, "http://sigil.codecauldron.org/", "/spring-external.obr" );
 
         // note internal opposed to external
-        proxyRepo.getRemoteStorage().setRemoteStorageUrl( "http://sigil.codecauldron.org/spring-internal.obr" );
-
-        // update the repo
-        repositories().updateRepo( proxyRepo );
+        proxyRepository.asProxyOf( "http://sigil.codecauldron.org/spring-internal.obr" ).save();
 
         // check again for equality here
-        assertObrPath( proxyRepo.getId(), "http://sigil.codecauldron.org/", "/spring-internal.obr" );
+        assertObrPath( rId, "http://sigil.codecauldron.org/", "/spring-internal.obr" );
 
         // note sigil2
-        proxyRepo.getRemoteStorage().setRemoteStorageUrl( "http://sigil2.codecauldron.org/spring-external.obr" );
-
-        // update the repo
-        repositories().updateRepo( proxyRepo );
+        proxyRepository.asProxyOf( "http://sigil2.codecauldron.org/spring-external.obr" ).save();
 
         // check again for equality here
-        assertObrPath( proxyRepo.getId(), "http://sigil2.codecauldron.org/", "/spring-external.obr" );
+        assertObrPath( rId, "http://sigil2.codecauldron.org/", "/spring-external.obr" );
 
         // note sigil3 and external -> internal
-        proxyRepo.getRemoteStorage().setRemoteStorageUrl( "http://sigil3.codecauldron.org/spring-internal.obr" );
-
-        // update the repo
-        repositories().updateRepo( proxyRepo );
+        proxyRepository.asProxyOf( "http://sigil3.codecauldron.org/spring-internal.obr" ).save();
 
         // check again for equality here
-        assertObrPath( proxyRepo.getId(), "http://sigil3.codecauldron.org/", "/spring-internal.obr" );
+        assertObrPath( rId, "http://sigil3.codecauldron.org/", "/spring-internal.obr" );
     }
 
     private void assertObrPath( final String repositoryId,

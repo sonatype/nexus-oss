@@ -16,6 +16,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import org.junit.Test;
+import org.sonatype.nexus.repository.site.client.ObrGroupRepository;
+import org.sonatype.nexus.repository.site.client.ObrHostedRepository;
 
 public class ObrGroupIT
     extends ObrITSupport
@@ -40,22 +42,22 @@ public class ObrGroupIT
         final String g3RId = repositoryIdForTest() + "-group-3";
         final String g4RId = repositoryIdForTest() + "-group-4";
 
-        createObrHostedRepository( h1RId );
+        repositories().create( ObrHostedRepository.class, h1RId ).save();
         upload( h1RId, FELIX_WEBCONSOLE );
 
-        createObrHostedRepository( h2RId );
+        repositories().create( ObrHostedRepository.class, h2RId ).save();
         upload( h2RId, OSGI_COMPENDIUM );
 
-        createObrHostedRepository( h3RId );
+        repositories().create( ObrHostedRepository.class, h3RId ).save();
         upload( h3RId, GERONIMO_SERVLET );
 
-        createObrHostedRepository( h4RId );
+        repositories().create( ObrHostedRepository.class, h4RId ).save();
         upload( h4RId, PORTLET_API );
 
-        createObrGroup( g4RId, h2RId, h4RId );
-        createObrGroup( g3RId, g4RId, h3RId );
-        createObrGroup( g2RId, g3RId, g4RId );
-        createObrGroup( g1RId, h1RId, g2RId );
+        repositories().create( ObrGroupRepository.class, g4RId ).ofRepositories( h2RId, h4RId ).save();
+        repositories().create( ObrGroupRepository.class, g3RId ).ofRepositories( g4RId, h3RId ).save();
+        repositories().create( ObrGroupRepository.class, g2RId ).ofRepositories( g3RId, g4RId ).save();
+        repositories().create( ObrGroupRepository.class, g1RId ).ofRepositories( h1RId, g2RId ).save();
 
         deployUsingObrIntoFelix( g1RId );
     }
@@ -77,19 +79,19 @@ public class ObrGroupIT
 
         final String gRId = repositoryIdForTest() + "-group";
 
-        createObrHostedRepository( h1RId );
+        repositories().create( ObrHostedRepository.class, h1RId ).save();
         upload( h1RId, FELIX_WEBCONSOLE );
 
-        createObrHostedRepository( h2RId );
+        repositories().create( ObrHostedRepository.class, h2RId ).save();
         upload( h2RId, OSGI_COMPENDIUM );
 
-        createObrHostedRepository( h3RId );
+        repositories().create( ObrHostedRepository.class, h3RId ).save();
         upload( h3RId, GERONIMO_SERVLET );
 
-        createObrHostedRepository( h4RId );
+        repositories().create( ObrHostedRepository.class, h4RId ).save();
         upload( h4RId, PORTLET_API );
 
-        createObrGroup( gRId, h1RId, h2RId, h3RId, h4RId );
+        repositories().create( ObrGroupRepository.class, gRId ).ofRepositories( h1RId, h2RId, h3RId, h4RId ).save();
 
         // verify that group level merged OBR is valid
         deployUsingObrIntoFelix( gRId );

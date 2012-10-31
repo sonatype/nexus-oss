@@ -25,38 +25,17 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
-import javax.annotation.Nullable;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Before;
 import org.junit.runners.Parameterized;
-import org.restlet.data.MediaType;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
-import org.sonatype.nexus.integrationtests.NexusRestClient;
-import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
-import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
-import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
-import org.sonatype.nexus.rest.model.RepositoryShadowResource;
-import org.sonatype.nexus.test.utils.EventInspectorsUtil;
-import org.sonatype.nexus.test.utils.RepositoriesNexusRestClient;
-import org.sonatype.nexus.test.utils.RepositoryGroupsNexusRestClient;
-import org.sonatype.nexus.test.utils.TasksNexusRestClient;
-import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-import com.google.common.base.Function;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public abstract class ObrITSupport
@@ -86,12 +65,6 @@ public abstract class ObrITSupport
     public static final String PORTLET_API =
         "org/apache/portals/portlet-api_2.0_spec/1.0/portlet-api_2.0_spec-1.0.jar";
 
-    // TODO replace this with a proper client
-    private RepositoriesNexusRestClient repositories;
-
-    // TODO replace this with a proper client
-    private RepositoryGroupsNexusRestClient groups;
-
     public ObrITSupport( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
@@ -107,33 +80,9 @@ public abstract class ObrITSupport
         );
     }
 
-    @Before
-    public void initRestClients()
+    protected Repositories repositories()
     {
-        final NexusRestClient nexusRestClient = new NexusRestClient(
-            new TestContext()
-                .setNexusUrl( nexus().getUrl().toExternalForm() )
-                .setSecureTest( true )
-        );
-        final TasksNexusRestClient tasks = new TasksNexusRestClient( nexusRestClient );
-        final EventInspectorsUtil events = new EventInspectorsUtil( nexusRestClient );
-
-        repositories = new RepositoriesNexusRestClient(
-            nexusRestClient, tasks, events, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML
-        );
-        groups = new RepositoryGroupsNexusRestClient(
-            nexusRestClient, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML
-        );
-    }
-
-    protected RepositoriesNexusRestClient repositories()
-    {
-        return repositories;
-    }
-
-    protected RepositoryGroupsNexusRestClient groups()
-    {
-        return groups;
+        return client().getSubsystem( Repositories.class );
     }
 
     protected Content content()
@@ -259,117 +208,6 @@ public abstract class ObrITSupport
         }
         while ( content.indexOf( expectedLine ) == -1 );
         System.out.println();
-    }
-
-    protected void createObrHostedRepository( final String repositoryId )
-    {
-        final RepositoryResource repo = new RepositoryResource();
-
-        repo.setId( repositoryId );
-        repo.setRepoType( "hosted" );
-        repo.setName( repositoryId );
-        repo.setProvider( "obr-proxy" );
-        repo.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
-        repo.setChecksumPolicy( ChecksumPolicy.WARN.name() );
-
-        repo.setBrowseable( true );
-        repo.setIndexable( false );
-        repo.setExposed( true );
-
-        try
-        {
-            repositories().createRepository( repo );
-        }
-        catch ( final IOException e )
-        {
-            throw Throwables.propagate( e );
-        }
-    }
-
-    protected void createObrProxyRepository( final String repositoryId, final String obrXmlUrl )
-    {
-        final RepositoryProxyResource repository = new RepositoryProxyResource();
-
-        repository.setId( repositoryId );
-        repository.setRepoType( "proxy" );
-        repository.setName( repositoryId );
-        repository.setProvider( "obr-proxy" );
-        repository.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
-        repository.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
-        repository.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
-        repository.setBrowseable( true );
-        repository.setIndexable( false );
-        repository.setExposed( true );
-        repository.setArtifactMaxAge( 1440 );
-        repository.setMetadataMaxAge( 1440 );
-
-        RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-        remoteStorage.setRemoteStorageUrl( obrXmlUrl );
-        repository.setRemoteStorage( remoteStorage );
-
-        try
-        {
-            repositories().createRepository( repository );
-        }
-        catch ( final IOException e )
-        {
-            throw Throwables.propagate( e );
-        }
-    }
-
-    protected void createObrShadowRepository( final String repositoryId, final String shadowOfRepositoryId )
-    {
-        final RepositoryShadowResource repo = new RepositoryShadowResource();
-
-        repo.setId( repositoryId );
-        repo.setRepoType( "virtual" );
-        repo.setName( repositoryId );
-        repo.setProvider( "obr-shadow" );
-        repo.setShadowOf( shadowOfRepositoryId );
-        repo.setSyncAtStartup( true );
-
-        repo.setExposed( true );
-
-        try
-        {
-            repositories().createRepository( repo );
-        }
-        catch ( final IOException e )
-        {
-            throw Throwables.propagate( e );
-        }
-    }
-
-    protected void createObrGroup( final String groupId, final String... memberRepositoriesIds )
-    {
-        final RepositoryGroupResource group = new RepositoryGroupResource();
-        group.setId( groupId );
-        group.setRepoType( "group" );
-        group.setProvider( "obr-group" );
-        group.setName( groupId );
-        group.setExposed( true );
-
-        group.setRepositories( Lists.transform(
-            Lists.newArrayList( memberRepositoriesIds ),
-            new Function<String, RepositoryGroupMemberRepository>()
-            {
-                public RepositoryGroupMemberRepository apply( @Nullable final String id )
-                {
-                    final RepositoryGroupMemberRepository memberRepository = new RepositoryGroupMemberRepository();
-                    memberRepository.setId( id );
-                    return memberRepository;
-                }
-            }
-        ) );
-
-        try
-        {
-            groups().createGroup( group );
-        }
-        catch ( final IOException e )
-        {
-            throw Throwables.propagate( e );
-        }
     }
 
     protected void upload( final String repositoryId, final String path )

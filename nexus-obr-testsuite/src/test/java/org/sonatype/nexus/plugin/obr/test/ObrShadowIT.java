@@ -13,6 +13,8 @@
 package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
+import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
+import org.sonatype.nexus.repository.site.client.ObrVirtualRepository;
 
 public class ObrShadowIT
     extends ObrITSupport
@@ -30,14 +32,14 @@ public class ObrShadowIT
         final String mavenRId = repositoryIdForTest() + "-maven";
         final String sRId = repositoryIdForTest() + "-shadow";
 
-        repositories().createMavenHostedReleaseRepository( mavenRId );
+        repositories().create( MavenHostedRepository.class, mavenRId ).save();
 
         upload( mavenRId, FELIX_WEBCONSOLE );
         upload( mavenRId, OSGI_COMPENDIUM );
         upload( mavenRId, GERONIMO_SERVLET );
         upload( mavenRId, PORTLET_API );
 
-        createObrShadowRepository( sRId, mavenRId );
+        repositories().create( ObrVirtualRepository.class, sRId ).asShadowOf( mavenRId ).save();
         deployUsingObrIntoFelix( sRId );
     }
 
