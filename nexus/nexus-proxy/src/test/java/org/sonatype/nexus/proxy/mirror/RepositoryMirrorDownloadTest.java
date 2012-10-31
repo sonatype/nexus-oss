@@ -12,21 +12,25 @@
  */
 package org.sonatype.nexus.proxy.mirror;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.checkOrder;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.same;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.mockito.Mock;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -35,10 +39,10 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.internal.MockRemoteStorage;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
@@ -59,7 +63,17 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
+import org.sonatype.sisu.litmus.testsupport.mock.MockitoRule;
 
+/**
+ * Tests for repository mirror configurations.
+ * <p/>
+ * When a proxy repository is confgured to retrieve artifacts from a Mirror, it will consult each configured mirror in
+ * the order shown in the Mirror URLs list.
+ * <p/>
+ * While Nexus will retrieve POM information, checksums, and PGP signatures from the original repository, it will
+ * retrieve all other artfiacts directly from the first available mirror.
+ */
 public class RepositoryMirrorDownloadTest
     extends AbstractNexusTestEnvironment
 {
@@ -88,13 +102,16 @@ public class RepositoryMirrorDownloadTest
 
     };
 
+    private RemoteProviderHintFactory remoteProviderHintFactory;
+
     // this is crazy...
     private static class AssertionRequest
     {
+
         /**
          * Mirrors
          */
-        public Mirror[] mirrors = new Mirror[] { MIRROR1, MIRROR2 };
+        public Mirror[] mirrors = new Mirror[]{ MIRROR1, MIRROR2 };
 
         /**
          * Mirror failures
@@ -127,8 +144,6 @@ public class RepositoryMirrorDownloadTest
         public Class<? extends Exception> assertFailureType;
     }
 
-    protected RemoteProviderHintFactory remoteProviderHintFactory;
-
     @Override
     protected void setUp()
         throws Exception
@@ -142,83 +157,109 @@ public class RepositoryMirrorDownloadTest
     public void testDownloadFromMirror()
         throws Exception
     {
-        M2Repository repo = createM2Repository( new Mirror[] { MIRROR1 } );
+        // given an M2Repo proxy with a single mirror configured
+        // when requesting an item from the proxy
+        // then the artifact is fetched from mirror
+        // and the hash is retrieved from the canonical ( never mirror ) repository
 
-        RepositoryItemUid uid = repo.createUid( ITEM_PATH );
+        // setup -----------
+        final M2Repository repo = createM2Repository( new Mirror[]{ MIRROR1 } ); // this is not a mock
+        final RemoteRepositoryStorage mockRemoteStorage = mock( RemoteRepositoryStorage.class );
+        //final LocalRepositoryStorage mockLocalStorage = createMockEmptyLocalStorageRepository();
+        doReturn( "dummy" ).when( mockRemoteStorage ).getProviderId();
+        // set our fake storage into the repo
+        repo.setRemoteStorage( mockRemoteStorage );
+        //repo.setLocalStorage( mockLocalStorage );
 
-        RemoteRepositoryStorage rs = createMock( RemoteRepositoryStorage.class );
-
-        expect( rs.getProviderId() ).andReturn( "dummy" );
+        // create a 'real' uid, from the real repo, for the fake artifact
+        final RepositoryItemUid uid = repo.createUid( ITEM_PATH );
+        final AbstractStorageItem storageItem = createRealRemoteStorageFileItem( uid, ITEM_CONTENT );
 
         // have to ask the mirror
-        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( MIRROR1.getUrl() ) ) ).andReturn(
-            newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+        doReturn( storageItem ).when( mockRemoteStorage ).retrieveItem( same( repo ),
+                                                                        (ResourceStoreRequest) anyObject(),
+                                                                        eq( MIRROR1.getUrl() ) );
 
         // checksums are from canonical
-        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
-            itemNotFound );
+        doThrow( itemNotFound ).when( mockRemoteStorage ).retrieveItem( same( repo ),
+                                                                        (ResourceStoreRequest) anyObject(),
+                                                                        eq( CANONICAL_URL ) );
 
-        // checksums are from canonical
-        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
-            itemNotFound );
-
-        rs.validateStorageUrl( MIRROR1.getUrl() );
-        expectLastCall();
-
-        replay( rs );
-
-        repo.setRemoteStorage( rs );
-
+        // requesting the item from the repo ---------------
         ResourceStoreRequest req = new ResourceStoreRequest( ITEM_PATH, false );
         repo.retrieveItem( req );
+
+        // verify
+        verify( mockRemoteStorage, times( 1 ) ).validateStorageUrl( MIRROR1.getUrl() );
+        verify( mockRemoteStorage, times( 2 ) ).retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(),
+                                                              eq( CANONICAL_URL ) );
+        verify( mockRemoteStorage, times( 1 ) ).retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(),
+                                                              eq( MIRROR1.getUrl() ) );
+
     }
 
     @Test
-    public void testItemNotFound()
+    public void whenCanonicalAndMirrorCannotFindArtifactThenRequestShouldFailWithItemNotFound()
         throws Exception
     {
         AssertionRequest req;
 
         // both mirror and canonical fail
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { itemNotFound };
-        req.canonicalFailures = new Exception[] { itemNotFound };
+        req.mirrorFailures = new Exception[]{ itemNotFound };
+        req.canonicalFailures = new Exception[]{ itemNotFound };
         req.assertFailureType = ItemNotFoundException.class;
         assertDownloadFromMirror( req );
 
+    }
+
+    @Test
+    public void whenMirrorCannotFindArtifactAndCanonicalCanThenShouldNotBlacklistMirror()
+        throws Exception
+    {
+        AssertionRequest req;
+
         // mirror fails, but canonical succeeds => not blacklisted
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { itemNotFound };
+        req.mirrorFailures = new Exception[]{ itemNotFound };
         req.canonicalSuccess = true;
         assertDownloadFromMirror( req );
     }
 
     @Test
-    public void testAccessDenied()
+    public void whenCanonicalAndMirrorDenyAccessThenRequestShouldFailWithItemNotFound()
         throws Exception
     {
         AssertionRequest req;
 
         // both mirror and canonical fail
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { accessDenied };
-        req.canonicalFailures = new Exception[] { accessDenied };
+        req.mirrorFailures = new Exception[]{ accessDenied };
+        req.canonicalFailures = new Exception[]{ accessDenied };
         req.assertFailureType = ItemNotFoundException.class;
         assertDownloadFromMirror( req );
 
+    }
+
+    @Test
+    public void whenMirrorDeniesAccessAndCanonicalSucceedsThenShouldBlacklistTheMirror()
+        throws Exception
+    {
+        AssertionRequest req;
+
         // mirror fails, but canonical succeeds => blacklisted
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { accessDenied };
+        req.mirrorFailures = new Exception[]{ accessDenied };
         req.assertMirrorBlacklisted = true;
         req.canonicalSuccess = true;
         assertDownloadFromMirror( req );
     }
 
     @Test
-    public void testMirrorAndCanonicalBothInvalidContent()
+    public void mirrorAndCanonicalBothHaveInvalidContent()
         throws Exception
     {
-        M2Repository repository = createTestRepository( new Mirror[] { MIRROR1, MIRROR2 } );
+        M2Repository repository = createTestRepository( new Mirror[]{ MIRROR1, MIRROR2 } );
         MockRemoteStorage mockStorage = (MockRemoteStorage) repository.getRemoteStorage();
 
         String content = "";
@@ -265,10 +306,10 @@ public class RepositoryMirrorDownloadTest
     }
 
     @Test
-    public void testMirrorInvalidContent()
+    public void mirrorInvalidContentCanonicalValidContent()
         throws Exception
     {
-        M2Repository repository = createTestRepository( new Mirror[] { MIRROR1, MIRROR2 } );
+        M2Repository repository = createTestRepository( new Mirror[]{ MIRROR1, MIRROR2 } );
         MockRemoteStorage mockStorage = (MockRemoteStorage) repository.getRemoteStorage();
 
         String content = "";
@@ -310,7 +351,7 @@ public class RepositoryMirrorDownloadTest
     public void testMirrorDownCanonicalRetry()
         throws Exception
     {
-        M2Repository repository = createTestRepository( new Mirror[] { MIRROR1, MIRROR2 } );
+        M2Repository repository = createTestRepository( new Mirror[]{ MIRROR1, MIRROR2 } );
         MockRemoteStorage mockStorage = (MockRemoteStorage) repository.getRemoteStorage();
 
         String content = "";
@@ -353,7 +394,7 @@ public class RepositoryMirrorDownloadTest
     public void testMirrorRetry()
         throws Exception
     {
-        M2Repository repository = createTestRepository( new Mirror[] { MIRROR1, MIRROR2 } );
+        M2Repository repository = createTestRepository( new Mirror[]{ MIRROR1, MIRROR2 } );
         MockRemoteStorage mockStorage = (MockRemoteStorage) repository.getRemoteStorage();
 
         String content = "";
@@ -447,7 +488,7 @@ public class RepositoryMirrorDownloadTest
         repository.setRemoteUrl( remoteUrl );
         repository.setRemoteStorage( mockStorage );
 
-        // localstorage needs to be something OTHER then EasyMock
+        // localstorage needs to be something OTHER then mock
         LocalRepositoryStorage ls =
             this.lookup( LocalRepositoryStorage.class, DefaultFSLocalRepositoryStorage.PROVIDER_STRING );
         repository.setLocalStorage( ls );
@@ -463,30 +504,30 @@ public class RepositoryMirrorDownloadTest
 
         // both mirror and canonical fail (two retries each)
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { storageException, storageException };
-        req.canonicalFailures = new Exception[] { storageException, storageException };
+        req.mirrorFailures = new Exception[]{ storageException, storageException };
+        req.canonicalFailures = new Exception[]{ storageException, storageException };
         req.assertFailureType = ItemNotFoundException.class; // original InvalidItemContentException is swallowed
         req.assertMirrorBlacklisted = false;
         assertDownloadFromMirror( req );
 
         // mirror fails twice, but canonical succeeds => blacklisted
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { storageException, storageException };
+        req.mirrorFailures = new Exception[]{ storageException, storageException };
         req.canonicalSuccess = true;
         req.assertMirrorBlacklisted = true;
         assertDownloadFromMirror( req );
 
         // mirror fails twice, canonical fails once, then succeeds => blacklisted
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { storageException, storageException };
-        req.canonicalFailures = new Exception[] { storageException };
+        req.mirrorFailures = new Exception[]{ storageException, storageException };
+        req.canonicalFailures = new Exception[]{ storageException };
         req.canonicalSuccess = true;
         req.assertMirrorBlacklisted = true;
         assertDownloadFromMirror( req );
 
         // mirror fails once, then succeeds
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { storageException };
+        req.mirrorFailures = new Exception[]{ storageException };
         req.mirrorSuccess = true;
         req.assertMirrorBlacklisted = false;
         assertDownloadFromMirror( req );
@@ -497,108 +538,96 @@ public class RepositoryMirrorDownloadTest
         throws Exception
     {
         AssertionRequest req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { new RuntimeException( "testRuntimeException" ) };
+        req.mirrorFailures = new Exception[]{ new RuntimeException( "testRuntimeException" ) };
         req.canonicalSuccess = true;
         req.assertMirrorBlacklisted = true;
         assertDownloadFromMirror( req );
     }
 
+    // FIXME mocking is way too deep here and verification order is impossible
     private void assertDownloadFromMirror( AssertionRequest request )
         throws Exception
     {
         // also checks fallback to canonical after first mirror fails
-        M2Repository repo = createM2Repository( request.mirrors );
+        final M2Repository realM2Repo = createM2Repository( request.mirrors );
+        realM2Repo.setChecksumPolicy( ChecksumPolicy.STRICT );
+        realM2Repo.getCurrentCoreConfiguration().commitChanges();
 
-        repo.setChecksumPolicy( ChecksumPolicy.STRICT );
-
-        repo.getCurrentCoreConfiguration().commitChanges();
-
-        RepositoryItemUid uid = repo.createUid( ITEM_PATH );
-
-        RepositoryItemUid hashUid = repo.createUid( uid.getPath() + ".sha1" );
-
-        RemoteRepositoryStorage rs = createMock( RemoteRepositoryStorage.class );
-
-        expect( rs.getProviderId() ).andReturn( "mock" );
-
-        checkOrder( rs, true );
-
-        rs.validateStorageUrl( MIRROR1.getUrl() );
-        expectLastCall();
+        final RepositoryItemUid itemUid = realM2Repo.createUid( ITEM_PATH );
+        final RepositoryItemUid itemHashUid = realM2Repo.createUid( itemUid.getPath() + ".sha1" );
+        final RemoteRepositoryStorage mockRemoteStorage = mock( RemoteRepositoryStorage.class );
+        doReturn( "mock" ).when( mockRemoteStorage ).getProviderId();
 
         for ( Exception exception : request.mirrorFailures )
         {
             if ( exception instanceof ItemNotFoundException )
             {
-                expect(
-                    rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0].getUrl() ) ) ).andReturn(
-                    newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
-
-                expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andReturn(
-                    newRemoteStorageFileItem( hashUid, ITEM_BAD_SHA1_HASH.getBytes() ) );
+               doThrow( exception ).when( mockRemoteStorage ).retrieveItem( same( realM2Repo ),
+                                                                             (ResourceStoreRequest) anyObject(),
+                                                                             eq( request.mirrors[0].getUrl() ) );
+               doReturn( createRealRemoteStorageFileItem( itemHashUid, ITEM_BAD_SHA1_HASH.getBytes() ) ).when(
+                    mockRemoteStorage ).retrieveItem(
+                    same( realM2Repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) );
             }
             else
             {
-                expect(
-                    rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0].getUrl() ) ) ).andThrow(
-                    exception );
+                doThrow( exception ).when( mockRemoteStorage ).retrieveItem( same( realM2Repo ),
+                                                                             (ResourceStoreRequest) anyObject(),
+                                                                             eq( request.mirrors[0].getUrl() ) );
             }
-            rs.validateStorageUrl( CANONICAL_URL );
-            expectLastCall().anyTimes();
         }
 
         if ( request.mirrorSuccess )
         {
-            expect(
-                rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0].getUrl() ) ) ).andReturn(
-                newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
-
-            expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andReturn(
-                newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
+            doReturn( createRealRemoteStorageFileItem( itemUid, ITEM_CONTENT ) ).when( mockRemoteStorage ).retrieveItem(
+                same( realM2Repo ),
+                (ResourceStoreRequest) anyObject(),
+                eq( request.mirrors[0].getUrl() ) );
+            doReturn( createRealRemoteStorageFileItem( itemHashUid, ITEM_SHA1_HASH.getBytes() ) ).when(
+                mockRemoteStorage ).retrieveItem(
+                same( realM2Repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) );
         }
 
         for ( Exception exception : request.canonicalFailures )
         {
             if ( exception instanceof ItemNotFoundException )
             {
-                expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andReturn(
-                    newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
-
-                expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andReturn(
-                    newRemoteStorageFileItem( hashUid, ITEM_BAD_SHA1_HASH.getBytes() ) );
-
+               doReturn( createRealRemoteStorageFileItem( itemHashUid, ITEM_BAD_SHA1_HASH.getBytes() ) ).when(
+                    mockRemoteStorage ).retrieveItem(
+                    same( realM2Repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) );
+               doThrow( exception ).when( mockRemoteStorage ).retrieveItem( same( realM2Repo ),
+                                                                             (ResourceStoreRequest) anyObject(),
+                                                                             eq( CANONICAL_URL ) );
             }
             else
             {
-                expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
-                    exception );
+                doThrow( exception ).when( mockRemoteStorage ).retrieveItem( same( realM2Repo ),
+                                                                             (ResourceStoreRequest) anyObject(),
+                                                                             eq( CANONICAL_URL ) );
             }
         }
 
         if ( request.canonicalSuccess )
         {
-            expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andReturn(
-                newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
-
-            expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andReturn(
-                newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
+            doReturn( createRealRemoteStorageFileItem( itemUid, ITEM_CONTENT ) ).when( mockRemoteStorage ).retrieveItem(
+                same( realM2Repo ),
+                (ResourceStoreRequest) anyObject(),
+                eq( CANONICAL_URL ) );
+            doReturn( createRealRemoteStorageFileItem( itemHashUid, ITEM_SHA1_HASH.getBytes() ) ).when(
+                mockRemoteStorage ).retrieveItem(
+                same( realM2Repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) );
         }
 
-        replay( rs );
-
-        repo.setRemoteStorage( rs );
-
+        realM2Repo.setRemoteStorage( mockRemoteStorage );
         ResourceStoreRequest req = new ResourceStoreRequest( ITEM_PATH, false );
 
         try
         {
-            StorageItem item = repo.retrieveItem( req );
-
+            StorageItem item = realM2Repo.retrieveItem( req );
             if ( request.assertFailureType != null )
             {
                 fail( "Operation was expected to fail" );
             }
-
             assertNotNull( item );
         }
         catch ( Exception failure )
@@ -607,42 +636,50 @@ public class RepositoryMirrorDownloadTest
             {
                 throw failure;
             }
-
             assertEquals( request.assertFailureType, failure.getClass() );
         }
+        assertEquals( request.assertMirrorBlacklisted, realM2Repo.getDownloadMirrors().isBlacklisted( MIRROR1 ) );
 
-        assertEquals( request.assertMirrorBlacklisted, repo.getDownloadMirrors().isBlacklisted( MIRROR1 ) );
     }
 
     // ////////////////////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////////////////////
 
-    private M2Repository createM2Repository( Mirror[] mirrors )
+    /**
+     * Create a real M2Repository from container, configured with the specified mirrors
+     *
+     * @param mirrors the mirrors to add in the specified order
+     * @return configured repo
+     * @throws Exception
+     */
+    private M2Repository createM2Repository( final Mirror[] mirrors )
         throws Exception
     {
+
+        // FIXME should use mocks entirely instead imo
         M2Repository repo = (M2Repository) getContainer().lookup( Repository.class, "maven2" );
 
+        // config
         CRepository repoConf = new DefaultCRepository();
-
         repoConf.setProviderRole( Repository.class.getName() );
         repoConf.setProviderHint( "maven2" );
         repoConf.setId( "repo" );
 
+        // FIXME why are we setting this if we are setting mock local storage later
         repoConf.setLocalStorage( new CLocalStorage() );
         repoConf.getLocalStorage().setProvider( "file" );
 
         repoConf.setRemoteStorage( new CRemoteStorage() );
-
         repoConf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultHttpRoleHint() );
         repoConf.getRemoteStorage().setUrl( CANONICAL_URL );
         repoConf.getRemoteStorage().setConnectionSettings( new CRemoteConnectionSettings() );
         repoConf.getRemoteStorage().getConnectionSettings().setRetrievalRetryCount( 2 );
 
+        // add mirrors
         if ( mirrors != null )
         {
             List<CMirror> cmirrors = new ArrayList<CMirror>( mirrors.length );
-
             for ( Mirror mirror : mirrors )
             {
                 CMirror cmirror = new CMirror();
@@ -650,32 +687,32 @@ public class RepositoryMirrorDownloadTest
                 cmirror.setUrl( mirror.getUrl() );
                 cmirrors.add( cmirror );
             }
-
             repoConf.getRemoteStorage().setMirrors( cmirrors );
         }
 
         Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
         repoConf.setExternalConfiguration( exRepo );
+
+        // FIXME ?????????
         M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
         exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
         repo.configure( repoConf );
-
         repo.getNotFoundCache().purge();
 
-        LocalRepositoryStorage ls = createMockEmptyLocalStorage();
-        repo.setLocalStorage( ls );
-
+        // mock local repo
+        final LocalRepositoryStorage mockLocalStorage = createMockEmptyLocalStorageRepository();
+        repo.setLocalStorage( mockLocalStorage );
         return repo;
     }
 
-    private AbstractStorageItem newRemoteStorageFileItem( RepositoryItemUid uid, byte[] bytes )
+    private AbstractStorageItem createRealRemoteStorageFileItem( RepositoryItemUid uid, byte[] bytes )
     {
         ContentLocator content = new ByteArrayContentLocator( bytes, getMimeUtil().getMimeType( uid.getPath() ) );
         DefaultStorageFileItem item =
             new DefaultStorageFileItem( uid.getRepository(), new ResourceStoreRequest( uid.getPath() ), true, false,
-                content );
+                                        content );
         if ( bytes.length == 0 )
         {
             item.getAttributes().put( "digest.sha1", ITEM_SHA1_HASH );
@@ -683,26 +720,18 @@ public class RepositoryMirrorDownloadTest
         return item;
     }
 
-    private LocalRepositoryStorage createMockEmptyLocalStorage()
-        throws ItemNotFoundException, StorageException, UnsupportedStorageOperationException
+    private LocalRepositoryStorage createMockEmptyLocalStorageRepository()
+        throws LocalStorageException, ItemNotFoundException, UnsupportedStorageOperationException
     {
-        LocalRepositoryStorage ls = createMock( LocalRepositoryStorage.class );
-
-        expect( ls.getProviderId() ).andReturn( "dummy" );
-
-        expect( ls.containsItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) ).andReturn( false ).anyTimes();
-
-        expect( ls.retrieveItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) ).andThrow(
-            itemNotFound ).anyTimes();
-
-        ls.deleteItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() );
-        expectLastCall().andThrow( itemNotFound ).anyTimes();
-
-        ls.storeItem( (Repository) anyObject(), (StorageItem) anyObject() );
-        expectLastCall().anyTimes();
-
-        replay( ls );
-
-        return ls;
+        LocalRepositoryStorage localRepositoryStorage = mock( LocalRepositoryStorage.class );
+        doReturn( "dummy" ).when( localRepositoryStorage ).getProviderId();
+        doReturn( false ).when( localRepositoryStorage ).containsItem( any( Repository.class ),
+                                                                       any( ResourceStoreRequest.class ) );
+        doThrow( itemNotFound ).when( localRepositoryStorage ).retrieveItem( any( Repository.class ),
+                                                                             any( ResourceStoreRequest.class ) );
+        doThrow( itemNotFound ).when( localRepositoryStorage ).deleteItem( any( Repository.class ),
+                                                                           any( ResourceStoreRequest.class ) );
+        return localRepositoryStorage;
     }
+
 }

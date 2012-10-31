@@ -12,28 +12,28 @@
  */
 package org.sonatype.nexus.security;
 
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.easymock.EasyMock;
-
+/**
+ * FIXME this class does nothing, yet referenced by 3 other classes atm to do 'something' make useful or remove
+ */
 public class WebSecurityUtil
 {
     public static void setupWebContext( String sessionId )
     {
-        HttpServletRequest mockRequest = EasyMock.createNiceMock( HttpServletRequest.class );
-        HttpServletResponse mockResponse = EasyMock.createNiceMock( HttpServletResponse.class );
-        HttpSession mockSession = EasyMock.createNiceMock( HttpSession.class );
+        HttpServletRequest mockRequest = mock( HttpServletRequest.class );
+        HttpServletResponse mockResponse = mock( HttpServletResponse.class );
+        HttpSession mockSession = mock( HttpSession.class );
 
-        EasyMock.expect( mockSession.getId() ).andReturn( sessionId ).anyTimes();
-        EasyMock.expect( mockRequest.getCookies() ).andReturn( null ).anyTimes();
-        EasyMock.expect( mockRequest.getSession() ).andReturn( mockSession ).anyTimes();
-        EasyMock.expect( mockRequest.getSession( false ) ).andReturn( mockSession ).anyTimes();
-        replay( mockSession );
-        replay( mockRequest );
+        doReturn( sessionId ).when(mockSession).getId();
+        doReturn( null ).when(mockRequest).getCookies();
+        doReturn( mockSession ).when(mockRequest).getSession();
+        doReturn( mockSession ).when(mockRequest).getSession( false);
 
         // we need to bind for the "web" impl of the RealmSecurityManager to work
         // TODO this method no longer exists on shiro! org.apache.shiro.web.util.WebUtils

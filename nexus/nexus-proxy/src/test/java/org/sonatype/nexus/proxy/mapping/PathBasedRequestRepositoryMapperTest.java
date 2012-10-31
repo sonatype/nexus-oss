@@ -12,19 +12,23 @@
  */
 package org.sonatype.nexus.proxy.mapping;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.makeThreadSafe;
-import static org.easymock.EasyMock.replay;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.mockito.Mock;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -40,23 +44,33 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.litmus.testsupport.mock.MockitoRule;
 
 public class PathBasedRequestRepositoryMapperTest
     extends AbstractNexusTestEnvironment
 {
-    private RepositoryRegistry registry;
+    @Rule
+    public TestRule mockito = new MockitoRule(this);
 
+    @Mock
     private Repository repoA;
 
+    @Mock
     private Repository repoB;
 
+    @Mock
     private Repository repoC;
 
+    @Mock
     private Repository repoD;
 
+    @Mock
     private Repository repoE;
 
+    @Mock
     private Repository repoF;
+
+    private RepositoryRegistry registry;
 
     private GroupRepository groupRepo;
 
@@ -77,98 +91,30 @@ public class PathBasedRequestRepositoryMapperTest
 
         registry = lookup( RepositoryRegistry.class );
 
-        // clean this up?
-
-        repoA = createMock( Repository.class );
-        makeThreadSafe( repoA, true );
-        expect( repoA.getId() ).andReturn( "repoA" ).anyTimes();
-        expect( repoA.getName() ).andReturn( "repoAName" ).anyTimes();
-        expect( repoA.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoA.getProviderHint() ).andReturn( "maven2" ).anyTimes();
-        expect( repoA.isUserManaged() ).andReturn( true ).anyTimes();
-        expect( repoA.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-
-        repoB = createMock( Repository.class );
-        makeThreadSafe( repoB, true );
-        expect( repoB.getId() ).andReturn( "repoB" ).anyTimes();
-        expect( repoB.getName() ).andReturn( "repoBName" ).anyTimes();
-        expect( repoB.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoB.getProviderHint() ).andReturn( "maven2" ).anyTimes();
-        expect( repoB.isUserManaged() ).andReturn( true ).anyTimes();
-        expect( repoB.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-
-        repoC = createMock( Repository.class );
-        makeThreadSafe( repoC, true );
-        expect( repoC.getId() ).andReturn( "repoC" ).anyTimes();
-        expect( repoC.getName() ).andReturn( "repoCName" ).anyTimes();
-        expect( repoC.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoC.getProviderHint() ).andReturn( "maven2" ).anyTimes();
-        expect( repoC.isUserManaged() ).andReturn( true ).anyTimes();
-        expect( repoC.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-
-        repoD = createMock( Repository.class );
-        makeThreadSafe( repoD, true );
-        expect( repoD.getId() ).andReturn( "repoD" ).anyTimes();
-        expect( repoD.getName() ).andReturn( "repoDName" ).anyTimes();
-        expect( repoD.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoD.getProviderHint() ).andReturn( "maven2" ).anyTimes();
-        expect( repoD.isUserManaged() ).andReturn( true ).anyTimes();
-        expect( repoD.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-
-        repoE = createMock( Repository.class );
-        makeThreadSafe( repoE, true );
-        expect( repoE.getId() ).andReturn( "repoE" ).anyTimes();
-        expect( repoE.getName() ).andReturn( "repoEName" ).anyTimes();
-        expect( repoE.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoE.getProviderHint() ).andReturn( "maven2" ).anyTimes();
-        expect( repoE.isUserManaged() ).andReturn( true ).anyTimes();
-        expect( repoE.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-
-        repoF = createMock( Repository.class );
-        makeThreadSafe( repoF, true );
-        expect( repoF.getId() ).andReturn( "repoF" ).anyTimes();
-        expect( repoF.getName() ).andReturn( "repoFName" ).anyTimes();
-        expect( repoF.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
-        expect( repoF.getProviderHint() ).andReturn( "maven2" ).anyTimes();
-        expect( repoF.isUserManaged() ).andReturn( true ).anyTimes();
-        expect( repoF.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
-
-        expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
-        expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
-        expect( repoC.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
-        expect( repoD.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
-        expect( repoE.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
-        expect( repoF.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
-
-        expect( repoA.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
-            .anyTimes();
-        expect( repoB.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
-            .anyTimes();
-        expect( repoC.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
-            .anyTimes();
-        expect( repoD.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
-            .anyTimes();
-        expect( repoE.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
-            .anyTimes();
-        expect( repoF.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
-            .anyTimes();
-
-        replay( repoA, repoB, repoC, repoD, repoE, repoF );
-
-        registry.addRepository( repoA );
-        registry.addRepository( repoB );
-        registry.addRepository( repoC );
-        registry.addRepository( repoD );
-        registry.addRepository( repoE );
-        registry.addRepository( repoF );
+        Map<String,Repository> repoMap = new LinkedHashMap<String, Repository>();
+        repoMap.put( "A", repoA );
+        repoMap.put( "B", repoB );
+        repoMap.put( "C", repoC );
+        repoMap.put( "D", repoD );
+        repoMap.put( "E", repoE );
+        repoMap.put( "F", repoF );
 
         ArrayList<String> testgroup = new ArrayList<String>();
-        testgroup.add( repoA.getId() );
-        testgroup.add( repoB.getId() );
-        testgroup.add( repoC.getId() );
-        testgroup.add( repoD.getId() );
-        testgroup.add( repoE.getId() );
-        testgroup.add( repoF.getId() );
+
+        for ( Map.Entry<String, Repository> entry : repoMap.entrySet() )
+        {
+            doReturn( "repo"+ entry.getKey()).when( entry.getValue() ).getId();
+            doReturn( "repo"+ entry.getKey() + "Name").when( entry.getValue() ).getName();
+            doReturn( Repository.class.getName()).when( entry.getValue() ).getProviderRole() ;
+            doReturn( "maven2").when( entry.getValue() ).getProviderHint();
+            doReturn( true ).when( entry.getValue() ).isUserManaged();
+            doReturn(null).when( entry.getValue() ).adaptToFacet( ProxyRepository.class  );
+            doReturn( new Maven2ContentClass() ).when( entry.getValue() ).getRepositoryContentClass();
+            doReturn(  new DefaultRepositoryKind( HostedRepository.class, null ) ).when( entry.getValue() ).getRepositoryKind();
+            registry.addRepository( entry.getValue() );
+            testgroup.add( entry.getValue().getId() );
+
+        }
 
         groupRepo = (M2GroupRepository) getContainer().lookup( GroupRepository.class, "maven2" );
 
@@ -300,22 +246,22 @@ public class PathBasedRequestRepositoryMapperTest
         // /a/b inclusion hit, needed order: A, B
         request = new ResourceStoreRequest( "/a/b/something", true );
         mappedRepositories = pm.getMappedRepositories( groupRepo, request, resolvedRepositories );
-        assertEquals( 2, mappedRepositories.size() );
-        assertTrue( mappedRepositories.get( 0 ).equals( repoA ) );
-        assertTrue( mappedRepositories.get( 1 ).equals( repoB ) );
+        assertThat( mappedRepositories, hasSize( 2 ) );
+        assertThat( mappedRepositories.get( 0 ), equalTo( repoA ) );
+        assertThat( mappedRepositories.get( 1 ), equalTo( repoB ) );
 
         // /e/f exclusion hit, needed order: A, B, C, D
         request = new ResourceStoreRequest( "/e/f/should/not/return/any/repo", true );
         mappedRepositories = pm.getMappedRepositories( groupRepo, request, resolvedRepositories );
-        assertEquals( 4, mappedRepositories.size() );
-        assertTrue( mappedRepositories.get( 0 ).equals( repoA ) );
-        assertTrue( mappedRepositories.get( 1 ).equals( repoB ) );
-        assertTrue( mappedRepositories.get( 2 ).equals( repoC ) );
-        assertTrue( mappedRepositories.get( 3 ).equals( repoD ) );
+        assertThat( mappedRepositories, hasSize( 4 ) );
+        assertThat( mappedRepositories.get( 0 ), equalTo( repoA ) );
+        assertThat( mappedRepositories.get( 1 ), equalTo( repoB ) );
+        assertThat( mappedRepositories.get( 2 ), equalTo( repoC ) );
+        assertThat( mappedRepositories.get( 3 ), equalTo( repoD ) );
 
         request = new ResourceStoreRequest( "/all/should/be/servicing", true );
         mappedRepositories = pm.getMappedRepositories( groupRepo, request, resolvedRepositories );
-        assertEquals( 6, mappedRepositories.size() );
+        assertThat( mappedRepositories, hasSize( 6 ) );
 
     }
 
