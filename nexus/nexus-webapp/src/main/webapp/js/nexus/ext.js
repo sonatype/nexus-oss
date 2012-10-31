@@ -16,6 +16,7 @@ define('nexus/ext',
         'nexus/ext/feedgrid',
         'nexus/ext/formpanel',
         'nexus/ext/TextEntryList',
+        'nexus/ext/linkbutton',
         'nexus/ext/twinpanelcontroller'
       ],
       function() {});
