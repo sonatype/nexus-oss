@@ -156,13 +156,6 @@ public class AbstractEnvironmentMojo
     protected String nexusBundleName;
 
     /**
-     * Emma used on ITs
-     * 
-     * @parameter
-     */
-    private MavenArtifact emmaArtifact;
-
-    /**
      * Nexus plugin artifacts to be installed into the Nexus instance under test.
      * 
      * @parameter
@@ -182,13 +175,6 @@ public class AbstractEnvironmentMojo
      * @parameter default-value="true"
      */
     private boolean setupMaven;
-
-    /**
-     * When true setup emma
-     * 
-     * @parameter default-value="true"
-     */
-    private boolean setupEmma;
 
     /**
      * Maven used on ITs
@@ -367,10 +353,6 @@ public class AbstractEnvironmentMojo
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
 
         File libFolder = new File( nexusBaseDir, "nexus/WEB-INF/lib" );
-        if ( setupEmma )
-        {
-            copyEmma( new File( nexusBaseDir, "lib" ) );
-        }
 
         // if any plugin artifacts were specified, install them into runtime
         File pluginFolder = new File( nexusBaseDir, "nexus/WEB-INF/plugin-repository" );
@@ -912,19 +894,6 @@ public class AbstractEnvironmentMojo
         if (nexusBundleArtifact == null) {
             throw new RuntimeException("Missing 'nexusBundleArtifact' configuration");
         }
-
-        if ( setupEmma && emmaArtifact == null )
-        {
-            emmaArtifact = new MavenArtifact( "emma", "emma" );
-        }
-
-    }
-
-    private void copyEmma( File pluginFolder )
-        throws MojoExecutionException, MojoFailureException
-    {
-        Artifact artifact = getMavenArtifact( emmaArtifact );
-        copy( artifact.getFile(), pluginFolder );
     }
 
     private void setupPlugins( Collection<MavenArtifact> nexusPluginsArtifacts, File libsFolder, File pluginsFolder )

@@ -311,7 +311,6 @@
               </execution>
             </executions>
             <configuration>
-              <setupEmma>true</setupEmma>
               <setupMaven>true</setupMaven>
               <nexusBundleArtifact>
                 <groupId>${it.nexus.bundle.groupId}</groupId>
