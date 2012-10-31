@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import org.sonatype.nexus.repository.site.client.SiteRepository;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResource;
 import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResourceResponse;
@@ -81,7 +82,7 @@ public class SiteRepositoryIT
     {
         final String repositoryId = repositoryIdForTest();
 
-        createSiteRepository( repositoryId );
+        repositories().create( SiteRepository.class, repositoryId ).save();
 
         final File builtProjectHome = executeMaven( "site-1", repositoryId, "site", "site:deploy" );
         final File indexHtml = downloadFromSite( repositoryId, "site-1/index.html" );
@@ -97,7 +98,7 @@ public class SiteRepositoryIT
     {
         final String repositoryId = repositoryIdForTest();
 
-        createSiteRepository( repositoryId );
+        repositories().create( SiteRepository.class, repositoryId ).save();
         copySiteContentToRepository( "site-content", repositoryId );
 
         ClientResponse clientResponse = null;
@@ -128,7 +129,8 @@ public class SiteRepositoryIT
     {
         final String repositoryId = repositoryIdForTest();
 
-        createSiteRepository( repositoryId );
+        repositories().create( SiteRepository.class, repositoryId ).save();
+
         copySiteContentToRepository( "site-content", repositoryId );
 
         ClientResponse clientResponse = null;
@@ -159,7 +161,7 @@ public class SiteRepositoryIT
     {
         final String repositoryId = repositoryIdForTest();
 
-        createSiteRepository( repositoryId );
+        repositories().create( SiteRepository.class, repositoryId ).save();
         copySiteContentToRepository( "site-content", repositoryId );
 
         ClientResponse clientResponse = null;

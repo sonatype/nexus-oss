@@ -33,11 +33,9 @@
       <artifactId>nexus-testsuite-support</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- TODO Drop this dependency when we have proper client for repository -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-utils</artifactId>
-      <scope>test</scope>
+      <groupId>org.sonatype.nexus.repository.site</groupId>
+      <artifactId>nexus-site-repository-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>

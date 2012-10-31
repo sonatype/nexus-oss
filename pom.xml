@@ -20,7 +20,6 @@
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>12</version>
-    <relativePath />
   </parent>
 
   <groupId>org.sonatype.nexus.repository.site</groupId>
@@ -63,6 +62,7 @@
   <modules>
     <module>nexus-site-repository-plugin</module>
     <module>nexus-site-repository-testsuite</module>
+    <module>nexus-site-repository-client</module>
   </modules>
 
   <dependencyManagement>
@@ -103,17 +103,21 @@
       </dependency>
 
       <dependency>
+        <groupId>org.sonatype.nexus.client</groupId>
+        <artifactId>nexus-client-core</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
         <version>1.5-SNAPSHOT</version>
-      </dependency>
-
-      <!-- TODO Drop this dependency when we have proper client for repository -->
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-test-utils</artifactId>
-        <version>${nexus.version}</version>
-        <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -122,6 +126,12 @@
         <version>${it.nexus.bundle.version}</version>
         <type>zip</type>
         <classifier>bundle</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.repository.site</groupId>
+        <artifactId>nexus-site-repository-client</artifactId>
+        <version>1.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>

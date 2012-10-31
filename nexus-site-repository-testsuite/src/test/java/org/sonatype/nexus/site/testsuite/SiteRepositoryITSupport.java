@@ -26,25 +26,13 @@ import java.util.Properties;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.Before;
 import org.junit.runners.Parameterized;
-import org.restlet.data.MediaType;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
+import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.integrationtests.NexusRestClient;
-import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.repository.WebSiteRepository;
-import org.sonatype.nexus.rest.model.RepositoryBaseResource;
-import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.test.utils.EventInspectorsUtil;
-import org.sonatype.nexus.test.utils.RepositoriesNexusRestClient;
-import org.sonatype.nexus.test.utils.TasksNexusRestClient;
-import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import com.google.common.base.Throwables;
 import com.sun.jersey.api.client.ClientResponse;
 
 public abstract class SiteRepositoryITSupport
@@ -62,9 +50,6 @@ public abstract class SiteRepositoryITSupport
         ).load();
     }
 
-    // TODO replace this with a proper client
-    private RepositoriesNexusRestClient repositories;
-
     public SiteRepositoryITSupport( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
@@ -80,49 +65,9 @@ public abstract class SiteRepositoryITSupport
         );
     }
 
-    @Before
-    public void initRestClients()
+    protected Repositories repositories()
     {
-        final NexusRestClient nexusRestClient = new NexusRestClient(
-            new TestContext()
-                .setNexusUrl( nexus().getUrl().toExternalForm() )
-                .setSecureTest( true )
-        );
-        final TasksNexusRestClient tasks = new TasksNexusRestClient( nexusRestClient );
-        final EventInspectorsUtil events = new EventInspectorsUtil( nexusRestClient );
-
-        repositories = new RepositoriesNexusRestClient(
-            nexusRestClient, tasks, events, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML
-        );
-    }
-
-    protected RepositoriesNexusRestClient repositories()
-    {
-        return repositories;
-    }
-
-    protected RepositoryBaseResource createSiteRepository( final String repositoryId )
-    {
-        final RepositoryResource repository = new RepositoryResource();
-
-        repository.setId( repositoryId );
-        repository.setName( repository.getId() );
-        repository.setRepoType( "hosted" );
-        repository.setProvider( "site" );
-        repository.setProviderRole( WebSiteRepository.class.getName() );
-        repository.setRepoPolicy( RepositoryPolicy.MIXED.name() );
-        repository.setBrowseable( true );
-        repository.setExposed( true );
-
-        try
-        {
-            return repositories().createRepository( repository );
-        }
-        catch ( final IOException e )
-        {
-            throw Throwables.propagate( e );
-        }
-
+        return client().getSubsystem( Repositories.class );
     }
 
     protected void copySiteContentToRepository( final String sitePath, final String repositoryId )
