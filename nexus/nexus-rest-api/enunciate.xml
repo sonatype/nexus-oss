@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2012 Sonatype, Inc.
-    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+    Copyright (c) 2008-2012 Sonatype, Inc.
 
-    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
-    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
-
-    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
-    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
-    Eclipse Foundation. All other trademarks are the property of their respective owners.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/pro/attributions
+    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
+    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
 <enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -21,36 +16,13 @@
   </services>
 
   <modules>
-    <!--
-    Disable *everything* except docs... stupid that these have to be enabled by default.
-    -->
-    <csharp disabled="true"/>
-    <c disabled="true"/>
-    <jersey disabled="true"/>
-    <ruby disabled="true"/>
-    <amf disabled="true"/>
-    <cxf disabled="true"/>
-    <gwt disabled="true"/>
-    <jboss disabled="true"/>
-    <jaxws disabled="true"/>
-    <jaxws-client disabled="true"/>
-    <jaxws-ri disabled="true"/>
-    <obj-c disabled="true"/>
-    <java-client disabled="true"/>
-    <spring-app disabled="true"/>
-    <xfire disabled="true"/>
-    <xfire-client disabled="true"/>
-    <xml disabled="true"/>
-
     <docs disabled="false"
-          title="Sonatype Nexus OSS REST API"
+          title="Nexus Core REST API"
           copyright="Sonatype, Inc. ${copyright.year}"
           includeExampleXml="true"
           includeExampleJson="true"
           includeDefaultDownloads="false">
-      <additional-css file="${project.build.directory}/enunciate-theme/css/custom.css"/>
     </docs>
-
   </modules>
 
 </enunciate>
