@@ -15,7 +15,12 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -27,23 +32,28 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
  * 
  * @author cstamas
  */
-@Component( role = DiscoveryStrategy.class, hint = "http-get-properties" )
+@Singleton
+@Named( "http-get-properties" )
+@Typed( DiscoveryStrategy.class )
 public class HttpGetPropertiesDiscoveryStrategy
     extends AbstractRemoteDiscoveryStrategy
 {
-    public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException,
-            IOException
+    @Inject
+    public HttpGetPropertiesDiscoveryStrategy( final Hc4Provider hc4Provider )
     {
-        DiscoveryResponse dr = new DiscoveryResponse( request );
+        super( hc4Provider );
+    }
 
+    public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
+        throws NoSuchRepositoryException, IOException
+    {
+        final DiscoveryResponse dr = new DiscoveryResponse( request );
         // handle
-        RequestResult response = handleRequest( getRemoteUrl( request ) );
+        final RequestResult response = handleRequest( getRemoteUrl( request ) );
 
         if ( response != null )
         {
-            Properties properties = new Properties();
-
+            final Properties properties = new Properties();
             try
             {
                 properties.load( response.getInputStream() );
@@ -53,17 +63,14 @@ public class HttpGetPropertiesDiscoveryStrategy
                 response.close();
             }
 
-            String keyPrefix = request.getKey() + ".";
-
+            final String keyPrefix = request.getKey() + ".";
             // repack it into response
             for ( Object key : properties.keySet() )
             {
-                String keyString = key.toString();
-
+                final String keyString = key.toString();
                 if ( keyString.startsWith( keyPrefix ) )
                 {
                     dr.getResponse().put( key.toString().substring( keyPrefix.length() ), properties.get( key ) );
-
                     dr.setSuccessful( true );
                 }
             }

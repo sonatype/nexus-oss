@@ -46,7 +46,6 @@
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-marshal</artifactId>
-      <version>1.4</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>

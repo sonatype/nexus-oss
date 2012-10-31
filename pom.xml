@@ -37,6 +37,10 @@
     <arguments>-Dtest=VOID -Dit.test=VOID</arguments>
   </properties>
 
+  <prerequisites>
+    <maven>3.0.4</maven>
+  </prerequisites>
+
   <modules>
     <module>nexus-runtime-platform</module>
     <module>nexus</module>

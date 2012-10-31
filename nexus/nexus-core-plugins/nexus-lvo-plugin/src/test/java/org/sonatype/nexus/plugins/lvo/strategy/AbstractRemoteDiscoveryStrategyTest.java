@@ -29,7 +29,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.Hc4ProviderImpl;
+import org.sonatype.nexus.apachehttpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.configuration.application.DefaultNexusConfiguration;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
@@ -38,16 +40,18 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Proxy;
+import org.sonatype.tests.http.server.fluent.Server;
 
 /**
  * Tests for network parts of AbstractRemoteDiscoveryStrategy
  */
 public class AbstractRemoteDiscoveryStrategyTest
+    extends TestSupport
 {
-
-    private AbstractRemoteDiscoveryStrategy underTest;
 
     private Server server;
 
@@ -60,13 +64,20 @@ public class AbstractRemoteDiscoveryStrategyTest
 
     @Mock
     private RemoteStorageContext remoteStorageContext;
+    
+    @Mock
+    private UserAgentBuilder userAgentBuilder;
+    
+    @Mock
+    private ApplicationEventMulticaster multicaster;
+    
+    @Mock
+    private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
     @Before
     public void setup()
         throws Exception
     {
-        MockitoAnnotations.initMocks( this );
-
         content = "nexus-oss.version=2.0\nnexus-oss.url=http://some.url\n";
 
         when( cfg.getGlobalRemoteStorageContext() ).thenReturn( remoteStorageContext );
@@ -91,7 +102,8 @@ public class AbstractRemoteDiscoveryStrategyTest
 
     private AbstractRemoteDiscoveryStrategy create()
     {
-        return new AbstractRemoteDiscoveryStrategy( cfg )
+        final Hc4Provider provider = new Hc4ProviderImpl( cfg, userAgentBuilder, multicaster, jmxInstaller );
+        return new AbstractRemoteDiscoveryStrategy( provider )
         {
             @Override
             public DiscoveryResponse discoverLatestVersion( final DiscoveryRequest request )
@@ -106,10 +118,7 @@ public class AbstractRemoteDiscoveryStrategyTest
     public void testDirect()
         throws Exception
     {
-        server =
-            Server.withPort( 0 )
-                .serve( "/test.properties" ).withBehaviours( content( content ) )
-                .start();
+        server = Server.withPort( 0 ).serve( "/test.properties" ).withBehaviours( content( content ) ).start();
 
         AbstractRemoteDiscoveryStrategy underTest = create();
 
@@ -118,17 +127,14 @@ public class AbstractRemoteDiscoveryStrategyTest
 
         assertThat( result.getInputStream(), notNullValue() );
         assertThat( "content did not match",
-                    IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ),
-                    is( true ) );
+            IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ), is( true ) );
     }
 
     @Test
     public void testProxy()
         throws Exception
     {
-        server = Proxy.withPort( 0 )
-            .serve( "/test.properties" ).withBehaviours( content( content ) )
-            .start();
+        server = Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( content( content ) ).start();
 
         RemoteProxySettings remoteCfg = remoteStorageContext.getRemoteProxySettings();
         remoteCfg.setHostname( "localhost" );
@@ -140,18 +146,14 @@ public class AbstractRemoteDiscoveryStrategyTest
 
         assertThat( result.getInputStream(), notNullValue() );
         assertThat( "content did not match",
-                    IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ),
-                    is( true ) );
+            IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ), is( true ) );
     }
 
     @Test
     public void testDirectFails()
         throws Exception
     {
-        server =
-            Server.withPort( 0 )
-                .serve( "/test.properties" ).withBehaviours( error( 404 ) )
-                .start();
+        server = Server.withPort( 0 ).serve( "/test.properties" ).withBehaviours( error( 404 ) ).start();
 
         AbstractRemoteDiscoveryStrategy underTest = create();
 
@@ -165,9 +167,7 @@ public class AbstractRemoteDiscoveryStrategyTest
     public void testProxyFails()
         throws Exception
     {
-        server = Proxy.withPort( 0 )
-            .serve( "/test.properties" ).withBehaviours( error( 404 ) )
-            .start();
+        server = Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( error( 404 ) ).start();
 
         RemoteProxySettings remoteCfg = remoteStorageContext.getRemoteProxySettings();
         remoteCfg.setHostname( "localhost" );
@@ -185,10 +185,9 @@ public class AbstractRemoteDiscoveryStrategyTest
         throws Exception
     {
         server =
-            Server.withPort( 0 )
-                .serve( "/test.properties" ).withBehaviours( redirect( "/redirect/test.properties", 301 ) )
-                .serve( "/redirect/test.properties").withBehaviours( content( content ) )
-                .start();
+            Server.withPort( 0 ).serve( "/test.properties" ).withBehaviours(
+                redirect( "/redirect/test.properties", 301 ) ).serve( "/redirect/test.properties" ).withBehaviours(
+                content( content ) ).start();
 
         AbstractRemoteDiscoveryStrategy underTest = create();
 
@@ -197,18 +196,16 @@ public class AbstractRemoteDiscoveryStrategyTest
 
         assertThat( result.getInputStream(), notNullValue() );
         assertThat( "content did not match",
-                    IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ),
-                    is( true ) );
+            IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ), is( true ) );
     }
 
     @Test
     public void testProxyRedirect()
         throws Exception
     {
-        server = Proxy.withPort( 0 )
-            .serve( "/test.properties" ).withBehaviours( redirect( "/redirect/test.properties", 301 ) )
-            .serve( "/redirect/test.properties" ).withBehaviours( content( content ) )
-            .start();
+        server =
+            Proxy.withPort( 0 ).serve( "/test.properties" ).withBehaviours( redirect( "/redirect/test.properties", 301 ) ).serve(
+                "/redirect/test.properties" ).withBehaviours( content( content ) ).start();
 
         RemoteProxySettings remoteCfg = remoteStorageContext.getRemoteProxySettings();
         remoteCfg.setHostname( "localhost" );
@@ -220,8 +217,7 @@ public class AbstractRemoteDiscoveryStrategyTest
 
         assertThat( result.getInputStream(), notNullValue() );
         assertThat( "content did not match",
-                    IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ),
-                    is( true ) );
+            IOUtils.contentEquals( result.getInputStream(), new ByteArrayInputStream( content.getBytes() ) ), is( true ) );
     }
 
 }

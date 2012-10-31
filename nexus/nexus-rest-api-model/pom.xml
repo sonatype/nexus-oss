@@ -60,12 +60,10 @@
               <models>
                 <model>src/main/mdo/vos.xml</model>
               </models>
+              <packageWithVersion>false</packageWithVersion>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
       </plugin>
     </plugins>
   </build>

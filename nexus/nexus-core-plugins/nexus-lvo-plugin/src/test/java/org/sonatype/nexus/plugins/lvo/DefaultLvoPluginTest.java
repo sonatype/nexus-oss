@@ -36,13 +36,14 @@ import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.plugins.lvo.config.LvoPluginConfiguration;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
  *
  */
 public class DefaultLvoPluginTest
+    extends TestSupport
 {
-
     @Mock
     private LvoPluginConfiguration cfg;
 
@@ -53,9 +54,7 @@ public class DefaultLvoPluginTest
     @Before
     public void setUp()
     {
-        MockitoAnnotations.initMocks( this );
         when( cfg.isEnabled() ).thenReturn( true );
-
         underTest = new DefaultLvoPlugin( cfg, strategies );
     }
 
@@ -63,14 +62,15 @@ public class DefaultLvoPluginTest
     public void testGetVersionTouchesStrategy()
         throws NoSuchStrategyException, IOException, NoSuchKeyException, NoSuchRepositoryException
     {
-        final Function<DiscoveryResponse, DiscoveryResponse> func = new Function<DiscoveryResponse, DiscoveryResponse>()
-        {
-            @Override
-            public DiscoveryResponse apply( @Nullable final DiscoveryResponse input )
+        final Function<DiscoveryResponse, DiscoveryResponse> func =
+            new Function<DiscoveryResponse, DiscoveryResponse>()
             {
-                return input;
-            }
-        };
+                @Override
+                public DiscoveryResponse apply( @Nullable final DiscoveryResponse input )
+                {
+                    return input;
+                }
+            };
 
         final CLvoKey key = mockOut( func );
 

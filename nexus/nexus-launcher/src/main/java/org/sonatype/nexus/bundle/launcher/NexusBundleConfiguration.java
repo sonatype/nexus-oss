@@ -14,6 +14,7 @@ package org.sonatype.nexus.bundle.launcher;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.sisu.bl.WebBundleConfiguration;
 
@@ -84,5 +85,22 @@ public interface NexusBundleConfiguration
      * @since 2.2
      */
     String getLogLevel();
+
+    /**
+     * Sets log level / logger name.
+     *
+     * @param loggerName logger name (cannot be null)
+     * @param level      one of TRACE/DEBUG/INFO/ERROR (cannot be null)
+     * @since 2.3
+     */
+    NexusBundleConfiguration setLogLevel( String loggerName, String level );
+
+    /**
+     * Gets the configured log levels / logger name.
+     *
+     * @return map between logger names and log level (should not be null)
+     * @since 2.3
+     */
+    Map<String, String> getLogLevels();
 
 }

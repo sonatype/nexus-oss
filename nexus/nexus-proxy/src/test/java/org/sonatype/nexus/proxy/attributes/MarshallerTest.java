@@ -94,12 +94,4 @@ public class MarshallerTest
     {
         doTest( new JacksonJSONMarshaller() );
     }
-
-    @Test
-    public void testJacksonXML()
-        throws IOException
-    {
-        doTest( new JacksonXMLMarshaller() );
-    }
-
 }

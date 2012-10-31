@@ -25,10 +25,12 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus</artifactId>
-  <packaging>pom</packaging>
   <name>Nexus</name>
-  <version>2.3-SNAPSHOT</version>
   <description>Sonatype Nexus Repository Manager</description>
+  <packaging>pom</packaging>
+
+  <version>2.3-SNAPSHOT</version>
+
   <inceptionYear>2007</inceptionYear>
 
   <scm>
@@ -37,7 +39,6 @@
     <url>https://github.com/sonatype/nexus</url>
   </scm>
 
-  <mailingLists />
   <licenses>
     <license>
       <name>Eclipse Public License</name>
@@ -162,13 +163,15 @@
     <logback.version>1.0.7</logback.version>
     <aether.version>1.13.1</aether.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
-    <enunciate.version>1.20</enunciate.version>
+    <enunciate.version>1.26</enunciate.version>
     <jetty.version>8.1.7.v20120910</jetty.version>
     <maven.version>3.0.4</maven.version>
     <plexus-security.version>2.8.3-SNAPSHOT</plexus-security.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <shiro.version>1.2.1</shiro.version>
     <surefire.version>2.12.4</surefire.version>
+    <jackson.version>1.9.10</jackson.version>
+    <goodies.version>1.5-SNAPSHOT</goodies.version>
 
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -179,12 +182,16 @@
 
     <nexus.plugin.name>CHANGEME-PLUGIN-NAME-NOT-CONFIGURED</nexus.plugin.name>
     <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
+
+    <copyright.year>2012</copyright.year>
   </properties>
+
+  <prerequisites>
+    <maven>3.0.4</maven>
+  </prerequisites>
 
   <dependencyManagement>
     <dependencies>
-
-      <!-- Platform -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-runtime-platform</artifactId>
@@ -193,6 +200,9 @@
         <scope>import</scope>
       </dependency>
 
+      <!--
+      FIXME: These should be removed, but until then update to 1.1.1-SNAPSHOT and avoid needing to exclude javax.inject here.
+      -->
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-api</artifactId>
@@ -233,32 +243,29 @@
         <version>3.2</version>
       </dependency>
 
-      <!--
-      FIXME: This might be unused now...
-      -->
-      <dependency>
-        <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-        <artifactId>plexus-app-booter</artifactId>
-        <version>2.1.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
       <dependency>
         <groupId>tanukisoft</groupId>
         <artifactId>wrapper</artifactId>
         <version>3.2.3</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.sisu.goodies</groupId>
+        <artifactId>goodies-common</artifactId>
+        <version>${goodies.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.sisu.goodies</groupId>
+        <artifactId>goodies-marshal</artifactId>
+        <version>${goodies.version}</version>
+      </dependency>
+
       <!-- Jetty -->
       <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.0.1</version>
+        <groupId>org.eclipse.jetty.orbit</groupId>
+        <artifactId>javax.servlet</artifactId>
+        <version>3.0.0.v201112011016</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
@@ -356,31 +363,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-archiver</artifactId>
-        <version>2.1.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-component-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-cipher</artifactId>
-        <version>1.5</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.7</version>
       </dependency>
 
       <dependency>
@@ -390,27 +375,15 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>classworlds-configuration-io</artifactId>
-        <version>1.0</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-task-scheduler</artifactId>
         <version>1.7</version>
       </dependency>
 
       <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>3.0</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-restlet-bridge</artifactId>
-        <version>1.22</version>
+        <version>1.23-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -444,42 +417,14 @@
 
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-cli</artifactId>
-        <version>1.2</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
-        <version>1.14</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.15</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.configuration</groupId>
         <artifactId>base-configuration</artifactId>
         <version>1.1.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
@@ -491,12 +436,8 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.5</version>
+        <version>1.6-SNAPSHOT</version>
         <exclusions>
-          <exclusion>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
           <exclusion>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
@@ -703,11 +644,7 @@
         <artifactId>maven-settings-builder</artifactId>
         <version>${maven.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-api</artifactId>
-        <version>${maven.version}</version>
-      </dependency>
+
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
@@ -750,34 +687,16 @@
         <version>${aether.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
-      </dependency>
-      
       <!-- Jackson -->
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-core-asl</artifactId>
-        <version>1.9.10</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-mapper-asl</artifactId>
-        <version>1.9.10</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml</groupId>
-        <artifactId>jackson-xml-databind</artifactId>
-        <version>0.6.2</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>stax-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>${jackson.version}</version>
       </dependency>
       
       <dependency>
@@ -857,16 +776,6 @@
         <version>${restlet.version}</version>
       </dependency>
 
-      <!--
-      FIXME: This is pulled in by the restlet bridge, and this configuration should be moved there, nothing else inside of NX uses this.
-      -->
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>org.json</artifactId>
-        <version>2.0-NEXUS-3758</version>
-      </dependency>
-
-      <!-- Various deps -->
       <dependency>
         <groupId>com.ning</groupId>
         <artifactId>async-http-client</artifactId>
@@ -897,6 +806,9 @@
         <version>4.2.2</version>
       </dependency>
 
+      <!--
+      FIXME: Get rid of this dependency.
+      -->
       <dependency>
         <groupId>commons-httpclient</groupId>
         <artifactId>commons-httpclient</artifactId>
@@ -912,7 +824,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>1.4</version>
+        <version>2.4</version>
       </dependency>
 
       <dependency>
@@ -937,12 +849,6 @@
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>2.6</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>spice-utils</artifactId>
-        <version>1.0.0</version>
       </dependency>
 
       <dependency>
@@ -981,6 +887,9 @@
         <version>1.5-SNAPSHOT</version>
       </dependency>
 
+      <!--
+      FIXME: Get rid of this dependency.
+      -->
       <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
@@ -1026,27 +935,15 @@
         <artifactId>sisu-pr-testutil</artifactId>
         <version>1.5.2</version>
       </dependency>
-      
-      <!-- TODO remove carrotsearch and replace with contiperf -->
-      <!-- profiling -->
-      <dependency>
-        <groupId>com.carrotsearch</groupId>
-        <artifactId>junit-benchmarks</artifactId>
-        <version>0.4.0</version>
-      </dependency>
-      <!-- h2 used by junit benchmarks to store perf data -->
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>1.3.154</version>
-      </dependency>
-
+     
       <dependency>
         <groupId>org.codehaus.enunciate</groupId>
         <artifactId>enunciate-core</artifactId>
         <version>${enunciate.version}</version>
-        <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
-        <!-- But nothing is using that annotation after build happened, and doco is generated -->
+        <!--
+        Only used for generated REST API documentation, and only used for @ResourceMethodSignature.
+        FIXME: This can be removed if plugins implement proper JAX-RS apis, and delegate to restlet crud.
+        -->
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1057,8 +954,16 @@
             <artifactId>commons-beanutils</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>net.sf.apt-jelly</groupId>
+            <artifactId>apt-jelly-freemarker</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1080,6 +985,12 @@
       <!--
       FIXME: Replace project.version with actual version used.
       -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-enunciate-theme</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1373,7 +1284,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>1.6</version>
+          <version>1.7</version>
           <extensions>true</extensions>
           <configuration>
             <pluginName>${nexus.plugin.name}</pluginName>
@@ -1384,7 +1295,7 @@
             <dependency>
               <groupId>org.sonatype.plugins</groupId>
               <artifactId>app-lifecycle-nexus</artifactId>
-              <version>1.6</version>
+              <version>1.7</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -1392,7 +1303,7 @@
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>1.4.1</version>
+          <version>1.5</version>
           <configuration>
             <useJava5>true</useJava5>
           </configuration>
@@ -1416,7 +1327,6 @@
               <include>css/**/*.css</include>
             </includes>
             <nosuffix>true</nosuffix>
-            <insertNewLine>true</insertNewLine>
           </configuration>
           <executions>
             <execution>
@@ -1425,6 +1335,11 @@
                 <goal>compress</goal>
               </goals>
               <configuration>
+                <!-- The plugin spews warnings when code is not in a shape that's optimized for minifying.
+                     Plugins interested in these warnings should configure the jslint goal instead. -->
+                <jswarn>false</jswarn>
+                <failOnWarning>false</failOnWarning>
+
                 <aggregations>
                   <aggregation>
                     <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
@@ -1449,17 +1364,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2.2</version>
-          <!--
-          FIXME: Sort out what this is for, and nuke it if is really not needed for anything, if it is then document it here for clarity.
-          -->
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.spice</groupId>
-              <artifactId>maven-assembly-helpers</artifactId>
-              <version>1.0</version>
-            </dependency>
-          </dependencies>
+          <version>2.3</version>
           <configuration>
             <tarLongFileMode>gnu</tarLongFileMode>
           </configuration>
@@ -1471,21 +1376,6 @@
           <version>2.6</version>
           <configuration>
             <escapeWindowsPaths>true</escapeWindowsPaths>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-eclipse-plugin</artifactId>
-          <version>2.6</version>
-          <configuration>
-            <downloadSources>true</downloadSources>
-            <downloadJavadocs>true</downloadJavadocs>
-            <projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
-            <wtpmanifest>true</wtpmanifest>
-            <wtpapplicationxml>true</wtpapplicationxml>
-            <wtpversion>2.0</wtpversion>
-            <manifest>${basedir}/src/main/resources/META-INF/MANIFEST.MF</manifest>
           </configuration>
         </plugin>
 
@@ -1524,14 +1414,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>${surefire.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>integration-test</goal>
-                <goal>verify</goal>
-              </goals>
-            </execution>
-          </executions>
           <configuration>
             <failIfNoTests>false</failIfNoTests>
             <!-- force use of property -->
@@ -1563,21 +1445,56 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
-          <version>2.1-alpha-2</version>
+          <version>2.3</version>
         </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>1.1.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.5.1</version>
+        </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>2.5.1</version>
         </plugin>
 
-        <!--
-        FIXME: Can probably use latest version, as the issue which we think this was for ( http://jira.codehaus.org/browse/MINVOKER-102 ) appears to have been fixed in version 1.6
-        -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>animal-sniffer-maven-plugin</artifactId>
+          <version>1.9</version>
+          <configuration>
+            <signature>
+              <groupId>org.codehaus.mojo.signature</groupId>
+              <artifactId>java16</artifactId>
+              <version>1.0</version>
+            </signature>
+          </configuration>
+        </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-invoker-plugin</artifactId>
-          <version>1.6-SONATYPE-r940877</version>
+          <version>1.7</version>
         </plugin>
 
         <!-- INTERNAL -->
@@ -1594,8 +1511,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0.1</version>
-        <!--$NO-MVN-MAN-VER$-->
         <executions>
           <execution>
             <id>enforce-java</id>
@@ -1618,7 +1533,6 @@
             <goals>
               <goal>enforce</goal>
             </goals>
-            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. <phase>compile</phase> -->
             <configuration>
               <rules>
                 <bannedDependencies>
@@ -1659,8 +1573,8 @@
                   <excludes>
                     <exclude>*:plexus-component-api</exclude>
                   </excludes>
-                  <message>plexus-component-api conflicts with newer plexus-container-default. You probably added a dependency that is plexus component made with older plexus
-                    container.
+                  <message>plexus-component-api conflicts with newer plexus-container-default.
+                    You probably a plexus component made with older plexus container.
                   </message>
                 </bannedDependencies>
                 <bannedDependencies>
@@ -1698,7 +1612,7 @@
                   <excludes>
                     <exclude>junit:junit</exclude>
                   </excludes>
-                  <message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead.</message>
+                  <message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
@@ -1756,7 +1670,7 @@
                   <includes>
                     <include>log4j:*</include>
                   </includes>
-                  <message>Do not use log4j api directly in tests. Use slf4j api instead.</message>
+                  <message>Do not use log4j api directly in tests. Use slf4j api instead</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
@@ -1771,9 +1685,18 @@
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
                   <excludes>
+                    <exclude>javax.servlet:servlet-api</exclude>
+                    <exclude>org.mortbay.jetty:servlet-api</exclude>
+                    <exclude>org.mortbay.jetty:servlet-api-2.5</exclude>
+                  </excludes>
+                  <message>Use servlet API from Jetty 8.x (org.eclipse.jetty.orbit:javax.servlet)</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
                     <exclude>org.sonatype.spice:plexus-ehcache</exclude>
                   </excludes>
-                  <message>Use the org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache!</message>
+                  <message>Use org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache</message>
                 </bannedDependencies>
               </rules>
               <fail>true</fail>
@@ -1797,12 +1720,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -1816,9 +1745,9 @@
   </build>
 
   <modules>
+    <module>nexus-enunciate-theme</module>
     <module>nexus-bootstrap</module>
     <module>nexus-plugins</module>
-    <module>nexus-mock</module>
     <module>nexus-utils</module>
     <module>nexus-web-utils</module>
     <module>nexus-logging-extras</module>
@@ -1861,57 +1790,65 @@
     </profile>
 
     <profile>
+      <id>sniff</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>animal-sniffer-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <id>enunciate</id>
       <activation>
-        <!-- A plugin is "enunciated" when enunciate.xml config file is present -->
         <file>
           <exists>enunciate.xml</exists>
         </file>
       </activation>
-      <properties>
-        <enunciate.plugin.version>1.20-SONATYPE-r919</enunciate.plugin.version>
-      </properties>
-      <dependencies>
-        <!-- Dependencies needed to annotate classes -->
-        <dependency>
-          <groupId>org.codehaus.enunciate</groupId>
-          <artifactId>enunciate-core</artifactId>
-          <scope>provided</scope>
-          <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
-          <!-- But nothing is using that annotation after build happened, and doco is generated -->
-        </dependency>
-        <dependency>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils-core</artifactId>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.codehaus.jackson</groupId>
-          <artifactId>jackson-xc</artifactId>
-          <version>1.9.10</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.ws.rs</groupId>
-          <artifactId>jsr311-api</artifactId>
-          <version>1.1.1</version>
-          <scope>provided</scope>
-        </dependency>
-        <!-- this dependency contains an annotation mentioned in com.google.common... package-infos. enunciate will report an error if it is missing. -->
-        <dependency>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-          <version>2.0.1</version>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
       <build>
         <plugins>
-          <!-- Enunciate plugin (RT deps are above, plugin execution deps are below as plugin deps) -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.sonatype.nexus</groupId>
+                      <artifactId>nexus-enunciate-theme</artifactId>
+                      <outputDirectory>${project.build.directory}/enunciate-theme</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.codehaus.enunciate</groupId>
             <artifactId>maven-enunciate-plugin</artifactId>
-            <version>${enunciate.plugin.version}</version>
+            <version>${enunciate.version}</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>enunciate-docs</artifactId>
+                <version>${enunciate.version}</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <phase>process-classes</phase>
@@ -1919,29 +1856,16 @@
                   <goal>docs</goal>
                 </goals>
                 <configuration>
-                  <!-- the directory where to put the docs -->
+                  <configFile>enunciate.xml</configFile>
                   <docsDir>${project.build.outputDirectory}/docs</docsDir>
                 </configuration>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.codehaus.enunciate</groupId>
-                <artifactId>enunciate-docs</artifactId>
-                <version>${enunciate.version}</version>
-              </dependency>
-              <!-- Skin disabled, until we come up with a proper skin -->
-              <!--dependency> <groupId>org.sonatype.templates</groupId> <artifactId>enunciate-doc-template</artifactId><version>1.0</version> </dependency -->
-            </dependencies>
-            <configuration>
-              <configFile>enunciate.xml</configFile>
-            </configuration>
           </plugin>
 
-          <plugin>
-            <groupId>com.mycila.maven-license-plugin</groupId>
-            <artifactId>maven-license-plugin</artifactId>
-          </plugin>
+          <!--
+          TODO: Configure yui-compression on relevant files here.
+          -->
         </plugins>
       </build>
     </profile>
@@ -1959,6 +1883,34 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>findbugs</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+            <version>2.5.2</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
@@ -1974,7 +1926,6 @@
       <build>
         <pluginManagement>
           <plugins>
-            <!-- "new" M2E like 1.0 "IndIgor" -->
             <plugin>
               <groupId>org.eclipse.m2e</groupId>
               <artifactId>lifecycle-mapping</artifactId>
@@ -2067,7 +2018,7 @@
                       <pluginExecutionFilter>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-invoker-plugin</artifactId>
-                        <versionRange>[1.6,)</versionRange>
+                        <versionRange>[1.7,)</versionRange>
                         <goals>
                           <goal>install</goal>
                         </goals>

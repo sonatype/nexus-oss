@@ -46,6 +46,9 @@
 
   <build>
     <plugins>
+      <!--
+      FIXME: This is probably better off done with maven-shade-plugin.
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>

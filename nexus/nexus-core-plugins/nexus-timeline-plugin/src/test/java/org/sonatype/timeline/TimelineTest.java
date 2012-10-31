@@ -42,12 +42,14 @@ public class TimelineTest
         cleanDirectory( indexDirectory );
     }
 
+    @Test
     public void testConfigureTimeline()
         throws Exception
     {
         timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
     }
 
+    @Test
     public void testSimpleAddAndRetrieve()
         throws Exception
     {
@@ -69,6 +71,7 @@ public class TimelineTest
         assertEquals( data, results.get( 0 ).getData() );
     }
 
+    @Test
     public void testPurge()
         throws Exception
     {
@@ -97,19 +100,10 @@ public class TimelineTest
         assertEquals( 0, cb3.getRecords().size() );
     }
 
-    /**
-     * This test is ignored, as it seems "manual edit" of the lucene index does not impact Lucene 3.6.1 (used in 3.0) as
-     * it was impacting Lucene 3.0 in pre-3.0 versions (file formats did change a lot, and lucene also). Anyway, this
-     * test is not quite useful, as crash is tested in another UT, and thus is unimportant too, as precondition (the
-     * manually edited index file) is not a reliable way to break an index anyway.
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    public void NOtestRepairIndexCouldNotRead()
+    @Test
+    public void testRepairIndexCouldNotRead()
         throws Exception
     {
-        // here we use data produced by testSimpleAddAndRetrieve(), but the index file is crashed (manually edited)
         File crashedPersistDir = new File( getBasedir(), "target/test-classes/crashed-could-not-read/persist" );
         File carshedIndexDir = new File( getBasedir(), "target/test-classes/crashed-could-not-read/index" );
         FileUtils.copyDirectoryStructure( crashedPersistDir, persistDirectory );
@@ -132,6 +126,7 @@ public class TimelineTest
         assertEquals( data, results.get( 0 ).getData() );
     }
 
+    @Test
     public void testRepairIndexCouldNotRetrieve()
         throws Exception
     {
@@ -147,6 +142,7 @@ public class TimelineTest
         assertTrue( cb.getRecords().size() > 0 );
     }
 
+    @Test
     public void testRepairIndexCouldNotAdd()
         throws Exception
     {
@@ -158,17 +154,32 @@ public class TimelineTest
 
         timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
 
+        {
+            // add, this should pass without any exception
+            Map<String, String> data = new HashMap<String, String>();
+            data.put( "k1", "v1" );
+            data.put( "k2", "v2" );
+            data.put( "k3", "v3" );
+            timeline.add( createTimelineRecord( System.currentTimeMillis(), "typeA", "subType", data ) );
+        }
+
         // pretend that when timeline is running, the index is manually changed
+        timeline.stop();
         cleanDirectory( indexDirectory );
         FileUtils.copyDirectoryStructure( crashedIndexDir, indexDirectory );
+        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
 
-        Map<String, String> data = new HashMap<String, String>();
-        data.put( "k1", "v1" );
-        data.put( "k2", "v2" );
-        data.put( "k3", "v3" );
-        timeline.add( createTimelineRecord( System.currentTimeMillis(), "typeA", "subType", data ) );
+        {
+            // add again, this should also pass without any exception
+            Map<String, String> data = new HashMap<String, String>();
+            data.put( "k1", "v1" );
+            data.put( "k2", "v2" );
+            data.put( "k3", "v3" );
+            timeline.add( createTimelineRecord( System.currentTimeMillis(), "typeA", "subType", data ) );
+        }
     }
 
+    @Test
     public void testRepairIndexCouldNotPurge()
         throws Exception
     {
@@ -180,9 +191,13 @@ public class TimelineTest
 
         timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
 
+        assertTrue( timeline.purge( System.currentTimeMillis(), null, null, null ) > 0 );
+
         // pretend that when timeline is running, the index is manually changed
+        timeline.stop();
         cleanDirectory( indexDirectory );
         FileUtils.copyDirectoryStructure( crashedIndexDir, indexDirectory );
+        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
 
         assertTrue( timeline.purge( System.currentTimeMillis(), null, null, null ) > 0 );
     }

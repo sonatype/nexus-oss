@@ -12,39 +12,23 @@
  */
 package org.sonatype.nexus.security.ldap.realms.testharness.nexus5193;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.restlet.data.MediaType.APPLICATION_JSON;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
-
-import java.io.File;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.sonatype.ldaptestsuite.LdapServer;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapConnMessageUtil;
-import org.sonatype.nexus.test.utils.NexusRequestMatchers;
-import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
-import org.sonatype.security.rest.model.PlexusUserResource;
-import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
-import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
 import org.sonatype.sisu.litmus.testsupport.net.TrustingX509TrustManager;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class Nexus5193LdapsSupportIT
     extends AbstractLdapIntegrationIT

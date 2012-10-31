@@ -31,38 +31,31 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api-model</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-web-utils</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-restlet-bridge</artifactId>
       <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.plexus</groupId>
-          <artifactId>plexus-jetty6</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>jetty</artifactId>
@@ -81,35 +74,39 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-web</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
+
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+    </dependency>
+
+    <!--
+    FIXME: See note on DM entry.
+    -->
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- For testing -->
@@ -118,6 +115,7 @@
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
@@ -130,16 +128,14 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-web</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
