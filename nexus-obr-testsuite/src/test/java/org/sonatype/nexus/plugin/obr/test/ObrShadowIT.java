@@ -39,7 +39,7 @@ public class ObrShadowIT
         upload( mavenRId, GERONIMO_SERVLET );
         upload( mavenRId, PORTLET_API );
 
-        repositories().create( ObrVirtualRepository.class, sRId ).asShadowOf( mavenRId ).save();
+        repositories().create( ObrVirtualRepository.class, sRId ).ofRepository( mavenRId ).save();
         deployUsingObrIntoFelix( sRId );
     }
 
