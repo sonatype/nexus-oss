@@ -988,12 +988,6 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-enunciate-theme</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1745,7 +1739,6 @@
   </build>
 
   <modules>
-    <module>nexus-enunciate-theme</module>
     <module>nexus-bootstrap</module>
     <module>nexus-plugins</module>
     <module>nexus-utils</module>
@@ -1818,27 +1811,6 @@
       </activation>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>process-classes</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.sonatype.nexus</groupId>
-                      <artifactId>nexus-enunciate-theme</artifactId>
-                      <outputDirectory>${project.build.directory}/enunciate-theme</outputDirectory>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <groupId>org.codehaus.enunciate</groupId>
             <artifactId>maven-enunciate-slim-plugin</artifactId>
