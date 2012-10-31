@@ -307,8 +307,6 @@
               <execution>
                 <goals>
                   <goal>setup-environment</goal>
-                  <!-- FIXME: Sort out what this goal is used for, and why its needed to execute -->
-                  <!--<goal>package</goal>-->
                 </goals>
               </execution>
             </executions>
