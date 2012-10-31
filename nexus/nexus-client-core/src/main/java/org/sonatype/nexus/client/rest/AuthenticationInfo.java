@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.client.rest;
 
+/**
+ * @since 2.1
+ */
 public interface AuthenticationInfo
 {
 

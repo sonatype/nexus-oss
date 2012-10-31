@@ -19,7 +19,7 @@ import org.sonatype.nexus.client.rest.ConnectionInfo;
 /**
  * A simple high level Nexus client.
  *
- * @author cstamas
+ * @since 2.1
  */
 public interface NexusClient
 {

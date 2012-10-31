@@ -14,6 +14,9 @@ package org.sonatype.nexus.client.core.subsystem.content;
 
 import org.sonatype.nexus.client.internal.util.Check;
 
+/**
+ * @since 2.1
+ */
 public class Location
 {
 

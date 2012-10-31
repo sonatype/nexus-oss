@@ -19,7 +19,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 
-import com.sun.jersey.api.client.ClientHandlerException;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -35,11 +34,15 @@ import org.sonatype.nexus.client.internal.util.Template;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.client.rest.ProxyInfo;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * @since 2.1
+ */
 @Named
 @Singleton
 public class JerseyNexusClientFactory
@@ -111,7 +114,7 @@ public class JerseyNexusClientFactory
 
     /**
      * NXCM-4547 JERSEY-1293 Enforce proxy setting on httpclient
-     *
+     * <p/>
      * Revisit for jersey 1.13.
      */
     private void enforceProxyUri( final ApacheHttpClient4Config config, final ApacheHttpClient4 client )
@@ -155,14 +158,16 @@ public class JerseyNexusClientFactory
                 final CredentialsProvider credentialsProvider =
                     new org.apache.http.impl.client.BasicCredentialsProvider();
                 credentialsProvider.setCredentials( AuthScope.ANY,
-                    new UsernamePasswordCredentials( upinfo.getUsername(), upinfo.getPassword() ) );
-                config.getProperties().put( ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER, credentialsProvider );
+                                                    new UsernamePasswordCredentials( upinfo.getUsername(),
+                                                                                     upinfo.getPassword() ) );
+                config.getProperties().put( ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                                            credentialsProvider );
                 config.getProperties().put( ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true );
             }
             else
             {
                 throw new IllegalArgumentException( Template.of( "AuthenticationInfo of type %s is not supported!",
-                    connectionInfo.getAuthenticationInfo().getClass().getName() ).toString() );
+                                                                 connectionInfo.getAuthenticationInfo().getClass().getName() ).toString() );
             }
         }
     }
@@ -175,7 +180,7 @@ public class JerseyNexusClientFactory
             if ( proxyInfo != null )
             {
                 config.getProperties().put( ApacheHttpClient4Config.PROPERTY_PROXY_URI,
-                    "http://" + proxyInfo.getProxyHost() + ":" + proxyInfo.getProxyPort() );
+                                            "http://" + proxyInfo.getProxyHost() + ":" + proxyInfo.getProxyPort() );
 
                 if ( proxyInfo.getProxyAuthentication() != null )
                 {
@@ -184,9 +189,9 @@ public class JerseyNexusClientFactory
                         final UsernamePasswordAuthenticationInfo upinfo =
                             (UsernamePasswordAuthenticationInfo) connectionInfo.getAuthenticationInfo();
                         config.getProperties().put( ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME,
-                            upinfo.getUsername() );
+                                                    upinfo.getUsername() );
                         config.getProperties().put( ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD,
-                            upinfo.getPassword() );
+                                                    upinfo.getPassword() );
                     }
                     else
                     {

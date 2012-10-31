@@ -25,6 +25,9 @@ import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 
+/**
+ * @since 2.1
+ */
 public abstract class AbstractNexusClient
     implements NexusClient
 {

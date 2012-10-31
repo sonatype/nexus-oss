@@ -22,6 +22,9 @@ import org.sonatype.nexus.client.rest.BaseUrl;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
 
+/**
+ * @since 2.1
+ */
 public abstract class AbstractNexusClientFactory<NC extends NexusClient>
     implements NexusClientFactory
 {

@@ -23,9 +23,7 @@ import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyArtifactMa
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 /**
- * TODO
- *
- * @since 1.0
+ * @since 2.1
  */
 @Named
 @Singleton

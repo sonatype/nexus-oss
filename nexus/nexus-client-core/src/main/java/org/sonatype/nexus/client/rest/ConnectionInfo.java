@@ -18,6 +18,9 @@ import java.util.Map;
 
 import org.sonatype.nexus.client.internal.util.Check;
 
+/**
+ * @since 2.1
+ */
 public class ConnectionInfo
 {
 

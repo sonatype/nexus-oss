@@ -24,7 +24,7 @@ import org.sonatype.nexus.client.internal.util.Template;
 /**
  * {@link Condition}s that matches remote Nexus version.
  *
- * @author cstamas
+ * @since 2.1
  */
 public abstract class VersionConditions
     implements Condition

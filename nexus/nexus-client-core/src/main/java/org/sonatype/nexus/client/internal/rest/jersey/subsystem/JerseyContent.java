@@ -13,7 +13,6 @@
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.lang.String.format;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,14 +24,16 @@ import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-
-import com.google.common.base.Preconditions;
 import com.sun.jersey.api.client.ClientResponse;
 
+/**
+ * @since 2.1
+ */
 public class JerseyContent
     extends SubsystemSupport<JerseyNexusClient>
     implements Content
 {
+
     private static final String CONTENT_PREFIX = "content/";
 
     public JerseyContent( final JerseyNexusClient nexusClient )
@@ -55,7 +56,7 @@ public class JerseyContent
         else
         {
             checkState(
-               target.isFile() && target.canWrite(),
+                target.isFile() && target.canWrite(),
                 "File '%s' is not a file or could not be written", target.getAbsolutePath()
             );
         }

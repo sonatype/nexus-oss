@@ -17,7 +17,7 @@ import java.util.Date;
 /**
  * Status of the remote Nexus instance.
  *
- * @author cstamas
+ * @since 2.1
  */
 public class NexusStatus
 {

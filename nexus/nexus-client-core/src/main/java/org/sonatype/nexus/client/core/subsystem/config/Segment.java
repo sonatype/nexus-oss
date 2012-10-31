@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.client.core.subsystem.config;
 
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
-
 /**
  * A configuration segment.
  *

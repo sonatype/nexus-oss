@@ -14,6 +14,9 @@ package org.sonatype.nexus.client.rest;
 
 import org.sonatype.nexus.client.internal.util.Check;
 
+/**
+ * @since 2.1
+ */
 public class ProxyInfo
 {
 
@@ -62,4 +65,5 @@ public class ProxyInfo
         return "ProxyInfo[proxyProtocol=" + proxyProtocol + ", proxyHost=" + proxyHost + ", proxyPort=" + proxyPort
             + ", proxyAuthentication=" + proxyAuthentication + "]";
     }
+
 }

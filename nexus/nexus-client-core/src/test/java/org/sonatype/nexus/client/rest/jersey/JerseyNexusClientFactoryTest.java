@@ -15,30 +15,24 @@ package org.sonatype.nexus.client.rest.jersey;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.client.rest.Protocol.HTTP;
 
-import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.thoughtworks.xstream.XStream;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.BaseUrl;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
-import org.sonatype.nexus.client.rest.Protocol;
 import org.sonatype.nexus.client.rest.ProxyInfo;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import com.google.common.collect.ImmutableMap;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Tests for JerseyNexusClientFactory.
@@ -80,7 +74,7 @@ public class JerseyNexusClientFactoryTest
         final ApacheHttpClient4 client = underTest.doCreateHttpClientFor( connection, xstream );
 
         assertThat( client.getClientHandler().getHttpClient().getParams().getParameter( ConnRoutePNames.DEFAULT_PROXY ),
-                    (Matcher)allOf(
+                    (Matcher) allOf(
                         Matchers.isA( HttpHost.class ),
                         Matchers.hasProperty( "hostName", is( "somehost" ) ),
                         Matchers.hasProperty( "port", is( 8888 ) )

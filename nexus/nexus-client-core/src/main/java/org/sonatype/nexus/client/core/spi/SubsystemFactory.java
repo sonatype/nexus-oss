@@ -16,9 +16,7 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusClient;
 
 /**
- * TODO
- *
- * @since 1.0
+ * @since 2.1
  */
 public interface SubsystemFactory<T, NC extends NexusClient>
 {
@@ -28,4 +26,5 @@ public interface SubsystemFactory<T, NC extends NexusClient>
     Class<T> getType();
 
     T create( NC nexusClient );
+
 }

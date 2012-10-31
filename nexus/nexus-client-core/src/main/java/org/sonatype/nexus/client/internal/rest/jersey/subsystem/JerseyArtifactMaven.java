@@ -24,6 +24,9 @@ import org.sonatype.nexus.rest.model.ArtifactResolveResourceResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+/**
+ * @since 2.1
+ */
 public class JerseyArtifactMaven
     extends SubsystemSupport<JerseyNexusClient>
     implements ArtifactMaven

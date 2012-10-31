@@ -16,7 +16,7 @@ package org.sonatype.nexus.client.internal.util;
  * A simple "template" just to defer the evaluation until it is actually needed. See {@link Check} for it's use, but is
  * not limited to it.
  *
- * @author cstamas
+ * @since 2.1
  */
 public class Template
 {

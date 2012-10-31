@@ -15,7 +15,7 @@ package org.sonatype.nexus.client.core.subsystem.artifact;
 /**
  * The core service at URI of {@code /service/local/artifact/maven}.
  *
- * @author cstamas
+ * @since 2.1
  */
 public interface ArtifactMaven
 {
@@ -23,9 +23,7 @@ public interface ArtifactMaven
     /**
      * Performs a "resolve" operation on Nexus side, using whatever metadata targeted repository uses and returns the
      * resolved artifact or {@code null} if resolution failed.
-     *
-     * @param req
-     * @return
      */
     ResolveResponse resolve( ResolveRequest req );
+
 }

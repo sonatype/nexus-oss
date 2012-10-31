@@ -1860,6 +1860,7 @@
     <module>nexus-oss-webapp</module>
     <module>nexus-stories</module>
     <module>nexus-test</module>
+    <module>nexus-client-core-testsuite</module>
     <module>nexus-test-harness</module>
   </modules>
 
