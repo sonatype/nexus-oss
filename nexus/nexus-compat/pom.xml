@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -22,49 +23,26 @@
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-web-utils</artifactId>
-  <name>Nexus : Web Utils</name>
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>nexus-compat</artifactId>
+  <name>Nexus : Compatibility Kit</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.jetty.orbit</groupId>
-      <artifactId>javax.servlet</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.appcontext</groupId>
-      <artifactId>appcontext</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-eventbus</artifactId>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-restlet-bridge</artifactId>
-    </dependency>
-    
     <dependency>
       <groupId>org.sonatype.security</groupId>
-      <artifactId>security-web</artifactId>
+      <artifactId>security-system</artifactId>
+      <scope>provided</scope>
     </dependency>
-
-    <!-- Testing -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
 </project>
