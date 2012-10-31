@@ -503,6 +503,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
  * Ext.Component! Instead of "fixing" ext js (and potentially breaking a button somewhere in the Nexus UI)
  * we will add the BoxComponent methods only to the browse button.
  */
+// FIXME this is fixed in ExtJS3 AFAIK, no need to enhance the prototype here
 Ext.applyIf(Ext.ux.form.BrowseButton.prototype, Ext.BoxComponent.prototype);
 
 Ext.reg('browsebutton', Ext.ux.form.BrowseButton);
