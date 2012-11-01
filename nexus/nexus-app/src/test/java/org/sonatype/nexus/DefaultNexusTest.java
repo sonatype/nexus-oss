@@ -38,6 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
+import org.sonatype.nexus.events.ManagedHandlers;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -52,6 +53,7 @@ import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @RunWith( MockitoJUnitRunner.class )
 public class DefaultNexusTest
@@ -96,6 +98,12 @@ public class DefaultNexusTest
 
     @Mock
     private RepositoryRegistry mockedRepositoryRegistry;
+
+    @Mock
+    private EventBus eventBus;
+
+    @Mock
+    private ManagedHandlers managedHandlers;
 
     @InjectMocks
     @Spy
