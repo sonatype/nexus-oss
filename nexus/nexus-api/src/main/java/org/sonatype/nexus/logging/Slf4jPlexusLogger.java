@@ -21,7 +21,10 @@ import org.slf4j.LoggerFactory;
  * Wrapper that wraps SLF4J logger into a Plexus Logger interface to be used with Legacy Plexus components.
  *
  * @author: cstamas
+ *
+ * @deprecated This class should be removed, and only used in places where a Plexus logger is required for compatibility with legacy apis.
  */
+@Deprecated
 public class Slf4jPlexusLogger
     implements org.codehaus.plexus.logging.Logger
 {
@@ -91,7 +94,7 @@ public class Slf4jPlexusLogger
     @Override
     public boolean isWarnEnabled()
     {
-        return isWarnEnabled();
+        return logger.isWarnEnabled();
     }
 
     @Override
