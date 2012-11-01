@@ -1358,7 +1358,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.3</version>
+          <!--
+          NOTE: 2.2-beta-3 is the latest version which does not have issues setting file/directory mode permissions in archives
+          NOTE: (2.3 which is the latest available, is better, but still has problems with directorySet outputDirectory permissions)
+          -->
+          <version>2.2-beta-3</version>
           <configuration>
             <tarLongFileMode>gnu</tarLongFileMode>
           </configuration>
