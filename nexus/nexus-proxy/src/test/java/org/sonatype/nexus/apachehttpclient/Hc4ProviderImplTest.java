@@ -30,7 +30,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class Hc4ProviderImplTest
@@ -45,7 +45,7 @@ public class Hc4ProviderImplTest
     private UserAgentBuilder userAgentBuilder;
     
     @Mock
-    private ApplicationEventMulticaster multicaster;
+    private EventBus eventBus;
 
     @Mock
     private RemoteStorageContext globalRemoteStorageContext;
@@ -69,7 +69,7 @@ public class Hc4ProviderImplTest
         setParameters();
         try
         {
-            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster, jmxInstaller );
+            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller );
 
             final HttpClient client = testSubject.createHttpClient();
             // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
@@ -100,7 +100,7 @@ public class Hc4ProviderImplTest
         setParameters();
         try
         {
-            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster, jmxInstaller );
+            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller );
 
             // Note: explicitly created instance (like in case of proxies), it does pool and
             // returns customized client
