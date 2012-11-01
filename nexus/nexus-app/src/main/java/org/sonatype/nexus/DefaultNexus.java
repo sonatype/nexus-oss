@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.events.ManagedHandlers;
 import org.sonatype.nexus.index.events.ReindexRepositoriesEvent;
 import org.sonatype.nexus.index.events.ReindexRepositoriesRequest;
@@ -125,12 +124,6 @@ public class DefaultNexus
      */
     @Requirement
     private TemplateManager templateManager;
-
-    /**
-     * The event inspector host.
-     */
-    @Requirement
-    private EventInspectorHost eventInspectorHost;
 
     /**
      * The status holding component.
