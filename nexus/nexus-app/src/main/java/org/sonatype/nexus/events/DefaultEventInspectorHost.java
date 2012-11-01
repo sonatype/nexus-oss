@@ -40,6 +40,7 @@ import org.sonatype.plexus.appevents.Event;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * A default implementation of EventInspectorHost, a component simply collecting all EventInspectors and re-emitting
@@ -97,7 +98,7 @@ public class DefaultEventInspectorHost
     }
 
     // == EventListener iface
-
+    @Subscribe
     public void onEvent( final Event<?> evt )
     {
         try
