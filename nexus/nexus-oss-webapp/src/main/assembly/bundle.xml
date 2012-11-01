@@ -91,6 +91,8 @@
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <useProjectArtifact>false</useProjectArtifact>
       <useStrictFiltering>true</useStrictFiltering>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
       <includes>
         <include>*:nexus-webapp:war</include>
       </includes>
@@ -113,6 +115,8 @@
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <useProjectArtifact>false</useProjectArtifact>
       <useStrictFiltering>true</useStrictFiltering>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
       <includes>
         <include>org.sonatype.nexus:nexus-bootstrap</include>
         <include>org.sonatype.nexus:nexus-logging-extras-appender</include>
