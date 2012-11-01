@@ -140,6 +140,7 @@ public class ResourceStoreContentPlexusResourceTest
                 return null;
             }
 
+            // FIXME: This is required until plexus-restlet-bridge removes use of AbstractLogEnabled
             @Override
             protected Logger getLogger()
             {

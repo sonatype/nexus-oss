@@ -17,7 +17,8 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
@@ -27,27 +28,19 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CNotification;
 import org.sonatype.nexus.configuration.model.CNotificationConfiguration;
 import org.sonatype.nexus.configuration.model.CNotificationTarget;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 
 @Component( role = NotificationManager.class )
 public class DefaultNotificationManager
     extends AbstractConfigurable
     implements NotificationManager
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private NexusConfiguration nexusConfig;
 
     @Requirement( role = Carrier.class )
     private Map<String, Carrier> carriers;
-    
-    // ==
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
 
     // ==
 
@@ -202,12 +195,12 @@ public class DefaultNotificationManager
                 }
                 catch ( NotificationException e )
                 {
-                    getLogger().warn( "Could not send out notification over carrier \"" + carrierKey + "\".", e );
+                    logger.warn( "Could not send out notification over carrier \"{}\".", carrierKey, e );
                 }
             }
             else
             {
-                getLogger().info( "Notification carrier \"" + carrierKey + "\" is unknown!" );
+                logger.info( "Notification carrier \"{}\" is unknown!", carrierKey );
             }
         }
     }

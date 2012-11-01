@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractApplicationStatusSource
     implements ApplicationStatusSource
 {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * System status.

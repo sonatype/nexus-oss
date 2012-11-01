@@ -30,7 +30,8 @@ import org.apache.shiro.realm.ldap.AbstractLdapRealm;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
 
@@ -38,12 +39,10 @@ import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
 public abstract class AbstractLdapAuthenticatingRealm
     extends AbstractLdapRealm
 {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private LdapManager ldapManager;
-
-    @Requirement
-    protected Logger logger;
 
     @Override
     protected AuthenticationInfo queryForAuthenticationInfo( AuthenticationToken token,

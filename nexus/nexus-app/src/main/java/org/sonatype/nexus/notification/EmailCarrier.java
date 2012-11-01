@@ -18,12 +18,12 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.MailRequest;
 import org.sonatype.nexus.email.NexusEmailer;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -35,20 +35,13 @@ public class EmailCarrier
 {
     public static final String KEY = "email";
 
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private NexusEmailer nexusEmailer;
 
     @Requirement
     private SecuritySystem securitySystem;
-
-    // --
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
 
     // --
     public void notifyTarget( NotificationTarget target, NotificationMessage message )
@@ -60,7 +53,7 @@ public class EmailCarrier
 
         if ( request.getToAddresses().size() > 0 )
         {
-            getLogger().info(
+            logger.info(
                 "Sending out e-mail notification to notification group \"" + target.getTargetId() + "\" (total of "
                     + request.getToAddresses().size() + " recipients)." );
 
@@ -68,7 +61,7 @@ public class EmailCarrier
         }
         else
         {
-            getLogger().info(
+            logger.info(
                 "Not sending out e-mail notification to notification group \"" + target.getTargetId()
                     + "\", there were no recipients (does users have e-mail accessible to Realm?)." );
         }
@@ -89,9 +82,9 @@ public class EmailCarrier
         // resolve roles to mails
         if ( target.getTargetRoles().size() > 0 )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Role ID's to notify (" + target.getTargetRoles().toString() + ")" );
+                logger.debug( "Role ID's to notify (" + target.getTargetRoles().toString() + ")" );
             }
 
             UserSearchCriteria criteria = new UserSearchCriteria();
@@ -106,9 +99,9 @@ public class EmailCarrier
                 {
                     if ( StringUtils.isNotBlank( user.getEmailAddress() ) )
                     {
-                        if ( getLogger().isDebugEnabled() )
+                        if ( logger.isDebugEnabled() )
                         {
-                            getLogger().debug(
+                            logger.debug(
                                 "Adding user \"" + user.getName() + "\" (" + user.getEmailAddress() + ")." );
                         }
 
@@ -121,9 +114,9 @@ public class EmailCarrier
         // resolve users to mails
         if ( target.getTargetUsers().size() > 0 )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "User ID's to notify (" + target.getTargetUsers().toString() + ")." );
+                logger.debug( "User ID's to notify (" + target.getTargetUsers().toString() + ")." );
             }
 
             for ( String userId : target.getTargetUsers() )
@@ -136,9 +129,9 @@ public class EmailCarrier
 
                         if ( StringUtils.isNotBlank( user.getEmailAddress() ) )
                         {
-                            if ( getLogger().isDebugEnabled() )
+                            if ( logger.isDebugEnabled() )
                             {
-                                getLogger().debug(
+                                logger.debug(
                                     "Adding user \"" + user.getName() + "\" (" + user.getEmailAddress() + ")." );
                             }
 
@@ -157,9 +150,9 @@ public class EmailCarrier
         // resolve externals to mails
         if ( target.getExternalTargets().size() > 0 )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "External emails to notify (" + target.getExternalTargets().toString() + ")." );
+                logger.debug( "External emails to notify (" + target.getExternalTargets().toString() + ")." );
             }
 
             for ( String email : target.getExternalTargets() )
