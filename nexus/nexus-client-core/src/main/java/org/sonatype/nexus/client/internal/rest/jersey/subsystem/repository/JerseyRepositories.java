@@ -157,6 +157,7 @@ public class JerseyRepositories
             final int score = repositoryFactory.canAdapt( rbs );
             if ( score > currentScore )
             {
+                currentScore = score;
                 factory = repositoryFactory;
             }
         }
