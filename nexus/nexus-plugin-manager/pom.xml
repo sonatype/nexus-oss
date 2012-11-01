@@ -14,6 +14,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -22,14 +23,40 @@
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-plugins</artifactId>
-  <name>Nexus : Plugins</name>
-  <packaging>pom</packaging>
+  <artifactId>nexus-plugin-manager</artifactId>
 
-  <modules>
-    <module>nexus-plugin-manager</module>
-    <module>nexus-plugin-api</module>
-    <module>nexus-plugin-test-api</module>
-  </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-model-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-proxy</artifactId>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
 </project>
