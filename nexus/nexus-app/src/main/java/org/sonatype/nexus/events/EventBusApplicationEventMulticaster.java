@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.compat.internal.events;
+package org.sonatype.nexus.events;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,7 +23,6 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 
@@ -91,6 +90,12 @@ public class EventBusApplicationEventMulticaster
         public void forward( final Event<?> evt )
         {
             listener.onEvent( evt );
+        }
+
+        @Override
+        public String toString()
+        {
+            return "Adapter for: " + listener;
         }
 
     }

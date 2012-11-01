@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.events;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,10 +22,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
+import org.sonatype.nexus.eventbus.ManagedHandler;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -32,6 +39,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 
 /**
  * A default implementation of EventInspectorHost, a component simply collecting all EventInspectors and re-emitting
@@ -43,32 +51,28 @@ import com.google.common.annotations.VisibleForTesting;
  * 
  * @author cstamas
  */
-@Component( role = EventInspectorHost.class )
+@Named
+@Singleton
 public class DefaultEventInspectorHost
     extends AbstractLoggingComponent
-    implements EventInspectorHost, Disposable
+    implements EventInspectorHost, Disposable, ManagedHandler
 {
     private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
         "org.sonatype.nexus.events.DefaultEventInspectorHost.poolSize", 500 );
 
     private final ThreadPoolExecutor hostThreadPool;
 
-    @Requirement( role = EventInspector.class )
-    private Map<String, EventInspector> eventInspectors;
+    private final Map<String, EventInspector> eventInspectors;
 
-    public DefaultEventInspectorHost()
+    @Inject
+    public DefaultEventInspectorHost(final Map<String,EventInspector> eventInspectors)
     {
+        this.eventInspectors = checkNotNull( eventInspectors );
+
         // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
         this.hostThreadPool =
             new ThreadPoolExecutor( 0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
                 new NexusThreadFactory( "nxevthost", "Event Inspector Host" ), new CallerRunsPolicy() );
-    }
-
-    @VisibleForTesting 
-    public DefaultEventInspectorHost( final Map<String, EventInspector> eventInspectors )
-    {
-        this();
-        this.eventInspectors = eventInspectors;
     }
 
     // == Disposable iface, to manage ExecutorService lifecycle

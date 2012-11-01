@@ -29,12 +29,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
+import org.sonatype.nexus.events.ManagedHandlers;
 import org.sonatype.nexus.index.events.ReindexRepositoriesEvent;
 import org.sonatype.nexus.index.events.ReindexRepositoriesRequest;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -69,8 +69,8 @@ import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * The default Nexus implementation.
@@ -85,7 +85,7 @@ public class DefaultNexus
 {
 
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     @Requirement
     private NexusPluginManager nexusPluginManager;
@@ -146,6 +146,9 @@ public class DefaultNexus
 
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
+
+    @Requirement
+    private ManagedHandlers managedHandlers;
 
     private static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
 
@@ -288,11 +291,11 @@ public class DefaultNexus
     public void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException
     {
-        this.applicationEventMulticaster.notifyEventListeners( new ReindexRepositoriesEvent(
-                                                                                             this,
-                                                                                             new ReindexRepositoriesRequest(
-                                                                                                                             path,
-                                                                                                                             fullReindex ) ) );
+        this.eventBus.post( new ReindexRepositoriesEvent(
+            this,
+            new ReindexRepositoriesRequest(
+                path,
+                fullReindex ) ) );
     }
 
     @Deprecated
@@ -368,8 +371,7 @@ public class DefaultNexus
         artifactPackagingMapper.setPropertiesFile( new File( nexusConfiguration.getConfigurationDirectory(),
                                                              MAPPING_PROPERTIES_FILE ) );
 
-        // EventInspectorHost
-        applicationEventMulticaster.addEventListener( eventInspectorHost );
+        managedHandlers.register();
 
         // load locally present plugins
         getLogger().info( "Activating locally installed plugins..." );
@@ -394,7 +396,9 @@ public class DefaultNexus
 
         applicationStatusSource.getSystemStatus().setInitializedAt( new Date() );
 
-        applicationEventMulticaster.notifyEventListeners( new NexusInitializedEvent( this ) );
+        managedHandlers.register();
+
+        eventBus.post( new NexusInitializedEvent( this ) );
     }
 
     /**
@@ -469,8 +473,7 @@ public class DefaultNexus
             nexusScheduler.initializeTasks();
 
             // notify about start
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( nexusConfiguration, null,
-                                                                                            null ) );
+            eventBus.post( new ConfigurationChangeEvent( nexusConfiguration, null, null ) );
 
             applicationStatusSource.getSystemStatus().setLastConfigChange( new Date() );
 
@@ -520,7 +523,7 @@ public class DefaultNexus
                 getLogger().info( "Started {}", getNexusNameForLogs() );
             }
 
-            applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( this ) );
+            eventBus.post( new NexusStartedEvent( this ) );
         }
         catch ( IOException e )
         {
@@ -550,15 +553,17 @@ public class DefaultNexus
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPING );
 
         // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
-        applicationEventMulticaster.notifyEventListeners( new NexusStoppingEvent( this ) );
+        eventBus.post( new NexusStoppingEvent( this ) );
 
         nexusScheduler.shutdown();
 
-        applicationEventMulticaster.notifyEventListeners( new NexusStoppedEvent( this ) );
+        eventBus.post( new NexusStoppedEvent( this ) );
 
         nexusConfiguration.dropInternals();
 
         securitySystem.stop();
+
+        managedHandlers.unregister();
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
 
