@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 @Component( role = Repository.class, hint = ObrRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "OBR" )
@@ -291,12 +292,14 @@ public class ObrRepository
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void onEvent( final RepositoryItemEventStore evt )
     {
         updateObr( evt, true );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void onEvent( final RepositoryItemEventDelete evt )
     {
