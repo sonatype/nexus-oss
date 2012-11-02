@@ -14,7 +14,10 @@ package org.sonatype.plexus.appevents;
 
 /**
  * The Interface EventMulticaster.
+ *
+ * @deprecated Use EventBus
  */
+@Deprecated
 public interface EventMulticaster
 {
     /**

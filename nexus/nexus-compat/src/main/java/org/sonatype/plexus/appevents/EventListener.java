@@ -18,15 +18,17 @@ package org.sonatype.plexus.appevents;
  * <code>addEventListener<code> method. When
  * the  event occurs, that object's appropriate
  * method is invoked.
- * 
+ *
  * @see AbstractEvent
+ * @deprecated Use EventBus
  */
+@Deprecated
 public interface EventListener
 {
 
     /**
      * On event.
-     * 
+     *
      * @param evt the evt
      */
     void onEvent( Event<?> evt );
