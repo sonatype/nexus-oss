@@ -17,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -51,7 +50,7 @@ import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.StringDigester;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.issue.IssueRetriever;
 import org.sonatype.sisu.pr.ProjectManager;
 import org.sonatype.sisu.pr.bundle.Archiver;
@@ -110,10 +109,10 @@ public class DefaultErrorReportingManager
                                   final ProjectManager projectManager,
                                   final UserAgentBuilder uaBuilder,
                                   final NexusConfiguration nexusConfig,
-                                  final ApplicationEventMulticaster applicationEventMulticaster,
+                                  final EventBus eventBus,
                                   final StorageManager storageManager )
     {
-        super( applicationEventMulticaster );
+        super( eventBus );
         this.archiver = archiver;
         this.issueRetriever = issueRetriever;
         this.issueSubmitter = issueSubmitter;

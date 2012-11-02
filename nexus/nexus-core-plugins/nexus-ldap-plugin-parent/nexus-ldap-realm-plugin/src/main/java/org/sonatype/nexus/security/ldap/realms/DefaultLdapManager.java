@@ -27,9 +27,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.ldap.LdapAuthenticator;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
@@ -48,10 +45,12 @@ import org.sonatype.security.ldap.realms.persist.LdapClearCacheEvent;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.tools.LdapURL;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 @Component( role = LdapManager.class )
 public class DefaultLdapManager
-    implements LdapManager, EventListener, Initializable, Disposable
+    implements LdapManager, Initializable, Disposable
 {
 
     private Logger logger = LoggerFactory.getLogger( getClass() );
@@ -69,7 +68,7 @@ public class DefaultLdapManager
     private LdapConfiguration ldapConfiguration;
 
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     private LdapConnector ldapConnector;
 
@@ -224,24 +223,22 @@ public class DefaultLdapManager
         throw new AuthenticationException( "User: " + userId + " could not be authenticated." );
     }
 
-    public void onEvent( Event<?> evt )
+    @Subscribe
+    public void onEvent( final LdapClearCacheEvent evt )
     {
-        if ( evt instanceof LdapClearCacheEvent )
-        {
-            // clear the connectors
-            this.ldapConnector = null;
-        }
+        // clear the connectors
+        this.ldapConnector = null;
     }
 
     public void initialize()
         throws InitializationException
     {
-        this.applicationEventMulticaster.addEventListener( this );
+        this.eventBus.register( this );
     }
 
     public void dispose()
     {
-        this.applicationEventMulticaster.removeEventListener( this );
+        this.eventBus.unregister( this );
     }
 
 }

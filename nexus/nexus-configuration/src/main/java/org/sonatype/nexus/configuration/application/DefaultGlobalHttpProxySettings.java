@@ -276,7 +276,7 @@ public class DefaultGlobalHttpProxySettings
 
         if ( wasDirty )
         {
-            getApplicationEventMulticaster().notifyEventListeners( new GlobalHttpProxySettingsChangedEvent( this ) );
+            eventBus().post( new GlobalHttpProxySettingsChangedEvent( this ) );
         }
 
         return wasDirty;

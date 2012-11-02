@@ -98,7 +98,6 @@ public class DefaultEventInspectorHost
         return hostThreadPool.getQueue().isEmpty() && hostThreadPool.getActiveCount() == 0;
     }
 
-    // == EventListener iface
     @AllowConcurrentEvents
     @Subscribe
     public void onEvent( final Event<?> evt )

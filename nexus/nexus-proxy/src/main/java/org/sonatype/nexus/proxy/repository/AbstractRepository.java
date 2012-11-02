@@ -202,7 +202,7 @@ public abstract class AbstractRepository
 
         if ( wasDirty )
         {
-            getApplicationEventMulticaster().notifyEventListeners( getRepositoryConfigurationUpdatedEvent() );
+            eventBus().post( getRepositoryConfigurationUpdatedEvent() );
         }
 
         this.localUrlChanged = false;
@@ -387,8 +387,7 @@ public abstract class AbstractRepository
 
             localStatusChanged = true;
 
-            getApplicationEventMulticaster().notifyEventListeners(
-                new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
+            eventBus().post( new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
         }
     }
 
@@ -537,9 +536,11 @@ public abstract class AbstractRepository
             }
         }
 
-        getApplicationEventMulticaster().notifyEventListeners(
-            new RepositoryEventExpireNotFoundCaches( this, request.getRequestPath(),
-                request.getRequestContext().flatten(), cacheAltered ) );
+        eventBus().post(
+            new RepositoryEventExpireNotFoundCaches(
+                this, request.getRequestPath(), request.getRequestContext().flatten(), cacheAltered
+            )
+        );
 
         return cacheAltered;
     }
@@ -593,7 +594,7 @@ public abstract class AbstractRepository
             }
         }
 
-        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventRecreateAttributes( this ) );
+        eventBus().post( new RepositoryEventRecreateAttributes( this ) );
 
         return true;
     }
@@ -865,7 +866,7 @@ public abstract class AbstractRepository
                 }
             }
 
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventRetrieve( this, item ) );
+            eventBus().post( new RepositoryItemEventRetrieve( this, item ) );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -998,7 +999,7 @@ public abstract class AbstractRepository
             StorageItem item = getLocalStorage().retrieveItem( this, request );
 
             // fire the event for file being deleted
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventDeleteRoot( this, item ) );
+            eventBus().post( new RepositoryItemEventDeleteRoot( this, item ) );
 
             // if we are deleting a collection, perform recursive notification about this too
             if ( item instanceof StorageCollectionItem )
@@ -1010,7 +1011,7 @@ public abstract class AbstractRepository
                 }
 
                 // it is collection, walk it and below and fire events for all files
-                DeletionNotifierWalker dnw = new DeletionNotifierWalker( getApplicationEventMulticaster(), request );
+                DeletionNotifierWalker dnw = new DeletionNotifierWalker( eventBus(), request );
 
                 DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
 
@@ -1100,11 +1101,11 @@ public abstract class AbstractRepository
 
         if ( Action.create.equals( action ) )
         {
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventStoreCreate( this, item ) );
+            eventBus().post( new RepositoryItemEventStoreCreate( this, item ) );
         }
         else
         {
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventStoreUpdate( this, item ) );
+            eventBus().post( new RepositoryItemEventStoreUpdate( this, item ) );
         }
     }
 
@@ -1176,7 +1177,6 @@ public abstract class AbstractRepository
     /**
      * Maintains not found cache.
      *
-     * @param path the path
      * @throws ItemNotFoundException the item not found exception
      */
     public void maintainNotFoundCache( ResourceStoreRequest request )
@@ -1224,8 +1224,6 @@ public abstract class AbstractRepository
 
     /**
      * Adds the uid to not found cache.
-     *
-     * @param path the path
      */
     @Override
     public void addToNotFoundCache( ResourceStoreRequest request )
@@ -1243,8 +1241,6 @@ public abstract class AbstractRepository
 
     /**
      * Removes the uid from not found cache.
-     *
-     * @param path the path
      */
     public void removeFromNotFoundCache( ResourceStoreRequest request )
     {
@@ -1263,7 +1259,6 @@ public abstract class AbstractRepository
      * Check conditions, such as availability, permissions, etc.
      *
      * @param request the request
-     * @param permission the permission
      * @return false, if the request should not be processed with response appropriate for current method, or true is
      *         execution should continue as usual.
      * @throws RepositoryNotAvailableException the repository not available exception

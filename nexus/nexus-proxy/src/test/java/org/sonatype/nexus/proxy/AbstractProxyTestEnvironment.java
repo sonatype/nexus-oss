@@ -40,9 +40,9 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * The Class AbstractProxyTestEnvironment.
@@ -60,7 +60,7 @@ public abstract class AbstractProxyTestEnvironment
     private ApplicationConfiguration applicationConfiguration;
 
     /** The app event hub */
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     /** The repository registry. */
     private RepositoryRegistry repositoryRegistry;
@@ -90,9 +90,9 @@ public abstract class AbstractProxyTestEnvironment
         return applicationConfiguration;
     }
 
-    public ApplicationEventMulticaster getApplicationEventMulticaster()
+    public EventBus eventBus()
     {
-        return applicationEventMulticaster;
+        return eventBus;
     }
 
     /**
@@ -207,13 +207,13 @@ public abstract class AbstractProxyTestEnvironment
 
         applicationConfiguration = lookup( ApplicationConfiguration.class );
 
-        applicationEventMulticaster = lookup( ApplicationEventMulticaster.class );
+        eventBus = lookup( EventBus.class );
 
         repositoryRegistry = lookup( RepositoryRegistry.class );
 
         testEventListener = new TestItemEventListener();
 
-        applicationEventMulticaster.addEventListener( testEventListener );
+        eventBus.register( testEventListener );
 
         attributesHandler = lookup( AttributesHandler.class );
 
@@ -228,10 +228,9 @@ public abstract class AbstractProxyTestEnvironment
 
         getEnvironmentBuilder().buildEnvironment( this );
 
-        applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( applicationConfiguration, null,
-            null ) );
+        eventBus.post( new ConfigurationChangeEvent( applicationConfiguration, null, null ) );
 
-        applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( null ) );
+        eventBus.post( new NexusStartedEvent( null ) );
 
         getEnvironmentBuilder().startService();
     }
@@ -357,7 +356,6 @@ public abstract class AbstractProxyTestEnvironment
     }
 
     protected class TestItemEventListener
-        implements EventListener
     {
         private List<Event> events = new ArrayList<Event>();
 
@@ -395,60 +393,10 @@ public abstract class AbstractProxyTestEnvironment
             events.clear();
         }
 
-        public void onEvent( Event evt )
+        @Subscribe
+        public void onEvent( RepositoryItemEvent evt )
         {
-            if ( RepositoryItemEvent.class.isAssignableFrom( evt.getClass() ) )
-            {
-                events.add( evt );
-            }
-        }
-    }
-
-    protected class TestRepositoryEventListener
-        implements EventListener
-    {
-        private List<Event> events = new ArrayList<Event>();
-
-        public List<Event> getEvents()
-        {
-            return events;
-        }
-
-        public Event getFirstEvent()
-        {
-            if ( events.size() > 0 )
-            {
-                return events.get( 0 );
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public Event getLastEvent()
-        {
-            if ( events.size() > 0 )
-            {
-                return events.get( events.size() - 1 );
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public void reset()
-        {
-            events.clear();
-        }
-
-        public void onEvent( Event evt )
-        {
-            if ( !RepositoryItemEvent.class.isAssignableFrom( evt.getClass() ) )
-            {
-                events.add( evt );
-            }
+            events.add( evt );
         }
     }
 

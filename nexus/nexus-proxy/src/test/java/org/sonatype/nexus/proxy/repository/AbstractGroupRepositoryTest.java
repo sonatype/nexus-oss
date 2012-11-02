@@ -85,18 +85,12 @@ public class AbstractGroupRepositoryTest
             }
         };
 
-    @Test
-    public void onEventNullEventShouldNotNPE()
-    {
-        groupRepo.onEvent( null );
-    }
 
     @Test
     public void onEventNullExternalConfigurationShouldNotNPE()
         throws Exception
     {
         doReturn( null ).when( groupRepo ).getExternalConfiguration( anyBoolean() );
-        groupRepo.onEvent( basicEvent );
         groupRepo.onEvent( removeEvent );
         groupRepo.onEvent( prepSaveEvent );
     }
@@ -105,7 +99,6 @@ public class AbstractGroupRepositoryTest
     public void onEventNullCurrentConfigurationShouldNotNPE()
     {
         doReturn( null ).when( groupRepo ).getCurrentConfiguration( anyBoolean() );
-        groupRepo.onEvent( basicEvent );
         groupRepo.onEvent( removeEvent );
         groupRepo.onEvent( prepSaveEvent );
     }
@@ -116,7 +109,6 @@ public class AbstractGroupRepositoryTest
         doReturn( repo ).when( removeEvent ).getRepository(); // not expected to return null
         doReturn( extConfig ).when( groupRepo ).getExternalConfiguration( anyBoolean() );
         doReturn( cRepo ).when( groupRepo ).getCurrentConfiguration( anyBoolean() );
-        groupRepo.onEvent( basicEvent );
         groupRepo.onEvent( removeEvent );
         groupRepo.onEvent( prepSaveEvent );
 

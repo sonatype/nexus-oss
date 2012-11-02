@@ -44,7 +44,7 @@ import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.ResourceStoreUtils;
-import org.sonatype.plexus.appevents.Event;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * The Class PathBasedRequestRepositoryMapper filters repositories to search using supplied list of filter expressions.
@@ -512,30 +512,26 @@ public class DefaultRequestRepositoryMapper
         return "Repository Grouping Configuration";
     }
 
-    @Override
-    public void onEvent( Event<?> evt )
+    @Subscribe
+    public void onEvent( final RepositoryRegistryEventRemove evt )
     {
-        super.onEvent( evt );
+        final String repoId = evt.getRepository().getId();
 
-        if ( evt instanceof RepositoryRegistryEventRemove )
+        List<CPathMappingItem> pathMappings = getCurrentConfiguration( true ).getPathMappings();
+
+        for ( Iterator<CPathMappingItem> iterator = pathMappings.iterator(); iterator.hasNext(); )
         {
-            String repoId = ( (RepositoryRegistryEventRemove) evt ).getRepository().getId();
+            CPathMappingItem item = iterator.next();
 
-            List<CPathMappingItem> pathMappings = getCurrentConfiguration( true ).getPathMappings();
-
-            for ( Iterator<CPathMappingItem> iterator = pathMappings.iterator(); iterator.hasNext(); )
+            if ( item.getGroupId().equals( repoId ) )
             {
-                CPathMappingItem item = iterator.next();
-
-                if ( item.getGroupId().equals( repoId ) )
-                {
-                    iterator.remove();
-                }
-                else
-                {
-                    item.removeRepository( repoId );
-                }
+                iterator.remove();
+            }
+            else
+            {
+                item.removeRepository( repoId );
             }
         }
     }
+
 }
