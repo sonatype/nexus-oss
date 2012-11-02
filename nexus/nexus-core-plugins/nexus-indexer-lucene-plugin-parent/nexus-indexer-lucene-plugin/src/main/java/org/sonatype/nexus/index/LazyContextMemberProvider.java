@@ -43,7 +43,7 @@ import com.google.common.base.Preconditions;
 public class LazyContextMemberProvider
     implements ContextMemberProvider
 {
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final DefaultIndexerManager indexerManager;
 
@@ -53,7 +53,6 @@ public class LazyContextMemberProvider
 
     public LazyContextMemberProvider( final DefaultIndexerManager indexerManager, final List<String> memberIds )
     {
-        this.logger = LoggerFactory.getLogger( getClass() );
         this.indexerManager = Preconditions.checkNotNull( indexerManager );
         this.memberIds = Preconditions.checkNotNull( memberIds );
     }

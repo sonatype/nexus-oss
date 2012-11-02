@@ -60,7 +60,7 @@ public class RestClientHelper
 
     private static final String SERVICE_URL_PART = "service/local/";
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private XStream xstream;
 

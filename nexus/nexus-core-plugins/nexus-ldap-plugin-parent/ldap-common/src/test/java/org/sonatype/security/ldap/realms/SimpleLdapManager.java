@@ -43,7 +43,7 @@ public class SimpleLdapManager
     implements LdapManager
 {
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private LdapAuthenticator ldapAuthenticator;

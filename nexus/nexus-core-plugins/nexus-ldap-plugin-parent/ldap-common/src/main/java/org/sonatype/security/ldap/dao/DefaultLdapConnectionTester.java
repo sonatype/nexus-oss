@@ -35,7 +35,7 @@ public class DefaultLdapConnectionTester
     @Requirement
     private LdapGroupDAO ldapGroupDAO;
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public void testConnection( LdapContextFactory ldapContextFactory )
         throws NamingException
