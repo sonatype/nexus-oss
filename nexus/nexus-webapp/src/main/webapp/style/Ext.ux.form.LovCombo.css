@@ -16,17 +16,17 @@
  */
 
 .ux-lovcombo-icon {
-	width:16px;
-	height:16px;
-	float:left;
-	background-position: -1px -1px ! important;
-	background-repeat:no-repeat ! important;
+    width: 16px;
+    height: 16px;
+    float: left;
+    background-position: -1px -1px ! important;
+    background-repeat: no-repeat ! important;
 }
+
 .ux-lovcombo-icon-checked {
-	background: transparent url(../ext-2.3/resources/images/default/menu/checked.gif);
+    background: transparent url(../ext-2.3/resources/images/default/menu/checked.gif);
 }
+
 .ux-lovcombo-icon-unchecked {
-	background: transparent url(../ext-2.3/resources/images/default/menu/unchecked.gif);
+    background: transparent url(../ext-2.3/resources/images/default/menu/unchecked.gif);
 }
- 
-/* eof */
