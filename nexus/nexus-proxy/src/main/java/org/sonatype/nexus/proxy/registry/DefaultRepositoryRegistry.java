@@ -32,8 +32,8 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * Repository registry. It holds handles to registered repositories and sorts them properly. This class is used to get a
@@ -57,7 +57,7 @@ public class DefaultRepositoryRegistry
     private Logger logger;
 
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
@@ -286,7 +286,7 @@ public class DefaultRepositoryRegistry
             }
         }
 
-        applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
+        eventBus.post( new RepositoryRegistryEventAdd( this, repository ) );
     }
 
     private void deleteRepository( final RepositoryTypeDescriptor rtd, final Repository repository,
@@ -294,14 +294,11 @@ public class DefaultRepositoryRegistry
     {
         if ( !silently )
         {
-            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventRemove( this, repository ) );
+            eventBus.post( new RepositoryRegistryEventRemove( this, repository ) );
         }
 
         // dump the event listeners, as once deleted doesn't care about config changes any longer
-        if ( repository instanceof EventListener )
-        {
-            applicationEventMulticaster.removeEventListener( (EventListener) repository );
-        }
+        eventBus.unregister( repository );
 
         synchronized ( this )
         {
@@ -314,7 +311,7 @@ public class DefaultRepositoryRegistry
 
         if ( !silently )
         {
-            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventPostRemove( this, repository ) );
+            eventBus.post( new RepositoryRegistryEventPostRemove( this, repository ) );
         }
     }
 

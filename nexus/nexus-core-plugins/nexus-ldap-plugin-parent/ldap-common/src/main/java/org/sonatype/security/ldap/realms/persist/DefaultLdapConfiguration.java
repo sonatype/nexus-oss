@@ -30,7 +30,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
@@ -39,6 +38,7 @@ import org.sonatype.security.ldap.realms.persist.model.Configuration;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Writer;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @Component( role = LdapConfiguration.class, hint = "default", instantiationStrategy = "singleton" )
 public class DefaultLdapConfiguration
@@ -61,7 +61,7 @@ public class DefaultLdapConfiguration
     private PasswordEncoderManager passwordEncoderManager;
     
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     private ReentrantLock lock = new ReentrantLock();
 
@@ -286,7 +286,7 @@ public class DefaultLdapConfiguration
         }
         
         // fire clear cache event
-        this.applicationEventMulticaster.notifyEventListeners( new LdapClearCacheEvent( null ) );
+        this.eventBus.post( new LdapClearCacheEvent( null ) );
     }
 
     public void clearCache()
@@ -294,7 +294,7 @@ public class DefaultLdapConfiguration
         configuration = null;
         
         // fire clear cache event
-        this.applicationEventMulticaster.notifyEventListeners( new LdapClearCacheEvent( null ) );
+        this.eventBus.post( new LdapClearCacheEvent( null ) );
     }
 
     private Configuration getDefaultConfiguration()
