@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.plexus.PlexusContainer;
@@ -30,6 +29,8 @@ import org.restlet.Route;
 import org.restlet.Router;
 import org.restlet.data.MediaType;
 import org.restlet.util.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
@@ -64,6 +65,8 @@ public class PlexusRestletApplicationBridge
     public static final String PLEXUS_DISCOVER_RESOURCES = "plexus.discoverResources";
 
     private static final String ENABLE_ENCODER_KEY = "enable-restlet-encoder";
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private PlexusContainer plexusContainer;
@@ -106,6 +109,15 @@ public class PlexusRestletApplicationBridge
         super( context );
 
         this.createdOn = new Date();
+    }
+
+    /**
+     * @deprecated Prefer Slf4j {@link #logger} instead.
+     */
+    @Override
+    @Deprecated
+    public java.util.logging.Logger getLogger() {
+        return super.getLogger();
     }
 
     /**
@@ -181,14 +193,14 @@ public class PlexusRestletApplicationBridge
         if ( shouldCollectPlexusResources )
         {
             // discover the plexusResources
-            getLogger().info( "Discovered " + plexusResources.size() + " PlexusResource components." );
+            logger.info( "Discovered {} PlexusResource components", plexusResources.size() );
         }
         else
         {
             // create an empty map
             plexusResources = new HashMap<String, PlexusResource>();
 
-            getLogger().info( "PlexusResource discovery disabled." );
+            logger.info( "PlexusResource discovery disabled" );
         }
 
         // we are putting XStream into this Application's Context, since XStream is threadsafe
@@ -238,7 +250,7 @@ public class PlexusRestletApplicationBridge
                         attach( applicationRouter, false, resource );
                     }
                     catch (Exception e) {
-                        getLogger().log(Level.WARNING, "Failed to attach resource: " + entry.getKey(), e);
+                        logger.warn("Failed to attach resource: {}", entry.getKey(), e);
                     }
                 }
             }
@@ -253,15 +265,12 @@ public class PlexusRestletApplicationBridge
                     && Boolean.parseBoolean( this.plexusContainer.getContext().get( ENABLE_ENCODER_KEY ).toString() ) )
                 {
                     enableCompression = true;
-                    getLogger().fine( "Restlet Encoder will compress output." );
+                    logger.debug( "Restlet Encoder will compress output" );
                 }
             }
             catch ( ContextException e )
             {
-                getLogger().log(
-                    Level.WARNING,
-                    "Failed to get plexus property: " + ENABLE_ENCODER_KEY
-                        + ", this property was found in the context.", e );
+                logger.warn("Failed to get plexus property: {}, this property was found in the context", ENABLE_ENCODER_KEY, e );
             }
 
             // encoding support
@@ -300,7 +309,7 @@ public class PlexusRestletApplicationBridge
                 resource.configureXStream( xstream );
             }
             catch (Exception e) {
-                getLogger().log(Level.WARNING, "Failed to configure xstream for resource: " + entry.getKey(), e);
+                logger.warn("Failed to configure xstream for resource: {}", entry.getKey(), e);
             }
         }
 
@@ -310,12 +319,8 @@ public class PlexusRestletApplicationBridge
 
     protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
     {
-        if ( getLogger().isLoggable( Level.FINE ) )
-        {
-            getLogger().log(
-                Level.FINE,
-                "Attaching Restlet of class '" + target.getClass().getName() + "' to URI='" + uriPattern
-                    + "' (strict='" + strict + "')" );
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attaching Restlet of class '{}' to URI='{}' (strict='{}')", target.getClass().getName(), uriPattern, strict );
         }
 
         Route route = router.attach( uriPattern, target );

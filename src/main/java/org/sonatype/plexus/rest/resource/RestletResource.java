@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -37,6 +36,8 @@ import org.restlet.resource.Resource;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -53,6 +54,8 @@ import com.thoughtworks.xstream.XStreamException;
 public class RestletResource
     extends Resource
 {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     private PlexusResource delegate;
 
     public RestletResource( Context context, Request request, Response response, PlexusResource delegate )
@@ -70,6 +73,15 @@ public class RestletResource
         setReadable( delegate.isReadable() );
         setModifiable( delegate.isModifiable() );
         setNegotiateContent( delegate.isNegotiateContent() );
+    }
+
+    /**
+     * @deprecated Prefer Slf4j {@link #logger} instead.
+     */
+    @Override
+    @Deprecated
+    public java.util.logging.Logger getLogger() {
+        return super.getLogger();
     }
 
     /**
@@ -192,10 +204,7 @@ public class RestletResource
                 }
                 catch ( XStreamException e )
                 {
-                    this.getLogger().log(
-                        Level.WARNING,
-                        "Invalid XML, unable to parse using XStream " + ( delegate == null ? "" : delegate.getClass() ),
-                        e );
+                    logger.warn("Invalid XML, unable to parse using XStream {}", ( delegate == null ? "" : delegate.getClass() ), e );
 
                     throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                         "Invalid XML, unable to parse using XStream", e );
