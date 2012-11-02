@@ -22,7 +22,6 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.noelios.restlet.http.HttpResponse;
 import com.noelios.restlet.http.HttpServerCall;
-import org.codehaus.plexus.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,9 +33,9 @@ import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.restlet.util.Series;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -140,11 +139,10 @@ public class ResourceStoreContentPlexusResourceTest
                 return null;
             }
 
-            // FIXME: This is required until plexus-restlet-bridge removes use of AbstractLogEnabled
             @Override
             protected Logger getLogger()
             {
-                return new Slf4jPlexusLogger( LoggerFactory.getLogger( ResourceStoreContentPlexusResourceTest.class ) );
+                return LoggerFactory.getLogger( ResourceStoreContentPlexusResourceTest.class );
             }
 
             @Override
