@@ -31,14 +31,16 @@
       <fileNamePattern>${appender.file}.%d{yyyy-MM-dd}.gz</fileNamePattern>
     </rollingPolicy>
   </appender>
-  
-  <logger name="httpclient" level="INFO" />
+
   <logger name="org.sonatype.nexus.rest.NexusApplication" level="ERROR" />
+  <logger name="httpclient" level="INFO" />
   <logger name="org.apache.http" level="INFO" />
   <logger name="org.restlet" level="WARN" />
   <logger name="org.apache.commons" level="WARN" />
   <logger name="org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter" level="INFO" />
+  <logger name="org.apache.shiro.web.filter.mgt.DefaultFilterChainManager" level="INFO"/>
   <logger name="org.eclipse.jetty" level="INFO" />
+  <logger name="eu.medsea.mimeutil.MimeUtil2" level="INFO"/>
   
   <root level="${root.level}">
     <appender-ref ref="console" />
