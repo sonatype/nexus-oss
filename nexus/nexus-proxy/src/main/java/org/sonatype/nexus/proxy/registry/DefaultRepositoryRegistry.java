@@ -23,6 +23,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
@@ -298,7 +299,10 @@ public class DefaultRepositoryRegistry
         }
 
         // dump the event listeners, as once deleted doesn't care about config changes any longer
-        eventBus.unregister( repository );
+        if ( repository instanceof AbstractConfigurable )
+        {
+            ( (AbstractConfigurable) repository ).unregisterFromEventBus();
+        }
 
         synchronized ( this )
         {

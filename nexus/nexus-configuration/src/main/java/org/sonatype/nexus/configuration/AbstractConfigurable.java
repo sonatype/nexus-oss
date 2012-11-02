@@ -40,6 +40,11 @@ public abstract class AbstractConfigurable
     @Requirement
     private EventBus eventBus;
 
+    /**
+     * True as long as this is registered with event bus.
+     */
+    private boolean registeredWithEventBus;
+
     public AbstractConfigurable()
     {
 
@@ -58,7 +63,7 @@ public abstract class AbstractConfigurable
     public void initialize()
         throws InitializationException
     {
-        eventBus.register( this );
+        registerWithEventBus();
 
         try
         {
@@ -81,7 +86,7 @@ public abstract class AbstractConfigurable
 
     public void dispose()
     {
-        eventBus.unregister( this );
+        unregisterFromEventBus();
     }
 
     @Subscribe
@@ -253,10 +258,29 @@ public abstract class AbstractConfigurable
         return eventBus;
     }
 
+    public void registerWithEventBus()
+    {
+        if ( !registeredWithEventBus )
+        {
+            eventBus.register( this );
+            registeredWithEventBus = true;
+        }
+    }
+
+    public void unregisterFromEventBus()
+    {
+        if ( registeredWithEventBus )
+        {
+            eventBus.unregister( this );
+            registeredWithEventBus = false;
+        }
+    }
+
     protected abstract Configurator getConfigurator();
 
     protected abstract Object getCurrentConfiguration( boolean forWrite );
 
     protected abstract CoreConfiguration wrapConfiguration( Object configuration )
         throws ConfigurationException;
+
 }
