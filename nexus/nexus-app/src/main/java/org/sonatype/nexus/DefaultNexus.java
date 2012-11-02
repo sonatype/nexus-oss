@@ -284,11 +284,7 @@ public class DefaultNexus
     public void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException
     {
-        this.eventBus.post( new ReindexRepositoriesEvent(
-            this,
-            new ReindexRepositoriesRequest(
-                path,
-                fullReindex ) ) );
+        this.eventBus.post( new ReindexRepositoriesEvent( this, new ReindexRepositoriesRequest( path, fullReindex ) ) );
     }
 
     @Deprecated
