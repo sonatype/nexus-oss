@@ -12,21 +12,22 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.doReturn;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
-
 public class RepositoryItemUidFactoryTest
     extends AbstractNexusTestEnvironment
 {
+    @Mock
     protected RepositoryItemUidFactory factory;
 
+    @Mock
     protected Repository repository;
 
     public void setUp()
@@ -34,9 +35,8 @@ public class RepositoryItemUidFactoryTest
     {
         super.setUp();
 
-        repository = EasyMock.createNiceMock( Repository.class );
-        expect( repository.getId() ).andReturn( "repo1" ).anyTimes();
-        replay( repository );
+        MockitoAnnotations.initMocks( this );
+        doReturn("repo1").when( repository ).getId();
 
         factory = lookup( RepositoryItemUidFactory.class );
     }

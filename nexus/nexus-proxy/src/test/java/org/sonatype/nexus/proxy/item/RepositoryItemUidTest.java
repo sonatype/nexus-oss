@@ -12,24 +12,20 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.makeThreadSafe;
-import static org.easymock.EasyMock.replay;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import junit.framework.Assert;
+import static org.mockito.Mockito.doReturn;
 
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
-import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
+import junit.framework.Assert;
 
 public class RepositoryItemUidTest
     extends AbstractNexusTestEnvironment
 {
+
+    @Mock
     protected Repository repository;
 
     @Override
@@ -37,16 +33,10 @@ public class RepositoryItemUidTest
         throws Exception
     {
         super.setUp();
-
-        repository = createMock( Repository.class );
-
-        makeThreadSafe( repository, true );
-
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-
-        replay( repository );
+        MockitoAnnotations.initMocks( this );
+        doReturn("dummy").when(repository).getId();
     }
-    
+
     @Test
     public void testKey()
     {
@@ -65,9 +55,9 @@ public class RepositoryItemUidTest
         RepositoryItemUid uid1 = factory.createUid( repository, "/a.txt" );
 
         RepositoryItemUid uid2 = factory.createUid( repository, "/a.txt" );
-        
+
         Assert.assertNotSame( uid1, uid2 );
-        
+
         Assert.assertEquals( uid1, uid2 );
 
         Assert.assertEquals( uid1.hashCode(), uid2.hashCode() );

@@ -21,36 +21,13 @@
   </services>
 
   <modules>
-    <!--
-    Disable *everything* except docs... stupid that these have to be enabled by default.
-    -->
-    <csharp disabled="true"/>
-    <c disabled="true"/>
-    <jersey disabled="true"/>
-    <ruby disabled="true"/>
-    <amf disabled="true"/>
-    <cxf disabled="true"/>
-    <gwt disabled="true"/>
-    <jboss disabled="true"/>
-    <jaxws disabled="true"/>
-    <jaxws-client disabled="true"/>
-    <jaxws-ri disabled="true"/>
-    <obj-c disabled="true"/>
-    <java-client disabled="true"/>
-    <spring-app disabled="true"/>
-    <xfire disabled="true"/>
-    <xfire-client disabled="true"/>
-    <xml disabled="true"/>
-
     <docs disabled="false"
-          title="Sonatype Nexus OSS REST API"
+          title="Nexus Core REST API"
           copyright="Sonatype, Inc. ${copyright.year}"
           includeExampleXml="true"
           includeExampleJson="true"
           includeDefaultDownloads="false">
-      <additional-css file="${project.build.directory}/enunciate-theme/css/custom.css"/>
     </docs>
-
   </modules>
 
 </enunciate>

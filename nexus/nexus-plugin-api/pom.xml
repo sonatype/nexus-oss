@@ -17,12 +17,11 @@
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-plugins</artifactId>
+    <artifactId>nexus</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-plugin-api</artifactId>
-  <name>Nexus : Plugins : Plugin API</name>
 
   <dependencies>
     <dependency>

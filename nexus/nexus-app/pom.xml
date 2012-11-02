@@ -114,11 +114,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.restlet</groupId>
       <artifactId>org.restlet</artifactId>
       <scope>test</scope>

@@ -45,7 +45,6 @@
       <url>http://www.eclipse.org/legal/epl-v10.html</url>
     </license>
   </licenses>
-
   <developers>
     <developer>
       <id>cstamas</id>
@@ -128,7 +127,6 @@
       <timezone>+3</timezone>
     </developer>
   </developers>
-
   <contributors>
     <contributor>
       <name>John Casey</name>
@@ -216,7 +214,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-host-api</artifactId>
@@ -228,7 +225,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-model-api</artifactId>
@@ -258,16 +254,14 @@
         <artifactId>goodies-common</artifactId>
         <version>${goodies.version}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu.goodies</groupId>
-        <artifactId>goodies-eventbus</artifactId>
-        <version>${goodies.version}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.sonatype.sisu.goodies</groupId>
         <artifactId>goodies-marshal</artifactId>
+        <version>${goodies.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu.goodies</groupId>
+        <artifactId>goodies-eventbus</artifactId>
         <version>${goodies.version}</version>
       </dependency>
 
@@ -277,85 +271,71 @@
         <artifactId>javax.servlet</artifactId>
         <version>3.0.0.v201112011016</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-webapp</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-continuation</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-servlet</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-security</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-deploy</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-client</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-util</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-servlets</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-http</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-io</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-xml</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-jmx</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-rewrite</artifactId>
@@ -574,13 +554,11 @@
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
@@ -592,7 +570,6 @@
         <artifactId>logback-core</artifactId>
         <version>${logback.version}</version>
       </dependency>
-
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
@@ -617,37 +594,31 @@
         <artifactId>maven-aether-provider</artifactId>
         <version>${maven.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
         <version>${maven.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
         <version>${maven.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-repository-metadata</artifactId>
         <version>${maven.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
         <version>${maven.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
         <version>${maven.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings-builder</artifactId>
@@ -659,13 +630,11 @@
         <artifactId>maven-core</artifactId>
         <version>${maven.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
         <version>${maven.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
@@ -677,25 +646,21 @@
         <artifactId>aether-api</artifactId>
         <version>${aether.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.aether</groupId>
         <artifactId>aether-util</artifactId>
         <version>${aether.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.aether</groupId>
         <artifactId>aether-spi</artifactId>
         <version>${aether.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.aether</groupId>
         <artifactId>aether-impl</artifactId>
         <version>${aether.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.aether</groupId>
         <artifactId>aether-connector-wagon</artifactId>
@@ -708,13 +673,12 @@
         <artifactId>jackson-core-asl</artifactId>
         <version>${jackson.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-mapper-asl</artifactId>
         <version>${jackson.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
@@ -761,37 +725,31 @@
         <artifactId>org.restlet</artifactId>
         <version>${restlet.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.restlet</groupId>
         <artifactId>org.restlet.ext.fileupload</artifactId>
         <version>${restlet.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.restlet</groupId>
         <artifactId>org.restlet.ext.jaxrs</artifactId>
         <version>${restlet.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.restlet</groupId>
         <artifactId>org.restlet.ext.velocity</artifactId>
         <version>${restlet.version}</version>
       </dependency>
-
       <dependency>
         <groupId>com.noelios.restlet</groupId>
         <artifactId>com.noelios.restlet</artifactId>
         <version>${restlet.version}</version>
       </dependency>
-
       <dependency>
         <groupId>com.noelios.restlet</groupId>
         <artifactId>com.noelios.restlet.ext.servlet</artifactId>
         <version>${restlet.version}</version>
       </dependency>
-
       <dependency>
         <groupId>com.noelios.restlet</groupId>
         <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
@@ -957,14 +915,7 @@
         <artifactId>sisu-pr-testutil</artifactId>
         <version>1.5.2</version>
       </dependency>
-      
-      <!-- TODO remove easymock -->
-      <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <version>2.4</version>
-      </dependency>
-
+     
       <dependency>
         <groupId>org.codehaus.enunciate</groupId>
         <artifactId>enunciate-core</artifactId>
@@ -1017,133 +968,102 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-enunciate-theme</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-compat</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-web-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-launcher</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-logging-extras</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-logging-extras-appender</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration-model</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-proxy</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-proxy</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-app</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-app</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
         <artifactId>nexus-client-core</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.indexer-lucene</groupId>
         <artifactId>nexus-indexer-lucene-model</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
         <version>${project.version}</version>
         <type>${nexus-plugin.type}</type>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.plugins.ldap</groupId>
         <artifactId>nexus-ldap-realm-plugin</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.plugins.ldap</groupId>
         <artifactId>nexus-ldap-realm-plugin</artifactId>
@@ -1151,72 +1071,66 @@
         <classifier>bundle</classifier>
         <type>zip</type>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-lvo-plugin</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-rest-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-rest-api-model</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-rest-api</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.tools</groupId>
         <artifactId>nexus-repository-conversion-tool</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.restlight</groupId>
         <artifactId>nexus-restlight-stage-client</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.restlight</groupId>
         <artifactId>nexus-restlight-m2-settings-client</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.restlight</groupId>
         <artifactId>nexus-restlight-client-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-compat</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1233,13 +1147,11 @@
         <artifactId>nexus-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-manager</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-test-api</artifactId>
@@ -1275,7 +1187,6 @@
           <include>**/*</include>
         </includes>
       </resource>
-
       <resource>
         <directory>${project.basedir}/src/main/filtered-resources</directory>
         <filtering>true</filtering>
@@ -1293,7 +1204,6 @@
           <include>**/*</include>
         </includes>
       </testResource>
-
       <testResource>
         <directory>${project.basedir}/src/test/filtered-resources</directory>
         <filtering>true</filtering>
@@ -1332,7 +1242,7 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
           <version>1.5.5</version>
-          <!-- qdox included in plexus-component-metadata is old and not compatible with latest sources -->
+          <!-- qdox included in ^^^ is old and not compatible with latest sources -->
           <dependencies>
             <dependency>
               <groupId>com.thoughtworks.qdox</groupId>
@@ -1433,7 +1343,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.3</version>
+          <!--
+          NOTE: 2.2-beta-3 is the latest version which does not have issues setting file/directory mode permissions in archives
+          NOTE: (2.3 which is the latest available, is better, but still has problems with directorySet outputDirectory permissions)
+          -->
+          <version>2.2-beta-3</version>
           <configuration>
             <tarLongFileMode>gnu</tarLongFileMode>
           </configuration>
@@ -1506,13 +1420,11 @@
             </systemPropertyVariables>
           </configuration>
         </plugin>
-
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>provided-dependencies-maven-plugin</artifactId>
           <version>1.5</version>
         </plugin>
-
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
@@ -1626,16 +1538,13 @@
                   <excludes>
                     <exclude>commons-vfs:commons-vfs</exclude>
                   </excludes>
-                  <message>commons-vfs 1.0 has a potential security vulnerability (osvdb-58760).
-                    Use org.apache.commons:commons-vfs2:2.0 or greater
-                  </message>
+                  <message>commons-vfs 1.0 has a potential security vulnerability (osvdb-58760). Use org.apache.commons:commons-vfs2:2.0 or greater</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
                     <exclude>xmlrpc:*</exclude>
                   </excludes>
-                  <message>Apache commons xmlrpc with versions less than 3.1.3 expose a potential security vulnerability (osvdb-68314).
-                    Use org.apache.commons:xmlrpc-* 3.1.3 or greater</message>
+                  <message>Apache commons xmlrpc with versions less than 3.1.3 expose a potential security vulnerability (osvdb-68314). Use org.apache.commons:xmlrpc-* 3.1.3 or greater</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
@@ -1693,8 +1602,7 @@
                   <excludes>
                     <exclude>junit:junit-dep:(,4.9]</exclude>
                   </excludes>
-                  <message>junit:junit-dep 4.9 wrongly includes hamcrest api in jar,
-                    4.10 or greater required due to TestRule changes over earlier versions</message>
+                  <message>junit:junit-dep 4.9 wrongly includes hamcrest api in jar, 4.10 or greater required due to TestRule changes over earlier versions</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
@@ -1779,7 +1687,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -1793,7 +1700,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -1806,7 +1712,6 @@
           </archive>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -1815,7 +1720,6 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
@@ -1824,14 +1728,15 @@
   </build>
 
   <modules>
-    <module>nexus-compat</module>
-    <module>nexus-enunciate-theme</module>
     <module>nexus-bootstrap</module>
-    <module>nexus-plugins</module>
+    <module>nexus-plugin-api</module>
+    <module>nexus-plugin-manager</module>
+    <module>nexus-plugin-test-api</module>
     <module>nexus-utils</module>
     <module>nexus-web-utils</module>
     <module>nexus-logging-extras</module>
     <module>nexus-logging-extras-appender</module>
+    <module>nexus-compat</module>
     <module>nexus-api</module>
     <module>nexus-oss-edition</module>
     <module>nexus-configuration-model</module>
@@ -1899,29 +1804,8 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>process-classes</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.sonatype.nexus</groupId>
-                      <artifactId>nexus-enunciate-theme</artifactId>
-                      <outputDirectory>${project.build.directory}/enunciate-theme</outputDirectory>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <groupId>org.codehaus.enunciate</groupId>
-            <artifactId>maven-enunciate-plugin</artifactId>
+            <artifactId>maven-enunciate-slim-plugin</artifactId>
             <version>${enunciate.version}</version>
             <dependencies>
               <dependency>
@@ -2137,7 +2021,7 @@
       </build>
     </profile>
 
-    <!-- Workaround for issue with IDEA loading nexus-plugins -->
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <profile>
       <id>idea</id>
       <properties>
@@ -2149,11 +2033,10 @@
       <id>optimize-js</id>
 
       <properties>
-        <!--
-        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
-        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
-        -->
+        <!-- 'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
+             understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now. -->
         <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+
         <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
         <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
       </properties>

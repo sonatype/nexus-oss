@@ -74,7 +74,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
  * So, this implementation is used in both "simple" repository cases: hosted and proxy, but in 1st case there is no
  * remote storage.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractProxyRepository
@@ -452,7 +452,7 @@ public abstract class AbstractProxyRepository
     /**
      * ProxyMode is a persisted configuration property, hence it modifies configuration! It is the caller responsibility
      * to save configuration.
-     * 
+     *
      * @param proxyMode
      * @param sendNotification
      * @param cause
@@ -561,7 +561,7 @@ public abstract class AbstractProxyRepository
      * This method should be called by AbstractProxyRepository and it's descendants only. Since this method modifies the
      * ProxyMode property of this repository, and this property is part of configuration, this call will result in
      * configuration flush too (potentially saving any other unsaved changes)!
-     * 
+     *
      * @param cause
      */
     protected void autoBlockProxying( Throwable cause )
@@ -766,7 +766,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Gets the item max age in (in minutes).
-     * 
+     *
      * @return the item max age in (in minutes)
      */
     public int getItemMaxAge()
@@ -776,7 +776,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Sets the item max age in (in minutes).
-     * 
+     *
      * @param itemMaxAge the new item max age in (in minutes).
      */
     public void setItemMaxAge( int itemMaxAge )
@@ -1296,7 +1296,7 @@ public abstract class AbstractProxyRepository
                     getLogger().debug(
                         "Item "
                             + request.toString()
-                            + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
+                            + " does not exist in local or remote storage, throwing ItemNotFoundException." );
                 }
 
                 throw new ItemNotFoundException( request, this );
@@ -1417,7 +1417,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks for remote existence of local item.
-     * 
+     *
      * @param localItem
      * @param request
      * @return
@@ -1452,10 +1452,10 @@ public abstract class AbstractProxyRepository
      * The following matrix summarises retry/blacklist behaviour
      * <p/>
      * <p/>
-     * 
+     *
      * <pre>
      * Error condition      Retry?        Blacklist?
-     * 
+     *
      * InetNotFound         no            no
      * AccessDedied         no            yes
      * InvalidContent       no            no
@@ -1700,7 +1700,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with "default" maxAge.
-     * 
+     *
      * @param item the item
      * @return true, if it is old
      */
@@ -1711,7 +1711,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with given maxAge.
-     * 
+     *
      * @param maxAge
      * @param item
      * @return
@@ -1818,7 +1818,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Beside original behavior, only add to NFC when we are not in BLOCKED mode.
-     * 
+     *
      * @since 2.0
      */
     @Override
