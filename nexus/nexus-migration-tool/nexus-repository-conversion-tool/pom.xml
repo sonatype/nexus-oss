@@ -29,14 +29,17 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-cli</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
@@ -46,30 +49,40 @@
 
   <build>
     <plugins>
-      <!--
-      FIXME: This is probably better off done with maven-shade-plugin.
-      -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
         <executions>
           <execution>
-            <phase>package</phase>
+            <phase>prepare-package</phase>
             <goals>
-              <goal>single</goal>
+              <goal>index</goal>
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/repository-conversion-cli-assembly.xml</descriptor>
-          </descriptors>
-          <archive>
-            <manifest>
-              <mainClass>org.sonatype.nexus.tools.repository.RepositoryConvertorCli</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>cli</shadedClassifierName>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.sonatype.nexus.tools.repository.RepositoryConvertorCli</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
