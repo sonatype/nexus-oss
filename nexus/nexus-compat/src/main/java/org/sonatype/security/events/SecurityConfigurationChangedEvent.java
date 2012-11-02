@@ -18,7 +18,9 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * An event fired when the security configuration has changed.
  *
  * @author Brian Demers
+ * @deprecated use {@link AuthorizationConfigurationChanged} event via an EventBus handler
  */
+@Deprecated
 public class SecurityConfigurationChangedEvent
     extends AbstractEvent<Object>
 {
