@@ -158,11 +158,6 @@
         <version>2.3.1</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.sisu.goodies</groupId>
-        <artifactId>goodies-eventbus</artifactId>
-        <version>1.5-SNAPSHOT</version>
-      </dependency>
-      <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
         <version>1.5-SNAPSHOT</version>

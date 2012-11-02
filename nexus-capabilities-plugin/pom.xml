@@ -63,16 +63,6 @@
       <artifactId>nexus-rest-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-eventbus</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
 
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>

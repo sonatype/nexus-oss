@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.eventbus.ManagedHandler;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
@@ -32,7 +33,7 @@ import com.google.common.eventbus.Subscribe;
 @Singleton
 public class NexusIsActiveCondition
     extends ConditionSupport
-    implements Condition, EventBus.LoadOnStart
+    implements Condition, ManagedHandler
 {
 
     @Inject
