@@ -290,7 +290,7 @@
       put, remove, update, and expire.
 
     * bootstrapCacheLoaderFactory - Specifies a BootstrapCacheLoader, which is called by a
-      cache on initialisation to prepopulate itself.
+      cache on initialisation to pre-populate itself.
 
     Each cache that will be distributed needs to set a cache event listener which replicates
     messages to the other CacheManager peers. For the built-in RMI implementation this is done
