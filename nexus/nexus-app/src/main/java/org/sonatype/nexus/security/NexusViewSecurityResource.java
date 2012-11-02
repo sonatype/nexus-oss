@@ -38,6 +38,7 @@ import org.sonatype.security.realms.tools.AbstractDynamicSecurityResource;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DynamicSecurityResource;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 @Component( role = DynamicSecurityResource.class, hint = "NexusViewSecurityResource" )
@@ -148,12 +149,14 @@ public class NexusViewSecurityResource
         return "repository-" + ( repoId.equals( "*" ) ? "all" : repoId );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void onEvent( final RepositoryRegistryEventAdd event )
     {
         setDirty( true );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void onEvent( final RepositoryRegistryEventRemove event )
     {

@@ -46,6 +46,7 @@ import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.tools.LdapURL;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 @Component( role = LdapManager.class )
@@ -223,6 +224,7 @@ public class DefaultLdapManager
         throw new AuthenticationException( "User: " + userId + " could not be authenticated." );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void onEvent( final LdapClearCacheEvent evt )
     {
