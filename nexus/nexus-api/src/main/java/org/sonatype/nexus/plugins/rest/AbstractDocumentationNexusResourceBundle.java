@@ -79,11 +79,11 @@ public abstract class AbstractDocumentationNexusResourceBundle
                 resources.add( new DefaultStaticResource( url, path, mimeSupport.guessMimeTypeFromPath( name ) ) );
             }
 
-            if ( logger.isDebugEnabled() )
+            if ( logger.isTraceEnabled() )
             {
-                logger.debug("Discovered documentation for: {}", getPluginId());
+                logger.trace("Discovered documentation for: {}", getPluginId());
                 for (StaticResource resource: resources) {
-                    logger.debug("  {}", resource);
+                    logger.trace("  {}", resource);
                 }
             }
         }
