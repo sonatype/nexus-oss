@@ -50,7 +50,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.plexus.appevents.Event;
+import com.google.common.eventbus.Subscribe;
 
 @Component( role = Repository.class, hint = ObrRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "OBR" )
 public class ObrRepository
@@ -129,8 +129,7 @@ public class ObrRepository
             if ( !getExternalConfiguration( false ).isObrPathSet() )
             {
                 // it is not set, this is an error
-                throw new RemoteStorageException(
-                                                  "Cannot set OBR URL! The OBR metadata path is not set, please specify a full URL including the OBR metadata file!" );
+                throw new RemoteStorageException("Cannot set OBR URL! The OBR metadata path is not set, please specify a full URL including the OBR metadata file!" );
             }
         }
         else
@@ -292,33 +291,37 @@ public class ObrRepository
         }
     }
 
-    @Override
-    public void onEvent( final Event<?> evt )
+    @Subscribe
+    public void onEvent( final RepositoryItemEventStore evt )
     {
-        final boolean adding = evt instanceof RepositoryItemEventStore;
-        if ( adding || evt instanceof RepositoryItemEventDelete )
-        {
-            final RepositoryItemEvent itemEvt = (RepositoryItemEvent) evt;
+        updateObr( evt, true );
+    }
 
-            if ( this.equals( itemEvt.getRepository() ) )
+    @Subscribe
+    public void onEvent( final RepositoryItemEventDelete evt )
+    {
+        updateObr( evt, false );
+    }
+
+    private void updateObr( final RepositoryItemEvent evt, final boolean adding )
+    {
+        if ( this.equals( evt.getRepository() ) )
+        {
+            try
             {
-                try
+                final Resource resource = obrMetadataSource.buildResource(
+                    ObrUtils.getCachedItem( evt.getItemUid() )
+                );
+                if ( resource != null )
                 {
-                    final Resource resource =
-                        obrMetadataSource.buildResource( ObrUtils.getCachedItem( itemEvt.getItemUid() ) );
-                    if ( resource != null )
-                    {
-                        ObrUtils.updateObr( obrMetadataSource, ObrUtils.createObrUid( this ), resource, adding );
-                    }
-                }
-                catch ( final Exception e )
-                {
-                    getLogger().warn( "Problem updating OBR " + getId(), e );
+                    ObrUtils.updateObr( obrMetadataSource, ObrUtils.createObrUid( this ), resource, adding );
                 }
             }
+            catch ( final Exception e )
+            {
+                getLogger().warn( "Problem updating OBR " + getId(), e );
+            }
         }
-
-        super.onEvent( evt );
     }
 
     /**
