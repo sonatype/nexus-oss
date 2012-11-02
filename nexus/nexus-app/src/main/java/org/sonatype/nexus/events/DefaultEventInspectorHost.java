@@ -40,6 +40,7 @@ import org.sonatype.plexus.appevents.Event;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -98,6 +99,7 @@ public class DefaultEventInspectorHost
     }
 
     // == EventListener iface
+    @AllowConcurrentEvents
     @Subscribe
     public void onEvent( final Event<?> evt )
     {

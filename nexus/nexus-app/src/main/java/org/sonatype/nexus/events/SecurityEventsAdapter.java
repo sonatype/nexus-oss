@@ -26,6 +26,7 @@ import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 import org.sonatype.security.events.UserPrincipalsExpired;
 import org.sonatype.security.events.UserPrincipalsExpiredEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -47,24 +48,28 @@ public class SecurityEventsAdapter
         this.eventBus = checkNotNull( eventBus );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void on( final AuthorizationConfigurationChanged event )
     {
         eventBus.post( new AuthorizationConfigurationChangedEvent( this ) );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void on( final SecurityConfigurationChanged event )
     {
         eventBus.post( new SecurityConfigurationChangedEvent( this ) );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void on( final UserPrincipalsExpired event )
     {
         eventBus.post( new UserPrincipalsExpiredEvent( this, event.getUserId(), event.getSource() ) );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void on( final AuthorizationConfigurationChangedEvent event )
     {
@@ -74,6 +79,7 @@ public class SecurityEventsAdapter
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void on( final SecurityConfigurationChangedEvent event )
     {
@@ -83,6 +89,7 @@ public class SecurityEventsAdapter
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void on( final UserPrincipalsExpiredEvent event )
     {

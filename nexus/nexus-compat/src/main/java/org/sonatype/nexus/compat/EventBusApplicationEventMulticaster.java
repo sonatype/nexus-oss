@@ -24,6 +24,7 @@ import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -86,6 +87,7 @@ public class EventBusApplicationEventMulticaster
             this.listener = listener;
         }
 
+        @AllowConcurrentEvents
         @Subscribe
         public void forward( final Event<?> evt )
         {
