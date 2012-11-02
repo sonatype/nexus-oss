@@ -15,17 +15,15 @@
 -->
 <ehcache updateCheck="false">
 
-    <!-- All ${...} is replaced by plexus if know to it! -->
     <!-- NO MORE DISK CACHE !!! 
     <diskStore path="${runtime-tmp}/ehcache"/>
      -->
     
-    <!-- all created caches shares these defaults 
-
+    <!-- all created caches shares these defaults
             memoryStoreEvictionPolicy= ("LRU"|"LFU"|"FIFO")
-	      LRU - least recently used
-	      LFU - least frequently used
-	      FIFO - first in first out
+              LRU - least recently used
+              LFU - least frequently used
+              FIFO - first in first out
     -->
     <defaultCache
             maxElementsInMemory="1000"
@@ -243,9 +241,9 @@
     maxElementsInMemory:
     Sets the maximum number of objects that will be created in memory
 
-	maxElementsOnDisk:
+    maxElementsOnDisk:
     Sets the maximum number of objects that will be maintained in the DiskStore
-	The default value is zero, meaning unlimited.
+    The default value is zero, meaning unlimited.
 
     eternal:
     Sets whether elements are eternal. If eternal,  timeouts are ignored and the
@@ -347,10 +345,9 @@
 
     -->
 
-
     <!--
     Mandatory Default Cache configuration. These settings will be applied to caches
-    created programmtically using CacheManager.add(String cacheName)
+    created programmatically using CacheManager.add(String cacheName)
     <defaultCache
             maxElementsInMemory="10000"
             eternal="false"
