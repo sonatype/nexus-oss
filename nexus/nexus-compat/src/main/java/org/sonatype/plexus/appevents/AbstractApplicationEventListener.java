@@ -23,6 +23,7 @@ public abstract class AbstractApplicationEventListener
 {
 
     @Inject
+    @Deprecated
     public AbstractApplicationEventListener( ApplicationEventMulticaster applicationEventMulticaster )
     {
         applicationEventMulticaster.addEventListener( this );

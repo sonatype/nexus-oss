@@ -31,6 +31,7 @@ public interface EventListener
      *
      * @param evt the evt
      */
+    @Deprecated
     void onEvent( Event<?> evt );
 
 }

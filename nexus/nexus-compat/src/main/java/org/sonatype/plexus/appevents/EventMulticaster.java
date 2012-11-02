@@ -25,6 +25,7 @@ public interface EventMulticaster
      * 
      * @param listener the listener
      */
+    @Deprecated
     public void addEventListener( EventListener listener );
 
     /**
@@ -32,6 +33,7 @@ public interface EventMulticaster
      * 
      * @param listener the listener
      */
+    @Deprecated
     public void removeEventListener( EventListener listener );
 
     /**
@@ -39,5 +41,7 @@ public interface EventMulticaster
      * 
      * @param evt the evt
      */
+    @Deprecated
     public void notifyEventListeners( Event<?> evt );
+
 }
