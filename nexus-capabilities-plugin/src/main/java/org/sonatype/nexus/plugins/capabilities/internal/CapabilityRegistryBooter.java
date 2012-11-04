@@ -18,8 +18,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.eventbus.ManagedHandler;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -29,8 +29,8 @@ import com.google.common.eventbus.Subscribe;
  */
 @Named
 @Singleton
+@EventBus.Managed
 public class CapabilityRegistryBooter
-    implements ManagedHandler
 {
 
     private final DefaultCapabilityRegistry capabilityRegistry;
