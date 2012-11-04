@@ -26,20 +26,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
-import org.sonatype.nexus.eventbus.ManagedHandler;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -55,9 +51,10 @@ import com.google.common.eventbus.Subscribe;
  */
 @Named
 @Singleton
+@EventBus.Managed
 public class DefaultEventInspectorHost
     extends AbstractLoggingComponent
-    implements EventInspectorHost, Disposable, ManagedHandler
+    implements EventInspectorHost, Disposable
 {
     private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
         "org.sonatype.nexus.events.DefaultEventInspectorHost.poolSize", 500 );

@@ -18,7 +18,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.eventbus.ManagedHandler;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
 import org.sonatype.security.events.SecurityConfigurationChanged;
@@ -36,8 +35,8 @@ import com.google.common.eventbus.Subscribe;
  */
 @Named
 @Singleton
+@EventBus.Managed
 public class SecurityEventsAdapter
-    implements ManagedHandler
 {
 
     private final EventBus eventBus;

@@ -38,7 +38,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
-import org.sonatype.nexus.events.ManagedHandlers;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -101,9 +100,6 @@ public class DefaultNexusTest
 
     @Mock
     private EventBus eventBus;
-
-    @Mock
-    private ManagedHandlers managedHandlers;
 
     @InjectMocks
     @Spy

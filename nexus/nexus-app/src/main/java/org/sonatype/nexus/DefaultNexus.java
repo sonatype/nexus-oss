@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.events.ManagedHandlers;
 import org.sonatype.nexus.index.events.ReindexRepositoriesEvent;
 import org.sonatype.nexus.index.events.ReindexRepositoriesRequest;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -139,9 +138,6 @@ public class DefaultNexus
 
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
-
-    @Requirement
-    private ManagedHandlers managedHandlers;
 
     private static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
 
@@ -360,8 +356,6 @@ public class DefaultNexus
         artifactPackagingMapper.setPropertiesFile( new File( nexusConfiguration.getConfigurationDirectory(),
                                                              MAPPING_PROPERTIES_FILE ) );
 
-        managedHandlers.register();
-
         // load locally present plugins
         getLogger().info( "Activating locally installed plugins..." );
 
@@ -384,8 +378,6 @@ public class DefaultNexus
         applicationStatusSource.getSystemStatus().setOperationMode( OperationMode.STANDALONE );
 
         applicationStatusSource.getSystemStatus().setInitializedAt( new Date() );
-
-        managedHandlers.register();
 
         eventBus.post( new NexusInitializedEvent( this ) );
     }
@@ -551,8 +543,6 @@ public class DefaultNexus
         nexusConfiguration.dropInternals();
 
         securitySystem.stop();
-
-        managedHandlers.unregister();
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
 
