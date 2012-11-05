@@ -88,7 +88,16 @@ public class JerseyRepositories
     @Override
     public <R extends Repository> R get( final Class<R> type, final String id )
     {
-        return type.cast( get( id ) );
+        final Repository repository = get( id );
+        if ( !type.isAssignableFrom( repository.getClass() ) )
+        {
+            throw new ClassCastException(
+                String.format(
+                    "Expected an '%s' but found repository is an '%s'", type.getName(), repository.getClass().getName()
+                )
+            );
+        }
+        return type.cast( repository );
     }
 
     @Override

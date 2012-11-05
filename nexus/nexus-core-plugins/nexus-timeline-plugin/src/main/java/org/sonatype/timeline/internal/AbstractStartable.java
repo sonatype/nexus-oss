@@ -20,7 +20,7 @@ import org.sonatype.timeline.TimelineConfiguration;
 
 public abstract class AbstractStartable
 {
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private volatile boolean started;
 
@@ -28,7 +28,6 @@ public abstract class AbstractStartable
 
     protected AbstractStartable()
     {
-        this.logger = LoggerFactory.getLogger( getClass() );
         this.started = false;
     }
 

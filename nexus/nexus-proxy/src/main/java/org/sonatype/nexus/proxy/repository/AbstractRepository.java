@@ -20,15 +20,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.mime.MimeUtil;
@@ -106,7 +106,7 @@ public abstract class AbstractRepository
     extends ConfigurableRepository
     implements Repository
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -1258,7 +1258,10 @@ public abstract class AbstractRepository
     /**
      * Check conditions, such as availability, permissions, etc.
      *
+<<<<<<< HEAD
      * @param request the request
+=======
+>>>>>>> refs/heads/master
      * @return false, if the request should not be processed with response appropriate for current method, or true is
      *         execution should continue as usual.
      * @throws RepositoryNotAvailableException the repository not available exception

@@ -26,6 +26,8 @@ import com.meterware.servletunit.InvocationContext;
 import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
+// FIXME: Consider dropping this test... its not terribly useful
+
 /**
  * Big fat not: this is semi-finished: maven sets the basedir, hence it was esites to move plexus files to /conf/ folder
  * in root of this module.

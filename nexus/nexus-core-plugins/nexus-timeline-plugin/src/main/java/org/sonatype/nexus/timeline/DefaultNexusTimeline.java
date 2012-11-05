@@ -20,15 +20,15 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
@@ -50,7 +50,7 @@ public class DefaultNexusTimeline
 
     private static final String TIMELINE_BASEDIR = "timeline";
 
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private Timeline timeline;
@@ -58,17 +58,12 @@ public class DefaultNexusTimeline
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
     public void initialize()
         throws InitializationException
     {
         try
         {
-            getLogger().info( "Initializing Nexus Timeline..." );
+            logger.info( "Initializing Nexus Timeline..." );
 
             moveLegacyTimeline();
         }
@@ -83,7 +78,7 @@ public class DefaultNexusTimeline
     {
         try
         {
-            getLogger().info( "Starting Nexus Timeline..." );
+            logger.info( "Starting Nexus Timeline..." );
             updateConfiguration();
         }
         catch ( IOException e )
@@ -97,7 +92,7 @@ public class DefaultNexusTimeline
     {
         try
         {
-            getLogger().info( "Stopping Nexus Timeline..." );
+            logger.info( "Stopping Nexus Timeline..." );
             timeline.stop();
         }
         catch ( IOException e )
@@ -133,7 +128,7 @@ public class DefaultNexusTimeline
             return;
         }
 
-        getLogger().info(
+        logger.info(
             "Moving legacy timeline index from '" + legacyIndexDir.getAbsolutePath() + "' to '"
                 + newIndexDir.getAbsolutePath() + "'." );
 

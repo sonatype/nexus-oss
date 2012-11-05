@@ -37,11 +37,6 @@ public class RepositoryStatusCheckerThread
         this.running = true;
     }
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
     public ProxyRepository getRepository()
     {
         return repository;
@@ -106,7 +101,7 @@ public class RepositoryStatusCheckerThread
                 // say this message only if repository is auto-blocked, regardless of repositoryStatusCheckMode
                 if ( getRepository().getProxyMode().shouldAutoUnblock() )
                 {
-                    getLogger().info(
+                    logger.info(
                         "Next attempt to auto-unblock the \"" + getRepository().getName() + "\" (id="
                             + getRepository().getId()
                             + ") repository by checking its remote peer health will occur in "

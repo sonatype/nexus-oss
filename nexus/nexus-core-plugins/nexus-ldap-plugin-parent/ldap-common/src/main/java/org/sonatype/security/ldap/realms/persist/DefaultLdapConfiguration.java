@@ -44,7 +44,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 public class DefaultLdapConfiguration
     implements LdapConfiguration
 {
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
     
     @org.codehaus.plexus.component.annotations.Configuration( value = "${application-conf}/ldap.xml" )
     private File configurationFile;

@@ -14,7 +14,7 @@ package org.sonatype.nexus.proxy.repository.charger;
 
 import java.io.IOException;
 
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;

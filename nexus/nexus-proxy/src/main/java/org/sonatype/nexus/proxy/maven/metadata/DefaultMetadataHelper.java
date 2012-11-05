@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.maven.metadata;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;

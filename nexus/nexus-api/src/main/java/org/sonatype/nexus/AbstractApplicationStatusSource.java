@@ -19,13 +19,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.codehaus.plexus.logging.Logger;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractApplicationStatusSource
     implements ApplicationStatusSource
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * System status.
@@ -54,8 +54,6 @@ public abstract class AbstractApplicationStatusSource
 
     /**
      * Internal method for getting SystemStatus. Does not perform any locking.
-     * 
-     * @return
      */
     protected SystemStatus getSystemStatusInternal()
     {
@@ -64,8 +62,6 @@ public abstract class AbstractApplicationStatusSource
 
     /**
      * Returns the RW lock.
-     * 
-     * @return
      */
     protected ReadWriteLock getLock()
     {
@@ -116,20 +112,7 @@ public abstract class AbstractApplicationStatusSource
     // ==
 
     /**
-     * Returns the Plexus logger.
-     * 
-     * @return
-     */
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
-    /**
      * Reads the version from a properties file (the one embedded by Maven into Jar).
-     * 
-     * @param path
-     * @return
      */
     protected String readVersion( String path )
     {
@@ -191,16 +174,12 @@ public abstract class AbstractApplicationStatusSource
 
     /**
      * Discovers (probably in "edition specific" way) the version of the application.
-     * 
-     * @return
      */
     protected abstract String discoverApplicationVersion();
 
     /**
      * Implement here any updates to SystemStatus needed. No need to bother with locking, it happens in the caller of
      * this method. The method body contains exclusive lock to SystemStatus.
-     * 
-     * @param systemStatus
      */
     protected abstract void renewSystemStatus( SystemStatus systemStatus );
 }

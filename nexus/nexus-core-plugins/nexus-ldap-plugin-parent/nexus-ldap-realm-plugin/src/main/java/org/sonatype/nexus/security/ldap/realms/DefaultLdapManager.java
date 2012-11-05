@@ -54,7 +54,7 @@ public class DefaultLdapManager
     implements LdapManager, Initializable, Disposable
 {
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private LdapAuthenticator ldapAuthenticator;
