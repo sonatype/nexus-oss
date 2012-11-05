@@ -123,11 +123,6 @@ public class DefaultErrorReportingManager
         this.storageManager = storageManager;
     }
 
-    private Logger getLogger()
-    {
-        return logger;
-    }
-
     // ==
 
     @Override
@@ -291,7 +286,7 @@ public class DefaultErrorReportingManager
         {
             if ( request.isManual() )
             {
-                getLogger().trace( "Manual error report: '{}'", request.getTitle() );
+                logger.trace( "Manual error report: '{}'", request.getTitle() );
                 IssueSubmissionRequest subRequest = buildRequest( request );
 
                 submitIssue( auth, response, subRequest );
@@ -299,7 +294,7 @@ public class DefaultErrorReportingManager
             else if ( ( isEnabled() && shouldHandleReport( request ) 
                 && !shouldIgnore( request.getThrowable() ) ) )
             {
-                getLogger().info( "Detected Error in Nexus: {}. Generating a problem report...",
+                logger.info( "Detected Error in Nexus: {}. Generating a problem report...",
                                   getThrowableMessage( request.getThrowable() )  );
                 IssueSubmissionRequest subRequest = buildRequest( request );
 
@@ -313,12 +308,12 @@ public class DefaultErrorReportingManager
                 {
                     response.setJiraUrl( existingIssues.get( 0 ).getLink() );
                     writeArchive( subRequest.getBundles(), existingIssues.get( 0 ).getKey() );
-                    getLogger().info(
+                    logger.info(
                         "Not reporting problem as it already exists in database: "
                             + existingIssues.iterator().next().getLink() );
                 }
             } else {
-                if ( getLogger().isInfoEnabled() )
+                if ( logger.isInfoEnabled() )
                 {
                     String reason = "Nexus ignores this type of error";
                     if ( !isEnabled() )
@@ -329,7 +324,7 @@ public class DefaultErrorReportingManager
                     {
                         reason = "it has already being reported or it does not have an error message";
                     }
-                    getLogger().info(
+                    logger.info(
                         "Detected Error in Nexus: {}. Skipping problem report generation because {}",
                         getThrowableMessage( request.getThrowable() ), reason
                     );
@@ -340,13 +335,13 @@ public class DefaultErrorReportingManager
         }
         catch ( Exception e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().warn( "Error while submitting problem report: {}", e.getMessage(), e );
+                logger.warn( "Error while submitting problem report: {}", e.getMessage(), e );
             }
             else
             {
-                getLogger().warn( "Error while submitting problem report: {}", e.getMessage() );
+                logger.warn( "Error while submitting problem report: {}", e.getMessage() );
             }
 
             Throwables.propagateIfInstanceOf( e, IssueSubmissionException.class );
@@ -380,7 +375,7 @@ public class DefaultErrorReportingManager
             response.setCreated( true );
             response.setJiraUrl( result.getIssueUrl() );
             writeArchive( result.getBundles(), result.getKey() );
-            getLogger().info( "Problem report ticket " + result.getIssueUrl() + " was created." );
+            logger.info( "Problem report ticket " + result.getIssueUrl() + " was created." );
         }
         catch ( IssueSubmissionException e )
         {
@@ -403,7 +398,7 @@ public class DefaultErrorReportingManager
 
             if ( errorHashSet.contains( hash ) )
             {
-                getLogger().debug( "Received an exception we already processed, ignoring." );
+                logger.debug( "Received an exception we already processed, ignoring." );
                 return false;
             }
             else
@@ -414,7 +409,7 @@ public class DefaultErrorReportingManager
         }
         else
         {
-            getLogger().debug( "Received an empty message in exception, will not handle" );
+            logger.debug( "Received an empty message in exception, will not handle" );
         }
 
         return false;
@@ -432,7 +427,7 @@ public class DefaultErrorReportingManager
         }
         catch ( Exception e )
         {
-            getLogger().error( "Unable to query JIRA server to find if error report already exists", e );
+            logger.error( "Unable to query JIRA server to find if error report already exists", e );
             return Collections.emptyList();
         }
 
@@ -462,7 +457,7 @@ public class DefaultErrorReportingManager
     {
         if ( bundles == null || bundles.isEmpty() )
         {
-            getLogger().debug( "No problem report bundle assembled" );
+            logger.debug( "No problem report bundle assembled" );
             return;
         }
 
@@ -474,7 +469,7 @@ public class DefaultErrorReportingManager
         }
         
         File zipFile = getZipFile( "nexus-error-bundle-" + suffix, "zip" );
-        getLogger().debug( "Writing problem report bundle: '{}'", zipFile );
+        logger.debug( "Writing problem report bundle: '{}'", zipFile );
 
         OutputStream output = null;
         InputStream input = null;

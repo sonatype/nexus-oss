@@ -25,10 +25,10 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.feeds.record.NexusItemInfo;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.NexusTimeline;
@@ -114,7 +114,7 @@ public class DefaultFeedRecorder
      */
     private static final String EVENT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSZ";
 
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * The timeline for persistent events and feeds.
@@ -127,11 +127,6 @@ public class DefaultFeedRecorder
      */
     @Requirement
     private FeedArtifactEventFilter feedArtifactEventFilter;
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
 
     protected DateFormat getDateFormat()
     {
@@ -148,7 +143,7 @@ public class DefaultFeedRecorder
         }
         catch ( ParseException e )
         {
-            getLogger().warn( "Could not format event date!", e );
+            logger.warn( "Could not format event date!", e );
 
             eventDate = new Date();
         }
@@ -367,9 +362,9 @@ public class DefaultFeedRecorder
 
             if ( value == null )
             {
-                if ( getLogger().isDebugEnabled() )
+                if ( logger.isDebugEnabled() )
                 {
-                    getLogger().debug( "The attribute with key '" + key + "' in event context is NULL!" );
+                    logger.debug( "The attribute with key '" + key + "' in event context is NULL!" );
                 }
 
                 value = "";
@@ -428,7 +423,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().debug( prc.getMessage() );
+        logger.debug( prc.getMessage() );
 
         return prc;
     }
@@ -439,7 +434,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().debug( prc.getMessage() );
+        logger.debug( prc.getMessage() );
     }
 
     public void systemProcessCanceled( SystemProcess prc, String cancelMessage )
@@ -448,7 +443,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().debug( prc.getMessage() );
+        logger.debug( prc.getMessage() );
     }
 
     public void systemProcessBroken( SystemProcess prc, Throwable e )
@@ -457,7 +452,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().debug( prc.getMessage(), e );
+        logger.debug( prc.getMessage(), e );
     }
 
     protected void addToTimeline( SystemEvent se )

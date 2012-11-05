@@ -45,7 +45,7 @@ public class NexusRestClient
 
     private RestClientHelper clientHelper = null;
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public static final String WAIT_FOR_START_TIMEOUT_KEY = "nexus.client.started.timeout";
 

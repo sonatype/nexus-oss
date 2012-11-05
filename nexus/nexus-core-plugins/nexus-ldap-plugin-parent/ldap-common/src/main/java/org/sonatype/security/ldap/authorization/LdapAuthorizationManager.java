@@ -38,7 +38,7 @@ public class LdapAuthorizationManager
     @Requirement
     private LdapManager ldapManager;
 
-    private Logger logger = LoggerFactory.getLogger( getClass() ); 
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public String getSource()
     {

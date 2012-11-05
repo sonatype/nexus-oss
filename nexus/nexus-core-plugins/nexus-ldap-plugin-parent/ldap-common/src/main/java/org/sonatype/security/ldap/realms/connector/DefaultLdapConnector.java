@@ -35,7 +35,7 @@ import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
 public class DefaultLdapConnector
     implements LdapConnector
 {
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
     
     private LdapUserDAO ldapUserManager;
 

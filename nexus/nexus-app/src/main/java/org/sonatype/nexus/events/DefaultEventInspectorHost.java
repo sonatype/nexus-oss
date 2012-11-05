@@ -131,7 +131,7 @@ public class DefaultEventInspectorHost
                 catch ( Exception e )
                 {
                     getLogger().warn( "EventInspector implementation={} had problem accepting an event={}",
-                        new Object[] { ei.getClass().getName(), evt.getClass(), e } );
+                        ei.getClass().getName(), evt.getClass(), e);
                 }
             }
         }
@@ -153,7 +153,7 @@ public class DefaultEventInspectorHost
                 catch ( Exception e )
                 {
                     getLogger().warn( "Async EventInspector implementation={} had problem accepting an event={}",
-                        new Object[] { ei.getClass().getName(), evt.getClass(), e } );
+                        ei.getClass().getName(), evt.getClass(), e);
                 }
             }
         }
@@ -185,8 +185,7 @@ public class DefaultEventInspectorHost
             }
             catch ( Exception e )
             {
-                logger.warn( "EventInspector implementation={} had problem accepting an event={}", new Object[] {
-                    ei.getClass().getName(), evt.getClass(), e } );
+                logger.warn( "EventInspector implementation={} had problem accepting an event={}", ei.getClass().getName(), evt.getClass(), e);
             }
         }
     }

@@ -17,18 +17,20 @@ import java.net.URI;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component( role = MetadataRebuilder.class )
-public class DefaultMetadataRebuilder extends AbstractLogEnabled
+public class DefaultMetadataRebuilder
     implements MetadataRebuilder
 {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private String repo;
 
     @Requirement
-    private FSMetadataHelper fSMetadataHelper = new FSMetadataHelper( getLogger() );
+    private FSMetadataHelper fSMetadataHelper = new FSMetadataHelper( logger );
 
     public void rebuildMetadata( String repo )
     {

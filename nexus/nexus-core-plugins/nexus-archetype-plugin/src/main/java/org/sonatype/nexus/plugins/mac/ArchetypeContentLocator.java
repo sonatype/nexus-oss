@@ -37,7 +37,7 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 public class ArchetypeContentLocator
     implements ContentLocator
 {
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final Repository repository;
 
@@ -55,7 +55,6 @@ public class ArchetypeContentLocator
                                     final IndexingContext indexingContext, final MacPlugin macPlugin,
                                     final ArtifactInfoFilter artifactInfoFilter )
     {
-        this.logger = LoggerFactory.getLogger( getClass() );
         this.repository = repository;
         this.repositoryContentUrl = repositoryContentUrl;
         this.indexingContext = indexingContext;

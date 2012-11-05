@@ -91,8 +91,7 @@ public class LogbackLogManager
 
     private static final String LOG_CONF_PROPS_RESOURCE = "/META-INF/log/" + LOG_CONF_PROPS;
 
-    @Requirement
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement( role = LogConfigurationParticipant.class )
     private List<LogConfigurationParticipant> logConfigurationParticipants;

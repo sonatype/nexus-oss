@@ -17,7 +17,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
@@ -27,6 +26,7 @@ import org.sonatype.nexus.configuration.model.v1_10_0.CErrorReporting;
 import org.sonatype.nexus.configuration.model.v1_10_0.CNotification;
 import org.sonatype.nexus.configuration.model.v1_10_0.CRepository;
 import org.sonatype.nexus.configuration.model.v1_10_0.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
 
 /**
@@ -36,7 +36,7 @@ import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
  */
 @Component( role = SingleVersionUpgrader.class, hint = "1.4.6" )
 public class Upgrade146to1100
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
 

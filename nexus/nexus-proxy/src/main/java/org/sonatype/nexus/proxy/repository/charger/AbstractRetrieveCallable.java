@@ -14,7 +14,7 @@ package org.sonatype.nexus.proxy.repository.charger;
 
 import java.util.concurrent.Callable;
 
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;

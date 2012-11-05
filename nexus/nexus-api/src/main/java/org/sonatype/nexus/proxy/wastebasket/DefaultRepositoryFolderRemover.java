@@ -17,29 +17,23 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 @Component( role = RepositoryFolderRemover.class )
 public class DefaultRepositoryFolderRemover
     implements RepositoryFolderRemover
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement( role = RepositoryFolderCleaner.class )
     private Map<String, RepositoryFolderCleaner> cleaners;
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
     public void deleteRepositoryFolders( final Repository repository, final boolean deleteForever )
         throws IOException
     {
-        getLogger().debug(
-            "Removing folders of repository \"" + repository.getName() + "\" (ID=" + repository.getId() + ")" );
+        logger.debug("Removing folders of repository \"{}\" (ID={})", repository.getName(), repository.getId() );
 
         for ( RepositoryFolderCleaner cleaner : cleaners.values() )
         {
@@ -49,9 +43,7 @@ public class DefaultRepositoryFolderRemover
             }
             catch ( Exception e )
             {
-                getLogger().warn(
-                    "Got exception during execution of RepositoryFolderCleaner " + cleaner.getClass().getName()
-                        + ", continuing.", e );
+                logger.warn( "Got exception during execution of RepositoryFolderCleaner {}, continuing.", cleaner.getClass().getName(), e );
             }
         }
     }

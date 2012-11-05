@@ -53,19 +53,13 @@ import org.sonatype.plexus.appevents.EventListener;
 public class DefaultRepositoryRegistry
     implements RepositoryRegistry, Disposable
 {
-    @Requirement
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
 
     public void addRepository( final Repository repository )
     {
@@ -75,7 +69,7 @@ public class DefaultRepositoryRegistry
 
         insertRepository( rtd, repository );
 
-        getLogger().info( "Added repository {}", RepositoryStringUtils.getFullHumanizedNameString( repository ) );
+        logger.info( "Added repository {}", RepositoryStringUtils.getFullHumanizedNameString( repository ) );
     }
 
     public void removeRepository( final String repoId )
@@ -254,7 +248,7 @@ public class DefaultRepositoryRegistry
 
         if ( !silently )
         {
-            getLogger().info( "Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString( repository ) );
+            logger.info( "Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString( repository ) );
         }
     }
 

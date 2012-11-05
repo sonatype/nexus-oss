@@ -16,10 +16,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.scheduling.TaskUtil;
 
 public abstract class AbstractRepositoryFolderCleaner
@@ -27,7 +27,7 @@ public abstract class AbstractRepositoryFolderCleaner
 {
     public static final String GLOBAL_TRASH_KEY = "trash";
 
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;

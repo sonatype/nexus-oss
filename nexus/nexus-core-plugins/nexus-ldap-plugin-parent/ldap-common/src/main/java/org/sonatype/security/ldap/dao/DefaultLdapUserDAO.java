@@ -41,7 +41,7 @@ import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 public class DefaultLdapUserDAO
     implements LdapUserDAO
 {
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private PasswordEncoderManager passwordEncoderManager;
