@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
@@ -153,100 +152,57 @@ public abstract class AbstractIndexPlexusResource
 
         SearchResponse result = new SearchResponse();
 
-        // doing "plain search"
-        final int RETRIES = 3;
-
-        int runCount = 0;
-
-        while ( runCount < RETRIES )
+        try
         {
-            try
+            int countRequested = count == null ? HIT_LIMIT : count;
+
+            searchResult =
+                searchByTerms( terms, getRepositoryId( request ), from, countRequested, exact, expandVersion,
+                               expandPackaging, expandClassifier, collapseResults );
+
+            result.setTooManyResults( searchResult.getTotalHitsCount() > countRequested );
+
+            result.setTotalCount( searchResult.getTotalHitsCount() );
+
+            result.setFrom( from == null ? -1 : from.intValue() );
+
+            result.setCount( count == null ? -1 : count );
+
+            result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
+
+            // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results,
+            // and
+            // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
+            // and full result set is smaller than HIT_LIMIT
+            // then repeat without collapse
+            if ( collapseResults && result.getData().size() < searchResult.getTotalHitsCount()
+                && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD && searchResult.getTotalHitsCount() < HIT_LIMIT )
+            {
+                collapseResults = false;
+            }
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
+                + getRepositoryId( request ) + "' does not exists!", e );
+        }
+        catch ( IOException e )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
+        }
+        finally
+        {
+            if ( searchResult != null )
             {
                 try
                 {
-                    int countRequested = count == null ? HIT_LIMIT : count;
-                    
-                    searchResult =
-                        searchByTerms( terms, getRepositoryId( request ), from, countRequested, exact,
-                            expandVersion, expandPackaging, expandClassifier, collapseResults );
-
-                    result.setTooManyResults( searchResult.getTotalHitsCount() > countRequested );
-
-                    result.setTotalCount( searchResult.getTotalHitsCount() );
-
-                    result.setFrom( from == null ? -1 : from.intValue() );
-
-                    result.setCount( count == null ? -1 : count );
-
-                    result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
-
-                    // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results,
-                    // and
-                    // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
-                    // and full result set is smaller than HIT_LIMIT
-                    // then repeat without collapse
-                    if ( collapseResults && result.getData().size() < searchResult.getTotalHitsCount()
-                        && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                        && searchResult.getTotalHitsCount() < HIT_LIMIT )
-                    {
-                        collapseResults = false;
-
-                        continue;
-                    }
-
-                    // we came here, so we break the while-loop, we got what we need
-                    break;
+                    searchResult.close();
                 }
-                catch ( NoSuchRepositoryException e )
+                catch ( IOException e )
                 {
-                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
-                        + getRepositoryId( request ) + "' does not exists!", e );
-                }
-                catch ( AlreadyClosedException e )
-                {
-                    getLogger().info(
-                        "*** NexusIndexer bug, we got AlreadyClosedException that should never happen with ReadOnly IndexReaders! Please put Nexus into DEBUG log mode and report this issue together with the stack trace!" );
-
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        // just keep it silent (DEBUG)
-                        getLogger().debug( "Got AlreadyClosedException exception!", e );
-                    }
-
-                    result.setData( null );
-                }
-                finally
-                {
-                    if ( searchResult != null )
-                    {
-                        try
-                        {
-                            searchResult.close();
-                        }
-                        catch ( IOException e )
-                        {
-                            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
-                        }
-                    }
+                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
                 }
             }
-            catch ( IOException e )
-            {
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
-            }
-
-            runCount++;
-        }
-
-        if ( result.getData() == null )
-        {
-            result.setTooManyResults( true );
-
-            result.setData( new ArrayList<NexusArtifact>() );
-
-            getLogger().info(
-                "Nexus BUG: Was unable to perform search " + RETRIES
-                    + " times, giving up, and lying about TooManyResults." );
         }
 
         return result;
