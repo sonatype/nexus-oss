@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -45,6 +46,7 @@ public class RepositoryLocalStatusCondition
     }
 
     @Override
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final RepositoryRegistryEventAdd event )
     {
@@ -54,6 +56,7 @@ public class RepositoryLocalStatusCondition
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final RepositoryEventLocalStatusChanged event )
     {
@@ -63,6 +66,7 @@ public class RepositoryLocalStatusCondition
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final RepositoryRegistryEventRemove event )
     {
