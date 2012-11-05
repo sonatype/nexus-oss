@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -27,11 +26,14 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
 import com.thoughtworks.xstream.XStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPlexusResource
-    extends AbstractLogEnabled
     implements PlexusResource
 {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private boolean available = true;
 
     private boolean readable = true;
@@ -39,6 +41,10 @@ public abstract class AbstractPlexusResource
     private boolean modifiable = false;
 
     private boolean negotiateContent = true;
+
+    protected Logger getLogger() {
+        return logger;
+    }
 
     // GETTER/SETTERS, will be unlikely overridden
 
