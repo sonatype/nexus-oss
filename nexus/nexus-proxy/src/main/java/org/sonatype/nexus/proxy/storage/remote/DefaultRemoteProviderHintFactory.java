@@ -16,6 +16,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
@@ -30,8 +31,7 @@ public class DefaultRemoteProviderHintFactory
 
     public final static String DEFAULT_HTTP_PROVIDER_FORCED_KEY = "nexus.default.http.providerForced";
 
-    @Requirement
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Boolean httpProviderForced = null;
 

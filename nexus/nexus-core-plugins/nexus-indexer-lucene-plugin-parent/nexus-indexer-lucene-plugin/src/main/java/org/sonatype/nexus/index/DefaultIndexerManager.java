@@ -75,12 +75,12 @@ import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.index.updater.ResourceFetcher;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -148,7 +148,7 @@ public class DefaultIndexerManager
 
     private static final Map<String, ReadWriteLock> locks = new HashMap<String, ReadWriteLock>();
 
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private NexusIndexer nexusIndexer;
@@ -210,11 +210,6 @@ public class DefaultIndexerManager
         this.nexusIndexer = nexusIndexer;
     }
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
     protected File getWorkingDirectory()
     {
         if ( workingDirectory == null )
@@ -240,7 +235,7 @@ public class DefaultIndexerManager
     public void shutdown( boolean deleteFiles )
         throws IOException
     {
-        getLogger().info( "Shutting down Nexus IndexerManager" );
+        logger.info( "Shutting down Nexus IndexerManager" );
 
         for ( IndexingContext ctx : nexusIndexer.getIndexingContexts().values() )
         {
@@ -277,7 +272,7 @@ public class DefaultIndexerManager
         boolean isSupported = isIndexingSupported( repository );
         boolean isIndexed = repository.isIndexable();
 
-        if ( getLogger().isDebugEnabled() )
+        if ( logger.isDebugEnabled() )
         {
             StringBuilder sb = new StringBuilder( "Indexing is " );
 
@@ -306,7 +301,7 @@ public class DefaultIndexerManager
 
             sb.append( "Skipping it." );
 
-            getLogger().debug( sb.toString() );
+            logger.debug( sb.toString() );
         }
     }
 
@@ -508,9 +503,9 @@ public class DefaultIndexerManager
         // do this only if we have contexts, otherwise be muted
         if ( ctx != null )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug(
+                logger.debug(
                     "Searching on repository ID='" + repositoryId + "' is set to: " + String.valueOf( searchable ) );
             }
 
@@ -540,7 +535,7 @@ public class DefaultIndexerManager
             }
             catch ( LocalStorageException e )
             {
-                getLogger().warn(
+                logger.warn(
                     String.format( "Cannot determine \"%s\" (ID=%s) repository's basedir:", repository.getName(),
                         repository.getId() ), e );
             }
@@ -585,7 +580,7 @@ public class DefaultIndexerManager
         // is this hidden path?
         if ( item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
-            getLogger().debug( "Will not index hidden file path: " + item.getRepositoryItemUid().toString() );
+            logger.debug( "Will not index hidden file path: " + item.getRepositoryItemUid().toString() );
 
             return;
         }
@@ -641,9 +636,9 @@ public class DefaultIndexerManager
 
                         if ( ac != null )
                         {
-                            if ( getLogger().isDebugEnabled() )
+                            if ( logger.isDebugEnabled() )
                             {
-                                getLogger().debug( "The ArtifactContext created from file is fine, continuing." );
+                                logger.debug( "The ArtifactContext created from file is fine, continuing." );
                             }
 
                             ArtifactInfo ai = ac.getArtifactInfo();
@@ -741,9 +736,9 @@ public class DefaultIndexerManager
             }
 
             // remove file from index
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug(
+                logger.debug(
                     "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
                         + " from index (DELETE)." );
             }
@@ -767,9 +762,9 @@ public class DefaultIndexerManager
             else
             {
                 // do NOT remove file from index
-                if ( getLogger().isDebugEnabled() )
+                if ( logger.isDebugEnabled() )
                 {
-                    getLogger().debug(
+                    logger.debug(
                         "NOT deleting artifact " + ac.getArtifactInfo().groupId + ":" + ac.getArtifactInfo().artifactId
                             + ":" + ac.getArtifactInfo().version
                             + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
@@ -1053,7 +1048,7 @@ public class DefaultIndexerManager
             {
                 try
                 {
-                    getLogger().info(
+                    logger.info(
                         RepositoryStringUtils.getFormattedMessage( "Trying to get remote index for repository %s",
                             repository ) );
 
@@ -1061,20 +1056,20 @@ public class DefaultIndexerManager
 
                     if ( hasRemoteIndex )
                     {
-                        getLogger().info(
+                        logger.info(
                             RepositoryStringUtils.getFormattedMessage(
                                 "Remote indexes updated successfully for repository %s", repository ) );
                     }
                     else
                     {
-                        getLogger().info(
+                        logger.info(
                             RepositoryStringUtils.getFormattedMessage(
                                 "Remote indexes unchanged (no update needed) for repository %s", repository ) );
                     }
                 }
                 catch ( TaskInterruptedException e )
                 {
-                    getLogger().warn(
+                    logger.warn(
                         RepositoryStringUtils.getFormattedMessage(
                             "Cannot fetch remote index for repository %s, task cancelled.", repository ) );
                 }
@@ -1082,16 +1077,16 @@ public class DefaultIndexerManager
                 {
                     // here, FileNotFoundException literally means ResourceFetcher -- that is HTTP based -- hit a 404 on
                     // remote, so we neglect this, this is not an error state actually
-                    if ( getLogger().isDebugEnabled() )
+                    if ( logger.isDebugEnabled() )
                     {
-                        getLogger().info(
+                        logger.info(
                             RepositoryStringUtils.getFormattedMessage(
                                 "Cannot fetch remote index for repository %s as it does not publish indexes.",
                                 repository ), e );
                     }
                     else
                     {
-                        getLogger().info(
+                        logger.info(
                             RepositoryStringUtils.getFormattedMessage(
                                 "Cannot fetch remote index for repository %s as it does not publish indexes.",
                                 repository ) );
@@ -1099,7 +1094,7 @@ public class DefaultIndexerManager
                 }
                 catch ( IOException e )
                 {
-                    getLogger().warn(
+                    logger.warn(
                         RepositoryStringUtils.getFormattedMessage(
                             "Cannot fetch remote index for repository %s due to IO problem.", repository ), e );
                     throw e;
@@ -1109,7 +1104,7 @@ public class DefaultIndexerManager
                     final String message =
                         RepositoryStringUtils.getFormattedMessage(
                             "Cannot fetch remote index for repository %s, error occurred.", repository );
-                    getLogger().warn( message, e );
+                    logger.warn( message, e );
                     throw new IOException( message, e );
                 }
             }
@@ -1333,7 +1328,7 @@ public class DefaultIndexerManager
         {
             TaskUtil.checkInterruption();
 
-            getLogger().info( "Publishing index for repository " + repository.getId() );
+            logger.info( "Publishing index for repository " + repository.getId() );
 
             IndexingContext context = getRepositoryIndexContext( repository );
 
@@ -1373,9 +1368,9 @@ public class DefaultIndexerManager
             {
                 try
                 {
-                    if ( getLogger().isDebugEnabled() )
+                    if ( logger.isDebugEnabled() )
                     {
-                        getLogger().debug( "Cleanup of temp files..." );
+                        logger.debug( "Cleanup of temp files..." );
                     }
 
                     FileUtils.deleteDirectory( targetDir );
@@ -1384,7 +1379,7 @@ public class DefaultIndexerManager
                 {
                     lastException = e;
 
-                    getLogger().warn( "Cleanup of temp files FAILED...", e );
+                    logger.warn( "Cleanup of temp files FAILED...", e );
                 }
             }
 
@@ -1412,7 +1407,7 @@ public class DefaultIndexerManager
         }
         catch ( Exception e )
         {
-            getLogger().error( "Cannot delete index items!", e );
+            logger.error( "Cannot delete index items!", e );
         }
     }
 
@@ -1457,7 +1452,7 @@ public class DefaultIndexerManager
         }
         catch ( Exception e )
         {
-            getLogger().error( "Cannot store index file " + path, e );
+            logger.error( "Cannot store index file " + path, e );
         }
         finally
         {
@@ -1545,7 +1540,7 @@ public class DefaultIndexerManager
 
         if ( context != null )
         {
-            getLogger().debug( "Optimizing local index context for repository: " + repository.getId() );
+            logger.debug( "Optimizing local index context for repository: " + repository.getId() );
 
             context.optimize();
         }
@@ -1632,9 +1627,9 @@ public class DefaultIndexerManager
         }
         catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Too many clauses exception caught:", e );
+                logger.debug( "Too many clauses exception caught:", e );
             }
 
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -1642,7 +1637,7 @@ public class DefaultIndexerManager
         }
         catch ( IOException e )
         {
-            getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
+            logger.error( "Got I/O exception while searching for query \"" + term + "\"", e );
 
             return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
@@ -1712,9 +1707,9 @@ public class DefaultIndexerManager
         }
         catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Too many clauses exception caught:", e );
+                logger.debug( "Too many clauses exception caught:", e );
             }
 
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -1722,7 +1717,7 @@ public class DefaultIndexerManager
         }
         catch ( IOException e )
         {
-            getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
+            logger.error( "Got I/O exception while searching for query \"" + term + "\"", e );
 
             return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
@@ -1816,9 +1811,9 @@ public class DefaultIndexerManager
         }
         catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Too many clauses exception caught:", e );
+                logger.debug( "Too many clauses exception caught:", e );
             }
 
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -1826,7 +1821,7 @@ public class DefaultIndexerManager
         }
         catch ( IOException e )
         {
-            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+            logger.error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
 
             return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
@@ -1977,9 +1972,9 @@ public class DefaultIndexerManager
         }
         catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Too many clauses exception caught:", e );
+                logger.debug( "Too many clauses exception caught:", e );
             }
 
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -1987,7 +1982,7 @@ public class DefaultIndexerManager
         }
         catch ( IOException e )
         {
-            getLogger().error( "Got I/O exception while searching for query \"" + query.toString() + "\"", e );
+            logger.error( "Got I/O exception while searching for query \"" + query.toString() + "\"", e );
 
             return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
@@ -2057,9 +2052,9 @@ public class DefaultIndexerManager
         }
         catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Too many clauses exception caught:", e );
+                logger.debug( "Too many clauses exception caught:", e );
             }
 
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -2067,7 +2062,7 @@ public class DefaultIndexerManager
         }
         catch ( IOException e )
         {
-            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+            logger.error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
 
             return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
@@ -2109,9 +2104,9 @@ public class DefaultIndexerManager
         }
         catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Too many clauses exception caught:", e );
+                logger.debug( "Too many clauses exception caught:", e );
             }
 
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -2119,7 +2114,7 @@ public class DefaultIndexerManager
         }
         catch ( IOException e )
         {
-            getLogger().error( "Got I/O exception while searching for query \"" + q.toString() + "\"", e );
+            logger.error( "Got I/O exception while searching for query \"" + q.toString() + "\"", e );
 
             return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
@@ -2203,9 +2198,9 @@ public class DefaultIndexerManager
         }
         catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Too many clauses exception caught:", e );
+                logger.debug( "Too many clauses exception caught:", e );
             }
 
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -2213,7 +2208,7 @@ public class DefaultIndexerManager
         }
         catch ( IOException e )
         {
-            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+            logger.error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
 
             return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
@@ -2260,9 +2255,9 @@ public class DefaultIndexerManager
         }
         catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                getLogger().debug( "Too many clauses exception caught:", e );
+                logger.debug( "Too many clauses exception caught:", e );
             }
 
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -2270,7 +2265,7 @@ public class DefaultIndexerManager
         }
         catch ( IOException e )
         {
-            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+            logger.error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
 
             return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
@@ -2370,7 +2365,7 @@ public class DefaultIndexerManager
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {
-            getLogger().error( e.getMessage(), e );
+            logger.error( e.getMessage(), e );
 
             IOException eek = new IOException( e.getMessage(), e );
 
@@ -2409,7 +2404,7 @@ public class DefaultIndexerManager
 
     private void logAlreadyBeingIndexed( final String repositoryId, final String processName )
     {
-        getLogger().info(
+        logger.info(
             String.format( "Repository '%s' is already in the process of being re-indexed. Skipping %s'.",
                 repositoryId, processName ) );
     }

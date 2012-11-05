@@ -22,8 +22,6 @@ import org.mockito.Mockito;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.slf4j.Logger;
-import org.slf4j.helpers.NOPLogger;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
@@ -47,8 +45,6 @@ public class RestletRepositoryURLBuilderTest
 
     private static final String MOCK_PATH_PREFIX = "mockprefix";
 
-    private Logger logger;
-
     private Repository repository;
 
     private Repository group;
@@ -63,8 +59,6 @@ public class RestletRepositoryURLBuilderTest
     public void setUp()
         throws Exception
     {
-        logger = NOPLogger.NOP_LOGGER;
-
         repository = Mockito.mock( Repository.class );
         Mockito.doReturn( MOCK_REPO_ID ).when( repository ).getId();
         Mockito.doReturn( M2Repository.class.getName() ).when( repository ).getProviderRole();
@@ -109,7 +103,7 @@ public class RestletRepositoryURLBuilderTest
         Mockito.doReturn( GLOBAL_BASE_URL ).when( globalRestApiSettings ).getBaseUrl();
 
         RestletRepositoryURLBuilder urlFinder =
-            new RestletRepositoryURLBuilder( logger, repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
+            new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
 
         Assert.assertEquals( GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
             urlFinder.getRepositoryContentUrl( MOCK_REPO_ID ) );
@@ -125,7 +119,7 @@ public class RestletRepositoryURLBuilderTest
         Mockito.doReturn( GLOBAL_BASE_URL ).when( globalRestApiSettings ).getBaseUrl();
 
         RestletRepositoryURLBuilder urlFinder =
-            new RestletRepositoryURLBuilder( logger, repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
+            new RestletRepositoryURLBuilder( repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
 
         Assert.assertEquals( GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
             urlFinder.getRepositoryContentUrl( MOCK_REPO_ID ) );
@@ -140,7 +134,7 @@ public class RestletRepositoryURLBuilderTest
         Mockito.doReturn( null ).when( globalRestApiSettings ).getBaseUrl();
 
         RestletRepositoryURLBuilder urlFinder =
-            new RestletRepositoryURLBuilder( logger, repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
+            new RestletRepositoryURLBuilder( repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
 
         Assert.assertNull( urlFinder.getRepositoryContentUrl( MOCK_REPO_ID ) );
     }
@@ -155,7 +149,7 @@ public class RestletRepositoryURLBuilderTest
         Mockito.doReturn( GLOBAL_BASE_URL ).when( globalRestApiSettings ).getBaseUrl();
 
         RestletRepositoryURLBuilder urlFinder =
-            new RestletRepositoryURLBuilder( logger, repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
+            new RestletRepositoryURLBuilder( repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
 
         Assert.assertEquals( GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
             urlFinder.getRepositoryContentUrl( MOCK_REPO_ID ) );
@@ -179,8 +173,7 @@ public class RestletRepositoryURLBuilderTest
             Response.setCurrent( response );
 
             RestletRepositoryURLBuilder urlFinder =
-                new RestletRepositoryURLBuilder( logger, repositoryRegistry, repositoryTypeRegistry,
-                    globalRestApiSettings );
+                new RestletRepositoryURLBuilder( repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
 
             Assert.assertEquals( restletBaseURL + "content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
                 urlFinder.getRepositoryContentUrl( MOCK_REPO_ID ) );
@@ -196,7 +189,7 @@ public class RestletRepositoryURLBuilderTest
         throws NoSuchRepositoryException
     {
         RestletRepositoryURLBuilder urlFinder =
-            new RestletRepositoryURLBuilder( logger, repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
+            new RestletRepositoryURLBuilder( repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings );
 
         urlFinder.getRepositoryContentUrl( NOT_FOUND_REPO_ID );
     }

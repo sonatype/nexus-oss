@@ -13,7 +13,6 @@
 package org.sonatype.nexus.client.rest;
 
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
 
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
@@ -23,6 +22,8 @@ import org.restlet.util.Series;
 
 import com.noelios.restlet.authentication.AuthenticationHelper;
 import com.noelios.restlet.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A copy+pasted "helper" class since the restlet engine is unfriendly for any extensions in this matter.
@@ -33,6 +34,8 @@ import com.noelios.restlet.util.Base64;
 public class HttpNxBasicHelper
     extends AuthenticationHelper
 {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public HttpNxBasicHelper()
     {
         super( new ChallengeScheme( "HTTP_NxBasic", "NxBasic", "Nexus modified HTTP Basic" ), true, true );
@@ -82,7 +85,7 @@ public class HttpNxBasicHelper
         }
         catch ( final UnsupportedEncodingException e )
         {
-            getLogger().log( Level.WARNING, "Unsupported encoding error", e );
+            logger.warn( "Unsupported encoding error", e );
         }
     }
 }

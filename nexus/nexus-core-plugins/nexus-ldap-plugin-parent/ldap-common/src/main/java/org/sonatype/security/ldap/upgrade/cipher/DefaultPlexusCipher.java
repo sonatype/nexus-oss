@@ -42,7 +42,7 @@ public class DefaultPlexusCipher
 
     private static final String STRING_ENCODING = "UTF8";
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     /**
      * Encryption algorithm to use by this instance. Needs protected scope for tests

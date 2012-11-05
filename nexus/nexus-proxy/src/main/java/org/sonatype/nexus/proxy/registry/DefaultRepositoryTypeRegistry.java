@@ -23,8 +23,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
@@ -43,7 +43,7 @@ import com.google.common.collect.Multimap;
 public class DefaultRepositoryTypeRegistry
     implements RepositoryTypeRegistry
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private PlexusContainer container;
@@ -54,11 +54,6 @@ public class DefaultRepositoryTypeRegistry
     private Map<String, ContentClass> repoCachedContentClasses = new HashMap<String, ContentClass>();
 
     private Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
 
     protected Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
     {
@@ -99,7 +94,7 @@ public class DefaultRepositoryTypeRegistry
 
                 // result.put( role, new RepositoryTypeDescriptor( role, XXX, "sites" ) );
 
-                getLogger().info( "Registered default repository types." );
+                logger.info( "Registered default repository types." );
 
                 this.repositoryTypeDescriptorsMap = result;
             }
@@ -122,11 +117,11 @@ public class DefaultRepositoryTypeRegistry
         {
             if ( d.getRepositoryMaxInstanceCount() == RepositoryType.UNLIMITED_INSTANCES )
             {
-                getLogger().info( "Registered Repository type " + d.toString() + "." );
+                logger.info( "Registered Repository type " + d.toString() + "." );
             }
             else
             {
-                getLogger().info(
+                logger.info(
                     "Registered Repository type " + d.toString() + " with maximal instance limit set to "
                         + d.getRepositoryMaxInstanceCount() + "." );
             }
@@ -141,7 +136,7 @@ public class DefaultRepositoryTypeRegistry
 
         if ( removed )
         {
-            getLogger().info( "Unregistered repository type " + d.toString() );
+            logger.info( "Unregistered repository type " + d.toString() );
         }
 
         return removed;
@@ -279,11 +274,11 @@ public class DefaultRepositoryTypeRegistry
                 }
                 catch ( ComponentLookupException e )
                 {
-                    getLogger().warn( "Container contains a component but lookup failed!", e );
+                    logger.warn( "Container contains a component but lookup failed!", e );
                 }
                 catch ( ComponentLifecycleException e )
                 {
-                    getLogger().warn( "Could not release the component! Possible leak here.", e );
+                    logger.warn( "Could not release the component! Possible leak here.", e );
                 }
             }
             else

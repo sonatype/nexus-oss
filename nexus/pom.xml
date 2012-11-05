@@ -2072,10 +2072,11 @@
       <id>optimize-js</id>
 
       <properties>
-        <!-- 'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
-             understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now. -->
+        <!--
+        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
+        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
+        -->
         <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
-
         <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
         <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
       </properties>

@@ -50,14 +50,13 @@ public class DefaultMergedTreeNodeFactory
     private static final boolean CHECK_LOCAL_AVAILABILITY = SystemPropertiesHelper.getBoolean(
         CHECK_LOCAL_AVAILABILITY_KEY, false );
 
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final Repository repository;
 
     public DefaultMergedTreeNodeFactory( Repository repository )
     {
         super( repository.getId() );
-        this.logger = LoggerFactory.getLogger( getClass() );
         this.repository = repository;
     }
 
