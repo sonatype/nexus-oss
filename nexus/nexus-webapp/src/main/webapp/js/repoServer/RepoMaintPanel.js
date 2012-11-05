@@ -737,10 +737,13 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
               }));
         }
 
-
         if (this.innerCt)
         {
-          this.root.reload();
+          // need to check if root node is reloadable and not 'Not Available'
+          // (may happen on closing staging repositories, which use this view)
+          if ( this.root.reload ) {
+            this.root.reload();
+          }
           this.afterRender();
         }
       },
