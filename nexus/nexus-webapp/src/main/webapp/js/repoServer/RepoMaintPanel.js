@@ -699,10 +699,6 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       },
 
       refreshHandler : function(button, e) {
-        if (this.root)
-        {
-          this.root.destroy();
-        }
         if (this.payload)
         {
           this.setRootNode(new Ext.tree.AsyncTreeNode({
@@ -741,9 +737,10 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
               }));
         }
 
+
         if (this.innerCt)
         {
-          this.innerCt.update('');
+          this.root.reload();
           this.afterRender();
         }
       },
