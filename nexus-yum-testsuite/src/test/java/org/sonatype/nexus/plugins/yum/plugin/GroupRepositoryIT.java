@@ -84,7 +84,7 @@ public class GroupRepositoryIT
         final String repo3 = createHostedRepo( client() ).getId();
         final MavenArtifact artifact = client().getSubsystem( MavenArtifact.class );
         artifact.upload( new UploadRequest( repo3, "a_group3", "an_artifact3", "3.0", "pom", "", "rpm",
-            resource( "/foo-bar-5.1.2-1.noarch.rpm" ) ) );
+            testData( "rpm/foo-bar-5.1.2-1.noarch.rpm" ) ) );
         sleep( 5, SECONDS );
         groupRepo.settings().getRepositories().add( memberRepo( repo3 ) );
         groupRepo.save();
@@ -112,9 +112,9 @@ public class GroupRepositoryIT
         sleep( 5, SECONDS );
         final MavenArtifact artifact = client().getSubsystem( MavenArtifact.class );
         artifact.upload( new UploadRequest( repo1, "a_group1", "an_artifact1", "1.0", "pom", "", "rpm",
-            resource( "/test-artifact-1.2.3-1.noarch.rpm" ) ) );
+            testData( "rpm/test-artifact-1.2.3-1.noarch.rpm" ) ) );
         artifact.upload( new UploadRequest( repo2, "a_group2", "an_artifact2", "2.0", "pom", "", "rpm",
-            resource( "/test-rpm-5.6.7-1.noarch.rpm" ) ) );
+            testData( "rpm/test-rpm-5.6.7-1.noarch.rpm" ) ) );
         sleep( 5, SECONDS );
         return groupRepo;
     }

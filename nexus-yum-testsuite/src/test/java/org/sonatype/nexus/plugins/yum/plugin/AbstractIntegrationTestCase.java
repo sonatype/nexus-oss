@@ -61,10 +61,9 @@ public class AbstractIntegrationTestCase
         }
     }
 
-    protected File resource( String path )
-        throws URISyntaxException
+    protected File testData( String path )
     {
-        return new File( getClass().getResource( path ).toURI() );
+        return testData().resolveFile( path );
     }
 
 }
