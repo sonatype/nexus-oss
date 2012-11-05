@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
@@ -33,10 +34,10 @@ import com.google.common.eventbus.Subscribe;
 public class CapabilityRegistryBooter
 {
 
-    private final DefaultCapabilityRegistry capabilityRegistry;
+    private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
 
     @Inject
-    public CapabilityRegistryBooter( final DefaultCapabilityRegistry capabilityRegistry )
+    public CapabilityRegistryBooter( final Provider<DefaultCapabilityRegistry> capabilityRegistry )
     {
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
     }
@@ -46,7 +47,7 @@ public class CapabilityRegistryBooter
     {
         try
         {
-            capabilityRegistry.load();
+            capabilityRegistry.get().load();
         }
         catch ( final Exception e )
         {
