@@ -2018,6 +2018,19 @@
                         <ignore />
                       </action>
                     </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.codehaus.enunciate</groupId>
+                        <artifactId>maven-enunciate-slim-plugin</artifactId>
+                        <versionRange>[1.26,)</versionRange>
+                        <goals>
+                          <goal>docs</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore />
+                      </action>
+                    </pluginExecution>
                   </pluginExecutions>
                 </lifecycleMappingMetadata>
               </configuration>
