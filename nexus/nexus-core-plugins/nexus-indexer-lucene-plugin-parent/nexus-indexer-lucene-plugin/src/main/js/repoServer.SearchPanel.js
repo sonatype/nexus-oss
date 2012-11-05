@@ -769,61 +769,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
                     name : 'single-search-field',
                     searchPanel : panel,
                     width : 300
-                  }, {
-                    xtype : 'button',
-                    text : 'Browse...',
-                    searchPanel : panel,
-                    tooltip : 'Click to select a file. It will not be uploaded to the ' + 'remote server, an SHA1 checksum is calculated locally and sent to ' + 'Nexus to find a match. This feature requires Java applet ' + 'support in your web browser.',
-                    handler : function(b) {
-                      var filename = null;
-
-                      if (!document.digestApplet)
-                      {
-                        b.searchPanel.grid.fetchMoreBar.addText('<div id="checksumContainer" style="width:10px">' + '<applet code="org/sonatype/nexus/applet/DigestApplet.class" ' + 'archive="' + Sonatype.config.resourcePath + '/digestapplet.jar" '
-                            + 'width="1" height="1" name="digestApplet"></applet>' + '</div>');
-                      }
-                      else
-                      {
-                        filename = document.digestApplet.selectFile();
-                      }
-
-                      if (!filename)
-                      {
-                        var fileInput = b.detachInputFile();
-                        filename = fileInput.getValue();
-                      }
-
-                      if (!filename)
-                      {
-                        return;
-                      }
-
-                      b.disable();
-
-                      var setFilenameLabel = function(panel, s) {
-                        if (panel.filenameLabel)
-                        {
-                          panel.filenameLabel.destroy();
-                        }
-                        panel.filenameLabel = s ? panel.searchToolbar.addText('<span style="color:#808080;">' + s + '</span>') : null;
-                      };
-
-                      setFilenameLabel(b.searchPanel, 'Calculating checksum...');
-
-                      var f = function(b, filename) {
-                        var sha1 = 'error calculating checksum';
-                        if (document.digestApplet)
-                        {
-                          sha1 = document.digestApplet.digest(filename);
-                        }
-
-                        b.searchPanel.getTopToolbar().items.itemAt(1).setRawValue(sha1);
-                        setFilenameLabel(b.searchPanel, filename);
-                        b.enable();
-                        b.searchPanel.startSearch(b.searchPanel, true);
-                      }
-                      f.defer(200, b, [b, filename]);
-                    }
                   }]
             });
       }
