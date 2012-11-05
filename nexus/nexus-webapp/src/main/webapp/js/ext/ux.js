@@ -13,7 +13,7 @@
 /*global define*/
 define('ext/ux',
       ['extjs', 'ext/ux/groupcombo/groupcombo', 'ext/ux/groupcombo/groupdataview', 'ext/ux/browsebutton',
-        'ext/ux/gridvalidator', 'ext/ux/lovcombo', 'ext/ux/multiselecttree', 'ext/ux/TabCloseMenu'],
+        'ext/ux/gridvalidator', 'ext/ux/lovcombo', 'ext/ux/multiselecttree', 'ext/ux/TabCloseMenu', 'ext/ux/statusbar'],
       function(Ext) {
         Ext.namespace('Ext.ux');
         return Ext;

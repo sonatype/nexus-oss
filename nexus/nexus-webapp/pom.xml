@@ -276,10 +276,8 @@
                 <aggregation>
                   <output>${compressed-dir}/style/sonatype-all.css</output>
                   <inputDir>${project.build.directory}/generated-sources/yuicompressor/style</inputDir>
-                  <!-- files to include, path relative to output's directory or absolute path -->
                   <includes>
-                    <include>Ext.ux.form.LovCombo.css</include>
-                    <include>Sonatype.css</include>
+                    <include>**/*.css</include>
                   </includes>
                 </aggregation>
               </aggregations>
