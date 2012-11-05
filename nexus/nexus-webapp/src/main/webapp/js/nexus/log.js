@@ -73,4 +73,5 @@ Nexus.Log = (function() {
  */
 Nexus.log = Nexus.Log.debug;
 
+  return Nexus;
 });
