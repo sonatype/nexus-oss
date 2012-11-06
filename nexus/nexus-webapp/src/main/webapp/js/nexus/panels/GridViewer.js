@@ -138,7 +138,7 @@ Ext.namespace('Sonatype.panels');
 
     this.gridPanel = new Ext.grid.GridPanel({
       region : this.collapsibleDetails ? 'center' : 'north',
-      collapsible : true,
+      collapsible : this.collapsible || false,
       split : true,
       height : this.collapsibleDetails ? null : Sonatype.view.mainTabPanel.getInnerHeight() / 3,
       minHeight : this.collapsibleDetails ? null : 100,
