@@ -12,7 +12,7 @@
  */
 define('repoServer',
   [
-    'RepoServer',
+    'repoServer/RepoServer',
     'repoServer/AbstractRepoPanel',
     'repoServer/ArtifactContainer',
     'repoServer/ConfigViewPanel',
