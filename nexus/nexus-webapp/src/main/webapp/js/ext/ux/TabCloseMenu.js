@@ -1,67 +1,153 @@
-/**
- * Very simple plugin for adding a close context menu to tabs.
- *
- * Copied from ExtJS 2.3 examples/tabs/TabCloseMenu.js
- *
- * @constructor
+/*!
+ * Ext JS Library 3.4.0
+ * Copyright(c) 2006-2011 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
  */
 /*global define*/
 define('ext/ux/TabCloseMenu',['extjs'], function(Ext){
-Ext.ux.TabCloseMenu = function () {
-  var tabs, menu, ctxItem;
+  /**
+   * @class Ext.ux.TabCloseMenu
+   * @extends Object
+   * Plugin (ptype = 'tabclosemenu') for adding a close context menu to tabs. Note that the menu respects
+   * the closable configuration on the tab. As such, commands like remove others and remove all will not
+   * remove items that are not closable.
+   *
+   * @constructor
+   * @param {Object} config The configuration options
+   * @ptype tabclosemenu
+   */
+  Ext.ux.TabCloseMenu = Ext.extend(Object, {
+    /**
+     * @cfg {String} closeTabText
+     * The text for closing the current tab. Defaults to <tt>'Close Tab'</tt>.
+     */
+    closeTabText: 'Close Tab',
 
-  function onContextMenu(ts, item, e) {
-    // create context menu on first right click
-    if (!menu) {
-      menu = new Ext.menu.Menu([
-        {
-          id: tabs.id + '-close',
-          text: 'Close Tab',
-          handler: function () {
-            tabs.remove(ctxItem);
-          }
-        },
-        {
-          id: tabs.id + '-close-others',
-          text: 'Close Other Tabs',
-          handler: function () {
-            tabs.items.each(function (item) {
-              if (item.closable && item != ctxItem) {
-                tabs.remove(item);
-              }
-            });
+    /**
+     * @cfg {String} closeOtherTabsText
+     * The text for closing all tabs except the current one. Defaults to <tt>'Close Other Tabs'</tt>.
+     */
+    closeOtherTabsText: 'Close Other Tabs',
+
+    /**
+     * @cfg {Boolean} showCloseAll
+     * Indicates whether to show the 'Close All' option. Defaults to <tt>true</tt>.
+     */
+    showCloseAll: true,
+
+    /**
+     * @cfg {String} closeAllTabsText
+     * <p>The text for closing all tabs. Defaults to <tt>'Close All Tabs'</tt>.
+     */
+    closeAllTabsText: 'Close All Tabs',
+
+    constructor : function(config){
+      Ext.apply(this, config || {});
+    },
+
+    //public
+    init : function(tabs){
+      this.tabs = tabs;
+      tabs.on({
+        scope: this,
+        contextmenu: this.onContextMenu,
+        destroy: this.destroy
+      });
+    },
+
+    destroy : function(){
+      Ext.destroy(this.menu);
+      delete this.menu;
+      delete this.tabs;
+      delete this.active;
+    },
+
+    // private
+    onContextMenu : function(tabs, item, e){
+      this.active = item;
+      var m = this.createMenu(),
+            disableAll = true,
+            disableOthers = true,
+            closeAll = m.getComponent('closeall');
+
+      m.getComponent('close').setDisabled(!item.closable);
+      tabs.items.each(function(){
+        if(this.closable){
+          disableAll = false;
+          if(this != item){
+            disableOthers = false;
+            return false;
           }
         }
-      ]);
-    }
-    ctxItem = item;
-    var items = menu.items;
-    items.get(tabs.id + '-close').setDisabled(!item.closable);
-
-    // Disable close others options if there are no tabs which can be closed
-    var disableCloseOthers = true;
-    tabs.items.each(function () {
-      if (this != item && this.closable) {
-        disableCloseOthers = false;
-        return false;
+      });
+      m.getComponent('closeothers').setDisabled(disableOthers);
+      if(closeAll){
+        closeAll.setDisabled(disableAll);
       }
-    });
-    items.get(tabs.id + '-close-others').setDisabled(disableCloseOthers);
 
-    // If there is only one tab, then disable close (close others will also be disabled by ^^^)
-    // FIXME: This is partially faulty since all tabs are closeable but really should disable closable for the last tab
-    var disableClose = false;
-    if (tabs.items.length === 1) {
-      disableClose = true;
+      e.stopEvent();
+      m.showAt(e.getPoint());
+    },
+
+    createMenu : function(){
+      if(!this.menu){
+        var items = [{
+          itemId: 'close',
+          text: this.closeTabText,
+          scope: this,
+          handler: this.onClose
+        }];
+        if(this.showCloseAll){
+          items.push('-');
+        }
+        items.push({
+          itemId: 'closeothers',
+          text: this.closeOtherTabsText,
+          scope: this,
+          handler: this.onCloseOthers
+        });
+        if(this.showCloseAll){
+          items.push({
+            itemId: 'closeall',
+            text: this.closeAllTabsText,
+            scope: this,
+            handler: this.onCloseAll
+          });
+        }
+        this.menu = new Ext.menu.Menu({
+          items: items
+        });
+      }
+      return this.menu;
+    },
+
+    onClose : function(){
+      this.tabs.remove(this.active);
+    },
+
+    onCloseOthers : function(){
+      this.doClose(true);
+    },
+
+    onCloseAll : function(){
+      this.doClose(false);
+    },
+
+    doClose : function(excludeActive){
+      var items = [];
+      this.tabs.items.each(function(item){
+        if(item.closable){
+          if(!excludeActive || item != this.active){
+            items.push(item);
+          }
+        }
+      }, this);
+      Ext.each(items, function(item){
+        this.tabs.remove(item);
+      }, this);
     }
-    items.get(tabs.id + '-close').setDisabled(disableClose);
+  });
 
-    menu.showAt(e.getPoint());
-  }
-
-  this.init = function (tp) {
-    tabs = tp;
-    tabs.on('contextmenu', onContextMenu);
-  };
-};
+  Ext.preg('tabclosemenu', Ext.ux.TabCloseMenu);
 });

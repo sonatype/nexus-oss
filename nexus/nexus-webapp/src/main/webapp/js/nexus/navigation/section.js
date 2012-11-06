@@ -97,7 +97,7 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
               Sonatype.view.supportedNexusTabs[c.tabId] = true;
             }
             // panel open action
-            return (!c.enabled) ? null : {
+            return (c.enabled === false) ? null : {
               sortable_title : c.title,
               autoHeight : true,
               id : 'navigation-' + c.tabId,
