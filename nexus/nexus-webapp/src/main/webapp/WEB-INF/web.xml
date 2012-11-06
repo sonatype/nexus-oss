@@ -58,6 +58,10 @@
         <param-name>useFileMappedBuffer</param-name>
         <param-value>false</param-value>
       </init-param>
+      <init-param>
+        <param-name>aliases</param-name>
+        <param-value>true</param-value>
+      </init-param>
     </servlet>
   -->
 </web-app>
