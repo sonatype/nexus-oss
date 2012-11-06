@@ -138,11 +138,12 @@ public class HttpClientManagerTest
         // check is all set as needed: retries should be not attempted, as it is manually handled in proxy repo
         Assert.assertTrue( ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() instanceof StandardHttpRequestRetryHandler );
         Assert.assertTrue( globalRemoteStorageContext.getRemoteConnectionSettings().getRetrievalRetryCount() != 0 );
-        Assert.assertEquals(
-            0,
-            ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).getRetryCount() );
-        Assert.assertEquals(
-            false,
-            ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).isRequestSentRetryEnabled() );
+        // TODO: NEXUS-5368 This is disabled on purpose for now (same in HttpClientManagerImpl!)
+        //Assert.assertEquals(
+        //    0,
+        //    ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).getRetryCount() );
+        //Assert.assertEquals(
+        //    false,
+        //    ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).isRequestSentRetryEnabled() );
     }
 }
