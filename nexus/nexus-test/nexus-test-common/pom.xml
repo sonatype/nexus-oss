@@ -24,10 +24,6 @@
   </parent>
 
   <artifactId>nexus-test-common</artifactId>
-  <packaging>jar</packaging>
-
-  <name>Nexus : Test : Common</name>
-  <description>Common Unit Test Dependencies</description>
 
   <dependencies>
     <dependency>

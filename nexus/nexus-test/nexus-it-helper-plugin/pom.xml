@@ -18,11 +18,10 @@
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-test-harness</artifactId>
+    <artifactId>nexus-test</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
   <artifactId>nexus-it-helper-plugin</artifactId>
-  <name>Nexus : Test Harness : Helper Plugin</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>
