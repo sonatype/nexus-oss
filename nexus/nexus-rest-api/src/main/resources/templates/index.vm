@@ -47,7 +47,7 @@
 
     <script src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
 
-  #if ($!debug == "")
+  #if ($!debug != "-debug")
       ## load aggregated module definitions
       <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   #end
