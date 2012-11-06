@@ -24,32 +24,32 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
-@Named( TouchTestCapabilityDescriptor.TYPE_ID )
+@Named( MessageCapabilityDescriptor.TYPE_ID )
 @Singleton
-public class TouchTestCapabilityDescriptor
+public class MessageCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
-    public static final String TYPE_ID = "TouchTest";
+    static final String TYPE_ID = "[message]";
 
-    public static final CapabilityType TYPE = capabilityType( TYPE_ID );
+    static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
-    public static final String FIELD_REPO_OR_GROUP_ID = "repoOrGroupId";
+    static final String REPOSITORY = "repository";
 
-    public static final String FIELD_MSG_ID = "message";
+    static final String MESSAGE = "message";
 
-    private static final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(
-        FIELD_REPO_OR_GROUP_ID, FormField.MANDATORY
+    static final RepoOrGroupComboFormField REPOSITORY_FIELD = new RepoOrGroupComboFormField(
+        REPOSITORY, FormField.MANDATORY
     );
 
-    private static final StringTextFormField msgField = new StringTextFormField(
-        FIELD_MSG_ID, "Message", "Message help text", FormField.MANDATORY
+    static final StringTextFormField MESSAGE_FIELD = new StringTextFormField(
+        MESSAGE, "Message", "Message help text", FormField.MANDATORY
     );
 
-    protected TouchTestCapabilityDescriptor()
+    protected MessageCapabilityDescriptor()
     {
-        super( TYPE, "Touch Test Capability", "What about me?", repoField, msgField );
+        super( TYPE, "Message Capability", "What about me?", REPOSITORY_FIELD, MESSAGE_FIELD );
     }
 
 }
