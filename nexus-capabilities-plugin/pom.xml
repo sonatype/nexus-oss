@@ -28,8 +28,6 @@
 
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus Capabilities :: Plugin</name>
-
   <properties>
     <debug-js>false</debug-js>
 

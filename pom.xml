@@ -29,8 +29,6 @@
 
   <packaging>pom</packaging>
 
-  <name>Nexus Capabilities (Parent)</name>
-
   <licenses>
     <license>
       <name>Eclipse Public License</name>
