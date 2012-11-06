@@ -11,7 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-// the following is a global, singleton class
+define('nexus/error/ErrorHandler',['extjs'], function(Ext){
+  Ext.namespace('Nexus.error');
+
 Nexus.error.ErrorHandler = function() {
   return {
     init: function() {
@@ -72,3 +74,4 @@ Nexus.error.ErrorHandler = function() {
 Nexus.error.handle = Nexus.error.ErrorHandler.handleError.createDelegate(Nexus.error.ErrorHandler);
 
 Nexus.error.ErrorHandler.init();
+});

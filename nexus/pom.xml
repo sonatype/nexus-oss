@@ -560,6 +560,12 @@
         <version>${commons-beanutils.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>1.7.1</version>
+      </dependency>
+
       <!-- SLF4J Logging -->
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -1118,11 +1124,6 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus.tools</groupId>
-        <artifactId>nexus-repository-conversion-tool</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1763,7 +1764,6 @@
     <module>nexus-app</module>
     <module>nexus-rest-api-model</module>
     <module>nexus-rest-api</module>
-    <module>nexus-migration-tool</module>
     <module>nexus-core-plugins</module>
     <module>nexus-webapp</module>
     <module>nexus-launcher</module>

@@ -81,6 +81,7 @@
               <exclude>**/nexus*/target/**</exclude>
               <exclude>**/nexus-ldap-plugin-parent/ldap-common/target/**</exclude>
               <exclude>**/ext-2.3/**</exclude>
+              <exclude>**/ext-3.4.0/**</exclude>
               <exclude>**/js/filetree/**</exclude>
               <exclude>**/editarea_0_8_2/**</exclude>
               <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
@@ -107,6 +108,8 @@
               <exclude>**/.idea/**</exclude>
               <exclude>**/atlassian-ide-plugin.xml</exclude>
               <exclude>nexus-plugin-archetype/src/main/resources/archetype-resources/**</exclude>
+              <exclude>nexus/nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
+              <exclude>nexus/nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
             </excludes>
             <mapping>
               <vm>SHARPSTAR_STYLE</vm>
