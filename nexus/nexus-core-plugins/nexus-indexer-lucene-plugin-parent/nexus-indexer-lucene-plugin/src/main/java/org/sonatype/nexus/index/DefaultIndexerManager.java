@@ -51,6 +51,7 @@ import org.apache.maven.index.ArtifactInfoPostprocessor;
 import org.apache.maven.index.Field;
 import org.apache.maven.index.FlatSearchRequest;
 import org.apache.maven.index.FlatSearchResponse;
+import org.apache.maven.index.IndexerEngine;
 import org.apache.maven.index.IteratorResultSet;
 import org.apache.maven.index.IteratorSearchRequest;
 import org.apache.maven.index.IteratorSearchResponse;
@@ -58,11 +59,14 @@ import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.MatchHighlightMode;
 import org.apache.maven.index.MatchHighlightRequest;
 import org.apache.maven.index.NexusIndexer;
+import org.apache.maven.index.Scanner;
+import org.apache.maven.index.ScanningRequest;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.apache.maven.index.context.DefaultIndexingContext;
 import org.apache.maven.index.context.DocumentFilter;
 import org.apache.maven.index.context.IndexCreator;
+import org.apache.maven.index.context.IndexUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.context.MergedIndexingContext;
 import org.apache.maven.index.context.StaticContextMemberProvider;
@@ -120,6 +124,8 @@ import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
 import com.google.common.annotations.VisibleForTesting;
+
+import copied.org.apache.maven.index.DefaultScannerListener;
 
 /**
  * <p>
@@ -219,6 +225,12 @@ public class DefaultIndexerManager
     @Requirement
     private IndexTreeView indexTreeView;
 
+    @Requirement
+    private Scanner scanner;
+
+    @Requirement
+    private IndexerEngine indexerEngine;
+
     /**
      * Locks that protect access to repository index. Item-level add/remove and search operations must acquire read
      * lock. Index-level add/remove/reindex must acquire exclusive lock.
@@ -248,9 +260,9 @@ public class DefaultIndexerManager
     }
 
     @VisibleForTesting
-    protected void setNexusIndexer( final NexusIndexer nexusIndexer )
+    protected void setScanner( final Scanner scanner )
     {
-        this.mavenIndexer = nexusIndexer;
+        this.scanner = scanner;
     }
 
     protected File getWorkingDirectory()
@@ -384,16 +396,16 @@ public class DefaultIndexerManager
             public void run( IndexingContext context )
                 throws IOException
             {
-                // TODO igorf, context should be null, need to through exception
-
-                doAddRepositoryIndexContext( repository );
+                addRepositoryIndexContext( repository, context );
             }
         } );
     }
 
-    private void doAddRepositoryIndexContext( final Repository repository )
+    private void addRepositoryIndexContext( final Repository repository, IndexingContext oldContext )
         throws IOException
     {
+        // TODO igorf, oldContext should be null, need to through exception
+
         if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
         {
             logSkippingRepositoryMessage( repository );
@@ -983,55 +995,38 @@ public class DefaultIndexerManager
         {
             try
             {
+                Runnable runnable = new Runnable()
+                {
+                    @Override
+                    public void run( final IndexingContext context )
+                        throws IOException
+                    {
+                        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                        {
+                            updateRemoteIndex( repository.adaptToFacet( ProxyRepository.class ), context, fullReindex );
+                        }
+
+                        TaskUtil.checkInterruption();
+
+                        // update always true, since we manually manage ctx purge
+                        // mavenIndexer.scan( context, fromPath, null, true /* incremental update */);
+
+                        // igorf, this needs be merged back to maven indexer
+                        DefaultScannerListener scanListener = //
+                            new DefaultScannerListener( context, //
+                                                        indexerEngine, //
+                                                        !fullReindex /* incremental update */, //
+                                                        null /* listener */);
+                        scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
+                    }
+                };
                 if ( fullReindex )
                 {
-                    temporary( repository, new Runnable()
-                    {
-                        @Override
-                        public void run( final IndexingContext context )
-                            throws IOException
-                        {
-                            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-                            {
-                                updateRemoteIndex( repository.adaptToFacet( ProxyRepository.class ), context,
-                                                   fullReindex );
-                            }
-
-                            TaskUtil.checkInterruption();
-
-                            // update always true, since we manually manage ctx purge
-                            mavenIndexer.scan( context, fromPath, null, true /* incremental update */);
-                        }
-                    } );
+                    temporary( repository, runnable );
                 }
                 else
                 {
-                    sharedSingle( repository, new Runnable()
-                    {
-                        @Override
-                        public void run( IndexingContext context )
-                            throws IOException
-                        {
-                            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-                            {
-                                updateRemoteIndex( repository.adaptToFacet( ProxyRepository.class ), context,
-                                                   fullReindex );
-                            }
-                        }
-                    } );
-                    // XXX igorf
-                    // this is really unfortunate, but mavenIndexer.scan scans to an implicit temporary
-                    // context that calls target.replace(temporary), which will break any concurrent searchers.
-                    exclusiveSingle( repository, new Runnable()
-                    {
-                        @Override
-                        public void run( IndexingContext context )
-                            throws IOException
-                        {
-                            // update always true, since we manually manage ctx purge
-                            mavenIndexer.scan( context, fromPath, null, true /* incremental update */);
-                        }
-                    } );
+                    sharedSingle( repository, runnable );
                 }
             }
             finally
@@ -1245,7 +1240,7 @@ public class DefaultIndexerManager
         } );
 
         updateRequest.setForceFullUpdate( forceFullUpdate );
-        updateRequest.setLocalIndexCacheDir( getRepositoryIndexDirectory( repository ) );
+        updateRequest.setLocalIndexCacheDir( context.getRepository() );
 
         if ( repository instanceof MavenRepository )
         {
@@ -2407,7 +2402,7 @@ public class DefaultIndexerManager
      * contents of the temporary context. 
      */
     // XXX igorf, better name
-    private void temporary( Repository repository, Runnable runnable )
+    private void temporary( final Repository repository, final Runnable runnable )
         throws IOException
     {
         String indexId = repository.getId() + "-tmp-ctx";
@@ -2424,7 +2419,7 @@ public class DefaultIndexerManager
         {
             temporary = new DefaultIndexingContext( indexId, //
                 repository.getId(), //
-                getRepositoryLocalStorageAsFile( repository ), //
+                getRepositoryLocalStorageAsFile( repository ), // repository local storage
                 FSDirectory.open( location ), //
                 null, // repository url
                 null, // repository update url
@@ -2436,19 +2431,26 @@ public class DefaultIndexerManager
             // Can't really happen because we use empty new directory
             throw new IOException( e.getMessage(), e );
         }
-
-        logger.debug( "Craeted temporary indexing context " + location + " for repository " + repository.getId() );
+        
+        logger.debug( "Created temporary indexing context " + location + " for repository " + repository.getId() );
 
         try
         {
             runnable.run( temporary );
-            
+
+            temporary.updateTimestamp( true );
+
             exclusiveSingle( repository, new Runnable()
             {
                 @Override
                 public void run( IndexingContext target )
                     throws IOException
                 {
+                    // TODO igorf guard against concurrent configuration changes
+                    // it is possible that Repository and/or target IndexingContext configuration have changed
+                    // and temporary context is populated based contains old/stale configuration
+                    // need to detect when this happens based on target timestamp for example and skip replace
+
                     target.replace( temporary.getIndexDirectory() );
                 }
             } );
