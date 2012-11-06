@@ -87,14 +87,11 @@
               <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
               <!-- FIXME is this really a good idea excluding all test resources? -->
               <exclude>**/src/test/resources/**</exclude>
-              <exclude>**/nexus/nexus-test-harness/nexus-test-harness-its/resources/**</exclude>
-              <exclude>**/nexus-repository-metadata/**</exclude>
+              <exclude>**/nexus-test-harness-its/resources/**</exclude>
               <exclude>**/gwt/ext/ui/**/*.js</exclude>
               <exclude>**/gwt/ext/ui/**/*.css</exclude>
               <!-- already has a lgpl license -->
               <exclude>**/Ext.ux.form.LovCombo.css</exclude>
-              <!-- Apache licensed, see profile -->
-              <exclude>**/nexus-migration-plugin/**</exclude>
               <!-- grid makes this directory -->
               <exclude>.maven/**</exclude>
               <!-- eclipse makes this directory -->

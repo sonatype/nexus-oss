@@ -19,6 +19,7 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.params.HttpConnectionParams;
 import org.junit.Assert;
@@ -43,7 +44,7 @@ public class Hc4ProviderImplTest
 
     @Mock
     private UserAgentBuilder userAgentBuilder;
-    
+
     @Mock
     private EventBus eventBus;
 
@@ -79,7 +80,17 @@ public class Hc4ProviderImplTest
             // shared client does not reuse connections (no pool)
             Assert.assertTrue( ( (DefaultHttpClient) client ).getConnectionReuseStrategy() instanceof NoConnectionReuseStrategy );
             Assert.assertTrue( ( (DefaultHttpClient) client ).getConnectionManager() instanceof PoolingClientConnectionManager );
-            // check is all set as needed
+
+            // check is all set as needed: retries
+            Assert.assertTrue( ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() instanceof StandardHttpRequestRetryHandler );
+            Assert.assertEquals(
+                globalRemoteStorageContext.getRemoteConnectionSettings().getRetrievalRetryCount(),
+                ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).getRetryCount() );
+            Assert.assertEquals(
+                false,
+                ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).isRequestSentRetryEnabled() );
+
+            // check is all set as needed: everything else
             Assert.assertEquals( 1234L, client.getParams().getLongParameter( ClientPNames.CONN_MANAGER_TIMEOUT, 0 ) );
             Assert.assertEquals( 1234, client.getParams().getIntParameter( HttpConnectionParams.CONNECTION_TIMEOUT, 0 ) );
             Assert.assertEquals( 1234, client.getParams().getIntParameter( HttpConnectionParams.SO_TIMEOUT, 0 ) );
@@ -111,7 +122,17 @@ public class Hc4ProviderImplTest
             // shared client does reuse connections (does pool)
             Assert.assertTrue( ( (DefaultHttpClient) client ).getConnectionReuseStrategy() instanceof DefaultConnectionReuseStrategy );
             Assert.assertTrue( ( (DefaultHttpClient) client ).getConnectionManager() instanceof PoolingClientConnectionManager );
-            // check is all set as needed
+
+            // check is all set as needed: retries
+            Assert.assertTrue( ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() instanceof StandardHttpRequestRetryHandler );
+            Assert.assertEquals(
+                globalRemoteStorageContext.getRemoteConnectionSettings().getRetrievalRetryCount(),
+                ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).getRetryCount() );
+            Assert.assertEquals(
+                false,
+                ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).isRequestSentRetryEnabled() );
+
+            // check is all set as needed: everything else
             Assert.assertEquals( 1234L, client.getParams().getLongParameter( ClientPNames.CONN_MANAGER_TIMEOUT, 0 ) );
             Assert.assertEquals( 1234, client.getParams().getIntParameter( HttpConnectionParams.CONNECTION_TIMEOUT, 0 ) );
             Assert.assertEquals( 1234, client.getParams().getIntParameter( HttpConnectionParams.SO_TIMEOUT, 0 ) );

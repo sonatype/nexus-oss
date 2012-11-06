@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-testsuite-support</artifactId>
-  <name>Nexus : Test : Test Suite Support</name>
 
   <properties>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>

@@ -17,13 +17,12 @@
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-test-harness</artifactId>
+    <artifactId>nexus-test</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-test-environment-maven-plugin</artifactId>
-  <name>Nexus : Test Harness : Test Environment Setup Plugin</name>
   <packaging>maven-plugin</packaging>
 
   <dependencies>

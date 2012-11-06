@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.type.TypeReference;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 
@@ -34,7 +35,9 @@ public class JacksonJSONMarshaller
     public JacksonJSONMarshaller()
     {
         this.objectMapper = new ObjectMapper();
-        objectMapper.writerWithDefaultPrettyPrinter();
+        // intent was to pretty-print, and this below will turn it on, but unsure
+        // abou the perf penalty, and do we really want to fiddle with it now
+        // this.objectMapper.configure( SerializationConfig.Feature.INDENT_OUTPUT, true );
     }
 
     @Override

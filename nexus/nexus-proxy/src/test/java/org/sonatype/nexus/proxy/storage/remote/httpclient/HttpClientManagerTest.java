@@ -23,15 +23,24 @@ import org.apache.http.ProtocolException;
 import org.apache.http.RequestLine;
 import org.apache.http.StatusLine;
 import org.apache.http.client.RedirectStrategy;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.Hc4ProviderImpl;
+import org.sonatype.nexus.apachehttpclient.PoolingClientConnectionManagerMBeanInstaller;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
@@ -43,16 +52,22 @@ public class HttpClientManagerTest
     @Mock
     private ProxyRepository proxyRepository;
 
-    @Mock
-    private RemoteStorageContext ctx;
-
     // ==
 
     @Mock
-    private Hc4Provider hc4Provider;
+    private ApplicationConfiguration applicationConfiguration;
 
     @Mock
     private UserAgentBuilder userAgentBuilder;
+
+    @Mock
+    private ApplicationEventMulticaster multicaster;
+
+    @Mock
+    private RemoteStorageContext globalRemoteStorageContext;
+
+    @Mock
+    private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
     @Mock
     private HttpRequest request;
@@ -69,21 +84,35 @@ public class HttpClientManagerTest
     @Mock
     private RequestLine requestLine;
 
-    private RedirectStrategy underTest;
+    private Hc4Provider hc4Provider;
+
+    private HttpClientManagerImpl httpClientManager;
 
     @Before
     public void before()
     {
+        final DefaultRemoteConnectionSettings rcs = new DefaultRemoteConnectionSettings();
+        rcs.setConnectionTimeout( 10000 );
+        when( globalRemoteStorageContext.getRemoteConnectionSettings() ).thenReturn( rcs );
+        when( globalRemoteStorageContext.getRemoteProxySettings() ).thenReturn( new DefaultRemoteProxySettings() );
+        when( applicationConfiguration.getGlobalRemoteStorageContext() ).thenReturn( globalRemoteStorageContext );
+
+        hc4Provider = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster, jmxInstaller );
+
         when( proxyRepository.getId() ).thenReturn( "central" );
         when( response.getStatusLine() ).thenReturn( statusLine );
         when( request.getRequestLine() ).thenReturn( requestLine );
-        underTest = new HttpClientManagerImpl( hc4Provider, userAgentBuilder ).getProxyRepositoryRedirectStrategy( proxyRepository, ctx );
+
+        httpClientManager = new HttpClientManagerImpl( hc4Provider, userAgentBuilder );
     }
 
     @Test
     public void doNotFollowRedirectsToDirIndex()
         throws ProtocolException
     {
+        final RedirectStrategy underTest =
+            httpClientManager.getProxyRepositoryRedirectStrategy( proxyRepository, globalRemoteStorageContext );
+
         // no location header
         when( requestLine.getMethod() ).thenReturn( "GET" );
         assertThat( underTest.isRedirected( request, response, httpContext ), is( false ) );
@@ -98,5 +127,23 @@ public class HttpClientManagerTest
         when( statusLine.getStatusCode() ).thenReturn( HttpStatus.SC_MOVED_TEMPORARILY );
         when( response.getFirstHeader( "location" ) ).thenReturn( new BasicHeader( "location", "http://localhost/dir/" ) );
         assertThat( underTest.isRedirected( request, response, httpContext ), is( false ) );
+    }
+
+    @Test
+    public void doNotHandleRetries()
+    {
+        final DefaultHttpClient client =
+            (DefaultHttpClient) new HttpClientManagerImpl( hc4Provider, userAgentBuilder ).create( proxyRepository,
+                globalRemoteStorageContext );
+        // check is all set as needed: retries should be not attempted, as it is manually handled in proxy repo
+        Assert.assertTrue( ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() instanceof StandardHttpRequestRetryHandler );
+        Assert.assertTrue( globalRemoteStorageContext.getRemoteConnectionSettings().getRetrievalRetryCount() != 0 );
+        // TODO: NEXUS-5368 This is disabled on purpose for now (same in HttpClientManagerImpl!)
+        //Assert.assertEquals(
+        //    0,
+        //    ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).getRetryCount() );
+        //Assert.assertEquals(
+        //    false,
+        //    ( (StandardHttpRequestRetryHandler) ( (DefaultHttpClient) client ).getHttpRequestRetryHandler() ).isRequestSentRetryEnabled() );
     }
 }

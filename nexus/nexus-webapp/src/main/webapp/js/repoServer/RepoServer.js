@@ -455,11 +455,13 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
         var welcomePanelConfig = {
           layout : 'auto',
           width : 500,
+          closable : false,
           items : []
         };
         var welcomeTabConfig = {
           title : 'Welcome',
           id : 'welcome',
+          closable : false,
           items : [{
                 layout : 'column',
                 border : false,
@@ -535,7 +537,16 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
 
         Sonatype.view.welcomeTab = new Sonatype.view.welcomePanel(welcomeTabConfig);
         Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
+
+        // set closable to false again, mainTabPanel.defaults contains 'closable : true'
+        // FIXME this will still show the closable tool button, so we need to actively reject close
+        Sonatype.view.welcomeTab.closable = false;
+        Sonatype.view.welcomeTab.on('beforeclose', function(panel) {
+          return false;
+        });
+
         Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
+
       },
 
       recoverLogin : function(e, target) {

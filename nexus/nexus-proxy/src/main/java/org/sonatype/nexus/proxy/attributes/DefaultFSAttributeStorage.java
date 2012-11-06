@@ -56,7 +56,7 @@ public class DefaultFSAttributeStorage
     /**
      * Instantiates a new FSX stream attribute storage.
      * 
-     * @param applicationEventMulticaster
+     * @param applicationConfiguration
      * @param applicationConfiguration
      */
     @Inject
