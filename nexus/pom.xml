@@ -1141,11 +1141,6 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.nexus.tools</groupId>
-        <artifactId>nexus-repository-conversion-tool</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.sonatype.nexus.restlight</groupId>
         <artifactId>nexus-restlight-stage-client</artifactId>
         <version>${project.version}</version>
@@ -1777,7 +1772,6 @@
     <module>nexus-app</module>
     <module>nexus-rest-api-model</module>
     <module>nexus-rest-api</module>
-    <module>nexus-migration-tool</module>
     <module>nexus-core-plugins</module>
     <module>nexus-webapp</module>
     <module>nexus-launcher</module>
