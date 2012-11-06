@@ -56,6 +56,16 @@ public class DefaultNexusBundleConfiguration
     public static final String START_TIMEOUT = "nexus.launcher.startTimeout";
 
     /**
+     * Default log level.
+     */
+    private static final String DEFAULT_LOG_LEVEL = "INFO";
+
+    /**
+     * Default logging pattern.
+     */
+    private static final String DEFAULT_LOG_PATTERN = "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n";
+
+    /**
      * File task builder.
      * Cannot be null.
      */
@@ -76,6 +86,11 @@ public class DefaultNexusBundleConfiguration
      * Map between logger name and logging level.
      */
     private Map<String, String> logLevelsPerLoggerName;
+
+    /**
+     * Logging pattern. When null, default one should be used.
+     */
+    private String logPattern;
 
     /**
      * Constructor.
@@ -212,6 +227,19 @@ public class DefaultNexusBundleConfiguration
     }
 
     @Override
+    public NexusBundleConfiguration setLogPattern( final String pattern )
+    {
+        this.logPattern = checkNotNull( pattern );
+        return this;
+    }
+
+    @Override
+    public String getLogPattern()
+    {
+        return logPattern;
+    }
+
+    @Override
     public List<FileTask> getOverlays()
     {
         final List<FileTask> overlays = Lists.newArrayList( super.getOverlays() );
@@ -249,12 +277,12 @@ public class DefaultNexusBundleConfiguration
             );
         }
 
-        if ( getLogLevel() != null )
+        if ( getLogLevel() != null || getLogPattern() != null )
         {
             overlays.add(
                 fileTaskBuilder.properties( path( "sonatype-work/nexus/conf/logback.properties" ) )
-                    .property( "root.level", getLogLevel() )
-                    .property( "appender.pattern", "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" )
+                    .property( "root.level", getLogLevel() == null ? DEFAULT_LOG_LEVEL : getLogLevel() )
+                    .property( "appender.pattern", getLogPattern() == null ? DEFAULT_LOG_PATTERN : getLogPattern() )
                     .property( "appender.file", "${nexus.log-config-dir}/../logs/nexus.log" )
             );
         }
