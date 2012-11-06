@@ -70,7 +70,7 @@ public class HttpClientManagerImpl
         Preconditions.checkNotNull( ctx );
         final DefaultHttpClient httpClient = (DefaultHttpClient) hc4Provider.createHttpClient( ctx );
         // RRS/Proxy repositories handle retries manually, so kill the retry handler set by Hc4Provider
-        httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( 0, false ) );
+        // httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( 0, false ) );
         configure( proxyRepository, ctx, httpClient );
         return httpClient;
     }
