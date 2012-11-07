@@ -49,6 +49,10 @@ public class BadRequestException
                 {
                     sb.append( "\n" );
                 }
+                if ( !"*".equals( error.getId() ) )
+                {
+                    sb.append( "[" ).append( error.getId() ).append( "] " );
+                }
                 sb.append( error.getMsg() );
             }
             if ( errors.size() > 1 )
