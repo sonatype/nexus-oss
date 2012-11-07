@@ -104,6 +104,11 @@
 
     <dependency>
       <groupId>org.sonatype.security</groupId>
+      <artifactId>security-rest-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -192,12 +197,6 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
-      <scope>test</scope>
-      <classifier>tests</classifier>
-    </dependency>
   </dependencies>
 
   <build>
@@ -210,6 +209,8 @@
             <sharedDependency>org.sonatype.nexus.plugins:nexus-restlet1x-model</sharedDependency>
             <sharedDependency>org.sonatype.plexus:plexus-restlet-bridge</sharedDependency>
             <sharedDependency>org.restlet:org.restlet</sharedDependency>
+            <sharedDependency>org.sonatype.security:security-rest-api</sharedDependency>
+            <sharedDependency>org.sonatype.security:security-rest-model</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>

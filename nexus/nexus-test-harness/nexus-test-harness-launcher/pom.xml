@@ -89,6 +89,11 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-rest-api</artifactId>
+    </dependency>
+
     <!-- MailUtil et al -->
     <dependency>
       <groupId>com.icegreen</groupId>
