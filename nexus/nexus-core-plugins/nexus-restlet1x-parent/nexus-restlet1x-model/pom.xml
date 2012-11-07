@@ -32,16 +32,17 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-restlet-bridge</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-rest-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -60,10 +61,24 @@
               <models>
                 <model>src/main/mdo/vos.xml</model>
               </models>
-              <packageWithVersion>false</packageWithVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>vos-security.xml</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>src/main/mdo/vos-security.xml</model>
+              </models>
             </configuration>
           </execution>
         </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
       </plugin>
     </plugins>
   </build>

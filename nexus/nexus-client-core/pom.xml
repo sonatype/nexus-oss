@@ -36,32 +36,6 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- Security Models -->
-    <!-- Sadly, littered over Core models, so even if we do not publicize any "security related" client ops -->
-    <!-- we still drag this along with Core Models -->
-    <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-rest-model</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.thoughtworks.xstream</groupId>
-          <artifactId>xstream</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-library</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- = Other client dependencies = -->
     <dependency>
       <groupId>org.slf4j</groupId>
