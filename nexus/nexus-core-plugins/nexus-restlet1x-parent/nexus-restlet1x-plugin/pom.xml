@@ -112,16 +112,19 @@
       <artifactId>security-system</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-web</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
@@ -143,11 +146,6 @@
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-web</artifactId>
     </dependency>
 
     <!--

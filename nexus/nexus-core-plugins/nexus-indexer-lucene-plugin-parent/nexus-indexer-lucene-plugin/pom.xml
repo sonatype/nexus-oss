@@ -111,10 +111,7 @@
       <artifactId>plexus-jetty-testsuite</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration-model</artifactId>
@@ -137,6 +134,12 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
       <scope>provided</scope>
     </dependency>
 

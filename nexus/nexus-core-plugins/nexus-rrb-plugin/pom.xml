@@ -66,6 +66,11 @@
   </developers>
 
   <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>

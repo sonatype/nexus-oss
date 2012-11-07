@@ -31,6 +31,7 @@
       <artifactId>nexus-app</artifactId>
       <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
@@ -42,6 +43,11 @@
           <artifactId>sisu-jetty8</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
     </dependency>
 
     <!--
