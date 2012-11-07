@@ -16,28 +16,11 @@
 <enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.26.xsd">
 
-  <modules>
-    <!--
-    Disable *everything* except docs... stupid that these have to be enabled by default.
-    -->
-    <csharp disabled="true"/>
-    <c disabled="true"/>
-    <jersey disabled="true"/>
-    <ruby disabled="true"/>
-    <amf disabled="true"/>
-    <cxf disabled="true"/>
-    <gwt disabled="true"/>
-    <jboss disabled="true"/>
-    <jaxws disabled="true"/>
-    <jaxws-client disabled="true"/>
-    <jaxws-ri disabled="true"/>
-    <obj-c disabled="true"/>
-    <java-client disabled="true"/>
-    <spring-app disabled="true"/>
-    <xfire disabled="true"/>
-    <xfire-client disabled="true"/>
-    <xml disabled="true"/>
+  <services>
+    <rest defaultRestSubcontext="service/local"/>
+  </services>
 
+  <modules>
     <docs disabled="false"
           title="Sonatype Security REST Model"
           copyright="Sonatype, Inc. 2012"

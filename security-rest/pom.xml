@@ -210,7 +210,7 @@
         <plugins>
           <plugin>
             <groupId>org.codehaus.enunciate</groupId>
-            <artifactId>maven-enunciate-plugin</artifactId>
+            <artifactId>maven-enunciate-slim-plugin</artifactId>
             <version>${enunciate.version}</version>
             <dependencies>
               <dependency>
