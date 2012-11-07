@@ -14,6 +14,8 @@ package org.sonatype.nexus.client.internal.rest.jersey;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.sonatype.nexus.client.core.BadRequestException;
+import org.sonatype.nexus.client.core.NotFoundException;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
@@ -493,7 +495,7 @@ public class NexusJerseyUniformInterface
         {
             return callable.perform();
         }
-        catch ( UniformInterfaceException e )
+        catch ( final UniformInterfaceException e )
         {
             final ClientResponse response = e.getResponse();
             try
@@ -517,7 +519,7 @@ public class NexusJerseyUniformInterface
                 response.close();
             }
         }
-        catch ( ClientHandlerException e )
+        catch ( final ClientHandlerException e )
         {
             throw e;
         }
