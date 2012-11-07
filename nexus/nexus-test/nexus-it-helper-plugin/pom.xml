@@ -18,10 +18,11 @@
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-test</artifactId>
+    <artifactId>nexus-test-harness</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
   <artifactId>nexus-it-helper-plugin</artifactId>
+  <name>Nexus : Test Harness : Helper Plugin</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>
@@ -38,7 +39,14 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <artifactId>nexus-app</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <version>${project.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -46,6 +54,18 @@
           <artifactId>shiro-core</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-logging-extras</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
