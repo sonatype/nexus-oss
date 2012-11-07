@@ -60,7 +60,7 @@ public class JerseyUser
     {
         final UserResourceRequest request = new UserResourceRequest();
         request.setData( settings() );
-        return getNexusClient().serviceResource( "Users" )
+        return getNexusClient().serviceResource( "users" )
             .post( UserResourceResponse.class, request )
             .getData();
     }
