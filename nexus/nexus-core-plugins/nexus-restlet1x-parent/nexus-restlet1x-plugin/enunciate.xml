@@ -22,7 +22,7 @@
 
   <modules>
     <docs disabled="false"
-          title="Nexus Core REST API"
+          title="${nexus.plugin.name} REST API"
           copyright="Sonatype, Inc. ${copyright.year}"
           includeExampleXml="true"
           includeExampleJson="true"

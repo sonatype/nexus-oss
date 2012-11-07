@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-restlet1x-model</artifactId>
-  <name>Nexus : Core Plugins : Restlet1x Model</name>
 
   <dependencies>
     <dependency>

@@ -25,7 +25,11 @@
 
   <artifactId>nexus-restlet1x-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <name>Nexus : Core Plugins : Restlet1x Plugin</name>
+
+  <properties>
+    <nexus.plugin.name>Nexus Restlet 1.x Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Provides Restlet 1.x REST API.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -46,11 +50,13 @@
       <artifactId>nexus-logging-extras</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
@@ -221,10 +227,7 @@
           </sharedDependencies>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
