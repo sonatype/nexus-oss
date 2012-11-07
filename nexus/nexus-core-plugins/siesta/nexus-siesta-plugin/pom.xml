@@ -1,0 +1,178 @@
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2012 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-siesta</artifactId>
+    <version>2.3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-siesta-plugin</artifactId>
+  <packaging>nexus-plugin</packaging>
+
+  <properties>
+    <siestaVersion>1.3-SNAPSHOT</siestaVersion>
+    <nexus.plugin.name>Nexus Siesta Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Support for Siesta (Jersey) REST API.</nexus.plugin.description>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-logging-extras</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-servlet</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
+    TODO: Sort out if we should exclude com.sun.xml.bind:jaxb-impl...
+    TODO: Though probably should pull it in to ensure we have the right JAXB impl and not left up to the version in the JDK.
+    -->
+
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-common</artifactId>
+      <version>${siestaVersion}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-inject-bean</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-server</artifactId>
+      <version>${siestaVersion}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-client</artifactId>
+      <version>${siestaVersion}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--
+    TODO: Sort out what to do about jackson here, and in NX core.
+    -->
+
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-jackson</artifactId>
+      <version>${siestaVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.jacksbee</groupId>
+      <artifactId>jacksbee-runtime</artifactId>
+      <version>1.1.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <configuration>
+          <sharedDependencies>
+            <sharedDependency>javax.ws.rs:jsr311-api</sharedDependency>
+            <sharedDependency>org.sonatype.sisu.siesta:siesta-common</sharedDependency>
+            <sharedDependency>org.sonatype.sisu.siesta:siesta-server</sharedDependency>
+            <sharedDependency>org.sonatype.sisu.siesta:siesta-client</sharedDependency>
+            <sharedDependency>org.sonatype.sisu.siesta:siesta-jackson</sharedDependency>
+
+            <!-- FIXME: Unsure which parts of this need to be marked as shared, and which should not be ... -->
+            <sharedDependency>com.sun.jersey:jersey-core</sharedDependency>
+            <sharedDependency>com.sun.jersey:jersey-server</sharedDependency>
+            <sharedDependency>com.sun.jersey:jersey-servlet</sharedDependency>
+            <sharedDependency>com.sun.jersey:jersey-client</sharedDependency>
+            <!--<sharedDependency>com.sun.jersey:jersey-guice</sharedDependency>-->
+            <!--<sharedDependency>com.sun.jersey:jersey-json</sharedDependency>-->
+            <!--<sharedDependency>com.sun.jersey.contribs:jersey-multipart</sharedDependency>-->
+            <!--<sharedDependency>com.sun.jersey.contribs:jersey-apache-client4</sharedDependency>-->
+
+            <!--<sharedDependency>org.codehaus.jackson:jackson-core-asl</sharedDependency>-->
+            <!--<sharedDependency>org.codehaus.jackson:jackson-mapper-asl</sharedDependency>-->
+            <!--<sharedDependency>org.codehaus.jackson:jackson-jaxrs</sharedDependency>-->
+            <!--<sharedDependency>org.codehaus.jackson:jackson-xc</sharedDependency>-->
+
+            <!--<sharedDependency>asm:asm</sharedDependency>-->
+            <!--<sharedDependency>org.jvnet.mimepull:mimepull</sharedDependency>-->
+            <!--<sharedDependency>com.sun.xml.bind:jaxb-impl</sharedDependency>-->
+            <sharedDependency>org.sonatype.sisu.jacksbee:jacksbee-runtime</sharedDependency>
+          </sharedDependencies>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

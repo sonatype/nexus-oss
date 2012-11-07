@@ -39,6 +39,7 @@
 
   <modules>
     <module>nexus-restlet1x-parent</module>
+    <module>siesta</module>
     <module>nexus-indexer-lucene-plugin-parent</module>
     <module>nexus-timeline-plugin</module>
     <module>nexus-lvo-plugin</module>
