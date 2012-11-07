@@ -76,6 +76,9 @@
     <hamcrest.version>1.2.1</hamcrest.version>
     <jersey.version>1.14</jersey.version>
     <skip.unittests>false</skip.unittests>
+
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
   </properties>
 
   <dependencyManagement>
