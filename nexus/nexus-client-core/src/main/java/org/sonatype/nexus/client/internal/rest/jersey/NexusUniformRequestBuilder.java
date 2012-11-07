@@ -611,10 +611,6 @@ public class NexusUniformRequestBuilder
                 response.close();
             }
         }
-        catch ( final ClientHandlerException e )
-        {
-            throw e;
-        }
     }
 
 }
