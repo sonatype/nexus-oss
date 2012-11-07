@@ -38,7 +38,7 @@
   </dependencies>
 
   <modules>
-    <module>nexus-legacy-rest-api-parent</module>
+    <module>nexus-restlet1x-parent</module>
     <module>nexus-indexer-lucene-plugin-parent</module>
     <module>nexus-timeline-plugin</module>
     <module>nexus-lvo-plugin</module>

@@ -17,13 +17,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins.rest</groupId>
-    <artifactId>nexus-legacy-rest-api-parent</artifactId>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-restlet1x-parent</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-legacy-rest-api-model</artifactId>
-  <name>Nexus : Core Plugins : Legacy Rest API Model</name>
+  <artifactId>nexus-restlet1x-model</artifactId>
+  <name>Nexus : Core Plugins : Restlet1x Model</name>
 
   <dependencies>
     <dependency>

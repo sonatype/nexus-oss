@@ -18,19 +18,19 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins.rest</groupId>
-    <artifactId>nexus-legacy-rest-api-parent</artifactId>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-restlet1x-parent</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+  <artifactId>nexus-restlet1x-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <name>Nexus : Core Plugins : Legacy Rest API Plugin</name>
+  <name>Nexus : Core Plugins : Restlet1x Plugin</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.rest</groupId>
-      <artifactId>nexus-legacy-rest-api-model</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-model</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
@@ -130,9 +130,8 @@
 
     <!-- This module does depend as "compile", also, plugin depending on this module needs it too -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>provided</scope>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
     </dependency>
 
     <dependency>
@@ -207,7 +206,7 @@
         <artifactId>app-lifecycle-maven-plugin</artifactId>
         <configuration>
           <sharedDependencies>
-            <sharedDependency>org.sonatype.nexus.plugins.rest:nexus-legacy-rest-api-model</sharedDependency>
+            <sharedDependency>org.sonatype.nexus.plugins:nexus-restlet1x-model</sharedDependency>
             <sharedDependency>org.sonatype.plexus:plexus-restlet-bridge</sharedDependency>
             <sharedDependency>org.restlet:org.restlet</sharedDependency>
             <sharedDependency>org.sonatype.security:security-rest-api</sharedDependency>

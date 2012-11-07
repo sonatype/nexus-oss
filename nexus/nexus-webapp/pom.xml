@@ -71,8 +71,8 @@
 
     <!-- There are problems with the Maven reactor that would require these modules However if we include as a test scope the reactor will be happy and the dependency pom will be correct -->
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.rest</groupId>
-      <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -176,8 +176,8 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins.rest</groupId>
-                  <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-restlet1x-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>

@@ -38,8 +38,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.rest</groupId>
-      <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
       <version>${project.version}</version>
       <exclusions>
         <exclusion>
@@ -49,8 +49,8 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.rest</groupId>
-      <artifactId>nexus-legacy-rest-api-model</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-model</artifactId>
       <version>${project.version}</version>
     </dependency>
 

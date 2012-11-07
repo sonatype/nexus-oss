@@ -32,8 +32,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus.plugins.rest</groupId>
-      <artifactId>nexus-legacy-rest-api-plugin</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
       <type>${nexus-plugin.type}</type>
