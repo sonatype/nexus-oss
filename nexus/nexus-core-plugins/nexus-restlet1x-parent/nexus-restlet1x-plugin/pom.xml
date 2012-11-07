@@ -38,6 +38,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-rest-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
       <scope>provided</scope>
@@ -112,11 +117,6 @@
 
     <dependency>
       <groupId>org.sonatype.security</groupId>
-      <artifactId>security-rest-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -139,10 +139,10 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- This module does depend as "compile", also, plugin depending on this module needs it too -->
     <dependency>
       <groupId>org.eclipse.jetty.orbit</groupId>
       <artifactId>javax.servlet</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
