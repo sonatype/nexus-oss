@@ -35,11 +35,13 @@ public interface User
 
     List<String> roles();
 
-    User withFirstName(String value);
+    User withPassword( String value );
 
-    User withLastName(String value);
+    User withFirstName( String value );
 
-    User withEmail(String value);
+    User withLastName( String value );
+
+    User withEmail( String value );
 
     User enableAccess();
 

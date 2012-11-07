@@ -99,11 +99,6 @@ public abstract class JerseyEntitySupport<E extends Entity<E>, S>
         return String.format( "%s{id=%s}", getClass().getSimpleName(), id() );
     }
 
-    protected S settings()
-    {
-        return settings;
-    }
-
     public void overwriteWith( final S source )
     {
         try
@@ -114,6 +109,16 @@ public abstract class JerseyEntitySupport<E extends Entity<E>, S>
         {
             throw Throwables.propagate( e );
         }
+    }
+
+    protected S settings()
+    {
+        return settings;
+    }
+
+    protected boolean shouldCreate()
+    {
+        return shouldCreate;
     }
 
     @SuppressWarnings( "unchecked" )
