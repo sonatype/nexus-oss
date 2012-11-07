@@ -1,0 +1,10 @@
+<metadata>
+  <groupId>aopalliance</groupId>
+  <artifactId>aopalliance</artifactId>
+  <version>1.0</version>
+  <versioning>
+    <versions>
+      <version>1.0</version>
+    </versions>
+  </versioning>
+</metadata>
