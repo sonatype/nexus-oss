@@ -13,27 +13,25 @@
 package org.sonatype.nexus.index;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import org.apache.maven.index.ArtifactScanningListener;
 import org.apache.maven.index.NexusIndexer;
+import org.apache.maven.index.Scanner;
+import org.apache.maven.index.ScanningRequest;
+import org.apache.maven.index.ScanningResult;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.hamcrest.Description;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,7 +82,7 @@ public class Nexus5249IndexerManagerIT
 
     protected CountingInvocationHandler fetchCountingInvocationHandler;
 
-    protected CountingInvocationHandler scanCountingInvocationHandler;
+    protected int scanInvocationCount;
 
     protected void prepare( final IOException failure )
         throws Exception
@@ -154,20 +152,20 @@ public class Nexus5249IndexerManagerIT
             (IndexUpdater) Proxy.newProxyInstance( getClass().getClassLoader(), new Class[] { IndexUpdater.class },
                 fetchCountingInvocationHandler );
 
-        // faking NexusIndexer, invoked by tested IndexerManager to perform scans only to count scan invocations
-        final NexusIndexer realIndexer = lookup( NexusIndexer.class );
-        scanCountingInvocationHandler =
-            new CountingInvocationHandler( new PassThruInvocationHandler( realIndexer ), NexusIndexer.class.getMethod(
-                "scan", new Class[] { IndexingContext.class, String.class, ArtifactScanningListener.class,
-                    boolean.class } ) );
-        final NexusIndexer fakeIndexer =
-            (NexusIndexer) Proxy.newProxyInstance( getClass().getClassLoader(), new Class[] { NexusIndexer.class },
-                scanCountingInvocationHandler );
+        final Scanner fakeScanner = new Scanner()
+        {
+            @Override
+            public ScanningResult scan( ScanningRequest request )
+            {
+                scanInvocationCount++;
+                return null;
+            }
+        };
 
         // applying faked components
         final DefaultIndexerManager dim = (DefaultIndexerManager) indexerManager;
         dim.setIndexUpdater( fakeUpdater );
-        dim.setNexusIndexer( fakeIndexer );
+        dim.setScanner( fakeScanner );
     }
 
     @Test
@@ -187,7 +185,7 @@ public class Nexus5249IndexerManagerIT
             // ensure we fetched from one we wanted (failingRepository)
             Assert.assertEquals( indexedProxyRepositories, fetchCountingInvocationHandler.getInvocationCount() );
             // ensure we scanned all the repositories, even the failing one, having 404 on remote update
-            Assert.assertEquals( indexedRepositories, scanCountingInvocationHandler.getInvocationCount() );
+            Assert.assertEquals( indexedRepositories, scanInvocationCount );
         }
         catch ( IOException e )
         {
@@ -216,7 +214,7 @@ public class Nexus5249IndexerManagerIT
             // ensure we fetched from one we wanted (failingRepository)
             assertThat( fetchCountingInvocationHandler, new InvocationMatcher( indexedProxyRepositories ) );
             // ensure we scanned all the repositories (minus the one failed, as it failed _BEFORE_ scan invocation)
-            Assert.assertEquals( indexedRepositories - 1, scanCountingInvocationHandler.getInvocationCount() );
+            Assert.assertEquals( indexedRepositories - 1, scanInvocationCount );
             // ensure we have composite exception
             Assert.assertEquals( CompositeException.class, e.getCause().getClass() );
             // ensure we got back our bad exception

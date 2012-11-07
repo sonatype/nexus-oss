@@ -24,7 +24,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.IteratorSearchResponse;
@@ -137,9 +136,6 @@ public class SearchNGIndexPlexusResource
      */
     private static final int COLLAPSE_OVERRIDE_TRESHOLD = SystemPropertiesHelper.getInteger(
         "plexus.search.ga.collapseOverrideThreshold", DEFAULT_COLLAPSE_OVERRIDE_TRESHOLD );
-
-    // doing "plain search" 3 times in case of AlreadyClosedExce
-    private final int RETRIES = 3;
 
     public static final String RESOURCE_URI = "/lucene/search";
 
@@ -272,46 +268,34 @@ public class SearchNGIndexPlexusResource
             collapseResults = !( true && expandVersion ); // && expandColA && expandColB;
         }
 
-        IteratorSearchResponse searchResult = null;
-
         SearchNGResponse result = new SearchNGResponse();
 
-        int runCount = 0;
-
-        while ( runCount < RETRIES )
+        try
         {
+            List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
+
+            // we need to save this reference to later
+            SystemWideLatestVersionCollector systemWideCollector = new SystemWideLatestVersionCollector();
+            filters.add( systemWideCollector );
+
+            RepositoryWideLatestVersionCollector repositoryWideCollector = null;
+            if ( collapseResults )
+            {
+                repositoryWideCollector = new RepositoryWideLatestVersionCollector();
+                filters.add( repositoryWideCollector );
+            }
+
             try
             {
-                List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
-
-                // we need to save this reference to later
-                SystemWideLatestVersionCollector systemWideCollector = new SystemWideLatestVersionCollector();
-                filters.add( systemWideCollector );
-
-                RepositoryWideLatestVersionCollector repositoryWideCollector = null;
-
-                if ( collapseResults )
+                IteratorSearchResponse searchResult =
+                    searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters,
+                                   searchers );
+                if ( searchResult != null )
                 {
-                    repositoryWideCollector = new RepositoryWideLatestVersionCollector();
-                    filters.add( repositoryWideCollector );
-                }
-
-                try
-                {
-                    searchResult =
-                        searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters,
-                                       searchers );
-
-                    if ( searchResult == null )
-                    {
-                        collapseResults = false;
-
-                        continue;
-                    }
-                    else
+                    try
                     {
                         repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
-                            searchResult, systemWideCollector, repositoryWideCollector );
+                                                      searchResult, systemWideCollector, repositoryWideCollector );
 
                         if ( !result.isTooManyResults() )
                         {
@@ -324,64 +308,32 @@ public class SearchNGIndexPlexusResource
                                 && searchResult.getTotalHitsCount() < GA_HIT_LIMIT )
                             {
                                 collapseResults = false;
-
-                                continue;
                             }
                         }
                     }
+                    finally
+                    {
+                        searchResult.close();
+                    }
                 }
-                catch ( IOException e )
+                else
                 {
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
+                    repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
+                                                  IteratorSearchResponse.empty( null ), null, null );
+                    collapseResults = false;
                 }
-
-                // we came here, so we break the while-loop, we got what we need
-                break;
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Repository to be searched does not exists!", e );
-            }
-            catch ( AlreadyClosedException e )
-            {
-                runCount++;
-
-                getLogger().info(
-                    "NexusIndexer issue (NEXUS-3702), we got AlreadyClosedException that happens when Reindexing or other \"indexer intensive\" task is running on instance while searching! Redoing search again." );
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    // just keep it silent (DEBUG)
-                    getLogger().debug( "Got AlreadyClosedException exception!", e );
-                }
-
-                result.setData( null );
-            }
-        }
-
-        if ( result.getData() == null )
-        {
-            try
-            {
-                repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
-                    IteratorSearchResponse.empty( null ), null, null );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // will not happen
             }
             catch ( IOException e )
             {
-                // will not happen
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
             }
-
-            getLogger().info(
-                "Nexus issue (NEXUS-3702): Was unable to perform search "
-                    + RETRIES
-                    + " times, giving up, and lying about TooManyResults. Please retry to reproduce this with DEBUG logs and report this issue!" );
         }
-
+        catch ( NoSuchRepositoryException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository to be searched does not exists!",
+                                         e );
+        }
+        
         return result;
     }
 
@@ -509,288 +461,281 @@ public class SearchNGIndexPlexusResource
 
         // System.out.println( "** Query is \"" + iterator.getQuery().toString() + "\"." );
 
-        try
+        if ( !response.isTooManyResults() )
         {
-            if ( !response.isTooManyResults() )
+            // 1st pass, collect results
+            LinkedHashMap<String, NexusNGArtifact> hits = new LinkedHashMap<String, NexusNGArtifact>();
+
+            NexusNGArtifact artifact;
+
+            float firstDocumentScore = -1f;
+
+            float lastDocumentScore = -1f;
+
+            final long startedAtMillis = System.currentTimeMillis();
+
+            // 1sd pass, build first two level (no links), and actually consume the iterator and collectors will be
+            // set
+            for ( ArtifactInfo ai : iterator )
             {
-                // 1st pass, collect results
-                LinkedHashMap<String, NexusNGArtifact> hits = new LinkedHashMap<String, NexusNGArtifact>();
+                final String key = ai.groupId + ":" + ai.artifactId + ":" + ai.version;
 
-                NexusNGArtifact artifact;
+                artifact = hits.get( key );
 
-                float firstDocumentScore = -1f;
+                // System.out.println( "* " + ai.context + " : " + ai.toString() + " -- " + ai.getLuceneScore() +
+                // " -- "
+                // + ( artifact != null ? "F" : "N" ) );
 
-                float lastDocumentScore = -1f;
-
-                final long startedAtMillis = System.currentTimeMillis();
-
-                // 1sd pass, build first two level (no links), and actually consume the iterator and collectors will be
-                // set
-                for ( ArtifactInfo ai : iterator )
+                if ( artifact == null )
                 {
-                    final String key = ai.groupId + ":" + ai.artifactId + ":" + ai.version;
-
-                    artifact = hits.get( key );
-
-                    // System.out.println( "* " + ai.context + " : " + ai.toString() + " -- " + ai.getLuceneScore() +
-                    // " -- "
-                    // + ( artifact != null ? "F" : "N" ) );
-
-                    if ( artifact == null )
+                    if ( System.currentTimeMillis() - startedAtMillis > FIRST_LOOP_EXECUTION_TIME_LIMIT )
                     {
-                        if ( System.currentTimeMillis() - startedAtMillis > FIRST_LOOP_EXECUTION_TIME_LIMIT )
-                        {
-                            getSearchDiagnosticLogger().debug(
-                                "Stopping delivering search results since we spent more than "
-                                    + FIRST_LOOP_EXECUTION_TIME_LIMIT + " millis in 1st loop processing results." );
+                        getSearchDiagnosticLogger().debug(
+                            "Stopping delivering search results since we spent more than "
+                                + FIRST_LOOP_EXECUTION_TIME_LIMIT + " millis in 1st loop processing results." );
 
-                            break;
-                        }
-
-                        // we stop if we delivered "most important" hits (change of relevance from 1st document we got)
-                        if ( hits.size() > 10
-                            && ( firstDocumentScore - ai.getLuceneScore() ) > DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD )
-                        {
-                            getSearchDiagnosticLogger().debug(
-                                "Stopping delivering search results since we span "
-                                    + DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD + " of score change (firstDocScore="
-                                    + firstDocumentScore + ", currentDocScore=" + ai.getLuceneScore() + ")." );
-
-                            break;
-                        }
-
-                        // we stop if we detect a "big drop" in relevance in relation to previous document's score
-                        if ( hits.size() > 10 && lastDocumentScore > 0 )
-                        {
-                            if ( ( lastDocumentScore - ai.getLuceneScore() ) > DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD )
-                            {
-                                getSearchDiagnosticLogger().debug(
-                                    "Stopping delivering search results since we hit a relevance drop bigger than "
-                                        + DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD + " (lastDocScore="
-                                        + lastDocumentScore + ", currentDocScore=" + ai.getLuceneScore() + ")." );
-
-                                // the relevance change was big, so we stepped over "trash" results that are
-                                // probably not relevant at all, just stop here then
-                                break;
-                            }
-                        }
-
-                        // we stop if we hit the GA limit
-                        if ( ( hits.size() + 1 ) > GA_HIT_LIMIT )
-                        {
-                            getSearchDiagnosticLogger().debug(
-                                "Stopping delivering search results since we hit a GA hit limit of " + GA_HIT_LIMIT
-                                    + "." );
-
-                            // check for HIT_LIMIT: if we are stepping it over, stop here
-                            break;
-                        }
-                        else
-                        {
-                            artifact = new NexusNGArtifact();
-
-                            artifact.setGroupId( ai.groupId );
-
-                            artifact.setArtifactId( ai.artifactId );
-
-                            artifact.setVersion( ai.version );
-
-                            artifact.setHighlightedFragment( getMatchHighlightHtmlSnippet( ai ) );
-
-                            hits.put( key, artifact );
-                        }
+                        break;
                     }
 
-                    Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
-
-                    addRepositoryDetails( request, response, repository );
-
-                    NexusNGArtifactHit hit = null;
-
-                    for ( NexusNGArtifactHit artifactHit : artifact.getArtifactHits() )
+                    // we stop if we delivered "most important" hits (change of relevance from 1st document we got)
+                    if ( hits.size() > 10
+                        && ( firstDocumentScore - ai.getLuceneScore() ) > DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD )
                     {
-                        if ( repository.getId().equals( artifactHit.getRepositoryId() ) )
-                        {
-                            hit = artifactHit;
+                        getSearchDiagnosticLogger().debug(
+                            "Stopping delivering search results since we span "
+                                + DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD + " of score change (firstDocScore="
+                                + firstDocumentScore + ", currentDocScore=" + ai.getLuceneScore() + ")." );
 
+                        break;
+                    }
+
+                    // we stop if we detect a "big drop" in relevance in relation to previous document's score
+                    if ( hits.size() > 10 && lastDocumentScore > 0 )
+                    {
+                        if ( ( lastDocumentScore - ai.getLuceneScore() ) > DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD )
+                        {
+                            getSearchDiagnosticLogger().debug(
+                                "Stopping delivering search results since we hit a relevance drop bigger than "
+                                    + DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD + " (lastDocScore="
+                                    + lastDocumentScore + ", currentDocScore=" + ai.getLuceneScore() + ")." );
+
+                            // the relevance change was big, so we stepped over "trash" results that are
+                            // probably not relevant at all, just stop here then
                             break;
                         }
                     }
 
-                    if ( hit == null )
+                    // we stop if we hit the GA limit
+                    if ( ( hits.size() + 1 ) > GA_HIT_LIMIT )
                     {
-                        hit = new NexusNGArtifactHit();
+                        getSearchDiagnosticLogger().debug(
+                            "Stopping delivering search results since we hit a GA hit limit of " + GA_HIT_LIMIT
+                                + "." );
 
-                        hit.setRepositoryId( repository.getId() );
-
-                        // if collapsed, we add links in 2nd pass, otherwise here
-                        if ( !collapsed )
-                        {
-                            // we are adding the POM link "blindly", unless packaging is POM,
-                            // since the it will be added below the "usual" way
-                            if ( !"pom".equals( ai.packaging ) )
-                            {
-                                NexusNGArtifactLink link =
-                                    createNexusNGArtifactLink( request, ai.repository, ai.groupId, ai.artifactId,
-                                        ai.version, "pom", null );
-
-                                // add the POM link
-                                hit.addArtifactLink( link );
-                            }
-                        }
-
-                        // we just created it, add it
-                        artifact.addArtifactHit( hit );
+                        // check for HIT_LIMIT: if we are stepping it over, stop here
+                        break;
                     }
+                    else
+                    {
+                        artifact = new NexusNGArtifact();
 
+                        artifact.setGroupId( ai.groupId );
+
+                        artifact.setArtifactId( ai.artifactId );
+
+                        artifact.setVersion( ai.version );
+
+                        artifact.setHighlightedFragment( getMatchHighlightHtmlSnippet( ai ) );
+
+                        hits.put( key, artifact );
+                    }
+                }
+
+                Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
+
+                addRepositoryDetails( request, response, repository );
+
+                NexusNGArtifactHit hit = null;
+
+                for ( NexusNGArtifactHit artifactHit : artifact.getArtifactHits() )
+                {
+                    if ( repository.getId().equals( artifactHit.getRepositoryId() ) )
+                    {
+                        hit = artifactHit;
+
+                        break;
+                    }
+                }
+
+                if ( hit == null )
+                {
+                    hit = new NexusNGArtifactHit();
+
+                    hit.setRepositoryId( repository.getId() );
+
+                    // if collapsed, we add links in 2nd pass, otherwise here
                     if ( !collapsed )
                     {
-                        boolean needsToBeAdded = true;
-
-                        for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
-                        {
-                            if ( StringUtils.equals( link.getClassifier(), ai.classifier )
-                                && StringUtils.equals( link.getExtension(), ai.fextension ) )
-                            {
-                                needsToBeAdded = false;
-
-                                break;
-                            }
-                        }
-
-                        if ( needsToBeAdded )
+                        // we are adding the POM link "blindly", unless packaging is POM,
+                        // since the it will be added below the "usual" way
+                        if ( !"pom".equals( ai.packaging ) )
                         {
                             NexusNGArtifactLink link =
                                 createNexusNGArtifactLink( request, ai.repository, ai.groupId, ai.artifactId,
-                                    ai.version, ai.fextension, ai.classifier );
+                                    ai.version, "pom", null );
 
+                            // add the POM link
                             hit.addArtifactLink( link );
                         }
                     }
 
-                    if ( firstDocumentScore < 0 )
-                    {
-                        firstDocumentScore = ai.getLuceneScore();
-                    }
-
-                    lastDocumentScore = ai.getLuceneScore();
+                    // we just created it, add it
+                    artifact.addArtifactHit( hit );
                 }
 
-                // summary:
-                getSearchDiagnosticLogger().debug(
-                    "Query terms \"" + terms + "\" (LQL \"" + iterator.getQuery() + "\") matched total of "
-                        + iterator.getTotalHitsCount() + " records, " + iterator.getTotalProcessedArtifactInfoCount()
-                        + " records were processed out of those, resulting in " + hits.size()
-                        + " unique GA records. Lucene scored documents first=" + firstDocumentScore + ", last="
-                        + lastDocumentScore + ". Main processing loop took "
-                        + ( System.currentTimeMillis() - startedAtMillis ) + " ms." );
-
-                // 2nd pass, set versions
-                for ( NexusNGArtifact artifactNg : hits.values() )
+                if ( !collapsed )
                 {
-                    final String systemWideCollectorKey =
-                        systemWideCollector.getKey( artifactNg.getGroupId(), artifactNg.getArtifactId() );
+                    boolean needsToBeAdded = true;
 
-                    LatestVersionHolder systemWideHolder = systemWideCollector.getLVHForKey( systemWideCollectorKey );
-
-                    if ( systemWideHolder != null )
+                    for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
                     {
-                        if ( systemWideHolder.getLatestSnapshot() != null )
+                        if ( StringUtils.equals( link.getClassifier(), ai.classifier )
+                            && StringUtils.equals( link.getExtension(), ai.fextension ) )
                         {
-                            artifactNg.setLatestSnapshot( systemWideHolder.getLatestSnapshot().toString() );
+                            needsToBeAdded = false;
 
-                            artifactNg.setLatestSnapshotRepositoryId( systemWideHolder.getLatestSnapshotRepositoryId() );
-                        }
-
-                        if ( systemWideHolder.getLatestRelease() != null )
-                        {
-                            artifactNg.setLatestRelease( systemWideHolder.getLatestRelease().toString() );
-
-                            artifactNg.setLatestReleaseRepositoryId( systemWideHolder.getLatestReleaseRepositoryId() );
+                            break;
                         }
                     }
 
-                    // add some "touche" on 1st level
-                    if ( collapsed )
+                    if ( needsToBeAdded )
                     {
-                        // set the top level version to one of the latest ones
-                        if ( artifactNg.getLatestRelease() != null )
-                        {
-                            artifactNg.setVersion( artifactNg.getLatestRelease() );
-                        }
-                        else
-                        {
-                            artifactNg.setVersion( artifactNg.getLatestSnapshot() );
-                        }
+                        NexusNGArtifactLink link =
+                            createNexusNGArtifactLink( request, ai.repository, ai.groupId, ai.artifactId,
+                                ai.version, ai.fextension, ai.classifier );
 
-                        // "create" the links now
-                        for ( NexusNGArtifactHit hit : artifactNg.getArtifactHits() )
+                        hit.addArtifactLink( link );
+                    }
+                }
+
+                if ( firstDocumentScore < 0 )
+                {
+                    firstDocumentScore = ai.getLuceneScore();
+                }
+
+                lastDocumentScore = ai.getLuceneScore();
+            }
+
+            // summary:
+            getSearchDiagnosticLogger().debug(
+                "Query terms \"" + terms + "\" (LQL \"" + iterator.getQuery() + "\") matched total of "
+                    + iterator.getTotalHitsCount() + " records, " + iterator.getTotalProcessedArtifactInfoCount()
+                    + " records were processed out of those, resulting in " + hits.size()
+                    + " unique GA records. Lucene scored documents first=" + firstDocumentScore + ", last="
+                    + lastDocumentScore + ". Main processing loop took "
+                    + ( System.currentTimeMillis() - startedAtMillis ) + " ms." );
+
+            // 2nd pass, set versions
+            for ( NexusNGArtifact artifactNg : hits.values() )
+            {
+                final String systemWideCollectorKey =
+                    systemWideCollector.getKey( artifactNg.getGroupId(), artifactNg.getArtifactId() );
+
+                LatestVersionHolder systemWideHolder = systemWideCollector.getLVHForKey( systemWideCollectorKey );
+
+                if ( systemWideHolder != null )
+                {
+                    if ( systemWideHolder.getLatestSnapshot() != null )
+                    {
+                        artifactNg.setLatestSnapshot( systemWideHolder.getLatestSnapshot().toString() );
+
+                        artifactNg.setLatestSnapshotRepositoryId( systemWideHolder.getLatestSnapshotRepositoryId() );
+                    }
+
+                    if ( systemWideHolder.getLatestRelease() != null )
+                    {
+                        artifactNg.setLatestRelease( systemWideHolder.getLatestRelease().toString() );
+
+                        artifactNg.setLatestReleaseRepositoryId( systemWideHolder.getLatestReleaseRepositoryId() );
+                    }
+                }
+
+                // add some "touche" on 1st level
+                if ( collapsed )
+                {
+                    // set the top level version to one of the latest ones
+                    if ( artifactNg.getLatestRelease() != null )
+                    {
+                        artifactNg.setVersion( artifactNg.getLatestRelease() );
+                    }
+                    else
+                    {
+                        artifactNg.setVersion( artifactNg.getLatestSnapshot() );
+                    }
+
+                    // "create" the links now
+                    for ( NexusNGArtifactHit hit : artifactNg.getArtifactHits() )
+                    {
+                        final String repositoryWideCollectorKey =
+                            repositoryWideCollector.getKey( hit.getRepositoryId(), artifactNg.getGroupId(),
+                                artifactNg.getArtifactId() );
+
+                        LatestECVersionHolder repositoryWideHolder =
+                            repositoryWideCollector.getLVHForKey( repositoryWideCollectorKey );
+
+                        if ( repositoryWideHolder != null )
                         {
-                            final String repositoryWideCollectorKey =
-                                repositoryWideCollector.getKey( hit.getRepositoryId(), artifactNg.getGroupId(),
-                                    artifactNg.getArtifactId() );
+                            String versionToSet = null;
 
-                            LatestECVersionHolder repositoryWideHolder =
-                                repositoryWideCollector.getLVHForKey( repositoryWideCollectorKey );
-
-                            if ( repositoryWideHolder != null )
+                            // do we have a "latest release" version?
+                            if ( repositoryWideHolder.getLatestRelease() != null )
                             {
-                                String versionToSet = null;
+                                versionToSet = repositoryWideHolder.getLatestRelease().toString();
+                            }
+                            else
+                            {
+                                versionToSet = repositoryWideHolder.getLatestSnapshot().toString();
+                            }
 
-                                // do we have a "latest release" version?
-                                if ( repositoryWideHolder.getLatestRelease() != null )
+                            // add POM link
+                            NexusNGArtifactLink pomLink =
+                                createNexusNGArtifactLink( request, hit.getRepositoryId(), artifactNg.getGroupId(),
+                                    artifactNg.getArtifactId(), versionToSet, "pom", null );
+
+                            hit.addArtifactLink( pomLink );
+
+                            // TODO: order!
+                            // add main artifact link
+                            // add everything else
+
+                            // make the list by joining two collections
+                            // rationale: in case of reposes, only one of these will be populated, other will be
+                            // empty
+                            // but in case of mixed policy (like group), probably both will exist
+                            // TODO: this will not work like it in groups, since then the versions will mismatch!
+                            ArrayList<ECHolder> ecHolders =
+                                new ArrayList<ECHolder>( repositoryWideHolder.getReleaseECHolders() );
+                            ecHolders.addAll( repositoryWideHolder.getSnapshotECHolders() );
+
+                            for ( ECHolder holder : ecHolders )
+                            {
+                                // add non-poms only, since we added POMs above
+                                if ( !"pom".equals( holder.getExtension() ) )
                                 {
-                                    versionToSet = repositoryWideHolder.getLatestRelease().toString();
-                                }
-                                else
-                                {
-                                    versionToSet = repositoryWideHolder.getLatestSnapshot().toString();
-                                }
+                                    NexusNGArtifactLink link =
+                                        createNexusNGArtifactLink( request, hit.getRepositoryId(),
+                                            artifactNg.getGroupId(), artifactNg.getArtifactId(), versionToSet,
+                                            holder.getExtension(), holder.getClassifier() );
 
-                                // add POM link
-                                NexusNGArtifactLink pomLink =
-                                    createNexusNGArtifactLink( request, hit.getRepositoryId(), artifactNg.getGroupId(),
-                                        artifactNg.getArtifactId(), versionToSet, "pom", null );
-
-                                hit.addArtifactLink( pomLink );
-
-                                // TODO: order!
-                                // add main artifact link
-                                // add everything else
-
-                                // make the list by joining two collections
-                                // rationale: in case of reposes, only one of these will be populated, other will be
-                                // empty
-                                // but in case of mixed policy (like group), probably both will exist
-                                // TODO: this will not work like it in groups, since then the versions will mismatch!
-                                ArrayList<ECHolder> ecHolders =
-                                    new ArrayList<ECHolder>( repositoryWideHolder.getReleaseECHolders() );
-                                ecHolders.addAll( repositoryWideHolder.getSnapshotECHolders() );
-
-                                for ( ECHolder holder : ecHolders )
-                                {
-                                    // add non-poms only, since we added POMs above
-                                    if ( !"pom".equals( holder.getExtension() ) )
-                                    {
-                                        NexusNGArtifactLink link =
-                                            createNexusNGArtifactLink( request, hit.getRepositoryId(),
-                                                artifactNg.getGroupId(), artifactNg.getArtifactId(), versionToSet,
-                                                holder.getExtension(), holder.getClassifier() );
-
-                                        hit.addArtifactLink( link );
-                                    }
+                                    hit.addArtifactLink( link );
                                 }
                             }
                         }
                     }
                 }
-
-                response.setData( new ArrayList<NexusNGArtifact>( hits.values() ) );
             }
-        }
-        finally
-        {
-            iterator.close();
+
+            response.setData( new ArrayList<NexusNGArtifact>( hits.values() ) );
         }
 
         response.setTooManyResults( iterator.getTotalHitsCount() > count );

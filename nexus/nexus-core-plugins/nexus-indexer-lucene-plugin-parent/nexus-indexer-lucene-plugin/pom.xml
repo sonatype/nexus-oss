@@ -29,7 +29,8 @@
   <name>Nexus Maven Indexer :: Plugin</name>
 
   <properties>
-    <maven.indexer.version>4.1.3-SONATYPE</maven.indexer.version>
+    <maven.indexer.version>5.0.0</maven.indexer.version>
+    <truezip.version>7.0-rc1</truezip.version>
 
     <nexus.plugin.name>Nexus Indexer Lucene Plugin</nexus.plugin.name>
     <nexus.plugin.description>Adds search capabilities for repository content.</nexus.plugin.description>

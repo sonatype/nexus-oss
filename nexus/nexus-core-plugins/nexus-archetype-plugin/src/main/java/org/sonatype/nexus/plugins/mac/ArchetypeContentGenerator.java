@@ -20,7 +20,6 @@ import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.context.IndexingContext;
 import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.IndexArtifactFilter;
-import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -45,7 +44,7 @@ public class ArchetypeContentGenerator
     private MacPlugin macPlugin;
 
     @Inject
-    private IndexerManager indexerManager;
+    private DefaultIndexerManager indexerManager;
 
     @Inject
     private IndexArtifactFilter indexArtifactFilter;
@@ -66,15 +65,16 @@ public class ArchetypeContentGenerator
         // make length unknown (since it will be known only in the moment of actual content pull)
         item.setLength( -1 );
 
-        return new ArchetypeContentLocator( repository,
-            repositoryURLBuilder.getExposedRepositoryContentUrl( repository ),
-            ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( repository ), macPlugin,
-            new ArtifactInfoFilter()
+        ArtifactInfoFilter artifactInfoFilter = new ArtifactInfoFilter()
+        {
+            public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
             {
-                public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
-                {
-                    return indexArtifactFilter.filterArtifactInfo( ai );
-                }
-            } );
+                return indexArtifactFilter.filterArtifactInfo( ai );
+            }
+        };
+        final String exposedRepositoryContentUrl = repositoryURLBuilder.getExposedRepositoryContentUrl( repository );
+
+        return new ArchetypeContentLocator( repository, exposedRepositoryContentUrl, indexerManager, macPlugin,
+                                            artifactInfoFilter );
     }
 }
