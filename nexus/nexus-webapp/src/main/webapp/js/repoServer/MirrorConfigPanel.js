@@ -355,7 +355,7 @@ Sonatype.repoServer.ProxyMirrorEditor = function(config) {
                           selectOnFocus : true,
                           allowBlank : true,
                           validator : function(v) {
-                            if (v.match(MIRROR_URL_REGEXP))
+                            if (v === '' || v.match(MIRROR_URL_REGEXP))
                             {
                               return true;
                             }
@@ -454,8 +454,9 @@ Sonatype.repoServer.HostedMirrorEditor = function(config) {
                           width : 255,
                           emptyText : 'Enter URL...',
                           selectOnFocus : true,
+                          allowBlank : true,
                           validator : function(v) {
-                            if (v.match(MIRROR_URL_REGEXP))
+                            if (v === '' || v.match(MIRROR_URL_REGEXP))
                             {
                               return true;
                             }
