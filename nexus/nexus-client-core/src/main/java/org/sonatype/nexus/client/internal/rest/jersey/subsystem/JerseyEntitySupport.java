@@ -45,6 +45,15 @@ public abstract class JerseyEntitySupport<E extends Entity<E>, S>
         this.shouldCreate = true;
     }
 
+    public JerseyEntitySupport( final JerseyNexusClient nexusClient,
+                                final String id,
+                                final S settings )
+    {
+        this( nexusClient, checkNotNull( id ) );
+        this.shouldCreate = false;
+        overwriteWith( settings );
+    }
+
     @Override
     public String id()
     {

@@ -24,7 +24,6 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
-import com.google.common.base.Preconditions;
 
 /**
  * Jersey based {@link User} implementation.
@@ -39,6 +38,11 @@ public class JerseyUser
     public JerseyUser( final JerseyNexusClient nexusClient, final String id )
     {
         super( nexusClient, id );
+    }
+
+    public JerseyUser( final JerseyNexusClient nexusClient, final UserResource settings )
+    {
+        super( nexusClient, settings.getUserId(), settings );
     }
 
     @Override
