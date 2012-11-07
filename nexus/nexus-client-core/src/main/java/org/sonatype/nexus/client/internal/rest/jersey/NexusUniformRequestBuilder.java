@@ -14,25 +14,30 @@ package org.sonatype.nexus.client.internal.rest.jersey;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Locale;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
+
 import org.sonatype.nexus.client.core.BadRequestException;
 import org.sonatype.nexus.client.core.NotFoundException;
+import org.sonatype.nexus.client.core.spi.rest.jersey.UniformRequestBuilder;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterface;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 
 /**
  * @since 2.3
  */
-public class NexusJerseyUniformInterface
-    implements UniformInterface
+public class NexusUniformRequestBuilder
+    implements UniformRequestBuilder
 {
 
-    private final UniformInterface delegate;
+    private final WebResource.Builder delegate;
 
-    public NexusJerseyUniformInterface( final UniformInterface delegate )
+    public NexusUniformRequestBuilder( final WebResource.Builder delegate )
     {
         this.delegate = checkNotNull( delegate );
     }
@@ -479,6 +484,83 @@ public class NexusJerseyUniformInterface
                 return null;
             }
         } );
+    }
+
+    @Override
+    public UniformRequestBuilder entity( final Object entity )
+    {
+        delegate.entity( entity );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder entity( final Object entity, final MediaType type )
+    {
+        delegate.entity( entity, type );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder entity( final Object entity, final String type )
+    {
+        delegate.entity( entity, type );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder type( final MediaType type )
+    {
+        delegate.type( type );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder type( final String type )
+    {
+        delegate.type( type );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder accept( final MediaType... types )
+    {
+        delegate.accept( types );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder accept( final String... types )
+    {
+        delegate.accept( types );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder acceptLanguage( final Locale... locales )
+    {
+        delegate.acceptLanguage( locales );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder acceptLanguage( final String... locales )
+    {
+        delegate.acceptLanguage( locales );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder cookie( final Cookie cookie )
+    {
+        delegate.cookie( cookie );
+        return this;
+    }
+
+    @Override
+    public UniformRequestBuilder header( final String name, final Object value )
+    {
+        delegate.header( name, value );
+        return this;
     }
 
     private static interface Operation<T>
