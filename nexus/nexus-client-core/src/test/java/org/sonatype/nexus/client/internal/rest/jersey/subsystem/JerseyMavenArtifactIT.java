@@ -14,8 +14,11 @@ package org.sonatype.nexus.client.internal.rest.jersey.subsystem;
 
 import java.net.MalformedURLException;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.client.core.NotFoundException;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactMaven;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
@@ -31,6 +34,9 @@ import junit.framework.Assert;
 public class JerseyMavenArtifactIT
     extends TestSupport
 {
+
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
 
     @Test
     public void artifactMavenResolveSuccess()
@@ -69,8 +75,9 @@ public class JerseyMavenArtifactIT
         final ResolveRequest resolveRequest =
             new ResolveRequest( "central-proxy", "com.sonatype.nexus.plugin", "nexus-staging-plugin",
                                 ResolveRequest.VERSION_RELEASE );
-        final ResolveResponse resolveResponse = artifactMaven.resolve( resolveRequest );
-        Assert.assertNull( resolveResponse );
+
+        thrown.expect( NotFoundException.class );
+        artifactMaven.resolve( resolveRequest );
     }
 
     /**

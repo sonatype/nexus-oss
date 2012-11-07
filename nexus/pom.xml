@@ -39,6 +39,13 @@
     <url>https://github.com/sonatype/nexus</url>
   </scm>
 
+  <repositories>
+    <repository>
+      <id>rso-public-grid</id>
+      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
+    </repository>
+  </repositories>
+
   <licenses>
     <license>
       <name>Eclipse Public License</name>

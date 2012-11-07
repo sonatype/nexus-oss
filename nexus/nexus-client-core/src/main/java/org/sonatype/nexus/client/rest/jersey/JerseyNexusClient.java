@@ -25,12 +25,13 @@ import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.internal.rest.AbstractXStreamNexusClient;
+import org.sonatype.nexus.client.internal.rest.jersey.NexusJerseyUniformInterface;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.UniformInterface;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -88,26 +89,34 @@ public class JerseyNexusClient
         return resolvePath( "service/local/" + path );
     }
 
-    public WebResource.Builder serviceResource( final String uri )
+    public UniformInterface serviceResource( final String uri )
     {
-        return getClient().resource( resolveServicePath( uri ) ).type( getMediaType() ).accept( getMediaType() );
+        return new NexusJerseyUniformInterface(
+            getClient().resource( resolveServicePath( uri ) ).type( getMediaType() ).accept( getMediaType() )
+        );
     }
 
-    public WebResource.Builder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public UniformInterface serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).type(
-            getMediaType() ).accept(
-            getMediaType() );
+        return new NexusJerseyUniformInterface(
+            getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).type(
+                getMediaType() ).accept(
+                getMediaType() )
+        );
     }
 
-    public WebResource.Builder uri( final String uri )
+    public UniformInterface uri( final String uri )
     {
-        return getClient().resource( resolvePath( uri ) ).getRequestBuilder();
+        return new NexusJerseyUniformInterface(
+            getClient().resource( resolvePath( uri ) ).getRequestBuilder()
+        );
     }
 
-    public WebResource.Builder uri( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public UniformInterface uri( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return getClient().resource( resolvePath( uri ) ).queryParams( queryParameters ).getRequestBuilder();
+        return new NexusJerseyUniformInterface(
+            getClient().resource( resolvePath( uri ) ).queryParams( queryParameters ).getRequestBuilder()
+        );
     }
 
     @Override
@@ -187,9 +196,6 @@ public class JerseyNexusClient
     /**
      * Internal method to be used by subsystem implementations to convert Jersey specific exception to
      * {@link NexusErrorMessageException}.
-     *
-     * @param e
-     * @return
      */
     public NexusErrorMessageException convertErrorResponse( final int statusCode, final String reasonPhrase,
                                                             final ErrorResponse errorResponse )

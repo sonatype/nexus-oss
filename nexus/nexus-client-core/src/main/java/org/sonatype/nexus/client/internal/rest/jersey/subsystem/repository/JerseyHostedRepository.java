@@ -79,14 +79,14 @@ public class JerseyHostedRepository<T extends HostedRepository>
     @Override
     public T allowRedeploy()
     {
-        settings().setWritePolicy( "ALLOW_WRITE_ONCE" );
+        settings().setWritePolicy( "ALLOW_WRITE" );
         return me();
     }
 
     @Override
     public T disableRedeploy()
     {
-        settings().setWritePolicy( "ALLOW_WRITE" );
+        settings().setWritePolicy( "ALLOW_WRITE_ONCE" );
         return me();
     }
 

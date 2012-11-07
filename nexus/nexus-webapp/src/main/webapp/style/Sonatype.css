@@ -98,6 +98,7 @@ a:link, a:visited, a:hover, a:active {
 }
 
 .user-profile-menu .x-menu-item-active {
+    margin: 0px 0px !important;
     border: solid 1px #444444;
     background-color: black;
     background-image: none;

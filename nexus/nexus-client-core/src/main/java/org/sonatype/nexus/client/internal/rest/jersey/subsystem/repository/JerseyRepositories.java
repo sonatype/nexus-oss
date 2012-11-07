@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.client.core.NotFoundException;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.spi.subsystem.repository.RepositoryFactory;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
@@ -34,8 +35,6 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Jersey based {@link Repositories} implementation.
@@ -63,26 +62,22 @@ public class JerseyRepositories
 
         // TODO the code is inefficient as it will at worst make two calls. Should be fixed when we have a proper repositories REST resource that will return also groups
 
-        ClientResponse response = getNexusClient()
-            .serviceResource( "repositories/" + id )
-            .get( ClientResponse.class );
-
-        if ( response.getStatus() < 300 )
+        try
         {
-            return convert( id, response.getEntity( RepositoryResourceResponse.class ).getData() );
+            return convert(
+                id,
+                getNexusClient().serviceResource( "repositories/" + id )
+                    .get( RepositoryResourceResponse.class ).getData()
+            );
         }
-
-        response.close();
-        response = getNexusClient()
-            .serviceResource( "repo_groups/" + id )
-            .get( ClientResponse.class );
-
-        if ( response.getStatus() < 300 )
+        catch ( final NotFoundException e )
         {
-            return convert( id, response.getEntity( RepositoryGroupResourceResponse.class ).getData() );
+            return convert(
+                id,
+                getNexusClient().serviceResource( "repo_groups/" + id )
+                    .get( RepositoryGroupResourceResponse.class ).getData()
+            );
         }
-
-        throw new UniformInterfaceException( response );
     }
 
     @Override

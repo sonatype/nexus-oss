@@ -19,8 +19,10 @@ import java.util.Date;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.index.ArtifactInfo;
@@ -114,51 +116,59 @@ public class ReindexIT
     {
         if ( shiftDays != 0 )
         {
-            IndexWriter iw = ctx.getIndexWriter();
-
-            for ( int docNum = 0; docNum < ctx.getIndexReader().maxDoc(); docNum++ )
+            final IndexWriter iw = ctx.getIndexWriter();
+            final IndexSearcher is = ctx.acquireIndexSearcher();
+            try
             {
-                if ( !ctx.getIndexReader().isDeleted( docNum ) )
+                final IndexReader ir = is.getIndexReader();
+                for ( int docNum = 0; docNum < ir.maxDoc(); docNum++ )
                 {
-                    Document doc = ctx.getIndexReader().document( docNum );
-
-                    String lastModified = doc.get( ArtifactInfo.LAST_MODIFIED );
-
-                    if ( lastModified != null )
+                    if ( !ir.isDeleted( docNum ) )
                     {
-                        long lm = Long.parseLong( lastModified );
+                        Document doc = ir.document( docNum );
 
-                        lm = lm + ( shiftDays * A_DAY_MILLIS );
+                        String lastModified = doc.get( ArtifactInfo.LAST_MODIFIED );
 
-                        doc.removeFields( ArtifactInfo.LAST_MODIFIED );
+                        if ( lastModified != null )
+                        {
+                            long lm = Long.parseLong( lastModified );
 
-                        doc.add( new Field( ArtifactInfo.LAST_MODIFIED, Long.toString( lm ), Field.Store.YES,
-                            Field.Index.NO ) );
+                            lm = lm + ( shiftDays * A_DAY_MILLIS );
 
-                        iw.updateDocument( new Term( ArtifactInfo.UINFO, doc.get( ArtifactInfo.UINFO ) ), doc );
+                            doc.removeFields( ArtifactInfo.LAST_MODIFIED );
+
+                            doc.add( new Field( ArtifactInfo.LAST_MODIFIED, Long.toString( lm ), Field.Store.YES,
+                                Field.Index.NO ) );
+
+                            iw.updateDocument( new Term( ArtifactInfo.UINFO, doc.get( ArtifactInfo.UINFO ) ), doc );
+                        }
                     }
                 }
+
+                ctx.optimize();
+
+                ctx.commit();
+
+                // shift timestamp too
+                if ( ctx.getTimestamp() != null )
+                {
+                    ctx.updateTimestamp( true, new Date( ctx.getTimestamp().getTime() + ( shiftDays * A_DAY_MILLIS ) ) );
+                }
+                else
+                {
+                    ctx.updateTimestamp( true, new Date( System.currentTimeMillis() + ( shiftDays * A_DAY_MILLIS ) ) );
+                }
             }
-
-            ctx.optimize();
-
-            ctx.commit();
-
-            // shift timestamp too
-            if ( ctx.getTimestamp() != null )
+            finally
             {
-                ctx.updateTimestamp( true, new Date( ctx.getTimestamp().getTime() + ( shiftDays * A_DAY_MILLIS ) ) );
-            }
-            else
-            {
-                ctx.updateTimestamp( true, new Date( System.currentTimeMillis() + ( shiftDays * A_DAY_MILLIS ) ) );
+                ctx.releaseIndexSearcher( is );
             }
         }
     }
 
     /**
      * Will reindex, shift if needed and publish indexes for a "remote" repository (published over jetty component).
-     *
+     * 
      * @param repositoryRoot
      * @param repositoryId
      * @param deleteIndexFiles
