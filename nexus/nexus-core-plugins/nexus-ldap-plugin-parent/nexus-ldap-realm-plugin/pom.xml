@@ -46,9 +46,8 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
       <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -62,10 +61,10 @@
       <artifactId>security-rest-api</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-web-utils</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 

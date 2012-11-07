@@ -76,9 +76,8 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
       <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Is in core -->
@@ -168,7 +167,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>

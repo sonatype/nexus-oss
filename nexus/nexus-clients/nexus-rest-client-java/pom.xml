@@ -29,8 +29,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>

@@ -18,7 +18,7 @@
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-test-harness</artifactId>
+    <artifactId>nexus-test</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
@@ -35,12 +35,11 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
-      <version>${project.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <version>${project.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.sonatype.sisu</groupId>
@@ -48,10 +47,10 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
      <dependency>
@@ -74,9 +73,9 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-client-java</artifactId>

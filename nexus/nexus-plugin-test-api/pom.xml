@@ -44,11 +44,12 @@
       <optional>true</optional>
     </dependency>
 
+    <!--
+    FIXME: Should update plugins to include this if only if using restlet1x plugin for REST.
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 

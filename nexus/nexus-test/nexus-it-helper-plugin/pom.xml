@@ -18,7 +18,7 @@
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-test-harness</artifactId>
+    <artifactId>nexus-test</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
   <artifactId>nexus-it-helper-plugin</artifactId>
@@ -46,14 +46,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.shiro</groupId>
-          <artifactId>shiro-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
