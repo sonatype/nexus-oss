@@ -16,8 +16,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import org.junit.Test;
-import org.sonatype.nexus.repository.site.client.ObrGroupRepository;
-import org.sonatype.nexus.repository.site.client.ObrHostedRepository;
+import org.sonatype.nexus.repository.obr.client.ObrGroupRepository;
+import org.sonatype.nexus.repository.obr.client.ObrHostedRepository;
 
 public class ObrGroupIT
     extends ObrITSupport

@@ -13,7 +13,7 @@
 package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
-import org.sonatype.nexus.repository.site.client.ObrHostedRepository;
+import org.sonatype.nexus.repository.obr.client.ObrHostedRepository;
 
 public class ObrHostedIT
     extends ObrITSupport

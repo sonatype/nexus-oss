@@ -26,8 +26,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.junit.Test;
-import org.sonatype.nexus.repository.site.client.ObrHostedRepository;
-import org.sonatype.nexus.repository.site.client.ObrProxyRepository;
+import org.sonatype.nexus.repository.obr.client.ObrHostedRepository;
+import org.sonatype.nexus.repository.obr.client.ObrProxyRepository;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 

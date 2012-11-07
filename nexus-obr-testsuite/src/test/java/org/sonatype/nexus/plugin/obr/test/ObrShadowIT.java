@@ -14,7 +14,7 @@ package org.sonatype.nexus.plugin.obr.test;
 
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
-import org.sonatype.nexus.repository.site.client.ObrVirtualRepository;
+import org.sonatype.nexus.repository.obr.client.ObrVirtualRepository;
 
 public class ObrShadowIT
     extends ObrITSupport
