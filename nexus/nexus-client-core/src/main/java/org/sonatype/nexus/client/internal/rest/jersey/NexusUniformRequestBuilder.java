@@ -586,8 +586,18 @@ public class NexusUniformRequestBuilder
                 {
                     if ( response.hasEntity() )
                     {
-                        final ErrorResponse errors = response.getEntity( ErrorResponse.class );
-                        throw new BadRequestException( errors );
+                        try
+                        {
+                            throw new BadRequestException( response.getEntity( ErrorResponse.class ) );
+                        }
+                        catch ( ClientHandlerException ignore )
+                        {
+                            // ignore as we do have an error response
+                        }
+                        catch ( UniformInterfaceException ignore )
+                        {
+                            // ignore as we do have an error response
+                        }
                     }
                 }
                 else if ( response.getStatus() == ClientResponse.Status.NOT_FOUND.getStatusCode() )
