@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -22,13 +23,51 @@
   </parent>
 
   <artifactId>nexus-test</artifactId>
-  <name>Nexus : Test : Support</name>
   <packaging>pom</packaging>
+
+  <!--
+  FIXME: Sort out what this is for...
+  -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-archiver</artifactId>
+        <version>2.2</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-component-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <modules>
     <module>nexus-test-common</module>
     <module>nexus-testsuite-client</module>
     <module>nexus-testsuite-support</module>
+    <module>nexus-it-helper-plugin</module>
+    <module>nexus-test-environment-maven-plugin</module>
+    <module>nexus-test-utils</module>
+    <module>nexus-test-harness-launcher</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>nexus-test-harness-its</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>nexus-test-harness-its</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

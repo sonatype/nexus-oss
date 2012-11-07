@@ -207,6 +207,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
             // a real item
             this.searchToolbar.add(this.convertToFieldObject(searchType.panelItems[i]));
           }
+          this.searchToolbar.doLayout();
         }
       },
       // toolbar only supports adding certain types of items, so we

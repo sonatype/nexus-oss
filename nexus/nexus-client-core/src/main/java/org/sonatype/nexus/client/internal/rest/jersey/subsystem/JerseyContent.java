@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import javax.ws.rs.core.Response;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
@@ -61,36 +62,21 @@ public class JerseyContent
             );
         }
 
-        final ClientResponse response =
-            getNexusClient().uri( CONTENT_PREFIX + location.toContentPath() ).get( ClientResponse.class );
+        final ClientResponse response = validateResponse(
+            location,
+            getNexusClient().uri( CONTENT_PREFIX + location.toContentPath() ).get( ClientResponse.class )
+        );
 
+        FileOutputStream fos = null;
         try
         {
-            if ( response.getStatus() >= 200 && response.getStatus() <= 299 )
-            {
-                FileOutputStream fos = null;
-                try
-                {
-                    fos = new FileOutputStream( target );
-                    IOUtil.copy( response.getEntityInputStream(), fos );
-                }
-                finally
-                {
-                    IOUtil.close( fos );
-                }
-            }
-            else if ( response.getStatus() == 404 )
-            {
-                throw new FileNotFoundException( location.toString() );
-            }
-            else
-            {
-                throw new IOException( "Unexpected response: " + response.getClientResponseStatus() );
-            }
+            fos = new FileOutputStream( target );
+            IOUtil.copy( response.getEntityInputStream(), fos );
         }
         finally
         {
             response.close();
+            IOUtil.close( fos );
         }
     }
 
@@ -98,50 +84,40 @@ public class JerseyContent
     public void upload( final Location location, final File target )
         throws IOException
     {
-        final ClientResponse response =
-            getNexusClient().uri( CONTENT_PREFIX + location.toContentPath() ).put( ClientResponse.class, target );
-        try
-        {
-            if ( response.getStatus() >= 200 && response.getStatus() <= 299 )
-            {
-                // we are okay
-            }
-            else
-            {
-                throw new IOException( "Unexpected response: " + response.getClientResponseStatus() );
-            }
-        }
-        finally
-        {
-            response.close();
-        }
+        validateResponse(
+            location,
+            getNexusClient().uri( CONTENT_PREFIX + location.toContentPath() ).put( ClientResponse.class, target )
+        );
     }
 
     @Override
     public void delete( final Location location )
         throws IOException
     {
-        final ClientResponse response =
-            getNexusClient().uri( CONTENT_PREFIX + location.toContentPath() ).delete( ClientResponse.class );
+        validateResponse(
+            location,
+            getNexusClient().uri( CONTENT_PREFIX + location.toContentPath() ).delete( ClientResponse.class )
+        );
+    }
 
-        try
-        {
-            if ( response.getStatus() >= 200 && response.getStatus() <= 299 )
-            {
-                // we are okay
-            }
-            else if ( response.getStatus() == 404 )
-            {
-                throw new FileNotFoundException( location.toString() );
-            }
-            else
-            {
-                throw new IOException( "Unexpected response: " + response.getClientResponseStatus() );
-            }
-        }
-        finally
+    private ClientResponse validateResponse( final Location location, final ClientResponse response )
+        throws IOException
+    {
+        if ( !successful( response ) )
         {
             response.close();
+            if ( Response.Status.NOT_FOUND.getStatusCode() == response.getStatus() )
+            {
+                throw new FileNotFoundException( "Inexistent Nexus path: " + location.toString() );
+            }
+            throw new IOException( "Unexpected response: " + response.getClientResponseStatus() );
         }
+        return response;
     }
+
+    private boolean successful( final ClientResponse response )
+    {
+        return Response.Status.Family.SUCCESSFUL.equals( response.getClientResponseStatus().getFamily() );
+    }
+
 }

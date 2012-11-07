@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 /**
  * An wrapper {@link Hc4Provider} that automatically registers / unregisters JMX MBeans for each created
  * {@link HttpClient}s and {@link PoolingClientConnectionManager}.
- *
+ * 
  * @since 2.2
  */
-@Named()
+@Named
 @Singleton
 public class PoolingClientConnectionManagerMBeanInstaller
 {
@@ -40,25 +40,27 @@ public class PoolingClientConnectionManagerMBeanInstaller
 
     private ObjectName jmxName;
 
+    /**
+     * Registers the connection manager to JMX.
+     * 
+     * @param connectionManager
+     */
     public synchronized void register( final PoolingClientConnectionManager connectionManager )
     {
         if ( jmxName == null )
         {
             try
             {
-                jmxName = ObjectName.getInstance(
-                    JMX_DOMAIN, "name", PoolingClientConnectionManager.class.getSimpleName()
-                );
+                jmxName =
+                    ObjectName.getInstance( JMX_DOMAIN, "name", PoolingClientConnectionManager.class.getSimpleName() );
 
                 final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
                 server.registerMBean( new PoolingClientConnectionManagerMBeanImpl( connectionManager ), jmxName );
             }
             catch ( final Exception e )
             {
-                LOGGER.warn(
-                    "Failed to register mbean {} due to {}:{}",
-                    new Object[]{ jmxName, e.getClass(), e.getMessage() }
-                );
+                LOGGER.warn( "Failed to register mbean {} due to {}:{}",
+                    new Object[] { jmxName, e.getClass(), e.getMessage() } );
                 jmxName = null;
             }
         }
@@ -68,6 +70,9 @@ public class PoolingClientConnectionManagerMBeanInstaller
         }
     }
 
+    /**
+     * Unregisters the connection manager from JMX.
+     */
     public synchronized void unregister()
     {
         if ( jmxName != null )
@@ -79,10 +84,8 @@ public class PoolingClientConnectionManagerMBeanInstaller
             }
             catch ( final Exception e )
             {
-                LOGGER.warn(
-                    "Failed to unregister mbean {} due to {}:{}",
-                    new Object[]{ jmxName, e.getClass(), e.getMessage() }
-                );
+                LOGGER.warn( "Failed to unregister mbean {} due to {}:{}",
+                    new Object[] { jmxName, e.getClass(), e.getMessage() } );
             }
             finally
             {

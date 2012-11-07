@@ -19,13 +19,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -130,6 +133,8 @@ public class IndexTemplatePlexusResource
         List<String> pluginPreBodyContributions = new ArrayList<String>();
         List<String> pluginPostBodyContributions = new ArrayList<String>();
 
+        List<String> pluginJsFiles = new ArrayList<String>();
+
         for ( String key : bundles.keySet() )
         {
             pluginContext = new HashMap<String, Object>( topContext );
@@ -142,29 +147,38 @@ public class IndexTemplatePlexusResource
 
             String preHeadTemplate = bundle.getPreHeadContribution( pluginContext );
 
-            evaluateIfNeeded( pluginContext, preHeadTemplate,
-                pluginPreHeadContributions );
+            evaluateIfNeeded( pluginContext, preHeadTemplate, pluginPreHeadContributions );
 
             // post HEAD
 
             String postHeadTemplate = bundle.getPostHeadContribution( pluginContext );
 
-            evaluateIfNeeded( pluginContext, postHeadTemplate,
-                pluginPostHeadContributions );
+            final Document html = Jsoup.parse( postHeadTemplate );
+            final Elements scripts = html.select( "script" );
+            for ( Element script : scripts )
+            {
+                final String src = script.attr( "src" );
+                if ( !src.isEmpty() )
+                {
+                    pluginJsFiles.add( src );
+                    script.remove();
+                }
+            }
+            postHeadTemplate = html.head().children().toString();
+
+            evaluateIfNeeded( pluginContext, postHeadTemplate, pluginPostHeadContributions );
 
             // pre BODY
 
             String preBodyTemplate = bundle.getPreBodyContribution( pluginContext );
 
-            evaluateIfNeeded( pluginContext, preBodyTemplate,
-                pluginPreBodyContributions );
+            evaluateIfNeeded( pluginContext, preBodyTemplate, pluginPreBodyContributions );
 
             // post BODY
 
             String postBodyTemplate = bundle.getPostBodyContribution( pluginContext );
 
-            evaluateIfNeeded( pluginContext, postBodyTemplate,
-                pluginPostBodyContributions );
+            evaluateIfNeeded( pluginContext, postBodyTemplate, pluginPostBodyContributions );
         }
 
         templatingContext.put( "appName", nexus.getSystemStatus().getAppName() );
@@ -176,11 +190,17 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "pluginPreBodyContributions", pluginPreBodyContributions );
         templatingContext.put( "pluginPostBodyContributions", pluginPostBodyContributions );
 
-        final VelocityRepresentation templateRepresentation =
-            new VelocityRepresentation( context, templateFilename, getClass().getClassLoader(), templatingContext,
-                MediaType.TEXT_HTML );
+        templatingContext.put( "pluginJsFiles", pluginJsFiles );
 
-        return templateRepresentation;
+        final String query = request.getResourceRef().getQuery();
+        String debug = null;
+        if ( query != null && query.contains( "debug" ) )
+        {
+            debug = "-debug";
+        }
+        templatingContext.put( "debug", debug );
+
+        return new VelocityRepresentation( context, templateFilename, getClass().getClassLoader(), templatingContext, MediaType.TEXT_HTML );
     }
 
     protected void evaluateIfNeeded( Map<String, Object> context, String template,

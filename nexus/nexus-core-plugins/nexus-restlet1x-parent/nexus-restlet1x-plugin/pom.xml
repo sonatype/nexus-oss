@@ -89,17 +89,21 @@
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
         </exclusion>
-        <!-- Velocity is in core -->
         <exclusion>
           <groupId>org.apache.velocity</groupId>
           <artifactId>velocity</artifactId>
         </exclusion>
-        <!-- plexus-host-api is in core -->
         <exclusion>
           <groupId>org.sonatype.plugin</groupId>
           <artifactId>plugin-host-api</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-velocity</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -146,6 +150,11 @@
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
     </dependency>
 
     <!--

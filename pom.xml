@@ -81,19 +81,17 @@
               <exclude>**/nexus*/target/**</exclude>
               <exclude>**/nexus-ldap-plugin-parent/ldap-common/target/**</exclude>
               <exclude>**/ext-2.3/**</exclude>
+              <exclude>**/ext-3.4.0/**</exclude>
               <exclude>**/js/filetree/**</exclude>
               <exclude>**/editarea_0_8_2/**</exclude>
               <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
               <!-- FIXME is this really a good idea excluding all test resources? -->
               <exclude>**/src/test/resources/**</exclude>
-              <exclude>**/nexus/nexus-test-harness/nexus-test-harness-its/resources/**</exclude>
-              <exclude>**/nexus-repository-metadata/**</exclude>
+              <exclude>**/nexus-test-harness-its/resources/**</exclude>
               <exclude>**/gwt/ext/ui/**/*.js</exclude>
               <exclude>**/gwt/ext/ui/**/*.css</exclude>
               <!-- already has a lgpl license -->
               <exclude>**/Ext.ux.form.LovCombo.css</exclude>
-              <!-- Apache licensed, see profile -->
-              <exclude>**/nexus-migration-plugin/**</exclude>
               <!-- grid makes this directory -->
               <exclude>.maven/**</exclude>
               <!-- eclipse makes this directory -->
@@ -107,6 +105,10 @@
               <exclude>**/.idea/**</exclude>
               <exclude>**/atlassian-ide-plugin.xml</exclude>
               <exclude>nexus-plugin-archetype/src/main/resources/archetype-resources/**</exclude>
+              <exclude>nexus/nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
+              <exclude>nexus/nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
+              <!-- tell license plugin to ignore workaround for MINDEXER-65 -->
+              <exclude>nexus/nexus-core-plugins/nexus-indexer-lucene-plugin-parent/nexus-indexer-lucene-plugin/src/main/java/copied/org/apache/maven/index/DefaultScannerListener.java</exclude>
             </excludes>
             <mapping>
               <vm>SHARPSTAR_STYLE</vm>

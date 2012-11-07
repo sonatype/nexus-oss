@@ -290,83 +290,18 @@
                   <insertNewLine>true</insertNewLine>
                   <output>${compressed-dir}/js/sonatype-all.js</output>
                   <inputDir>${project.build.directory}/generated-sources/yuicompressor/js</inputDir>
+                  <excludes>
+                    <exclude>lib/require*.js</exclude>
+                  </excludes>
                   <includes>
-                    <include>${basedir}/src/main/webapp/ext-2.3/adapter/ext/ext-base.js</include>
-                    <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
-                    <include>nexus/common.js</include>
-                    <include>nexus/error/common.js</include>
-                    <include>nexus/error/ErrorHandler.js</include>
-                    <include>nexus/util/common.js</include>
-                    <include>nexus/util/Format.js</include>
-                    <include>extensions/ext-override.js</include>
-                    <include>filetree/js/Ext.ux.form.BrowseButton.js</include>
-                    <include>groupcombo/groupcombo.js</include>
-                    <include>groupcombo/groupdataview.js</include>
-                    <include>Sonatype.js</include>
-                    <include>extensions/Ext.messagebox.js</include>
-                    <include>extensions/Ext.form.js</include>
-                    <include>extensions/SearchField.js</include>
-                    <include>extensions/Sonatype.ext.FeedGrid.js</include>
-                    <include>extensions/Ext.tree.js</include>
-                    <include>extensions/ext.util.md5.js</include>
-                    <include>extensions/MultiSelectTree.js</include>
-                    <include>extensions/TwinPanelController.js</include>
-                    <include>extensions/TextEntryList.js</include>
-                    <include>extensions/Sonatype.events.js</include>
-                    <include>extensions/Sonatype.navigation.js</include>
-                    <include>extensions/Sonatype.panels.js</include>
-                    <include>extensions/Ext.ux.form.LovCombo.js</include>
-                    <include>extensions/Ext.ux.ThemeCombo.js</include>
-                    <include>extensions/RoleSelector.js</include>
-                    <include>nexus/form/common.js</include>
-                    <include>nexus/form/LabelField.js</include>
-                    <include>Sonatype.utils.js</include>
-                    <include>Sonatype.config.js</include>
-                    <include>Sonatype.lib.js</include>
-                    <include>Sonatype.resources.js</include>
-                    <include>Sonatype.headLinks.js</include>
-                    <include>Sonatype.view.js</include>
-                    <include>extensions/ZeroClipboard.js</include>
-                    <include>formFieldGenerator.js</include>
-                    <include>repoServer/repoServer.referenceData.js</include>
-                    <include>repoServer/repoServer.resources.js</include>
-                    <include>repoServer/repoServer.FeedViewPanel.js</include>
-                    <include>repoServer/repoServer.ArtifactContainer.js</include>
-                    <include>repoServer/repoServer.LogsViewPanel.js</include>
-                    <include>repoServer/repoServer.ServerEditPanel.js</include>
-                    <include>repoServer/repoServer.RoutesEditPanel.js</include>
-                    <include>repoServer/repoServer.SchedulesEditPanel.js</include>
-                    <include>repoServer/repoServer.UserEditPanel.js</include>
-                    <include>repoServer/repoServer.RoleEditPanel.js</include>
-                    <include>repoServer/repoServer.PrivilegeEditPanel.js</include>
-                    <include>repoServer/repoServer.AbstractRepoPanel.js</include>
-                    <include>repoServer/repoServer.FileUploadPanel.js</include>
-                    <include>repoServer/repoServer.RepoMaintPanel.js</include>
-                    <include>repoServer/repoServer.RepositoryBrowserContainer.js</include>
-                    <include>repoServer/repoServer.RepoEditPanel.js</include>
-                    <include>repoServer/repoServer.GroupsEditPanel.js</include>
-                    <include>repoServer/repoServer.RepoServer.js</include>
-                    <include>repoServer/repoServer.RepoTargetEditPanel.js</include>
-                    <include>repoServer/repoServer.helpAbout.js</include>
-                    <include>repoServer/repoServer.Documentation.js</include>
-                    <include>repoServer/repoServer.LogEditPanel.js</include>
-                    <include>repoServer/repoServer.MirrorConfigPanel.js</include>
-                    <include>repoServer/repoServer.UserBrowserPanel.js</include>
-                    <include>repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
-                    <include>repoServer/repoServer.RepoSummaryPanel.js</include>
-                    <include>repoServer/repoServer.Maven2InformationPanel.js</include>
-                    <include>nexus/profile/common.js</include>
-                    <include>nexus/profile/UserProfile.js</include>
-                    <include>nexus/profile/Summary.js</include>
-                  </includes>
+                    <include>**/*.js</include>
+                  </includes> 
                 </aggregation>
                 <aggregation>
                   <output>${compressed-dir}/style/sonatype-all.css</output>
                   <inputDir>${project.build.directory}/generated-sources/yuicompressor/style</inputDir>
-                  <!-- files to include, path relative to output's directory or absolute path -->
                   <includes>
-                    <include>Ext.ux.form.LovCombo.css</include>
-                    <include>Sonatype.css</include>
+                    <include>**/*.css</include>
                   </includes>
                 </aggregation>
               </aggregations>
@@ -374,6 +309,7 @@
           </execution>
           <execution>
             <id>jslint</id>
+            <phase>verify</phase>
             <goals>
               <goal>jslint</goal>
             </goals>
@@ -382,7 +318,12 @@
               <!-- only include new js resources following the Nexus.* namespace -->
               <includes>
                 <include>js/nexus/**/*.js</include>
+                <include>js/ext/**/*.js</include>
               </includes>
+              <excludes>
+                <!-- do not check third party extensions -->
+                <exclude>js/ext/ux/**/*.js</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>
@@ -408,23 +349,16 @@
         <configuration>
           <warSourceIncludes>
             *,
-            ext-2.3/ext-all-debug.js,
-            ext-2.3/ext-all.js,
-            ext-2.3/adapter/ext/ext-base.js,
-            ext-2.3/resources/css/ext-all.css,
-            ext-2.3/resources/css/xtheme-gray.css,
-            ext-2.3/resources/images/**,
+            ext-3.4.0/adapter/ext/ext-base-debug.js,
+            ext-3.4.0/ext-all-debug.js,
+            ext-3.4.0/adapter/ext/ext-base.js,
+            ext-3.4.0/ext-all.js,
+            ext-3.4.0/resources/css/ext-all.css,
+            ext-3.4.0/resources/css/xtheme-gray.css,
+            ext-3.4.0/resources/images/**,
             images/**,
-            js/*,
-            js/extensions/*,
-            js/filetree/js/Ext.ux.form.BrowseButton.js,
-            js/groupcombo/*,
-            js/repoServer/*,
-            style/Sonatype.css,
-            style/Sonatype-content.css,
-            style/Ext.ux.form.LovCombo.css,
             WEB-INF/*,
-            js/sonatype-all.js,
+            js/lib/*,
             style/sonatype-all.css
           </warSourceIncludes>
           <webResources>
@@ -462,6 +396,31 @@
           </execution>
         </executions>
       </plugin>
+      <!--
+      <plugin>
+        <groupId>com.github.mcheely</groupId>
+        <artifactId>requirejs-maven-plugin</artifactId>
+        <version>1.0.4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>optimize</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <configFile>
+            ${basedir}/src/main/config/buildconfig.js
+          </configFile>
+          <filterConfig>
+            true
+          </filterConfig>
+          <skip>
+            false
+          </skip>
+        </configuration>
+      </plugin>
+      -->
     </plugins>
   </build>
 

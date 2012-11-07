@@ -103,4 +103,20 @@ public interface NexusBundleConfiguration
      */
     Map<String, String> getLogLevels();
 
+    /**
+     * Sets logging pattern.
+     *
+     * @param pattern logging pattern (cannot be null)
+     * @since 2.3
+     */
+    NexusBundleConfiguration setLogPattern( String pattern );
+
+    /**
+     * Gets the configured logging pattern.
+     *
+     * @return logging pattern. Null in case default one should be used
+     * @since 2.3
+     */
+    String getLogPattern();
+
 }

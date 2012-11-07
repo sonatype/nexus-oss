@@ -138,10 +138,6 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
       },
       refreshHandler : function(button, e) {
         Sonatype.Events.fireEvent(this.nodeClickEvent, null, this.nodeClickPassthru);
-        if (this.root)
-        {
-          this.root.destroy();
-        }
         if (this.payload)
         {
           this.loader.url = this.payload.data.resourceURI + '/index_content';
@@ -182,9 +178,10 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
               }));
         }
 
+        Sonatype.repoServer.IndexBrowserPanel.superclass.refreshHandler.apply(this, arguments);
+
         if (this.innerCt)
         {
-          this.innerCt.update('');
           this.afterRender();
         }
       },
