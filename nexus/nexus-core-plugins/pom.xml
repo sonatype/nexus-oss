@@ -38,7 +38,7 @@
   </dependencies>
 
   <modules>
-    <module>nexus-restlet1x-parent</module>
+    <module>restlet1x</module>
     <module>indexer</module>
     <module>ldap</module>
     <module>nexus-timeline-plugin</module>
