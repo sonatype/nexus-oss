@@ -15,13 +15,14 @@ package org.sonatype.nexus.client.core;
 /**
  * Generic runtime exception to be thrown by Subsystems, when some error is reported by Nexus. This exception here is
  * solely for purpose of not proliferating possible runtime exceptions of underlying implementation.
- * 
- * @author cstamas
+ *
+ * @since 2.1
  */
 @SuppressWarnings( "serial" )
 public abstract class NexusClientException
     extends RuntimeException
 {
+
     public NexusClientException( String message )
     {
         super( message );

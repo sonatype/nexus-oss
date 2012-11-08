@@ -13,23 +13,17 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-  <!-- the version of maven's project object model -->
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <!-- a unique name for this project -->
   <artifactId>nexus-webapp</artifactId>
-  <!--we don't need this to be a jar except that the app assembler crashes if it's not -->
-  <packaging>war</packaging>
-  <!-- a short but descriptive name for the project -->
   <name>Nexus : Web Application</name>
+  <packaging>war</packaging>
 
   <properties>
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
@@ -37,59 +31,53 @@
 
     <plugin-repository.directory>${project.build.finalName}/WEB-INF/plugin-repository</plugin-repository.directory>
     <optional-plugins.directory>${project.build.finalName}/WEB-INF/optional-plugins</optional-plugins.directory>
+
+    <maven.yuicompressor.failOnWarning>true</maven.yuicompressor.failOnWarning>
   </properties>
 
   <dependencies>
-  
-    <!-- This is here to prevent it coming into WAR -->
+    <!--
+    Prevent Servlet API from being included in the WAR.
+    -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
-    <!-- The bundle -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-slf4j-logging</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-web-utils</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>servlet-api-2.5</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-manager</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-api</artifactId>
-    </dependency>
+    <!--
+    FIXME: Put these into DM
+    -->
 
     <!-- There are problems with the Maven reactor that would require these modules However if we include as a test scope the reactor will be happy and the dependency pom will be correct -->
     <dependency>
@@ -163,27 +151,12 @@
       <type>zip</type>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-groovy-console-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>httpunit</groupId>
-      <artifactId>httpunit</artifactId>
-      <version>1.6.2</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
@@ -252,14 +225,6 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-groovy-console-plugin</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                  <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-maven-bridge-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
@@ -271,138 +236,75 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
-        <groupId>net.sf.alchim</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>0.7.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>2.0.1</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
-            <id>jsfiles</id>
+            <id>aggregate</id>
+
             <goals>
               <goal>compress</goal>
             </goals>
+
             <configuration>
+              <sourceDirectory>${project.basedir}/src/main/webapp</sourceDirectory>
+
+              <includes>
+                <include>js/**/*.js</include>
+                <include>style/**/*.css</include>
+              </includes>
+
+              <!-- yuicompressor warns when code is not in a shape that's optimized for minifying. Those checks are a subset of jslint,
+                   so new/ported code in the Nexus.* namespace will be checked for that anyway. ATM this only pollutes the log (~9400 warnings) -->
+              <jswarn>false</jswarn>
+              <failOnWarning>false</failOnWarning>
+
               <aggregations>
                 <aggregation>
+                  <insertNewLine>true</insertNewLine>
                   <output>${compressed-dir}/js/sonatype-all.js</output>
-                  <!-- files to include, path relative to output's directory or absolute path -->
+                  <inputDir>${project.build.directory}/generated-sources/yuicompressor/js</inputDir>
+                  <excludes>
+                    <exclude>lib/require*.js</exclude>
+                  </excludes>
                   <includes>
-                    <include>${basedir}/src/main/webapp/ext-2.3/adapter/ext/ext-base.js</include>
-                    <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
-                    <include>${compressed-dir}/js/nexus/common.js</include>
-                    <include>${compressed-dir}/js/nexus/error/common.js</include>
-                    <include>${compressed-dir}/js/nexus/error/ErrorHandler.js</include>
-                    <include>${compressed-dir}/js/nexus/util/common.js</include>
-                    <include>${compressed-dir}/js/nexus/util/Format.js</include>
-                    <include>${compressed-dir}/js/extensions/ext-override.js</include>
-                    <include>${compressed-dir}/js/filetree/js/Ext.ux.form.BrowseButton.js</include>
-                    <include>${compressed-dir}/js/groupcombo/groupcombo.js</include>
-                    <include>${compressed-dir}/js/groupcombo/groupdataview.js</include>
-                    <include>${compressed-dir}/js/Sonatype.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.messagebox.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.form.js</include>
-                    <include>${compressed-dir}/js/extensions/SearchField.js</include>
-                    <include>${compressed-dir}/js/extensions/Sonatype.ext.FeedGrid.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.tree.js</include>
-                    <include>${compressed-dir}/js/extensions/ext.util.md5.js</include>
-                    <include>${compressed-dir}/js/extensions/MultiSelectTree.js</include>
-                    <include>${compressed-dir}/js/extensions/TwinPanelController.js</include>
-                    <include>${compressed-dir}/js/extensions/TextEntryList.js</include>
-                    <include>${compressed-dir}/js/extensions/Sonatype.events.js</include>
-                    <include>${compressed-dir}/js/extensions/Sonatype.navigation.js</include>
-                    <include>${compressed-dir}/js/extensions/Sonatype.panels.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.ux.form.LovCombo.js</include>
-                    <include>${compressed-dir}/js/extensions/Ext.ux.ThemeCombo.js</include>
-                    <include>${compressed-dir}/js/extensions/RoleSelector.js</include>
-                    <include>${compressed-dir}/js/nexus/form/common.js</include>
-                    <include>${compressed-dir}/js/nexus/form/LabelField.js</include>
-                    <include>${compressed-dir}/js/Sonatype.utils.js</include>
-                    <include>${compressed-dir}/js/Sonatype.config.js</include>
-                    <include>${compressed-dir}/js/Sonatype.lib.js</include>
-                    <include>${compressed-dir}/js/Sonatype.resources.js</include>
-                    <include>${compressed-dir}/js/Sonatype.headLinks.js</include>
-                    <include>${compressed-dir}/js/Sonatype.view.js</include>
-                    <include>${compressed-dir}/js/extensions/ZeroClipboard.js</include>
-                    <include>${compressed-dir}/js/formFieldGenerator.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.referenceData.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.resources.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.FeedViewPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.ArtifactContainer.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.LogsViewPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.ServerEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RoutesEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.SchedulesEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.UserEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RoleEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.PrivilegeEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.AbstractRepoPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.FileUploadPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoMaintPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepositoryBrowserContainer.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.GroupsEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoServer.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoTargetEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.helpAbout.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.Documentation.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.LogEditPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.MirrorConfigPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.UserBrowserPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.RepoSummaryPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.Maven2InformationPanel.js</include>
-                    <include>${compressed-dir}/js/nexus/profile/common.js</include>
-                    <include>${compressed-dir}/js/nexus/profile/UserProfile.js</include>
-                    <include>${compressed-dir}/js/nexus/profile/Summary.js</include>
+                    <include>**/*.js</include>
+                  </includes> 
+                </aggregation>
+                <aggregation>
+                  <output>${compressed-dir}/style/sonatype-all.css</output>
+                  <inputDir>${project.build.directory}/generated-sources/yuicompressor/style</inputDir>
+                  <includes>
+                    <include>**/*.css</include>
                   </includes>
                 </aggregation>
               </aggregations>
             </configuration>
           </execution>
           <execution>
-            <id>cssfiles</id>
+            <id>jslint</id>
+            <phase>verify</phase>
             <goals>
-              <goal>compress</goal>
+              <goal>jslint</goal>
             </goals>
             <configuration>
-              <aggregations>
-                <aggregation>
-                  <output>${compressed-dir}/style/sonatype-all.css</output>
-                  <!-- files to include, path relative to output's directory or absolute path -->
-                  <includes>
-                    <include>${compressed-dir}/style/Ext.ux.form.LovCombo.css</include>
-                    <include>${compressed-dir}/style/Sonatype.css</include>
-                  </includes>
-                </aggregation>
-              </aggregations>
+              <!-- jslint goal will include sources in src/main/webapp by default -->
+              <!-- only include new js resources following the Nexus.* namespace -->
+              <includes>
+                <include>js/nexus/**/*.js</include>
+                <include>js/ext/**/*.js</include>
+              </includes>
+              <excludes>
+                <!-- do not check third party extensions -->
+                <exclude>js/ext/ux/**/*.js</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <outputDirectory>${compressed-dir}</outputDirectory>
-          <sourceDirectory>${basedir}/src/main/webapp</sourceDirectory>
-          <webappDirectory>${compressed-dir}</webappDirectory>
-          <nosuffix>true</nosuffix>
-          <nomunge>true</nomunge>
-          <jswarn>false</jswarn>
-          <excludes>
-            <exclude>**/ext-2.3/**/*.js</exclude>
-          </excludes>
-          <aggregations>
-            <aggregation>
-              <!-- insert new line after each concatenation (default: false) -->
-              <insertNewLine>true</insertNewLine>
-            </aggregation>
-          </aggregations>
-        </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
@@ -416,29 +318,23 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.1-alpha-2</version>
         <configuration>
           <warSourceIncludes>
             *,
-            ext-2.3/ext-all-debug.js,
-            ext-2.3/ext-all.js,
-            ext-2.3/adapter/ext/ext-base.js,
-            ext-2.3/resources/css/ext-all.css,
-            ext-2.3/resources/css/xtheme-gray.css,
-            ext-2.3/resources/images/**,
+            ext-3.4.0/adapter/ext/ext-base-debug.js,
+            ext-3.4.0/ext-all-debug.js,
+            ext-3.4.0/adapter/ext/ext-base.js,
+            ext-3.4.0/ext-all.js,
+            ext-3.4.0/resources/css/ext-all.css,
+            ext-3.4.0/resources/css/xtheme-gray.css,
+            ext-3.4.0/resources/images/**,
             images/**,
-            js/*,
-            js/extensions/*,
-            js/filetree/js/Ext.ux.form.BrowseButton.js,
-            js/groupcombo/*,
-            js/repoServer/*,
-            style/Sonatype.css,
-            style/Sonatype-content.css,
-            style/Ext.ux.form.LovCombo.css,
             WEB-INF/*,
-            js/sonatype-all.js,
+            js/lib/*,
             style/sonatype-all.css
           </warSourceIncludes>
           <webResources>
@@ -453,36 +349,12 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>${jetty.version}</version>
-        <configuration>
-          <webXml>${basedir}/src/main/webapp-war-extras/WEB-INF/web.xml</webXml>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>plx-maven-plugin</artifactId>
-        <version>1.4</version>
-        <configuration>
-          <includeTestClasspath>true</includeTestClasspath>
-          <!-- prependClasspaths> <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath> </prependClasspaths -->
-          <systemProperties>
-            <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
-          </systemProperties>
-          <platformArtifact>
-            <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-            <artifactId>plexus-platform-base</artifactId>
-            <version>${plexus.appbooter.version}</version>
-          </platformArtifact>
-          <debugOutput>true</debugOutput>
-        </configuration>
-      </plugin>
+      <!--
+      NOTE: This makes a new artifact (not attached w/classifier) with artifactId nexus-webapp-dependencies :-(
+      -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <version>1.5</version>
         <executions>
           <execution>
             <id>generate-dependency-poms</id>
@@ -500,26 +372,32 @@
           </execution>
         </executions>
       </plugin>
+      <!--
       <plugin>
-        <groupId>org.simplericity.jettyconsole</groupId>
-        <artifactId>jetty-console-maven-plugin</artifactId>
-        <version>1.42</version>
+        <groupId>com.github.mcheely</groupId>
+        <artifactId>requirejs-maven-plugin</artifactId>
+        <version>1.0.4</version>
         <executions>
           <execution>
-            <configuration>
-              <backgroundImage>${basedir}/src/main/jettyconsole/background-image-nexus.jpg</backgroundImage>
-              <additionalDependencies>
-                <additionalDependency>
-                  <artifactId>jetty-console-jettyxml-plugin</artifactId>
-                </additionalDependency>
-              </additionalDependencies>
-            </configuration>
             <goals>
-              <goal>createconsole</goal>
+              <goal>optimize</goal>
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <configFile>
+            ${basedir}/src/main/config/buildconfig.js
+          </configFile>
+          <filterConfig>
+            true
+          </filterConfig>
+          <skip>
+            false
+          </skip>
+        </configuration>
       </plugin>
+      -->
     </plugins>
   </build>
+
 </project>

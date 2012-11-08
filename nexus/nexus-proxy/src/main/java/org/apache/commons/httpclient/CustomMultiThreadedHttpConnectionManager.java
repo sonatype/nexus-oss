@@ -45,7 +45,9 @@ import org.slf4j.LoggerFactory;
  * @author Carl A. Dunham
  * @author Brian Demers
  *
+ * @deprecated Use httpclient4 components instead
  */
+@Deprecated
 public class CustomMultiThreadedHttpConnectionManager implements HttpConnectionManager {
 
     // -------------------------------------------------------- Class Variables

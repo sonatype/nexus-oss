@@ -21,9 +21,11 @@ import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.ArtifactResolveResource;
 import org.sonatype.nexus.rest.model.ArtifactResolveResourceResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+/**
+ * @since 2.1
+ */
 public class JerseyArtifactMaven
     extends SubsystemSupport<JerseyNexusClient>
     implements ArtifactMaven
@@ -56,29 +58,14 @@ public class JerseyArtifactMaven
             queryParams.add( "e", req.getExtension() );
         }
 
-        try
-        {
-            final ArtifactResolveResource data =
-                getNexusClient().serviceResource( "artifact/maven/resolve", queryParams ).get(
-                    ArtifactResolveResourceResponse.class ).getData();
+        final ArtifactResolveResource data = getNexusClient().serviceResource( "artifact/maven/resolve", queryParams )
+            .get( ArtifactResolveResourceResponse.class ).getData();
 
-            return new ResolveResponse( data.isPresentLocally(), data.getGroupId(), data.getArtifactId(),
-                                        data.getVersion(), data.getBaseVersion(), data.getClassifier(),
-                                        data.getExtension(), data.isSnapshot(),
-                                        data.getSnapshotBuildNumber(), data.getSnapshotTimeStamp(), data.getFileName(),
-                                        data.getSha1(),
-                                        data.getRepositoryPath() );
-        }
-        catch ( UniformInterfaceException e )
-        {
-            if ( e.getResponse().getStatus() == 404 )
-            {
-                return null;
-            }
-            else
-            {
-                throw e;
-            }
-        }
+        return new ResolveResponse( data.isPresentLocally(), data.getGroupId(), data.getArtifactId(),
+                                    data.getVersion(), data.getBaseVersion(), data.getClassifier(),
+                                    data.getExtension(), data.isSnapshot(),
+                                    data.getSnapshotBuildNumber(), data.getSnapshotTimeStamp(), data.getFileName(),
+                                    data.getSha1(),
+                                    data.getRepositoryPath() );
     }
 }

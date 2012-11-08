@@ -21,10 +21,12 @@ package org.sonatype.nexus.client.internal.msg;
 //---------------------------------/
 
 /**
- * COPIED FROM plexus-restlet-bridge to cease the dependency on it (as it would pull in Restlet and other shit).
+ * COPIED FROM plexus-restlet-bridge to cease the dependency on it (as it would pull in Restlet and many other
+ * dependencies).
+ * <p/>
  * An item describing the error.
  *
- * @version $Revision$ $Date$
+ * @since 2.1
  */
 public class ErrorMessage
     implements java.io.Serializable

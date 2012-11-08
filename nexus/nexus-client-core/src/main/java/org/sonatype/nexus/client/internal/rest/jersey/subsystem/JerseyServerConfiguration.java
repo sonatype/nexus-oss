@@ -18,6 +18,9 @@ import org.sonatype.nexus.client.core.subsystem.config.HttpProxy;
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.config.JerseyHttpProxy;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
+/**
+ * @since 2.2
+ */
 public class JerseyServerConfiguration
     extends SubsystemSupport<JerseyNexusClient>
     implements ServerConfiguration

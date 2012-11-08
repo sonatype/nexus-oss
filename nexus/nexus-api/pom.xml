@@ -12,29 +12,20 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-  <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
 
-  <!-- the version of maven's project object model -->
-  <modelVersion>4.0.0</modelVersion>
-
-  <!-- a unique name for this project -->
   <artifactId>nexus-api</artifactId>
-
-  <!-- POM packaging -->
-  <packaging>jar</packaging>
-
-  <!-- a short but descriptive name for the project -->
   <name>Nexus : API</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -45,20 +36,31 @@
       <artifactId>nexus-utils</artifactId>
     </dependency>
 
-    <!-- Here for "compatibility" reason only! -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-multibindings</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-assistedinject</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.plexus.appevents</groupId>
       <artifactId>plexus-app-events-api</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-task-scheduler</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-task-scheduler</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.configuration</groupId>
       <artifactId>base-configuration</artifactId>
@@ -72,40 +74,18 @@
     <dependency>
       <groupId>eu.medsea.mimeutil</groupId>
       <artifactId>mime-util</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
-    <!-- for marking extensions -->
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-host-api</artifactId>
     </dependency>
 
-    <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
-
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-
-    </plugins>
-  </build>
 
 </project>

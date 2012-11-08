@@ -39,4 +39,10 @@ public abstract class NexusTaskEvent<T>
         return getEventSender();
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "nexusTask=" + getNexusTask() +
+            '}';
+    }
 }

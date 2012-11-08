@@ -17,10 +17,11 @@ import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 
 public class Nexus2302Test
-    extends org.sonatype.nexus.AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private ContentPlexusResource contentResource;
 

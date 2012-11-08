@@ -12,17 +12,17 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import static org.easymock.EasyMock.anyBoolean;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.easymock.IAnswer;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
 public class DefaultStorageCollectionItemTest
@@ -31,18 +31,13 @@ public class DefaultStorageCollectionItemTest
     @Test
     public void testNonVirtualCollectionSimple()
     {
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
-        {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/" );
-            }
-        } );
 
-        replay( repository );
+        doReturn( "dummy" ).when( repository ).getId();
+        doAnswer( new Answer<RepositoryItemUid>() {
+            public RepositoryItemUid answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
+            }}).when( repository ).createUid( "/" );
 
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( repository, "/", true, true );
         checkAbstractStorageItem( repository, coll, false, "", "/", "/" );
@@ -54,46 +49,22 @@ public class DefaultStorageCollectionItemTest
     {
         List<StorageItem> result = new ArrayList<StorageItem>();
 
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a/some/dir/coll" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
+        doReturn( "dummy" ).when( repository ).getId();
+        doAnswer( new Answer<RepositoryItemUid>() {
+            public RepositoryItemUid answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
+            }}).when( repository ).createUid( "/a/some/dir/coll" );
+        String[] items = new String[]{"A","B","C"};
+        for ( String item : items )
         {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll" );
-            }
-        } );
-        expect( repository.createUid( "/a/some/dir/coll/A" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
-        {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/A" );
-            }
-        } );
-        expect( repository.createUid( "/a/some/dir/coll/B" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
-        {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/B" );
-            }
-        } );
-        expect( repository.createUid( "/a/some/dir/coll/C" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
-        {
-            @Override
-            public RepositoryItemUid answer()
-                throws Throwable
-            {
-                return getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/C" );
-            }
-        } );
-        expect( repository.list( anyBoolean(), isA( StorageCollectionItem.class ) ) ).andReturn( result );
-
-        replay( repository );
+            doAnswer( new Answer<RepositoryItemUid>() {
+                public RepositoryItemUid answer(InvocationOnMock invocation) {
+                    Object[] args = invocation.getArguments();
+                    return getRepositoryItemUidFactory().createUid( repository, (String)args[0] );
+                }}).when( repository ).createUid( "/a/some/dir/coll/" + item );
+        }
+        doReturn( result ).when( repository ).list( Matchers.anyBoolean(),Matchers.isA( StorageCollectionItem.class ));
 
         // and now fill in result, since repo is active
         result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/A", true, true, new StringContentLocator(
@@ -107,15 +78,13 @@ public class DefaultStorageCollectionItemTest
             new DefaultStorageCollectionItem( repository, "/a/some/dir/coll", true, true );
         checkAbstractStorageItem( repository, coll, false, "coll", "/a/some/dir/coll", "/a/some/dir" );
 
-        Collection<StorageItem> items = coll.list();
-        assertEquals( 3, items.size() );
+        Collection<StorageItem> resultItems = coll.list();
+        assertEquals( 3, resultItems.size() );
     }
 
     @Test
     public void testVirtualCollectionSimple()
     {
-        replay( router );
-
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( router, "/", true, true );
         checkAbstractStorageItem( router, coll, true, "", "/", "/" );
     }
@@ -125,10 +94,7 @@ public class DefaultStorageCollectionItemTest
         throws Exception
     {
         List<StorageItem> result = new ArrayList<StorageItem>();
-
-        expect( router.list( isA( ResourceStoreRequest.class ) ) ).andReturn( result );
-
-        replay( router );
+        doReturn( result ).when( router ).list( Matchers.isA(ResourceStoreRequest.class) );
 
         // and now fill in result, since repo is active
         result.add( new DefaultStorageFileItem( router, "/a/some/dir/coll/A", true, true,

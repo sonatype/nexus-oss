@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.security.SecuritySystem;
 
 public abstract class AbstractNexusTestEnvironment
-    extends AbstractNexusTestCase
+    extends NexusProxyTestSupport
 {
     /** The cache manager. */
     private CacheManager cacheManager;

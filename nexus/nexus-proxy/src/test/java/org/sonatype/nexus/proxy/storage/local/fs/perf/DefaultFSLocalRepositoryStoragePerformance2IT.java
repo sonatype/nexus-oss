@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,7 @@ import org.sonatype.nexus.proxy.attributes.perf.internal.TMockRepository;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DummyRepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.LinkPersister;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSPeer;
@@ -124,12 +126,19 @@ public class DefaultFSLocalRepositoryStoragePerformance2IT
         ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( 0 );
 
         // prime the retrieve
-        ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );
-        originalLastAccessTime =
-            localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
+        originalLastAccessTime = primeLastRequestedTimestamp();
+    }
 
-        // sleep so we are sure the clock is different when we validate the last update time.
-        Thread.sleep( 11 );
+    protected long primeLastRequestedTimestamp()
+        throws IOException, ItemNotFoundException
+    {
+        ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );
+        StorageItem item = localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest );
+        // set it way in the past, to make sure we will have threshold hit
+        final long lastRequested = System.currentTimeMillis() - 10000;
+        item.getRepositoryItemAttributes().setLastRequested( lastRequested );
+        repository.getAttributesHandler().storeAttributes( item );
+        return lastRequested;
     }
 
     private AttributeStorage getAttributeStorage()

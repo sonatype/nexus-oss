@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -35,7 +35,7 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 public class RepositoryCreateUpdateTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     protected Nexus nexus;
 

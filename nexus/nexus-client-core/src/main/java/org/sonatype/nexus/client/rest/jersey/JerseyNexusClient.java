@@ -15,7 +15,6 @@ package org.sonatype.nexus.client.rest.jersey;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -23,16 +22,17 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusErrorMessageException;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
+import org.sonatype.nexus.client.core.spi.rest.jersey.UniformRequestBuilder;
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.internal.rest.AbstractXStreamNexusClient;
+import org.sonatype.nexus.client.internal.rest.jersey.NexusUniformRequestBuilder;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
-
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.UniformInterface;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -41,8 +41,8 @@ import com.thoughtworks.xstream.XStream;
  * XStream, this will probably change, hence, this class, as one of the implementations keeps the fact of XStream use
  * encapsulated, I did not want to proliferate it through all of Nexus Client. This class should not be instantiated
  * manually, use {@link JerseyNexusClientFactory} for it.
- * 
- * @author cstamas
+ *
+ * @since 2.1
  */
 public class JerseyNexusClient
     extends AbstractXStreamNexusClient
@@ -90,25 +90,34 @@ public class JerseyNexusClient
         return resolvePath( "service/local/" + path );
     }
 
-    public WebResource.Builder serviceResource( final String uri )
+    public UniformRequestBuilder serviceResource( final String uri )
     {
-        return getClient().resource( resolveServicePath( uri ) ).type( getMediaType() ).accept( getMediaType() );
+        return new NexusUniformRequestBuilder(
+            getClient().resource( resolveServicePath( uri ) ).type( getMediaType() ).accept( getMediaType() )
+        );
     }
 
-    public WebResource.Builder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public UniformRequestBuilder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).type( getMediaType() ).accept(
-            getMediaType() );
+        return new NexusUniformRequestBuilder(
+            getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).type(
+                getMediaType() ).accept(
+                getMediaType() )
+        );
     }
 
-    public WebResource.Builder uri( final String uri )
+    public UniformRequestBuilder uri( final String uri )
     {
-        return getClient().resource( resolvePath( uri ) ).getRequestBuilder();
+        return new NexusUniformRequestBuilder(
+            getClient().resource( resolvePath( uri ) ).getRequestBuilder()
+        );
     }
 
-    public WebResource.Builder uri( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public UniformRequestBuilder uri( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return getClient().resource( resolvePath( uri ) ).queryParams( queryParameters ).getRequestBuilder();
+        return new NexusUniformRequestBuilder(
+            getClient().resource( resolvePath( uri ) ).queryParams( queryParameters ).getRequestBuilder()
+        );
     }
 
     @Override
@@ -116,9 +125,11 @@ public class JerseyNexusClient
     {
         final StatusResource response = serviceResource( "status" ).get( StatusResourceResponse.class ).getData();
         return new NexusStatus( response.getAppName(), response.getFormattedAppName(), response.getVersion(),
-            response.getApiVersion(), response.getEditionLong(), response.getEditionShort(), response.getState(),
-            response.getInitializedAt(), response.getStartedAt(), response.getLastConfigChange(), -1,
-            response.getBaseUrl() );
+                                response.getApiVersion(), response.getEditionLong(), response.getEditionShort(),
+                                response.getState(),
+                                response.getInitializedAt(), response.getStartedAt(), response.getLastConfigChange(),
+                                -1,
+                                response.getBaseUrl() );
     }
 
     @Override
@@ -170,13 +181,14 @@ public class JerseyNexusClient
             else
             {
                 throw new IllegalArgumentException( "Subsystem conditions not satisfied: "
-                    + subsystemFactory.availableWhen().explainNotSatisfied( getNexusStatus() ) );
+                                                        + subsystemFactory.availableWhen().explainNotSatisfied(
+                    getNexusStatus() ) );
             }
         }
         else
         {
             throw new IllegalArgumentException( "No SubsystemFactory configured for subsystem having type "
-                + subsystemType.getName() );
+                                                    + subsystemType.getName() );
         }
     }
 
@@ -185,9 +197,6 @@ public class JerseyNexusClient
     /**
      * Internal method to be used by subsystem implementations to convert Jersey specific exception to
      * {@link NexusErrorMessageException}.
-     * 
-     * @param e
-     * @return
      */
     public NexusErrorMessageException convertErrorResponse( final int statusCode, final String reasonPhrase,
                                                             final ErrorResponse errorResponse )

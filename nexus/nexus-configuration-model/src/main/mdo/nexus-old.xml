@@ -13,16 +13,16 @@
 
 -->
 <model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd">
+       xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd">
 
   <id>nexus</id>
 
   <name>NexusConfiguration</name>
 
   <description>
-		<![CDATA[
-    	<p>Nexus Repository Manager configuration.</p>
-    	]]>
+    <![CDATA[
+    <p>Nexus Repository Manager configuration.</p>
+    ]]>
   </description>
 
   <defaults>
@@ -63,7 +63,7 @@
             Lucene
             index, file
             attributes, shared local storage, etc. are here.
-					</description>
+          </description>
           <type>String</type>
           <required>true</required>
           <defaultValue>${basedir}/nexus-work</defaultValue>
@@ -73,7 +73,7 @@
           <version>1.0.0/1.0.4</version>
           <description>
             The Nexus logDirectory should contain log files created by Nexus during work.
-					</description>
+          </description>
           <type>String</type>
           <required>true</required>
           <defaultValue>${basedir}/logs</defaultValue>
@@ -94,7 +94,7 @@
             The global connection settings are settings applied across Nexus. These can be overridden by
             per-repository connection
             settings.
-					</description>
+          </description>
           <association>
             <type>CRemoteConnectionSettings</type>
           </association>
@@ -107,7 +107,7 @@
             The global connection settings are settings applied across Nexus. These can be overridden by
             per-repository connection
             settings.
-					</description>
+          </description>
           <association>
             <type>CRemoteConnectionSettings</type>
           </association>
@@ -120,7 +120,7 @@
             The global HTTP Proxy settings are settings applied across Nexus. These can be overridden by
             per-repository HTTP Proxy
             settings.
-					</description>
+          </description>
           <association>
             <type>CRemoteHttpProxySettings</type>
           </association>
@@ -337,7 +337,7 @@
       <version>1.0.0+</version>
       <description>
         The connections settings defines common connection properties, like retries count and timeouts.
-			</description>
+      </description>
       <fields>
         <field>
           <name>connectionTimeout</name>
@@ -512,7 +512,7 @@
           <required>true</required>
           <description>
             NotFoundCache, the neg-cache records time to live in minutes. How long will misses be cached.
-					</description>
+          </description>
           <defaultValue>1440</defaultValue>
         </field>
         <field>
@@ -565,7 +565,7 @@
           <required>true</required>
           <description>
             NotFoundCache, the neg-cache records time to live in minutes. How long will misses be cached.
-					</description>
+          </description>
           <defaultValue>1440</defaultValue>
         </field>
       </fields>
@@ -591,7 +591,7 @@
           <required>true</required>
           <description>
             NotFoundCache, the neg-cache records time to live in minutes. How long will misses be cached.
-					</description>
+          </description>
           <defaultValue>1440</defaultValue>
         </field>
         <field>
@@ -609,7 +609,7 @@
           <required>true</required>
           <description>
             Should router merge or spoof metadata? If true, merging will occur, otherwise spoofing.
-					</description>
+          </description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
@@ -649,7 +649,7 @@
             separated
             list of
             repository ID's.
-					</description>
+          </description>
         </field>
         <field>
           <name>exclusions</name>
@@ -664,7 +664,7 @@
             separated
             list of
             repository ID's.
-					</description>
+          </description>
         </field>
       </fields>
     </class>
@@ -743,7 +743,7 @@
           <required>true</required>
           <description>
             If true, repository will deny any kind of deployment (write) request. Caching will still work.
-					</description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -753,7 +753,7 @@
           <required>true</required>
           <description>
             If true, repository will deny any kind of deployment (write) request. Caching will still work.
-					</description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -763,7 +763,7 @@
           <required>true</required>
           <description>
             If true, repository will deny any kind of deployment (write) request. Caching will still work.
-					</description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -773,7 +773,7 @@
           <required>true</required>
           <description>
             If true, repository is user managed, and it is allowed to be edited/dropped by users.
-					</description>
+          </description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
@@ -783,7 +783,7 @@
           <required>true</required>
           <description>
             If true, repository is exposed at content.
-					</description>
+          </description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
@@ -793,7 +793,7 @@
           <required>true</required>
           <description>
             If true, NFC will be used. If false, no miss caching will happen.
-					</description>
+          </description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
@@ -840,7 +840,7 @@
           <required>true</required>
           <description>
             NotFoundCache, the neg-cache records time to live in minutes. How long will misses be cached.
-					</description>
+          </description>
           <defaultValue>1440</defaultValue>
         </field>
         <field>
@@ -904,7 +904,7 @@
             remote store (this setting does not affect hosted reposes). Beware,
             this setting is modifying the
             repo metadata!
-					</description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -917,7 +917,7 @@
             host/proxy/server
             release or snapshot
             artifacts only.
-					</description>
+          </description>
           <defaultValue>release</defaultValue>
         </field>
         <field>
@@ -935,7 +935,7 @@
             artifact is not served) and
             'strictIfExists' (like 'strict' if hash exists remotely or
             warn if not exists).
-					</description>
+          </description>
           <defaultValue>warn</defaultValue>
         </field>
         <field>
@@ -962,7 +962,7 @@
             repository will
             use the shared
             local storage.
-					</description>
+          </description>
           <association>
             <type>CLocalStorage</type>
           </association>
@@ -976,7 +976,7 @@
             Nexus-hosted. If
             defined at least
             the remote URL, the repository will be proxy-repository.
-					</description>
+          </description>
           <association>
             <type>CRemoteStorage</type>
           </association>
@@ -1003,7 +1003,7 @@
 
     public static final String REPOSITORY_TYPE_SNAPSHOT = "snapshot";
 
-	/* A field that "carries" the Configuration modelVersion with object */
+    /* A field that "carries" the Configuration modelVersion with object */
     public final String modelVersion = Configuration.MODEL_VERSION;
     
     /* A field to store the default local storage URL */
@@ -1030,7 +1030,7 @@
     public static final String TYPE_MAVEN_SITE = "maven-site";
     public static final String TYPE_ECLIPSE_UPDATE_SITE = "eclipse-update-site";
 
-	/* A field that "carries" the Configuration modelVersion with object */
+    /* A field that "carries" the Configuration modelVersion with object */
     public final String modelVersion = Configuration.MODEL_VERSION;
     
     /* A field to store the default local storage URL */
@@ -1052,7 +1052,7 @@
     public static final String PROXY_MODE_BLOCKED_AUTO = "blockedAuto";
     public static final String PROXY_MODE_BLOCKED_MANUAL = "blockedManual";
 
-	/* A field that "carries" the Configuration modelVersion with object */
+    /* A field that "carries" the Configuration modelVersion with object */
     public final String modelVersion = Configuration.MODEL_VERSION;
     
     /* A field to store the default local storage URL */
@@ -1069,7 +1069,7 @@
         The local storage definition. If defined, the repository will have own instance of local storage instead
         to use shared
         one.
-			</description>
+      </description>
       <fields>
         <field>
           <name>provider</name>
@@ -1096,7 +1096,7 @@
             existing repo
             contens on FS
             not in default location.
-					</description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
       </fields>
@@ -1109,7 +1109,7 @@
         storage instance. If
         any other properties are defined, the repository will own a private repository
         store instance.
-			</description>
+      </description>
       <fields>
         <field>
           <name>provider</name>
@@ -1131,7 +1131,7 @@
           <version>1.0.0+</version>
           <description>
             The remote authentication, if needed to authenticate on remote repository.
-					</description>
+          </description>
           <association>
             <type>CRemoteAuthentication</type>
           </association>
@@ -1142,7 +1142,7 @@
           <version>1.0.0+</version>
           <description>
             The specific connection settings to use when connecting to this repository.
-					</description>
+          </description>
           <association>
             <type>CRemoteConnectionSettings</type>
           </association>
@@ -1153,7 +1153,7 @@
           <version>1.0.0+</version>
           <description>
             The specific HTTP Proxy settings to use when connecting to this repository.
-					</description>
+          </description>
           <association>
             <type>CRemoteHttpProxySettings</type>
           </association>
@@ -1164,7 +1164,7 @@
           <version>1.0.8+</version>
           <description>
             Repository mirrors configuration.
-				  </description>
+          </description>
           <association>
             <type>CMirror</type>
             <multiplicity>*</multiplicity>
@@ -1249,7 +1249,7 @@
             existing
             Nexus
             Repository.
-					</description>
+          </description>
         </field>
         <field>
           <name>type</name>
@@ -1273,7 +1273,7 @@
           <required>true</required>
           <description>
             If true, the shadow will sync with master at startup. It may cause longer startup time of Nexus.
-					</description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -1283,7 +1283,7 @@
           <required>true</required>
           <description>
             If true, repository is user managed, and it is allowed to be edited/dropped by users.
-					</description>
+          </description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
@@ -1293,7 +1293,7 @@
           <required>true</required>
           <description>
             If true, repository is exposed at content.
-					</description>
+          </description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
@@ -1322,7 +1322,7 @@
     public static final String TYPE_MAVEN2 = "maven2"; /* maven2 layout of maven1 repo */
     public static final String TYPE_MAVEN2_CONSTRAINED = "maven2-constrained"; /* maven2 with version constraints */
 
-	/* A field that "carries" the Configuration modelVersion with object */
+    /* A field that "carries" the Configuration modelVersion with object */
     public final String modelVersion = Configuration.MODEL_VERSION;
     
     /* A field to store the default local storage URL */
@@ -1332,7 +1332,7 @@
         <codeSegment>
           <version>1.0.7+</version>
           <code><![CDATA[
-	/* A field that "carries" the Configuration modelVersion with object */
+    /* A field that "carries" the Configuration modelVersion with object */
     public final String modelVersion = Configuration.MODEL_VERSION;
     
     /* A field to store the default local storage URL */
@@ -1389,7 +1389,7 @@
             request will be executed by
             ordering supplied in
             mapping.
-					</description>
+          </description>
         </field>
         <field>
           <name>repositoryGroups</name>
@@ -1478,7 +1478,7 @@
           <description>
             Repository group ID, that identifies this group and takes part in calculation of repo group root
             path.
-					</description>
+          </description>
         </field>
         <field>
           <name>name</name>
@@ -1555,7 +1555,7 @@
             set
             rights for
             unauthenticated users, use "anonymous" username.
-					</description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -1568,7 +1568,7 @@
             the
             used
             JSecurity realm!
-					</description>
+          </description>
           <defaultValue>anonymous</defaultValue>
         </field>
         <field>
@@ -1581,7 +1581,7 @@
             the
             used
             JSecurity realm!
-					</description>
+          </description>
           <defaultValue>anonymous</defaultValue>
         </field>
         <field>
@@ -1685,7 +1685,7 @@
           <required>true</required>
           <description>
             The base URL against to build absolute URLs in REST responses, RSS feeds, mails, etc.
-					</description>
+          </description>
         </field>
         <field>
           <name>accessAllowedFrom</name>
@@ -2095,7 +2095,7 @@
           <required>true</required>
           <description>
             The host of the smtp server.
-                    </description>
+          </description>
         </field>
         <field>
           <name>port</name>
@@ -2104,7 +2104,7 @@
           <required>true</required>
           <description>
             The port of the smtp server.
-                    </description>
+          </description>
           <defaultValue>-1</defaultValue>
         </field>
         <field>
@@ -2114,7 +2114,7 @@
           <required>false</required>
           <description>
             Enable ssl.
-                    </description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -2124,7 +2124,7 @@
           <required>false</required>
           <description>
             Enable tls.
-                    </description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -2134,7 +2134,7 @@
           <required>false</required>
           <description>
             Username to access smtp server.
-                    </description>
+          </description>
         </field>
         <field>
           <name>password</name>
@@ -2143,7 +2143,7 @@
           <required>false</required>
           <description>
             Password to access smtp server.
-                    </description>
+          </description>
         </field>
         <field>
           <name>debugMode</name>
@@ -2152,7 +2152,7 @@
           <required>false</required>
           <description>
             Enable debug mode.
-                    </description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -2162,7 +2162,7 @@
           <required>true</required>
           <description>
             Email addresses that Nexus will use to send emails from.
-                    </description>
+          </description>
           <defaultValue>nexus-system@sonatype.org</defaultValue>
         </field>
       </fields>

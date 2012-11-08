@@ -12,6 +12,9 @@
  */
 
 /*global Ext, Sonatype, Nexus*/
+define('nexus/profile/Summary',['extjs', 'nexus/profile/UserProfile', 'nexus/ext/formpanel', 'nexus/config'], function(Ext, profile){
+
+Ext.namespace('Nexus.profile');
 Nexus.profile.Summary = function(config) {
   var
         cfg = config || {},
@@ -29,6 +32,15 @@ Nexus.profile.Summary = function(config) {
   this.FIELD_WIDTH = 250;
 
   items = [
+    {
+      // NEXUS-5294 Disable Save for external users
+      xtype : 'panel',
+      cls : 'x-form-invalid-msg',
+      border : false,
+      html : 'Externally configured users are read-only (' + Sonatype.user.curr.loggedInUserSource + ')',
+      hidden : !isExternalUser,
+      width : this.FIELD_WIDTH * 2
+    },
     {
       xtype : 'textfield',
       fieldLabel : 'User ID',
@@ -132,6 +144,11 @@ Nexus.profile.Summary = function(config) {
     id : this.username
   };
 
+  // NEXUS-5294 Disable Save for external users
+  this.isValid = function() {
+    return !isExternalUser && Nexus.profile.Summary.superclass.isValid.apply(this, arguments);
+  };
+
   // mandatory call
   this.checkPayload();
 
@@ -155,7 +172,7 @@ Sonatype.Events.addListener('userAdminViewInit', function(views) {
 });
 */
 
-Nexus.profile.register('Summary', Nexus.profile.Summary, ['user']);
+profile.register('Summary', Nexus.profile.Summary, ['user']);
 
   /* FIXME remove this when UserProfile is stable
   var testPanel = function(){
@@ -179,3 +196,4 @@ Nexus.profile.register('Summary', Nexus.profile.Summary, ['user']);
   Nexus.profile.register('test', testPanel);
    */
 
+});

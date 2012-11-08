@@ -18,7 +18,7 @@ import org.sonatype.nexus.client.core.NexusStatus;
 /**
  * {@link Condition}s matching {@link NexusStatus}.
  *
- * @author cstamas
+ * @since 2.1
  */
 public abstract class NexusStatusConditions
 {

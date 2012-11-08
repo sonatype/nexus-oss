@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
+import org.sonatype.nexus.proxy.RemoteStorageTransportException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -73,7 +74,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
  * So, this implementation is used in both "simple" repository cases: hosted and proxy, but in 1st case there is no
  * remote storage.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractProxyRepository
@@ -451,7 +452,7 @@ public abstract class AbstractProxyRepository
     /**
      * ProxyMode is a persisted configuration property, hence it modifies configuration! It is the caller responsibility
      * to save configuration.
-     * 
+     *
      * @param proxyMode
      * @param sendNotification
      * @param cause
@@ -560,7 +561,7 @@ public abstract class AbstractProxyRepository
      * This method should be called by AbstractProxyRepository and it's descendants only. Since this method modifies the
      * ProxyMode property of this repository, and this property is part of configuration, this call will result in
      * configuration flush too (potentially saving any other unsaved changes)!
-     * 
+     *
      * @param cause
      */
     protected void autoBlockProxying( Throwable cause )
@@ -765,7 +766,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Gets the item max age in (in minutes).
-     * 
+     *
      * @return the item max age in (in minutes)
      */
     public int getItemMaxAge()
@@ -775,7 +776,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Sets the item max age in (in minutes).
-     * 
+     *
      * @param itemMaxAge the new item max age in (in minutes).
      */
     public void setItemMaxAge( int itemMaxAge )
@@ -1020,7 +1021,7 @@ public abstract class AbstractProxyRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            StringBuffer db = new StringBuffer( request.toString() );
+            StringBuilder db = new StringBuilder( request.toString() );
 
             db.append( " :: localOnly=" ).append( request.isRequestLocalOnly() );
             db.append( ", remoteOnly=" ).append( request.isRequestRemoteOnly() );
@@ -1193,17 +1194,19 @@ public abstract class AbstractProxyRepository
                             }
 
                         }
-                        catch ( RemoteAccessDeniedException ex )
-                        {
-                            // NEXUS-4593 do not autoblock, 403 is "ok"
-
-                            // do not go remote, but we did not mark it as "remote checked" also.
-                            // let the user do proper setup and probably it will try again
-                            shouldGetRemote = false;
-                        }
                         catch ( RemoteStorageException ex )
                         {
-                            autoBlockProxying( ex );
+                            // NEXUS-4593 HTTP status 403 should not lead to autoblock
+                            if ( !( ex instanceof RemoteAccessDeniedException )
+                                && !( ex instanceof RemoteStorageTransportException ) )
+                            {
+                                autoBlockProxying( ex );
+                            }
+
+                            if ( ex instanceof RemoteStorageTransportException )
+                            {
+                                throw ex;
+                            }
 
                             // do not go remote, but we did not mark it as "remote checked" also.
                             // let the user do proper setup and probably it will try again
@@ -1237,10 +1240,16 @@ public abstract class AbstractProxyRepository
                         catch ( StorageException ex )
                         {
                             if ( ex instanceof RemoteStorageException
-                            // NEXUS-4593 HTTP status 403 should not lead to autoblock
-                                && !( ex instanceof RemoteAccessDeniedException ) )
+                                // NEXUS-4593 HTTP status 403 should not lead to autoblock
+                                && !( ex instanceof RemoteAccessDeniedException )
+                                && !( ex instanceof RemoteStorageTransportException ) )
                             {
                                 autoBlockProxying( ex );
+                            }
+
+                            if ( ex instanceof RemoteStorageTransportException )
+                            {
+                                throw ex;
                             }
 
                             remoteItem = null;
@@ -1287,7 +1296,7 @@ public abstract class AbstractProxyRepository
                     getLogger().debug(
                         "Item "
                             + request.toString()
-                            + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
+                            + " does not exist in local or remote storage, throwing ItemNotFoundException." );
                 }
 
                 throw new ItemNotFoundException( request, this );
@@ -1408,7 +1417,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks for remote existence of local item.
-     * 
+     *
      * @param localItem
      * @param request
      * @return
@@ -1443,10 +1452,10 @@ public abstract class AbstractProxyRepository
      * The following matrix summarises retry/blacklist behaviour
      * <p/>
      * <p/>
-     * 
+     *
      * <pre>
      * Error condition      Retry?        Blacklist?
-     * 
+     *
      * InetNotFound         no            no
      * AccessDedied         no            yes
      * InvalidContent       no            no
@@ -1487,7 +1496,10 @@ public abstract class AbstractProxyRepository
 
                     if ( getRemoteStorageContext() != null )
                     {
-                        retryCount = getRemoteStorageContext().getRemoteConnectionSettings().getRetrievalRetryCount();
+                        RemoteConnectionSettings settings = getRemoteStorageContext().getRemoteConnectionSettings();
+                        if (settings != null) {
+                            retryCount = settings.getRetrievalRetryCount();
+                        }
                     }
 
                     if ( getLogger().isDebugEnabled() )
@@ -1553,6 +1565,13 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( RemoteStorageException e )
                         {
+                            // in case when we were unable to make outbound request
+                            // at all, do not retry
+                            if ( e instanceof RemoteStorageTransportException )
+                            {
+                                throw e;
+                            }
+
                             lastException = e;
 
                             selector.feedbackFailure( mirror );
@@ -1681,7 +1700,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with "default" maxAge.
-     * 
+     *
      * @param item the item
      * @return true, if it is old
      */
@@ -1692,7 +1711,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with given maxAge.
-     * 
+     *
      * @param maxAge
      * @param item
      * @return
@@ -1799,7 +1818,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Beside original behavior, only add to NFC when we are not in BLOCKED mode.
-     * 
+     *
      * @since 2.0
      */
     @Override

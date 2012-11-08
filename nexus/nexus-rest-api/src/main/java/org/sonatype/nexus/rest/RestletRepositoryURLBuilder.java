@@ -17,6 +17,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Request;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -29,8 +30,7 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 public class RestletRepositoryURLBuilder
     implements RepositoryURLBuilder
 {
-    @Requirement
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
@@ -48,17 +48,15 @@ public class RestletRepositoryURLBuilder
 
     /**
      * This constructor is used for testing only.
-     * 
-     * @param logger
+     *
      * @param repositoryRegistry
      * @param repositoryTypeRegistry
      * @param globalRestApiSettings
      */
-    protected RestletRepositoryURLBuilder( final Logger logger, final RepositoryRegistry repositoryRegistry,
+    protected RestletRepositoryURLBuilder( final RepositoryRegistry repositoryRegistry,
                                            final RepositoryTypeRegistry repositoryTypeRegistry,
                                            final GlobalRestApiSettings globalRestApiSettings )
     {
-        this.logger = logger;
         this.repositoryRegistry = repositoryRegistry;
         this.repositoryTypeRegistry = repositoryTypeRegistry;
         this.globalRestApiSettings = globalRestApiSettings;
@@ -105,7 +103,7 @@ public class RestletRepositoryURLBuilder
             return null;
         }
 
-        StringBuffer url = new StringBuffer( baseURL );
+        StringBuilder url = new StringBuilder( baseURL );
 
         if ( !baseURL.endsWith( "/" ) )
         {

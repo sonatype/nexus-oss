@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.restlight.core;
 
+@Deprecated
 public class PlexusRole
 {
     private String roleId;

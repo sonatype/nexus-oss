@@ -26,7 +26,7 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 
 public class RebuildAttributesTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private DefaultNexus defaultNexus;
 

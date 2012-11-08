@@ -18,41 +18,47 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import com.google.common.base.Throwables;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.ByteArrayEntity;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import com.google.common.base.Throwables;
 
 /**
  * Tests for HttpGetPropertiesDiscoveryStrategyTest.
  */
 public class HttpGetPropertiesDiscoveryStrategyTest
+    extends TestSupport
 {
+    @Mock
+    private Hc4Provider hc4provider;
 
     @Test
     public void translateProperties()
         throws IOException, NoSuchRepositoryException
     {
-        HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy()
+        HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy( hc4provider )
         {
             @Override
             protected RequestResult handleRequest( final String url )
             {
                 try
                 {
-                    GetMethod method = mock( GetMethod.class );
-                    when( method.getResponseBodyAsStream() )
-                        .thenReturn(
-                            new ByteArrayInputStream(
-                                "test.version=2.0\ntest.url=http://some.url\n".getBytes() )
-                        );
-                    return new RequestResult( method );
+                    HttpGet method = mock( HttpGet.class );
+                    HttpResponse response = mock( HttpResponse.class );
+                    when( response.getEntity() ).thenReturn(
+                        new ByteArrayEntity( "test.version=2.0\ntest.url=http://some.url\n".getBytes() ) );
+                    return new RequestResult( method, response );
                 }
                 catch ( IOException e )
                 {
@@ -73,7 +79,7 @@ public class HttpGetPropertiesDiscoveryStrategyTest
     public void translatePropertiesFail()
         throws IOException, NoSuchRepositoryException
     {
-        HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy()
+        HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy( hc4provider )
         {
             @Override
             protected RequestResult handleRequest( final String url )

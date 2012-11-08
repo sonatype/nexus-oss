@@ -1,0 +1,193 @@
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2012 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus.indexer-lucene</groupId>
+    <artifactId>nexus-indexer-lucene</artifactId>
+    <version>2.3-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.sonatype.nexus.plugins</groupId>
+  <artifactId>nexus-indexer-lucene-plugin</artifactId>
+  <packaging>nexus-plugin</packaging>
+
+  <name>Nexus Maven Indexer :: Plugin</name>
+
+  <properties>
+    <maven.indexer.version>5.0.0</maven.indexer.version>
+    <truezip.version>7.0-rc1</truezip.version>
+
+    <nexus.plugin.name>Nexus Indexer Lucene Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds search capabilities for repository content.</nexus.plugin.description>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus.indexer-lucene</groupId>
+      <artifactId>nexus-indexer-lucene-model</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.indexer</groupId>
+      <artifactId>indexer-artifact</artifactId>
+      <version>${maven.indexer.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.indexer</groupId>
+      <artifactId>indexer-core</artifactId>
+      <version>${maven.indexer.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- Aether is needed and will be published too (see applifecycle config) -->
+    <!-- since sadly Maven Indexer exposes it's classes over it's public API -->
+    <!-- All this because of the presence of Version in ArtifactInfo -->
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-util</artifactId>
+    </dependency>
+
+    <!-- Is in core -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-proxy</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-app</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty-testsuite</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration-model</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- We use oldie Plexus annos, so this is a must -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-app</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-proxy</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- FIXME: This dependency is here only for TestMarshalUnmarchal via TestLuceneRestMarshalUnmarchal -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <configuration>
+          <sharedDependencies>
+            <sharedDependencies>org.sonatype.nexus.indexer-lucene:nexus-indexer-lucene-model</sharedDependencies>
+            <sharedDependencies>org.apache.maven.indexer:indexer-artifact</sharedDependencies>
+            <sharedDependencies>org.apache.maven.indexer:indexer-core</sharedDependencies>
+            <sharedDependencies>org.apache.lucene:lucene-core</sharedDependencies>
+            <sharedDependencies>org.apache.lucene:lucene-highlighter</sharedDependencies>
+            <sharedDependencies>org.apache.lucene:lucene-memory</sharedDependencies>
+            <sharedDependencies>org.sonatype.aether:aether-api</sharedDependencies>
+            <sharedDependencies>org.sonatype.aether:aether-util</sharedDependencies>
+          </sharedDependencies>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

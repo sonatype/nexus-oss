@@ -15,7 +15,7 @@ package org.sonatype.nexus.client.internal.util;
 /**
  * Simple internal utility class to perform checks of arguments. Inspired by Google's {@code Preconditions}.
  *
- * @author cstamas
+ * @since 2.1
  */
 public class Check
 {

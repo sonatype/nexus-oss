@@ -15,6 +15,7 @@ package org.sonatype.nexus.restlight.stage;
 /**
  * Constant library that contains all of the vocabulary elements that can vary for the staging client.
  */
+@Deprecated
 public final class VocabularyKeys
 {
 

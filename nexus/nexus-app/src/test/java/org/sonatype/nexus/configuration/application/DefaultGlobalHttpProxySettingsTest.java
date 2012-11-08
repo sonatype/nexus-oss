@@ -14,14 +14,14 @@ package org.sonatype.nexus.configuration.application;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
 
 public class DefaultGlobalHttpProxySettingsTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
 
     @SuppressWarnings( "unchecked" )

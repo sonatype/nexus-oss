@@ -12,10 +12,16 @@
  */
 package org.sonatype.nexus.client.core;
 
+/**
+ * A condition to be satisfied by Nexus status in order for Nexus client to connect.
+ *
+ * @since 2.1
+ */
 public interface Condition
 {
 
     boolean isSatisfiedBy( final NexusStatus status );
 
     String explainNotSatisfied( final NexusStatus status );
+
 }

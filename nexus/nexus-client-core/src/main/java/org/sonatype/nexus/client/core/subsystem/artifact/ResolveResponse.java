@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.client.core.subsystem.artifact;
 
+/**
+ * Request for resolving a {@link ArtifactMaven}.
+ *
+ * @since 2.1
+ */
 public class ResolveResponse
 {
 

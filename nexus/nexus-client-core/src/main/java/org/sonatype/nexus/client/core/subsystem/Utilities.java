@@ -15,12 +15,11 @@ package org.sonatype.nexus.client.core.subsystem;
 import java.util.Date;
 
 /**
- * TODO
- *
- * @since 1.0
+ * @since 2.1
  */
 public interface Utilities
 {
 
     Date getLastModified( String uri );
+
 }

@@ -15,6 +15,9 @@ package org.sonatype.nexus.client.core.spi;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.internal.util.Check;
 
+/**
+ * @since 2.1
+ */
 public abstract class SubsystemSupport<NC extends NexusClient>
 {
 

@@ -33,10 +33,8 @@ import org.sonatype.nexus.plugins.plugin.console.PluginConsoleManager;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.DocumentationLinkDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
-import org.sonatype.nexus.plugins.plugin.console.api.dto.RestInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.model.DocumentationLink;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
-import org.sonatype.nexus.plugins.plugin.console.model.RestInfo;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -70,13 +68,9 @@ public class PluginInfoListPlexusResource
 
         xstream.processAnnotations( PluginInfoDTO.class );
         xstream.processAnnotations( PluginInfoListResponseDTO.class );
-        xstream.processAnnotations( RestInfoDTO.class );
 
         xstream.registerLocalConverter( PluginInfoListResponseDTO.class, "data", new AliasingListConverter(
             PluginInfoDTO.class, "pluginInfo" ) );
-
-        xstream.registerLocalConverter( PluginInfoDTO.class, "restInfos", new AliasingListConverter( RestInfoDTO.class,
-            "restInfo" ) );
     }
 
     @Override
@@ -140,13 +134,6 @@ public class PluginInfoListPlexusResource
         result.setScmTimestamp( StringUtils.isEmpty( pluginInfo.getScmTimestamp() ) ? "N/A"
             : pluginInfo.getScmTimestamp() );
         result.setFailureReason( pluginInfo.getFailureReason() );
-
-        for ( RestInfo restInfo : pluginInfo.getRestInfos() )
-        {
-            RestInfoDTO restInfoDTO = new RestInfoDTO();
-            restInfoDTO.setURI( restInfo.getUri() );
-            result.addRestInfo( restInfoDTO );
-        }
 
         return result;
     }

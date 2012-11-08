@@ -38,6 +38,7 @@ import java.util.List;
  * locations, managing the test-harness server, and initializing the test fixture used when a RESTLight client connects
  * and loads its vocabulary information.
  */
+@Deprecated
 public abstract class AbstractRESTTest
 {
 

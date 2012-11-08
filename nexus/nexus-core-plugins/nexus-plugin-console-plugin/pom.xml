@@ -25,19 +25,19 @@
   <artifactId>nexus-plugin-console-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Plugin Console</name>
-  <description>Adds a UI to view installed plugins.</description>
+
+  <properties>
+    <nexus.plugin.name>Nexus Plugin Console Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds a UI to view installed plugins.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
-
-    <!-- Because this is a nexus-plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Because we extend current "ugly" REST API -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
@@ -50,7 +50,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- We use oldie plexus annos, so we have to declare it explicitly -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
@@ -60,17 +59,12 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Remove this plugin (it's already in parent!) when fixed MNGECLIPSE-2574 -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
@@ -94,36 +88,9 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate-metadata</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/classes/static/js/nexus-plugin-console-plugin-all.js</output>
-              <nosuffix>true</nosuffix>
-              <nomunge>true</nomunge>
-              <jswarn>false</jswarn>
-              <insertNewLine>true</insertNewLine>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
-
     </plugins>
   </build>
 

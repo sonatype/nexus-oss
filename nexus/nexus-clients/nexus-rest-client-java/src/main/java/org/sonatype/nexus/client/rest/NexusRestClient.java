@@ -33,6 +33,7 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 
+@Deprecated
 @Component(role=NexusClient.class, instantiationStrategy="per-lookup")
 public class NexusRestClient
     implements NexusClient
@@ -44,7 +45,7 @@ public class NexusRestClient
 
     private RestClientHelper clientHelper = null;
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public static final String WAIT_FOR_START_TIMEOUT_KEY = "nexus.client.started.timeout";
 

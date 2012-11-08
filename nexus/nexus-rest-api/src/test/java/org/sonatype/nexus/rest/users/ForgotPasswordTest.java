@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Test;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
@@ -40,7 +40,7 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
 public class ForgotPasswordTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private GreenMail server;
 

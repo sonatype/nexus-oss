@@ -24,9 +24,10 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 import com.thoughtworks.xstream.XStream;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 public class ClearPasswordTest
-    extends AbstractNexusTestCase
+    extends NexusTestSupport
 {
     private ApplicationConfigurationSource getConfigSource()
         throws Exception

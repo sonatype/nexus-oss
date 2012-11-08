@@ -13,7 +13,7 @@
 package org.sonatype.nexus.templates.repository.maven;
 
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
@@ -21,7 +21,7 @@ import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.templates.TemplateSet;
 
 public class MavenRepositoryTemplateTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private Nexus nexus;
 

@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -23,16 +24,15 @@
   </parent>
 
   <artifactId>nexus-proxy</artifactId>
-
   <name>Nexus : Proxy</name>
 
   <dependencies>
-<!-- 
+    <!--
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-artifact</artifactId>
     </dependency>
--->
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
@@ -41,18 +41,9 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository-metadata-api</artifactId>
     </dependency>
-    <!-- For App basic -->
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-velocity</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-interpolation</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus.appevents</groupId>
@@ -66,18 +57,13 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-    </dependency>
-    <!-- Components impl -->
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
-      <scope>compile</scope>
     </dependency>
-    
+
     <!-- Local and remote storage techs -->
     <dependency>
       <groupId>com.ning</groupId>
@@ -91,14 +77,12 @@
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-ehcache</artifactId>
     </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
@@ -137,27 +121,18 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-resource-scanner</artifactId>
-      <version>1.0</version>
+      <version>1.0.1</version>
     </dependency>
 
     <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.carrotsearch</groupId>
-      <artifactId>junit-benchmarks</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>server-provider</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -175,39 +150,18 @@
       <artifactId>shiro-web</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- For the Jackson XML Marshaller that is slower than JSON and will remain in test to not pollute core -->
-    <dependency>
-      <groupId>com.fasterxml</groupId>
-      <artifactId>jackson-xml-databind</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-        <executions>
-          <execution>
-            <id>test-components</id>
-            <goals>
-              <goal>generate-test-metadata</goal>
-            </goals>
-            <configuration>
-              <generatedMetadata>${project.build.testOutputDirectory}/META-INF/plexus/components.xml</generatedMetadata>
-              <staticMetadataDirectory>${basedir}/src/test/resources/META-INF/plexus</staticMetadataDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
@@ -215,28 +169,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>with-tests</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-configuration</artifactId>
-          <classifier>tests</classifier>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-api</artifactId>
-          <classifier>tests</classifier>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
     <profile>
       <id>ahc-provider</id>
       <build>
@@ -246,8 +178,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>ahc-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>
@@ -263,8 +193,9 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
-      <id>apacheHttpClient4x-provider</id>
+      <id>hc4-provider</id>
       <build>
         <plugins>
           <plugin>
@@ -272,8 +203,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>apacheHttpClient4x-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>
@@ -289,8 +218,9 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
-      <id>apacheHttpClient3x-provider</id>
+      <id>hc3-provider</id>
       <build>
         <plugins>
           <plugin>
@@ -298,8 +228,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>apacheHttpClient3x-provider-test</id>
-                <phase>test</phase>
                 <goals>
                   <goal>test</goal>
                 </goals>

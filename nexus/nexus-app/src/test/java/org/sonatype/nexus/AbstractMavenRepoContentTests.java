@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
  * @author cstamas
  */
 public abstract class AbstractMavenRepoContentTests
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     protected DefaultNexus defaultNexus;
 

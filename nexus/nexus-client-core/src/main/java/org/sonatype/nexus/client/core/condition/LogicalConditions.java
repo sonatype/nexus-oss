@@ -19,7 +19,7 @@ import org.sonatype.nexus.client.internal.util.Check;
 /**
  * Set of basic logical operators that combines multiple {@link org.sonatype.nexus.client.core.Condition}s into one.
  *
- * @author cstamas
+ * @since 2.1
  */
 public abstract class LogicalConditions
 {

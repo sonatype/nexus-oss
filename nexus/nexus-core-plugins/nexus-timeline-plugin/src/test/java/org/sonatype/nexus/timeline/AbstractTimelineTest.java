@@ -15,27 +15,16 @@ package org.sonatype.nexus.timeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.security.AbstractNexusTestCase;
+import com.google.inject.Module;
+import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.security.guice.SecurityModule;
 
 public abstract class AbstractTimelineTest
-    extends AbstractNexusTestCase
+    extends NexusTestSupport
 {
-    /**
-     * Handy method that does what was done before: keeps all in memory, but this is usable for small amount of data,
-     * like these in UT. This should NOT be used in production code, unless you want app that kills itself with OOM.
-     * 
-     * @param result
-     * @return
-     */
-    protected List<Entry> asList( Entries result )
+    @Override
+    protected Module[] getTestCustomModules()
     {
-        ArrayList<Entry> records = new ArrayList<Entry>();
-
-        for ( Entry rec : result )
-        {
-            records.add( rec );
-        }
-
-        return records;
+        return new Module[] { new SecurityModule() };
     }
 }

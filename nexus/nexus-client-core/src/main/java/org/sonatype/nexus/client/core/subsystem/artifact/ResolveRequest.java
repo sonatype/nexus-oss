@@ -14,6 +14,11 @@ package org.sonatype.nexus.client.core.subsystem.artifact;
 
 import org.sonatype.nexus.client.internal.util.Check;
 
+/**
+ * Result of resolving a {@link ArtifactMaven}.
+ *
+ * @since 2.1
+ */
 public class ResolveRequest
 {
 

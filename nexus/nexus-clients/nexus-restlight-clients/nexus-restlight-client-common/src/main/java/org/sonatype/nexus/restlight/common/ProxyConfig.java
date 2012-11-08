@@ -20,6 +20,7 @@ package org.sonatype.nexus.restlight.common;
  * @since 1.9.2.3
  * @since 2.0
  */
+@Deprecated
 public class ProxyConfig {
     private final String host;
     private final int port;

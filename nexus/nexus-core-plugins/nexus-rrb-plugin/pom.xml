@@ -24,9 +24,13 @@
   </parent>
 
   <artifactId>nexus-rrb-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Remote Repository Browsing</name>
-  <description>Adds browsing support for proxied remote repositories</description>
+  <packaging>nexus-plugin</packaging>
+
+  <properties>
+    <nexus.plugin.name>Nexus Remote Repository Browsing Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds browsing support for browsing remote proxy remote repositories.</nexus.plugin.description>
+  </properties>
 
   <developers>
     <developer>
@@ -67,49 +71,31 @@
       <artifactId>nexus-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-restlet-bridge</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet</groupId>
-      <artifactId>org.restlet</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <!--
+    FIXME: Get rid of this... See https://github.com/sonatype/nexus/pull/565
+    -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -117,71 +103,49 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-jetty-testsuite</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-app</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-proxy</artifactId>
+      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Needed to make Maven "know" nexus-plugin packaging -->
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <configuration>
-          <sourceDirectory>${project.build.directory}/classes/static/js/</sourceDirectory>
-          <output>${project.build.directory}/classes/static/js/nexus-rrb-plugin-all.js</output>
-        </configuration>
       </plugin>
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>with-tests</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-plugin-test-api</artifactId>
-          <version>${project.version}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-app</artifactId>
-          <classifier>tests</classifier>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-proxy</artifactId>
-          <classifier>tests</classifier>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-configuration</artifactId>
-          <classifier>tests</classifier>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>

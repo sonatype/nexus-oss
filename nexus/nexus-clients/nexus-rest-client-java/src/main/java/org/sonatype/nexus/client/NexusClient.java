@@ -18,6 +18,7 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 
+@Deprecated
 public interface NexusClient
 {
     public static final String ROLE = NexusClient.class.getName();

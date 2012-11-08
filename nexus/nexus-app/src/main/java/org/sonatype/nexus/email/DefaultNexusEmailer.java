@@ -292,7 +292,7 @@ public class DefaultNexusEmailer
             platformEditionShort = status.getEditionShort();
 
             userAgentPlatformInfo =
-                new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" )
+                new StringBuilder( "Nexus/" ).append( status.getVersion() ).append( " (" )
                     .append( status.getEditionShort() ).append( "; " ).append( System.getProperty( "os.name" ) )
                     .append( "; " ).append( System.getProperty( "os.version" ) ).append( "; " )
                     .append( System.getProperty( "os.arch" ) ).append( "; " )

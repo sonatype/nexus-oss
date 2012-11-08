@@ -26,7 +26,10 @@ import com.ning.http.client.BodyGenerator;
  * A BodyGenerator that uses StorageFileItem as it's content source.
  * 
  * @author cstamas
+ *
+ * @deprecated Use httpclient4 components instead
  */
+@Deprecated
 public class StorageFileItemBodyGenerator
     implements BodyGenerator
 {

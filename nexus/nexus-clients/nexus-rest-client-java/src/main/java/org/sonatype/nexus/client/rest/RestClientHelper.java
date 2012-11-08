@@ -47,6 +47,7 @@ import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
 
+@Deprecated
 public class RestClientHelper
 {
     private final Context restContext;
@@ -59,7 +60,7 @@ public class RestClientHelper
 
     private static final String SERVICE_URL_PART = "service/local/";
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private XStream xstream;
 

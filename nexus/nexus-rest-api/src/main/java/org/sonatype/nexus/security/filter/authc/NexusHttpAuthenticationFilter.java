@@ -239,7 +239,7 @@ public class NexusHttpAuthenticationFilter
 
             this.getLogger().debug(
                 "Unknown session exception while logging in anonymous user: '{}' with principal '{}'",
-                new Object[] { anonSession, subject.getPrincipal(), e } );
+                new Object[] { anonSession, usernamePasswordToken.getUsername(), e } );
 
             if ( anonSession != null )
             {

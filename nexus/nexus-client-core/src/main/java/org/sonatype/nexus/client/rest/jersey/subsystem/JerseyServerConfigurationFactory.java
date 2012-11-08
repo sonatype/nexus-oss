@@ -19,8 +19,6 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
-import org.sonatype.nexus.client.core.subsystem.content.Content;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyContent;
 import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyServerConfiguration;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 

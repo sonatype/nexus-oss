@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -24,91 +25,60 @@
 
   <artifactId>nexus-testsuite-support</artifactId>
 
-  <name>Nexus : Test : Test Suite Support</name>
-
   <properties>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
   </properties>
-
-  <build>
-    <testResources>
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-      <testResource>
-        <directory>${project.basedir}/src/test/filtered-resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-    </testResources>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-launcher</artifactId>
-      <version>2.3-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.client</groupId>
       <artifactId>nexus-client-core</artifactId>
-      <version>2.3-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-testsuite-client</artifactId>
-      <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-marshal</artifactId>
-      <version>1.4</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-asl</artifactId>
-      <version>1.9.4</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
-      <version>1.9.4</version>
-      <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-oss-webapp</artifactId>
-        <version>2.0</version>
-        <type>zip</type>
-        <classifier>bundle</classifier>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

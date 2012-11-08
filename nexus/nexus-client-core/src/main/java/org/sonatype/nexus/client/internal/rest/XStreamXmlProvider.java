@@ -33,7 +33,7 @@ import com.thoughtworks.xstream.io.xml.CompactWriter;
  * Jersey provider that uses XStream, as we want to use the same tech (as we have all the config bits already) on client
  * side for marshaling as server side does.
  *
- * @author cstamas
+ * @since 2.1
  */
 @Provider
 public class XStreamXmlProvider

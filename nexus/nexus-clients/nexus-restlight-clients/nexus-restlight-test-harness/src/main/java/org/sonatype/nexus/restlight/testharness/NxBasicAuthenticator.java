@@ -31,6 +31,7 @@ import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.security.Constraint;
 
 // Grabbed from BasicAuthenticator in Jetty, and modded to use NxBASIC authType instead.
+@Deprecated
 public class NxBasicAuthenticator
     extends LoginAuthenticator
 {
@@ -73,7 +74,7 @@ public class NxBasicAuthenticator
                         UserIdentity user = _loginService.login(username,password);
                         if (user!=null)
                         {
-                            renewSessionOnAuthentication(request,response);
+                            renewSession(request,response);
                             return new UserAuthentication(AUTH_TYPE,user);
                         }
                     }

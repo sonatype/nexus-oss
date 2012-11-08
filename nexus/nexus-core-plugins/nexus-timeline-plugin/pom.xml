@@ -23,16 +23,15 @@
   </parent>
 
   <artifactId>nexus-timeline-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Timeline</name>
-  <description>Adds timeline and feeds based on it.</description>
+  <packaging>nexus-plugin</packaging>
 
   <properties>
-    <truezip.version>7.0-rc1</truezip.version>
+    <nexus.plugin.name>Nexus Timeline Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds timeline and feeds based on it.</nexus.plugin.description>
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
@@ -44,13 +43,25 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- TimelinePersistor uses Protobuf -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+    <!-- TimelineIndexer uses Lucene -->
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>3.6.1</version>
+    </dependency>
+
+    <!-- RSS feeds -->
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-timeline</artifactId>
+      <version>0.9</version>
     </dependency>
 
     <!-- Stuff already in core -->
@@ -74,62 +85,28 @@
       <artifactId>sisu-inject-plexus</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <!-- Tests -->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-      <!-- We must exclude indexer-core from bundling as classpath dependency, since we are shading it to make it shared -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-generate-metadata</id>
-            <configuration>
-              <sharedDependencies>
-                <sharedDependencies>org.sonatype.spice:spice-timeline</sharedDependencies>
-                <sharedDependencies>rome:rome</sharedDependencies>
-              </sharedDependencies>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <sharedDependencies>
+            <sharedDependencies>rome:rome</sharedDependencies>
+          </sharedDependencies>
+        </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>with-tests</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-proxy</artifactId>
-          <classifier>tests</classifier>
-        </dependency>
-        <dependency>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-configuration</artifactId>
-          <classifier>tests</classifier>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 
 </project>

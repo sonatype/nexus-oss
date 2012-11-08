@@ -22,22 +22,26 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.mime.MimeSupport;
 
 public abstract class AbstractDocumentationNexusResourceBundle
     implements NexusDocumentationBundle
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Requirement
     private MimeSupport mimeSupport;
 
-    protected Logger getLogger()
-    {
-        return logger;
+    protected AbstractDocumentationNexusResourceBundle() {
+    }
+
+    @VisibleForTesting
+    protected AbstractDocumentationNexusResourceBundle(final MimeSupport mimeSupport) {
+        this.mimeSupport = mimeSupport;
     }
 
     public List<StaticResource> getContributedResouces()
@@ -75,14 +79,17 @@ public abstract class AbstractDocumentationNexusResourceBundle
                 resources.add( new DefaultStaticResource( url, path, mimeSupport.guessMimeTypeFromPath( name ) ) );
             }
 
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isTraceEnabled() )
             {
-                getLogger().debug( "Discovered documentation for: '" + getPluginId() + "': " + resources.toString() );
+                logger.trace("Discovered documentation for: {}", getPluginId());
+                for (StaticResource resource: resources) {
+                    logger.trace("  {}", resource);
+                }
             }
         }
         catch ( IOException e )
         {
-            getLogger().error( "Error discovering plugin documentation " + getPluginId(), e );
+            logger.error( "Error discovering plugin documentation {}", getPluginId(), e );
         }
         finally
         {
@@ -94,7 +101,7 @@ public abstract class AbstractDocumentationNexusResourceBundle
                 }
                 catch ( IOException e )
                 {
-                    getLogger().debug( e.getMessage(), e );
+                    logger.debug( e.getMessage(), e );
                 }
             }
         }
@@ -113,8 +120,7 @@ public abstract class AbstractDocumentationNexusResourceBundle
 
     /**
      * Deprecated, but left in place because old plugins still rely on this.
-     * 
-     * @return
+     *
      * @deprecated use getPathPrefix() method.
      */
     @Deprecated

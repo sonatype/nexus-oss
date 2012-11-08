@@ -14,6 +14,9 @@ package org.sonatype.nexus.client.rest;
 
 import org.sonatype.nexus.client.internal.util.Check;
 
+/**
+ * @since 2.1
+ */
 public class UsernamePasswordAuthenticationInfo
     implements AuthenticationInfo
 {
@@ -43,4 +46,5 @@ public class UsernamePasswordAuthenticationInfo
     {
         return getClass().getSimpleName() + "[username=" + username + ", password=****]";
     }
+
 }

@@ -37,7 +37,7 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
@@ -54,7 +54,7 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 
 public class UserPrincipalsHelperTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private SecuritySystem securitySystem = null;
 

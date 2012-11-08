@@ -15,30 +15,30 @@ package org.sonatype.nexus.mime;
 import java.io.File;
 import java.util.Collection;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.ExtensionMimeDetector;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for {@link DefaultMimeUtil}.
+ */
 public class DefaultMimeUtilTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
-
     protected MimeUtil mimeUtil;
 
     protected MimeUtil2 medseaMimeUtil;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        mimeUtil = lookup( MimeUtil.class );
-
+    @Before
+    public void setUp() throws Exception {
+        mimeUtil = new DefaultMimeUtil();
         medseaMimeUtil = new MimeUtil2();
-
         medseaMimeUtil.registerMimeDetector( ExtensionMimeDetector.class.getName() );
     }
 
@@ -63,16 +63,16 @@ public class DefaultMimeUtilTest
     {
         File testFile = null;
 
-        testFile = getTestFile( "pom.xml" );
+        testFile = util.resolveFile( "pom.xml" );
         assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile ) );
 
         assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile.toURI().toURL() ) );
 
-        testFile = getTestFile( "src/test/java/org/sonatype/nexus/mime/DefaultMimeUtilTest.java" );
+        testFile = util.resolveFile( "src/test/java/org/sonatype/nexus/mime/DefaultMimeUtilTest.java" );
 
         assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile ) );
 
-        testFile = getTestFile( "target/test-classes/org/sonatype/nexus/mime/DefaultMimeUtilTest.class" );
+        testFile = util.resolveFile( "target/test-classes/org/sonatype/nexus/mime/DefaultMimeUtilTest.class" );
 
         assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile ) );
     }

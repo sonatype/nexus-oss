@@ -14,6 +14,7 @@ package org.sonatype.nexus.rest.global;
 
 import java.util.ArrayList;
 
+import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
@@ -37,6 +38,7 @@ import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationS
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
+import org.sonatype.nexus.rest.model.HtmlUnescapeStringConverter;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RestApiSettings;
@@ -172,7 +174,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         
         settings.getRoles().addAll( target.getTargetRoles() );
         
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         for ( String email : target.getExternalTargets() )
         {
@@ -426,4 +428,10 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         return result;
     }
 
+    @Override
+    public void configureXStream( final XStream xstream )
+    {
+        xstream.registerLocalConverter( SmtpSettings.class, "username", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( SmtpSettings.class, "password", new HtmlUnescapeStringConverter( true ) );
+    }
 }

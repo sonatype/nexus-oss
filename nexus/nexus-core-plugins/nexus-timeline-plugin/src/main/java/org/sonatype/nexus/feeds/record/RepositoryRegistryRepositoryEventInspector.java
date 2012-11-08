@@ -79,7 +79,7 @@ public class RepositoryRegistryRepositoryEventInspector
     private void inspectForTimeline( Event<?> evt, Repository repository )
     {
         // we do not want RSS entries about boot and repo additions during boot
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {

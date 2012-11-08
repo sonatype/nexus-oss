@@ -43,8 +43,6 @@ public class PluginInfoDTO
 
     private List<DocumentationLinkDTO> documentation;
 
-    private List<RestInfoDTO> restInfos = new ArrayList<RestInfoDTO>();
-
     public String getSite()
     {
         return site;
@@ -123,23 +121,6 @@ public class PluginInfoDTO
     public void setScmTimestamp( String scmTimestamp )
     {
         this.scmTimestamp = scmTimestamp;
-    }
-
-    @XmlElementWrapper( name = "restInfos" )
-    @XmlElement( name = "restInfo" )
-    public List<RestInfoDTO> getRestInfos()
-    {
-        return restInfos;
-    }
-
-    public void setRestInfos( List<RestInfoDTO> restInfos )
-    {
-        this.restInfos = restInfos;
-    }
-
-    public void addRestInfo( RestInfoDTO restInfo )
-    {
-        this.restInfos.add( restInfo );
     }
 
     public List<DocumentationLinkDTO> getDocumentation()

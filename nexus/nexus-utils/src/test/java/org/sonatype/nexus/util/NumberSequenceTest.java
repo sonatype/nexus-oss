@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.util;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -137,6 +136,22 @@ public class NumberSequenceTest
         }
     }
 
+    private static void ArrayUtils_reverse(int[] array) {
+        if (array == null) {
+            return;
+        }
+        int i = 0;
+        int j = array.length - 1;
+        int tmp;
+        while (j > i) {
+            tmp = array[j];
+            array[j] = array[i];
+            array[i] = tmp;
+            j--;
+            i++;
+        }
+    }
+
     @Test
     public void testFibonacciSequenceBackAndForth()
     {
@@ -156,7 +171,7 @@ public class NumberSequenceTest
             Assert.assertEquals( f, fs.next() );
         }
 
-        ArrayUtils.reverse( fibonacciNumbers );
+        ArrayUtils_reverse( fibonacciNumbers );
 
         for ( int f : fibonacciNumbers )
         {

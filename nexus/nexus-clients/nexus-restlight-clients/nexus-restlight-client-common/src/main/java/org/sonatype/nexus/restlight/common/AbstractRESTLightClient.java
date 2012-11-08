@@ -65,6 +65,7 @@ import org.sonatype.aether.version.Version;
  * new version requires an extra API call that an older version didn't require).
  * </p>
  */
+@Deprecated
 public abstract class AbstractRESTLightClient
 {
 
@@ -123,7 +124,7 @@ public abstract class AbstractRESTLightClient
      */
     protected static final String VOCAB_MANIFEST = "vocabulary.lst";
     
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final String baseUrl;
 

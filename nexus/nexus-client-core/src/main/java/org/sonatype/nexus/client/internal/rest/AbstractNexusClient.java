@@ -25,11 +25,14 @@ import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 
+/**
+ * @since 2.1
+ */
 public abstract class AbstractNexusClient
     implements NexusClient
 {
 
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final ConnectionInfo connectionInfo;
 
@@ -39,7 +42,6 @@ public abstract class AbstractNexusClient
 
     protected AbstractNexusClient( final ConnectionInfo connectionInfo )
     {
-        this.logger = LoggerFactory.getLogger( getClass() );
         this.connectionInfo = Check.notNull( connectionInfo, ConnectionInfo.class );
         this.subsystemInstanceCache = new LinkedHashMap<Class<?>, Object>();
     }

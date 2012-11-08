@@ -28,7 +28,7 @@ public class LvoIndexHtmlCustomizer
         String version =
             getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-lvo-plugin/pom.properties" );
 
-        return "<script src=\"js/repoServer/nexus-lvo-plugin-all.js" + ( version == null ? "" : "?" + version )
+        return "<script src=\"static/js/nexus-lvo-plugin-all.js" + ( version == null ? "" : "?" + version )
             + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
     }
 }

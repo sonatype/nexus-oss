@@ -19,7 +19,6 @@ import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,7 +28,7 @@ import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.testsuite.client.RemoteLoggerFactory;
-import com.google.common.base.Stopwatch;
+import org.sonatype.sisu.bl.BundleStatistics;
 import com.google.common.base.Throwables;
 
 /**
@@ -93,10 +92,24 @@ public abstract class NexusRunningITSupport
             runningNexusBundleCoordinates = null;
         }
 
-        final Stopwatch stopwatch = startNexus( nexus() );
-        testIndex().recordInfo(
-            "startup time", stopwatch.elapsedMillis() == 0 ? "already running" : stopwatch.toString()
-        );
+        final NexusBundle nexusToBeStarted = nexus();
+
+        final boolean alreadyRunning = nexusToBeStarted.isRunning();
+
+        startNexus( nexusToBeStarted );
+
+        if ( !alreadyRunning )
+        {
+            final BundleStatistics statistics = nexusToBeStarted.statistics();
+            testIndex().recordInfo( "preparation time", statistics.preparationTime().asSeconds().toString() );
+            testIndex().recordInfo(
+                "startup time",
+                String.format(
+                    "%s (boot time %s)",
+                    statistics.startupTime().asSeconds().toString(), statistics.bootingTime().asSeconds().toString()
+                )
+            );
+        }
 
         assertThat( "Nexus is running before test starts", nexus().isRunning(), is( true ) );
 
@@ -224,12 +237,10 @@ public abstract class NexusRunningITSupport
         logRemoteThatTestIs( remoteLogger(), doingWhat );
     }
 
-    private Stopwatch startNexus( final NexusBundle nexusBundle )
+    private void startNexus( final NexusBundle nexusBundle )
     {
-        final Stopwatch stopwatch = new Stopwatch();
         if ( nexusBundle != null && !nexusBundle.isRunning() )
         {
-            stopwatch.start();
             try
             {
                 LOGGER.info( "Starting Nexus ({})", nexusBundle );
@@ -239,9 +250,7 @@ public abstract class NexusRunningITSupport
             {
                 throw Throwables.propagate( e );
             }
-            stopwatch.stop();
         }
-        return stopwatch;
     }
 
     private static void stopNexus( final NexusBundle nexusBundle )

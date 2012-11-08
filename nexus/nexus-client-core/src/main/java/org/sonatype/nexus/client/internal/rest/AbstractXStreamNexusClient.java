@@ -23,7 +23,7 @@ import com.thoughtworks.xstream.XStream;
  * of the implementations keeps the fact of XStream use encapsulated, I did not want to proliferate it through all of
  * Nexus Client.
  *
- * @author cstamas
+ * @since 2.1
  */
 public abstract class AbstractXStreamNexusClient
     extends AbstractNexusClient

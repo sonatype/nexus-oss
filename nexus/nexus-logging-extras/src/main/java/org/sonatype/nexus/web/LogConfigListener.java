@@ -12,95 +12,55 @@
  */
 package org.sonatype.nexus.web;
 
-/**
- * Initialize logging system on start-up.
- * 
- * @author juven
- * @author adreghiciu@gmail.com
- */
-import java.util.logging.Handler;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
+import com.google.common.base.Throwables;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.sonatype.nexus.log.LogManager;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.slf4j.bridge.SLF4JBridgeHandler;
+import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * Initialize logging system on start-up.
+ *
+ * @author juven
+ * @author adreghiciu@gmail.com
+ */
 public class LogConfigListener
     implements ServletContextListener
 {
-
-    private Handler[] originalHandlers;
-
-    public void contextInitialized( ServletContextEvent sce )
+    public void contextInitialized( ServletContextEvent event )
     {
-        setUpJULHandlerSLF4J();
-
-        configureLogManager( sce.getServletContext() );
-    }
-
-    public void contextDestroyed( ServletContextEvent sce )
-    {
-        setUpJULHandlerOriginal();
-    }
-
-    /**
-     * Remove the original JUL handlers, install SLF4J handler
-     */
-    private void setUpJULHandlerSLF4J()
-    {
-        Logger julLogger = LogManager.getLogManager().getLogger( "" );
-
-        originalHandlers = julLogger.getHandlers();
-
-        for ( Handler handler : originalHandlers )
-        {
-            julLogger.removeHandler( handler );
-        }
-
+        // FIXME: JUL handler should be handled by container or bootstrap
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+
+        configureLogManager(event.getServletContext());
     }
 
-    private void setUpJULHandlerOriginal()
+    public void contextDestroyed( ServletContextEvent event )
     {
-        SLF4JBridgeHandler.uninstall();
-
-        Logger julLogger = LogManager.getLogManager().getLogger( "" );
-
-        if ( originalHandlers != null )
-        {
-            for ( Handler handler : originalHandlers )
-            {
-                julLogger.addHandler( handler );
-            }
-        }
+        // ignore
     }
 
-    private void configureLogManager( ServletContext sc )
+    private void configureLogManager( ServletContext context )
     {
         try
         {
-            PlexusContainer plexusContainer = (PlexusContainer) sc.getAttribute( PlexusConstants.PLEXUS_KEY );
-            if ( plexusContainer == null )
-            {
-                throw new IllegalStateException( "Could not find Plexus container in servlet context" );
-            }
-
-            org.sonatype.nexus.log.LogManager logManager =
-                plexusContainer.lookup( org.sonatype.nexus.log.LogManager.class );
-
+            // FIXME: Replace with Guice-based lookup of component
+            PlexusContainer container = (PlexusContainer) context.getAttribute( PlexusConstants.PLEXUS_KEY );
+            checkState(container != null, "Could not find Plexus container in servlet context");
+            LogManager logManager = container.lookup( LogManager.class );
             logManager.configure();
         }
         catch ( ComponentLookupException e )
         {
-            throw new IllegalStateException( "Could not lookup LogConfigurationParticipants" );
+            throw Throwables.propagate(e);
         }
-
     }
-
 }

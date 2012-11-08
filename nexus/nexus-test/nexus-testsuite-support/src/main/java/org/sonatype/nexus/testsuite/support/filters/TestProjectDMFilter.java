@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.testsuite.support.Filter;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 import com.google.common.collect.Maps;
@@ -45,10 +46,10 @@ public class TestProjectDMFilter
      * @param modelResolver Model resolver used to resolve effective model of test project (pom). Cannot be null.
      */
     @Inject
-    public TestProjectDMFilter( @Named( "remote-model-resolver-using-settings" )
-                                final MavenModelResolver modelResolver )
+    public TestProjectDMFilter( @Named( "remote-model-resolver-using-settings" ) final MavenModelResolver modelResolver,
+                                @Parameters final Map<String, String> properties )
     {
-        super( modelResolver );
+        super( modelResolver, properties );
     }
 
     /**

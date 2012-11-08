@@ -23,11 +23,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.noelios.restlet.http.HttpResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -53,6 +52,7 @@ import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -81,8 +81,11 @@ import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.security.SecuritySystem;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Maps;
 import com.noelios.restlet.ext.servlet.ServletCall;
 import com.noelios.restlet.http.HttpRequest;
+import com.noelios.restlet.http.HttpResponse;
 
 /**
  * This is an abstract resource handler that uses ResourceStore implementor and publishes those over REST.
@@ -792,7 +795,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
         result.addProperty( "virtual=" + item.isVirtual() );
 
         // attributes
-        for ( Map.Entry<String, String> entry : item.getRepositoryItemAttributes().asMap().entrySet() )
+        final TreeMap<String, String> sortedAttributes = Maps.newTreeMap();
+        sortedAttributes.putAll( item.getRepositoryItemAttributes().asMap() );
+        for ( Map.Entry<String, String> entry : sortedAttributes.entrySet() )
         {
             result.addAttribute( entry.toString() );
         }
@@ -877,7 +882,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
             else if ( t instanceof IllegalArgumentException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
+            }
+            else if ( t instanceof RemoteStorageTransportOverloadedException )
+            {
+                throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t );
             }
             else if ( t instanceof RepositoryNotAvailableException )
             {
@@ -885,31 +894,31 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
             else if ( t instanceof IllegalRequestException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
             }
             else if ( t instanceof IllegalOperationException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
             }
             else if ( t instanceof UnsupportedStorageOperationException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
             }
             else if ( t instanceof NoSuchRepositoryAccessException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_FORBIDDEN, t ), t );
             }
             else if ( t instanceof NoSuchRepositoryException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof NoSuchResourceStoreException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof ItemNotFoundException )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof AccessDeniedException )
             {
@@ -942,6 +951,15 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 handleErrorConstructLogMessage( req, res, t, shouldLogInfoStackTrace );
             }
         }
+    }
+
+    private Status getStatus( final Status status, final Exception e )
+    {
+        if ( e == null || e.getMessage() == null )
+        {
+            return status;
+        }
+        return new Status( status, e.getMessage() );
     }
 
     protected void handleErrorConstructLogMessage( final Request req, final Response res, final Exception t,

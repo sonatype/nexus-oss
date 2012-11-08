@@ -23,39 +23,33 @@
 
   <artifactId>nexus-lvo-plugin</artifactId>
   <name>Nexus : Core Plugins : LVO Plugin</name>
-  <description>Reminds about newer Nexus versions.</description>
+
+  <properties>
+    <nexus.plugin.name>Nexus LVO Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Reminds about newer Nexus versions.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-utils</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
       <artifactId>server-provider</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Needed to make Maven "know" nexus-plugin packaging -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
@@ -82,47 +76,12 @@
           <packageWithVersion>false</packageWithVersion>
         </configuration>
       </plugin>
+
       <plugin>
-        <groupId>net.sf.alchim</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>0.7.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>2.0.1</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compress</goal>
-            </goals>
-            <configuration>
-              <aggregations>
-                <aggregation>
-                  <output>${project.build.directory}/classes/static/js/nexus-lvo-plugin-all.js</output>
-                  <!-- files to include, path relative to output's directory or absolute path -->
-                  <includes>
-                    <include>${project.build.directory}/classes/static/js/repoServer.NexusUpgradeChecker.js</include>
-                  </includes>
-                </aggregation>
-              </aggregations>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <nosuffix>true</nosuffix>
-          <nomunge>true</nomunge>
-          <jswarn>false</jswarn>
-          <aggregations>
-            <aggregation>
-              <!-- insert new line after each concatenation (default: false) -->
-              <insertNewLine>true</insertNewLine>
-            </aggregation>
-          </aggregations>
-        </configuration>
       </plugin>
     </plugins>
   </build>
+
 </project>

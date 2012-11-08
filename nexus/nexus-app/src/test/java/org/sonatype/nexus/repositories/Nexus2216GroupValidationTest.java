@@ -24,7 +24,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class Nexus2216GroupValidationTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     // we need some stuff to prepare
     protected boolean loadConfigurationAtSetUp()

@@ -12,20 +12,20 @@
  */
 package org.sonatype.nexus.plugins.rest;
 
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import java.util.List;
 
 public class SimpleDocumentationNexusResourceBundleTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
     @Test
     public void testDoc()
         throws Exception
     {
-        NexusResourceBundle docBundle = lookup( NexusResourceBundle.class, "simpleTest" );
+        NexusResourceBundle docBundle = new SimpleDocumentationResourceBundle();
 
         List<StaticResource> resources = docBundle.getContributedResouces();
         Assert.assertNotNull( resources );

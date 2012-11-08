@@ -22,6 +22,7 @@ import javax.ws.rs.Produces;
 import org.apache.http.client.HttpClient;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -37,8 +38,7 @@ import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
-import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientUtil;
+import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -59,6 +59,9 @@ public class RemoteBrowserResource
 {
     public static final String RESOURCE_URI = "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY
         + "}/remotebrowser";
+
+    @Requirement
+    private QueryStringBuilder queryStringBuilder;
 
     private final Logger logger = LoggerFactory.getLogger( RemoteBrowserResource.class );
 
@@ -136,6 +139,7 @@ public class RemoteBrowserResource
     }
 
     private HttpClient getHttpClient(final ProxyRepository proxyRepository) {
+        // FIXME: Use Hc4Provider...
         RemoteStorageContext ctx = proxyRepository.getRemoteStorageContext();
         HttpClient client = HttpClientUtil.getHttpClient(HttpClientRemoteStorage.CTX_KEY, ctx);
         if (client == null) {

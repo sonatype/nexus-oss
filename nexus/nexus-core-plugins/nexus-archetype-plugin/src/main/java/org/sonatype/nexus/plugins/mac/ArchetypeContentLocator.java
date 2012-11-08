@@ -23,6 +23,7 @@ import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.context.IndexingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
@@ -37,13 +38,13 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 public class ArchetypeContentLocator
     implements ContentLocator
 {
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final Repository repository;
 
     private final String repositoryContentUrl;
 
-    private final IndexingContext indexingContext;
+    private final DefaultIndexerManager nexusIndexer;
 
     private final MacPlugin macPlugin;
 
@@ -52,13 +53,12 @@ public class ArchetypeContentLocator
     private volatile String payload;
 
     public ArchetypeContentLocator( final Repository repository, final String repositoryContentUrl,
-                                    final IndexingContext indexingContext, final MacPlugin macPlugin,
+                                    final DefaultIndexerManager nexusIndexer, final MacPlugin macPlugin,
                                     final ArtifactInfoFilter artifactInfoFilter )
     {
-        this.logger = LoggerFactory.getLogger( getClass() );
         this.repository = repository;
         this.repositoryContentUrl = repositoryContentUrl;
-        this.indexingContext = indexingContext;
+        this.nexusIndexer = nexusIndexer;
         this.macPlugin = macPlugin;
         this.artifactInfoFilter = artifactInfoFilter;
     }
@@ -68,27 +68,42 @@ public class ArchetypeContentLocator
     {
         if ( payload == null )
         {
-            final MacRequest req = new MacRequest( repository.getId(), repositoryContentUrl, artifactInfoFilter );
-
-            // NEXUS-5216: Warn if indexing context is null (indexable=false) for given repository but continue
-            // to return the correct empty catalog
-            if ( indexingContext == null )
+            nexusIndexer.shared( repository, new DefaultIndexerManager.Runnable()
             {
-                logger.info(
-                    "Archetype Catalog for repository {} is not buildable as it lacks IndexingContext (indexable=false?).",
-                    RepositoryStringUtils.getHumanizedNameString( repository ) );
-            }
+                @Override
+                public void run( IndexingContext context )
+                    throws IOException
+                {
+                    // XXX igorf, this is not called when context == null, but we need to generate an empty catalog
 
-            // get the catalog
-            final ArchetypeCatalog catalog = macPlugin.listArcherypesAsCatalog( req, indexingContext );
-            // serialize it to XML
-            final StringWriter sw = new StringWriter();
-            final ArchetypeCatalogXpp3Writer writer = new ArchetypeCatalogXpp3Writer();
-            writer.write( sw, catalog );
-            payload = sw.toString();
+                    payload = generateCatalogPayload( context );
+                }
+            } );
         }
 
         return payload;
+    }
+
+    private String generateCatalogPayload( IndexingContext context )
+        throws IOException
+    {
+        final MacRequest req = new MacRequest( repository.getId(), repositoryContentUrl, artifactInfoFilter );
+
+        // NEXUS-5216: Warn if indexing context is null (indexable=false) for given repository but continue
+        // to return the correct empty catalog
+        if ( context == null )
+        {
+            logger.info( "Archetype Catalog for repository {} is not buildable as it lacks IndexingContext (indexable=false?).",
+                         RepositoryStringUtils.getHumanizedNameString( repository ) );
+        }
+
+        // get the catalog
+        final ArchetypeCatalog catalog = macPlugin.listArcherypesAsCatalog( req, context );
+        // serialize it to XML
+        final StringWriter sw = new StringWriter();
+        final ArchetypeCatalogXpp3Writer writer = new ArchetypeCatalogXpp3Writer();
+        writer.write( sw, catalog );
+        return sw.toString();
     }
 
     @Override

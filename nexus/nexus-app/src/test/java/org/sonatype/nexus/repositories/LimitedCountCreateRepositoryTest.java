@@ -16,7 +16,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -27,7 +27,7 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
 
 public class LimitedCountCreateRepositoryTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private Nexus nexus;
 

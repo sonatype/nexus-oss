@@ -13,10 +13,10 @@
 package org.sonatype.nexus.email;
 
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 
 public class DefaultNexusEmailerTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private NexusEmailer emailer;
 

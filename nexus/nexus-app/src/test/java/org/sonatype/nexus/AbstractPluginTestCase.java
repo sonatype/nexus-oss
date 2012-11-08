@@ -27,7 +27,7 @@ import org.sonatype.guice.plexus.config.PlexusBeanModule;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 
 /**
- * Base class to be extended by Nexus plugins tests. Beside the standard {@link AbstractNexusTestCase} functionality
+ * Base class to be extended by Nexus plugins tests. Beside the standard {@link NexusAppTestSupport} functionality
  * will scan additional paths for components, such as "target/classes", "target/test-classes", or ant-like classpath
  * entries.
  * 
@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
  * @author Alin Dreghiciu
  */
 public abstract class AbstractPluginTestCase
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     protected String[] sourceDirectories = { "target/classes", "target/test-classes" };
 

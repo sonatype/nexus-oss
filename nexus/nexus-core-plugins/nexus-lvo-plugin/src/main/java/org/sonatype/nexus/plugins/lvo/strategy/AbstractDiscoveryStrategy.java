@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.plugins.lvo.strategy;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
 
@@ -26,11 +24,4 @@ public abstract class AbstractDiscoveryStrategy
     extends AbstractLoggingComponent
     implements DiscoveryStrategy
 {
-    @Requirement
-    private Nexus nexus;
-
-    protected Nexus getNexus()
-    {
-        return nexus;
-    }
 }

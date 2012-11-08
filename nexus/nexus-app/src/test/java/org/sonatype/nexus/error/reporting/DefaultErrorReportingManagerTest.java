@@ -39,7 +39,7 @@ import org.sonatype.jira.AttachmentHandler;
 import org.sonatype.jira.mock.MockAttachmentHandler;
 import org.sonatype.jira.mock.StubJira;
 import org.sonatype.jira.test.JiraXmlRpcTestServlet;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
@@ -48,7 +48,7 @@ import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 
 public class DefaultErrorReportingManagerTest
-    extends AbstractNexusTestCase
+    extends NexusAppTestSupport
 {
     private DefaultErrorReportingManager manager;
 

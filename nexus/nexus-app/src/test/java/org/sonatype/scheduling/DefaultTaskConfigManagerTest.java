@@ -26,20 +26,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import com.google.inject.Module;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.security.AbstractNexusTestCase;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
+import org.sonatype.security.guice.SecurityModule;
 
 public class DefaultTaskConfigManagerTest
-    extends AbstractNexusTestCase
+    extends NexusTestSupport
 {
     private DefaultScheduler defaultScheduler;
 
@@ -78,6 +80,12 @@ public class DefaultTaskConfigManagerTest
     // typeClassMap.put( SCHEDULE_TYPE_MONTHLY, CMonthlySchedule.class );
     // typeClassMap.put( SCHEDULE_TYPE_ADVANCED, CAdvancedSchedule.class );
     // }
+
+    @Override
+    protected Module[] getTestCustomModules()
+    {
+        return new Module[] { new SecurityModule() };
+    }
 
     public void setUp()
         throws Exception

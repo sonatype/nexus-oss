@@ -11,7 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-// the following is a global, singleton class
+define('nexus/error/ErrorHandler',['extjs'], function(Ext){
+  Ext.namespace('Nexus.error');
+
 Nexus.error.ErrorHandler = function() {
   return {
     init: function() {
@@ -30,7 +32,7 @@ Nexus.error.ErrorHandler = function() {
         lines[lines.length] = "Line Number: " + args[2];
       } else {
         lines = ["An unknown error has occurred."]; // purposely rebuild lines
-        lines[lines.length] = "The following information may be useful:"
+        lines[lines.length] = "The following information may be useful:";
         for (var x = 0; x < args.length; x++) {
           lines[lines.length] = Ext.encode(args[x]);
         }
@@ -72,3 +74,4 @@ Nexus.error.ErrorHandler = function() {
 Nexus.error.handle = Nexus.error.ErrorHandler.handleError.createDelegate(Nexus.error.ErrorHandler);
 
 Nexus.error.ErrorHandler.init();
+});

@@ -14,31 +14,25 @@ package org.sonatype.nexus.client.rest;
 
 import org.sonatype.nexus.client.core.NexusClient;
 
+/**
+ * @since 2.1
+ */
 public interface NexusClientFactory
 {
 
     /**
      * Creates a {@link NexusClient} against given baseUrl.
-     *
-     * @param baseUrl
-     * @return
      */
     NexusClient createFor( BaseUrl baseUrl );
 
     /**
      * Creates a {@link NexusClient} against given baseUrl and authentication info (Nexus authentication).
-     *
-     * @param baseUrl
-     * @param authenticationInfo
-     * @return
      */
     NexusClient createFor( BaseUrl baseUrl, AuthenticationInfo authenticationInfo );
 
     /**
      * Creates a {@link NexusClient} against given data in the provided {@link ConnectionInfo}.
-     *
-     * @param connectionInfo
-     * @return
      */
     NexusClient createFor( ConnectionInfo connectionInfo );
+
 }

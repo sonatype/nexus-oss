@@ -15,7 +15,6 @@ package org.sonatype.nexus.rest;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ConcurrentMap;
-import java.util.logging.Level;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.restlet.Context;
@@ -133,8 +132,8 @@ public class NexusRestletResource
             try {
                 manager.handleError( request );
             } catch ( IssueSubmissionException e ) {
-                getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
-	    }
+                logger.error("Unable to submit error report to jira", e );
+            }
         }
     }
 }

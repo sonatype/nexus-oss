@@ -15,8 +15,12 @@ package org.sonatype.nexus.client.core.subsystem.content;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @since 2.1
+ */
 public interface Content
 {
+
     void download( Location location, File target )
         throws IOException;
 

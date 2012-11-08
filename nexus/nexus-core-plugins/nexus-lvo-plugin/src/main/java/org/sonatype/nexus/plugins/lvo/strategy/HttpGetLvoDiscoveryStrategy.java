@@ -14,14 +14,20 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
-import com.thoughtworks.xstream.io.xml.XppDomDriver;
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.io.xml.XppDomDriver;
 
 /**
  * This is a "remote" strategy, uses HTTP GET to get a remote LVO Plugin response. It extends the
@@ -29,18 +35,25 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
  * 
  * @author cstamas
  */
-@Component( role = DiscoveryStrategy.class, hint = "http-get-lvo" )
+@Singleton
+@Named( "http-get-lvo" )
+@Typed( DiscoveryStrategy.class )
 public class HttpGetLvoDiscoveryStrategy
     extends AbstractRemoteDiscoveryStrategy
 {
     private XStream xstream;
 
-    protected XStream getXStream()
+    @Inject
+    public HttpGetLvoDiscoveryStrategy( final Hc4Provider hc4Provider )
+    {
+        super( hc4Provider );
+    }
+
+    protected synchronized XStream getXStream()
     {
         if ( xstream == null )
         {
-            XStream xstream = new XStream( new XppDomDriver() );
-
+            xstream = new XStream( new XppDomDriver() );
             DiscoveryResponse.configureXStream( xstream );
         }
 
@@ -48,27 +61,22 @@ public class HttpGetLvoDiscoveryStrategy
     }
 
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException,
-            IOException
+        throws NoSuchRepositoryException, IOException
     {
-        DiscoveryResponse dr = new DiscoveryResponse( request );
-
+        final DiscoveryResponse dr = new DiscoveryResponse( request );
         // handle
-        RequestResult response = handleRequest( getRemoteUrl( request ) );
-
+        final RequestResult response = handleRequest( getRemoteUrl( request ) );
         if ( response != null )
         {
             try
             {
-                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( response.getInputStream() );
-
+                final DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( response.getInputStream() );
                 return remoteResponse;
             }
             catch ( XStreamException e )
             {
                 // handle gracefully, but only XStream problems!
                 dr.setSuccessful( false );
-
                 return dr;
             }
             finally

@@ -22,7 +22,7 @@ import org.sonatype.nexus.client.internal.util.Template;
 /**
  * Edition conditions that contains {@link Condition}s to match remote Nexus edition.
  *
- * @author cstamas
+ * @since 2.1
  */
 public abstract class EditionConditions
 {

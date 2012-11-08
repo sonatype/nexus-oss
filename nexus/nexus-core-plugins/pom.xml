@@ -26,40 +26,37 @@
   <packaging>pom</packaging>
   <name>Nexus : Core Plugins</name>
 
+  <dependencies>
+    <!--
+    FIXME: See note on DM entry.
+    -->
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
   <modules>
-    <module>nexus-indexer-lucene-plugin-parent</module>
+    <module>indexer</module>
+    <module>ldap</module>
     <module>nexus-timeline-plugin</module>
     <module>nexus-lvo-plugin</module>
     <module>nexus-plugin-console-plugin</module>
-    <module>nexus-ldap-plugin-parent</module>
     <module>nexus-rrb-plugin</module>
     <module>nexus-core-documentation-plugin</module>
-    <module>nexus-groovy-console-plugin</module>
     <module>nexus-archetype-plugin</module>
     <module>nexus-maven-bridge-plugin</module>
   </modules>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>${applifecycle.version}</version>
-          <extensions>true</extensions>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.plugins</groupId>
-              <artifactId>app-lifecycle-nexus</artifactId>
-              <version>${applifecycle.version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
   </build>
 
 </project>

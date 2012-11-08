@@ -81,13 +81,6 @@ public class DefaultTaskConfigManager
 
     // ==
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
-    // ==
-
     public void initializeConfiguration()
         throws ConfigurationException
     {
@@ -145,11 +138,11 @@ public class DefaultTaskConfigManager
         {
             List<CScheduledTask> tempList = new ArrayList<CScheduledTask>( tasks );
 
-            getLogger().info( tempList.size() + " task(s) to load." );
+            logger.info( tempList.size() + " task(s) to load." );
 
             for ( CScheduledTask task : tempList )
             {
-                getLogger().info( "Loading task - " + task.getName() );
+                logger.info( "Loading task - " + task.getName() );
 
                 try
                 {
@@ -180,7 +173,7 @@ public class DefaultTaskConfigManager
                 {
                     // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
                     // name
-                    getLogger().warn(
+                    logger.warn(
                         "Unable to initialize task " + task.getName() + ", couldn't load service class "
                         + task.getId(), e
                     );
@@ -223,7 +216,7 @@ public class DefaultTaskConfigManager
                 }
                 catch ( IOException e )
                 {
-                    getLogger().warn( "Could not save task changes!", e );
+                    logger.warn( "Could not save task changes!", e );
                 }
             }
         }
@@ -247,7 +240,7 @@ public class DefaultTaskConfigManager
                 }
                 catch ( IOException e )
                 {
-                    getLogger().warn( "Could not save task changes!", e );
+                    logger.warn( "Could not save task changes!", e );
                 }
             }
         }
@@ -360,7 +353,7 @@ public class DefaultTaskConfigManager
                 }
                 catch ( NumberFormatException nfe )
                 {
-                    getLogger().error( "Invalid day being added to monthly schedule - " + day + " - skipping." );
+                    logger.error( "Invalid day being added to monthly schedule - " + day + " - skipping." );
                 }
             }
 
@@ -380,7 +373,7 @@ public class DefaultTaskConfigManager
                 }
                 catch ( NumberFormatException nfe )
                 {
-                    getLogger().error( "Invalid day being added to weekly schedule - " + day + " - skipping." );
+                    logger.error( "Invalid day being added to weekly schedule - " + day + " - skipping." );
                 }
             }
 
