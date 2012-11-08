@@ -17,6 +17,7 @@ import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryCondi
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -36,6 +37,7 @@ public class RepositoryExistsCondition
     }
 
     @Override
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final RepositoryRegistryEventAdd event )
     {
@@ -45,6 +47,7 @@ public class RepositoryExistsCondition
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final RepositoryRegistryEventRemove event )
     {

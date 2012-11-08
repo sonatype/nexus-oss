@@ -38,7 +38,7 @@ public class CrudIT
     public void crud()
     {
         // create
-        final CapabilityResource cap = testCapability();
+        final CapabilityResource cap = messageCapability();
 
         CapabilityListItemResource r = capabilities().add( cap );
         assertThat( r.getId(), is( notNullValue() ) );
@@ -69,7 +69,7 @@ public class CrudIT
     @Test
     public void enable()
     {
-        final CapabilityListItemResource created = capabilities().add( testCapability() );
+        final CapabilityListItemResource created = capabilities().add( messageCapability() );
         final CapabilityListItemResource enabled = capabilities().enable( created.getId() );
 
         assertThat( enabled.isEnabled(), is( true ) );
@@ -78,16 +78,16 @@ public class CrudIT
     @Test
     public void disable()
     {
-        final CapabilityListItemResource created = capabilities().add( testCapability() );
+        final CapabilityListItemResource created = capabilities().add( messageCapability() );
         final CapabilityListItemResource enabled = capabilities().disable( created.getId() );
 
         assertThat( enabled.isEnabled(), is( false ) );
     }
 
-    private CapabilityResource testCapability()
+    private CapabilityResource messageCapability()
     {
-        return capability().withTypeId( "TouchTest" ).withNotes( "crud-test" )
-            .withProperty( capabilityProperty().withKey( "repoOrGroupId" ).withValue( TEST_REPOSITORY ) )
+        return capability().withTypeId( "[message]" ).withNotes( "What about Notes?" )
+            .withProperty( capabilityProperty().withKey( "repository" ).withValue( "releases" ) )
             .withProperty( capabilityProperty().withKey( "message" ).withValue( "Testing CRUD" ) );
     }
 

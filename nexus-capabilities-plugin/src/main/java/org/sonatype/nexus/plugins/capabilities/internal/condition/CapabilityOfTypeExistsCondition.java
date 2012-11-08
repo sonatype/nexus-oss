@@ -24,6 +24,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -80,6 +81,7 @@ public class CapabilityOfTypeExistsCondition
         getEventBus().unregister( this );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final CapabilityEvent.Created event )
     {
@@ -89,6 +91,7 @@ public class CapabilityOfTypeExistsCondition
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final CapabilityEvent.AfterRemove event )
     {

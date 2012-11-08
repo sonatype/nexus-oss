@@ -25,8 +25,6 @@
 
   <artifactId>nexus-capabilities-model</artifactId>
 
-  <name>Nexus Capabilities :: Model</name>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

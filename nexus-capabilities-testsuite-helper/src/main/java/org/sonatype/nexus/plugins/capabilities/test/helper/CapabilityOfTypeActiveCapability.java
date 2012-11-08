@@ -12,45 +12,31 @@
  */
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
+import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 
-@Named( TouchTestCapabilityDescriptor.TYPE_ID )
-public class TouchTestCapability
-    extends CapabilitySupport
+@Named( CapabilityOfTypeActiveCapabilityDescriptor.TYPE_ID )
+public class CapabilityOfTypeActiveCapability
+    extends TestCapability
     implements Capability
 {
 
-    @Override
-    public void onCreate()
+    private final Conditions conditions;
+
+    @Inject
+    public CapabilityOfTypeActiveCapability( final Conditions conditions )
     {
-        getLogger().info( "Create capability with id {} and properties {}", context().id(), context().properties() );
+        this.conditions = conditions;
     }
 
     @Override
-    public void onUpdate()
+    public Condition activationCondition()
     {
-        getLogger().info( "Update capability with id {} and properties {}", context().id(), context().properties() );
-    }
-
-    @Override
-    public void onLoad()
-    {
-        getLogger().info( "Load capability with id {} and properties {}", context().id(), context().properties() );
-    }
-
-    @Override
-    public void onRemove()
-    {
-        getLogger().info( "Remove capability with id {}", context().id() );
-    }
-
-    @Override
-    public String status()
-    {
-        return "<h3>I'm well. Thanx!</h3>";
+        return conditions.capabilities().capabilityOfTypeActive( MessageCapabilityDescriptor.TYPE );
     }
 
 }

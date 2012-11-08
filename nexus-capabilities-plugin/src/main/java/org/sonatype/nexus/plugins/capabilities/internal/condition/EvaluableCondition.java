@@ -22,6 +22,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.Evaluable;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -78,6 +79,7 @@ public class EvaluableCondition
         getEventBus().unregister( this );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final CapabilityEvent.AfterUpdate event )
     {

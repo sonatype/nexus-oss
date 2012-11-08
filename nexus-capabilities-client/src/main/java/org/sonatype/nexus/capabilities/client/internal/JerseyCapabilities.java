@@ -13,7 +13,9 @@
 package org.sonatype.nexus.capabilities.client.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -56,6 +58,23 @@ public class JerseyCapabilities
     public List<CapabilityListItemResource> list()
     {
         return list( false );
+    }
+
+    @Override
+    public CapabilityListItemResource list( final String id )
+    {
+        final List<CapabilityListItemResource> capabilities = list( true );
+        final Collection<CapabilityListItemResource> filtered =
+            Collections2.filter( capabilities, new Predicate<CapabilityListItemResource>()
+            {
+                @Override
+                public boolean apply( @Nullable final CapabilityListItemResource input )
+                {
+                    return input != null && input.getId().equals( id );
+                }
+            } );
+        checkState( !filtered.isEmpty(), "Capability with id %s does not exist", id );
+        return filtered.iterator().next();
     }
 
     @Override

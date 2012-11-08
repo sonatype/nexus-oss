@@ -20,6 +20,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -70,6 +71,7 @@ public abstract class CompositeConditionSupport
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final ConditionEvent.Satisfied event )
     {
@@ -79,6 +81,7 @@ public abstract class CompositeConditionSupport
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final ConditionEvent.Unsatisfied event )
     {
