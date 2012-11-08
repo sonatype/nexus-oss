@@ -72,7 +72,7 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- This dependency is only needed if you want to include REST Resources -->
+
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-rest-api</artifactId>
@@ -339,5 +339,17 @@
         </configuration>
       </plugin>
     </plugins>
+
   </build>
+
+  <profiles>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <profile>
+      <id>idea</id>
+      <properties>
+        <nexusPluginType>jar</nexusPluginType>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>
