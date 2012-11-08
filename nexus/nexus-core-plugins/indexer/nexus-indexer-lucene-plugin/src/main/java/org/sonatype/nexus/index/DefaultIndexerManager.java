@@ -1240,7 +1240,6 @@ public class DefaultIndexerManager
         } );
 
         updateRequest.setForceFullUpdate( forceFullUpdate );
-        updateRequest.setLocalIndexCacheDir( context.getRepository() );
 
         if ( repository instanceof MavenRepository )
         {
