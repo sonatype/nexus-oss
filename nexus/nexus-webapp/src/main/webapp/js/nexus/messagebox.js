@@ -13,31 +13,9 @@
 
 /*global define*/
 define('nexus/messagebox',['extjs', 'nexus', 'sonatype'], function(Ext, Nexus, Sonatype) {
-// Extend message box, so that we can get ids on the buttons for testing
-Nexus.MessageBox = (function() {
-  var O, F = function() {};
-  F.prototype = Ext.MessageBox;
-  O = function() {};
-  O.prototype = new F();
-  O.superclass = F.prototype;
+  Sonatype.MessageBox = Ext.MessageBox;
 
-  Ext.override(O, (function() {
-        return {
-          show : function(options) {
-            O.superclass.show.call(this, options);
-            this.getDialog().getEl().select('button').each(function(el) {
-                  el.dom.id = el.dom.innerHTML;
-                });
-          }
-        };
-      }()));
-  return new O();
-}());
-
-  // legacy
-  Sonatype.MessageBox = Nexus.MessageBox;
-
-  return Nexus.MessageBox;
+  return Ext.MessageBox;
 });
 
 
