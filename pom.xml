@@ -79,7 +79,7 @@
             <excludes>
               <!-- we have target pattern in this format because of target package in nexus-api and nexus-proxy modules -->
               <exclude>**/nexus*/target/**</exclude>
-              <exclude>**/nexus-ldap-plugin-parent/ldap-common/target/**</exclude>
+              <exclude>**/ldap-common/target/**</exclude>
               <exclude>**/ext-2.3/**</exclude>
               <exclude>**/ext-3.4.0/**</exclude>
               <exclude>**/js/filetree/**</exclude>
