@@ -32,11 +32,6 @@
           <role>org.apache.shiro.authz.permission.RolePermissionResolver</role>
           <field-name>rolePermissionResolverMap</field-name>
         </requirement>
-        <requirement>
-          <role>org.codehaus.plexus.logging.Logger</role>
-          <role-hint>default</role-hint>
-          <field-name>logger</field-name>
-        </requirement>
       </requirements>
     </component>
 
