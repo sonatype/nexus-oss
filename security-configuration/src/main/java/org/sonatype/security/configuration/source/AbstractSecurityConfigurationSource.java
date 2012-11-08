@@ -109,7 +109,7 @@ public abstract class AbstractSecurityConfigurationSource
 
         if ( getConfiguration() != null )
         {
-            getLogger().debug( "Configuration loaded succesfully." );
+            getLogger().debug( "Configuration loaded successfully." );
         }
     }
 
