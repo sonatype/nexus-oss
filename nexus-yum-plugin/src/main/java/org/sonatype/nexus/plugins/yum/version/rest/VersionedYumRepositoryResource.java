@@ -32,9 +32,9 @@ import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "VersionizedYumRepositoryResource" )
-@Path( VersionizedYumRepositoryResource.RESOURCE_URI )
-public class VersionizedYumRepositoryResource
+@Component( role = PlexusResource.class, hint = "VersionedYumRepositoryResource" )
+@Path( VersionedYumRepositoryResource.RESOURCE_URI )
+public class VersionedYumRepositoryResource
     extends AbstractYumRepositoryResource
     implements PlexusResource
 {
@@ -70,7 +70,7 @@ public class VersionizedYumRepositoryResource
     public PathProtectionDescriptor getResourceProtection()
     {
         return new PathProtectionDescriptor( YUM_REPO_PREFIX + "/**",
-            "authcBasic,perms[nexus:yumVersionizedRepositories]" );
+            "authcBasic,perms[nexus:yumVersionedRepositories]" );
     }
 
     @Override

@@ -109,9 +109,9 @@ public class RpmListWriter
             }
         }
 
-        File rpmVersionizedListFile = fileFactory.getRpmListFile( repositoryId, version );
-        writeRpmFileList( filesWithRequiredVersion, rpmVersionizedListFile );
-        return rpmVersionizedListFile;
+        File rpmVersionedListFile = fileFactory.getRpmListFile( repositoryId, version );
+        writeRpmFileList( filesWithRequiredVersion, rpmVersionedListFile );
+        return rpmVersionedListFile;
     }
 
     private boolean hasRequiredVersion( String file )

@@ -43,7 +43,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
 
-public class VersionizedYumRepositoryResourceTest
+public class VersionedYumRepositoryResourceTest
     extends AbstractYumNexusTestCase
 {
     private static final String VERSION = "2.2-1";
@@ -52,7 +52,7 @@ public class VersionizedYumRepositoryResourceTest
 
     private static final String ALIAS = "myAlias";
 
-    @Requirement( hint = "VersionizedYumRepositoryResource" )
+    @Requirement( hint = "VersionedYumRepositoryResource" )
     private PlexusResource resource;
 
     @Inject

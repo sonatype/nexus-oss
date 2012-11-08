@@ -17,7 +17,7 @@
   <!-- general switch to activate / deactivate the plugin -->
   <active>true</active>
 
-  <!-- timeout for requests for a filtered (versionized) repository -->
+  <!-- timeout for requests for a filtered (versioned) repository -->
   <repositoryCreationTimeout>150</repositoryCreationTimeout><!-- in seconds -->
   
   <!-- enables or disables the creation of a repository of repositories -->
