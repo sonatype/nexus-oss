@@ -161,14 +161,6 @@
       <artifactId>jsoup</artifactId>
     </dependency>
 
-    <!--
-    FIXME: See note on DM entry.
-    -->
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
