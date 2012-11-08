@@ -22,9 +22,9 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
-import org.sonatype.nexus.plugins.yum.repository.task.RepositoryScanningTask;
-import org.sonatype.nexus.plugins.yum.repository.task.YumGroupRepositoryGenerationTask;
+import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.task.RepositoryScanningTask;
+import org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;

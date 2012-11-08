@@ -13,14 +13,9 @@
 package org.sonatype.nexus.repository.yum;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 
-import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -36,10 +31,6 @@ public interface Yum
     void addVersion( String version );
 
     Repository getRepository();
-
-    ScheduledTask<YumRepository> createYumRepository();
-
-    ScheduledTask<YumRepository> createYumRepository( String version, File yumRepoDir, URL yumRepoUrl );
 
     YumRepository getYumRepository( String version, URL repoBaseUrl )
         throws Exception;

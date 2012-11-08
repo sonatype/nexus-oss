@@ -10,25 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum;
+package org.sonatype.nexus.repository.yum.internal;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
 
-public interface YumRegistry
+public final class RepositoryUtils
 {
+    private RepositoryUtils()
+    {
+    }
 
-    Yum register( Repository repository );
+    public static File getBaseDir( Repository repository )
+        throws URISyntaxException, MalformedURLException
+    {
+        String localUrl = repository.getLocalUrl();
+        if ( isFile( localUrl ) )
+        {
+            return new File( localUrl );
+        }
+        return new File( new URL( localUrl ).toURI() );
+    }
 
-    Yum unregister( String repositoryId );
-
-    Yum get( String repositoryId );
-
-    boolean isRegistered( String repositoryId );
-
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
+    private static boolean isFile( String localUrl )
+    {
+        return localUrl.startsWith( "/" );
+    }
 
 }

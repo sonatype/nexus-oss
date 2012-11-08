@@ -12,23 +12,23 @@
  */
 package org.sonatype.nexus.repository.yum;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
+import java.io.File;
 
-public interface YumRegistry
+public interface YumRepository
 {
 
-    Yum register( Repository repository );
+    public static final String YUM_REPOSITORY_DIR_NAME = "repodata";
 
-    Yum unregister( String repositoryId );
+    public static final String REPOMD_XML = "repomd.xml";
 
-    Yum get( String repositoryId );
+    public File getBaseDir();
 
-    boolean isRegistered( String repositoryId );
+    public File getFile( String path );
 
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
+    public boolean isDirty();
+
+    public String getVersion();
+
+    public String getId();
 
 }

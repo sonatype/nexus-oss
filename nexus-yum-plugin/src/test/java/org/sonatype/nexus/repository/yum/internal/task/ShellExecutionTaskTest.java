@@ -10,25 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum;
+package org.sonatype.nexus.repository.yum.internal.task;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
+import java.io.IOException;
+import org.junit.Test;
 
-public interface YumRegistry
+import org.sonatype.nexus.repository.yum.internal.task.ShellExecutionTask;
+
+public class ShellExecutionTaskTest
 {
+    @Test
+    public void shouldExecuteTask()
+        throws Exception
+    {
+        ShellExecutionTask task = new ShellExecutionTask();
+        task.setCommand( "/bin/bash" );
+        task.doRun();
+    }
 
-    Yum register( Repository repository );
-
-    Yum unregister( String repositoryId );
-
-    Yum get( String repositoryId );
-
-    boolean isRegistered( String repositoryId );
-
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
-
+    @Test( expected = IOException.class )
+    public void shouldFailForOnNonZeroExitCode()
+        throws Exception
+    {
+        ShellExecutionTask task = new ShellExecutionTask();
+        task.setCommand( "/bla/blup/foo" );
+        task.doRun();
+    }
 }

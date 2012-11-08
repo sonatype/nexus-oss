@@ -10,25 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum;
+package org.sonatype.nexus.repository.yum.internal;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
 
-public interface YumRegistry
+public class YumRepositoryGenerateEvent
 {
 
-    Yum register( Repository repository );
+    private final Repository repository;
 
-    Yum unregister( String repositoryId );
+    public YumRepositoryGenerateEvent( final Repository repository )
+    {
+        this.repository = checkNotNull( repository );
+    }
 
-    Yum get( String repositoryId );
-
-    boolean isRegistered( String repositoryId );
-
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
+    public Repository getRepository()
+    {
+        return repository;
+    }
 
 }

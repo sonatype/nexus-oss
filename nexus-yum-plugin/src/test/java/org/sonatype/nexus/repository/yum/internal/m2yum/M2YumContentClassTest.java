@@ -10,25 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum;
+package org.sonatype.nexus.repository.yum.internal.m2yum;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
-public interface YumRegistry
+import org.junit.Test;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.registry.ContentClass;
+
+public class M2YumContentClassTest
 {
 
-    Yum register( Repository repository );
-
-    Yum unregister( String repositoryId );
-
-    Yum get( String repositoryId );
-
-    boolean isRegistered( String repositoryId );
-
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
+    @Test
+    public void shouldBeCompatibleToM2()
+        throws Exception
+    {
+        ContentClass m2yum = new M2YumContentClass();
+        assertThat( m2yum.isCompatible( new M2YumContentClass() ), is( true ) );
+        assertThat( m2yum.isCompatible( new Maven2ContentClass() ), is( true ) );
+    }
 
 }

@@ -21,7 +21,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
+import org.sonatype.nexus.plugins.yum.plugin.DefaultDeletionService;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;

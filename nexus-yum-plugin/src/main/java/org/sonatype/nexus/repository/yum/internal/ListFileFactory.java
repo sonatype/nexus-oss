@@ -10,25 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum;
+package org.sonatype.nexus.repository.yum.internal;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
+import java.io.File;
 
-public interface YumRegistry
+public interface ListFileFactory
 {
+    File getRpmListFile( String id );
 
-    Yum register( Repository repository );
-
-    Yum unregister( String repositoryId );
-
-    Yum get( String repositoryId );
-
-    boolean isRegistered( String repositoryId );
-
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
+    File getRpmListFile( String id, String version );
 
 }

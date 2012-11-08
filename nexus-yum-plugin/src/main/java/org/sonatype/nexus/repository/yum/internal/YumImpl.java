@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.yum.internal;
 import static java.io.File.pathSeparator;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -23,17 +23,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
-import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
-import org.sonatype.nexus.plugins.yum.repository.YumRepository;
-import org.sonatype.nexus.plugins.yum.repository.service.YumRepositoryCache;
-import org.sonatype.nexus.plugins.yum.repository.task.TaskDoubledException;
-import org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
+import org.sonatype.nexus.repository.yum.internal.task.TaskAlreadyScheduledException;
+import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
+import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
@@ -100,10 +99,9 @@ public class YumImpl
         return repository;
     }
 
-    @Override
-    public ScheduledTask<YumRepository> createYumRepository( final String version,
-                                                             final File yumRepoBaseDir,
-                                                             final URL yumRepoUrl )
+    ScheduledTask<YumRepository> createYumRepository( final String version,
+                                                      final File yumRepoBaseDir,
+                                                      final URL yumRepoUrl )
     {
         try
         {
@@ -134,7 +132,7 @@ public class YumImpl
         {
             return nexusScheduler.submit( ID, task );
         }
-        catch ( TaskDoubledException e )
+        catch ( TaskAlreadyScheduledException e )
         {
             return mergeAddedFiles( e.getOriginal(), task );
         }
@@ -160,7 +158,6 @@ public class YumImpl
         return (ScheduledTask<YumRepository>) existingScheduledTask;
     }
 
-    @Override
     public ScheduledTask<YumRepository> createYumRepository()
     {
         return addToYumRepository( null );
@@ -170,13 +167,13 @@ public class YumImpl
     public YumRepository getYumRepository( final String version, final URL baseRepoUrl )
         throws Exception
     {
-        YumRepository yumRepository = cache.lookup( repository.getId(), version );
+        YumRepositoryImpl yumRepository = cache.lookup( repository.getId(), version );
         if ( ( yumRepository == null ) || yumRepository.isDirty() )
         {
             final ScheduledTask<YumRepository> future = createYumRepository(
                 version, createRepositoryTempDir( repository, version ), baseRepoUrl
             );
-            yumRepository = future.get();
+            yumRepository = (YumRepositoryImpl) future.get();
             cache.cache( yumRepository );
         }
         return yumRepository;
@@ -195,7 +192,7 @@ public class YumImpl
     }
 
     @Override
-    public ScheduledTask<YumRepository> addToYumRepository( String filePath )
+    public ScheduledTask<YumRepository> addToYumRepository( @Nullable String filePath )
     {
         try
         {

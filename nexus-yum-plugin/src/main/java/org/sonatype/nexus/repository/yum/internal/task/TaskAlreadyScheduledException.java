@@ -10,25 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum;
+package org.sonatype.nexus.repository.yum.internal.task;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
+import java.util.concurrent.RejectedExecutionException;
+
 import org.sonatype.scheduling.ScheduledTask;
 
-public interface YumRegistry
+public class TaskAlreadyScheduledException
+    extends RejectedExecutionException
 {
+    private static final long serialVersionUID = 1L;
 
-    Yum register( Repository repository );
+    private final ScheduledTask<?> original;
 
-    Yum unregister( String repositoryId );
+    public TaskAlreadyScheduledException( ScheduledTask<?> original, String message )
+    {
+        super( message );
+        this.original = original;
+    }
 
-    Yum get( String repositoryId );
-
-    boolean isRegistered( String repositoryId );
-
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
-
+    public ScheduledTask<?> getOriginal()
+    {
+        return original;
+    }
 }

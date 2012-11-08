@@ -10,25 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum;
+package org.sonatype.nexus.repository.yum.internal.rest;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
+import javax.inject.Singleton;
 
-public interface YumRegistry
+import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
+
+@Singleton
+public class YumSecurityResource
+    extends AbstractStaticSecurityResource
+    implements StaticSecurityResource
 {
 
-    Yum register( Repository repository );
-
-    Yum unregister( String repositoryId );
-
-    Yum get( String repositoryId );
-
-    boolean isRegistered( String repositoryId );
-
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
+    @Override
+    protected String getResourcePath()
+    {
+        return "/META-INF/org.sonatype.nexus.plugins.yum-security.xml";
+    }
 
 }

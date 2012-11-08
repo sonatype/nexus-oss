@@ -10,25 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum;
+package org.sonatype.nexus.repository.yum.internal.utils;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
+import java.io.File;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 
-public interface YumRegistry
+public final class FileMatchers
 {
+    private FileMatchers()
+    {
+    }
 
-    Yum register( Repository repository );
+    public static Matcher<File> exists()
+    {
+        return new BaseMatcher<File>()
+        {
+            public boolean matches( Object item )
+            {
+                return ( (File) item ).exists();
+            }
 
-    Yum unregister( String repositoryId );
+            public void describeTo( Description description )
+            {
+                description.appendText( "file or directory exists" );
+            }
 
-    Yum get( String repositoryId );
-
-    boolean isRegistered( String repositoryId );
-
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
+        };
+    }
 
 }
