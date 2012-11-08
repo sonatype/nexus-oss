@@ -49,8 +49,8 @@ import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.code.tempusfugit.temporal.Condition;
 
@@ -157,8 +157,7 @@ public class YumMetadataGenerationTaskConcurrencyTest
         enhancer.setSuperclass( YumMetadataGenerationTask.class );
         enhancer.setCallback( interceptor );
         final YumMetadataGenerationTask task = (YumMetadataGenerationTask) enhancer.create();
-        setField( task, "applicationEventMulticaster", lookup( ApplicationEventMulticaster.class ) );
-        setField( task, "logger", LoggerFactory.getLogger( YumMetadataGenerationTask.class ) );
+        setField( task, "eventBus", lookup( EventBus.class ) );
         task.setRepositoryId( "REPO_" + repositoryId );
         return task;
     }

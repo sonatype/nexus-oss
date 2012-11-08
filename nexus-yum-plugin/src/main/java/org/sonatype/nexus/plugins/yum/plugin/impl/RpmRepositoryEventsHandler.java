@@ -13,14 +13,12 @@
 package org.sonatype.nexus.plugins.yum.plugin.impl;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.guice.plexus.config.Strategies;
-import org.sonatype.nexus.plugins.yum.plugin.AbstractEventListener;
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
-import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.plugin.event.YumRepositoryGenerateEvent;
 import org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumGroupRepository;
@@ -32,16 +30,19 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
-@Component( role = ItemEventListener.class, instantiationStrategy = Strategies.LOAD_ON_START )
-public class RpmRepositoryEventListener
-    extends AbstractEventListener
+@Named
+@Singleton
+@EventBus.Managed
+public class RpmRepositoryEventsHandler
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ItemEventListener.class );
+
+    private static final Logger LOG = LoggerFactory.getLogger( RpmRepositoryEventsHandler.class );
 
     @Inject
     private RepositoryRegistry repositoryRegistry;
@@ -55,35 +56,43 @@ public class RpmRepositoryEventListener
     @Inject
     private DeletionService deletionService;
 
-    @Override
-    public void onEvent( Event<?> evt )
+    @Subscribe
+    public void on( final YumRepositoryGenerateEvent event )
     {
-        if ( evt instanceof RepositoryItemEventStore )
+        final Repository repository = event.getRepository();
+        for ( GroupRepository groupRepository : nexusRepositoryRegistry.getGroupsOfRepository( repository ) )
         {
-            processRepositoryItemAdd( (RepositoryItemEventStore) evt );
-        }
-        else if ( evt instanceof RepositoryRegistryEventAdd )
-        {
-            processRepository( ( (RepositoryRegistryEventAdd) evt ).getRepository() );
-        }
-        else if ( evt instanceof RepositoryItemEventDelete )
-        {
-            processRepositoryItemDelete( (RepositoryItemEventDelete) evt );
-        }
-        else if ( evt instanceof YumRepositoryGenerateEvent )
-        {
-            final Repository repository = ( (YumRepositoryGenerateEvent) evt ).getRepository();
-            for ( GroupRepository groupRepository : nexusRepositoryRegistry.getGroupsOfRepository( repository ) )
+            if ( groupRepository.getRepositoryKind().isFacetAvailable( M2YumGroupRepository.class ) )
             {
-                if ( groupRepository.getRepositoryKind().isFacetAvailable( M2YumGroupRepository.class ) )
-                {
-                    yumService.createGroupRepository( groupRepository );
-                }
+                yumService.createGroupRepository( groupRepository );
             }
         }
     }
 
-    private void processRepositoryItemDelete( RepositoryItemEventDelete itemEvent )
+    @Subscribe
+    public void on( final RepositoryRegistryEventAdd event )
+    {
+        if ( event.getRepository().getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
+        {
+            repositoryRegistry.registerRepository( event.getRepository().adaptToFacet( MavenHostedRepository.class ) );
+        }
+    }
+
+    @AllowConcurrentEvents
+    @Subscribe
+    public void on( final RepositoryItemEventStore itemEvent )
+    {
+        if ( isRpmItemEvent( itemEvent ) )
+        {
+            LOG.info( "ItemStoreEvent : {}", itemEvent.getItem().getPath() );
+            yumService.markDirty( itemEvent.getRepository(), getItemVersion( itemEvent.getItem() ) );
+            yumService.addToYumRepository( itemEvent.getRepository(), itemEvent.getItem().getPath() );
+        }
+    }
+
+    @AllowConcurrentEvents
+    @Subscribe
+    public void on( RepositoryItemEventDelete itemEvent )
     {
         if ( isRpmItemEvent( itemEvent ) )
         {
@@ -98,24 +107,6 @@ public class RpmRepositoryEventListener
     private boolean isCollectionItem( RepositoryItemEvent itemEvent )
     {
         return StorageCollectionItem.class.isAssignableFrom( itemEvent.getItem().getClass() );
-    }
-
-    private void processRepository( Repository repository )
-    {
-        if ( repository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
-        {
-            repositoryRegistry.registerRepository( MavenRepository.class.cast( repository ) );
-        }
-    }
-
-    private void processRepositoryItemAdd( RepositoryItemEventStore itemEvent )
-    {
-        if ( isRpmItemEvent( itemEvent ) )
-        {
-            LOG.info( "ItemStoreEvent : {}", itemEvent.getItem().getPath() );
-            yumService.markDirty( itemEvent.getRepository(), getItemVersion( itemEvent.getItem() ) );
-            yumService.addToYumRepository( itemEvent.getRepository(), itemEvent.getItem().getPath() );
-        }
     }
 
     private boolean isRpmItemEvent( RepositoryItemEvent itemEvent )

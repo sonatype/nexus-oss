@@ -28,11 +28,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
@@ -47,13 +47,14 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
- * 
+ *
  * @author sherold
  */
 @Component( role = SchedulerTask.class, hint = YumMetadataGenerationTask.ID, instantiationStrategy = "per-lookup" )
@@ -61,6 +62,7 @@ public class YumMetadataGenerationTask
     extends AbstractNexusTask<YumRepository>
     implements ListFileFactory
 {
+
     public static final String ID = "YumMetadataGenerationTask";
 
     private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
@@ -87,28 +89,42 @@ public class YumMetadataGenerationTask
 
     public static final String PARAM_SINGLE_RPM_PER_DIR = "yumMetadataGenerationSingleRpmPerDir";
 
+    private final EventBus eventBus;
+
+    private final RepositoryRegistry repositoryRegistry;
+
+    private final YumConfiguration yumConfig;
+
+    private final RepositoryURLBuilder repositoryURLBuilder;
+
+    @VisibleForTesting
     public YumMetadataGenerationTask()
     {
-        this( null );
+        this( null, null, null, null );
     }
 
-    public YumMetadataGenerationTask( String name )
+    @Inject
+    public YumMetadataGenerationTask( final EventBus eventBus,
+                                      final RepositoryRegistry repositoryRegistry,
+                                      final YumConfiguration yumConfig,
+                                      final RepositoryURLBuilder repositoryURLBuilder )
+    {
+        this( null, eventBus, repositoryRegistry, yumConfig, repositoryURLBuilder );
+    }
+
+    public YumMetadataGenerationTask( final String name,
+                                      final EventBus eventBus,
+                                      final RepositoryRegistry repositoryRegistry,
+                                      final YumConfiguration yumConfig,
+                                      final RepositoryURLBuilder repositoryURLBuilder )
     {
         super( name );
+        this.eventBus = eventBus;
+        this.repositoryRegistry = repositoryRegistry;
+        this.yumConfig = yumConfig;
+        this.repositoryURLBuilder = repositoryURLBuilder;
         getParameters().put( PARAM_SINGLE_RPM_PER_DIR, Boolean.toString( true ) );
     }
-
-    @Requirement
-    private ApplicationEventMulticaster eventMulticaster;
-
-    @Requirement
-    private RepositoryRegistry repositoryRegistry;
-
-    @Requirement
-    private YumConfiguration yumConfig;
-
-    @Requirement
-    private RepositoryURLBuilder repositoryURLBuilder;
 
     @Override
     protected YumRepository doRun()
@@ -250,7 +266,7 @@ public class YumMetadataGenerationTask
             try
             {
                 final Repository repository = repositoryRegistry.getRepository( getRepositoryId() );
-                eventMulticaster.notifyEventListeners( new YumRepositoryGenerateEvent( repository ) );
+                eventBus.post( new YumRepositoryGenerateEvent( repository ) );
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -271,7 +287,7 @@ public class YumMetadataGenerationTask
         throws IOException
     {
         return new RpmListWriter( getRepositoryId(), getRpmDir(), getAddedFiles(), getVersion(),
-            isSingleRpmPerDirectory(), this ).writeList();
+                                  isSingleRpmPerDirectory(), this ).writeList();
     }
 
     private File createCacheDir()
@@ -303,7 +319,7 @@ public class YumMetadataGenerationTask
         String packageFile = packageList.getAbsolutePath();
         String cacheDir = createCacheDir().getAbsolutePath();
         return format( "createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getRepoDir().getAbsolutePath(),
-            getRpmUrl(), packageFile, cacheDir, getRpmDir() );
+                       getRpmUrl(), packageFile, cacheDir, getRpmDir() );
     }
 
     @Override

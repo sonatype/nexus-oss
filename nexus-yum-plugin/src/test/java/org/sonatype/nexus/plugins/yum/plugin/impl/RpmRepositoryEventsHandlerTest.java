@@ -18,21 +18,20 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
+import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
-
-public class RpmRepositoryEventListenerTest
+public class RpmRepositoryEventsHandlerTest
     extends AbstractRepositoryTester
 {
+
     @Inject
-    private ItemEventListener listener;
+    private RpmRepositoryEventsHandler handler;
 
     @Inject
     private RepositoryRegistry repositoryRegistry;
@@ -57,7 +56,7 @@ public class RpmRepositoryEventListenerTest
         throws Exception
     {
         Repository repo = createRepository( true );
-        listener.onEvent( new RepositoryRegistryEventAdd( null, repo ) );
+        handler.on( new RepositoryRegistryEventAdd( null, repo ) );
         Assert.assertTrue( repositoryRegistry.isRegistered( repo ) );
     }
 
@@ -67,7 +66,7 @@ public class RpmRepositoryEventListenerTest
     {
         Repository repo = createRepository( false );
         repositoryRegistry.unregisterRepository( repo );
-        listener.onEvent( new RepositoryRegistryEventAdd( null, repo ) );
+        handler.on( new RepositoryRegistryEventAdd( null, repo ) );
         Assert.assertFalse( repositoryRegistry.isRegistered( repo ) );
     }
 
@@ -76,7 +75,8 @@ public class RpmRepositoryEventListenerTest
     {
         Repository repo = createRepository( true );
         repositoryRegistry.unregisterRepository( repo );
-        listener.onEvent( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test-source.jar" ) ) );
+        handler.on(
+            new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test-source.jar" ) ) );
     }
 
     @Test
@@ -86,7 +86,8 @@ public class RpmRepositoryEventListenerTest
 
         MavenRepository repo = createRepository( true );
         repositoryRegistry.registerRepository( repo );
-        listener.onEvent( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
+        handler.on(
+            new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
     }
 
     @Test
@@ -96,7 +97,8 @@ public class RpmRepositoryEventListenerTest
 
         MavenRepository repo = createRepository( true );
         repositoryRegistry.registerRepository( repo );
-        listener.onEvent( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );
+        handler.on(
+            new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );
     }
 
 }

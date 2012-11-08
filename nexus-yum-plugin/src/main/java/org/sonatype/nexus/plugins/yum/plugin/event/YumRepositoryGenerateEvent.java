@@ -12,16 +12,23 @@
  */
 package org.sonatype.nexus.plugins.yum.plugin.event;
 
-import org.sonatype.nexus.proxy.events.RepositoryEvent;
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class YumRepositoryGenerateEvent
-    extends RepositoryEvent
 {
 
-    public YumRepositoryGenerateEvent( Repository repository )
+    private final Repository repository;
+
+    public YumRepositoryGenerateEvent( final Repository repository )
     {
-        super( repository );
+        this.repository = checkNotNull( repository );
+    }
+
+    public Repository getRepository()
+    {
+        return repository;
     }
 
 }

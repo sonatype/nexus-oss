@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.junit.After;
@@ -36,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.ItemEventListener;
 import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
@@ -44,7 +42,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
-
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
@@ -56,6 +53,7 @@ import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
 public class ConcurrentRpmDeployedListenerTest
     extends AbstractRepositoryTester
 {
+
     private static final Logger log = LoggerFactory.getLogger( ConcurrentRpmDeployedListenerTest.class );
 
     @Rule
@@ -68,7 +66,7 @@ public class ConcurrentRpmDeployedListenerTest
     private NexusScheduler nexusScheduler;
 
     @Inject
-    private ItemEventListener listener;
+    private RpmRepositoryEventsHandler handler;
 
     @Inject
     private RepositoryRegistry repositoryRegistry;
@@ -120,7 +118,7 @@ public class ConcurrentRpmDeployedListenerTest
 
         StorageItem storageItem = createItem( versionStr, rpmFile.getName() );
 
-        listener.onEvent( new RepositoryItemEventStoreCreate( repo, storageItem ) );
+        handler.on( new RepositoryItemEventStoreCreate( repo, storageItem ) );
 
         final int activeWorker = getRunningTasks();
         log.info( "active worker: " + activeWorker );

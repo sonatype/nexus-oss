@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -49,6 +48,7 @@ import org.sonatype.scheduling.schedules.RunNowSchedule;
 @SuppressWarnings( "unchecked" )
 public class YumMetadataGenerationTaskTest
 {
+
     private static final String ANOTHER_REPO = "repo2";
 
     private static final String ANOTHER_VERSION = "version2";
@@ -71,7 +71,7 @@ public class YumMetadataGenerationTaskTest
     {
         YumMetadataGenerationTask task = task( REPO, NO_VERSION );
         assertFalse( task.allowConcurrentExecution( createMap( scheduledTask( task ),
-            scheduledTask( REPO, NO_VERSION, RUNNING ) ) ) );
+                                                               scheduledTask( REPO, NO_VERSION, RUNNING ) ) ) );
     }
 
     @Test
@@ -80,7 +80,7 @@ public class YumMetadataGenerationTaskTest
     {
         YumMetadataGenerationTask task = task( REPO, VERSION );
         assertFalse( task.allowConcurrentExecution( createMap( scheduledTask( task ),
-            scheduledTask( REPO, VERSION, RUNNING ) ) ) );
+                                                               scheduledTask( REPO, VERSION, RUNNING ) ) ) );
     }
 
     @Test
@@ -89,7 +89,7 @@ public class YumMetadataGenerationTaskTest
     {
         YumMetadataGenerationTask task = task( REPO, VERSION );
         assertTrue( task.allowConcurrentExecution( createMap( scheduledTask( task ),
-            scheduledTask( REPO, ANOTHER_VERSION, RUNNING ) ) ) );
+                                                              scheduledTask( REPO, ANOTHER_VERSION, RUNNING ) ) ) );
     }
 
     @Test
@@ -98,7 +98,7 @@ public class YumMetadataGenerationTaskTest
     {
         YumMetadataGenerationTask task = task( REPO, NO_VERSION );
         assertTrue( task.allowConcurrentExecution( createMap( scheduledTask( task ),
-            scheduledTask( ANOTHER_REPO, NO_VERSION, RUNNING ) ) ) );
+                                                              scheduledTask( ANOTHER_REPO, NO_VERSION, RUNNING ) ) ) );
     }
 
     @Test
@@ -106,7 +106,12 @@ public class YumMetadataGenerationTaskTest
         throws Exception
     {
         // given
-        YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+        YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+            null,
+            repoRegistry(),
+            null,
+            null
+        );
         setField( task, "repositoryRegistry", repoRegistry() );
         task.setRpmDir( RPM_DIR.getAbsolutePath() );
         task.setRpmUrl( RPM_URL );
@@ -122,7 +127,12 @@ public class YumMetadataGenerationTaskTest
         throws Exception
     {
         // given
-        YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+        YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+            null,
+            repoRegistry(),
+            null,
+            repositoryURLBuilder()
+        );
         task.setRepositoryId( REPO );
         setField( task, "repositoryRegistry", repoRegistry() );
         setField( task, "repositoryURLBuilder", repositoryURLBuilder() );
