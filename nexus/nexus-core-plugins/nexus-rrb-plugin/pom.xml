@@ -91,15 +91,14 @@
     </dependency>
 
     <!--
-    FIXME: Get rid of this... See https://github.com/sonatype/nexus/pull/565
+    FIXME: Should not need this...
     -->
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Test -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>

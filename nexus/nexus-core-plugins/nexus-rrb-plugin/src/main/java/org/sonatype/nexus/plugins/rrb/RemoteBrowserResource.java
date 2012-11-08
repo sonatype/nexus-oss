@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.rrb;
 
 import java.net.URLDecoder;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -32,6 +33,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStore;
@@ -57,11 +59,14 @@ public class RemoteBrowserResource
     extends AbstractResourceStoreContentPlexusResource
     implements PlexusResource
 {
-    public static final String RESOURCE_URI = "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY
-        + "}/remotebrowser";
+    public static final String RESOURCE_URI = "/repositories/{" +
+        AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser";
 
     @Requirement
     private QueryStringBuilder queryStringBuilder;
+
+    @Requirement
+    private Hc4Provider httpClientProvider;
 
     private final Logger logger = LoggerFactory.getLogger( RemoteBrowserResource.class );
 
@@ -120,14 +125,15 @@ public class RemoteBrowserResource
         try
         {
             ProxyRepository proxyRepository = getUnprotectedRepositoryRegistry().getRepositoryWithFacet( id, ProxyRepository.class );
-            HttpClient client = getHttpClient(proxyRepository);
+            HttpClient client = httpClientProvider.createHttpClient(proxyRepository.getRemoteStorageContext());
 
-            MavenRepositoryReader mr = new MavenRepositoryReader( client );
+            MavenRepositoryReader mr = new MavenRepositoryReader( proxyRepository, client, queryStringBuilder );
             MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
-            // we really should not do the encoding here, but this is work around until NEXUS-4058 is fixed.
-            data.setData( mr.extract( remotePath,
-                createRemoteResourceReference( request, id, "" ).toString( false, false ), proxyRepository, id ) );
-            logger.debug( "return value is {}", data.toString() );
+            // FIXME: Sort this out, NEXUS-4058 was closed about a year go (orig: we really should not do the encoding here, but this is work around until NEXUS-4058 is fixed).
+            String localUrl = createRemoteResourceReference( request, id, "" ).toString(false, false);
+            List<RepositoryDirectory> result = mr.extract(remotePath, localUrl, id);
+            data.setData( result );
+            logger.debug( "return value is {}", data );
 
             return data;
         }
@@ -138,16 +144,6 @@ public class RemoteBrowserResource
         }
     }
 
-    private HttpClient getHttpClient(final ProxyRepository proxyRepository) {
-        // FIXME: Use Hc4Provider...
-        RemoteStorageContext ctx = proxyRepository.getRemoteStorageContext();
-        HttpClient client = HttpClientUtil.getHttpClient(HttpClientRemoteStorage.CTX_KEY, ctx);
-        if (client == null) {
-            client = HttpClientUtil.configure(HttpClientRemoteStorage.CTX_KEY, proxyRepository.getRemoteStorageContext(), logger);
-        }
-        return client;
-    }
-
     protected Reference createRemoteResourceReference( Request request, String repoId, String remoteUrl )
     {
         Reference repoRootRef = createRepositoryReference( request, repoId );
@@ -155,52 +151,8 @@ public class RemoteBrowserResource
         return createReference( repoRootRef, "remotebrowser/" + remoteUrl );
     }
 
-    // TODO: if/when xxx is implemented the renderItem method might look something like:
-    //
-    // @Inject
-    // private NexusItemAuthorizer authorizer;
-    //
-    // @Override
-    // protected Object renderItem( Context context, Request request, Response response, Variant variant,
-    // StorageItem storageItem )
-    // throws IOException,
-    // AccessDeniedException,
-    // NoSuchResourceStoreException,
-    // IllegalOperationException,
-    // ItemNotFoundException,
-    // StorageException,
-    // ResourceException
-    // {
-    //
-    // // I think this is triggered automaticly when you try to get the stream from a fileStorageItem,
-    // //but we are not going to call that method. so do the check programaticly
-    // if ( !authorizer.authorizePath(
-    // getRepositoryRegistry().getRepository( storageItem.getRepositoryId() ),
-    // storageItem.getResourceStoreRequest(),
-    // Action.read ) )
-    // {
-    // logger.debug( "No access to: " + storageItem.getResourceStoreRequest().getRequestPath() );
-    // throw new AccessDeniedException(
-    // storageItem.getResourceStoreRequest(),
-    // "No access to file!" );
-    // }
-    //
-    // // you should be able to get the path from storageItem.getRemoteUrl()
-    // // NOTE: we should not use any of the stream methods on the FileStorageItem as that
-    // // would cache the remote file( and we are after the directory listings
-    // // so I am not even sure how that would work out)
-    //
-    // // now you have the remote url so you could feed that into the same thing you are using now
-    //
-    // }
-
     /**
      * DUMMY IMPLEMENTATION, just to satisfy superclass (but why is this class expanding it at all?)
-     * 
-     * @param request
-     * @return
-     * @throws NoSuchResourceStoreException
-     * @throws ResourceException
      */
     @Override
     protected ResourceStore getResourceStore( final Request request )

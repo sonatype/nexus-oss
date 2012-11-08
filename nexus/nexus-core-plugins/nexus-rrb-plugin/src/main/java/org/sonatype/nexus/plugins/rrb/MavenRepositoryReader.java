@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,7 +42,11 @@ public class MavenRepositoryReader
 
     private final Logger logger = LoggerFactory.getLogger( MavenRepositoryReader.class );
 
+    private final ProxyRepository proxyRepository;
+
     private final HttpClient client;
+
+    private final QueryStringBuilder queryStringBuilder;
 
     private String remotePath;
 
@@ -48,13 +54,13 @@ public class MavenRepositoryReader
 
     private String localUrl;
 
-    private ProxyRepository proxyRepository;
-
     private String id;
 
-    public MavenRepositoryReader( final HttpClient client )
+    public MavenRepositoryReader( final ProxyRepository proxyRepository, final HttpClient client, final QueryStringBuilder queryStringBuilder )
     {
+        this.proxyRepository = checkNotNull(proxyRepository);
         this.client = checkNotNull(client);
+        this.queryStringBuilder = checkNotNull(queryStringBuilder);
     }
 
     /**
@@ -62,13 +68,11 @@ public class MavenRepositoryReader
      * @param localUrl url to the local resource service
      * @return a list containing the remote data
      */
-    public List<RepositoryDirectory> extract( String remotePath, String localUrl, ProxyRepository proxyRepository,
-                                              String id )
+    public List<RepositoryDirectory> extract( String remotePath, String localUrl, String id )
     {
         logger.debug( "remotePath={}", remotePath );
         this.remotePath = remotePath;
         this.localUrl = localUrl;
-        this.proxyRepository = proxyRepository;
 
         this.id = id;
 
@@ -142,6 +146,19 @@ public class MavenRepositoryReader
         return parser.extractLinks( indata );
     }
 
+    private String maybeAppendQueryString(final String url) {
+        String queryString = queryStringBuilder.getQueryString(proxyRepository);
+
+        // if there is no query-string ot append, simply return what we've been handed
+        if (StringUtils.isEmpty(queryString)) {
+            return url;
+        }
+
+        // else sort out the seperator to use and append the query-string
+        String sep = url.contains("?") ? "&" : "?";
+        return url + sep + queryString;
+    }
+
     private String findcreateNewUrl( StringBuilder indata )
     {
         logger.debug( "indata={}", indata.toString() );
@@ -156,6 +173,9 @@ public class MavenRepositoryReader
         {
             newUrl += "/";
         }
+
+        newUrl = maybeAppendQueryString(newUrl);
+
         logger.debug( "newUrl={}", newUrl );
         return newUrl;
     }
@@ -189,43 +209,26 @@ public class MavenRepositoryReader
 
     /**
      * Used to detect error in S3 response.
-     * 
-     * @param indata
-     * @return
      */
     private boolean responseContainsError( StringBuilder indata )
     {
-        if ( indata.indexOf( "<Error>" ) != -1 || indata.indexOf( "<error>" ) != -1 )
-        {
-            return true;
-        }
-        return false;
+        return indata.indexOf("<Error>") != -1 || indata.indexOf("<error>") != -1;
     }
 
     /**
      * Used to detect access denied in S3 response.
-     * 
-     * @param indata
-     * @return
      */
     private boolean responseContainsAccessDenied( StringBuilder indata )
     {
-        if ( indata.indexOf( "<Code>AccessDenied</Code>" ) != -1 || indata.indexOf( "<code>AccessDenied</code>" ) != -1 )
-        {
-            return true;
-        }
-        return false;
+        return indata.indexOf("<Code>AccessDenied</Code>") != -1 || indata.indexOf("<code>AccessDenied</code>") != -1;
     }
 
     private StringBuilder getContent() {
         StringBuilder buff = new StringBuilder();
 
-        String url;
-        String sep = "?";
-        if (remoteUrl.contains("?prefix")) {
-            sep = "&";
-        }
-        url = remoteUrl + sep + "delimiter=/";
+        String sep = remoteUrl.contains("?") ? "&" : "?";
+        String url = remoteUrl + sep + "delimiter=/";
+        url = maybeAppendQueryString(url);
 
         HttpGet method = new HttpGet(url);
         try {
