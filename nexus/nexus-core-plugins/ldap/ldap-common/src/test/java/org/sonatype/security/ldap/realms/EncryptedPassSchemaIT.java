@@ -13,8 +13,8 @@
 package org.sonatype.security.ldap.realms;
 
 
-public class EncryptedPassSchemaTest
-    extends AbstractLdapSchemaTest
+public class EncryptedPassSchemaIT
+    extends LdapSchemaTestSupport
 {
     protected boolean isPasswordsEncrypted()
     {

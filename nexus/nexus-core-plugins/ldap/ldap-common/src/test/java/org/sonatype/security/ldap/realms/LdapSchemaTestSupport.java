@@ -23,15 +23,15 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.context.Context;
 import org.junit.Test;
-import org.sonatype.security.ldap.AbstractLdapTest;
+import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 
-public abstract class AbstractLdapSchemaTest
-    extends AbstractLdapTest
+public abstract class LdapSchemaTestSupport
+    extends LdapTestSupport
 {
 
     private LdapManager ldapManager;

@@ -12,8 +12,11 @@
  */
 package org.sonatype.security.ldap.realms;
 
-public class NestedGroupsNoGroupDNLdapSchemaTest
-    extends AbstractLdapSchemaTest
-{
 
+
+public class DigestMd5AuthLdapSchemaIT
+    extends LdapSchemaTestSupport
+{
+    
+    
 }

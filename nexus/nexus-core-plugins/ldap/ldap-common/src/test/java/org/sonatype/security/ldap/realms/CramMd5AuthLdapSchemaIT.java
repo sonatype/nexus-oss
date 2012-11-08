@@ -14,8 +14,8 @@ package org.sonatype.security.ldap.realms;
 
 
 
-public class CramMd5AuthLdapSchemaTest
-    extends AbstractLdapSchemaTest
+public class CramMd5AuthLdapSchemaIT
+    extends LdapSchemaTestSupport
 {
     
     
