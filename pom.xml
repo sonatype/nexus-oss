@@ -108,7 +108,7 @@
               <exclude>nexus/nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
               <exclude>nexus/nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
               <!-- tell license plugin to ignore workaround for MINDEXER-65 -->
-              <exclude>nexus/nexus-core-plugins/nexus-indexer-lucene-plugin-parent/nexus-indexer-lucene-plugin/src/main/java/copied/org/apache/maven/index/DefaultScannerListener.java</exclude>
+              <exclude>**/nexus-indexer-lucene-plugin/src/main/java/copied/org/apache/maven/index/DefaultScannerListener.java</exclude>
             </excludes>
             <mapping>
               <vm>SHARPSTAR_STYLE</vm>
