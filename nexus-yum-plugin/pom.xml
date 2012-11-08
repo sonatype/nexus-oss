@@ -104,4 +104,25 @@
     </plugins>
   </build>
 
+  <profiles>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <profile>
+      <id>idea</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.7.2</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+          <version>2.4</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+
 </project>
