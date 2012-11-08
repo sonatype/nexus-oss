@@ -25,7 +25,8 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-compat</artifactId>
-  <name>Nexus : Compatibility Kit</name>
+
+  <description>Classes/Components for keeping Nexus compatible with older versions</description>
 
   <dependencies>
     <dependency>
