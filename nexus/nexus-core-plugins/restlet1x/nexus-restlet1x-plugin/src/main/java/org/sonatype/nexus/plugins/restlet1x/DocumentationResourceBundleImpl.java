@@ -10,44 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin.coredocumentation;
+package org.sonatype.nexus.plugins.restlet1x;
 
-import java.io.IOException;
-import java.util.zip.ZipFile;
-
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
-import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 
-@Component( role = NexusResourceBundle.class, hint = "SecurityDocumentationResourceBundle" )
-public class SecurityDocumentationResourceBundle
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+/**
+ * @since 2.3
+ */
+@Named
+@Singleton
+public class DocumentationResourceBundleImpl
     extends AbstractDocumentationNexusResourceBundle
 {
-
     @Override
     public String getPluginId()
     {
-        return "nexus-core-documentation-plugin";
-    }
-
-    @Override
-    public String getUrlSnippet()
-    {
-        return "security";
+        return "nexus-restlet1x-plugin";
     }
 
     @Override
     public String getDescription()
     {
-        return "Security API";
+        return "Restlet 1.x API";
     }
-
-    @Override
-    protected ZipFile getZipFile()
-        throws IOException
-    {
-        return getZipFile( AbstractSecurityPlexusResource.class );
-    }
-
 }
