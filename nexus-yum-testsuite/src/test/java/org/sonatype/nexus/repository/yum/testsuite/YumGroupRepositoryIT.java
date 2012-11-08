@@ -35,6 +35,11 @@ public class YumGroupRepositoryIT
     @Rule
     public OsTestRule osTestRule = new OsTestRule();
 
+    public YumGroupRepositoryIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
+
     @Test
     public void shouldRegenerateRepoAfterUpload()
         throws Exception

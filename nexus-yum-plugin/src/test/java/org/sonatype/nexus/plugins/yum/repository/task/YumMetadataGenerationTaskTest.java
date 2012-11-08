@@ -20,6 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase.UTIL;
 import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
 import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
+import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -61,7 +63,7 @@ public class YumMetadataGenerationTaskTest
 
     private static final String RPM_URL = BASE_URL + "/content/repositories/" + REPO;
 
-    private static final File RPM_DIR = new File( "." );
+    private static final File RPM_DIR = UTIL.getBaseDir();
 
     @Test
     public void shouldNotExecuteIfOperateOnSameRepository()

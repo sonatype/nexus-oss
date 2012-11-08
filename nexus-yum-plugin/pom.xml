@@ -9,15 +9,12 @@
     <groupId>org.sonatype.nexus.yum</groupId>
     <artifactId>nexus-yum</artifactId>
     <version>2.2-SNAPSHOT</version>
-
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-yum-plugin</artifactId>
 
   <packaging>nexus-plugin</packaging>
-
-  <name>Nexus Yum :: Plugin</name>
 
   <properties>
     <pluginName>Nexus : Plugins : Yum</pluginName>
@@ -26,37 +23,32 @@
   </properties>
 
   <dependencies>
-    <!-- This dependency is only needed if you want to include REST Resources -->
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Basic testing -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus.yum</groupId>
-      <artifactId>nexus-yum-testhelper</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
-      <scope>test</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-utils</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-exec</artifactId>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.yum</groupId>
+      <artifactId>nexus-yum-testhelper</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>xmlunit</groupId>
@@ -69,22 +61,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Pure Java RPM-library -->
-    <dependency>
       <groupId>org.redline-rpm</groupId>
       <artifactId>redline</artifactId>
       <scope>test</scope>
@@ -96,13 +72,13 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>${app.lifecycle.version}</version>
+        <version>1.6</version>
         <extensions>true</extensions>
         <dependencies>
           <dependency>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>app-lifecycle-nexus</artifactId>
-            <version>${app.lifecycle.version}</version>
+            <version>1.6</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -113,4 +89,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

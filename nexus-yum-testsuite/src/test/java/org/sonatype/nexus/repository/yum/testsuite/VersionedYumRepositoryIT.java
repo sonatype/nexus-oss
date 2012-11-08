@@ -37,6 +37,11 @@ public class VersionedYumRepositoryIT
 
     private static final String ALIAS = "alias";
 
+    public VersionedYumRepositoryIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
+
     @Test
     public void shouldGenerateVersionedRepoForVersion()
         throws Exception

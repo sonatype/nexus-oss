@@ -193,7 +193,7 @@ public class YumConfigurationTest
         // given
         final DefaultYumConfiguration config = new DefaultYumConfiguration();
         final NexusConfiguration nexusConfig = mock( NexusConfiguration.class );
-        when( nexusConfig.getConfigurationDirectory() ).thenReturn( new File( "target/test-classes/config/empty" ) );
+        when( nexusConfig.getConfigurationDirectory() ).thenReturn( UTIL.resolveFile( "target/test-classes/config/empty" ) );
         setField( config, "nexusConfiguration", nexusConfig );
         // when
         config.load();

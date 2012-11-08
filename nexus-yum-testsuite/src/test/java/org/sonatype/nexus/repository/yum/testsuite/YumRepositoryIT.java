@@ -33,6 +33,11 @@ public class YumRepositoryIT
 
     private static final String ARTIFACT_ID = "test-artifact";
 
+    public YumRepositoryIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
+
     @Test
     public void shouldRemoveRpmFromYumRepoIfRemovedByWebGui()
         throws Exception

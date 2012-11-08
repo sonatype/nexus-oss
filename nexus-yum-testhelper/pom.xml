@@ -13,15 +13,14 @@
 
   <artifactId>nexus-yum-testhelper</artifactId>
 
-  <name>Nexus Yum :: Test Helper</name>
-
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>compile</scope>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
+
 </project>
 
 

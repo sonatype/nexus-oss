@@ -17,6 +17,7 @@ import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
 import static org.junit.Assert.assertTrue;
+import static org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase.UTIL;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,14 +36,14 @@ import org.custommonkey.xmlunit.Diff;
 import org.freecompany.redline.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.sonatype.nexus.plugins.yum.repository.xml.TimeStampIgnoringDifferenceListener;
 
 public final class RepositoryTestUtils
 {
-    public static final File BASE_TMP_FILE = new File( "target/test-tmp" );
 
-    public static final File BASE_FILE = new File( "target/test-classes" );
+    public static final File BASE_TMP_FILE = UTIL.resolveFile( "target/test-tmp" );
+
+    public static final File BASE_FILE = UTIL.resolveFile( "target/test-classes" );
 
     public static final File RPM_BASE_FILE = new File( BASE_FILE, "repo" );
 
@@ -51,8 +52,6 @@ public final class RepositoryTestUtils
     public static final File BASE_CACHE_DIR = new File( BASE_TMP_FILE, ".cache" );
 
     public static final File PACKAGE_CACHE_DIR = new File( BASE_CACHE_DIR, ".packageFiles" );
-
-    public static final File REPOSITORY_RPM_CACHE_DIR = new File( BASE_CACHE_DIR, "yum/.repositoryRpms" );
 
     public static final File REPODATA_DIR = new File( TARGET_DIR, "repodata" );
 
@@ -92,7 +91,7 @@ public final class RepositoryTestUtils
         catch ( AssertionError e )
         {
             log.error( "Primary.xml failed test for template {} with following content : {}", templateName,
-                IOUtils.toString( new GZIPInputStream( new FileInputStream( primaryXmlFile ) ) ) );
+                       IOUtils.toString( new GZIPInputStream( new FileInputStream( primaryXmlFile ) ) ) );
             throw e;
         }
     }
@@ -102,7 +101,7 @@ public final class RepositoryTestUtils
     {
         Diff xmlDiff =
             new Diff( createTemplateFileReader( templateName, REPOMD_XML ), new FileReader( new File( repodataDir,
-                REPOMD_XML ) ) );
+                                                                                                      REPOMD_XML ) ) );
 
         xmlDiff.overrideDifferenceListener( new TimeStampIgnoringDifferenceListener() );
         assertTrue( xmlDiff.toString(), xmlDiff.similar() );
@@ -152,5 +151,10 @@ public final class RepositoryTestUtils
         final File destDir = new File( BASE_TMP_FILE, RandomStringUtils.randomAlphabetic( 20 ) );
         copyDirectory( srcDir, destDir );
         return destDir;
+    }
+
+    private static class Marker
+    {
+
     }
 }

@@ -12,44 +12,53 @@
  */
 package org.sonatype.nexus.repository.yum.testsuite;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
+
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.artifact.MavenArtifact;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.repository.yum.client.Yum;
-import org.sonatype.nexus.testsuite.support.NexusRunningITSupport;
+import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class YumRepositoryITSupport
-    extends NexusRunningITSupport
+    extends NexusRunningParametrizedITSupport
 {
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data()
+    {
+        return firstAvailableTestParameters(
+            systemTestParameters(),
+            testParameters(
+                $( "${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle" )
+            )
+        ).load();
+    }
+
+    public YumRepositoryITSupport( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
 
     @Override
     protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
     {
-        return configuration.addPlugins( getPluginFile() );// .enableDebugging( 8000, true );
-    }
-
-    private File getPluginFile()
-    {
-        URL pluginFileUrl = getClass().getResource( "/plugin.zip" );
-        if ( pluginFileUrl == null )
-        {
-            throw new IllegalStateException( "Couldn't find /plugin.zip in classpath" );
-        }
-        try
-        {
-            return new File( pluginFileUrl.toURI() );
-        }
-        catch ( URISyntaxException e )
-        {
-            throw new RuntimeException( "Could not determine plugin bundle URI.", e );
-        }
+        return configuration
+            .setLogLevel( "org.sonatype.nexus.plugins.yum", "DEBUG" )
+            .addPlugins(
+                artifactResolver().resolvePluginFromDependencyManagement(
+                    "org.sonatype.nexus.plugins", "nexus-yum-plugin"
+                )
+            );
     }
 
     protected Yum yum()

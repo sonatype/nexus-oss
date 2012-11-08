@@ -36,6 +36,11 @@ public class SecurityIT
 
     private static final String PASSWORD = "yum123";
 
+    public SecurityIT( final String nexusBundleCoordinates )
+    {
+        super( nexusBundleCoordinates );
+    }
+
     @Test( expected = UniformInterfaceException.class )
     public void shouldNotHaveReadAccessToAliasesForAnonymous()
         throws Exception
