@@ -61,7 +61,6 @@
     <module>security-system</module>
     <module>security-configuration</module>
     <module>security-web</module>
-    <module>security-rest</module>
     <module>security-web-sample</module>
   </modules>
 
