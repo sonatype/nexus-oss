@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.repository.yum.internal;
 
 import static java.lang.Thread.sleep;
 import static org.mockito.Matchers.any;
@@ -19,18 +19,23 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.plugin.DefaultDeletionService;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
+import org.mockito.Mockito;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
-import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
+import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
+import org.sonatype.nexus.rest.RepositoryURLBuilder;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-public class DefaultDeletionServiceTest
+public class YumImplDeletionsTest
     extends TestSupport
 {
 
@@ -46,37 +51,42 @@ public class DefaultDeletionServiceTest
 
     private static final String REPO_ID = "snapshots";
 
-    private DefaultDeletionService service;
-
     private Yum yum;
 
     private Repository repository;
 
+    private NexusScheduler nexusScheduler;
+
     @Before
     public void prepareService()
+        throws MalformedURLException, URISyntaxException
     {
         final YumPluginConfiguration config = mock( YumPluginConfiguration.class );
+        when( config.isActive() ).thenReturn( true );
         when( config.isDeleteProcessing() ).thenReturn( true );
         when( config.getDelayAfterDeletion() ).thenReturn( TIMEOUT_IN_SEC );
 
         repository = mock( Repository.class );
         when( repository.getId() ).thenReturn( REPO_ID );
+        when( repository.getLocalUrl() ).thenReturn( "/target" );
 
-        yum = mock( Yum.class );
+        nexusScheduler = mock( NexusScheduler.class );
+        when( nexusScheduler.createTaskInstance( YumMetadataGenerationTask.class ) ).thenReturn(
+            mock( YumMetadataGenerationTask.class )
+        );
 
-        final YumRegistry yumRegistry = mock( YumRegistry.class );
-        when( yumRegistry.get( REPO_ID ) ).thenReturn( yum );
-
-        service = new DefaultDeletionService( config, yumRegistry );
+        yum = new YumImpl( mock( RepositoryURLBuilder.class ), nexusScheduler, config, repository );
     }
 
     @Test
     public void shouldNotRegenerateRepositoryWithoutRpms()
         throws Exception
     {
-        service.deleteDirectory( repository, BASE_PATH );
+        yum.deleteDirectory( BASE_PATH );
         sleep( TIMEOUT_IN_SEC * 2000 );
-        verify( yum, times( 0 ) ).recreateRepository();
+        verify( nexusScheduler, times( 0 ) ).submit(
+            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+        );
     }
 
     @Test
@@ -86,12 +96,14 @@ public class DefaultDeletionServiceTest
         when( repository.retrieveItem( any( ResourceStoreRequest.class ) ) )
             .thenThrow( new ItemNotFoundException( new ResourceStoreRequest( "/some/fake/path" ) ) );
 
-        service.deleteDirectory( repository, BASE_PATH );
-        service.deleteRpm( repository, SUB_PATH1 );
+        yum.deleteDirectory( BASE_PATH );
+        yum.deleteRpm( SUB_PATH1 );
 
         sleep( TIMEOUT_IN_SEC * 2000 );
 
-        verify( yum, times( 1 ) ).recreateRepository();
+        verify( nexusScheduler, times( 1 ) ).submit(
+            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+        );
     }
 
     @Test
@@ -101,14 +113,16 @@ public class DefaultDeletionServiceTest
         when( repository.retrieveItem( any( ResourceStoreRequest.class ) ) )
             .thenThrow( new ItemNotFoundException( new ResourceStoreRequest( "/some/fake/path" ) ) );
 
-        service.deleteDirectory( repository, BASE_PATH );
-        service.deleteRpm( repository, SUB_PATH1 );
-        service.deleteRpm( repository, SUB_PATH2 );
-        service.deleteRpm( repository, SUB_PATH3 );
+        yum.deleteDirectory( BASE_PATH );
+        yum.deleteRpm( SUB_PATH1 );
+        yum.deleteRpm( SUB_PATH2 );
+        yum.deleteRpm( SUB_PATH3 );
 
         sleep( TIMEOUT_IN_SEC * 2000 );
 
-        verify( yum, times( 1 ) ).recreateRepository();
+        verify( nexusScheduler, times( 1 ) ).submit(
+            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+        );
     }
 
     @SuppressWarnings( "deprecation" )
@@ -121,21 +135,27 @@ public class DefaultDeletionServiceTest
             .thenReturn( null )
             .thenThrow( new ItemNotFoundException( new ResourceStoreRequest( "/some/fake/path" ) ) );
 
-        service.deleteDirectory( repository, BASE_PATH );
-        service.deleteRpm( repository, SUB_PATH1 );
+        yum.deleteDirectory( BASE_PATH );
+        yum.deleteRpm( SUB_PATH1 );
 
         sleep( TIMEOUT_IN_SEC * 1500 );
-        verify( yum, times( 0 ) ).recreateRepository();
+        verify( nexusScheduler, times( 0 ) ).submit(
+            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+        );
 
         sleep( TIMEOUT_IN_SEC * 2500 );
-        verify( yum, times( 1 ) ).recreateRepository();
+        verify( nexusScheduler, times( 1 ) ).submit(
+            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+        );
     }
 
     @Test
     public void shouldRegenerateRepositoryAfterDeletionSingleRpm()
         throws Exception
     {
-        service.deleteRpm( repository, SUB_PATH1 );
-        verify( yum, times( 1 ) ).recreateRepository();
+        yum.deleteRpm( SUB_PATH1 );
+        verify( nexusScheduler, times( 1 ) ).submit(
+            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+        );
     }
 }

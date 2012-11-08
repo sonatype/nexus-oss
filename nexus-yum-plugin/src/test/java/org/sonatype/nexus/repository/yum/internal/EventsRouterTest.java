@@ -18,21 +18,20 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
-import org.sonatype.nexus.repository.yum.internal.RpmRepositoryEventsHandler;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
+import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
 
-public class RpmRepositoryEventsHandlerTest
+public class EventsRouterTest
     extends AbstractRepositoryTester
 {
 
     @Inject
-    private RpmRepositoryEventsHandler handler;
+    private EventsRouter handler;
 
     @Inject
     private YumRegistry repositoryRegistry;

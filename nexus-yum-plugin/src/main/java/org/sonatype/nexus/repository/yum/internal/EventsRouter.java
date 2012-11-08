@@ -21,8 +21,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
-import org.sonatype.nexus.repository.yum.internal.m2yum.M2YumGroupRepository;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
@@ -35,6 +33,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.internal.m2yum.M2YumGroupRepository;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -42,25 +41,21 @@ import com.google.common.eventbus.Subscribe;
 @Named
 @Singleton
 @EventBus.Managed
-public class RpmRepositoryEventsHandler
+public class EventsRouter
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( RpmRepositoryEventsHandler.class );
+    private static final Logger LOG = LoggerFactory.getLogger( EventsRouter.class );
 
     private final Provider<RepositoryRegistry> repositoryRegistry;
 
     private final Provider<YumRegistry> yumRegistryProvider;
 
-    private final Provider<DeletionService> deletionService;
-
     @Inject
-    public RpmRepositoryEventsHandler( final Provider<RepositoryRegistry> repositoryRegistry,
-                                       final Provider<YumRegistry> yumRegistryProvider,
-                                       final Provider<DeletionService> deletionService )
+    public EventsRouter( final Provider<RepositoryRegistry> repositoryRegistry,
+                         final Provider<YumRegistry> yumRegistryProvider )
     {
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.yumRegistryProvider = checkNotNull( yumRegistryProvider );
-        this.deletionService = checkNotNull( deletionService );
     }
 
     @Subscribe
@@ -105,13 +100,17 @@ public class RpmRepositoryEventsHandler
     @Subscribe
     public void on( RepositoryItemEventDelete itemEvent )
     {
-        if ( isRpmItemEvent( itemEvent ) )
+        final Yum yum = yumRegistryProvider.get().get( itemEvent.getRepository().getId() );
+        if ( yum != null )
         {
-            deletionService.get().deleteRpm( itemEvent.getRepository(), itemEvent.getItem().getPath() );
-        }
-        else if ( isCollectionItem( itemEvent ) )
-        {
-            deletionService.get().deleteDirectory( itemEvent.getRepository(), itemEvent.getItem().getPath() );
+            if ( isRpmItemEvent( itemEvent ) )
+            {
+                yum.deleteRpm( itemEvent.getItem().getPath() );
+            }
+            else if ( isCollectionItem( itemEvent ) )
+            {
+                yum.deleteDirectory( itemEvent.getItem().getPath() );
+            }
         }
     }
 

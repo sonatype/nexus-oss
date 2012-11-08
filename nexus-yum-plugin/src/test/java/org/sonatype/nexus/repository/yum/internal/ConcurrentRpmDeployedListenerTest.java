@@ -65,7 +65,7 @@ public class ConcurrentRpmDeployedListenerTest
     private NexusScheduler nexusScheduler;
 
     @Inject
-    private RpmRepositoryEventsHandler handler;
+    private EventsRouter handler;
 
     @Inject
     private YumRegistry repositoryRegistry;

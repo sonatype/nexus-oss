@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.yum.internal;
 
 import static java.io.File.pathSeparator;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
@@ -21,18 +22,25 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.internal.task.TaskAlreadyScheduledException;
-import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
+import org.sonatype.nexus.repository.yum.internal.task.TaskAlreadyScheduledException;
+import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
@@ -42,6 +50,8 @@ import com.google.inject.assistedinject.Assisted;
 public class YumImpl
     implements Yum
 {
+
+    private final static Logger log = LoggerFactory.getLogger( YumImpl.class );
 
     private final RepositoryURLBuilder repositoryURLBuilder;
 
@@ -54,6 +64,18 @@ public class YumImpl
     private final File baseDir;
 
     private final Set<String> versions = new HashSet<String>();
+
+    private static final int POOL_SIZE = 10;
+
+    private static final int MAX_EXECUTION_COUNT = 100;
+
+    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor( POOL_SIZE );
+
+    private final Map<ScheduledFuture<?>, DelayedDirectoryDeletionTask> taskMap =
+        new HashMap<ScheduledFuture<?>, DelayedDirectoryDeletionTask>();
+
+    private final Map<DelayedDirectoryDeletionTask, ScheduledFuture<?>> reverseTaskMap =
+        new HashMap<DelayedDirectoryDeletionTask, ScheduledFuture<?>>();
 
     @Inject
     public YumImpl( final RepositoryURLBuilder repositoryURLBuilder,
@@ -217,11 +239,121 @@ public class YumImpl
 
     private YumMetadataGenerationTask createTask()
     {
-        return nexusScheduler.createTaskInstance( YumMetadataGenerationTask.class );
+        final YumMetadataGenerationTask task = nexusScheduler.createTaskInstance( YumMetadataGenerationTask.class );
+        if ( task == null )
+        {
+            throw new IllegalStateException(
+                "Could not create a task fo type " + YumMetadataGenerationTask.class.getName()
+            );
+        }
+        return task;
     }
 
     private File createRepositoryTempDir( Repository repository, String version )
     {
         return new File( yumConfig.getBaseTempDir(), repository.getId() + File.separator + version );
     }
+
+    @Override
+    public void deleteRpm( String path )
+    {
+        if ( yumConfig.isDeleteProcessing() )
+        {
+            if ( findDelayedParentDirectory( path ) == null )
+            {
+                log.info( "Delete rpm {} / {}", repository.getId(), path );
+                recreateRepository();
+            }
+        }
+    }
+
+    @Override
+    public void deleteDirectory( String path )
+    {
+        if ( yumConfig.isDeleteProcessing() )
+        {
+            if ( findDelayedParentDirectory( path ) == null )
+            {
+                schedule( new DelayedDirectoryDeletionTask( path ) );
+            }
+        }
+    }
+
+    private void schedule( DelayedDirectoryDeletionTask task )
+    {
+        final ScheduledFuture<?> future = executor.schedule( task, yumConfig.getDelayAfterDeletion(), SECONDS );
+        taskMap.put( future, task );
+        reverseTaskMap.put( task, future );
+    }
+
+    private DelayedDirectoryDeletionTask findDelayedParentDirectory( final String path )
+    {
+        for ( Runnable runnable : executor.getQueue() )
+        {
+            DelayedDirectoryDeletionTask dirTask = taskMap.get( runnable );
+            if ( dirTask != null && path.startsWith( dirTask.path ) )
+            {
+                return dirTask;
+            }
+        }
+        return null;
+    }
+
+    private boolean isDeleted( String path )
+    {
+        try
+        {
+            repository.retrieveItem( new ResourceStoreRequest( path ) );
+            return false;
+        }
+        catch ( Exception e )
+        {
+            return true;
+        }
+    }
+
+    private class DelayedDirectoryDeletionTask
+        implements Runnable
+    {
+
+        private final String path;
+
+        private int executionCount = 0;
+
+        private DelayedDirectoryDeletionTask( final String path )
+        {
+            this.path = path;
+        }
+
+        @Override
+        public void run()
+        {
+            executionCount++;
+            final ScheduledFuture<?> future = reverseTaskMap.remove( this );
+            if ( future != null )
+            {
+                taskMap.remove( future );
+            }
+            if ( isDeleted( path ) )
+            {
+                log.info(
+                    "Recreate yum repository {} because of removed path {}", getId(), path
+                );
+                recreateRepository();
+            }
+            else if ( executionCount < MAX_EXECUTION_COUNT )
+            {
+                log.info( "Rescheduling creation of yum repository {} because path {} not deleted.", getId(), path );
+                schedule( this );
+            }
+            else
+            {
+                log.warn(
+                    "Deleting path {} in repository {} took too long - retried {} times.",
+                    path, getId(), MAX_EXECUTION_COUNT
+                );
+            }
+        }
+    }
+
 }

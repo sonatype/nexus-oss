@@ -41,4 +41,8 @@ public interface Yum
 
     void recreateRepository();
 
+    void deleteRpm( String path );
+
+    void deleteDirectory( String path );
+
 }
