@@ -30,9 +30,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.registry.RootContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -40,17 +37,20 @@ import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractDynamicSecurityResource;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DynamicSecurityResource;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 @Component( role = DynamicSecurityResource.class, hint = "NexusViewSecurityResource" )
 public class NexusViewSecurityResource
     extends AbstractDynamicSecurityResource
-    implements EventListener, Initializable, DynamicSecurityResource
+    implements Initializable, DynamicSecurityResource
 {
     @Requirement
     private RepositoryRegistry repoRegistry;
 
     @Requirement
-    private ApplicationEventMulticaster eventMulticaster;
+    private EventBus eventBus;
 
     @Requirement
     private RepositoryTypeRegistry repoTypeRegistry;
@@ -149,25 +149,26 @@ public class NexusViewSecurityResource
         return "repository-" + ( repoId.equals( "*" ) ? "all" : repoId );
     }
 
-    public void onEvent( Event<?> event )
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onEvent( final RepositoryRegistryEventAdd event )
     {
-        if ( RepositoryRegistryEventAdd.class.isAssignableFrom( event.getClass() )
-            || RepositoryRegistryEventRemove.class.isAssignableFrom( event.getClass() ) )
-        {
-            setDirty( true );
-        }
+        setDirty( true );
+    }
 
-        if ( event instanceof RepositoryRegistryEventRemove )
-        {
-            String repoId = ( (RepositoryRegistryEventRemove) event ).getRepository().getId();
-            configManager.cleanRemovedPrivilege( createPrivilegeId( repoId ) );
-        }
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onEvent( final RepositoryRegistryEventRemove event )
+    {
+        setDirty( true );
+
+        configManager.cleanRemovedPrivilege( createPrivilegeId( event.getRepository().getId() ) );
     }
 
     public void initialize()
         throws InitializationException
     {
-        this.eventMulticaster.addEventListener( this );
+        this.eventBus.register( this );
     }
 
 }

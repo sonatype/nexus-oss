@@ -40,7 +40,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
@@ -61,7 +61,7 @@ public class HttpClientManagerTest
     private UserAgentBuilder userAgentBuilder;
 
     @Mock
-    private ApplicationEventMulticaster multicaster;
+    private EventBus eventBus;
 
     @Mock
     private RemoteStorageContext globalRemoteStorageContext;
@@ -97,7 +97,7 @@ public class HttpClientManagerTest
         when( globalRemoteStorageContext.getRemoteProxySettings() ).thenReturn( new DefaultRemoteProxySettings() );
         when( applicationConfiguration.getGlobalRemoteStorageContext() ).thenReturn( globalRemoteStorageContext );
 
-        hc4Provider = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, multicaster, jmxInstaller );
+        hc4Provider = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller );
 
         when( proxyRepository.getId() ).thenReturn( "central" );
         when( response.getStatusLine() ).thenReturn( statusLine );

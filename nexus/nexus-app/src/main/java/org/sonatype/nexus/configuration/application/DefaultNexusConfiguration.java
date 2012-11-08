@@ -71,7 +71,6 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -79,6 +78,7 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
@@ -97,7 +97,7 @@ public class DefaultNexusConfiguration
     implements NexusConfiguration, Initializable
 {
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     /**
      * The path cache is referenced here only for UTs sake. At deploy/runtime, this does not matter, as CacheManager is
@@ -281,7 +281,7 @@ public class DefaultNexusConfiguration
 
             ConfigurationPrepareForLoadEvent loadEvent = new ConfigurationPrepareForLoadEvent( this );
 
-            applicationEventMulticaster.notifyEventListeners( loadEvent );
+            eventBus.post( loadEvent );
 
             if ( loadEvent.isVetoed() )
             {
@@ -294,7 +294,7 @@ public class DefaultNexusConfiguration
             applyConfiguration();
 
             // we successfully loaded config
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationLoadEvent( this ) );
+            eventBus.post( new ConfigurationLoadEvent( this ) );
         }
     }
 
@@ -370,16 +370,15 @@ public class DefaultNexusConfiguration
 
         ConfigurationPrepareForSaveEvent prepare = new ConfigurationPrepareForSaveEvent( this );
 
-        applicationEventMulticaster.notifyEventListeners( prepare );
+        eventBus.post( prepare );
 
         if ( !prepare.isVetoed() )
         {
             logApplyConfiguration( prepare.getChanges() );
 
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
+            eventBus.post( new ConfigurationCommitEvent( this ) );
 
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
-                getCurrentUserId() ) );
+            eventBus.post( new ConfigurationChangeEvent( this, prepare.getChanges(), getCurrentUserId() ) );
 
             return true;
         }
@@ -387,7 +386,7 @@ public class DefaultNexusConfiguration
         {
             getLogger().info( vetoFormatter.format( new VetoFormatterRequest( prepare, getLogger().isDebugEnabled() ) ) );
 
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationRollbackEvent( this ) );
+            eventBus.post( new ConfigurationRollbackEvent( this ) );
 
             return false;
         }
@@ -413,7 +412,7 @@ public class DefaultNexusConfiguration
             configurationSource.storeConfiguration();
 
             // we successfully saved config
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
+            eventBus.post( new ConfigurationSaveEvent( this ) );
         }
     }
 

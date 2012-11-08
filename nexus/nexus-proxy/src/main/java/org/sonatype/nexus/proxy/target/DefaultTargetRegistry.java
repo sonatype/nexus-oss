@@ -208,7 +208,7 @@ public class DefaultTargetRegistry
         validate( cnf );
         removeRepositoryTarget( cnf.getId(), true );
         getCurrentConfiguration( true ).add( cnf );
-        getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventAdd( this, target ) );
+        eventBus().post( new TargetRegistryEventAdd( this, target ) );
         return true;
     }
 
@@ -229,7 +229,7 @@ public class DefaultTargetRegistry
                 ti.remove();
                 if ( !forUpdate )
                 {
-                    getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventRemove( this, target ) );
+                    eventBus().post( new TargetRegistryEventRemove( this, target ) );
                 }
                 return true;
             }

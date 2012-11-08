@@ -50,10 +50,11 @@ import org.sonatype.nexus.proxy.repository.charger.ItemRetrieveCallable;
 import org.sonatype.nexus.proxy.repository.threads.ThreadPoolManager;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.charger.CallableExecutor;
 import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
 import org.sonatype.sisu.charger.internal.FirstArrivedInOrderChargeStrategy;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
@@ -86,8 +87,20 @@ public abstract class AbstractGroupRepository
         return (AbstractGroupRepositoryConfiguration) super.getExternalConfiguration( forWrite );
     }
 
+    @Subscribe
+    public void onEvent( final RepositoryRegistryEventRemove evt )
+    {
+        final AbstractGroupRepositoryConfiguration extConfig = this.getExternalConfiguration( false );
+
+        if ( extConfig != null && extConfig.getMemberRepositoryIds().contains( evt.getRepository().getId() ) )
+        {
+            removeMemberRepositoryId( evt.getRepository().getId() );
+        }
+    }
+
+    @Subscribe
     @Override
-    public void onEvent( Event<?> evt )
+    public void onEvent( final ConfigurationPrepareForSaveEvent evt )
     {
         boolean membersChanged = false;
         List<String> currentMemberIds = Collections.emptyList();
@@ -117,22 +130,10 @@ public abstract class AbstractGroupRepository
 
         super.onEvent( evt );
 
-        // act automatically on repo removal. Remove it from myself if member.
-        if ( evt instanceof RepositoryRegistryEventRemove )
-        {
-            final RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
-            final AbstractGroupRepositoryConfiguration extConfig = this.getExternalConfiguration( false );
-
-            if ( extConfig != null && extConfig.getMemberRepositoryIds().contains( revt.getRepository().getId() ) )
-            {
-                removeMemberRepositoryId( revt.getRepository().getId() );
-            }
-        }
-        else if ( evt instanceof ConfigurationPrepareForSaveEvent && membersChanged )
+        if ( membersChanged )
         {
             // fire another event
-            getApplicationEventMulticaster().notifyEventListeners(
-                new RepositoryGroupMembersChangedEvent( this, currentMemberIds, newMemberIds ) );
+            eventBus().post( new RepositoryGroupMembersChangedEvent( this, currentMemberIds, newMemberIds ) );
         }
     }
 
@@ -175,7 +176,7 @@ public abstract class AbstractGroupRepository
             result.addAll( repository.evictUnusedItems( request, timestamp ) );
         }
 
-        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+        eventBus().post( new RepositoryEventEvictUnusedItems( this ) );
 
         return result;
     }

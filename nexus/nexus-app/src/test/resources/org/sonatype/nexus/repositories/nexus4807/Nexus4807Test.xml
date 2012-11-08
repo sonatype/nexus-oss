@@ -108,9 +108,9 @@
           <field-name>attributesHandler</field-name>
         </requirement>
         <requirement>
-          <role>org.sonatype.plexus.appevents.ApplicationEventMulticaster</role>
+          <role>org.sonatype.sisu.goodies.eventbus.EventBus</role>
           <role-hint></role-hint>
-          <field-name>applicationEventMulticaster</field-name>
+          <field-name>eventBus</field-name>
         </requirement>
       </requirements>
     </component>
