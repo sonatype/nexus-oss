@@ -196,7 +196,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -204,7 +203,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
