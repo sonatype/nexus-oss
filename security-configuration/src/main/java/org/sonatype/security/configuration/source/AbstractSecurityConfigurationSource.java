@@ -64,9 +64,7 @@ public abstract class AbstractSecurityConfigurationSource
 
     /**
      * Load configuration.
-     * 
-     * @param file the file
-     * @return the configuration
+     *
      * @throws IOException Signals that an I/O exception has occurred.
      */
     protected void loadConfiguration( InputStream is )
@@ -115,8 +113,7 @@ public abstract class AbstractSecurityConfigurationSource
 
     /**
      * Save configuration.
-     * 
-     * @param file the file
+     *
      * @throws IOException Signals that an I/O exception has occurred.
      */
     protected void saveConfiguration( OutputStream os, SecurityConfiguration configuration )
