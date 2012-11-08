@@ -14,13 +14,13 @@ package org.sonatype.nexus.log.internal;
 
 import javax.inject.Inject;
 
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 /**
- * Logback appender that will multicast the logging event.
+ * Logback appender that will post the logging event.
  * 
  * @author adreghiciu@gmail.com
  */
@@ -29,7 +29,7 @@ public class NexusEventSystemAppender
 {
 
     @Inject
-    private ApplicationEventMulticaster eventMulticaster;
+    private EventBus eventBus;
 
     /**
      * {@inheritDoc}
@@ -37,10 +37,9 @@ public class NexusEventSystemAppender
     @Override
     protected void append( ILoggingEvent eventObject )
     {
-        if ( eventMulticaster != null )
+        if ( eventBus != null )
         {
-            LogbackLoggingEvent logEvent = new LogbackLoggingEvent( eventObject );
-            eventMulticaster.notifyEventListeners( logEvent );
+            eventBus.post( new LogbackLoggingEvent( eventObject ) );
         }
     }
 

@@ -459,6 +459,17 @@ public abstract class NexusITSupport
      */
     protected String repositoryIdForTest()
     {
+        return testMethodName();
+    }
+
+    /**
+     * Generates a name specific to the test.
+     * The id will be equal to the name of the current running test method.
+     *
+     * @return name. Never null.
+     */
+    protected String testMethodName()
+    {
         String methodName = testName.getMethodName();
         if ( methodName.contains( "[" ) )
         {

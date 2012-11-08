@@ -23,6 +23,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
@@ -32,8 +33,8 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * Repository registry. It holds handles to registered repositories and sorts them properly. This class is used to get a
@@ -56,7 +57,7 @@ public class DefaultRepositoryRegistry
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
@@ -280,7 +281,7 @@ public class DefaultRepositoryRegistry
             }
         }
 
-        applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
+        eventBus.post( new RepositoryRegistryEventAdd( this, repository ) );
     }
 
     private void deleteRepository( final RepositoryTypeDescriptor rtd, final Repository repository,
@@ -288,13 +289,13 @@ public class DefaultRepositoryRegistry
     {
         if ( !silently )
         {
-            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventRemove( this, repository ) );
+            eventBus.post( new RepositoryRegistryEventRemove( this, repository ) );
         }
 
         // dump the event listeners, as once deleted doesn't care about config changes any longer
-        if ( repository instanceof EventListener )
+        if ( repository instanceof AbstractConfigurable )
         {
-            applicationEventMulticaster.removeEventListener( (EventListener) repository );
+            ( (AbstractConfigurable) repository ).unregisterFromEventBus();
         }
 
         synchronized ( this )
@@ -308,7 +309,7 @@ public class DefaultRepositoryRegistry
 
         if ( !silently )
         {
-            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventPostRemove( this, repository ) );
+            eventBus.post( new RepositoryRegistryEventPostRemove( this, repository ) );
         }
     }
 

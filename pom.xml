@@ -56,7 +56,7 @@
     </plugins>
     <pluginManagement>
       <plugins>
-        <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -->
+        <!-- Manually run with: mvn license:format -N -->
         <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
           <artifactId>maven-license-plugin</artifactId>
@@ -79,7 +79,7 @@
             <excludes>
               <!-- we have target pattern in this format because of target package in nexus-api and nexus-proxy modules -->
               <exclude>**/nexus*/target/**</exclude>
-              <exclude>**/nexus-ldap-plugin-parent/ldap-common/target/**</exclude>
+              <exclude>**/ldap-common/target/**</exclude>
               <exclude>**/ext-2.3/**</exclude>
               <exclude>**/ext-3.4.0/**</exclude>
               <exclude>**/js/filetree/**</exclude>
@@ -108,7 +108,7 @@
               <exclude>nexus/nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
               <exclude>nexus/nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
               <!-- tell license plugin to ignore workaround for MINDEXER-65 -->
-              <exclude>nexus/nexus-core-plugins/nexus-indexer-lucene-plugin-parent/nexus-indexer-lucene-plugin/src/main/java/copied/org/apache/maven/index/DefaultScannerListener.java</exclude>
+              <exclude>**/nexus-indexer-lucene-plugin/src/main/java/copied/org/apache/maven/index/DefaultScannerListener.java</exclude>
             </excludes>
             <mapping>
               <vm>SHARPSTAR_STYLE</vm>

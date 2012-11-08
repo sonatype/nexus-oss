@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -36,24 +35,19 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
-import org.sonatype.nexus.proxy.maven.gav.Gav.HashType;
-import org.sonatype.nexus.proxy.maven.gav.Gav.SignatureType;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
+import com.google.common.eventbus.Subscribe;
 
 public class M2RepositoryTest
     extends M2ResourceStoreTest
@@ -343,7 +337,7 @@ public class M2RepositoryTest
 
         M2Repository repository = (M2Repository) getResourceStore();
 
-        getApplicationEventMulticaster().addEventListener( ch );
+        eventBus().register( ch );
 
         File mdFile = new File( new File( getBasedir() ), "target/test-classes/repo1" + path );
         long fileTimestamp = mdFile.lastModified();
@@ -421,7 +415,7 @@ public class M2RepositoryTest
         getLogger().info(path + " -> AFTER assert 3 requestCount=" + expectedHits[2] + " at (" + System.currentTimeMillis() + ")");
 
         // cleanup counter listener for next test call to avoid added overhead, logging noise
-        getApplicationEventMulticaster().removeEventListener( ch );
+        eventBus().unregister( ch );
     }
 
     @Test
@@ -794,7 +788,6 @@ public class M2RepositoryTest
     // ==
 
     protected class CounterListener
-        implements EventListener
     {
         private int requestCount = 0;
 
@@ -808,22 +801,26 @@ public class M2RepositoryTest
             this.requestCount = 0;
         }
 
-        public void onEvent( Event<?> evt )
+        @Subscribe
+        public void onEvent( RepositoryItemEventCache evt )
         {
-            if ( evt instanceof RepositoryItemEventCache )
+            final RepositoryItemEventCache riec = (RepositoryItemEventCache) evt;
+            final String path = riec.getItem().getPath();
+            if ( path.endsWith( "maven-metadata.xml" ) || path.endsWith( "spoof-1.0.txt" ) )
             {
-                final RepositoryItemEventCache riec = (RepositoryItemEventCache) evt;
-                final String path =  riec.getItem().getPath();
-                if(path.endsWith( "maven-metadata.xml" ) || path.endsWith("spoof-1.0.txt" ))
+                // logging to track if listener received message in time for accurate test assertion
+                if ( getLogger().isInfoEnabled() )
                 {
-                    // logging to track if listener received message in time for accurate test assertion
-                    if(getLogger().isInfoEnabled()){
-                        getLogger().info(path + " -> CounterListener increments to " + (++requestCount) + " at (" + System.currentTimeMillis() + ")");
-                    } else {
-                        requestCount = requestCount + 1;
-                    }
+                    getLogger().info( path + " -> CounterListener increments to " + ( ++requestCount ) + " at ("
+                                          + System.currentTimeMillis() + ")" );
+                }
+                else
+                {
+                    requestCount = requestCount + 1;
                 }
             }
         }
+
      }
+
 }

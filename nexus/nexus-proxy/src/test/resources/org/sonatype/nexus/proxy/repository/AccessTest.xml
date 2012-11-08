@@ -6,25 +6,17 @@
 			<implementation>org.sonatype.nexus.configuration.SimpleSecureApplicationConfiguration</implementation>
         <requirements>
           <requirement>
-            <role>
-              org.sonatype.plexus.appevents.ApplicationEventMulticaster
-                </role>
-            <field>applicationEventMulticaster
-                </field>
+            <role>org.sonatype.sisu.goodies.eventbus.EventBus</role>
+            <role-hint></role-hint>
+            <field-name>eventBus</field-name>
           </requirement>
           <requirement>
-            <role>
-              org.sonatype.nexus.configuration.application.GlobalHttpProxySettings
-                </role>
-            <field>globalHttpProxySettings
-                </field>
+            <role>org.sonatype.nexus.configuration.application.GlobalHttpProxySettings</role>
+            <field>globalHttpProxySettings</field>
           </requirement>
           <requirement>
-            <role>
-              org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings
-                </role>
-            <field>globalRemoteConnectionSettings
-                </field>
+            <role>org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings</role>
+            <field>globalRemoteConnectionSettings</field>
           </requirement>
         </requirements>
 		</component>

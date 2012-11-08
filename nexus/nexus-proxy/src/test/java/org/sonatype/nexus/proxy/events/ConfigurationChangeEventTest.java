@@ -40,10 +40,8 @@ public class ConfigurationChangeEventTest
         throws Exception
     {
         // flush all potential changes
-        getApplicationEventMulticaster()
-            .notifyEventListeners( new ConfigurationPrepareForSaveEvent( getApplicationConfiguration() ) );
-        getApplicationEventMulticaster()
-            .notifyEventListeners( new ConfigurationCommitEvent( getApplicationConfiguration() ) );
+        eventBus().post( new ConfigurationPrepareForSaveEvent( getApplicationConfiguration() ) );
+        eventBus().post( new ConfigurationCommitEvent( getApplicationConfiguration() ) );
 
         // get hold on all registered reposes
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
@@ -65,11 +63,10 @@ public class ConfigurationChangeEventTest
 
         // fire prepareForSave event
         ConfigurationPrepareForSaveEvent pevt = new ConfigurationPrepareForSaveEvent( getApplicationConfiguration() );
-        getApplicationEventMulticaster().notifyEventListeners( pevt );
+        eventBus().post( pevt );
         assertFalse( pevt.isVetoed() );
 
-        getApplicationEventMulticaster()
-            .notifyEventListeners( new ConfigurationCommitEvent( getApplicationConfiguration() ) );
+        eventBus().post( new ConfigurationCommitEvent( getApplicationConfiguration() ) );
 
         // changes are now applied!
         assertEquals( "Should be applied!", LocalStatus.OUT_OF_SERVICE, repo1.getLocalStatus() );

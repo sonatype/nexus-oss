@@ -20,6 +20,8 @@ import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectio
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 public class DefaultGlobalRemoteConnectionSettingsTest
     extends NexusAppTestSupport
@@ -34,15 +36,12 @@ public class DefaultGlobalRemoteConnectionSettingsTest
         cfg.loadConfiguration();
 
         final Event<GlobalRemoteConnectionSettings>[] event = new Event[1];
-        ApplicationEventMulticaster applicationEventMulticaster = lookup( ApplicationEventMulticaster.class );
-        applicationEventMulticaster.addEventListener( new EventListener()
+        lookup( EventBus.class ).register( new Object()
         {
-            public void onEvent( Event<?> evt )
+            @Subscribe
+            public void onEvent( GlobalRemoteConnectionSettingsChangedEvent evt )
             {
-                if ( evt instanceof GlobalRemoteConnectionSettingsChangedEvent )
-                {
-                    event[0] = (GlobalRemoteConnectionSettingsChangedEvent) evt;
-                }
+                event[0] = evt;
             }
         } );
 

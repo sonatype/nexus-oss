@@ -71,14 +71,14 @@ public class JerseyUsers
         } );
     }
 
-    private JerseyUser convert( @Nullable final UserResource roleResource )
+    private JerseyUser convert( @Nullable final UserResource resource )
     {
-        if ( roleResource == null )
+        if ( resource == null )
         {
             return null;
         }
-        final JerseyUser role = create( roleResource.getUserId() );
-        role.overwriteWith( roleResource );
+        final JerseyUser role = new JerseyUser( getNexusClient(), resource );
+        role.overwriteWith( resource );
         return role;
     }
 

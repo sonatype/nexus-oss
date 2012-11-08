@@ -13,7 +13,7 @@
 /*global define*/
 define('ext/all',
       ['extjs', 'ext/ux', 'ext/data', 'ext/dd', 'ext/form', 'ext/grid',
-        'ext/layout', 'ext/lib', 'ext/tree', 'ext/component', 'ext/history',
+        'ext/layout', 'ext/lib', 'ext/tree', 'ext/component', 
         'ext/string', 'ext/tooltip'],
       function(Ext) {
         Ext.BLANK_IMAGE_URL = "ext-3.4.0/resources/images/default/s.gif";

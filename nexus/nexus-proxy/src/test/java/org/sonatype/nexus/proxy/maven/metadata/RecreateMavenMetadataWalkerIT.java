@@ -13,7 +13,6 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -53,6 +52,7 @@ import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * @author Juven Xu
@@ -225,9 +225,9 @@ public class RecreateMavenMetadataWalkerIT
                 new DefaultWalkerContext( repo, new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
             ctx.getProcessors().add( new RecreateMavenMetadataWalkerProcessor( getLogger() ) );
             final ValidationEventListener validationEventListener = new ValidationEventListener();
-            getApplicationEventMulticaster().addEventListener( validationEventListener );
+            eventBus().register( validationEventListener );
             walker.walk( ctx );
-            getApplicationEventMulticaster().removeEventListener( validationEventListener );
+            eventBus().unregister( validationEventListener );
             assertFalse( "We should not record any STORE!", validationEventListener.hasStoresRecorded() );
         }
 
@@ -245,9 +245,9 @@ public class RecreateMavenMetadataWalkerIT
                 new DefaultWalkerContext( repo, new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
             ctx.getProcessors().add( new RecreateMavenMetadataWalkerProcessor( getLogger() ) );
             final ValidationEventListener validationEventListener = new ValidationEventListener();
-            getApplicationEventMulticaster().addEventListener( validationEventListener );
+            eventBus().register( validationEventListener );
             walker.walk( ctx );
-            getApplicationEventMulticaster().removeEventListener( validationEventListener );
+            eventBus().unregister( validationEventListener );
             assertTrue( "We should record one STORE!", validationEventListener.hasStoresRecorded() );
             assertEquals( "There should be only 2 STOREs!", 2, validationEventListener.storeCount() );
             assertTrue( "This checksum should be recreated!", validationEventListener.isOverwritten( checksumPath ) );
@@ -268,7 +268,6 @@ public class RecreateMavenMetadataWalkerIT
      * @author cstamas
      */
     public static class ValidationEventListener
-        implements EventListener
     {
         private HashSet<String> pathsFromStoreEvents;
 
@@ -292,14 +291,10 @@ public class RecreateMavenMetadataWalkerIT
             return pathsFromStoreEvents.size();
         }
 
-        @Override
-        public void onEvent( Event<?> evt )
+        @Subscribe
+        public void onEvent( RepositoryItemEventStore evt )
         {
-            if ( evt instanceof RepositoryItemEventStore )
-            {
-                final RepositoryItemEventStore sevt = (RepositoryItemEventStore) evt;
-                pathsFromStoreEvents.add( sevt.getItem().getRepositoryItemUid().getPath() );
-            }
+            pathsFromStoreEvents.add( evt.getItem().getRepositoryItemUid().getPath() );
         }
     }
 

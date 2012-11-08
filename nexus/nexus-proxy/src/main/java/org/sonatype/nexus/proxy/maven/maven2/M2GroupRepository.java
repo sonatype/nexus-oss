@@ -245,7 +245,7 @@ public class M2GroupRepository
                         "IOException during parse of metadata UID=\"" + fileItem.getRepositoryItemUid().toString()
                             + "\", will be skipped from aggregation!", e );
 
-                    getApplicationEventMulticaster().notifyEventListeners(
+                    eventBus().post(
                         newMetadataFailureEvent( fileItem,
                             "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
@@ -255,7 +255,7 @@ public class M2GroupRepository
                         "Metadata exception during parse of metadata from UID=\""
                             + fileItem.getRepositoryItemUid().toString() + "\", will be skipped from aggregation!", e );
 
-                    getApplicationEventMulticaster().notifyEventListeners(
+                    eventBus().post(
                         newMetadataFailureEvent( fileItem,
                             "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }

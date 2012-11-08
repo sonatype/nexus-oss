@@ -52,6 +52,7 @@ import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @RunWith( MockitoJUnitRunner.class )
 public class DefaultNexusTest
@@ -96,6 +97,9 @@ public class DefaultNexusTest
 
     @Mock
     private RepositoryRegistry mockedRepositoryRegistry;
+
+    @Mock
+    private EventBus eventBus;
 
     @InjectMocks
     @Spy
