@@ -339,9 +339,10 @@ public class DefaultTimeline
         try
         {
             // check for any previous attempt
-            if ( repairTriedAndFailed )
+            if ( repairTriedAndFailed || indexer.isStarted() )
             {
                 // return silently, as we leave indexer in broken state to not bork whole instance
+                // or, as someone else already fixed it (isStarted)
                 return;
             }
             getLogger().info( "Timeline index got corrupted, trying to repair it.", e );
