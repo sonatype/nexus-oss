@@ -18,11 +18,11 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sonatype.security.ldap.AbstractLdapTest;
+import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.ldap.dao.LdapUser;
 
-public class DefaultLdapManagerTest
-    extends AbstractLdapTest
+public class DefaultLdapManagerIT
+    extends LdapTestSupport
 {
 
     private LdapManager getLdapManager()

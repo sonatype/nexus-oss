@@ -18,18 +18,16 @@ import javax.naming.NamingException;
 
 import junit.framework.Assert;
 
-import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.context.Context;
 import org.junit.Test;
-import org.sonatype.security.ldap.AbstractLdapTest;
+import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.ldap.dao.LdapDAOException;
-import org.sonatype.security.ldap.dao.LdapUtils;
 import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
-public class MultipleAccessLdapConfigTest
-    extends AbstractLdapTest
+public class MultipleAccessLdapConfigIT
+    extends LdapTestSupport
 {
 
     private SimpleLdapManager ldapManager;
