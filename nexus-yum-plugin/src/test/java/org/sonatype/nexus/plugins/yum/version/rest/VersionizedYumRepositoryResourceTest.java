@@ -34,7 +34,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
+import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -56,7 +56,7 @@ public class VersionizedYumRepositoryResourceTest
     private PlexusResource resource;
 
     @Inject
-    private RepositoryRegistry repositoryRegistry;
+    private YumRepositories repositoryRegistry;
 
     @Inject
     private YumConfiguration aliasMapper;

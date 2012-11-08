@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.yum.repository.YumRepository.REPOMD_XML;
 import static org.sonatype.nexus.plugins.yum.repository.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -98,9 +99,12 @@ public class YumMetadataGenerationTask
     private final RepositoryURLBuilder repositoryURLBuilder;
 
     @VisibleForTesting
-    public YumMetadataGenerationTask()
+    protected YumMetadataGenerationTask()
     {
-        this( null, null, null, null );
+        this.eventBus = null;
+        this.repositoryRegistry = null;
+        this.yumConfig = null;
+        this.repositoryURLBuilder = null;
     }
 
     @Inject
@@ -109,20 +113,13 @@ public class YumMetadataGenerationTask
                                       final YumConfiguration yumConfig,
                                       final RepositoryURLBuilder repositoryURLBuilder )
     {
-        this( null, eventBus, repositoryRegistry, yumConfig, repositoryURLBuilder );
-    }
+        super( null );
 
-    public YumMetadataGenerationTask( final String name,
-                                      final EventBus eventBus,
-                                      final RepositoryRegistry repositoryRegistry,
-                                      final YumConfiguration yumConfig,
-                                      final RepositoryURLBuilder repositoryURLBuilder )
-    {
-        super( name );
-        this.eventBus = eventBus;
-        this.repositoryRegistry = repositoryRegistry;
-        this.yumConfig = yumConfig;
-        this.repositoryURLBuilder = repositoryURLBuilder;
+        this.eventBus = checkNotNull( eventBus );
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
+        this.yumConfig = checkNotNull( yumConfig );
+        this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
+
         getParameters().put( PARAM_SINGLE_RPM_PER_DIR, Boolean.toString( true ) );
     }
 
@@ -130,9 +127,10 @@ public class YumMetadataGenerationTask
     protected YumRepository doRun()
         throws Exception
     {
-        setDefaults();
         if ( yumConfig.isActive() )
         {
+            setDefaults();
+
             LOG.info( "Generating Yum-Repository for '{}' ...", getRpmDir() );
             try
             {

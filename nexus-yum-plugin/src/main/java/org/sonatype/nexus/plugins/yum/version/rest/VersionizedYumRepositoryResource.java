@@ -22,7 +22,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
+import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.plugins.yum.repository.service.YumService;
@@ -52,7 +52,7 @@ public class VersionizedYumRepositoryResource
         + "}";
 
     @Inject
-    private RepositoryRegistry repositoryRegistry;
+    private YumRepositories repositoryRegistry;
 
     @Inject
     private YumConfiguration aliasMapper;

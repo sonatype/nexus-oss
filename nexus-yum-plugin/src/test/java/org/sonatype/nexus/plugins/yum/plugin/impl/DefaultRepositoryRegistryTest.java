@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
+import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
@@ -36,7 +36,7 @@ public class DefaultRepositoryRegistryTest
     private static final String REPO_ID = "rpm-snapshots";
 
     @Inject
-    private RepositoryRegistry repositoryRegistry;
+    private YumRepositories repositoryRegistry;
 
     @Inject
     private NexusScheduler nexusScheduler;

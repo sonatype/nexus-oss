@@ -12,29 +12,39 @@
  */
 package org.sonatype.nexus.plugins.yum.plugin.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
+import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.repository.task.RepositoryScanningTask;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 
-@Component( role = RepositoryRegistry.class )
-public class DefaultRepositoryRegistry
-    implements RepositoryRegistry
+@Named
+@Singleton
+public class YumRepositoriesImpl
+    implements YumRepositories
 {
-    private static final Logger LOG = LoggerFactory.getLogger( DefaultRepositoryRegistry.class );
+
+    private static final Logger LOG = LoggerFactory.getLogger( YumRepositoriesImpl.class );
 
     private final Map<String, MavenRepositoryInfo> repositories = new ConcurrentHashMap<String, MavenRepositoryInfo>();
 
-    @Requirement
-    private NexusScheduler nexusScheduler;
+    private final NexusScheduler nexusScheduler;
+
+    @Inject
+    public YumRepositoriesImpl( final NexusScheduler nexusScheduler )
+    {
+        this.nexusScheduler = checkNotNull( nexusScheduler );
+    }
 
     @Override
     public void registerRepository( MavenRepository repository )

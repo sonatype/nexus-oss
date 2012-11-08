@@ -16,7 +16,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
 
-public interface RepositoryRegistry
+public interface YumRepositories
 {
     void unregisterRepository( Repository repository );
 

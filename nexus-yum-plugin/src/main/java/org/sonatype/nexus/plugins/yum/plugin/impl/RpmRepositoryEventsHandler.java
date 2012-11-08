@@ -12,14 +12,17 @@
  */
 package org.sonatype.nexus.plugins.yum.plugin.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
+import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.plugin.event.YumRepositoryGenerateEvent;
 import org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumGroupRepository;
 import org.sonatype.nexus.plugins.yum.repository.service.YumService;
@@ -30,6 +33,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -44,27 +48,35 @@ public class RpmRepositoryEventsHandler
 
     private static final Logger LOG = LoggerFactory.getLogger( RpmRepositoryEventsHandler.class );
 
-    @Inject
-    private RepositoryRegistry repositoryRegistry;
+    private final Provider<YumRepositories> yumRepositories;
+
+    private final Provider<RepositoryRegistry> repositoryRegistry;
+
+    private final Provider<YumService> yumService;
+
+    private final Provider<DeletionService> deletionService;
 
     @Inject
-    private org.sonatype.nexus.proxy.registry.RepositoryRegistry nexusRepositoryRegistry;
-
-    @Inject
-    private YumService yumService;
-
-    @Inject
-    private DeletionService deletionService;
+    public RpmRepositoryEventsHandler( final Provider<YumRepositories> yumRepositories,
+                                       final Provider<RepositoryRegistry> repositoryRegistry,
+                                       final Provider<YumService> yumService,
+                                       final Provider<DeletionService> deletionService )
+    {
+        this.yumRepositories = checkNotNull( yumRepositories );
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
+        this.yumService = checkNotNull( yumService );
+        this.deletionService = checkNotNull( deletionService );
+    }
 
     @Subscribe
     public void on( final YumRepositoryGenerateEvent event )
     {
         final Repository repository = event.getRepository();
-        for ( GroupRepository groupRepository : nexusRepositoryRegistry.getGroupsOfRepository( repository ) )
+        for ( GroupRepository groupRepository : repositoryRegistry.get().getGroupsOfRepository( repository ) )
         {
             if ( groupRepository.getRepositoryKind().isFacetAvailable( M2YumGroupRepository.class ) )
             {
-                yumService.createGroupRepository( groupRepository );
+                yumService.get().createGroupRepository( groupRepository );
             }
         }
     }
@@ -74,7 +86,8 @@ public class RpmRepositoryEventsHandler
     {
         if ( event.getRepository().getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
-            repositoryRegistry.registerRepository( event.getRepository().adaptToFacet( MavenHostedRepository.class ) );
+            yumRepositories.get().registerRepository(
+                event.getRepository().adaptToFacet( MavenHostedRepository.class ) );
         }
     }
 
@@ -85,8 +98,8 @@ public class RpmRepositoryEventsHandler
         if ( isRpmItemEvent( itemEvent ) )
         {
             LOG.info( "ItemStoreEvent : {}", itemEvent.getItem().getPath() );
-            yumService.markDirty( itemEvent.getRepository(), getItemVersion( itemEvent.getItem() ) );
-            yumService.addToYumRepository( itemEvent.getRepository(), itemEvent.getItem().getPath() );
+            yumService.get().markDirty( itemEvent.getRepository(), getItemVersion( itemEvent.getItem() ) );
+            yumService.get().addToYumRepository( itemEvent.getRepository(), itemEvent.getItem().getPath() );
         }
     }
 
@@ -96,11 +109,11 @@ public class RpmRepositoryEventsHandler
     {
         if ( isRpmItemEvent( itemEvent ) )
         {
-            deletionService.deleteRpm( itemEvent.getRepository(), itemEvent.getItem().getPath() );
+            deletionService.get().deleteRpm( itemEvent.getRepository(), itemEvent.getItem().getPath() );
         }
         else if ( isCollectionItem( itemEvent ) )
         {
-            deletionService.deleteDirectory( itemEvent.getRepository(), itemEvent.getItem().getPath() );
+            deletionService.get().deleteDirectory( itemEvent.getRepository(), itemEvent.getItem().getPath() );
         }
     }
 
@@ -111,7 +124,7 @@ public class RpmRepositoryEventsHandler
 
     private boolean isRpmItemEvent( RepositoryItemEvent itemEvent )
     {
-        return repositoryRegistry.isRegistered( itemEvent.getRepository() )
+        return yumRepositories.get().isRegistered( itemEvent.getRepository() )
             && itemEvent.getItem().getPath().endsWith( ".rpm" );
     }
 
@@ -120,4 +133,5 @@ public class RpmRepositoryEventsHandler
         String[] parts = item.getParentPath().split( "/" );
         return parts[parts.length - 1];
     }
+
 }

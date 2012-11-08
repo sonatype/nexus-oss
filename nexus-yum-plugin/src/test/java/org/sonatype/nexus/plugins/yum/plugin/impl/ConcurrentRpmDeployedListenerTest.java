@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
+import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -69,7 +69,7 @@ public class ConcurrentRpmDeployedListenerTest
     private RpmRepositoryEventsHandler handler;
 
     @Inject
-    private RepositoryRegistry repositoryRegistry;
+    private YumRepositories repositoryRegistry;
 
     @Inject
     private YumConfiguration yumConfig;

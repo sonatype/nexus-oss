@@ -44,6 +44,7 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @SuppressWarnings( "unchecked" )
 public class YumMetadataGenerationTaskTest
@@ -107,12 +108,11 @@ public class YumMetadataGenerationTaskTest
     {
         // given
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
-            null,
+            mock( EventBus.class ),
             repoRegistry(),
-            null,
-            null
+            mock( YumConfiguration.class ),
+            mock( RepositoryURLBuilder.class )
         );
-        setField( task, "repositoryRegistry", repoRegistry() );
         task.setRpmDir( RPM_DIR.getAbsolutePath() );
         task.setRpmUrl( RPM_URL );
         // when
@@ -128,9 +128,9 @@ public class YumMetadataGenerationTaskTest
     {
         // given
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
-            null,
+            mock( EventBus.class ),
             repoRegistry(),
-            null,
+            mock( YumConfiguration.class ),
             repositoryURLBuilder()
         );
         task.setRepositoryId( REPO );
