@@ -21,7 +21,7 @@ import javax.ws.rs.Path;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
@@ -55,7 +55,7 @@ public class VersionedYumRepositoryResource
     private YumRepositories repositoryRegistry;
 
     @Inject
-    private YumConfiguration aliasMapper;
+    private YumPluginConfiguration aliasMapper;
 
     @Inject
     private YumService yumService;

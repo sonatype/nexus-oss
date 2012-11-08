@@ -36,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.execution.CommandLineExecutor;
 import org.sonatype.nexus.plugins.yum.plugin.event.YumRepositoryGenerateEvent;
 import org.sonatype.nexus.plugins.yum.repository.ListFileFactory;
@@ -94,7 +94,7 @@ public class YumMetadataGenerationTask
 
     private final RepositoryRegistry repositoryRegistry;
 
-    private final YumConfiguration yumConfig;
+    private final YumPluginConfiguration yumConfig;
 
     private final RepositoryURLBuilder repositoryURLBuilder;
 
@@ -110,7 +110,7 @@ public class YumMetadataGenerationTask
     @Inject
     public YumMetadataGenerationTask( final EventBus eventBus,
                                       final RepositoryRegistry repositoryRegistry,
-                                      final YumConfiguration yumConfig,
+                                      final YumPluginConfiguration yumConfig,
                                       final RepositoryURLBuilder repositoryURLBuilder )
     {
         super( null );

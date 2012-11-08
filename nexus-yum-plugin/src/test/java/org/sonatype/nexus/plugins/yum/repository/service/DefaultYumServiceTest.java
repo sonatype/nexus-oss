@@ -26,7 +26,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -51,7 +51,7 @@ public class DefaultYumServiceTest
     private YumRepositories repositoryRegistry;
 
     @Inject
-    private YumConfiguration yumConfig;
+    private YumPluginConfiguration yumConfig;
 
     @Before
     public void activateService()

@@ -35,7 +35,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -60,7 +60,7 @@ public class RepositoryVersionAliasResourceTest
     private PlexusResource resource;
 
     @Inject
-    private YumConfiguration yumConfiguration;
+    private YumPluginConfiguration yumConfiguration;
 
     @Before
     public void loadYumConfig()

@@ -19,7 +19,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -37,7 +37,7 @@ public class RpmRepositoryEventsHandlerTest
     private YumRepositories repositoryRegistry;
 
     @Inject
-    private YumConfiguration yumConfig;
+    private YumPluginConfiguration yumConfig;
 
     @Before
     public void activateRepo()

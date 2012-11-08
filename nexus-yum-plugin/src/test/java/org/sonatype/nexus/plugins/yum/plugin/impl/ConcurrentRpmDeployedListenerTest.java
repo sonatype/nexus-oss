@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
@@ -72,7 +72,7 @@ public class ConcurrentRpmDeployedListenerTest
     private YumRepositories repositoryRegistry;
 
     @Inject
-    private YumConfiguration yumConfig;
+    private YumPluginConfiguration yumConfig;
 
     @Before
     public void activateRepo()

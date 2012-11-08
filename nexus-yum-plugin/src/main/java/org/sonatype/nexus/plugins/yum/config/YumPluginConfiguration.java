@@ -17,7 +17,7 @@ import java.io.File;
 import org.sonatype.nexus.plugins.yum.config.domain.XmlYumConfiguration;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
 
-public interface YumConfiguration
+public interface YumPluginConfiguration
 {
     public String getVersion( String repositoryId, String alias )
         throws AliasNotFoundException;

@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
 import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -42,7 +42,7 @@ public class DefaultDeletionService
     private static final int MAX_EXECUTION_COUNT = 100;
 
     @Inject
-    private YumConfiguration configuration;
+    private YumPluginConfiguration configuration;
 
     @Inject
     private YumService yumService;

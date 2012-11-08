@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -110,7 +110,7 @@ public class YumMetadataGenerationTaskTest
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
             mock( EventBus.class ),
             repoRegistry(),
-            mock( YumConfiguration.class ),
+            mock( YumPluginConfiguration.class ),
             mock( RepositoryURLBuilder.class )
         );
         task.setRpmDir( RPM_DIR.getAbsolutePath() );
@@ -130,7 +130,7 @@ public class YumMetadataGenerationTaskTest
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
             mock( EventBus.class ),
             repoRegistry(),
-            mock( YumConfiguration.class ),
+            mock( YumPluginConfiguration.class ),
             repositoryURLBuilder()
         );
         task.setRepositoryId( REPO );
@@ -203,7 +203,7 @@ public class YumMetadataGenerationTaskTest
         task.setAddedFiles( null );
         task.setSingleRpmPerDirectory( true );
 
-        final YumConfiguration yumConfig = mock( YumConfiguration.class );
+        final YumPluginConfiguration yumConfig = mock( YumPluginConfiguration.class );
         when( yumConfig.getMaxParallelThreadCount() ).thenReturn( 10 );
         setField( task, "yumConfig", yumConfig );
         return task;

@@ -22,12 +22,11 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.plugin.impl.DefaultDeletionService;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 
 public class DefaultDeletionServiceTest
@@ -57,7 +56,7 @@ public class DefaultDeletionServiceTest
         yumService = mock( YumService.class );
         service = new DefaultDeletionService();
         setField( service, "yumService", yumService );
-        YumConfiguration config = mock( YumConfiguration.class );
+        YumPluginConfiguration config = mock( YumPluginConfiguration.class );
         when( config.isDeleteProcessing() ).thenReturn( true );
         when( config.getDelayAfterDeletion() ).thenReturn( TIMEOUT_IN_SEC );
         setField( service, "configuration", config );

@@ -22,7 +22,7 @@ import java.net.URL;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.plugins.yum.repository.task.TaskDoubledException;
@@ -46,7 +46,7 @@ public class DefaultYumService
     private NexusScheduler nexusScheduler;
 
     @Requirement
-    private YumConfiguration yumConfig;
+    private YumPluginConfiguration yumConfig;
 
     private final YumRepositoryCache cache = new YumRepositoryCache();
 

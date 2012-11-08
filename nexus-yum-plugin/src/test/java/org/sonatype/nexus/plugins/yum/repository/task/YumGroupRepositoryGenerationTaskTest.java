@@ -34,7 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -126,7 +126,7 @@ public class YumGroupRepositoryGenerationTaskTest
     {
         YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
         task.setGroupRepository( groupRepo );
-        final YumConfiguration yumConfig = mock( YumConfiguration.class );
+        final YumPluginConfiguration yumConfig = mock( YumPluginConfiguration.class );
         when( yumConfig.isActive() ).thenReturn( true );
         setField( task, "yumConfig", yumConfig );
         task.doRun();

@@ -33,7 +33,7 @@ import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -59,7 +59,7 @@ public class VersionedYumRepositoryResourceTest
     private YumRepositories repositoryRegistry;
 
     @Inject
-    private YumConfiguration aliasMapper;
+    private YumPluginConfiguration aliasMapper;
 
     private MavenRepository repository;
 

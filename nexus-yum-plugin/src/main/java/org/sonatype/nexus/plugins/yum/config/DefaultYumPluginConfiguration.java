@@ -36,13 +36,13 @@ import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
 import org.sonatype.nexus.plugins.yum.version.alias.domain.AliasKey;
 import org.sonatype.nexus.plugins.yum.version.alias.domain.AliasMapping;
 
-@Component( role = YumConfiguration.class )
-public class DefaultYumConfiguration
-    implements YumConfiguration, Initializable
+@Component( role = YumPluginConfiguration.class )
+public class DefaultYumPluginConfiguration
+    implements YumPluginConfiguration, Initializable
 {
     public static final String YUM_XML = "yum.xml";
 
-    private static final Logger log = LoggerFactory.getLogger( DefaultYumConfiguration.class );
+    private static final Logger log = LoggerFactory.getLogger( DefaultYumPluginConfiguration.class );
 
     private static final Object LOAD_WRITE_MUTEX = new Object();
 
@@ -65,7 +65,7 @@ public class DefaultYumConfiguration
 
     private File configFile;
 
-    public DefaultYumConfiguration()
+    public DefaultYumPluginConfiguration()
         throws JAXBException
     {
         final JAXBContext jc = JAXBContext.newInstance( XmlYumConfiguration.class, AliasMapping.class );
