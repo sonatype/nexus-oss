@@ -22,10 +22,11 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusErrorMessageException;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
+import org.sonatype.nexus.client.core.spi.rest.jersey.UniformRequestBuilder;
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.internal.rest.AbstractXStreamNexusClient;
-import org.sonatype.nexus.client.internal.rest.jersey.NexusJerseyUniformInterface;
+import org.sonatype.nexus.client.internal.rest.jersey.NexusUniformRequestBuilder;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.rest.model.StatusResource;
@@ -89,32 +90,32 @@ public class JerseyNexusClient
         return resolvePath( "service/local/" + path );
     }
 
-    public UniformInterface serviceResource( final String uri )
+    public UniformRequestBuilder serviceResource( final String uri )
     {
-        return new NexusJerseyUniformInterface(
+        return new NexusUniformRequestBuilder(
             getClient().resource( resolveServicePath( uri ) ).type( getMediaType() ).accept( getMediaType() )
         );
     }
 
-    public UniformInterface serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public UniformRequestBuilder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return new NexusJerseyUniformInterface(
+        return new NexusUniformRequestBuilder(
             getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).type(
                 getMediaType() ).accept(
                 getMediaType() )
         );
     }
 
-    public UniformInterface uri( final String uri )
+    public UniformRequestBuilder uri( final String uri )
     {
-        return new NexusJerseyUniformInterface(
+        return new NexusUniformRequestBuilder(
             getClient().resource( resolvePath( uri ) ).getRequestBuilder()
         );
     }
 
-    public UniformInterface uri( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public UniformRequestBuilder uri( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return new NexusJerseyUniformInterface(
+        return new NexusUniformRequestBuilder(
             getClient().resource( resolvePath( uri ) ).queryParams( queryParameters ).getRequestBuilder()
         );
     }

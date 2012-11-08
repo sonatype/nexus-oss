@@ -38,11 +38,11 @@
   </dependencies>
 
   <modules>
-    <module>nexus-indexer-lucene-plugin-parent</module>
+    <module>indexer</module>
+    <module>ldap</module>
     <module>nexus-timeline-plugin</module>
     <module>nexus-lvo-plugin</module>
     <module>nexus-plugin-console-plugin</module>
-    <module>nexus-ldap-plugin-parent</module>
     <module>nexus-rrb-plugin</module>
     <module>nexus-core-documentation-plugin</module>
     <module>nexus-archetype-plugin</module>
