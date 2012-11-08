@@ -98,15 +98,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-core-documentation-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
       <version>${project.version}</version>
@@ -194,14 +185,6 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-plugin-console-plugin</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-core-documentation-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
