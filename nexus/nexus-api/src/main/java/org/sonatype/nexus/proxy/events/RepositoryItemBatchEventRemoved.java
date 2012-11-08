@@ -10,45 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core.subsystem.security;
+package org.sonatype.nexus.proxy.events;
 
-import java.util.List;
+import java.util.Collection;
 
-import org.sonatype.nexus.client.core.subsystem.Entity;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * A Nexus user.
- *
+ * Event fired when a removal of a batch of items is to be announced.
+ * 
+ * @author cstamas
  * @since 2.3
  */
-public interface User
-    extends Entity<User>
+public class RepositoryItemBatchEventRemoved
+    extends RepositoryItemBatchEvent
 {
-
-    String firstName();
-
-    String lastName();
-
-    String email();
-
-    boolean isActive();
-
-    List<String> roles();
-
-    User withPassword( String value );
-
-    User withFirstName( String value );
-
-    User withLastName( String value );
-
-    User withEmail( String value );
-
-    User enableAccess();
-
-    User disableAccess();
-
-    User withRole( String value );
-
-    User removeRole( String value );
-
+    /**
+     * Constructor.
+     * 
+     * @param repository
+     * @param itemPaths
+     */
+    public RepositoryItemBatchEventRemoved( final Repository repository, final Collection<String> itemPaths )
+    {
+        super( repository, itemPaths );
+    }
 }

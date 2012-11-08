@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,8 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
+package org.sonatype.nexus.proxy.events;
 
-define('sonatype/headlinks',['../extjs', 'sonatype'], function(Ext, Sonatype){
-  return Sonatype;
-});
+import java.util.Collection;
+
+import org.sonatype.nexus.proxy.repository.Repository;
+
+/**
+ * Event fired when addition of a batch of items is to be announced.
+ * 
+ * @author cstamas
+ * @since 2.3
+ */
+public class RepositoryItemBatchEventAdded
+    extends RepositoryItemBatchEvent
+{
+    /**
+     * Constructor.
+     * 
+     * @param repository
+     * @param itemPaths
+     */
+    public RepositoryItemBatchEventAdded( final Repository repository, final Collection<String> itemPaths )
+    {
+        super( repository, itemPaths );
+    }
+}

@@ -39,6 +39,11 @@ public class JerseyRole
         super( nexusClient, id );
     }
 
+    public JerseyRole( final JerseyNexusClient nexusClient, final String id, final RoleResource settings )
+    {
+        super( nexusClient, id, settings );
+    }
+
     @Override
     protected RoleResource createSettings( final String id )
     {
