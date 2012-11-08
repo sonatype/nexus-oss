@@ -24,17 +24,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
+import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * AuthorizationManager that wraps roles from security-xml-realm.
@@ -51,16 +51,16 @@ public class SecurityXmlAuthorizationManager
 
     private final PrivilegeInheritanceManager privInheritance;
 
-    private final ApplicationEventMulticaster eventMulticaster;
+    private final EventBus eventBus;
 
     @Inject
     public SecurityXmlAuthorizationManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
                                             PrivilegeInheritanceManager privInheritance,
-                                            ApplicationEventMulticaster eventMulticaster )
+                                            EventBus eventBus )
     {
         this.configuration = configuration;
         this.privInheritance = privInheritance;
-        this.eventMulticaster = eventMulticaster;
+        this.eventBus = eventBus;
     }
 
     public String getSource()
@@ -312,7 +312,7 @@ public class SecurityXmlAuthorizationManager
 
     private void fireAuthorizationChangedEvent()
     {
-        this.eventMulticaster.notifyEventListeners( new AuthorizationConfigurationChangedEvent( null ) );
+        this.eventBus.post( new AuthorizationConfigurationChanged() );
     }
 
 }

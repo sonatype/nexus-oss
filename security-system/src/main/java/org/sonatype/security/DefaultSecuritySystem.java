@@ -44,9 +44,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
@@ -56,9 +53,9 @@ import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.email.NullSecurityEmailer;
 import org.sonatype.security.email.SecurityEmailer;
-import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
-import org.sonatype.security.events.SecurityConfigurationChangedEvent;
-import org.sonatype.security.events.UserPrincipalsExpiredEvent;
+import org.sonatype.security.events.AuthorizationConfigurationChanged;
+import org.sonatype.security.events.SecurityConfigurationChanged;
+import org.sonatype.security.events.UserPrincipalsExpired;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.PasswordGenerator;
@@ -71,6 +68,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * This implementation wraps a Shiro SecurityManager, and adds user management.
@@ -79,7 +78,7 @@ import org.sonatype.sisu.ehcache.CacheManagerComponent;
 @Typed( SecuritySystem.class )
 @Named( "default" )
 public class DefaultSecuritySystem
-    implements SecuritySystem, EventListener
+    implements SecuritySystem
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
@@ -97,7 +96,7 @@ public class DefaultSecuritySystem
 
     private PasswordGenerator passwordGenerator;
 
-    private ApplicationEventMulticaster eventMulticaster;
+    private EventBus eventBus;
 
     private List<SecurityEmailer> securityEmailers;
 
@@ -106,7 +105,7 @@ public class DefaultSecuritySystem
     private static final String ALL_ROLES_KEY = "all";
 
     @Inject
-    public DefaultSecuritySystem( List<SecurityEmailer> securityEmailers, ApplicationEventMulticaster eventMulticaster,
+    public DefaultSecuritySystem( List<SecurityEmailer> securityEmailers, EventBus eventBus,
                                   PasswordGenerator passwordGenerator,
                                   Map<String, AuthorizationManager> authorizationManagers, Map<String, Realm> realmMap,
                                   SecurityConfigurationManager securityConfiguration,
@@ -114,7 +113,7 @@ public class DefaultSecuritySystem
                                   CacheManagerComponent cacheManagerComponent, UserManagerFacade userManagerFacade )
     {
         this.securityEmailers = securityEmailers;
-        this.eventMulticaster = eventMulticaster;
+        this.eventBus = eventBus;
         this.passwordGenerator = passwordGenerator;
         this.authorizationManagers = authorizationManagers;
         this.realmMap = realmMap;
@@ -122,7 +121,7 @@ public class DefaultSecuritySystem
         this.securityManagers = securityManagers;
         this.cacheManagerComponent = cacheManagerComponent;
 
-        this.eventMulticaster.addEventListener( this );
+        this.eventBus.register( this );
         this.userManagerFacade = userManagerFacade;
         SecurityUtils.setSecurityManager( this.getSecurityManager() );
     }
@@ -398,7 +397,7 @@ public class DefaultSecuritySystem
         }
 
         // clear the realm caches
-        this.eventMulticaster.notifyEventListeners( new AuthorizationConfigurationChangedEvent( null ) );
+        this.eventBus.post( new AuthorizationConfigurationChanged() );
 
         return user;
     }
@@ -424,7 +423,7 @@ public class DefaultSecuritySystem
         UserManager userManager = userManagerFacade.getUserManager( source );
         userManager.deleteUser( userId );
 
-        this.eventMulticaster.notifyEventListeners( new UserPrincipalsExpiredEvent( null, userId, source ) );
+        this.eventBus.post( new UserPrincipalsExpired( userId, source ) );
     }
 
     public Set<RoleIdentifier> getUsersRoles( String userId, String source )
@@ -940,20 +939,19 @@ public class DefaultSecuritySystem
         }
     }
 
-    public void onEvent( Event<?> evt )
+    @Subscribe
+    public void onEvent( final AuthorizationConfigurationChanged evt )
     {
-        if ( AuthorizationConfigurationChangedEvent.class.isInstance( evt ) )
-        {
-            this.clearRealmCaches();
-        }
+        this.clearRealmCaches();
+    }
 
-        if ( SecurityConfigurationChangedEvent.class.isInstance( evt ) )
-        {
-            this.clearRealmCaches();
-            this.securityConfiguration.clearCache();
+    @Subscribe
+    public void onEvent( final SecurityConfigurationChanged evt )
+    {
+        this.clearRealmCaches();
+        this.securityConfiguration.clearCache();
 
-            this.setSecurityManagerRealms();
-        }
+        this.setSecurityManagerRealms();
     }
 
     public RealmSecurityManager getSecurityManager()
