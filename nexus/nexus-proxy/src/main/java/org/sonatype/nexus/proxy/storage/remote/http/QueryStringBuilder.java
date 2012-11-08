@@ -10,21 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.remote.http;
-
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
+ * Constructs optional query-string to append to requests.
+ *
  * This class is part of Nexus internal implementation and can be changed or removed without prio notice.
- * 
+ *
  * @since 2.2
  */
 @Named
@@ -34,37 +38,41 @@ public class QueryStringBuilder
     private final List<QueryStringContributor> queryParameterContributors;
 
     @Inject
-    public QueryStringBuilder( List<QueryStringContributor> queryParameterContributors )
-    {
-        this.queryParameterContributors = queryParameterContributors;
+    public QueryStringBuilder(final List<QueryStringContributor> queryParameterContributors) {
+        this.queryParameterContributors = checkNotNull(queryParameterContributors);
     }
 
-    public String getQueryString( RemoteStorageContext ctx, ProxyRepository repository )
-    {
-        final StringBuilder result = new StringBuilder();
+    public String getQueryString(final RemoteStorageContext ctx, final ProxyRepository repository) {
+        checkNotNull(ctx);
+        checkNotNull(repository);
 
+        final StringBuilder result = new StringBuilder();
         final String configuredQueryString = ctx.getRemoteConnectionSettings().getQueryString();
 
-        if ( StringUtils.isNotBlank( configuredQueryString ) )
-        {
-            result.append( configuredQueryString );
+        if (StringUtils.isNotBlank(configuredQueryString)) {
+            result.append(configuredQueryString);
         }
 
-        for ( QueryStringContributor contributor : queryParameterContributors )
-        {
-            String contributedQueryString = contributor.getQueryString( ctx, repository );
-            if ( StringUtils.isNotBlank( contributedQueryString ) )
-            {
-                if ( StringUtils.isNotBlank( result.toString() ) )
-                {
-                    result.append( '&' );
+        for (QueryStringContributor contributor : queryParameterContributors) {
+            String contributedQueryString = contributor.getQueryString(ctx, repository);
+            if (StringUtils.isNotBlank(contributedQueryString)) {
+                if (StringUtils.isNotBlank(result.toString())) {
+                    result.append('&');
                 }
-                result.append( contributedQueryString );
+                result.append(contributedQueryString);
             }
         }
 
         final String resultStr = result.toString();
 
-        return StringUtils.isNotBlank( resultStr ) ? resultStr : null;
+        return StringUtils.isNotBlank(resultStr) ? resultStr : null;
+    }
+
+    /**
+     * @since 2.3
+     */
+    public String getQueryString(final ProxyRepository repository) {
+        checkNotNull(repository);
+        return getQueryString(repository.getRemoteStorageContext(), repository);
     }
 }
