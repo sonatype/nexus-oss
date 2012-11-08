@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -52,7 +53,7 @@ public class YumGroupRepositoryGenerationTaskTest
 
     private static final File REPO_DIR2 = new File( BASE_REPO_DIR + "/repo2" );
 
-    private static final File GROUP_REPO_DIR = new File( "target/tmp/group-repo" );
+    private static final File GROUP_REPO_DIR = AbstractYumNexusTestCase.UTIL.resolveFile( "target/tmp/group-repo" );
 
     private static final String REPO_ID = "group-repo-id";
 

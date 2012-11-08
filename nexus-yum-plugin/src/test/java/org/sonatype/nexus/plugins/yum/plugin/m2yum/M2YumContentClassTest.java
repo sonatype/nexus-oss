@@ -16,11 +16,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.plugin.m2yum.M2YumContentClass;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-
-import com.sonatype.nexus.staging.api.AbstractStagingProfilePlexusResource;
 
 public class M2YumContentClassTest
 {
@@ -34,11 +31,4 @@ public class M2YumContentClassTest
         assertThat( m2yum.isCompatible( new Maven2ContentClass() ), is( true ) );
     }
 
-    @Test
-    public void shouldDetectStagingRepoValidation()
-        throws Exception
-    {
-        final AbstractStagingProfilePlexusResource resource = new AbstractStagingProfilePlexusResource();
-        assertThat( resource.validateProfile(), is( "maven2" ) );
-    }
 }

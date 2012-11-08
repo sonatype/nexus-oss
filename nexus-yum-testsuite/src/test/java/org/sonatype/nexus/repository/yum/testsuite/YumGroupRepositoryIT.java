@@ -26,6 +26,7 @@ import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.repository.yum.client.YumGroupRepository;
+import org.sonatype.nexus.test.os.IgnoreOn;
 import org.sonatype.nexus.test.os.OsTestRule;
 
 public class YumGroupRepositoryIT
@@ -41,6 +42,7 @@ public class YumGroupRepositoryIT
     }
 
     @Test
+    @IgnoreOn( "mac" )
     public void shouldRegenerateRepoAfterUpload()
         throws Exception
     {
@@ -52,6 +54,7 @@ public class YumGroupRepositoryIT
     }
 
     @Test
+    @IgnoreOn( "mac" )
     public void shouldRegenerateGroupRepoWhenMemberRepoIsRemoved()
         throws Exception
     {
@@ -66,6 +69,7 @@ public class YumGroupRepositoryIT
     }
 
     @Test
+    @IgnoreOn( "mac" )
     public void shouldRegenerateGroupRepoWhenMemberRepoIsAdded()
         throws Exception
     {
