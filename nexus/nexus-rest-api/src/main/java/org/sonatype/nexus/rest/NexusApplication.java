@@ -18,7 +18,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Directory;
-import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.service.StatusService;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
@@ -26,16 +25,15 @@ import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.RetargetableRestlet;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.web.ProtectedPathManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.eventbus.Subscribe;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -47,10 +45,9 @@ import com.thoughtworks.xstream.XStream;
 @Component( role = Application.class, hint = "nexus" )
 public class NexusApplication
     extends PlexusRestletApplicationBridge
-    implements EventListener
 {
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     @Requirement
     private ProtectedPathManager protectedPathManager;
@@ -88,20 +85,17 @@ public class NexusApplication
     @Requirement( role = StatusService.class )
     private StatusService statusService;
 
-    /**
-     * Listener.
-     */
-    public void onEvent( Event<?> evt )
+    @Subscribe
+    public void onEvent( final NexusStartedEvent evt )
     {
-        if ( NexusStartedEvent.class.isAssignableFrom( evt.getClass() ) )
-        {
-            recreateRoot( true );
-            afterCreateRoot( (RetargetableRestlet) getRoot() );
-        }
-        else if ( NexusStoppedEvent.class.isAssignableFrom( evt.getClass() ) )
-        {
-            recreateRoot( false );
-        }
+        recreateRoot( true );
+        afterCreateRoot( (RetargetableRestlet) getRoot() );
+    }
+
+    @Subscribe
+    public void onEvent( final NexusStoppedEvent evt )
+    {
+        recreateRoot( false );
     }
 
     /**
@@ -114,7 +108,7 @@ public class NexusApplication
         getRangeService().setEnabled( false );
 
         // adding ourselves as listener
-        applicationEventMulticaster.addEventListener( this );
+        eventBus.register( this );
     }
 
     /**

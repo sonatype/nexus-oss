@@ -18,7 +18,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Preconditions;
 
@@ -31,14 +31,14 @@ import com.google.common.base.Preconditions;
 public class DeletionNotifierWalker
     extends AbstractWalkerProcessor
 {
-    private final ApplicationEventMulticaster applicationEventMulticaster;
+    private final EventBus eventBus;
 
     private final ResourceStoreRequest request;
 
-    public DeletionNotifierWalker( final ApplicationEventMulticaster applicationEventMulticaster,
+    public DeletionNotifierWalker( final EventBus eventBus,
                                    final ResourceStoreRequest request )
     {
-        this.applicationEventMulticaster = Preconditions.checkNotNull( applicationEventMulticaster );
+        this.eventBus = Preconditions.checkNotNull( eventBus );
         this.request = Preconditions.checkNotNull( request );
     }
 
@@ -52,8 +52,7 @@ public class DeletionNotifierWalker
             item.getItemContext().setParentContext( request.getRequestContext() );
 
             // just fire it, and someone will eventually catch it
-            applicationEventMulticaster.notifyEventListeners( new RepositoryItemEventDeleteItem(
-                context.getRepository(), item ) );
+            eventBus.post( new RepositoryItemEventDeleteItem( context.getRepository(), item ) );
         }
     }
 }

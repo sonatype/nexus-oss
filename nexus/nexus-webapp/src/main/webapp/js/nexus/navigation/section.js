@@ -39,6 +39,8 @@ Sonatype.navigation.Section = function(cfg) {
         layout : 'fit',
         frame : true,
         autoHeight : true,
+        hideMode : 'offsets',
+        animCollapse : false,
         listeners : {
           collapse : this.collapseExpandHandler,
           expand : this.collapseExpandHandler,

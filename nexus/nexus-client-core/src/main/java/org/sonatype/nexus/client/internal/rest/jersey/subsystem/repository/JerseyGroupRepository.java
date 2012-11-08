@@ -12,7 +12,11 @@
  */
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -130,13 +134,47 @@ public class JerseyGroupRepository<T extends GroupRepository>
     @Override
     public T ofRepositories( final String... memberRepositoryIds )
     {
-        for ( final String memberRepositoryId : memberRepositoryIds )
+        checkNotNull( memberRepositoryIds );
+        ensureMemberListsIsValid();
+        settings().getRepositories().clear();
+        return addMember( memberRepositoryIds );
+    }
+
+    @Override
+    public T addMember( final String... memberRepositoryIds )
+    {
+        ensureMemberListsIsValid();
+        for ( final String memberRepositoryId : checkNotNull( memberRepositoryIds ) )
         {
             final RepositoryGroupMemberRepository repository = new RepositoryGroupMemberRepository();
             repository.setId( memberRepositoryId );
             settings().addRepository( repository );
         }
         return me();
+    }
+
+    @Override
+    public T removeMember( final String... memberRepositoryIds )
+    {
+        final List<String> toRemove = Arrays.asList( checkNotNull( memberRepositoryIds ) );
+        ensureMemberListsIsValid();
+        final Iterator<RepositoryGroupMemberRepository> it = settings().getRepositories().iterator();
+        while ( it.hasNext() )
+        {
+            if ( toRemove.contains( it.next().getId() ) )
+            {
+                it.remove();
+            }
+        }
+        return me();
+    }
+
+    private void ensureMemberListsIsValid()
+    {
+        if ( settings().getRepositories() == null )
+        {
+            settings().setRepositories( Lists.<RepositoryGroupMemberRepository>newArrayList() );
+        }
     }
 
 }

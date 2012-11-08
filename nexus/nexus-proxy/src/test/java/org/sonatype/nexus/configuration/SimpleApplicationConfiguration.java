@@ -25,7 +25,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.test.NexusTestSupport;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public abstract class SimpleApplicationConfiguration
 {
 
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     private Configuration configuration;
 
@@ -123,9 +123,9 @@ public abstract class SimpleApplicationConfiguration
         throws IOException
     {
         // send events out, but nothing else
-        applicationEventMulticaster.notifyEventListeners( new ConfigurationPrepareForSaveEvent( this ) );
-        applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
-        applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
+        eventBus.post( new ConfigurationPrepareForSaveEvent( this ) );
+        eventBus.post( new ConfigurationCommitEvent( this ) );
+        eventBus.post( new ConfigurationSaveEvent( this ) );
     }
 
     public boolean isSecurityEnabled()

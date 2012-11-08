@@ -13,6 +13,7 @@
 package org.sonatype.nexus.client.testsuite;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -174,6 +175,25 @@ public class RepositoriesIT
         repositories().create( MavenGroupRepository.class, id )
             .ofRepositories( "central", "releases", "snapshots" )
             .save();
+    }
+
+    @Test
+    public void groupMembersOperations()
+    {
+        final String id = repositoryIdForTest();
+        final MavenGroupRepository repository = repositories().create( MavenGroupRepository.class, id )
+            .ofRepositories( "central", "releases", "snapshots" );
+
+        assertThat( repository.memberRepositories(), contains( "central", "releases", "snapshots" ) );
+
+        repository.ofRepositories( "central", "releases" );
+        assertThat( repository.memberRepositories(), contains( "central", "releases" ) );
+
+        repository.addMember( "snapshots" );
+        assertThat( repository.memberRepositories(), contains( "central", "releases", "snapshots" ) );
+
+        repository.removeMember( "releases" );
+        assertThat( repository.memberRepositories(), contains( "central", "snapshots" ) );
     }
 
     @Test

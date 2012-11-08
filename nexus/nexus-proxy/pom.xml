@@ -45,14 +45,6 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-velocity</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.plexus.appevents</groupId>
-      <artifactId>plexus-app-events-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.plexus.appevents</groupId>
-      <artifactId>simple-event-multicaster</artifactId>
-    </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>

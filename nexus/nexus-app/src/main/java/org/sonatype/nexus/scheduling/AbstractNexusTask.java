@@ -24,13 +24,13 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractSchedulerTask<T>
@@ -39,7 +39,7 @@ public abstract class AbstractNexusTask<T>
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     protected AbstractNexusTask()
     {
@@ -60,7 +60,7 @@ public abstract class AbstractNexusTask<T>
 
     protected void notifyEventListeners( final Event<?> event )
     {
-        applicationEventMulticaster.notifyEventListeners( event );
+        eventBus.post( event );
     }
     
     // TODO: finish this thread!
@@ -143,7 +143,7 @@ public abstract class AbstractNexusTask<T>
 
         // fire event
         final NexusTaskEventStarted<T> startedEvent = new NexusTaskEventStarted<T>( this );
-        applicationEventMulticaster.notifyEventListeners( startedEvent );
+        eventBus.post( startedEvent );
 
         T result = null;
 
@@ -161,14 +161,13 @@ public abstract class AbstractNexusTask<T>
             {
                 getLogger().info( getLoggedMessage( "canceled", started ) );
 
-                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedCanceled<T>( this,
-                    startedEvent ) );
+                eventBus.post( new NexusTaskEventStoppedCanceled<T>( this, startedEvent ) );
             }
             else
             {
                 getLogger().info( getLoggedMessage( "finished", started ) );
 
-                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedDone<T>( this, startedEvent ) );
+                eventBus.post( new NexusTaskEventStoppedDone<T>( this, startedEvent ) );
             }
 
             afterRun();
@@ -184,8 +183,7 @@ public abstract class AbstractNexusTask<T>
                 getLogger().info( getLoggedMessage( "canceled", started ) );
 
                 // just return, nothing happened just task cancelled
-                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedCanceled<T>( this,
-                    startedEvent ) );
+                eventBus.post( new NexusTaskEventStoppedCanceled<T>( this, startedEvent ) );
 
                 return null;
             }
@@ -194,8 +192,7 @@ public abstract class AbstractNexusTask<T>
                 getLogger().warn( getLoggedMessage( "failed", started ), e );
 
                 // notify that there was a failure
-                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedFailed<T>( this,
-                    startedEvent, e ) );
+                eventBus.post( new NexusTaskEventStoppedFailed<T>( this, startedEvent, e ) );
 
                 throw e;
             }

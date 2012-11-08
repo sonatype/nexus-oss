@@ -61,8 +61,8 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.ClasspathDependency;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -81,7 +81,7 @@ public class DefaultNexusPluginManager
 
     private final PluginRepositoryManager repositoryManager;
 
-    private final ApplicationEventMulticaster eventMulticaster;
+    private final EventBus eventBus;
 
     private final RepositoryTypeRegistry repositoryTypeRegistry;
 
@@ -99,14 +99,14 @@ public class DefaultNexusPluginManager
 
     @Inject
     public DefaultNexusPluginManager( final RepositoryTypeRegistry repositoryTypeRegistry,
-                                      final ApplicationEventMulticaster eventMulticaster,
+                                      final EventBus eventBus,
                                       final PluginRepositoryManager repositoryManager,
                                       final DefaultPlexusContainer container,
                                       final MimeSupport mimeSupport,
                                       final @Parameters Map<String, String> variables )
     {
         this.repositoryTypeRegistry = checkNotNull( repositoryTypeRegistry );
-        this.eventMulticaster = checkNotNull( eventMulticaster );
+        this.eventBus = checkNotNull( eventBus );
         this.repositoryManager = checkNotNull( repositoryManager );
         this.container = checkNotNull( container );
         this.mimeSupport = checkNotNull( mimeSupport );
@@ -534,6 +534,6 @@ public class DefaultNexusPluginManager
         response.addPluginResponse( result );
         pluginResponses.put( gav, result );
 
-        eventMulticaster.notifyEventListeners( pluginEvent );
+        eventBus.post( pluginEvent );
     }
 }

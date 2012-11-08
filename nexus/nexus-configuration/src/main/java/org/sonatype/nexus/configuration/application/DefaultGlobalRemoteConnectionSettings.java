@@ -166,7 +166,7 @@ public class DefaultGlobalRemoteConnectionSettings
 
         if ( wasDirty )
         {
-            getApplicationEventMulticaster().notifyEventListeners( new GlobalRemoteConnectionSettingsChangedEvent( this ) );
+            eventBus().post( new GlobalRemoteConnectionSettingsChangedEvent( this ) );
         }
 
         return wasDirty;

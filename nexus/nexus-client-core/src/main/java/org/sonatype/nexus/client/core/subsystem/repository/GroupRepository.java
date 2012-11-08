@@ -28,9 +28,25 @@ public interface GroupRepository<T extends GroupRepository>
     /**
      * Configures member repositories. Provided member repositories will replace exiting members (if any).
      *
-     * @param memberRepositoryIds id of member repositories to be added (cannot be null)
+     * @param memberRepositoryIds ids of member repositories (cannot be null)
      * @return itself, for fluent api usage
      */
     T ofRepositories( String... memberRepositoryIds );
+
+    /**
+     * Adds member repositories at the end of list of current repositories.
+     *
+     * @param memberRepositoryIds ids of member repositories to be added (cannot be null)
+     * @return itself, for fluent api usage
+     */
+    T addMember( String... memberRepositoryIds );
+
+    /**
+     * Removed member repositories from the list of current repositories.
+     *
+     * @param memberRepositoryIds ids of member repositories to be removed (cannot be null)
+     * @return itself, for fluent api usage
+     */
+    T removeMember( String... memberRepositoryIds );
 
 }

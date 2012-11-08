@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRoot;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * NXCM-3747 Test: implementation separates the events sent out when deleting a collection, making a distinction about
@@ -58,7 +59,7 @@ public class DeleteEventsTest
 
         // install listener
         final DeleteEventsListener listener = new DeleteEventsListener();
-        getApplicationEventMulticaster().addEventListener( listener );
+        eventBus().register( listener );
 
         // perform delete
         repo1.deleteItem( new ResourceStoreRequest( "/org" ) );
@@ -87,7 +88,7 @@ public class DeleteEventsTest
 
         // install listener
         final DeleteEventsListener listener = new DeleteEventsListener();
-        getApplicationEventMulticaster().addEventListener( listener );
+        eventBus().register( listener );
 
         // perform delete
         repo1.deleteItem( new ResourceStoreRequest( "/org" ) );
@@ -108,7 +109,7 @@ public class DeleteEventsTest
 
         // install listener
         final DeleteEventsListener listener = new DeleteEventsListener();
-        getApplicationEventMulticaster().addEventListener( listener );
+        eventBus().register( listener );
 
         // perform delete
         repo1.deleteItem( new ResourceStoreRequest( "/spoof/maven-metadata.xml" ) );
@@ -122,7 +123,6 @@ public class DeleteEventsTest
     // ==
 
     public static class DeleteEventsListener
-        implements EventListener
     {
         private final List<RepositoryItemEventDelete> deleteEvents;
 
@@ -136,13 +136,10 @@ public class DeleteEventsTest
             return deleteEvents;
         }
 
-        @Override
-        public void onEvent( Event<?> evt )
+        @Subscribe
+        public void onEvent( RepositoryItemEventDelete evt )
         {
-            if ( evt instanceof RepositoryItemEventDelete )
-            {
-                deleteEvents.add( (RepositoryItemEventDelete) evt );
-            }
+            deleteEvents.add( (RepositoryItemEventDelete) evt );
         }
     }
 

@@ -37,8 +37,8 @@ import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
@@ -62,7 +62,7 @@ public class NexusHttpAuthenticationFilter
     private SecuritySystem securitySystem;
 
     @Inject
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     @Deprecated
     protected PlexusContainer getPlexusContainer()
@@ -287,10 +287,15 @@ public class NexusHttpAuthenticationFilter
 
     private void postAuthcEvent( ServletRequest request, String username, String userAgent, boolean success )
     {
-        if ( applicationEventMulticaster != null )
+        if ( eventBus != null )
         {
-            applicationEventMulticaster.notifyEventListeners( new NexusAuthenticationEvent( this, new ClientInfo(
-                username, RemoteIPFinder.findIP( (HttpServletRequest) request ), userAgent ), success ) );
+            eventBus.post(
+                new NexusAuthenticationEvent(
+                    this,
+                    new ClientInfo( username, RemoteIPFinder.findIP( (HttpServletRequest) request ), userAgent ),
+                    success
+                )
+            );
         }
     }
 
