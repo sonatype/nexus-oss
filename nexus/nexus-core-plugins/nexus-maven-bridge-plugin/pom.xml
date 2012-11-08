@@ -41,6 +41,10 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
+    NOTE: Huge mess of excludes here to avoid pulling bits from dependencies which are provided by NX core :-(
+    -->
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-maven-bridge</artifactId>
