@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.test.NexusTestSupport;
@@ -51,6 +53,13 @@ public class AbstractYumNexusTestCase
         throws TimeoutException, InterruptedException
     {
         waitOrTimeout( condition, Timeout.timeout( seconds( 60 ) ), new ThreadSleep( millis( 30 ) ) );
+    }
+
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
+    {
+        super.customizeContainerConfiguration(configuration );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 
     @Override

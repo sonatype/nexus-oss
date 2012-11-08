@@ -10,33 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.repository.yum.internal;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 import com.google.code.tempusfugit.temporal.Condition;
 
-public class DefaultRepositoryRegistryTest
+public class YumRegistryImplTest
     extends AbstractRepositoryTester
 {
 
     private static final String REPO_ID = "rpm-snapshots";
 
     @Inject
-    private YumRepositories repositoryRegistry;
+    private YumRegistry yumRegistry;
 
     @Inject
     private NexusScheduler nexusScheduler;
@@ -51,9 +48,11 @@ public class DefaultRepositoryRegistryTest
             UTIL.resolveFile( "target/test-classes/repo" ).toURI().toString()
         );
 
-        repositoryRegistry.registerRepository( repository );
+        yumRegistry.register( repository );
+
         waitForAllTasksToBeDone();
-        Assert.assertNotNull( repositoryRegistry.findRepositoryForId( REPO_ID ) );
+
+        Assert.assertNotNull( yumRegistry.get( REPO_ID ) );
     }
 
     @Test
@@ -61,23 +60,12 @@ public class DefaultRepositoryRegistryTest
         throws Exception
     {
         MavenRepository repository = createRepository( true );
-        repositoryRegistry.registerRepository( repository );
-        Assert.assertTrue( repositoryRegistry.isRegistered( repository ) );
-        repositoryRegistry.unregisterRepository( repository );
-        Assert.assertFalse( repositoryRegistry.isRegistered( repository ) );
-    }
 
-    @SuppressWarnings( "serial" )
-    public static class QueueingEventListener
-        extends ArrayList<Event<?>>
-        implements EventListener
-    {
+        yumRegistry.register( repository );
+        Assert.assertTrue( yumRegistry.isRegistered( repository.getId() ) );
 
-        @Override
-        public void onEvent( Event<?> evt )
-        {
-            add( evt );
-        }
+        yumRegistry.unregister( repository.getId() );
+        Assert.assertFalse( yumRegistry.isRegistered( repository.getId() ) );
     }
 
     private void waitForAllTasksToBeDone()

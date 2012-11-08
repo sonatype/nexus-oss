@@ -20,11 +20,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
 import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 
 public class RpmRepositoryEventsHandlerTest
     extends AbstractRepositoryTester
@@ -34,7 +34,7 @@ public class RpmRepositoryEventsHandlerTest
     private RpmRepositoryEventsHandler handler;
 
     @Inject
-    private YumRepositories repositoryRegistry;
+    private YumRegistry repositoryRegistry;
 
     @Inject
     private YumPluginConfiguration yumConfig;
@@ -57,7 +57,7 @@ public class RpmRepositoryEventsHandlerTest
     {
         Repository repo = createRepository( true );
         handler.on( new RepositoryRegistryEventAdd( null, repo ) );
-        Assert.assertTrue( repositoryRegistry.isRegistered( repo ) );
+        Assert.assertTrue( repositoryRegistry.isRegistered( repo.getId() ) );
     }
 
     @Test
@@ -65,18 +65,17 @@ public class RpmRepositoryEventsHandlerTest
         throws Exception
     {
         Repository repo = createRepository( false );
-        repositoryRegistry.unregisterRepository( repo );
+        repositoryRegistry.unregister( repo.getId() );
         handler.on( new RepositoryRegistryEventAdd( null, repo ) );
-        Assert.assertFalse( repositoryRegistry.isRegistered( repo ) );
+        Assert.assertFalse( repositoryRegistry.isRegistered( repo.getId() ) );
     }
 
     @Test
     public void shouldNotCreateRepo()
     {
         Repository repo = createRepository( true );
-        repositoryRegistry.unregisterRepository( repo );
-        handler.on(
-            new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test-source.jar" ) ) );
+        repositoryRegistry.unregister( repo.getId() );
+        handler.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test-source.jar" ) ) );
     }
 
     @Test
@@ -85,9 +84,8 @@ public class RpmRepositoryEventsHandlerTest
         yumConfig.setActive( false );
 
         MavenRepository repo = createRepository( true );
-        repositoryRegistry.registerRepository( repo );
-        handler.on(
-            new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
+        repositoryRegistry.register( repo );
+        handler.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
     }
 
     @Test
@@ -96,9 +94,8 @@ public class RpmRepositoryEventsHandlerTest
         yumConfig.setActive( false );
 
         MavenRepository repo = createRepository( true );
-        repositoryRegistry.registerRepository( repo );
-        handler.on(
-            new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );
+        repositoryRegistry.register( repo );
+        handler.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );
     }
 
 }

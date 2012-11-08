@@ -15,49 +15,46 @@ package org.sonatype.nexus.plugins.yum.repository.task;
 import static org.apache.commons.io.FileUtils.listFiles;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskState;
 
 /**
- * This job scans a {@link MavenHostedRepository} for RPMs and adds each version to the
- * {@link MavenRepositoryInfo#addVersion(String) MavenRepositoryInfo}.
- * 
+ * This job scans a {@link Repository} for RPMs and adds each version to Yam.
+ *
  * @author sherold
  */
 @Component( role = SchedulerTask.class, hint = RepositoryScanningTask.ID, instantiationStrategy = "per-lookup" )
 public class RepositoryScanningTask
     extends AbstractNexusTask<Object>
 {
+
     private static final int MAXIMAL_PARALLEL_RUNS = 3;
 
     public static final String ID = "RepositoryScanningTask";
 
-    private static final String[] RPM_EXTENSIONS = new String[] { "rpm" };
+    private static final String[] RPM_EXTENSIONS = new String[]{ "rpm" };
 
-    private MavenRepositoryInfo mavenRepositoryInfo;
+    private Yum yum;
 
     @Override
     protected Object doRun()
         throws Exception
     {
-        if ( mavenRepositoryInfo == null )
+        if ( yum == null )
         {
-            throw new IllegalArgumentException( "Please provide a mavenRepositoryInfo" );
+            throw new IllegalArgumentException( "Please provide a Yum" );
         }
 
-        getLogger().info( "Start new RepositoryScanningJob for repository : {}",
-            mavenRepositoryInfo.getRepository().getId() );
         scanRepository();
-        getLogger().info( "Scanning for repository {} done.", mavenRepositoryInfo.getRepository().getId() );
+
         return null;
     }
 
@@ -66,22 +63,20 @@ public class RepositoryScanningTask
     {
         try
         {
-            getLogger().info( "Start scanning of repository base url : {}",
-                mavenRepositoryInfo.getRepository().getLocalUrl() );
+            getLogger().info( "Start scanning of repository base url : {}", yum.getRepository().getLocalUrl() );
 
-            File repositoryBaseDir = mavenRepositoryInfo.getBaseDir();
-            for ( File file : (Collection<File>) listFiles( repositoryBaseDir, RPM_EXTENSIONS, true ) )
+            File repositoryBaseDir = yum.getBaseDir();
+            for ( File file : listFiles( repositoryBaseDir, RPM_EXTENSIONS, true ) )
             {
-                mavenRepositoryInfo.addVersion( file.getParentFile().getName() );
+                yum.addVersion( file.getParentFile().getName() );
             }
 
-            getLogger().info( "Found following versions in repository '{}' : {}", mavenRepositoryInfo.getId(),
-                mavenRepositoryInfo.getVersions() );
+            getLogger().info( "Found following versions in repository '{}' : {}", yum.getId(), yum.getVersions() );
 
         }
         catch ( Exception e )
         {
-            getLogger().error( "Could not scan repository " + mavenRepositoryInfo.getId(), e );
+            getLogger().error( "Could not scan repository " + yum.getId(), e );
         }
     }
 
@@ -115,17 +110,12 @@ public class RepositoryScanningTask
     @Override
     protected String getMessage()
     {
-        return "Scanning repository [" + mavenRepositoryInfo.getRepository() +"]";
+        return "Scanning repository [" + yum.getRepository() + "]";
     }
 
-    public MavenRepositoryInfo getMavenRepositoryInfo()
+    public void setYum( Yum yum )
     {
-        return mavenRepositoryInfo;
-    }
-
-    public void setMavenRepositoryInfo( MavenRepositoryInfo mavenRepositoryInfo )
-    {
-        this.mavenRepositoryInfo = mavenRepositoryInfo;
+        this.yum = yum;
     }
 
 }

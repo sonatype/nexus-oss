@@ -18,23 +18,23 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URL;
-
 import javax.inject.Inject;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.Yum;
+import org.sonatype.nexus.repository.yum.YumRegistry;
+import junit.framework.Assert;
 
 public class DefaultYumServiceTest
     extends AbstractYumNexusTestCase
 {
+
     private static final String REPO_BASE_URL = "http://localhost:8081/nexus/service/local/snapshots/1.0";
 
     private static final String VERSION_1_0 = "1.0";
@@ -45,28 +45,27 @@ public class DefaultYumServiceTest
     // private static final String FILE_PATH2 = "path2.rpm";
 
     @Inject
-    private YumService yumService;
-
-    @Inject
-    private YumRepositories repositoryRegistry;
+    private YumRegistry yumRegistry;
 
     @Inject
     private YumPluginConfiguration yumConfig;
+
+    private Yum yum;
 
     @Before
     public void activateService()
     {
         yumConfig.setActive( true );
+        yum = yumRegistry.register( createRepository( SNAPSHOTS ) );
     }
 
     @Test
     public void shouldCacheRepository()
         throws Exception
     {
-        YumRepository repo1 =
-            yumService.getRepository( createRepository( SNAPSHOTS ), VERSION_1_0, new URL( REPO_BASE_URL ) );
-        YumRepository repo2 =
-            yumService.getRepository( createRepository( SNAPSHOTS ), VERSION_1_0, new URL( REPO_BASE_URL ) );
+        final YumRepository repo1 = yum.getYumRepository( VERSION_1_0, new URL( REPO_BASE_URL ) );
+        final YumRepository repo2 = yum.getYumRepository( VERSION_1_0, new URL( REPO_BASE_URL ) );
+
         Assert.assertEquals( repo1, repo2 );
     }
 
@@ -74,13 +73,11 @@ public class DefaultYumServiceTest
     public void shouldRecreateRepository()
         throws Exception
     {
-        YumRepository repo1 =
-            yumService.getRepository( createRepository( SNAPSHOTS ), VERSION_1_0, new URL( REPO_BASE_URL ) );
+        final YumRepository repo1 = yum.getYumRepository( VERSION_1_0, new URL( REPO_BASE_URL ) );
 
-        yumService.markDirty( createRepository( SNAPSHOTS ), VERSION_1_0 );
+        yum.markDirty( VERSION_1_0 );
 
-        YumRepository repo2 =
-            yumService.getRepository( createRepository( SNAPSHOTS ), VERSION_1_0, new URL( REPO_BASE_URL ) );
+        YumRepository repo2 = yum.getYumRepository( VERSION_1_0, new URL( REPO_BASE_URL ) );
 
         assertNotSame( repo1, repo2 );
     }
@@ -90,22 +87,22 @@ public class DefaultYumServiceTest
         throws Exception
     {
         yumConfig.setActive( false );
-        Assert.assertNull( yumService.createYumRepository( createRepository( SNAPSHOTS ) ) );
+        Assert.assertNull( yum.createYumRepository() );
     }
 
     @Test
     public void shouldNotFindRepository()
         throws Exception
     {
-        Assert.assertNull( repositoryRegistry.findRepositoryForId( "blablup" ) );
+        Assert.assertNull( yumRegistry.get( "blablup" ) );
     }
 
     @Test
     public void shouldFindRepository()
         throws Exception
     {
-        repositoryRegistry.registerRepository( createRepository( SNAPSHOTS ) );
-        Assert.assertNotNull( repositoryRegistry.findRepositoryForId( SNAPSHOTS ) );
+        yumRegistry.register( createRepository( SNAPSHOTS ) );
+        Assert.assertNotNull( yumRegistry.get( SNAPSHOTS ) );
     }
 
     public static MavenRepository createRepository( String id )

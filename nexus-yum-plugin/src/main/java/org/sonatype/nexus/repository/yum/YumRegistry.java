@@ -10,34 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.yum.repository.service;
-
-import java.io.File;
-import java.net.URL;
+package org.sonatype.nexus.repository.yum;
 
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
 
-public interface YumService
+public interface YumRegistry
 {
-    ScheduledTask<YumRepository> createYumRepository( Repository repository );
 
-    ScheduledTask<YumRepository> createYumRepository( Repository repository, String version, File yumRepoDir,
-                                                      URL yumRepoUrl );
+    Yum register( Repository repository );
 
-    YumRepository getRepository( Repository repository, String version, URL repoBaseUrl )
-        throws Exception;
+    Yum unregister( String repositoryId );
 
-    void markDirty( Repository repository, String itemVersion );
+    Yum get( String repositoryId );
 
-    ScheduledTask<YumRepository> createYumRepository( File rpmBaseDir, String rpmBaseUrl, File yumRepoBaseDir,
-                                                      URL yumRepoUrl, String id, boolean singleRpmPerDirectory );
-
-    ScheduledTask<YumRepository> addToYumRepository( Repository repository, String path );
-
-    void recreateRepository( Repository repository );
+    boolean isRegistered( String repositoryId );
 
     ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
+
 }

@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -34,18 +33,18 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase;
 import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-
 import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
 
 public class VersionedYumRepositoryResourceTest
     extends AbstractYumNexusTestCase
 {
+
     private static final String VERSION = "2.2-1";
 
     private static final String TESTREPO = "conflict-artifact";
@@ -56,10 +55,10 @@ public class VersionedYumRepositoryResourceTest
     private PlexusResource resource;
 
     @Inject
-    private YumRepositories repositoryRegistry;
+    private YumRegistry yumRegistry;
 
     @Inject
-    private YumPluginConfiguration aliasMapper;
+    private YumPluginConfiguration yumPluginConfiguration;
 
     private MavenRepository repository;
 
@@ -71,16 +70,16 @@ public class VersionedYumRepositoryResourceTest
         {
             repository = createRepository( TESTREPO );
         }
-        repositoryRegistry.registerRepository( repository );
+        yumRegistry.register( repository );
         waitFor( new Condition()
         {
             @Override
             public boolean isSatisfied()
             {
-                return repositoryRegistry.findRepositoryInfoForId( TESTREPO ).getVersions().size() == 5;
+                return yumRegistry.get( TESTREPO ).getVersions().size() == 5;
             }
         } );
-        aliasMapper.setAlias( TESTREPO, ALIAS, VERSION );
+        yumPluginConfiguration.setAlias( TESTREPO, ALIAS, VERSION );
     }
 
     @Test( expected = ResourceException.class )
@@ -106,7 +105,7 @@ public class VersionedYumRepositoryResourceTest
         resource.get( null, request, response, null );
         Assert.assertEquals( Status.REDIRECTION_PERMANENT, response.getStatus() );
         Assert.assertEquals( "http://localhost:8081/nexus/service/local/yum/repos/" + TESTREPO + "/" + VERSION + "/",
-            response.getLocationRef().getIdentifier() );
+                             response.getLocationRef().getIdentifier() );
     }
 
     @Test
@@ -114,7 +113,7 @@ public class VersionedYumRepositoryResourceTest
         throws Exception
     {
         Request request = createRequest( "/repodata/repomd.xml", TESTREPO, VERSION );
-        System.out.println( repositoryRegistry.findRepositoryInfoForId( TESTREPO ).getVersions() );
+        System.out.println( yumRegistry.get( TESTREPO ).getVersions() );
 
         FileRepresentation representation = (FileRepresentation) resource.get( null, request, null, null );
         Assert.assertTrue( representation.getFile().exists() );

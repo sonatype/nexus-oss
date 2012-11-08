@@ -20,7 +20,6 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
-import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -32,6 +31,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 
 @Component( role = GroupRepository.class, hint = M2YumGroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2-Yum Repository Group" )
 public class M2YumGroupRepository
@@ -43,7 +43,7 @@ public class M2YumGroupRepository
     private ContentClass contentClass;
 
     @Requirement
-    private YumService yumService;
+    private YumRegistry yumRegistry;
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
@@ -77,7 +77,7 @@ public class M2YumGroupRepository
         super.addMemberRepositoryId( repositoryId );
         if ( !skipTaskGeneration && isRpmRepo( repositoryId ) )
         {
-            yumService.createGroupRepository( this );
+            yumRegistry.createGroupRepository( this );
         }
     }
 
@@ -107,7 +107,7 @@ public class M2YumGroupRepository
         {
             if ( isRpmRepo( repositoryId ) )
             {
-                yumService.createGroupRepository( this );
+                yumRegistry.createGroupRepository( this );
             }
         }
         catch ( NoSuchRepositoryException e )
@@ -129,7 +129,7 @@ public class M2YumGroupRepository
         {
             skipTaskGeneration = false;
         }
-        yumService.createGroupRepository( this );
+        yumRegistry.createGroupRepository( this );
     }
 
 }

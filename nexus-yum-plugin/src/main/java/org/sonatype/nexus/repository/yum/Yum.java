@@ -10,52 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.yum.plugin.impl;
+package org.sonatype.nexus.repository.yum;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.HashSet;
+import java.net.URL;
 import java.util.Set;
 
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.plugins.yum.repository.YumRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.scheduling.ScheduledTask;
 
-public class MavenRepositoryInfo
+public interface Yum
 {
-    private final MavenRepository repository;
 
-    private final Set<String> versions = new HashSet<String>();
+    String getId();
 
-    public MavenRepositoryInfo( MavenRepository repository )
-    {
-        this.repository = repository;
-    }
+    File getBaseDir();
 
-    public MavenRepository getRepository()
-    {
-        return repository;
-    }
+    Set<String> getVersions();
 
-    public File getBaseDir()
-        throws MalformedURLException, URISyntaxException
-    {
-        return RepositoryUtils.getBaseDir( repository );
-    }
+    void addVersion( String version );
 
-    public void addVersion( String version )
-    {
-        versions.add( version );
-    }
+    Repository getRepository();
 
-    public String getId()
-    {
-        return repository.getId();
-    }
+    ScheduledTask<YumRepository> createYumRepository();
 
-    public Set<String> getVersions()
-    {
-        return versions;
-    }
+    ScheduledTask<YumRepository> createYumRepository( String version, File yumRepoDir, URL yumRepoUrl );
+
+    YumRepository getYumRepository( String version, URL repoBaseUrl )
+        throws Exception;
+
+    void markDirty( String itemVersion );
+
+    ScheduledTask<YumRepository> addToYumRepository( String path );
+
+    void recreateRepository();
 
 }

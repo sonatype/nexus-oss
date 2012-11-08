@@ -45,18 +45,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.repository.AbstractSchedulerTest;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
-import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.Yum;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-
 import com.google.code.tempusfugit.temporal.Condition;
 
 public class YumMetadataGenerationTaskConcurrencyTest
     extends AbstractSchedulerTest
 {
+
     private static final String RPM_NAME_2 = "hallomommy";
 
     private static final String RPM_NAME_1 = "hallodaddy";
@@ -71,7 +72,7 @@ public class YumMetadataGenerationTaskConcurrencyTest
     private NexusScheduler nexusScheduler;
 
     @Requirement
-    private YumService yumService;
+    private YumRegistry yumRegistry;
 
     private final Set<String> threadNames = new HashSet<String>();
 
@@ -121,20 +122,25 @@ public class YumMetadataGenerationTaskConcurrencyTest
         {
             futures.add( nexusScheduler.submit( "WaitTask", nexusScheduler.createTaskInstance( WaitTask.class ) ) );
         }
+        final Yum yum = yumRegistry.register( repository );
+
         // when
         final String file1 = "rpm1/" + rpm1.getName();
         final String file2 = "rpm2/" + rpm2.getName();
-        final ScheduledTask<YumRepository> first = yumService.addToYumRepository( repository, file1 );
-        final ScheduledTask<YumRepository> second = yumService.addToYumRepository( repository, file2 );
+
+        final ScheduledTask<YumRepository> first = yum.addToYumRepository( file1 );
+        final ScheduledTask<YumRepository> second = yum.addToYumRepository( file2 );
         futures.add( first );
         futures.add( second );
 
         waitFor( futures );
         // then
         assertThat( second, is( first ) );
-        assertThat( ( (YumMetadataGenerationTask) first.getTask() ).getAddedFiles(), is( file1 + pathSeparator + file2 ) );
+        assertThat( ( (YumMetadataGenerationTask) first.getTask() ).getAddedFiles(),
+                    is( file1 + pathSeparator + file2 ) );
         final String content =
-            IOUtils.toString( new GZIPInputStream( new FileInputStream( new File( tmpDir, "repodata/primary.xml.gz" ) ) ) );
+            IOUtils.toString(
+                new GZIPInputStream( new FileInputStream( new File( tmpDir, "repodata/primary.xml.gz" ) ) ) );
         assertThat( content, containsString( RPM_NAME_1 ) );
         assertThat( content, containsString( RPM_NAME_2 ) );
     }

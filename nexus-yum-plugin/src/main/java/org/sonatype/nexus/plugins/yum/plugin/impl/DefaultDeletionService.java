@@ -18,19 +18,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.plugin.DeletionService;
-import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.Yum;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 
-@Component( role = DeletionService.class )
+@Named
+@Singleton
 public class DefaultDeletionService
     implements DeletionService
 {
@@ -41,11 +44,16 @@ public class DefaultDeletionService
 
     private static final int MAX_EXECUTION_COUNT = 100;
 
-    @Inject
-    private YumPluginConfiguration configuration;
+    private final YumPluginConfiguration configuration;
+
+    private final YumRegistry yumRegistry;
 
     @Inject
-    private YumService yumService;
+    public DefaultDeletionService(final YumPluginConfiguration configuration, final  YumRegistry yumRegistry)
+    {
+        this.configuration = configuration;
+        this.yumRegistry = yumRegistry;
+    }
 
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor( POOL_SIZE );
 
@@ -67,8 +75,12 @@ public class DefaultDeletionService
             }
             else
             {
-                log.info( "Delete rpm {} / {}", repository.getId(), path );
-                yumService.recreateRepository( repository );
+                final Yum yum = yumRegistry.get( repository.getId() );
+                if ( yum != null )
+                {
+                    log.info( "Delete rpm {} / {}", repository.getId(), path );
+                    yum.recreateRepository();
+                }
             }
         }
     }
@@ -122,20 +134,26 @@ public class DefaultDeletionService
         {
             if ( isDeleted( task.getRepository(), task.getPath() ) )
             {
-                log.info( "Recreate yum repository {} because of removed path {}", task.getRepository().getId(),
-                    task.getPath() );
-                yumService.recreateRepository( task.getRepository() );
+                final Yum yum = yumRegistry.get( task.getRepository().getId() );
+                if ( yum != null )
+                {
+                    log.info(
+                        "Recreate yum repository {} because of removed path {}",
+                        task.getRepository().getId(), task.getPath()
+                    );
+                    yum.recreateRepository();
+                }
             }
             else if ( task.getExecutionCount() < MAX_EXECUTION_COUNT )
             {
                 log.info( "Rescheduling creation of yum repository {} because path {} not deleted.",
-                    task.getRepository().getId(), task.getPath() );
+                          task.getRepository().getId(), task.getPath() );
                 schedule( task );
             }
             else
             {
                 log.warn( "Deleting path {} in repository {} took too long - retried {} times.",
-                    new Object[] { task.getPath(), task.getRepository().getId(), MAX_EXECUTION_COUNT } );
+                          new Object[]{ task.getPath(), task.getRepository().getId(), MAX_EXECUTION_COUNT } );
             }
         }
     }

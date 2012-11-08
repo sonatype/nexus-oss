@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.yum.repository.service;
+package org.sonatype.nexus.repository.yum.internal;
 
 import static java.io.File.pathSeparator;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -18,67 +18,92 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
+import org.sonatype.nexus.plugins.yum.repository.service.YumRepositoryCache;
 import org.sonatype.nexus.plugins.yum.repository.task.TaskDoubledException;
-import org.sonatype.nexus.plugins.yum.repository.task.YumGroupRepositoryGenerationTask;
 import org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
+import com.google.inject.assistedinject.Assisted;
 
-@Component( role = YumService.class )
-public class DefaultYumService
-    implements YumService
+@Named
+public class YumImpl
+    implements Yum
 {
 
-    @Requirement
-    private RepositoryURLBuilder repositoryURLBuilder;
+    private final RepositoryURLBuilder repositoryURLBuilder;
 
-    @Requirement
-    private NexusScheduler nexusScheduler;
+    private final NexusScheduler nexusScheduler;
 
-    @Requirement
-    private YumPluginConfiguration yumConfig;
+    private final YumPluginConfiguration yumConfig;
+
+    private final Repository repository;
+
+    private final File baseDir;
+
+    private final Set<String> versions = new HashSet<String>();
+
+    @Inject
+    public YumImpl( final RepositoryURLBuilder repositoryURLBuilder,
+                    final NexusScheduler nexusScheduler,
+                    final YumPluginConfiguration yumConfig,
+                    final @Assisted Repository repository )
+        throws MalformedURLException, URISyntaxException
+    {
+        this.repositoryURLBuilder = repositoryURLBuilder;
+
+        this.nexusScheduler = nexusScheduler;
+        this.yumConfig = yumConfig;
+        this.repository = repository;
+
+        this.baseDir = RepositoryUtils.getBaseDir( repository );
+    }
 
     private final YumRepositoryCache cache = new YumRepositoryCache();
 
-    @Override
-    public ScheduledTask<YumRepository> createYumRepository( File rpmBaseDir, String rpmBaseUrl, File yumRepoBaseDir,
-                                                             URL yumRepoUrl, String id, boolean singleRpmPerDirectory )
+    public String getId()
     {
-        try
-        {
-            if ( yumConfig.isActive() )
-            {
-                YumMetadataGenerationTask task = createTask();
-                task.setRpmDir( rpmBaseDir.getAbsolutePath() );
-                task.setRpmUrl( rpmBaseUrl );
-                task.setRepositoryId( id );
-                task.setRepoDir( yumRepoBaseDir );
-                task.setRepoUrl( yumRepoUrl.toString() );
-                task.setSingleRpmPerDirectory( singleRpmPerDirectory );
-                return submitTask( task );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new RuntimeException( "Unable to create repository", e );
-        }
+        return repository.getId();
+    }
 
-        return null;
+    public Set<String> getVersions()
+    {
+        return versions;
+    }
+
+    public File getBaseDir()
+    {
+        return baseDir;
+    }
+
+    public void addVersion( String version )
+    {
+        versions.add( version );
     }
 
     @Override
-    public ScheduledTask<YumRepository> createYumRepository( Repository repository, String version,
-                                                             File yumRepoBaseDir, URL yumRepoUrl )
+    public Repository getRepository()
+    {
+        return repository;
+    }
+
+    @Override
+    public ScheduledTask<YumRepository> createYumRepository( final String version,
+                                                             final File yumRepoBaseDir,
+                                                             final URL yumRepoUrl )
     {
         try
         {
@@ -128,27 +153,29 @@ public class DefaultYumService
             }
             else
             {
-                existingTask.setAddedFiles( existingTask.getAddedFiles() + pathSeparator + taskToMerge.getAddedFiles() );
+                existingTask.setAddedFiles(
+                    existingTask.getAddedFiles() + pathSeparator + taskToMerge.getAddedFiles() );
             }
         }
         return (ScheduledTask<YumRepository>) existingScheduledTask;
     }
 
     @Override
-    public ScheduledTask<YumRepository> createYumRepository( Repository repository )
+    public ScheduledTask<YumRepository> createYumRepository()
     {
-        return addToYumRepository( repository, null );
+        return addToYumRepository( null );
     }
 
     @Override
-    public YumRepository getRepository( Repository repository, String version, URL baseRepoUrl )
+    public YumRepository getYumRepository( final String version, final URL baseRepoUrl )
         throws Exception
     {
         YumRepository yumRepository = cache.lookup( repository.getId(), version );
         if ( ( yumRepository == null ) || yumRepository.isDirty() )
         {
-            ScheduledTask<YumRepository> future =
-                createYumRepository( repository, version, createRepositoryTempDir( repository, version ), baseRepoUrl );
+            final ScheduledTask<YumRepository> future = createYumRepository(
+                version, createRepositoryTempDir( repository, version ), baseRepoUrl
+            );
             yumRepository = future.get();
             cache.cache( yumRepository );
         }
@@ -156,19 +183,19 @@ public class DefaultYumService
     }
 
     @Override
-    public void recreateRepository( Repository repository )
+    public void recreateRepository()
     {
-        createYumRepository( repository );
+        createYumRepository();
     }
 
     @Override
-    public void markDirty( Repository repository, String itemVersion )
+    public void markDirty( final String itemVersion )
     {
         cache.markDirty( repository.getId(), itemVersion );
     }
 
     @Override
-    public ScheduledTask<YumRepository> addToYumRepository( Repository repository, String filePath )
+    public ScheduledTask<YumRepository> addToYumRepository( String filePath )
     {
         try
         {
@@ -189,15 +216,6 @@ public class DefaultYumService
         }
 
         return null;
-    }
-
-    @Override
-    public ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository )
-    {
-        YumGroupRepositoryGenerationTask task =
-            nexusScheduler.createTaskInstance( YumGroupRepositoryGenerationTask.class );
-        task.setGroupRepository( groupRepository );
-        return nexusScheduler.submit( YumGroupRepositoryGenerationTask.ID, task );
     }
 
     private YumMetadataGenerationTask createTask()

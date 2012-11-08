@@ -22,13 +22,12 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
-import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
-import org.sonatype.nexus.plugins.yum.repository.service.YumService;
 import org.sonatype.nexus.plugins.yum.rest.AbstractYumRepositoryResource;
 import org.sonatype.nexus.plugins.yum.rest.domain.UrlPathInterpretation;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
+import org.sonatype.nexus.repository.yum.Yum;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -38,6 +37,7 @@ public class VersionedYumRepositoryResource
     extends AbstractYumRepositoryResource
     implements PlexusResource
 {
+
     private static final String YUM_REPO_PREFIX_NAME = "yum/repos";
 
     private static final String YUM_REPO_PREFIX = "/" + YUM_REPO_PREFIX_NAME;
@@ -52,13 +52,10 @@ public class VersionedYumRepositoryResource
         + "}";
 
     @Inject
-    private YumRepositories repositoryRegistry;
+    private YumPluginConfiguration yumConfiguration;
 
     @Inject
-    private YumPluginConfiguration aliasMapper;
-
-    @Inject
-    private YumService yumService;
+    private YumRegistry yumRegistry;
 
     @Override
     protected String getUrlPrefixName()
@@ -70,7 +67,7 @@ public class VersionedYumRepositoryResource
     public PathProtectionDescriptor getResourceProtection()
     {
         return new PathProtectionDescriptor( YUM_REPO_PREFIX + "/**",
-            "authcBasic,perms[nexus:yumVersionedRepositories]" );
+                                             "authcBasic,perms[nexus:yumVersionedRepositories]" );
     }
 
     @Override
@@ -86,14 +83,15 @@ public class VersionedYumRepositoryResource
         final String repositoryId = request.getAttributes().get( REPOSITORY_URL_PARAM ).toString();
         final String version = request.getAttributes().get( VERSION_URL_PARAM ).toString();
 
-        final MavenRepositoryInfo mavenRepositoryInfo = repositoryRegistry.findRepositoryInfoForId( repositoryId );
-        if ( mavenRepositoryInfo == null )
+        final Yum yum = yumRegistry.get( repositoryId );
+        if ( yum == null )
         {
-            throw new ResourceException( CLIENT_ERROR_BAD_REQUEST, "Couldn't find repository with id : " + repositoryId );
+            throw new ResourceException( CLIENT_ERROR_BAD_REQUEST,
+                                         "Couldn't find repository with id : " + repositoryId );
         }
 
         final String aliasVersion;
-        if ( mavenRepositoryInfo.getVersions().contains( version ) )
+        if ( yum.getVersions().contains( version ) )
         {
             aliasVersion = version;
         }
@@ -101,7 +99,7 @@ public class VersionedYumRepositoryResource
         {
             try
             {
-                aliasVersion = aliasMapper.getVersion( repositoryId, version );
+                aliasVersion = yumConfiguration.getVersion( repositoryId, version );
             }
             catch ( AliasNotFoundException ex )
             {
@@ -110,8 +108,7 @@ public class VersionedYumRepositoryResource
             }
         }
 
-        return yumService.getRepository( mavenRepositoryInfo.getRepository(), aliasVersion,
-            interpretation.getRepositoryUrl() );
+        return yum.getYumRepository( aliasVersion, interpretation.getRepositoryUrl() );
     }
 
     @Override

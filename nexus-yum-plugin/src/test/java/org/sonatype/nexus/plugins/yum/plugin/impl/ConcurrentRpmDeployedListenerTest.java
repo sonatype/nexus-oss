@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
 import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
-import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -69,7 +69,7 @@ public class ConcurrentRpmDeployedListenerTest
     private RpmRepositoryEventsHandler handler;
 
     @Inject
-    private YumRepositories repositoryRegistry;
+    private YumRegistry repositoryRegistry;
 
     @Inject
     private YumPluginConfiguration yumConfig;
@@ -102,7 +102,7 @@ public class ConcurrentRpmDeployedListenerTest
         throws URISyntaxException, MalformedURLException, NoSuchAlgorithmException, IOException
     {
         final MavenRepository repo = createRepository( true, "repo" + index );
-        repositoryRegistry.registerRepository( repo );
+        repositoryRegistry.register( repo );
         for ( int version = 0; version < 5; version++ )
         {
             assertNotMoreThan10ThreadForRpmUpload( repo, version );

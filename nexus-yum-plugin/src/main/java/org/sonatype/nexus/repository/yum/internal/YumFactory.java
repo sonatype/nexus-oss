@@ -10,22 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.yum.plugin;
+package org.sonatype.nexus.repository.yum.internal;
 
-import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.plugins.yum.plugin.impl.MavenRepositoryInfo;
+import org.sonatype.nexus.repository.yum.Yum;
 
-public interface YumRepositories
+public interface YumFactory
 {
-    void unregisterRepository( Repository repository );
 
-    MavenRepository findRepositoryForId( String repositoryId );
-
-    MavenRepositoryInfo findRepositoryInfoForId( String repositoryId );
-
-    boolean isRegistered( Repository repository );
-
-    void registerRepository( MavenRepository repository );
+    Yum create( Repository repository );
 
 }
