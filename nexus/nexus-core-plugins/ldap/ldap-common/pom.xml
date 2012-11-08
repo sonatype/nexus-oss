@@ -102,7 +102,7 @@
             <!--
             TODO: This might not be needed w/forkMode=always
             -->
-            <argLine>-Xmx256M</argLine>
+            <argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>
           </configuration>
         </plugin>
       </plugins>
