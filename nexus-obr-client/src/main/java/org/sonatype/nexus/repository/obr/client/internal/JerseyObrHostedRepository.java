@@ -10,39 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.site.client.internal;
+package org.sonatype.nexus.repository.obr.client.internal;
 
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.JerseyProxyRepository;
+import org.sonatype.nexus.client.internal.rest.jersey.subsystem.repository.JerseyHostedRepository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.repository.site.client.ObrProxyRepository;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
+import org.sonatype.nexus.repository.obr.client.ObrHostedRepository;
+import org.sonatype.nexus.rest.model.RepositoryResource;
 
 /**
  * @since 2.1
  */
-public class JerseyObrProxyRepository
-    extends JerseyProxyRepository<ObrProxyRepository>
-    implements ObrProxyRepository
+public class JerseyObrHostedRepository
+    extends JerseyHostedRepository<ObrHostedRepository>
+    implements ObrHostedRepository
 {
 
     static final String PROVIDER = "obr-proxy";
 
-    public JerseyObrProxyRepository( final JerseyNexusClient nexusClient, final String id )
+    public JerseyObrHostedRepository( final JerseyNexusClient nexusClient, final String id )
     {
         super( nexusClient, id );
     }
 
-    public JerseyObrProxyRepository( final JerseyNexusClient nexusClient, final RepositoryProxyResource resource )
+    public JerseyObrHostedRepository( final JerseyNexusClient nexusClient, final RepositoryResource resource )
     {
         super( nexusClient, resource );
     }
 
     @Override
-    protected RepositoryProxyResource createSettings()
+    protected RepositoryResource createSettings()
     {
-        final RepositoryProxyResource settings = super.createSettings();
+        final RepositoryResource settings = super.createSettings();
 
-        settings.setProvider( JerseyObrProxyRepository.PROVIDER );
+        settings.setProvider( JerseyObrHostedRepository.PROVIDER );
         settings.setRepoPolicy( "RELEASE" );
         settings.setIndexable( false );
 
