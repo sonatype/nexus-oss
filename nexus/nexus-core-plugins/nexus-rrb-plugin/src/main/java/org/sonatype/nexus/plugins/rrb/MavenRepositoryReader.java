@@ -42,11 +42,11 @@ public class MavenRepositoryReader
 
     private final Logger logger = LoggerFactory.getLogger( MavenRepositoryReader.class );
 
-    private final ProxyRepository proxyRepository;
-
     private final HttpClient client;
 
     private final QueryStringBuilder queryStringBuilder;
+
+    private ProxyRepository proxyRepository;
 
     private String remotePath;
 
@@ -56,9 +56,8 @@ public class MavenRepositoryReader
 
     private String id;
 
-    public MavenRepositoryReader( final ProxyRepository proxyRepository, final HttpClient client, final QueryStringBuilder queryStringBuilder )
+    public MavenRepositoryReader( final HttpClient client, final QueryStringBuilder queryStringBuilder )
     {
-        this.proxyRepository = checkNotNull(proxyRepository);
         this.client = checkNotNull(client);
         this.queryStringBuilder = checkNotNull(queryStringBuilder);
     }
@@ -68,11 +67,12 @@ public class MavenRepositoryReader
      * @param localUrl url to the local resource service
      * @return a list containing the remote data
      */
-    public List<RepositoryDirectory> extract( String remotePath, String localUrl, String id )
+    public List<RepositoryDirectory> extract( String remotePath, String localUrl, final ProxyRepository proxyRepository, String id )
     {
         logger.debug( "remotePath={}", remotePath );
         this.remotePath = remotePath;
         this.localUrl = localUrl;
+        this.proxyRepository = proxyRepository;
 
         this.id = id;
 

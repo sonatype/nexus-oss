@@ -127,11 +127,11 @@ public class RemoteBrowserResource
             ProxyRepository proxyRepository = getUnprotectedRepositoryRegistry().getRepositoryWithFacet( id, ProxyRepository.class );
             HttpClient client = httpClientProvider.createHttpClient(proxyRepository.getRemoteStorageContext());
 
-            MavenRepositoryReader mr = new MavenRepositoryReader( proxyRepository, client, queryStringBuilder );
+            MavenRepositoryReader mr = new MavenRepositoryReader( client, queryStringBuilder );
             MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
             // FIXME: Sort this out, NEXUS-4058 was closed about a year go (orig: we really should not do the encoding here, but this is work around until NEXUS-4058 is fixed).
             String localUrl = createRemoteResourceReference( request, id, "" ).toString(false, false);
-            List<RepositoryDirectory> result = mr.extract(remotePath, localUrl, id);
+            List<RepositoryDirectory> result = mr.extract(remotePath, localUrl, proxyRepository, id);
             data.setData( result );
             logger.debug( "return value is {}", data );
 
