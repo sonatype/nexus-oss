@@ -38,11 +38,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-rest-api</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
       <scope>provided</scope>
@@ -186,19 +181,24 @@
         </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.security.realms</groupId>
+      <artifactId>security-xml-realm</artifactId>
+      <version>${plexus-security.version}</version>
+      <scope>test</scope>
+      <classifier>tests</classifier>
     </dependency>
   </dependencies>
 
@@ -216,6 +216,11 @@
             <sharedDependency>org.sonatype.security:security-rest-model</sharedDependency>
           </sharedDependencies>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
       </plugin>
 
       <plugin>

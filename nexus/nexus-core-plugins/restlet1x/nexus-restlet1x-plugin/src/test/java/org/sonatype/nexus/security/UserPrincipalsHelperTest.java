@@ -48,6 +48,7 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -95,6 +96,7 @@ public class UserPrincipalsHelperTest
         try
         {
             ThreadContext.remove();
+            lookup( CacheManagerComponent.class ).shutdown();
         }
         finally
         {
