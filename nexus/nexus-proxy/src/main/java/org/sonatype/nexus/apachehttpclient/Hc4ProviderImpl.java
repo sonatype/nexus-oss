@@ -61,11 +61,10 @@ import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationS
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Preconditions;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Default implementation of {@link Hc4Provider}.
@@ -77,7 +76,7 @@ import com.google.common.base.Preconditions;
 @Named
 public class Hc4ProviderImpl
     extends AbstractLoggingComponent
-    implements Hc4Provider, EventListener
+    implements Hc4Provider
 {
     /**
      * Key for customizing connection pool maximum size. Value should be integer equal to 0 or greater. Pool size of 0
@@ -138,9 +137,9 @@ public class Hc4ProviderImpl
     private final UserAgentBuilder userAgentBuilder;
 
     /**
-     * The low level core event multicaster.
+     * The low level core event bus.
      */
-    private final ApplicationEventMulticaster applicationEventMulticaster;
+    private final EventBus eventBus;
 
     /**
      * Shared client connection manager.
@@ -162,12 +161,13 @@ public class Hc4ProviderImpl
      * 
      * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}.
      * @param userAgentBuilder UA builder component.
-     * @param multicaster the event multicaster
+     * @param eventBus the event multicaster
      * @param jmxInstaller installer to expose pool information over JMX.
      */
     @Inject
     public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
-                            final UserAgentBuilder userAgentBuilder, final ApplicationEventMulticaster multicaster,
+                            final UserAgentBuilder userAgentBuilder,
+                            final EventBus eventBus,
                             final PoolingClientConnectionManagerMBeanInstaller jmxInstaller )
     {
         this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
@@ -176,8 +176,8 @@ public class Hc4ProviderImpl
         this.sharedConnectionManager = createClientConnectionManager();
         this.evictingThread = new EvictingThread( sharedConnectionManager, getConnectionPoolKeepalive() );
         this.evictingThread.start();
-        this.applicationEventMulticaster = Preconditions.checkNotNull( multicaster );
-        this.applicationEventMulticaster.addEventListener( this );
+        this.eventBus = Preconditions.checkNotNull( eventBus );
+        this.eventBus.register( this );
         this.jmxInstaller.register( sharedConnectionManager );
         getLogger().info( "{} started up (keep-alive {} millis), listening for shutdown.", getClass().getSimpleName(),
             getConnectionPoolKeepalive() );
@@ -267,19 +267,14 @@ public class Hc4ProviderImpl
         evictingThread.interrupt();
         jmxInstaller.unregister();
         sharedConnectionManager.shutdown();
-        applicationEventMulticaster.removeEventListener( this );
+        eventBus.unregister( this );
         getLogger().info( "{} shut down.", getClass().getSimpleName() );
     }
 
-    // == EventListener API
-
-    @Override
-    public void onEvent( Event<?> evt )
+    @Subscribe
+    public void onEvent( final NexusStoppedEvent evt )
     {
-        if ( evt instanceof NexusStoppedEvent )
-        {
-            shutdown();
-        }
+        shutdown();
     }
 
     // ==

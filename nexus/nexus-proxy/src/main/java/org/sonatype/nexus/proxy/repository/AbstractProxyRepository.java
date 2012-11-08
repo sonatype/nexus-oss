@@ -259,9 +259,12 @@ public abstract class AbstractProxyRepository
             }
 
             // fire off the new event if crawling did end, so we did flip all the bits
-            getApplicationEventMulticaster().notifyEventListeners(
-                new RepositoryEventExpireProxyCaches( this, request.getRequestPath(),
-                    request.getRequestContext().flatten(), expireCacheWalkerProcessor.isCacheAltered() ) );
+            eventBus().post(
+                new RepositoryEventExpireProxyCaches(
+                    this, request.getRequestPath(), request.getRequestContext().flatten(),
+                    expireCacheWalkerProcessor.isCacheAltered()
+                )
+            );
 
             return expireCacheWalkerProcessor.isCacheAltered();
         }
@@ -315,7 +318,7 @@ public abstract class AbstractProxyRepository
                 doEvictUnusedItems( request, timestamp, new EvictUnusedItemsWalkerProcessor( timestamp ),
                     new EvictUnusedItemsWalkerFilter() );
 
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+            eventBus().post( new RepositoryEventEvictUnusedItems( this ) );
 
             return result;
         }
@@ -538,14 +541,12 @@ public abstract class AbstractProxyRepository
                 if ( sendNotification )
                 {
                     // this one should be fired _always_
-                    getApplicationEventMulticaster().notifyEventListeners(
-                        new RepositoryEventProxyModeSet( this, oldProxyMode, proxyMode, cause ) );
+                    eventBus().post( new RepositoryEventProxyModeSet( this, oldProxyMode, proxyMode, cause ) );
 
                     if ( !proxyMode.equals( oldProxyMode ) )
                     {
                         // this one should be fired on _transition_ only
-                        getApplicationEventMulticaster().notifyEventListeners(
-                            new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
+                        eventBus().post( new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
                     }
                 }
             }
@@ -983,13 +984,11 @@ public abstract class AbstractProxyRepository
 
             if ( Action.create.equals( action ) )
             {
-                getApplicationEventMulticaster().notifyEventListeners(
-                    new RepositoryItemEventCacheCreate( this, result ) );
+                eventBus().post( new RepositoryItemEventCacheCreate( this, result ) );
             }
             else
             {
-                getApplicationEventMulticaster().notifyEventListeners(
-                    new RepositoryItemEventCacheUpdate( this, result ) );
+                eventBus().post( new RepositoryItemEventCacheUpdate( this, result ) );
             }
         }
         catch ( ItemNotFoundException ex )
@@ -1361,7 +1360,7 @@ public abstract class AbstractProxyRepository
 
         for ( RepositoryItemValidationEvent event : events )
         {
-            getApplicationEventMulticaster().notifyEventListeners( event );
+            eventBus().post( event );
         }
     }
 

@@ -353,7 +353,7 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
             Sonatype.utils.replaceHistory(this);
           }
 
-          if (parts.length > 2)
+          if (parts.length > 1)
           {
             var tab, panel = this.cardPanel.getLayout().activeItem.tabPanel;
 
@@ -380,10 +380,10 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
               }
             }
 
-            if (parts && parts.length > 2 && parts[1] == 'browsestorage' && selected != null)
+            if (parts && parts.length > 2 && parts[1] == 'browsestorage' && toSelect != null)
             {
               var repoBrowser = panel.find('name', 'repositoryBrowser')[0];
-              repoBrowser.selectPath('/' + selected.data.name + parts[2], 'text', function(success, node) {
+              repoBrowser.selectPath('/' + toSelect.data.name + parts[2], 'text', function(success, node) {
                     if (success)
                     {
                       if (node.ownerTree.nodeClickEvent)

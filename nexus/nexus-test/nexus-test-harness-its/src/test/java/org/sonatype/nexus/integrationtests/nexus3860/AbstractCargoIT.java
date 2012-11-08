@@ -301,6 +301,12 @@ public abstract class AbstractCargoIT
 
             assertThat( "Should have been DEBUG level logging so there should have been DEBUG in log",
                 downloadedLogStr, containsString( "DEBUG" ) );
+
+            downloadedLogStr = downloadedLogStr.replace(
+                "org.sonatype.nexus.error.reporting.DefaultErrorReportingManager",
+                ""
+            );
+
             assertThat( downloadedLogStr, not( containsString( "error" ) ) );
             assertThat( downloadedLogStr, not( containsString( "exception" ) ) );
 

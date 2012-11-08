@@ -114,6 +114,57 @@ public class SecurityIT
     }
 
     @Test
+    public void createUser()
+    {
+        final String username = testMethodName();
+        users().create( username )
+            .withEmail( username + "@sonatype.org" )
+            .withFirstName( "bar" )
+            .withLastName( "foo" )
+            .withPassword( "super secret" )
+            .withRole( "anonymous" )
+            .save();
+
+        final User user = users().get( username );
+        assertThat( user, is( notNullValue() ) );
+        assertThat( user.firstName(), is( "bar" ) );
+    }
+
+    @Test
+    public void updateUser()
+    {
+        final String username = testMethodName();
+        users().create( username )
+            .withEmail( username + "@sonatype.org" )
+            .withFirstName( "bar" )
+            .withLastName( "foo" )
+            .withPassword( "super secret" )
+            .withRole( "anonymous" )
+            .save();
+
+        final User user = users().get( username )
+            .withFirstName( "Bar the second" )
+            .save();
+
+        assertThat( user, is( notNullValue() ) );
+        assertThat( user.firstName(), is( "Bar the second" ) );
+    }
+
+    @Test
+    public void deleteUser()
+    {
+        final String username = testMethodName();
+        final User user = users().create( username )
+            .withEmail( username + "@sonatype.org" )
+            .withFirstName( "bar" )
+            .withLastName( "foo" )
+            .withPassword( "super secret" )
+            .withRole( "anonymous" )
+            .save();
+        user.remove();
+    }
+
+    @Test
     public void getUser()
     {
         final User user = users().get( "admin" );

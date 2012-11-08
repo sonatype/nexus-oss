@@ -19,6 +19,8 @@ import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettin
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 public class DefaultGlobalHttpProxySettingsTest
     extends NexusAppTestSupport
@@ -33,15 +35,12 @@ public class DefaultGlobalHttpProxySettingsTest
         cfg.loadConfiguration();
 
         final Event<GlobalHttpProxySettings>[] event = new Event[1];
-        ApplicationEventMulticaster applicationEventMulticaster = lookup( ApplicationEventMulticaster.class );
-        applicationEventMulticaster.addEventListener( new EventListener()
+        lookup( EventBus.class ).register( new Object()
         {
-            public void onEvent( Event<?> evt )
+            @Subscribe
+            public void onEvent( GlobalHttpProxySettingsChangedEvent evt )
             {
-                if ( evt instanceof GlobalHttpProxySettingsChangedEvent )
-                {
-                    event[0] = (GlobalHttpProxySettingsChangedEvent) evt;
-                }
+                    event[0] = evt;
             }
         } );
 

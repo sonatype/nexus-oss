@@ -18,36 +18,41 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Abstract class to implement configurable components to "click" them in into generic configuration environment.
- *
+ * <p/>
  * NOTE: Don't convert AbstractConfigurable plexus components to sisu, they will be initialized BEFORE configuration is loaded.
  *
  * @author cstamas
  */
 public abstract class AbstractConfigurable
-    implements Configurable, EventListener, Initializable, Disposable
+    implements Configurable, Initializable, Disposable
 {
-    /** The configuration */
+
+    /**
+     * The configuration
+     */
     private CoreConfiguration coreConfiguration;
 
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     /**
-     * For plexus injection.
+     * True as long as this is registered with event bus.
      */
+    private boolean registeredWithEventBus;
+
     public AbstractConfigurable()
     {
+
     }
 
-    public AbstractConfigurable( final ApplicationEventMulticaster applicationEventMulticaster )
+    public AbstractConfigurable( final EventBus eventBus )
     {
-        this.applicationEventMulticaster = applicationEventMulticaster;
+        this.eventBus = eventBus;
     }
 
     protected boolean isConfigured()
@@ -58,7 +63,7 @@ public abstract class AbstractConfigurable
     public void initialize()
         throws InitializationException
     {
-        applicationEventMulticaster.addEventListener( this );
+        registerWithEventBus();
 
         try
         {
@@ -74,91 +79,85 @@ public abstract class AbstractConfigurable
         throws ConfigurationException
     {
         // someone needs this, someone not
-        // for example, whoever is configged using framework, will not need this,
+        // for example, whoever is configured using framework, will not need this,
         // but we still have components on their own, like DefaultTaskConfigManager
         // that are driven by spice Scheduler
     }
 
     public void dispose()
     {
-        applicationEventMulticaster.removeEventListener( this );
+        unregisterFromEventBus();
     }
 
-    public void onEvent( final Event<?> evt )
+    @Subscribe
+    public void onEvent( final ConfigurationPrepareForLoadEvent evt )
     {
-        // act automatically on config events
-        if ( evt instanceof ConfigurationPrepareForLoadEvent )
+        try
         {
-            ConfigurationPrepareForLoadEvent vevt = (ConfigurationPrepareForLoadEvent) evt;
+            // validate
+            initializeConfiguration();
+        }
+        catch ( ConfigurationException e )
+        {
+            // put a veto
+            evt.putVeto( this, e );
+        }
+    }
 
+    @Subscribe
+    public void onEvent( final ConfigurationPrepareForSaveEvent evt )
+    {
+        if ( isDirty() )
+        {
             try
             {
-                // validate
-                initializeConfiguration();
+                // prepare
+                prepareForSave();
+
+                // register ourselves as changed
+                evt.getChanges().add( this );
             }
             catch ( ConfigurationException e )
             {
                 // put a veto
-                vevt.putVeto( this, e );
+                evt.putVeto( this, e );
             }
         }
-        else if ( evt instanceof ConfigurationPrepareForSaveEvent )
-        {
-            if ( isDirty() )
-            {
-                ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
+    }
 
-                try
-                {
-                    // prepare
-                    prepareForSave();
+    @Subscribe
+    public void onEvent( final ConfigurationValidateEvent evt )
+    {
+        try
+        {
+            // validate
+            getCurrentCoreConfiguration().validateChanges();
+        }
+        catch ( ConfigurationException e )
+        {
+            // put a veto
+            evt.putVeto( this, e );
+        }
+    }
 
-                    // register ourselves as changed
-                    psevt.getChanges().add( this );
-                }
-                catch ( ConfigurationException e )
-                {
-                    // put a veto
-                    psevt.putVeto( this, e );
-                }
-            }
-        }
-        else if ( evt instanceof ConfigurationValidateEvent )
+    @Subscribe
+    public void onEvent( final ConfigurationCommitEvent evt )
+    {
+        try
         {
-            ConfigurationValidateEvent vevt = (ConfigurationValidateEvent) evt;
-
-            try
-            {
-                // validate
-                getCurrentCoreConfiguration().validateChanges();
-            }
-            catch ( ConfigurationException e )
-            {
-                // put a veto
-                vevt.putVeto( this, e );
-            }
+            commitChanges();
         }
-        else if ( evt instanceof ConfigurationCommitEvent )
+        catch ( ConfigurationException e )
         {
-            try
-            {
-                commitChanges();
-            }
-            catch ( ConfigurationException e )
-            {
-                // FIXME: log or something?
-                rollbackChanges();
-            }
-        }
-        else if ( evt instanceof ConfigurationRollbackEvent )
-        {
+            // FIXME: log or something?
             rollbackChanges();
         }
     }
 
-    protected ApplicationEventMulticaster getApplicationEventMulticaster()
+    @Subscribe
+    public void onEvent( final ConfigurationRollbackEvent evt )
     {
-        return applicationEventMulticaster;
+        rollbackChanges();
     }
 
     protected abstract ApplicationConfiguration getApplicationConfiguration();
@@ -254,10 +253,34 @@ public abstract class AbstractConfigurable
         getCurrentCoreConfiguration().commitChanges();
     }
 
+    protected EventBus eventBus()
+    {
+        return eventBus;
+    }
+
+    public void registerWithEventBus()
+    {
+        if ( !registeredWithEventBus )
+        {
+            eventBus.register( this );
+            registeredWithEventBus = true;
+        }
+    }
+
+    public void unregisterFromEventBus()
+    {
+        if ( registeredWithEventBus )
+        {
+            eventBus.unregister( this );
+            registeredWithEventBus = false;
+        }
+    }
+
     protected abstract Configurator getConfigurator();
 
     protected abstract Object getCurrentConfiguration( boolean forWrite );
 
     protected abstract CoreConfiguration wrapConfiguration( Object configuration )
         throws ConfigurationException;
+
 }

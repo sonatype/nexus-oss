@@ -24,14 +24,14 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
-import org.sonatype.security.events.SecurityConfigurationChangedEvent;
+import org.sonatype.security.events.SecurityConfigurationChanged;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.model.upgrade.SecurityDataUpgrader;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @Component( role = EventInspector.class, hint = "SecurityUpgradeEventInspector" )
 public class SecurityUpgradeEventInspector
@@ -55,7 +55,7 @@ public class SecurityUpgradeEventInspector
     private SecurityDataUpgrader upgrader;
 
     @Requirement
-    private ApplicationEventMulticaster eventMulticaster;
+    private EventBus eventBus;
 
     public boolean accepts( Event<?> evt )
     {
@@ -112,7 +112,7 @@ public class SecurityUpgradeEventInspector
                     // because we change the configuration directly we need to tell the SecuritySystem to clear the
                     // cache,
                     // although at this point nothing should be cached, but better safe the sorry
-                    eventMulticaster.notifyEventListeners( new SecurityConfigurationChangedEvent( null ) );
+                    eventBus.post( new SecurityConfigurationChanged() );
                 }
             }
             catch ( ConfigurationIsCorruptedException e )

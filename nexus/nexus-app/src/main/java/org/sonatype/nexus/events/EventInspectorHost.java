@@ -20,7 +20,6 @@ import org.sonatype.plexus.appevents.EventListener;
  * @author cstamas
  */
 public interface EventInspectorHost
-    extends EventListener
 {
     /**
      * Shuts down event inspector cleanly (mainly maintains the thread pool).
