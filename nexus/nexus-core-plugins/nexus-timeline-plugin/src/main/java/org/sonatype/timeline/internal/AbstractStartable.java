@@ -20,7 +20,7 @@ import org.sonatype.timeline.TimelineConfiguration;
 
 public abstract class AbstractStartable
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger;
 
     private TimelineConfiguration configuration;
 
@@ -28,10 +28,11 @@ public abstract class AbstractStartable
 
     protected AbstractStartable()
     {
+        this.logger = LoggerFactory.getLogger( getClass() );
         this.started = false;
     }
 
-    public void start( TimelineConfiguration config )
+    public void start( final TimelineConfiguration config )
         throws IOException
     {
         this.configuration = config;

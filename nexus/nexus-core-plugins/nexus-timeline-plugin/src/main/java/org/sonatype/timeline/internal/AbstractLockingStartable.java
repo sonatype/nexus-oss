@@ -27,7 +27,7 @@ public abstract class AbstractLockingStartable
         this.timelineLock = new ReentrantReadWriteLock();
     }
 
-    public void start( TimelineConfiguration config )
+    public void start( final TimelineConfiguration config )
         throws IOException
     {
         getTimelineLock().writeLock().lock();

@@ -38,13 +38,14 @@ import org.sonatype.timeline.proto.TimeLineRecordProtos;
 
 /**
  * The class doing persitence of timeline records using Protobuf.
- * 
+ *
  * @author juven
  * @author cstamas
  */
 public class DefaultTimelinePersistor
     extends AbstractStartable
 {
+
     @Deprecated
     private static final String V1_DATA_FILE_NAME_DATE_FORMAT = "yyyy-MM-dd.HH-mm-ss";
 
@@ -60,9 +61,9 @@ public class DefaultTimelinePersistor
 
     private static final String V2_DATA_FILE_NAME_DATE_FORMAT = "yyyy-MM-dd.HH-mm-ssZ";
 
-    private static final Pattern V2_DATA_FILE_NAME_PATTERN = Pattern.compile( "^"
-        + V2_DATA_FILE_NAME_PREFIX.replace( ".", "\\." ) + "(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2}[+-]\\d{4})"
-        + V2_DATA_FILE_NAME_SUFFIX.replace( ".", "\\." ) + "$" );
+    private static final Pattern V2_DATA_FILE_NAME_PATTERN = Pattern.compile( "^" + V2_DATA_FILE_NAME_PREFIX.replace(
+        ".", "\\." ) + "(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2}[+-]\\d{4})" + V2_DATA_FILE_NAME_SUFFIX.replace(
+        ".", "\\." ) + "$" );
 
     private int rollingIntervalMillis;
 
@@ -92,7 +93,13 @@ public class DefaultTimelinePersistor
         // nop
     }
 
-    public void persist( final TimelineRecord... records )
+    /**
+     * Persistor writes to file, so we must ensure write request are coming in one by one.
+     *
+     * @param records
+     * @throws IOException
+     */
+    public synchronized void persist( final TimelineRecord... records )
         throws IOException
     {
         verify( records );
@@ -216,7 +223,7 @@ public class DefaultTimelinePersistor
     /**
      * Reads a whole file into memory, and in case of any problem, it returns an empty collection, making this file to
      * be skipped.
-     * 
+     *
      * @param file
      * @return
      */
@@ -268,7 +275,7 @@ public class DefaultTimelinePersistor
 
     // ==
 
-    protected synchronized File getDataFile()
+    protected File getDataFile()
         throws IOException
     {
         final long now = System.currentTimeMillis();
@@ -285,7 +292,8 @@ public class DefaultTimelinePersistor
     {
         final SimpleDateFormat dateFormat = new SimpleDateFormat( V2_DATA_FILE_NAME_DATE_FORMAT );
         final StringBuilder fileName = new StringBuilder();
-        fileName.append( V2_DATA_FILE_NAME_PREFIX ).append( dateFormat.format( new Date( System.currentTimeMillis() ) ) ).append(
+        fileName.append( V2_DATA_FILE_NAME_PREFIX ).append(
+            dateFormat.format( new Date( System.currentTimeMillis() ) ) ).append(
             V2_DATA_FILE_NAME_SUFFIX );
         return fileName.toString();
     }

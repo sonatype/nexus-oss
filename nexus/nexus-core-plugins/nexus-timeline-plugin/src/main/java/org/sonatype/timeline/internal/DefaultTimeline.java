@@ -33,6 +33,7 @@ public class DefaultTimeline
     extends AbstractLockingStartable
     implements Timeline
 {
+
     private final DefaultTimelinePersistor persistor;
 
     private final DefaultTimelineIndexer indexer;
@@ -66,6 +67,7 @@ public class DefaultTimeline
     protected void doStart()
         throws IOException
     {
+        getLogger().info( "Starting Timeline..." );
         // if persistor fails, it's a total failure, we
         // cannot work without persistor
         persistor.start( getConfiguration() );
@@ -86,6 +88,7 @@ public class DefaultTimeline
     protected void doStop()
         throws IOException
     {
+        getLogger().info( "Stopping Timeline..." );
         final ArrayList<IOException> exceptions = new ArrayList<IOException>( 2 );
         try
         {
@@ -147,14 +150,14 @@ public class DefaultTimeline
 
     @Override
     public void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter filter,
-                          TimelineCallback callback )
+        TimelineCallback callback )
     {
         retrieve( 0L, System.currentTimeMillis(), fromItem, count, types, subTypes, filter, callback );
     }
 
     @Override
     public void retrieve( long fromTime, long toTime, int from, int count, Set<String> types, Set<String> subTypes,
-                          TimelineFilter filter, TimelineCallback callback )
+        TimelineFilter filter, TimelineCallback callback )
     {
         retrieveFromIndexer( fromTime, toTime, from, count, types, subTypes, filter, callback );
     }
@@ -247,7 +250,7 @@ public class DefaultTimeline
     }
 
     protected void retrieveFromIndexer( long fromTime, long toTime, int from, int count, Set<String> types,
-                                        Set<String> subTypes, TimelineFilter filter, TimelineCallback callback )
+        Set<String> subTypes, TimelineFilter filter, TimelineCallback callback )
     {
         getTimelineLock().readLock().lock();
         try
@@ -294,73 +297,92 @@ public class DefaultTimeline
 
     private final ReentrantLock repairLock = new ReentrantLock();
 
+    private volatile boolean repairTriedAndFailed = false;
+
     /**
      * Indexer is healthy if there is no ongoing repair, and indexer reports itself as started.
      */
-    protected boolean isIndexerHealthy()
+    protected synchronized boolean isIndexerHealthy()
     {
         // we have no ongoing repair and indexer is started
-        return ( !repairLock.isLocked() ) && indexer.isStarted();
+        final boolean locked = repairLock.tryLock();
+        try
+        {
+            return locked && indexer.isStarted();
+        }
+        finally
+        {
+            if ( locked )
+            {
+                repairLock.unlock();
+            }
+        }
     }
 
     /**
-     * This method might, and probably will, be invoked by multiple threads doing different things, but only one should
-     * "win" and do the job. The prize of the winner is actually a penalty, that the winning thread will do the heavy
-     * lifting of repairing the timeline indexer, which is actually shoveling over the records from persistor into newly
-     * started indexer, if it was possible to start it at all.
-     * 
+     * This method will be invoked by only one thread, the one that detects an indexer problem (catches an IOException
+     * during indexer operation most likely). If the thread detecting the problem fails to repair the indexer, it will
+     * be flagged as "dead beef" (see {@link DefaultTimeline#repairTriedAndFailed}), so no subsequent thread catching
+     * IOException will try to fix it anymore. For concurrent invocations protection (ruling out parallel retries),
+     * a lock is used for foolproof protection, but also, {@link #isIndexerHealthy()} method will protect too. Repair
+     * will be tried only once, and never after. Timeline repair in that case will happen on next instance reboot, but
+     * this was the case even before (indexer was stopped, and {@link #isIndexerHealthy()} method started returning
+     * false, hence, noone touched indexer, nor catched IOException anymore, and no repair was tried).
+     *
      * @param e
      * @throws IOException
      */
     protected void repairTimelineIndexer( final Exception e )
         throws IOException
     {
-        if ( repairLock.tryLock() )
+        repairLock.lock();
+        try
         {
+            // check for any previous attempt
+            if ( repairTriedAndFailed )
+            {
+                // return silently, as we leave indexer in broken state to not bork whole instance
+                return;
+            }
+            getLogger().info( "Timeline index got corrupted, trying to repair it.", e );
+            // stopping it cleanly
+            indexer.stop();
+            // deleting index files
+            FileUtils.cleanDirectory( getConfiguration().getIndexDirectory() );
             try
             {
-                getLogger().info( "Timeline index got corrupted, trying to repair it.", e );
-                // stopping it cleanly
-                indexer.stop();
-                // deleting index files
-                FileUtils.cleanDirectory( getConfiguration().getIndexDirectory() );
-                try
+                // creating new index from scratch
+                indexer.start( getConfiguration() );
+                // pouring over records from persisted into indexer
+                final RepairBatch rb = new RepairBatch( indexer );
+                persistor.readAllSinceDays( getConfiguration().getRepairDaysCountRestored(), rb );
+                rb.finish();
+
+                // TODO: the else branch has no sense, as on unsuccesful start, exception will be thrown anyway
+                if ( indexer.isStarted() )
                 {
-                    // creating new index from scratch
-                    indexer.start( getConfiguration() );
-                    // pouring over records from persisted into indexer
-                    final RepairBatch rb = new RepairBatch( indexer );
-                    persistor.readAllSinceDays( getConfiguration().getRepairDaysCountRestored(), rb );
-                    rb.finish();
-                    if ( indexer.isStarted() )
-                    {
-                        getLogger().info(
-                            "Timeline index is succesfully repaired, the last "
-                                + getConfiguration().getRepairDaysCountRestored() + " days were restored." );
-                    }
-                    else
-                    {
-                        getLogger().warn( "Timeline index was corrupted and repair of it failed!" );
-                    }
+                    getLogger().info(
+                        "Timeline index is succesfully repaired, the last "
+                            + getConfiguration().getRepairDaysCountRestored() + " days were restored." );
                 }
-                catch ( Exception ex )
+                else
                 {
-                    // we need to stop it
-                    indexer.stop();
-                    if ( ex instanceof IOException )
-                    {
-                        throw (IOException) ex;
-                    }
-                    else
-                    {
-                        throw new IOException( "Unable to repair the Timeline indexer!", ex );
-                    }
+                    // this branch will most likely never execute
+                    throw new IOException( "Unable to repair the Timeline indexer!" );
                 }
             }
-            finally
+            catch ( IOException ex )
             {
-                repairLock.unlock();
+                getLogger().warn( "Timeline index was corrupted and repair of it failed!", e );
+                // we need to stop it and signal to not try any other thread
+                repairTriedAndFailed = true;
+                indexer.stop();
+                throw ex;
             }
+        }
+        finally
+        {
+            repairLock.unlock();
         }
     }
 }
