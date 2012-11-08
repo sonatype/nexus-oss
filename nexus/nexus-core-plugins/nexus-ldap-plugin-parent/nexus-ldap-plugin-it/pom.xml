@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-ldap-plugin-it</artifactId>
-  <name>Nexus : Core Plugins : OSS LDAP : Plugin ITs</name>
 
   <dependencies>
     <dependency>
