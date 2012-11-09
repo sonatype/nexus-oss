@@ -12,8 +12,9 @@
  */
 package org.sonatype.security.ldap.realms;
 
-public class DynaGroupMissingSchemaTest
-    extends AbstractLdapSchemaTest
-{
 
+public class NestedUsersDnGroupLdapSchemaIT
+    extends LdapSchemaTestSupport
+{
+    
 }

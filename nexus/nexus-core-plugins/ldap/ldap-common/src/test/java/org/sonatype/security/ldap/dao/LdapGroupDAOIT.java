@@ -21,10 +21,10 @@ import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
 import org.junit.Test;
-import org.sonatype.security.ldap.AbstractLdapTest;
+import org.sonatype.security.ldap.LdapTestSupport;
 
-public class LdapGroupDAOTest
-    extends AbstractLdapTest
+public class LdapGroupDAOIT
+    extends LdapTestSupport
 {
 
     @Test

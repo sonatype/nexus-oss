@@ -30,7 +30,7 @@ import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
-public abstract class AbstractLdapTest
+public abstract class LdapTestSupport
     extends NexusTestSupport
 {
     private LdapServer ldapServer;

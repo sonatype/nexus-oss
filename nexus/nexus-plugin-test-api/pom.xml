@@ -31,25 +31,20 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>server-provider</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
       <classifier>tests</classifier>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
       <classifier>tests</classifier>
-      <optional>true</optional>
-    </dependency>
-
-    <!--
-    FIXME: Should update plugins to include this if only if using restlet1x plugin for REST.
-    -->
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-plugin</artifactId>
     </dependency>
   </dependencies>
 

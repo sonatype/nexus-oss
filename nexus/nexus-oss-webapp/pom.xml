@@ -28,7 +28,6 @@
   FIXME: Rename to nexus-bundle-template
   -->
   <artifactId>nexus-oss-webapp</artifactId>
-  <name>Nexus : Distros : Nexus OSS Bundle</name>
   <packaging>pom</packaging>
 
   <dependencies>

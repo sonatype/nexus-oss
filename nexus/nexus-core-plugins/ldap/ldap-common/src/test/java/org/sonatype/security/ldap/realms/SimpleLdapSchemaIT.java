@@ -12,8 +12,8 @@
  */
 package org.sonatype.security.ldap.realms;
 
-public class DynamicNoUserBaseDnLdapSchemaTest
-    extends AbstractLdapSchemaTest
+public class SimpleLdapSchemaIT
+    extends LdapSchemaTestSupport
 {
 
 }

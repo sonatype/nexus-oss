@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-proxy</artifactId>
-  <name>Nexus : Proxy</name>
 
   <dependencies>
     <!--
