@@ -232,7 +232,6 @@ public class MavenRepositoryReader
 
         HttpGet method = new HttpGet(url);
         try {
-            // FIXME: This misses a lot of headers/query-string/user-agent customizations that the remote storage impl would have applied
             logger.debug("Requesting: {}", method);
             HttpResponse response = client.execute(method);
             int statusCode = response.getStatusLine().getStatusCode();
