@@ -270,8 +270,14 @@ public class DefaultTimeline
                             public Void doIt()
                                 throws IOException
                             {
-                                repairTimelineIndexer( e, indexerGeneration );
-                                timelineLock.readLock().lock();
+                                try
+                                {
+                                    repairTimelineIndexer( e, indexerGeneration );
+                                }
+                                finally
+                                {
+                                    timelineLock.readLock().lock();
+                                }
                                 return null;
                             }
                         } );
