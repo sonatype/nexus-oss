@@ -36,16 +36,15 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-model</artifactId>
-    </dependency>
-
      <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration-model</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-logging-extras</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
@@ -59,6 +58,10 @@
       <artifactId>commons-io</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-model</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
