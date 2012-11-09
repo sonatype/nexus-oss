@@ -35,12 +35,18 @@
       <artifactId>server-provider</artifactId>
     </dependency>
 
+    <!-- Needed as runtime for many tests to work at all -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
       <classifier>tests</classifier>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
