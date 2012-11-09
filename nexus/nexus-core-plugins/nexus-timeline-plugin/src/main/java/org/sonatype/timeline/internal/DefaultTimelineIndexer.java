@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -45,11 +46,11 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.sonatype.timeline.TimelineCallback;
+import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineRecord;
 
 public class DefaultTimelineIndexer
-    extends AbstractStartable
 {
 
     private static final String TIMESTAMP = "_t";
@@ -68,11 +69,12 @@ public class DefaultTimelineIndexer
 
     private SearcherManager searcherManager;
 
+    private AtomicInteger generation = new AtomicInteger( 0 );
+
     // ==
     // Public API
 
-    @Override
-    protected void doStart()
+    protected void start( final TimelineConfiguration configuration )
         throws IOException
     {
         try
@@ -82,7 +84,7 @@ public class DefaultTimelineIndexer
             {
                 directory.close();
             }
-            directory = FSDirectory.open( getConfiguration().getIndexDirectory() );
+            directory = FSDirectory.open( configuration.getIndexDirectory() );
             if ( IndexReader.indexExists( directory ) )
             {
                 if ( IndexWriter.isLocked( directory ) )
@@ -99,6 +101,7 @@ public class DefaultTimelineIndexer
             indexWriter.commit();
 
             searcherManager = new SearcherManager( indexWriter, false, new SearcherFactory() );
+            generation.incrementAndGet();
         }
         catch ( IOException e )
         {
@@ -107,8 +110,7 @@ public class DefaultTimelineIndexer
         }
     }
 
-    @Override
-    public void doStop()
+    protected void stop()
         throws IOException
     {
         closeIndexWriter();
@@ -119,13 +121,18 @@ public class DefaultTimelineIndexer
         }
     }
 
-    public void add( final TimelineRecord record )
+    protected int getGeneration()
+    {
+        return generation.intValue();
+    }
+
+    protected void add( final TimelineRecord record )
         throws IOException
     {
         addAll( record );
     }
 
-    public void addAll( final TimelineRecord... records )
+    protected void addAll( final TimelineRecord... records )
         throws IOException
     {
         try
@@ -143,7 +150,7 @@ public class DefaultTimelineIndexer
         }
     }
 
-    public void addBatch( final TimelineRecord record )
+    protected void addBatch( final TimelineRecord record )
         throws IOException
     {
         try
@@ -157,7 +164,7 @@ public class DefaultTimelineIndexer
         }
     }
 
-    public void finishBatch()
+    protected void finishBatch()
         throws IOException
     {
         try
@@ -171,7 +178,7 @@ public class DefaultTimelineIndexer
         }
     }
 
-    public void retrieve( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes,
+    protected void retrieve( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes,
         int from, int count, final TimelineFilter filter, final TimelineCallback callback )
         throws IOException
     {
@@ -256,7 +263,7 @@ public class DefaultTimelineIndexer
         }
     }
 
-    public int purge( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes )
+    protected int purge( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes )
         throws IOException
     {
         try

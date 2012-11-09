@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.timeline.TimelineCallback;
+import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 import org.sonatype.timeline.proto.TimeLineRecordProtos;
 
@@ -43,7 +44,6 @@ import org.sonatype.timeline.proto.TimeLineRecordProtos;
  * @author cstamas
  */
 public class DefaultTimelinePersistor
-    extends AbstractStartable
 {
 
     @Deprecated
@@ -76,21 +76,14 @@ public class DefaultTimelinePersistor
     // ==
     // Public API
 
-    @Override
-    protected void doStart()
+    protected void start( final TimelineConfiguration configuration )
     {
-        this.persistDirectory = getConfiguration().getPersistDirectory();
+        this.persistDirectory = configuration.getPersistDirectory();
         if ( !this.persistDirectory.exists() )
         {
             this.persistDirectory.mkdirs();
         }
-        this.rollingIntervalMillis = getConfiguration().getPersistRollingIntervalMillis();
-    }
-
-    @Override
-    protected void doStop()
-    {
-        // nop
+        this.rollingIntervalMillis = configuration.getPersistRollingIntervalMillis();
     }
 
     /**
