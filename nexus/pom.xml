@@ -1768,7 +1768,7 @@
     <module>nexus-configuration</module>
     <module>nexus-proxy</module>
     <module>nexus-app</module>
-    <module>nexus-core-plugins</module>
+    <module>plugins</module>
     <module>nexus-webapp</module>
     <module>nexus-launcher</module>
     <module>nexus-client-core</module>
