@@ -214,6 +214,8 @@
             <sharedDependency>org.restlet:org.restlet</sharedDependency>
             <sharedDependency>org.sonatype.security:security-rest-api</sharedDependency>
             <sharedDependency>org.sonatype.security:security-rest-model</sharedDependency>
+            <!-- Used by ResourceSupport class, and as Restlet1x is now a plugin, this is not on core anymore -->
+            <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>
