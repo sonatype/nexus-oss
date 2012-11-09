@@ -18,12 +18,12 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
-import org.sonatype.security.ldap.AbstractLdapTest;
+import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 
-public class LdapUserManagerNotConfiguredTest
-    extends AbstractLdapTest
+public class LdapUserManagerNotConfiguredIT
+    extends LdapTestSupport
 {
     @Override
     public void setUp()

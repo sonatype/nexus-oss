@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-configuration</artifactId>
-  <name>Nexus : Configuration</name>
 
   <dependencies>
     <dependency>
@@ -72,7 +71,6 @@
       <artifactId>xstream</artifactId>
     </dependency>
 
-    <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>

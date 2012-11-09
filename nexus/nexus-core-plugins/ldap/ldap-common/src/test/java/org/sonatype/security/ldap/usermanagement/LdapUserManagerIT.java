@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.guice.SecurityModule;
-import org.sonatype.security.ldap.AbstractLdapTest;
+import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
@@ -34,8 +34,8 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 import com.google.inject.Module;
 
-public class LdapUserManagerTest
-    extends AbstractLdapTest
+public class LdapUserManagerIT
+    extends LdapTestSupport
 {
     @Override
     protected Module[] getTestCustomModules()

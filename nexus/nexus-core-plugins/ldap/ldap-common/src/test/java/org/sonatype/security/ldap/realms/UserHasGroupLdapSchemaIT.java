@@ -12,8 +12,8 @@
  */
 package org.sonatype.security.ldap.realms;
 
-public class UserHasGroupLdapSchemaTest
-    extends AbstractLdapSchemaTest
+public class UserHasGroupLdapSchemaIT
+    extends LdapSchemaTestSupport
 {
 
 }
