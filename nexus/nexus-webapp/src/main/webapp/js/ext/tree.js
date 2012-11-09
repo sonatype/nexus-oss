@@ -15,7 +15,6 @@ define('ext/tree',
       [
         'ext/tree/sonatype',
         'ext/tree/treedropzone',
-        'ext/tree/treeloader',
-        'ext/tree/treenode'
+        'ext/tree/treeloader'
       ],
       function() {});

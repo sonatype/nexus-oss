@@ -15,6 +15,11 @@
 define('ext/form/displayfield',['extjs'], function(Ext) {
 Ext.form.TimestampDisplayField = Ext.extend(Ext.form.DisplayField, {
   setValue : function(v) {
+    if (typeof v !== 'number') {
+      this.setRawValue(v);
+      return this;
+    }
+
     // java give the timestamp in miliseconds, extjs consumes it in seconds
     var toSecs = Math.round(v / 1000);
     v = new Date.parseDate(toSecs, 'U').toString();
@@ -27,6 +32,11 @@ Ext.reg('timestampDisplayField', Ext.form.TimestampDisplayField);
 
 Ext.form.ByteDisplayField = Ext.extend(Ext.form.DisplayField, {
   setValue : function(v) {
+    if (typeof v !== 'number') {
+      this.setRawValue(v);
+      return this;
+    }
+
     if (v < 1024)
     {
       v = v + ' Bytes';
