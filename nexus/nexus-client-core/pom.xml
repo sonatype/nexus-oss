@@ -30,8 +30,8 @@
   <dependencies>
     <!-- Core API Models -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api-model</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-model</artifactId>
     </dependency>
 
     <!-- Security Models -->

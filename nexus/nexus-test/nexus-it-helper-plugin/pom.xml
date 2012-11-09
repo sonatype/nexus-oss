@@ -22,6 +22,7 @@
     <version>2.3-SNAPSHOT</version>
   </parent>
   <artifactId>nexus-it-helper-plugin</artifactId>
+  <name>Nexus : Test Harness : Helper Plugin</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>
@@ -38,14 +39,29 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <artifactId>nexus-app</artifactId>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.shiro</groupId>
-          <artifactId>shiro-core</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+
+    <!-- Restlet1x is now a plugin, and this is a plugin too -->
+    <!-- in this case, exact type is needed, to have plugin MD reflect this -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-logging-extras</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

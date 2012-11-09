@@ -17,4 +17,3 @@ define('sonatype', ['extjs'], function(Ext) {
 
   return Sonatype;
 });
-

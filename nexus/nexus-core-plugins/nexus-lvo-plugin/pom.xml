@@ -24,8 +24,7 @@
 
   <artifactId>nexus-lvo-plugin</artifactId>
 
-  <!-- FIXME: This is not being used as a plugin for some reason... WTF -->
-  <!--<packaging>nexus-plugin</packaging>-->
+  <packaging>nexus-plugin</packaging>
 
   <properties>
     <nexus.plugin.name>Nexus LVO Plugin</nexus.plugin.name>
@@ -40,8 +39,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 

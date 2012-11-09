@@ -96,8 +96,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -115,8 +116,8 @@
 
     <!-- FIXME: This dependency is here only for TestMarshalUnmarchal via TestLuceneRestMarshalUnmarchal -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
