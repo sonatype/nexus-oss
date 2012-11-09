@@ -93,7 +93,7 @@ public class DefaultTimeline
                     DefaultTimeline.this.configuration = configuration;
                     // if persistor fails, it's a total failure, we
                     // cannot work without persistor
-                    persistor.start( configuration );
+                    persistor.setConfiguration( configuration );
 
                     // indexer start, that might need repair
                     // and might end up in falied repair

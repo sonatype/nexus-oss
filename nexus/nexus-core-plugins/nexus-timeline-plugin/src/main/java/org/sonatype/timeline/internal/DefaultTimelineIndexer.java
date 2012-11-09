@@ -17,7 +17,6 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -69,7 +68,7 @@ public class DefaultTimelineIndexer
 
     private SearcherManager searcherManager;
 
-    private AtomicInteger generation = new AtomicInteger( 0 );
+    private int generation = 0;
 
     // ==
     // Public API
@@ -77,37 +76,29 @@ public class DefaultTimelineIndexer
     protected void start( final TimelineConfiguration configuration )
         throws IOException
     {
-        try
+        closeIndexWriter();
+        if ( directory != null )
         {
-            closeIndexWriter();
-            if ( directory != null )
-            {
-                directory.close();
-            }
-            directory = FSDirectory.open( configuration.getIndexDirectory() );
-            if ( IndexReader.indexExists( directory ) )
-            {
-                if ( IndexWriter.isLocked( directory ) )
-                {
-                    IndexWriter.unlock( directory );
-                }
-            }
-
-            final IndexWriterConfig config =
-                new IndexWriterConfig( Version.LUCENE_36, new StandardAnalyzer( Version.LUCENE_36 ) );
-            config.setMergeScheduler( new SerialMergeScheduler() );
-            config.setRAMBufferSizeMB( 2.0 );
-            indexWriter = new IndexWriter( directory, config );
-            indexWriter.commit();
-
-            searcherManager = new SearcherManager( indexWriter, false, new SearcherFactory() );
-            generation.incrementAndGet();
+            directory.close();
         }
-        catch ( IOException e )
+        directory = FSDirectory.open( configuration.getIndexDirectory() );
+        if ( IndexReader.indexExists( directory ) )
         {
-            stop();
-            throw e;
+            if ( IndexWriter.isLocked( directory ) )
+            {
+                IndexWriter.unlock( directory );
+            }
         }
+
+        final IndexWriterConfig config =
+            new IndexWriterConfig( Version.LUCENE_36, new StandardAnalyzer( Version.LUCENE_36 ) );
+        config.setMergeScheduler( new SerialMergeScheduler() );
+        config.setRAMBufferSizeMB( 2.0 );
+        indexWriter = new IndexWriter( directory, config );
+        indexWriter.commit();
+
+        searcherManager = new SearcherManager( indexWriter, false, new SearcherFactory() );
+        generation = generation + 1;
     }
 
     protected void stop()
@@ -123,7 +114,7 @@ public class DefaultTimelineIndexer
 
     protected int getGeneration()
     {
-        return generation.intValue();
+        return generation;
     }
 
     protected void add( final TimelineRecord record )
@@ -135,173 +126,134 @@ public class DefaultTimelineIndexer
     protected void addAll( final TimelineRecord... records )
         throws IOException
     {
-        try
+        for ( TimelineRecord rec : records )
         {
-            for ( TimelineRecord rec : records )
-            {
-                indexWriter.addDocument( createDocument( rec ) );
-            }
-            indexWriter.commit();
+            indexWriter.addDocument( createDocument( rec ) );
         }
-        catch ( IOException e )
-        {
-            stop();
-            throw e;
-        }
+        indexWriter.commit();
     }
 
     protected void addBatch( final TimelineRecord record )
         throws IOException
     {
-        try
-        {
-            indexWriter.addDocument( createDocument( record ) );
-        }
-        catch ( IOException e )
-        {
-            stop();
-            throw e;
-        }
+        indexWriter.addDocument( createDocument( record ) );
     }
 
     protected void finishBatch()
         throws IOException
     {
-        try
-        {
-            indexWriter.commit();
-        }
-        catch ( IOException e )
-        {
-            stop();
-            throw e;
-        }
+        indexWriter.commit();
     }
 
-    protected void retrieve( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes,
+    protected void retrieve( final long fromTime, final long toTime, final Set<String> types,
+        final Set<String> subTypes,
         int from, int count, final TimelineFilter filter, final TimelineCallback callback )
         throws IOException
     {
+        if ( count == 0 )
+        {
+            // new in Lucene 3.5, it would bitch IllegalArgEx if we ask for "top 0" docs
+            return;
+        }
+        searcherManager.maybeRefresh();
+        final IndexSearcher searcher = searcherManager.acquire();
         try
         {
-            if ( count == 0 )
+            if ( searcher.maxDoc() == 0 )
             {
-                // new in Lucene 3.5, it would bitch IllegalArgEx if we ask for "top 0" docs
+                // index empty
                 return;
             }
-            searcherManager.maybeRefresh();
-            final IndexSearcher searcher = searcherManager.acquire();
-            try
+            final TopFieldDocs topDocs;
+            if ( filter == null )
             {
-                if ( searcher.maxDoc() == 0 )
-                {
-                    // index empty
-                    return;
-                }
-                final TopFieldDocs topDocs;
-                if ( filter == null )
-                {
-                    // without filter is easy: we account for paging only
-                    topDocs =
-                        searcher.search( buildQuery( fromTime, toTime, types, subTypes ), null, from + count, new Sort(
-                            new SortField( TIMESTAMP, SortField.LONG, true ) ) );
-                }
-                else
-                {
-                    // with filter is hard: we go for max val and let's see what will filter throw out to fulfil count to
-                    // return
-                    topDocs =
-                        searcher.search( buildQuery( fromTime, toTime, types, subTypes ), null, Integer.MAX_VALUE,
-                                         new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
-                }
-                if ( topDocs.scoreDocs.length == 0 )
-                {
-                    // nothing found on index
-                    return;
-                }
-
-                // build result
-                int i = 0;
-                int returned = 0;
-                while ( true )
-                {
-                    if ( i >= topDocs.scoreDocs.length || returned >= count )
-                    {
-                        break;
-                    }
-
-                    Document doc = searcher.doc( topDocs.scoreDocs[i++].doc );
-                    TimelineRecord data = buildData( doc );
-                    if ( filter != null && !filter.accept( data ) )
-                    {
-                        data = null;
-                        continue;
-                    }
-                    // skip the unneeded stuff
-                    // Warning: this means we skip the needed FILTERED stuff out!
-                    if ( from > 0 )
-                    {
-                        from--;
-                        continue;
-                    }
-                    returned++;
-                    if ( !callback.processNext( data ) )
-                    {
-                        break;
-                    }
-                }
+                // without filter is easy: we account for paging only
+                topDocs =
+                    searcher.search( buildQuery( fromTime, toTime, types, subTypes ), null, from + count, new Sort(
+                        new SortField( TIMESTAMP, SortField.LONG, true ) ) );
             }
-            finally
+            else
             {
-                searcherManager.release( searcher );
+                // with filter is hard: we go for max val and let's see what will filter throw out to fulfil count to
+                // return
+                topDocs =
+                    searcher.search( buildQuery( fromTime, toTime, types, subTypes ), null, Integer.MAX_VALUE,
+                                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+            }
+            if ( topDocs.scoreDocs.length == 0 )
+            {
+                // nothing found on index
+                return;
+            }
+
+            // build result
+            int i = 0;
+            int returned = 0;
+            while ( true )
+            {
+                if ( i >= topDocs.scoreDocs.length || returned >= count )
+                {
+                    break;
+                }
+
+                Document doc = searcher.doc( topDocs.scoreDocs[i++].doc );
+                TimelineRecord data = buildData( doc );
+                if ( filter != null && !filter.accept( data ) )
+                {
+                    data = null;
+                    continue;
+                }
+                // skip the unneeded stuff
+                // Warning: this means we skip the needed FILTERED stuff out!
+                if ( from > 0 )
+                {
+                    from--;
+                    continue;
+                }
+                returned++;
+                if ( !callback.processNext( data ) )
+                {
+                    break;
+                }
             }
         }
-        catch ( IOException e )
+        finally
         {
-            stop();
-            throw e;
+            searcherManager.release( searcher );
         }
     }
 
     protected int purge( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes )
         throws IOException
     {
+        searcherManager.maybeRefresh();
+        final IndexSearcher searcher = searcherManager.acquire();
         try
         {
-            searcherManager.maybeRefresh();
-            final IndexSearcher searcher = searcherManager.acquire();
-            try
+            if ( searcher.maxDoc() == 0 )
             {
-                if ( searcher.maxDoc() == 0 )
-                {
-                    // empty index, nothing to purge
-                    return 0;
-                }
+                // empty index, nothing to purge
+                return 0;
+            }
 
-                final Query q = buildQuery( fromTime, toTime, types, subTypes );
-                // just to know how many will we delete, will not actually load 'em up
-                final TopFieldDocs topDocs =
-                    searcher.search( q, null, searcher.maxDoc(),
-                                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
-                if ( topDocs.scoreDocs.length == 0 )
-                {
-                    // nothing matched to be purged
-                    return 0;
-                }
-                indexWriter.deleteDocuments( q );
-                indexWriter.commit();
-                indexWriter.optimize();
-                return topDocs.scoreDocs.length;
-            }
-            finally
+            final Query q = buildQuery( fromTime, toTime, types, subTypes );
+            // just to know how many will we delete, will not actually load 'em up
+            final TopFieldDocs topDocs =
+                searcher.search( q, null, searcher.maxDoc(),
+                                 new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+            if ( topDocs.scoreDocs.length == 0 )
             {
-                searcherManager.release( searcher );
+                // nothing matched to be purged
+                return 0;
             }
+            indexWriter.deleteDocuments( q );
+            indexWriter.commit();
+            indexWriter.optimize();
+            return topDocs.scoreDocs.length;
         }
-        catch ( IOException e )
+        finally
         {
-            stop();
-            throw e;
+            searcherManager.release( searcher );
         }
     }
 

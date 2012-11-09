@@ -76,7 +76,13 @@ public class DefaultTimelinePersistor
     // ==
     // Public API
 
-    protected void start( final TimelineConfiguration configuration )
+    /**
+     * Protected by DefaultTimeline, as is called from start(), that is exclusive access, so no other
+     * call might fall in.
+     * 
+     * @param configuration
+     */
+    protected void setConfiguration( final TimelineConfiguration configuration )
     {
         this.persistDirectory = configuration.getPersistDirectory();
         if ( !this.persistDirectory.exists() )
@@ -268,7 +274,13 @@ public class DefaultTimelinePersistor
 
     // ==
 
-    protected File getDataFile()
+    /**
+     * Only one method setting AND reading lastRolledTimestamp and lastRolledFile, must be synced.
+     *
+     * @return
+     * @throws IOException
+     */
+    protected synchronized File getDataFile()
         throws IOException
     {
         final long now = System.currentTimeMillis();
