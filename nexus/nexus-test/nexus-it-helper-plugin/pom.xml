@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <type>nexus-plugin</type>
+      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
