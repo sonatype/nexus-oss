@@ -24,9 +24,6 @@
   </parent>
 
   <artifactId>nexus-indexer-lucene-client</artifactId>
-  <packaging>jar</packaging>
-
-  <name>Nexus Maven Indexer :: Client</name>
 
   <dependencies>
     <dependency>

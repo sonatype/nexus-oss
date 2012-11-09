@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-oss-edition</artifactId>
-  <name>Nexus : OSS Edition</name>
 
   <dependencies>
     <dependency>

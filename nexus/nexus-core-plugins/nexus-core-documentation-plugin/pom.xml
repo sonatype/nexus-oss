@@ -13,7 +13,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -25,7 +26,6 @@
 
   <artifactId>nexus-core-documentation-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <name>Nexus : Core Plugins : Core Documentation</name>
 
   <properties>
     <nexus.plugin.name>Nexus Core Documentation Plugin</nexus.plugin.name>
@@ -35,7 +35,7 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
+      <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -46,9 +46,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-      <scope>provided</scope>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

@@ -24,15 +24,12 @@
 
   <artifactId>nexus-configuration-model</artifactId>
 
-  <name>Nexus : Configuration Model</name>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-api</artifactId>
     </dependency>
 
-    <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
@@ -102,6 +99,7 @@
           <packageWithVersion>false</packageWithVersion>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>modello-plugin-upgrade</artifactId>

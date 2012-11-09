@@ -22,7 +22,6 @@
   </parent>
 
   <artifactId>nexus-ldap-realm-plugin</artifactId>
-  <name>Nexus : Core Plugins : OSS LDAP : LDAP Plugin</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>
@@ -32,8 +31,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -44,56 +43,13 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-rest-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>ldap-common</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- TESTING -->
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>server-provider</artifactId>
+      <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
 
