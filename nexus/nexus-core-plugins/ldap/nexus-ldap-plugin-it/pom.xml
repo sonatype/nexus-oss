@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-ldap-plugin-it</artifactId>
-  <name>Nexus : Core Plugins : OSS LDAP : Plugin ITs</name>
 
   <dependencies>
     <dependency>
@@ -150,7 +149,7 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <!-- workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart -->
-              <argLine>-Xmx256M</argLine>
+              <argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>
               <!-- LDAP NEEDS tests to be forked or they get broken, do not remove this! -->
               <forkMode>always</forkMode>
             </configuration>

@@ -13,7 +13,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -24,7 +25,6 @@
   </parent>
 
   <artifactId>nexus-archetype-plugin</artifactId>
-  <name>Nexus : Core Plugins : Maven Archetype Catalog</name>
   <packaging>nexus-plugin</packaging>
 
   <properties>
@@ -33,12 +33,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>nexus-archetype-common</artifactId>
@@ -52,21 +46,21 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <scope>provided</scope>
-      <type>${nexus-plugin.type}</type>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
+      <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

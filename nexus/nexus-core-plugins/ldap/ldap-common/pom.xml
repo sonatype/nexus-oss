@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>ldap-common</artifactId>
-  <name>Nexus : Core Plugins : OSS LDAP : Common</name>
 
   <dependencies>
     <!--
@@ -39,26 +38,31 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-core</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -70,12 +74,6 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -102,7 +100,7 @@
             <!--
             TODO: This might not be needed w/forkMode=always
             -->
-            <argLine>-Xmx256M</argLine>
+            <argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>
           </configuration>
         </plugin>
       </plugins>
