@@ -23,7 +23,9 @@
   </parent>
 
   <artifactId>nexus-lvo-plugin</artifactId>
-  <packaging>nexus-plugin</packaging>
+
+  <!-- FIXME: This is not being used as a plugin for some reason... WTF -->
+  <!--<packaging>nexus-plugin</packaging>-->
 
   <properties>
     <nexus.plugin.name>Nexus LVO Plugin</nexus.plugin.name>
