@@ -16,11 +16,12 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.logback.EventTarget;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
 /**
- * {@link EventTarget} that will multicast the incoming logging event to {@link ApplicationEventMulticaster}.
+ * {@link EventTarget} that will post the incoming logging event to {@link EventBus}.
  * 
  * @author cstamas
  * @since 2.2
@@ -30,15 +31,14 @@ public class NexusEventSystemEventTarget
     implements EventTarget
 {
     @Requirement
-    private ApplicationEventMulticaster eventMulticaster;
+    private EventBus eventBus;
 
     @Override
     public void onEvent( final ILoggingEvent eventObject )
     {
-        if ( eventMulticaster != null )
+        if ( eventBus != null )
         {
-            final LogbackLoggingEvent logEvent = new LogbackLoggingEvent( eventObject );
-            eventMulticaster.notifyEventListeners( logEvent );
+            eventBus.post( new LogbackLoggingEvent( eventObject ) );
         }
     }
 }

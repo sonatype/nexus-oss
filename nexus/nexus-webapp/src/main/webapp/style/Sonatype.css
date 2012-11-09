@@ -509,3 +509,7 @@ button.st-icon-refresh {
     width: 18px;
     height: 0px;
 }
+
+.st-server-panel .x-panel-collapsed .x-panel-bwrap {
+    display: none;
+}

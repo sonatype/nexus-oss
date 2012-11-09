@@ -29,8 +29,8 @@ import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * A filter that maps the action from the HTTP Verb.
@@ -46,7 +46,7 @@ public class FailureLoggingHttpMethodPermissionFilter
     private SecuritySystem securitySystem;
 
     @Inject
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private EventBus eventBus;
 
     protected Logger getLogger()
     {
@@ -81,9 +81,8 @@ public class FailureLoggingHttpMethodPermissionFilter
         final ResourceInfo resInfo =
             new ResourceInfo( "HTTP", ( (HttpServletRequest) request ).getMethod(), action,
                 ( (HttpServletRequest) request ).getRequestURI() );
-        final NexusAuthorizationEvent evt = new NexusAuthorizationEvent( this, clientInfo, resInfo, false );
 
-        applicationEventMulticaster.notifyEventListeners( evt );
+        eventBus.post( new NexusAuthorizationEvent( this, clientInfo, resInfo, false ) );
 
     }
 

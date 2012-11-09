@@ -157,7 +157,7 @@ public abstract class AbstractMavenRepository
                 doEvictUnusedItems( request, timestamp, new EvictUnusedMavenItemsWalkerProcessor( timestamp ),
                     new EvictUnusedMavenItemsWalkerFilter() );
 
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+            eventBus().post( new RepositoryEventEvictUnusedItems( this ) );
 
             return result;
         }
@@ -231,7 +231,7 @@ public abstract class AbstractMavenRepository
             }
         }
 
-        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
+        eventBus().post( new RepositoryEventRecreateMavenMetadata( this ) );
 
         return !ctx.isStopped();
     }

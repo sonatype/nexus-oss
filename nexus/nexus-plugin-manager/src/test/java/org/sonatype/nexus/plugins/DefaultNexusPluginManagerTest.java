@@ -30,10 +30,10 @@ import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactExcep
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 /**
@@ -49,7 +49,7 @@ public class DefaultNexusPluginManagerTest
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
     @Mock
-    private ApplicationEventMulticaster eventMulticaster;
+    private EventBus eventBus;
 
     @Mock
     private PluginRepositoryManager pluginRepositoryManager;
@@ -65,7 +65,7 @@ public class DefaultNexusPluginManagerTest
         throws Exception
     {
         final DefaultNexusPluginManager underTest = new DefaultNexusPluginManager(
-            repositoryTypeRegistry, eventMulticaster, pluginRepositoryManager,
+            repositoryTypeRegistry, eventBus, pluginRepositoryManager,
             new DefaultPlexusContainer(), mimeSupport, new HashMap<String, String>()
         )
         {

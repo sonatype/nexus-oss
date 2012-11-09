@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.client.internal.rest.jersey.subsystem.security;
 
+import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.client.internal.rest.jersey.subsystem.security.JerseyUsers.path;
 
 import java.util.Collections;
@@ -39,11 +40,17 @@ public class JerseyUser
         super( nexusClient, id );
     }
 
+    public JerseyUser( final JerseyNexusClient nexusClient, final UserResource settings )
+    {
+        super( nexusClient, settings.getUserId(), settings );
+    }
+
     @Override
     protected UserResource createSettings( final String id )
     {
         final UserResource resource = new UserResource();
         resource.setUserId( id );
+        resource.setStatus( "active" );
         return resource;
     }
 
@@ -60,7 +67,7 @@ public class JerseyUser
     {
         final UserResourceRequest request = new UserResourceRequest();
         request.setData( settings() );
-        return getNexusClient().serviceResource( "Users" )
+        return getNexusClient().serviceResource( "users" )
             .post( UserResourceResponse.class, request )
             .getData();
     }
@@ -109,6 +116,14 @@ public class JerseyUser
     public List<String> roles()
     {
         return Collections.unmodifiableList( settings().getRoles() );
+    }
+
+    @Override
+    public User withPassword( final String value )
+    {
+        checkState( shouldCreate(), "Password can only be set when user is created" );
+        settings().setPassword( value );
+        return this;
     }
 
     @Override

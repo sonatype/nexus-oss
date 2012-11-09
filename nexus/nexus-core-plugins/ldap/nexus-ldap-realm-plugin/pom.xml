@@ -79,7 +79,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <!-- workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart -->
-          <argLine>-Xmx256M</argLine>
+          <argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>
         </configuration>
       </plugin>
 

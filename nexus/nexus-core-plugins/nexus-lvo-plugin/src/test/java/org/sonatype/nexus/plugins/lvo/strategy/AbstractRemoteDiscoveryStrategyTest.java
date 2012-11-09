@@ -41,7 +41,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Proxy;
 import org.sonatype.tests.http.server.fluent.Server;
@@ -69,7 +69,7 @@ public class AbstractRemoteDiscoveryStrategyTest
     private UserAgentBuilder userAgentBuilder;
     
     @Mock
-    private ApplicationEventMulticaster multicaster;
+    private EventBus eventBus;
     
     @Mock
     private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
@@ -102,7 +102,7 @@ public class AbstractRemoteDiscoveryStrategyTest
 
     private AbstractRemoteDiscoveryStrategy create()
     {
-        final Hc4Provider provider = new Hc4ProviderImpl( cfg, userAgentBuilder, multicaster, jmxInstaller );
+        final Hc4Provider provider = new Hc4ProviderImpl( cfg, userAgentBuilder, eventBus, jmxInstaller );
         return new AbstractRemoteDiscoveryStrategy( provider )
         {
             @Override

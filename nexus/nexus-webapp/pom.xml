@@ -22,16 +22,10 @@
   </parent>
 
   <artifactId>nexus-webapp</artifactId>
-  <name>Nexus : Web Application</name>
   <packaging>war</packaging>
 
   <properties>
-    <nexus-tools-input>target/nexus-tools</nexus-tools-input>
     <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
-
-    <plugin-repository.directory>${project.build.finalName}/WEB-INF/plugin-repository</plugin-repository.directory>
-    <optional-plugins.directory>${project.build.finalName}/WEB-INF/optional-plugins</optional-plugins.directory>
-
     <maven.yuicompressor.failOnWarning>true</maven.yuicompressor.failOnWarning>
   </properties>
 
@@ -79,7 +73,11 @@
     FIXME: Put these into DM
     -->
 
-    <!-- There are problems with the Maven reactor that would require these modules However if we include as a test scope the reactor will be happy and the dependency pom will be correct -->
+    <!--
+    There are problems with the Maven reactor that would require these modules.
+    However if we include as a test scope the reactor will be happy and the dependency pom will be correct.
+    -->
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
@@ -166,6 +164,7 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/plugin-repository</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -173,7 +172,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -181,7 +179,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins.ldap</groupId>
@@ -189,7 +186,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -197,7 +193,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -205,7 +200,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -213,7 +207,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -221,7 +214,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -229,7 +221,6 @@
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
-                  <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

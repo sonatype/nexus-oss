@@ -14,7 +14,7 @@
  * Target Edit/Create panel layout and controller
  */
 /*global define*/
-define('nexus/ext/twinpanelcontroller',['extjs', 'nexus'], function(Ext, Nexus) {
+define('nexus/ext/twinpanelcontroller',['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype) {
 
 Ext.namespace('Nexus.ext');
 

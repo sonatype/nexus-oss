@@ -32,10 +32,6 @@ public class ContentIT
 
     private static final String AOP_POM = "aopalliance/aopalliance/1.0/aopalliance-1.0.pom";
 
-    private static final String AOP_JAR = "aopalliance/aopalliance/1.0/aopalliance-1.0.jar";
-
-    private static final String AOP_META = "aopalliance/aopalliance/maven-metadata.xml";
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
