@@ -264,23 +264,17 @@ public class DefaultTimeline
                     try
                     {
                         timelineLock.readLock().unlock();
-                        try
+                        doExclusively( new Work<Void>()
                         {
-                            doExclusively( new Work<Void>()
+                            @Override
+                            public Void doIt()
+                                throws IOException
                             {
-                                @Override
-                                public Void doIt()
-                                    throws IOException
-                                {
-                                    repairTimelineIndexer( e, indexerGeneration );
-                                    return null;
-                                }
-                            } );
-                        }
-                        finally
-                        {
-                            timelineLock.readLock().lock();
-                        }
+                                repairTimelineIndexer( e, indexerGeneration );
+                                timelineLock.readLock().lock();
+                                return null;
+                            }
+                        } );
                         return work.doIt();
                     }
                     catch ( final IOException ee )
