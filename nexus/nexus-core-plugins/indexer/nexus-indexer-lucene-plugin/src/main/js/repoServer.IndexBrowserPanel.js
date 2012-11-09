@@ -167,6 +167,7 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
                   }
                 }
               }));
+          Sonatype.repoServer.IndexBrowserPanel.superclass.refreshHandler.apply(this, arguments);
         }
         else
         {
@@ -178,7 +179,6 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
               }));
         }
 
-        Sonatype.repoServer.IndexBrowserPanel.superclass.refreshHandler.apply(this, arguments);
 
         if (this.innerCt)
         {

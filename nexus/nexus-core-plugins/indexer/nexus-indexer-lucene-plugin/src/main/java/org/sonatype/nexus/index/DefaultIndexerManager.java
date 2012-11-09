@@ -66,7 +66,6 @@ import org.apache.maven.index.artifact.VersionUtils;
 import org.apache.maven.index.context.DefaultIndexingContext;
 import org.apache.maven.index.context.DocumentFilter;
 import org.apache.maven.index.context.IndexCreator;
-import org.apache.maven.index.context.IndexUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.context.MergedIndexingContext;
 import org.apache.maven.index.context.StaticContextMemberProvider;
@@ -1008,14 +1007,15 @@ public class DefaultIndexerManager
 
                         TaskUtil.checkInterruption();
 
-                        // update always true, since we manually manage ctx purge
-                        // mavenIndexer.scan( context, fromPath, null, true /* incremental update */);
+                        // igorf: always do scan in incremental mode. for repositories with remote index, the scan must
+                        // be incremental to properly merge remote index and local scan. for repositories without remote
+                        // index full rescan is forced by starting with new/empty temporary context.
 
-                        // igorf, this needs be merged back to maven indexer
+                        // igorf, this needs be merged back to maven indexer, see MINDEXER-65
                         DefaultScannerListener scanListener = //
                             new DefaultScannerListener( context, //
                                                         indexerEngine, //
-                                                        !fullReindex /* incremental update */, //
+                                                        true /* incremental update, see note above */, //
                                                         null /* listener */);
                         scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
                     }

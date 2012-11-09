@@ -32,12 +32,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
       <scope>test</scope>
       <exclusions>
@@ -52,6 +46,18 @@
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

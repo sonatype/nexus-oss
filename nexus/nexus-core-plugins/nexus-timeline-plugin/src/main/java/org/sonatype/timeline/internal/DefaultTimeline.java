@@ -14,36 +14,49 @@ package org.sonatype.timeline.internal;
 
 import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
+import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineRecord;
 
 @Singleton
 @Named( "default" )
 public class DefaultTimeline
-    extends AbstractStartable
     implements Timeline
 {
+
+    private final Logger logger;
+
+    private TimelineConfiguration configuration;
+
+    private volatile boolean started;
+
     private final DefaultTimelinePersistor persistor;
 
     private final DefaultTimelineIndexer indexer;
 
-    private final ReentrantReadWriteLock timelineLock = new ReentrantReadWriteLock();
-
-    private final ReentrantLock repairLock = new ReentrantLock();
+    private final ReentrantReadWriteLock timelineLock;
 
     public DefaultTimeline()
     {
+        this.logger = LoggerFactory.getLogger( getClass() );
+        this.started = false;
         this.persistor = new DefaultTimelinePersistor();
         this.indexer = new DefaultTimelineIndexer();
+        this.timelineLock = new ReentrantReadWriteLock();
+    }
+
+    protected Logger getLogger()
+    {
+        return logger;
     }
 
     /**
@@ -53,7 +66,7 @@ public class DefaultTimeline
     {
         return indexer;
     }
-    
+
     /**
      * Visible for UT
      */
@@ -65,228 +78,283 @@ public class DefaultTimeline
     // ==
     // Public API
 
-    @Override
-    protected void doStart()
+    public void start( final TimelineConfiguration configuration )
         throws IOException
     {
-        try
+        getLogger().debug( "Starting Timeline..." );
+        doExclusively( new Work<Void>()
         {
-            timelineLock.writeLock().lock();
-            persistor.start( getConfiguration() );
-            try
+            @Override
+            public Void doIt()
+                throws IOException
             {
-                indexer.start( getConfiguration() );
+                if ( !started )
+                {
+                    DefaultTimeline.this.configuration = configuration;
+                    // if persistor fails, it's a total failure, we
+                    // cannot work without persistor
+                    persistor.setConfiguration( configuration );
+
+                    // indexer start, that might need repair
+                    // and might end up in falied repair
+                    try
+                    {
+                        indexer.start( configuration );
+                    }
+                    catch ( IOException e )
+                    {
+                        // we are staring, so repair must be tried at least once
+                        // so we are passing the actual generation, and we are within exclusive lock
+                        repairTimelineIndexer( e, indexer.getGeneration() );
+                    }
+                    DefaultTimeline.this.started = true;
+                    getLogger().info( "Started Timeline..." );
+                }
+                return null;
             }
-            catch ( IOException e )
-            {
-                repairTimelineIndexer( e );
-            }
-        }
-        finally
-        {
-            timelineLock.writeLock().unlock();
-        }
+        } );
     }
 
-    @Override
-    protected void doStop()
+    public void stop()
         throws IOException
     {
-        try
+        getLogger().debug( "Stopping Timeline..." );
+        doExclusively( new Work<Void>()
         {
-            timelineLock.writeLock().lock();
-            indexer.stop();
-        }
-        finally
-        {
-            timelineLock.writeLock().unlock();
-        }
+            @Override
+            public Void doIt()
+                throws IOException
+            {
+                if ( started )
+                {
+                    DefaultTimeline.this.started = false;
+                    indexer.stop();
+                    getLogger().info( "Stopped Timeline..." );
+                }
+                return null;
+            }
+        } );
+    }
+
+    public boolean isStarted()
+    {
+        return started;
     }
 
     @Override
     public void add( final TimelineRecord... records )
     {
+        if ( !started )
+        {
+            return;
+        }
         try
         {
-            timelineLock.readLock().lock();
-            if ( !isStarted() )
-            {
-                return;
-            }
-            try
-            {
-                persistor.persist( records );
-                if ( isIndexerHealthy() )
-                {
-                    try
-                    {
-                        indexer.addAll( records );
-                    }
-                    catch ( IOException e )
-                    {
-                        repairTimelineIndexer( e );
-                        // now try add again
-                        indexer.addAll( records );
-                    }
-                }
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn( "Failed to add a timeline record", e );
-            }
+            persistor.persist( records );
+            addToIndexer( records );
         }
-        finally
+        catch ( IOException e )
         {
-            timelineLock.readLock().unlock();
+            getLogger().warn( "Failed to add a timeline record", e );
         }
     }
 
     @Override
     public int purge( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter )
     {
-        try
+        if ( !started )
         {
-            timelineLock.readLock().lock();
-            if ( !isStarted() )
-            {
-                return 0;
-            }
-            try
-            {
-                if ( isIndexerHealthy() )
-                {
-                    try
-                    {
-                        return indexer.purge( 0l, timestamp, types, subTypes );
-                    }
-                    catch ( IOException e )
-                    {
-                        repairTimelineIndexer( e );
-                        // now try purge again
-                        return indexer.purge( 0l, timestamp, types, subTypes );
-                    }
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn( "Failed to purge timeline!", e );
-
-                return 0;
-            }
+            return 0;
         }
-        finally
-        {
-            timelineLock.readLock().unlock();
-        }
+        return purgeFromIndexer( timestamp, types, subTypes, filter );
     }
 
     @Override
-    public void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter filter,
-                          TimelineCallback callback )
+    public void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter
+        filter, TimelineCallback callback )
     {
-        retrieve( 0L, System.currentTimeMillis(), types, subTypes, fromItem, count, filter, callback );
+        if ( !started )
+        {
+            return;
+        }
+        retrieveFromIndexer( 0L, System.currentTimeMillis(), fromItem, count, types, subTypes, filter, callback );
+    }
+
+    @Override
+    public void retrieve( long fromTime, long toTime, int from, int count, Set<String> types, Set<String> subTypes,
+        TimelineFilter filter, TimelineCallback callback )
+    {
+        if ( !started )
+        {
+            return;
+        }
+        retrieveFromIndexer( fromTime, toTime, from, count, types, subTypes, filter, callback );
     }
 
     // ==
 
-    protected boolean isIndexerHealthy()
+    protected void addToIndexer( final TimelineRecord... records )
     {
-        // we have no ongoing repair and indexer is started
-        return ( !repairLock.isLocked() ) && indexer.isStarted();
+        doTryRepair( new Work<Void>()
+        {
+            @Override
+            public Void doIt()
+                throws IOException
+            {
+                indexer.addAll( records );
+                return null;
+            }
+        } );
     }
 
-    protected void repairTimelineIndexer( final Exception e )
-        throws IOException
+    protected int purgeFromIndexer( final long timestamp, final Set<String> types, final Set<String> subTypes,
+        final TimelineFilter filter )
     {
-        if ( repairLock.tryLock() )
+        return doTryRepair( new Work<Integer>()
         {
-            try
+            @Override
+            public Integer doIt()
+                throws IOException
             {
-                getLogger().info( "Timeline index got corrupted, trying to repair it.", e );
-                indexer.stop();
-                FileUtils.cleanDirectory( getConfiguration().getIndexDirectory() );
+                return indexer.purge( 0l, timestamp, types, subTypes );
+            }
+        } );
+    }
+
+    protected void retrieveFromIndexer( final long fromTime, final long toTime, final int from, final int count,
+        final Set<String> types, final Set<String> subTypes, final TimelineFilter filter,
+        final TimelineCallback callback )
+    {
+        doTryRepair( new Work<Void>()
+        {
+            @Override
+            public Void doIt()
+                throws IOException
+            {
+                indexer.retrieve( fromTime, toTime, types, subTypes, from, count, filter, callback );
+                return null;
+            }
+        } );
+    }
+
+// ==
+
+    protected static interface Work<E>
+    {
+
+        E doIt()
+            throws IOException;
+
+    }
+
+    protected <E> E doTryRepair( final Work<E> work )
+    {
+        if ( timelineLock.readLock().tryLock() )
+        {
+            if ( started && !indexerIsDead )
+            {
+                final int indexerGeneration = indexer.getGeneration();
                 try
                 {
-                    indexer.start( getConfiguration() );
-                    final RepairBatch rb = new RepairBatch( indexer );
-                    persistor.readAllSinceDays( getConfiguration().getRepairDaysCountRestored(), rb );
-                    rb.finish();
-                    if ( indexer.isStarted() )
-                    {
-                        getLogger().info(
-                            "Timeline index is succesfully repaired, the last "
-                                + getConfiguration().getRepairDaysCountRestored() + " days were restored." );
-                    }
-                    else
-                    {
-                        getLogger().warn( "Timeline index was corrupted and repair of it failed!" );
-                    }
+                    return work.doIt();
                 }
-                catch ( Exception ex )
+                catch ( final IOException e )
                 {
-                    // we need to stop it
-                    indexer.stop();
-                    if ( ex instanceof IOException )
-                    {
-                        throw (IOException) ex;
-                    }
-                    else
-                    {
-                        throw new IOException( "Unable to repair the Timeline indexer!", ex );
-                    }
-                }
-            }
-            finally
-            {
-                repairLock.unlock();
-            }
-        }
-    }
-
-    protected void retrieve( long fromTime, long toTime, Set<String> types, Set<String> subTypes, int from, int count,
-                             TimelineFilter filter, TimelineCallback callback )
-    {
-        try
-        {
-            timelineLock.readLock().lock();
-            if ( !isStarted() )
-            {
-                return;
-            }
-            try
-            {
-                if ( isIndexerHealthy() )
-                {
+                    getLogger().debug( "Unable to operate against Timeline indexer!", e );
                     try
                     {
-                        indexer.retrieve( fromTime, toTime, types, subTypes, from, count, filter, callback );
+                        timelineLock.readLock().unlock();
+                        doExclusively( new Work<Void>()
+                        {
+                            @Override
+                            public Void doIt()
+                                throws IOException
+                            {
+                                try
+                                {
+                                    repairTimelineIndexer( e, indexerGeneration );
+                                }
+                                finally
+                                {
+                                    timelineLock.readLock().lock();
+                                }
+                                return null;
+                            }
+                        } );
+                        return work.doIt();
                     }
-                    catch ( IOException e )
+                    catch ( final IOException ee )
                     {
-                        repairTimelineIndexer( e );
-
-                        // now try retrieve again
-                        indexer.retrieve( fromTime, toTime, types, subTypes, from, count, filter, callback );
+                        getLogger().warn( "Unable to operate against Timeline indexer after repair!", e );
                     }
                 }
-                else
+                finally
                 {
-                    return;
+                    timelineLock.readLock().unlock();
                 }
             }
-            catch ( IOException e )
-            {
-                getLogger().warn( "Unable to retrieve data from timeline!", e );
-                return;
-            }
+        }
+        return null;
+    }
+
+    protected <E> E doExclusively( final Work<E> work )
+        throws IOException
+    {
+        timelineLock.writeLock().lock();
+        try
+        {
+            return work.doIt();
         }
         finally
         {
-            timelineLock.readLock().unlock();
+            timelineLock.writeLock().unlock();
+        }
+    }
+
+    // ==
+
+    private volatile boolean indexerIsDead = false;
+
+    protected void repairTimelineIndexer( final Exception e, final int generation )
+        throws IOException
+    {
+        // check for any previous attempt or flagged dead indexer
+        if ( !indexerIsDead && ( indexer.getGeneration() == generation ) )
+        {
+            getLogger().info( "Timeline index got corrupted, trying to repair it.", e );
+            // stopping it cleanly
+            indexer.stop();
+            // deleting index files
+            FileUtils.cleanDirectory( configuration.getIndexDirectory() );
+            try
+            {
+                // creating new index from scratch
+                indexer.start( configuration );
+                // pouring over records from persisted into indexer
+                final RepairBatch rb = new RepairBatch( indexer );
+                persistor.readAllSinceDays( configuration.getRepairDaysCountRestored(), rb );
+                rb.finish();
+
+                getLogger().info(
+                    "Timeline index is succesfully repaired, the last "
+                        + configuration.getRepairDaysCountRestored() + " days were restored." );
+            }
+            catch ( IOException ex )
+            {
+                getLogger().warn( "Timeline index was corrupted and repair of it failed!", e );
+                // we need to stop it and signal to not try any other thread
+                indexerIsDead = true;
+                indexer.stop();
+                throw ex;
+            }
+            catch ( Exception ex )
+            {
+                getLogger().warn( "Timeline index was corrupted and repair of it failed!", e );
+                // we need to stop it and signal to not try any other thread
+                indexerIsDead = true;
+                indexer.stop();
+                throw new IOException( "Failed to repair indexer!", ex );
+            }
         }
     }
 }

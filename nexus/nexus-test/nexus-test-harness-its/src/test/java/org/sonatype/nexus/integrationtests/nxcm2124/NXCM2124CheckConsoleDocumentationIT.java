@@ -29,6 +29,12 @@ import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+/**
+ * Originally, this IT was as it's name says, simply check for presence
+ * of documentation plugin in console. But as restlet1x plugin was
+ * introduced, the documentation was moved into it. Hence, now this
+ * it checks presence of restlet1x plugin.
+ */
 public class NXCM2124CheckConsoleDocumentationIT
     extends AbstractPluginConsoleIT
 {
@@ -36,7 +42,7 @@ public class NXCM2124CheckConsoleDocumentationIT
     public void checkDoc()
         throws IOException
     {
-        String pluginName = "Nexus Core Documentation Plugin";
+        String pluginName = "Nexus Restlet 1.x Plugin";
 
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 

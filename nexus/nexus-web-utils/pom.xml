@@ -43,8 +43,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-restlet-bridge</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

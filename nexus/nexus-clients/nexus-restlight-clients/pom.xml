@@ -50,8 +50,6 @@
 
       <!-- INTERNAL -->
 
-      <!-- FIXME: Remove project.version use and use actual version -->
-
       <dependency>
         <groupId>org.sonatype.nexus.restlight</groupId>
         <artifactId>nexus-restlight-client-common</artifactId>

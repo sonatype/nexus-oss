@@ -228,7 +228,7 @@ public class MultithreadTimelineTest
     private static class SearcherThread
         extends Thread
     {
-        private final Timeline timeline;
+        private final DefaultTimeline timeline;
 
         private final String typeToSearchFor;
 
@@ -238,7 +238,7 @@ public class MultithreadTimelineTest
 
         private Throwable ex;
 
-        public SearcherThread( Timeline timeline, String typeToSearchFor )
+        public SearcherThread( DefaultTimeline timeline, String typeToSearchFor )
         {
             this.timeline = timeline;
 

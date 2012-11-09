@@ -40,11 +40,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-lvo-plugin</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-slf4j-logging</artifactId>
     </dependency>
@@ -57,11 +52,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
     </dependency>
 
     <dependency>
@@ -80,7 +70,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-plugin-console-plugin</artifactId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -89,7 +79,16 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-core-documentation-plugin</artifactId>
+      <artifactId>nexus-lvo-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-plugin-console-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -168,14 +167,21 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-plugin-console-plugin</artifactId>
+                  <artifactId>nexus-restlet1x-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-core-documentation-plugin</artifactId>
+                  <artifactId>nexus-lvo-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-plugin-console-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
