@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +76,9 @@ public class YumImplDeletionsTest
             mock( YumMetadataGenerationTask.class )
         );
 
-        yum = new YumImpl( mock( RepositoryURLBuilder.class ), nexusScheduler, config, repository );
+        yum = new YumImpl(
+            mock( RepositoryURLBuilder.class ), nexusScheduler, config, new ScheduledThreadPoolExecutor(10), repository
+        );
     }
 
     @Test

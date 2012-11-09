@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import javax.annotation.Nullable;
@@ -59,17 +60,15 @@ public class YumImpl
 
     private final YumPluginConfiguration yumConfig;
 
+    private final ScheduledThreadPoolExecutor executor;
+
     private final Repository repository;
 
     private final File baseDir;
 
     private final Set<String> versions = new HashSet<String>();
 
-    private static final int POOL_SIZE = 10;
-
     private static final int MAX_EXECUTION_COUNT = 100;
-
-    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor( POOL_SIZE );
 
     private final Map<ScheduledFuture<?>, DelayedDirectoryDeletionTask> taskMap =
         new HashMap<ScheduledFuture<?>, DelayedDirectoryDeletionTask>();
@@ -81,13 +80,14 @@ public class YumImpl
     public YumImpl( final RepositoryURLBuilder repositoryURLBuilder,
                     final NexusScheduler nexusScheduler,
                     final YumPluginConfiguration yumConfig,
+                    final ScheduledThreadPoolExecutor executor,
                     final @Assisted Repository repository )
         throws MalformedURLException, URISyntaxException
     {
         this.repositoryURLBuilder = repositoryURLBuilder;
-
         this.nexusScheduler = nexusScheduler;
         this.yumConfig = yumConfig;
+        this.executor = executor;
         this.repository = repository;
 
         this.baseDir = RepositoryUtils.getBaseDir( repository );

@@ -7,6 +7,8 @@
  */
 package org.sonatype.nexus.repository.yum.internal.guice;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.yum.Yum;
@@ -20,9 +22,12 @@ public class YumPluginModule
     extends AbstractModule
 {
 
+    private static final int POOL_SIZE = 10;
+
     @Override
     protected void configure()
     {
+        bind( ScheduledThreadPoolExecutor.class ).toInstance( new ScheduledThreadPoolExecutor( POOL_SIZE ) );
         install( new FactoryModuleBuilder().implement( Yum.class, YumImpl.class ).build( YumFactory.class ) );
     }
 
