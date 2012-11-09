@@ -47,13 +47,6 @@ public interface Timeline
         throws IOException;
 
     /**
-     * Returns {@code true} if component is started.
-     * 
-     * @return {@code true} if {@link #start(TimelineConfiguration)} was invoked and component is running.
-     */
-    boolean isStarted();
-
-    /**
      * Adds a record(s) to the Timeline.
      * 
      * @param records the record(s) to add.
@@ -82,5 +75,20 @@ public interface Timeline
      * @param callback the callback to receive results, never {@code null}.
      */
     void retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter filter,
+                   TimelineCallback callback );
+
+    /**
+     * Retrieves records from timeline. The order is desceding, newest is 1st, oldest last.
+     * 
+     * @param fromTime
+     * @param toTime
+     * @param fromItem the number of items you want to skip (paging), 0 for none ("from beginning").
+     * @param count the count of records you want to retrieve.
+     * @param types the types to purge
+     * @param subTypes the subTypes to purge
+     * @param filter the filter you want to apply, or null for no filtering.
+     * @param callback the callback to receive results, never {@code null}.
+     */
+    void retrieve( long fromTime, long toTime, int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter filter,
                    TimelineCallback callback );
 }
