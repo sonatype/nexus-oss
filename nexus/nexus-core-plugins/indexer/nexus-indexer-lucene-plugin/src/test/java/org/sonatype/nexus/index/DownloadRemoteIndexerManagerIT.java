@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -29,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.index.context.IndexingContext;
+import org.apache.maven.index.treeview.DefaultTreeNodeFactory;
+import org.apache.maven.index.treeview.TreeNode;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -37,8 +40,10 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.BlockingServer;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 
 // This is an IT just because it runs longer then 15 seconds
@@ -68,12 +73,13 @@ public class DownloadRemoteIndexerManagerIT
         ResourceHandler resource_handler = new ResourceHandler()
         {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
+            public void handle( String target, Request baseRequest, HttpServletRequest request,
+                                HttpServletResponse response )
                 throws IOException, ServletException
             {
                 System.out.print( "JETTY: " + target );
                 super.handle( target, baseRequest, request, response );
-                System.out.println( "  ::  " + ((Response)response).getStatus() );
+                System.out.println( "  ::  " + ( (Response) response ).getStatus() );
             }
         };
         resource_handler.setResourceBase( fakeCentral.getAbsolutePath() );
@@ -123,6 +129,8 @@ public class DownloadRemoteIndexerManagerIT
 
         searchFor( "org.sonatype.nexus", 8, central.getId() );
 
+        assertRootGroups();
+
         // copy index 01
         overwriteIndex( index1, centralIndex );
 
@@ -130,12 +138,24 @@ public class DownloadRemoteIndexerManagerIT
 
         searchFor( "org.sonatype.nexus", 1, central.getId() );
 
+        assertRootGroups();
+
         // copy index 02
         overwriteIndex( index2, centralIndex );
 
         super.indexerManager.reindexRepository( null, central.getId(), true );
 
         searchFor( "org.sonatype.nexus", 8, central.getId() );
+
+        assertRootGroups();
+    }
+
+    private void assertRootGroups()
+        throws NoSuchRepositoryException, IOException
+    {
+        TreeNode node = indexerManager.listNodes( new DefaultTreeNodeFactory( central.getId() ), "/", central.getId() );
+        Assert.assertEquals( 1, node.getChildren().size() );
+        Assert.assertEquals( "/org/", node.getChildren().get( 0 ).getPath() );
     }
 
     private void overwriteIndex( File source, File destination )
