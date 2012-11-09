@@ -34,7 +34,7 @@ public class TimelinePersistorTest
         super.setUp();
         persistDirectory = new File( getBasedir(), "target/persist" );
         cleanDirectory( persistDirectory );
-        persistor.start( new TimelineConfiguration( persistDirectory, null ) );
+        persistor.setConfiguration( new TimelineConfiguration( persistDirectory, null ) );
     }
 
     @Override
@@ -121,7 +121,7 @@ public class TimelinePersistorTest
     public void testRolling()
         throws Exception
     {
-        persistor.start( new TimelineConfiguration( persistDirectory, null, 1, 30 ) );
+        persistor.setConfiguration( new TimelineConfiguration( persistDirectory, null, 1, 30 ) );
 
         persistor.persist( createTimelineRecord() );
         persistor.persist( createTimelineRecord() );

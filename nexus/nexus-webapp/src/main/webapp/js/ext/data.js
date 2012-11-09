@@ -13,6 +13,6 @@
 /*global define*/
 define('ext/data',
       [
-        'ext/data/connection', 'ext/data/node', 'ext/data/store'
+        'ext/data/connection', 'ext/data/store'
       ],
       function() {});

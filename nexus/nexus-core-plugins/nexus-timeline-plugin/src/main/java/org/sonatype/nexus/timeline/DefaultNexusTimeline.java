@@ -146,10 +146,6 @@ public class DefaultNexusTimeline
     private void updateConfiguration()
         throws IOException
     {
-        if ( timeline.isStarted() )
-        {
-            timeline.stop();
-        }
         final TimelineConfiguration config =
             new TimelineConfiguration( applicationConfiguration.getWorkingDirectory( TIMELINE_BASEDIR ) );
         timeline.start( config );

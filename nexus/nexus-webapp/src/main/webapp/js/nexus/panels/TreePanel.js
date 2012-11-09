@@ -218,7 +218,7 @@ Sonatype.panels.TreePanel = function(cfg) {
   {
 
     root = new Ext.tree.AsyncTreeNode({
-      text : this.payload ? this.payload.get(this.titleColumn) : '/',
+      text : this.payload ? this.payload.data[this.titleColumn] : '/',
       path : '/',
       singleClickExpand : true,
       expanded : this.autoExpandRoot
@@ -272,7 +272,7 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
   refreshHandler : function(button, e) {
     if (this.resetRootNodeText)
     {
-      this.root.setText(this.payload ? this.payload.get(this.titleColumn) : '/');
+      this.root.setText(this.payload ? this.payload.data[this.titleColumn] : '/');
     }
     this.root.attributes.localStorageUpdated = false;
     if (this.root.reload)

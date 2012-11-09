@@ -45,12 +45,13 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.sonatype.timeline.TimelineCallback;
+import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineRecord;
 
 public class DefaultTimelineIndexer
-    extends AbstractStartable
 {
+
     private static final String TIMESTAMP = "_t";
 
     private static final String TYPE = "_1";
@@ -67,47 +68,40 @@ public class DefaultTimelineIndexer
 
     private SearcherManager searcherManager;
 
+    private int generation = 0;
+
     // ==
     // Public API
 
-    @Override
-    protected void doStart()
+    protected void start( final TimelineConfiguration configuration )
         throws IOException
     {
-        try
+        closeIndexWriter();
+        if ( directory != null )
         {
-            closeIndexWriter();
-            if ( directory != null )
-            {
-                directory.close();
-            }
-            directory = FSDirectory.open( getConfiguration().getIndexDirectory() );
-            if ( IndexReader.indexExists( directory ) )
-            {
-                if ( IndexWriter.isLocked( directory ) )
-                {
-                    IndexWriter.unlock( directory );
-                }
-            }
-
-            final IndexWriterConfig config =
-                new IndexWriterConfig( Version.LUCENE_36, new StandardAnalyzer( Version.LUCENE_36 ) );
-            config.setMergeScheduler( new SerialMergeScheduler() );
-            config.setRAMBufferSizeMB( 2.0 );
-            indexWriter = new IndexWriter( directory, config );
-            indexWriter.commit();
-
-            searcherManager = new SearcherManager( indexWriter, false, new SearcherFactory() );
+            directory.close();
         }
-        catch ( IOException e )
+        directory = FSDirectory.open( configuration.getIndexDirectory() );
+        if ( IndexReader.indexExists( directory ) )
         {
-            stop();
-            throw e;
+            if ( IndexWriter.isLocked( directory ) )
+            {
+                IndexWriter.unlock( directory );
+            }
         }
+
+        final IndexWriterConfig config =
+            new IndexWriterConfig( Version.LUCENE_36, new StandardAnalyzer( Version.LUCENE_36 ) );
+        config.setMergeScheduler( new SerialMergeScheduler() );
+        config.setRAMBufferSizeMB( 2.0 );
+        indexWriter = new IndexWriter( directory, config );
+        indexWriter.commit();
+
+        searcherManager = new SearcherManager( indexWriter, false, new SearcherFactory() );
+        generation = generation + 1;
     }
 
-    @Override
-    public void doStop()
+    protected void stop()
         throws IOException
     {
         closeIndexWriter();
@@ -118,13 +112,18 @@ public class DefaultTimelineIndexer
         }
     }
 
-    public void add( final TimelineRecord record )
+    protected int getGeneration()
+    {
+        return generation;
+    }
+
+    protected void add( final TimelineRecord record )
         throws IOException
     {
         addAll( record );
     }
 
-    public void addAll( final TimelineRecord... records )
+    protected void addAll( final TimelineRecord... records )
         throws IOException
     {
         for ( TimelineRecord rec : records )
@@ -134,20 +133,21 @@ public class DefaultTimelineIndexer
         indexWriter.commit();
     }
 
-    public void addBatch( final TimelineRecord record )
+    protected void addBatch( final TimelineRecord record )
         throws IOException
     {
         indexWriter.addDocument( createDocument( record ) );
     }
 
-    public void finishBatch()
+    protected void finishBatch()
         throws IOException
     {
         indexWriter.commit();
     }
 
-    public void retrieve( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes,
-                          int from, int count, final TimelineFilter filter, final TimelineCallback callback )
+    protected void retrieve( final long fromTime, final long toTime, final Set<String> types,
+        final Set<String> subTypes,
+        int from, int count, final TimelineFilter filter, final TimelineCallback callback )
         throws IOException
     {
         if ( count == 0 )
@@ -178,7 +178,7 @@ public class DefaultTimelineIndexer
                 // return
                 topDocs =
                     searcher.search( buildQuery( fromTime, toTime, types, subTypes ), null, Integer.MAX_VALUE,
-                        new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+                                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
             }
             if ( topDocs.scoreDocs.length == 0 )
             {
@@ -223,7 +223,7 @@ public class DefaultTimelineIndexer
         }
     }
 
-    public int purge( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes )
+    protected int purge( final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes )
         throws IOException
     {
         searcherManager.maybeRefresh();
@@ -240,7 +240,7 @@ public class DefaultTimelineIndexer
             // just to know how many will we delete, will not actually load 'em up
             final TopFieldDocs topDocs =
                 searcher.search( q, null, searcher.maxDoc(),
-                    new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+                                 new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
             if ( topDocs.scoreDocs.length == 0 )
             {
                 // nothing matched to be purged
@@ -279,7 +279,7 @@ public class DefaultTimelineIndexer
     {
         final Document doc = new Document();
         doc.add( new Field( TIMESTAMP, DateTools.timeToString( record.getTimestamp(), TIMELINE_RESOLUTION ),
-            Field.Store.YES, Field.Index.NOT_ANALYZED ) );
+                            Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         doc.add( new Field( TYPE, record.getType(), Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         doc.add( new Field( SUBTYPE, record.getSubType(), Field.Store.YES, Field.Index.NOT_ANALYZED ) );
         for ( Map.Entry<String, String> dataEntry : record.getData().entrySet() )
@@ -294,14 +294,14 @@ public class DefaultTimelineIndexer
         if ( isEmptySet( types ) && isEmptySet( subTypes ) )
         {
             return new TermRangeQuery( TIMESTAMP, DateTools.timeToString( from, TIMELINE_RESOLUTION ),
-                DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true );
+                                       DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true );
         }
         else
         {
             final BooleanQuery result = new BooleanQuery();
             result.add(
                 new TermRangeQuery( TIMESTAMP, DateTools.timeToString( from, TIMELINE_RESOLUTION ),
-                    DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true ), Occur.MUST );
+                                    DateTools.timeToString( to, TIMELINE_RESOLUTION ), true, true ), Occur.MUST );
             if ( !isEmptySet( types ) )
             {
                 final BooleanQuery typeQ = new BooleanQuery();
