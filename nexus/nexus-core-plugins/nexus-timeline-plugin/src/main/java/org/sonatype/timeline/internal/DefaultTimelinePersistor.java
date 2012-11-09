@@ -36,6 +36,7 @@ import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 import org.sonatype.timeline.proto.TimeLineRecordProtos;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * The class doing persitence of timeline records using Protobuf.
@@ -79,10 +80,10 @@ public class DefaultTimelinePersistor
     /**
      * Protected by DefaultTimeline, as is called from start(), that is exclusive access, so no other
      * call might fall in.
-     * 
+     *
      * @param configuration
      */
-    protected void setConfiguration( final TimelineConfiguration configuration )
+    protected synchronized void setConfiguration( final TimelineConfiguration configuration )
     {
         this.persistDirectory = configuration.getPersistDirectory();
         if ( !this.persistDirectory.exists() )
@@ -98,7 +99,7 @@ public class DefaultTimelinePersistor
      * @param records
      * @throws IOException
      */
-    public synchronized void persist( final TimelineRecord... records )
+    protected synchronized void persist( final TimelineRecord... records )
         throws IOException
     {
         verify( records );
@@ -120,13 +121,41 @@ public class DefaultTimelinePersistor
         }
     }
 
-    public void readAll( final TimelineCallback callback )
+    /**
+     * Only one method setting AND reading lastRolledTimestamp and lastRolledFile, called only from #persist that is already synced.
+     *
+     * @return
+     * @throws IOException
+     */
+    protected File getDataFile()
+        throws IOException
+    {
+        final long now = System.currentTimeMillis();
+        if ( lastRolledTimestamp == 0L || ( now - lastRolledTimestamp ) > ( rollingIntervalMillis * 1000 ) )
+        {
+            lastRolledTimestamp = now;
+            lastRolledFile = new File( persistDirectory, buildTimestampedFileName() );
+            lastRolledFile.createNewFile();
+        }
+        return lastRolledFile;
+    }
+
+    @VisibleForTesting
+    protected void readAll( final TimelineCallback callback )
         throws IOException
     {
         readAllSinceDays( Integer.MAX_VALUE, callback );
     }
 
-    public void readAllSinceDays( final int days, final TimelineCallback callback )
+    /**
+     * This method is called only from timeline's repair method, that gains exclusive access to indexer, but also
+     * it's own state (wrt start/stop), meaning the configuration, hence the single field will no be modified.
+     *
+     * @param days
+     * @param callback
+     * @throws IOException
+     */
+    protected void readAllSinceDays( final int days, final TimelineCallback callback )
         throws IOException
     {
         // read data files
@@ -273,25 +302,6 @@ public class DefaultTimelinePersistor
     }
 
     // ==
-
-    /**
-     * Only one method setting AND reading lastRolledTimestamp and lastRolledFile, must be synced.
-     *
-     * @return
-     * @throws IOException
-     */
-    protected synchronized File getDataFile()
-        throws IOException
-    {
-        final long now = System.currentTimeMillis();
-        if ( lastRolledTimestamp == 0L || ( now - lastRolledTimestamp ) > ( rollingIntervalMillis * 1000 ) )
-        {
-            lastRolledTimestamp = now;
-            lastRolledFile = new File( persistDirectory, buildTimestampedFileName() );
-            lastRolledFile.createNewFile();
-        }
-        return lastRolledFile;
-    }
 
     protected String buildTimestampedFileName()
     {
