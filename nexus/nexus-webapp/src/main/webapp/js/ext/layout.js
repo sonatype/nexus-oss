@@ -13,7 +13,6 @@
 /*global define*/
 define('ext/layout',
       [
-        'ext/layout/absolutelayout',
-        'ext/layout/formlayout'
+        'ext/layout/absolutelayout'
       ],
       function() {});
