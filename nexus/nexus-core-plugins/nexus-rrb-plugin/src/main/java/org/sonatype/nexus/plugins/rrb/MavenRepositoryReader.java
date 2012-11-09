@@ -13,11 +13,16 @@
 package org.sonatype.nexus.plugins.rrb;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.parsers.ArtifactoryRemoteRepositoryParser;
@@ -25,11 +30,9 @@ import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Class for retrieving directory data from remote repository. This class is not thread-safe!
@@ -39,7 +42,11 @@ public class MavenRepositoryReader
 
     private final Logger logger = LoggerFactory.getLogger( MavenRepositoryReader.class );
 
-    private final AsyncHttpClient client;
+    private final HttpClient client;
+
+    private final QueryStringBuilder queryStringBuilder;
+
+    private ProxyRepository proxyRepository;
 
     private String remotePath;
 
@@ -47,13 +54,12 @@ public class MavenRepositoryReader
 
     private String localUrl;
 
-    private ProxyRepository proxyRepository;
-
     private String id;
 
-    public MavenRepositoryReader( final AsyncHttpClient client )
+    public MavenRepositoryReader( final HttpClient client, final QueryStringBuilder queryStringBuilder )
     {
-        this.client = client;
+        this.client = checkNotNull(client);
+        this.queryStringBuilder = checkNotNull(queryStringBuilder);
     }
 
     /**
@@ -61,8 +67,7 @@ public class MavenRepositoryReader
      * @param localUrl url to the local resource service
      * @return a list containing the remote data
      */
-    public List<RepositoryDirectory> extract( String remotePath, String localUrl, ProxyRepository proxyRepository,
-                                              String id )
+    public List<RepositoryDirectory> extract( String remotePath, String localUrl, final ProxyRepository proxyRepository, String id )
     {
         logger.debug( "remotePath={}", remotePath );
         this.remotePath = remotePath;
@@ -87,7 +92,7 @@ public class MavenRepositoryReader
         {
             logger.trace( html.toString() );
         }
-        return parseResult( html );
+        return parseResult(html);
     }
 
     private ArrayList<RepositoryDirectory> parseResult( StringBuilder indata )
@@ -141,6 +146,19 @@ public class MavenRepositoryReader
         return parser.extractLinks( indata );
     }
 
+    private String maybeAppendQueryString(final String url) {
+        String queryString = queryStringBuilder.getQueryString(proxyRepository);
+
+        // if there is no query-string ot append, simply return what we've been handed
+        if (StringUtils.isEmpty(queryString)) {
+            return url;
+        }
+
+        // else sort out the seperator to use and append the query-string
+        String sep = url.contains("?") ? "&" : "?";
+        return url + sep + queryString;
+    }
+
     private String findcreateNewUrl( StringBuilder indata )
     {
         logger.debug( "indata={}", indata.toString() );
@@ -155,6 +173,9 @@ public class MavenRepositoryReader
         {
             newUrl += "/";
         }
+
+        newUrl = maybeAppendQueryString(newUrl);
+
         logger.debug( "newUrl={}", newUrl );
         return newUrl;
     }
@@ -188,104 +209,57 @@ public class MavenRepositoryReader
 
     /**
      * Used to detect error in S3 response.
-     * 
-     * @param indata
-     * @return
      */
     private boolean responseContainsError( StringBuilder indata )
     {
-        if ( indata.indexOf( "<Error>" ) != -1 || indata.indexOf( "<error>" ) != -1 )
-        {
-            return true;
-        }
-        return false;
+        return indata.indexOf("<Error>") != -1 || indata.indexOf("<error>") != -1;
     }
 
     /**
      * Used to detect access denied in S3 response.
-     * 
-     * @param indata
-     * @return
      */
     private boolean responseContainsAccessDenied( StringBuilder indata )
     {
-        if ( indata.indexOf( "<Code>AccessDenied</Code>" ) != -1 || indata.indexOf( "<code>AccessDenied</code>" ) != -1 )
-        {
-            return true;
-        }
-        return false;
+        return indata.indexOf("<Code>AccessDenied</Code>") != -1 || indata.indexOf("<code>AccessDenied</code>") != -1;
     }
 
-    private StringBuilder getContent()
-    {
-        RequestBuilder builder = new RequestBuilder();
+    private StringBuilder getContent() {
+        StringBuilder buff = new StringBuilder();
 
-        if ( remoteUrl.indexOf( "?prefix" ) != -1 )
-        {
-            builder.setUrl( remoteUrl + "&delimiter=/" );
-        }
-        else
-        {
-            builder.setUrl( remoteUrl + "?delimiter=/" );
-        }
+        String sep = remoteUrl.contains("?") ? "&" : "?";
+        String url = remoteUrl + sep + "delimiter=/";
+        url = maybeAppendQueryString(url);
 
-        Response response = null;
-        StringBuilder result = new StringBuilder();
+        HttpGet method = new HttpGet(url);
+        try {
+            logger.debug("Requesting: {}", method);
+            HttpResponse response = client.execute(method);
+            int statusCode = response.getStatusLine().getStatusCode();
+            logger.debug("Status code: {}", statusCode);
 
-        try
-        {
-            response = doCall( builder.build(), result );
-        }
-        catch ( IOException e )
-        {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.warn( e.getMessage(), e );
-            }
-            else
-            {
-                logger.warn( e.getMessage() );
-            }
-        }
-
-        // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200),
-        // stripping off the last '/'
-        // returns the error we are looking for (so we can do a query)
-
-        String serverHeader = response != null ? response.getHeader( "Server" ) : null;
-        if ( result.length() == 0 && serverHeader != null && serverHeader.equalsIgnoreCase( "AmazonS3" )
-            && remoteUrl.endsWith( "/" ) )
-        {
-            remoteUrl = remoteUrl.substring( 0, remoteUrl.length() - 1 );
-            // now just call it again
-            return getContent();
-        }
-
-        return result;
-    }
-
-    private Response doCall( Request request, StringBuilder result )
-        throws IOException
-    {
-        try
-        {
-            Response response = client.executeRequest( request ).get();
-            final int responseCode = response.getStatusCode();
-
-            logger.debug( "responseCode={}", responseCode );
-            BufferedReader reader = new BufferedReader( new InputStreamReader( response.getResponseBodyAsStream() ) );
-
-            String line = null;
-            while ( ( line = reader.readLine() ) != null )
-            {
-                result.append( line + "\n" );
+            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buff.append(line).append("\n");
             }
 
-            return response;
+            // HACK: Deal with S3 edge-case
+            // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200),
+            // stripping off the last '/' returns the error we are looking for (so we can do a query)
+            Header serverHeader = response.getFirstHeader(HttpHeaders.SERVER);
+            if (buff.length() == 0 && serverHeader != null &&
+                serverHeader.getValue().equalsIgnoreCase("AmazonS3") &&
+                remoteUrl.endsWith("/")) {
+                remoteUrl = remoteUrl.substring(0, remoteUrl.length() - 1);
+                return getContent();
+            }
+
+            return buff;
         }
-        catch ( Exception e )
-        {
-            throw new IOException( e );
+        catch (Exception e) {
+            logger.warn("Failed to get directory listing content", e);
         }
+
+        return buff;
     }
 }

@@ -27,10 +27,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -42,8 +45,9 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import com.ning.http.client.AsyncHttpClient;
 
 /**
  * In this test we use example repo files that placed in the test resource catalogue To access these files locally via
@@ -52,6 +56,7 @@ import com.ning.http.client.AsyncHttpClient;
  * @author bjorne
  */
 public class MavenRepositoryReaderIT
+    extends TestSupport
 {
     MavenRepositoryReader reader; // The "class under test"
 
@@ -61,12 +66,15 @@ public class MavenRepositoryReaderIT
 
     String nameOfConnector; // This is the host:portnumber of the Jetty connector
 
+    @Mock
+    private QueryStringBuilder queryStringBuilder;
+
     @Before
     public void setUp()
         throws Exception
     {
-        final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        reader = new MavenRepositoryReader( asyncHttpClient );
+        HttpClient httpClient = new DefaultHttpClient();
+        reader = new MavenRepositoryReader( httpClient, queryStringBuilder );
 
         // Create a Jetty server with a handler that returns the content of the
         // given target (i.e. an emulated html, S3Repo, etc, file from the test
@@ -130,7 +138,6 @@ public class MavenRepositoryReaderIT
             break; // We only need one connector name (and there should only be
             // one...)
         }
-
     }
 
     @After
@@ -141,9 +148,27 @@ public class MavenRepositoryReaderIT
     }
 
     /**
-     * First some tests of architypical test repos
-     */
+    * Auxiliary methods
+    */
+    private String getRemoteUrl() {
+        return "http://" + nameOfConnector + "/";
+    }
 
+    private ProxyRepository getFakeProxyRepository(final String remoteUrl) {
+        final ProxyRepository repository = Mockito.mock(ProxyRepository.class);
+        Mockito.when(repository.getRemoteUrl()).thenReturn(remoteUrl);
+
+        final DefaultRemoteStorageContext rsc = new DefaultRemoteStorageContext(null);
+        rsc.setRemoteProxySettings(new DefaultRemoteProxySettings());
+        rsc.setRemoteConnectionSettings(new DefaultRemoteConnectionSettings());
+        Mockito.when(repository.getRemoteStorageContext()).thenReturn(rsc);
+
+        return repository;
+    }
+
+    /**
+    * First some tests of architypical test repos
+    */
     @Test( timeout = 5000 )
     public void testReadHtml()
     {
@@ -184,10 +209,10 @@ public class MavenRepositoryReaderIT
     }
 
     /**
-     * Below follows a set of tests of some typical existing repos. The respectively repo's top level is stored as a
-     * file in the ordinary test resource catalog. Each file has a name indicating the repo it is taken from and an
-     * extension with the date it was downloaded in the format YYYYMMDD.
-     */
+    * Below follows a set of tests of some typical existing repos. The respectively repo's top level is stored as a
+    * file in the ordinary test resource catalog. Each file has a name indicating the repo it is taken from and an
+    * extension with the date it was downloaded in the format YYYYMMDD.
+    */
 
     @Test( timeout = 5000 )
     public void testAmazon_20100118()
@@ -352,10 +377,10 @@ public class MavenRepositoryReaderIT
     }
 
     /*
-     * @Test(timeout = 5000) public void testterracotta() { // Fetched from URI http://download.terracotta.org/maven2/
-     * List<RepositoryDirectory> result = reader .extract(getURLForTestRepoResource("terracotta_20100118"), localUrl,
-     * null, "test"); assertEquals(-1, result.size()); }
-     */
+    * @Test(timeout = 5000) public void testterracotta() { // Fetched from URI http://download.terracotta.org/maven2/
+    * List<RepositoryDirectory> result = reader .extract(getURLForTestRepoResource("terracotta_20100118"), localUrl,
+    * null, "test"); assertEquals(-1, result.size()); }
+    */
 
     @Test( timeout = 5000 )
     public void testSpringsource()
@@ -364,26 +389,5 @@ public class MavenRepositoryReaderIT
         List<RepositoryDirectory> result =
             reader.extract( "Springsource_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 995, result.size() );
-    }
-
-    /**
-     * Auxiliary methods
-     */
-    private String getRemoteUrl()
-    {
-        return "http://" + nameOfConnector + "/";
-    }
-    
-    private ProxyRepository getFakeProxyRepository(final String remoteUrl)
-    {
-        final ProxyRepository repository = Mockito.mock( ProxyRepository.class );
-        Mockito.when( repository.getRemoteUrl() ).thenReturn( remoteUrl );
-        
-        final DefaultRemoteStorageContext rsc = new DefaultRemoteStorageContext( null );
-        rsc.setRemoteProxySettings( new DefaultRemoteProxySettings() );
-        rsc.setRemoteConnectionSettings( new DefaultRemoteConnectionSettings() );
-        Mockito.when( repository.getRemoteStorageContext() ).thenReturn( rsc );
-        
-        return repository;
     }
 }
