@@ -22,11 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.experimental.categories.Category;
+import org.sonatype.sisu.litmus.testsupport.group.Slow;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 
-public class MultithreadTimelineTest
+@Category(Slow.class)
+public class MultithreadTimelineIT
     extends AbstractInternalTimelineTestCase
 {
     protected File persistorDirectory;
