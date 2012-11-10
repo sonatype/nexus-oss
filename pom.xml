@@ -109,8 +109,8 @@
               <exclude>nexus/nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
               <!-- tell license plugin to ignore workaround for MINDEXER-65 -->
               <exclude>**/nexus-indexer-lucene-plugin/src/main/java/copied/org/apache/maven/index/DefaultScannerListener.java</exclude>
-              <!-- Exclude zion job configuration files -->
-              <exclude>job-config/**</exclude>
+              <!-- Exclude zion work directory -->
+              <exclude>zwork/**</exclude>
             </excludes>
             <mapping>
               <vm>SHARPSTAR_STYLE</vm>
