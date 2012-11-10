@@ -38,7 +38,7 @@ public class NexusPRConnector
     extends HttpClientConnector
 {
 
-    private final org.sonatype.nexus.apachehttpclient.Hc4Provider httpClientProvider;
+    private final Hc4Provider httpClientProvider;
 
     @Inject
     public NexusPRConnector( final Hc4Provider httpClientProvider )
