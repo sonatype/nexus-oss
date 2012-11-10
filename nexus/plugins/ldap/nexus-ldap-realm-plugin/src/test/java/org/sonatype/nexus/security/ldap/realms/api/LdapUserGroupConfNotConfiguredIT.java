@@ -18,7 +18,7 @@ import java.io.FileInputStream;
 import org.codehaus.plexus.context.Context;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusLdapTestCase;
+import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -26,8 +26,8 @@ import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfigur
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
 
-public class LdapUserGroupConfNotConfiguredTest
-    extends AbstractNexusLdapTestCase
+public class LdapUserGroupConfNotConfiguredIT
+    extends NexusLdapTestSupport
 {
 
     private PlexusResource getResource()

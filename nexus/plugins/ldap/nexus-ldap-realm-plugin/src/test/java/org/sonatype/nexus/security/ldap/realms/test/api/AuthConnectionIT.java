@@ -18,14 +18,14 @@ import org.junit.Test;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.AbstractNexusLdapTestCase;
+import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
-public class AuthConnectionTest
-    extends AbstractNexusLdapTestCase
+public class AuthConnectionIT
+    extends NexusLdapTestSupport
 {
 
     private PlexusResource getResource()

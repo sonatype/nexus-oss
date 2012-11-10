@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.security.ldap.realms.test.api;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +21,11 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.AbstractNexusLdapTestCase;
+import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserListResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequest;
@@ -30,8 +33,8 @@ import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConf
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
-public class UserGroupConfigTest
-    extends AbstractNexusLdapTestCase
+public class UserGroupConfigWithMd5IT
+    extends NexusLdapTestSupport
 {
 
     private PlexusResource getResource()
@@ -49,11 +52,14 @@ public class UserGroupConfigTest
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
         testRequest.setData( dto );
 
-        dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
         dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
-        dto.setAuthScheme( "none" );
+        dto.setSystemPassword( "secret" );
+        dto.setSystemUsername( "admin" );
+        dto.setProtocol( "ldap" );
+        dto.setAuthScheme( "DIGEST-MD5" );
+        dto.setRealm( "localhost" );
 
         dto.setGroupMemberFormat( "uid=${username},ou=people,o=sonatype" );
         dto.setGroupObjectClass( "groupOfUniqueNames" );
@@ -66,6 +72,8 @@ public class UserGroupConfigTest
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
+
+        // expect no groups,
 
         Request request = new Request();
         Response response = new Response( request );
@@ -110,48 +118,6 @@ public class UserGroupConfigTest
     }
 
     @Test
-    public void testSuccessWithLimit()
-        throws Exception
-    {
-        PlexusResource resource = getResource();
-        LdapUserAndGroupConfigTestRequest testRequest = new LdapUserAndGroupConfigTestRequest();
-        LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
-        testRequest.setData( dto );
-
-        // limit to 3
-        dto.setUserLimitCount( 3 );
-
-        dto.setProtocol( "ldap" );
-        dto.setHost( "localhost" );
-        dto.setPort( this.getLdapPort() );
-        dto.setSearchBase( "o=sonatype" );
-        dto.setAuthScheme( "none" );
-
-        dto.setGroupMemberFormat( "uid=${username},ou=people,o=sonatype" );
-        dto.setGroupObjectClass( "groupOfUniqueNames" );
-        dto.setGroupBaseDn( "ou=groups" );
-        dto.setGroupIdAttribute( "cn" );
-        dto.setGroupMemberAttribute( "uniqueMember" );
-        dto.setUserObjectClass( "inetOrgPerson" );
-        dto.setUserBaseDn( "ou=people" );
-        dto.setUserIdAttribute( "uid" );
-        dto.setUserPasswordAttribute( "userPassword" );
-        dto.setUserRealNameAttribute( "sn" );
-        dto.setEmailAddressAttribute( "mail" );
-
-        Request request = new Request();
-        Response response = new Response( request );
-
-        LdapUserListResponse usersListResponse =
-            (LdapUserListResponse) resource.put( null, request, response, testRequest );
-
-        Assert.assertNotNull( usersListResponse );
-        Assert.assertEquals( 200, response.getStatus().getCode() );
-
-        Assert.assertEquals( 3, usersListResponse.getLdapUserRoleMappings().size() );
-    }
-
-    @Test
     public void testSuccessUsingLdapGroups()
         throws Exception
     {
@@ -160,11 +126,14 @@ public class UserGroupConfigTest
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
         testRequest.setData( dto );
 
-        dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
         dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
-        dto.setAuthScheme( "none" );
+        dto.setSystemPassword( "secret" );
+        dto.setSystemUsername( "admin" );
+        dto.setProtocol( "ldap" );
+        dto.setAuthScheme( "DIGEST-MD5" );
+        dto.setRealm( "localhost" );
 
         dto.setGroupMemberFormat( "uid=${username},ou=people,o=sonatype" );
         dto.setGroupObjectClass( "groupOfUniqueNames" );
@@ -254,7 +223,6 @@ public class UserGroupConfigTest
         // dto.setUserPasswordAttribute("userPassword");
         // dto.setUserRealNameAttribute("sn");
         // dto.setEmailAddressAttribute( "mail");
-
         Request request = new Request();
         Response response = new Response( request );
 
@@ -279,11 +247,14 @@ public class UserGroupConfigTest
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
         testRequest.setData( dto );
 
-        dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
         dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
-        dto.setAuthScheme( "none" );
+        dto.setSystemPassword( "secret" );
+        dto.setSystemUsername( "admin" );
+        dto.setProtocol( "ldap" );
+        dto.setAuthScheme( "DIGEST-MD5" );
+        dto.setRealm( "localhost" );
 
         dto.setGroupMemberFormat( "uid=${username},ou=people,o=sonatype" );
         dto.setGroupObjectClass( "groupOfUniqueNames" );
@@ -322,11 +293,14 @@ public class UserGroupConfigTest
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
         testRequest.setData( dto );
 
-        dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
         dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
-        dto.setAuthScheme( "none" );
+        dto.setSystemPassword( "secret" );
+        dto.setSystemUsername( "admin" );
+        dto.setProtocol( "ldap" );
+        dto.setAuthScheme( "DIGEST-MD5" );
+        dto.setRealm( "localhost" );
 
         dto.setGroupMemberFormat( "uid=${username},ou=people,o=sonatype" );
         dto.setGroupObjectClass( "groupOfUniqueNames" );
@@ -365,11 +339,14 @@ public class UserGroupConfigTest
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
         testRequest.setData( dto );
 
-        dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
         dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
-        dto.setAuthScheme( "none" );
+        dto.setSystemPassword( "secret" );
+        dto.setSystemUsername( "admin" );
+        dto.setProtocol( "ldap" );
+        dto.setAuthScheme( "DIGEST-MD5" );
+        dto.setRealm( "localhost" );
 
         dto.setGroupMemberFormat( "Foo" );
         dto.setGroupObjectClass( "groupOfUniqueNames" );
@@ -412,11 +389,14 @@ public class UserGroupConfigTest
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
         testRequest.setData( dto );
 
-        dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
-        dto.setPort( 54321 ); // bad port
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
-        dto.setAuthScheme( "none" );
+        dto.setSystemPassword( "secret" );
+        dto.setSystemUsername( "admin" );
+        dto.setProtocol( "ldap" );
+        // dto.setAuthScheme( "DIGEST-MD5" );
+        dto.setRealm( "localhost" );
 
         dto.setGroupMemberFormat( "uid=${username},ou=people,o=sonatype" );
         dto.setGroupObjectClass( "groupOfUniqueNames" );
@@ -443,6 +423,14 @@ public class UserGroupConfigTest
             Assert.assertEquals( 400, e.getStatus().getCode() );
         }
 
+    }
+
+    @Override
+    protected void copyDefaultLdapConfigToPlace()
+        throws IOException
+    {
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/md5-ldap.xml" ),
+                     new FileOutputStream( getNexusLdapConfiguration() ) );
     }
 
 }

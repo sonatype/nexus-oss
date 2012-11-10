@@ -15,7 +15,7 @@ package org.sonatype.nexus.security.ldap.realms.api;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.sonatype.nexus.AbstractNexusLdapTestCase;
+import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -23,8 +23,8 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 
-public class LdapConnValidationTest
-    extends AbstractNexusLdapTestCase
+public class LdapConnValidationIT
+    extends NexusLdapTestSupport
 {
 
     private PlexusResource getResource()

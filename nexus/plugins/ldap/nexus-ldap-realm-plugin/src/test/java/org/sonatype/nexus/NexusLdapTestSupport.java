@@ -35,7 +35,7 @@ import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.Module;
 
-public abstract class AbstractNexusLdapTestCase
+public abstract class NexusLdapTestSupport
     extends NexusTestSupport
 {
     @Override

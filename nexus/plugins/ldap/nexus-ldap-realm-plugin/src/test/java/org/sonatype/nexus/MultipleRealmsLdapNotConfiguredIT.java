@@ -13,18 +13,20 @@
 package org.sonatype.nexus;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.context.Context;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
+import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
-public class NotConfiguredLdapNexusTest
-    extends AbstractNexusLdapTestCase
+public class MultipleRealmsLdapNotConfiguredIT
+    extends NexusLdapTestSupport
 {
 
     @Test
@@ -34,6 +36,7 @@ public class NotConfiguredLdapNexusTest
         SecuritySystem security = lookup( SecuritySystem.class );
         security.start();
 
+        // LDAP should fail
         try
         {
             security.authenticate( new UsernamePasswordToken( "cstamas", "cstamas123" ) );
@@ -43,21 +46,37 @@ public class NotConfiguredLdapNexusTest
         {
             // expected
         }
+
+        // xml should not
+        Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "admin", "admin123" ) ) );
+
+        Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "deployment", "deployment123" ) ) );
+
     }
 
     @Test
     public void testAuthorization()
         throws Exception
     {
+
         SecuritySystem security = lookup( SecuritySystem.class );
         security.start();
 
+        // LDAP should fail
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", AbstractLdapAuthenticatingRealm.class.getName() );
+        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
         // if realm is not configured, the user should not be able to be authorized
+        Assert.assertFalse( security.hasRole( principals, "nx-developer" ) );
+        Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
 
-        Assert.assertFalse( security.hasRole( principals, "developer" ) );
+        // xml user
+        principals = new SimplePrincipalCollection();
+        // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
+        // was: principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
+        principals.add( "deployment", XmlAuthenticatingRealm.ROLE );
+
+        Assert.assertTrue( security.hasRole( principals, "nx-deployment" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
     }
 
@@ -68,11 +87,30 @@ public class NotConfiguredLdapNexusTest
         SecuritySystem security = lookup( SecuritySystem.class );
         security.start();
 
+        // LDAP
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", AbstractLdapAuthenticatingRealm.class.getName() );
+        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
         // if realm is not configured, the user should not be able to be authorized
-        Assert.assertFalse( security.isPermitted( principals, "nexus:usersforgotpw:create" ) );
+        Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:create" ) );
+
+        // XML
+        principals = new SimplePrincipalCollection();
+        // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
+        // was: principals.add( "test-user", new XmlAuthenticatingRealm().getName() );
+        principals.add( "test-user", XmlAuthenticatingRealm.ROLE );
+
+        Assert.assertTrue( security.isPermitted( principals, "security:usersforgotpw:create" ) );
+        Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:delete" ) );
+
+        Assert.assertTrue( security.isPermitted( principals, "nexus:target:1:*:delete" ) );
+    }
+
+    @Override
+    protected void copyDefaultConfigToPlace()
+        throws IOException
+    {
+        copyResource( "/test-conf/security-configuration-multipleRealms.xml", getSecurityConfiguration() );
     }
 
     @Override
