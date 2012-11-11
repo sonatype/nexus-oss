@@ -17,15 +17,15 @@ import java.io.File;
 import org.codehaus.plexus.context.Context;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusLdapTestCase;
+import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
-public class LdapConnNotConfiguredTest
-    extends AbstractNexusLdapTestCase
+public class LdapConnNotConfiguredIT
+    extends NexusLdapTestSupport
 {
 
     private PlexusResource getResource()

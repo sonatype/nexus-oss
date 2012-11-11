@@ -18,14 +18,14 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusLdapTestCase;
+import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
-public class LdapConnMd5Test
-    extends AbstractNexusLdapTestCase
+public class LdapConnMd5IT
+    extends NexusLdapTestSupport
 {
 
     private PlexusResource getResource()
