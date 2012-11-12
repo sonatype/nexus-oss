@@ -58,26 +58,22 @@ public class RepositoryScanningTask
         return null;
     }
 
-    @SuppressWarnings( "unchecked" )
     private void scanRepository()
     {
         try
         {
-            getLogger().info( "Start scanning of repository base url : {}", yum.getRepository().getLocalUrl() );
+            getLogger().debug(
+                "Scanning repository '{}' base dir '{}' for RPMs ", yum.getRepository().getId(), yum.getBaseDir()
+            );
 
-            File repositoryBaseDir = yum.getBaseDir();
-            for ( File file : listFiles( repositoryBaseDir, RPM_EXTENSIONS, true ) )
+            for ( File file : listFiles( yum.getBaseDir(), RPM_EXTENSIONS, true ) )
             {
                 yum.addVersion( file.getParentFile().getName() );
             }
-
-            getLogger().info(
-                "Found following versions in repository '{}' : {}", yum.getRepository().getId(), yum.getVersions()
-            );
         }
-        catch ( Exception e )
+        catch ( final Throwable e )
         {
-            getLogger().error( "Could not scan repository " + yum.getRepository().getId(), e );
+            getLogger().error( "Failed to scan RPMs from repository '{}'", yum.getRepository().getId(), e );
         }
     }
 
@@ -111,7 +107,7 @@ public class RepositoryScanningTask
     @Override
     protected String getMessage()
     {
-        return "Scanning repository [" + yum.getRepository() + "]";
+        return "Scanning repository '" + yum.getRepository().getId() + "'";
     }
 
     public void setYum( Yum yum )
