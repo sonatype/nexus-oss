@@ -154,7 +154,6 @@ public class YumMetadataGenerationTask
             }
             // TODO dubious
             Thread.sleep( 100 );
-            LOG.debug( "Generation complete." );
 
             regenerateMetadataForGroups();
             return new YumRepositoryImpl( getRepoDir(), getRepositoryId(), getVersion() );
