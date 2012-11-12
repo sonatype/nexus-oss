@@ -36,11 +36,11 @@ import java.util.concurrent.Callable;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.RpmScanner;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
@@ -111,9 +111,9 @@ public class YumMetadataGenerationTaskTest
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
             repoRegistry(),
             mock( YumPluginConfiguration.class ),
-            mock( YumRegistry.class ),
             mock( RepositoryURLBuilder.class ),
-            mock( RpmScanner.class )
+            mock( RpmScanner.class ),
+            mock( NexusScheduler.class )
         );
         task.setRpmDir( RPM_DIR.getAbsolutePath() );
         task.setRpmUrl( RPM_URL );
@@ -132,9 +132,9 @@ public class YumMetadataGenerationTaskTest
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
             repoRegistry(),
             mock( YumPluginConfiguration.class ),
-            mock( YumRegistry.class ),
             repositoryURLBuilder(),
-            mock( RpmScanner.class )
+            mock( RpmScanner.class ),
+            mock( NexusScheduler.class )
         );
         task.setRepositoryId( REPO );
         setField( task, "repositoryRegistry", repoRegistry() );

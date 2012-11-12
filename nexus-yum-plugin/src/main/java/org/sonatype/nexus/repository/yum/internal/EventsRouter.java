@@ -34,6 +34,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.m2yum.M2YumGroupRepository;
+import org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -48,12 +50,16 @@ public class EventsRouter
 
     private final Provider<YumRegistry> yumRegistryProvider;
 
+    private final NexusScheduler nexusScheduler;
+
     @Inject
     public EventsRouter( final Provider<RepositoryRegistry> repositoryRegistry,
-                         final Provider<YumRegistry> yumRegistryProvider )
+                         final Provider<YumRegistry> yumRegistryProvider,
+                         final NexusScheduler nexusScheduler )
     {
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.yumRegistryProvider = checkNotNull( yumRegistryProvider );
+        this.nexusScheduler = checkNotNull( nexusScheduler );
     }
 
     @AllowConcurrentEvents
@@ -75,7 +81,7 @@ public class EventsRouter
             || anyOfRepositoriesIsYumEnabled( event.getRemovedRepositoryIds() )
             || anyOfRepositoriesIsYumEnabled( event.getReorderedRepositoryIds() ) ) )
         {
-            yumRegistryProvider.get().createGroupRepository( event.getGroupRepository() );
+            YumGroupRepositoryGenerationTask.createTaskFor( nexusScheduler, event.getGroupRepository() );
         }
     }
 

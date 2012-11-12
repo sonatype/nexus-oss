@@ -37,6 +37,7 @@ import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -199,4 +200,15 @@ public class YumGroupRepositoryGenerationTask
         }
         return format( "mergerepo --nogroups -d %s -o %s", repos.toString(), repoBaseDir.getAbsolutePath() );
     }
+
+    public static ScheduledTask<YumRepository> createTaskFor( final NexusScheduler nexusScheduler,
+                                                              final GroupRepository groupRepository )
+    {
+        final YumGroupRepositoryGenerationTask task = nexusScheduler.createTaskInstance(
+            YumGroupRepositoryGenerationTask.class
+        );
+        task.setGroupRepository( groupRepository );
+        return nexusScheduler.submit( YumGroupRepositoryGenerationTask.ID, task );
+    }
+
 }

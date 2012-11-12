@@ -27,6 +27,4 @@ public interface YumRegistry
 
     boolean isRegistered( String repositoryId );
 
-    ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository );
-
 }

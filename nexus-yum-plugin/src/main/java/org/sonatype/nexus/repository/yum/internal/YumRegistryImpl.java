@@ -96,13 +96,4 @@ public class YumRegistryImpl
         return yums.containsKey( repositoryId );
     }
 
-    @Override
-    public ScheduledTask<YumRepository> createGroupRepository( GroupRepository groupRepository )
-    {
-        YumGroupRepositoryGenerationTask task =
-            nexusScheduler.createTaskInstance( YumGroupRepositoryGenerationTask.class );
-        task.setGroupRepository( groupRepository );
-        return nexusScheduler.submit( YumGroupRepositoryGenerationTask.ID, task );
-    }
-
 }
