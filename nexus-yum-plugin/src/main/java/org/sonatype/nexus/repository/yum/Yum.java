@@ -22,8 +22,6 @@ import org.sonatype.scheduling.ScheduledTask;
 public interface Yum
 {
 
-    String getId();
-
     File getBaseDir();
 
     Set<String> getVersions();

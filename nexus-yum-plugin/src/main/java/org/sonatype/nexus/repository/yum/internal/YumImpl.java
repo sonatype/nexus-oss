@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import javax.annotation.Nullable;
@@ -95,21 +94,19 @@ public class YumImpl
 
     private final YumRepositoryCache cache = new YumRepositoryCache();
 
-    public String getId()
-    {
-        return repository.getId();
-    }
-
+    @Override
     public Set<String> getVersions()
     {
         return versions;
     }
 
+    @Override
     public File getBaseDir()
     {
         return baseDir;
     }
 
+    @Override
     public void addVersion( String version )
     {
         versions.add( version );
@@ -148,43 +145,6 @@ public class YumImpl
         return null;
     }
 
-    private ScheduledTask<YumRepository> submitTask( YumMetadataGenerationTask task )
-    {
-        try
-        {
-            return nexusScheduler.submit( ID, task );
-        }
-        catch ( TaskAlreadyScheduledException e )
-        {
-            return mergeAddedFiles( e.getOriginal(), task );
-        }
-    }
-
-    @SuppressWarnings( "unchecked" )
-    private ScheduledTask<YumRepository> mergeAddedFiles( ScheduledTask<?> existingScheduledTask,
-                                                          YumMetadataGenerationTask taskToMerge )
-    {
-        if ( isNotBlank( taskToMerge.getAddedFiles() ) )
-        {
-            final YumMetadataGenerationTask existingTask = (YumMetadataGenerationTask) existingScheduledTask.getTask();
-            if ( isBlank( existingTask.getAddedFiles() ) )
-            {
-                existingTask.setAddedFiles( taskToMerge.getAddedFiles() );
-            }
-            else
-            {
-                existingTask.setAddedFiles(
-                    existingTask.getAddedFiles() + pathSeparator + taskToMerge.getAddedFiles() );
-            }
-        }
-        return (ScheduledTask<YumRepository>) existingScheduledTask;
-    }
-
-    public ScheduledTask<YumRepository> createYumRepository()
-    {
-        return addToYumRepository( null );
-    }
-
     @Override
     public YumRepository getYumRepository( final String version, final URL baseRepoUrl )
         throws Exception
@@ -199,6 +159,18 @@ public class YumImpl
             cache.cache( yumRepository );
         }
         return yumRepository;
+    }
+
+    private ScheduledTask<YumRepository> submitTask( YumMetadataGenerationTask task )
+    {
+        try
+        {
+            return nexusScheduler.submit( ID, task );
+        }
+        catch ( TaskAlreadyScheduledException e )
+        {
+            return mergeAddedFiles( e.getOriginal(), task );
+        }
     }
 
     @Override
@@ -235,6 +207,31 @@ public class YumImpl
         }
 
         return null;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private ScheduledTask<YumRepository> mergeAddedFiles( ScheduledTask<?> existingScheduledTask,
+                                                          YumMetadataGenerationTask taskToMerge )
+    {
+        if ( isNotBlank( taskToMerge.getAddedFiles() ) )
+        {
+            final YumMetadataGenerationTask existingTask = (YumMetadataGenerationTask) existingScheduledTask.getTask();
+            if ( isBlank( existingTask.getAddedFiles() ) )
+            {
+                existingTask.setAddedFiles( taskToMerge.getAddedFiles() );
+            }
+            else
+            {
+                existingTask.setAddedFiles(
+                    existingTask.getAddedFiles() + pathSeparator + taskToMerge.getAddedFiles() );
+            }
+        }
+        return (ScheduledTask<YumRepository>) existingScheduledTask;
+    }
+
+    ScheduledTask<YumRepository> createYumRepository()
+    {
+        return addToYumRepository( null );
     }
 
     private YumMetadataGenerationTask createTask()
@@ -288,7 +285,7 @@ public class YumImpl
 
     private DelayedDirectoryDeletionTask findDelayedParentDirectory( final String path )
     {
-        for ( Runnable runnable : executor.getQueue() )
+        for ( final Runnable runnable : executor.getQueue() )
         {
             DelayedDirectoryDeletionTask dirTask = taskMap.get( runnable );
             if ( dirTask != null && path.startsWith( dirTask.path ) )
@@ -337,20 +334,23 @@ public class YumImpl
             if ( isDeleted( path ) )
             {
                 log.info(
-                    "Recreate yum repository {} because of removed path {}", getId(), path
+                    "Recreate yum repository {} because of removed path {}", getRepository().getId(), path
                 );
                 recreateRepository();
             }
             else if ( executionCount < MAX_EXECUTION_COUNT )
             {
-                log.info( "Rescheduling creation of yum repository {} because path {} not deleted.", getId(), path );
+                log.info(
+                    "Rescheduling creation of yum repository {} because path {} not deleted.",
+                    getRepository().getId(), path
+                );
                 schedule( this );
             }
             else
             {
                 log.warn(
                     "Deleting path {} in repository {} took too long - retried {} times.",
-                    path, getId(), MAX_EXECUTION_COUNT
+                    path, getRepository().getId(), MAX_EXECUTION_COUNT
                 );
             }
         }

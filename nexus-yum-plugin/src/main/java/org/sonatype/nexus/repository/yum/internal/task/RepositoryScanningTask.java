@@ -71,8 +71,9 @@ public class RepositoryScanningTask
                 yum.addVersion( file.getParentFile().getName() );
             }
 
-            getLogger().info( "Found following versions in repository '{}' : {}", yum.getId(), yum.getVersions() );
-
+            getLogger().info(
+                "Found following versions in repository '{}' : {}", yum.getRepository().getId(), yum.getVersions()
+            );
         }
         catch ( Exception e )
         {
