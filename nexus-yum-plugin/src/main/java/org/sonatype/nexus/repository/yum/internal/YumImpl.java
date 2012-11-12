@@ -107,9 +107,10 @@ public class YumImpl
     }
 
     @Override
-    public void addVersion( String version )
+    public void addVersion( final String version )
     {
         versions.add( version );
+        log.debug( "Added version '{}' to repository '{}", version, getRepository().getId() );
     }
 
     @Override
