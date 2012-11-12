@@ -53,7 +53,7 @@ public class YumRepositoryITSupport
     protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
     {
         return configuration
-            .setLogLevel( "org.sonatype.nexus.plugins.yum", "DEBUG" )
+            .setLogLevel( "org.sonatype.nexus.repository.yum", "DEBUG" )
             .addPlugins(
                 artifactResolver().resolvePluginFromDependencyManagement(
                     "org.sonatype.nexus.plugins", "nexus-yum-plugin"
