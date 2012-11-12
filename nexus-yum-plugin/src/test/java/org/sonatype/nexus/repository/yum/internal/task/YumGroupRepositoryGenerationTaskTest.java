@@ -38,26 +38,23 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
 import org.sonatype.nexus.test.os.IgnoreOn;
 import org.sonatype.nexus.test.os.OsTestRule;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class YumGroupRepositoryGenerationTaskTest
+    extends TestSupport
 {
 
-    private static final String BASE_REPO_DIR = "src/test/yum-repo";
+    private static final String GROUP_ID_1 = "group-repo-id-1";
 
-    private static final File REPO_DIR1 = new File( BASE_REPO_DIR + "/repo1" );
+    private static final String GROUP_ID_2 = "group-repo-id-2";
 
-    private static final File REPO_DIR2 = new File( BASE_REPO_DIR + "/repo2" );
+    private static final String MEMBER_ID_1 = "repo1";
 
-    private static final File GROUP_REPO_DIR = AbstractYumNexusTestCase.UTIL.resolveFile( "target/tmp/group-repo" );
-
-    private static final String REPO_ID = "group-repo-id";
-
-    private static final String REPO_ID2 = "group-repo-id2";
+    private static final String MEMBER_ID_2 = "repo2";
 
     private GroupRepository groupRepo;
 
@@ -71,7 +68,7 @@ public class YumGroupRepositoryGenerationTaskTest
     {
         givenGroupRepoWith2YumRepos();
         thenGenerateYumRepo();
-        RepositoryTestUtils.assertRepository( new File( GROUP_REPO_DIR, "repodata" ), "group-repo" );
+        RepositoryTestUtils.assertRepository( util.resolveFile( "target/tmp/group-repo/repodata" ), "group-repo" );
     }
 
     @Test
@@ -80,7 +77,7 @@ public class YumGroupRepositoryGenerationTaskTest
     {
         final YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
         final GroupRepository groupRepo = mock( GroupRepository.class );
-        when( groupRepo.getId() ).thenReturn( REPO_ID );
+        when( groupRepo.getId() ).thenReturn( GROUP_ID_1 );
         task.setGroupRepository( groupRepo );
         assertThat( task.allowConcurrentExecution( createRunningTaskForRepos( groupRepo ) ), is( false ) );
     }
@@ -91,9 +88,9 @@ public class YumGroupRepositoryGenerationTaskTest
     {
         final YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
         final GroupRepository groupRepo = mock( GroupRepository.class );
-        when( groupRepo.getId() ).thenReturn( REPO_ID );
+        when( groupRepo.getId() ).thenReturn( GROUP_ID_1 );
         final GroupRepository groupRepo2 = mock( GroupRepository.class );
-        when( groupRepo2.getId() ).thenReturn( REPO_ID2 );
+        when( groupRepo2.getId() ).thenReturn( GROUP_ID_2 );
         task.setGroupRepository( groupRepo );
         assertThat( task.allowConcurrentExecution( createRunningTaskForRepos( groupRepo2 ) ), is( false ) );
     }
@@ -135,23 +132,26 @@ public class YumGroupRepositoryGenerationTaskTest
     private void givenGroupRepoWith2YumRepos()
         throws IOException
     {
+        final File groupRepoDir = util.resolveFile( "target/tmp/group-repo" );
         groupRepo = mock( GroupRepository.class );
-        when( groupRepo.getLocalUrl() ).thenReturn( GROUP_REPO_DIR.getAbsolutePath() );
-        List<Repository> repositories = asList( createRepo( REPO_DIR1 ), createRepo( REPO_DIR2 ) );
+        when( groupRepo.getLocalUrl() ).thenReturn( groupRepoDir.getAbsolutePath() );
+        List<Repository> repositories = asList( createRepo( MEMBER_ID_1 ), createRepo( MEMBER_ID_2 ) );
         when( groupRepo.getMemberRepositories() ).thenReturn( repositories );
-        if ( GROUP_REPO_DIR.exists() )
+        if ( groupRepoDir.exists() )
         {
-            FileUtils.deleteDirectory( GROUP_REPO_DIR );
+            FileUtils.deleteDirectory( groupRepoDir );
         }
-        GROUP_REPO_DIR.mkdirs();
+        groupRepoDir.mkdirs();
     }
 
-    private Repository createRepo( File repoDir )
+    private Repository createRepo( final String repositoryId )
     {
         final Repository repo = mock( Repository.class );
         final RepositoryKind kind = mock( RepositoryKind.class );
         when( kind.isFacetAvailable( Matchers.eq( MavenHostedRepository.class ) ) ).thenReturn( true );
-        when( repo.getLocalUrl() ).thenReturn( repoDir.getAbsolutePath() );
+        when( repo.getLocalUrl() ).thenReturn(
+            util.resolveFile( "src/test/yum-repo/" + repositoryId ).getAbsolutePath()
+        );
         when( repo.getRepositoryKind() ).thenReturn( kind );
         return repo;
     }
