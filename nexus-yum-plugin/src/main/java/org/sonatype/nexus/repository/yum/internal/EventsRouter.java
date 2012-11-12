@@ -61,6 +61,7 @@ public class EventsRouter
         this.yumRegistryProvider = checkNotNull( yumRegistryProvider );
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void on( final RepositoryRegistryEventAdd event )
     {
@@ -70,6 +71,7 @@ public class EventsRouter
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void on( final RepositoryGroupMembersChangedEvent event )
     {
@@ -91,7 +93,6 @@ public class EventsRouter
             final Yum yum = yumRegistryProvider.get().get( eventStore.getRepository().getId() );
             if ( yum != null )
             {
-                LOG.info( "ItemStoreEvent : {}", eventStore.getItem().getPath() );
                 yum.markDirty( getItemVersion( eventStore.getItem() ) );
                 yum.addToYumRepository( eventStore.getItem().getPath() );
             }
