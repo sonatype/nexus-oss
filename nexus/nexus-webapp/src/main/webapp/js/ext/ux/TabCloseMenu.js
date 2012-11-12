@@ -69,16 +69,15 @@ define('ext/ux/TabCloseMenu',['extjs'], function(Ext){
       var m = this.createMenu(),
             disableAll = true,
             disableOthers = true,
-            closeAll = m.getComponent('closeall');
+            closeAll = m.getComponent('closeall'),
+            closableTabs = 0;
 
       m.getComponent('close').setDisabled(!item.closable);
       tabs.items.each(function(){
-        if(this.closable){
+        if (this.closable && this != item) {
           disableAll = false;
-          if(this != item){
-            disableOthers = false;
-            return false;
-          }
+          disableOthers = false;
+          return false;
         }
       });
       m.getComponent('closeothers').setDisabled(disableOthers);

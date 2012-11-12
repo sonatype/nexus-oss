@@ -539,14 +539,12 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
         Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
 
         // set closable to false again, mainTabPanel.defaults contains 'closable : true'
-        // FIXME this will still show the closable tool button, so we need to actively reject close
         Sonatype.view.welcomeTab.closable = false;
-        Sonatype.view.welcomeTab.on('beforeclose', function(panel) {
-          return false;
-        });
+
+        // HACK: close is not a tool button, so we need to hide it manually
+        Ext.get(Sonatype.view.welcomeTab.tabEl).down('a.x-tab-strip-close').toggleClass('x-hidden');
 
         Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
-
       },
 
       recoverLogin : function(e, target) {
