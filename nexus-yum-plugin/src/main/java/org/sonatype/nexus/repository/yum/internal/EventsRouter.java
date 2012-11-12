@@ -143,6 +143,7 @@ public class EventsRouter
                 {
                     final Repository repository = repositoryRegistry.get().getRepository( repositoryId );
                     if ( repository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class )
+                        // TODO this is suspicious. Should not directly use FS
                         && new File( RepositoryUtils.getBaseDir( repository ), "repodata/repomd.xml" ).exists() )
                     {
                         return true;
