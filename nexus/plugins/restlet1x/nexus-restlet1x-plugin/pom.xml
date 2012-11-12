@@ -216,6 +216,8 @@
             <sharedDependency>org.sonatype.security:security-rest-model</sharedDependency>
             <!-- Used by ResourceSupport class, and as Restlet1x is now a plugin, this is not on core anymore -->
             <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
+            <sharedDependency>com.noelios.restlet:com.noelios.restlet</sharedDependency>
+            <sharedDependency>com.noelios.restlet:com.noelios.restlet.ext.servlet</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>
