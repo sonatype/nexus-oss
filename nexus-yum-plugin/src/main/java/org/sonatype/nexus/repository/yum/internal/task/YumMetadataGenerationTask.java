@@ -163,20 +163,12 @@ public class YumMetadataGenerationTask
     }
 
     protected void setDefaults()
+        throws MalformedURLException, URISyntaxException
     {
         final Repository repository = findRepository();
         if ( isBlank( getRpmDir() ) && repository != null )
         {
-            try
-            {
-                setRpmDir( RepositoryUtils.getBaseDir( repository ).getAbsolutePath() );
-            }
-            catch ( MalformedURLException e )
-            {
-            }
-            catch ( URISyntaxException e )
-            {
-            }
+            setRpmDir( RepositoryUtils.getBaseDir( repository ).getAbsolutePath() );
         }
         if ( isBlank( getRpmUrl() ) && repository != null )
         {
