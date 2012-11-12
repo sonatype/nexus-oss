@@ -64,6 +64,7 @@ public class RepositoryScanningTask
             "Scanning repository '{}' base dir '{}' for RPMs ", yum.getRepository().getId(), yum.getBaseDir()
         );
 
+        // TODO this should use Nexus walker
         for ( File file : listFiles( yum.getBaseDir(), RPM_EXTENSIONS, true ) )
         {
             yum.addVersion( file.getParentFile().getName() );
