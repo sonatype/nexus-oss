@@ -60,20 +60,13 @@ public class RepositoryScanningTask
 
     private void scanRepository()
     {
-        try
-        {
-            getLogger().debug(
-                "Scanning repository '{}' base dir '{}' for RPMs ", yum.getRepository().getId(), yum.getBaseDir()
-            );
+        getLogger().debug(
+            "Scanning repository '{}' base dir '{}' for RPMs ", yum.getRepository().getId(), yum.getBaseDir()
+        );
 
-            for ( File file : listFiles( yum.getBaseDir(), RPM_EXTENSIONS, true ) )
-            {
-                yum.addVersion( file.getParentFile().getName() );
-            }
-        }
-        catch ( final Throwable e )
+        for ( File file : listFiles( yum.getBaseDir(), RPM_EXTENSIONS, true ) )
         {
-            getLogger().error( "Failed to scan RPMs from repository '{}'", yum.getRepository().getId(), e );
+            yum.addVersion( file.getParentFile().getName() );
         }
     }
 
