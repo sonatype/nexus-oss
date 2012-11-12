@@ -14,6 +14,8 @@ package org.sonatype.nexus.repository.yum.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.File;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -21,6 +23,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
@@ -29,7 +33,6 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
@@ -64,6 +67,18 @@ public class EventsRouter
         if ( event.getRepository().getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
             yumRegistryProvider.get().register( event.getRepository().adaptToFacet( MavenHostedRepository.class ) );
+        }
+    }
+
+    @Subscribe
+    public void on( final RepositoryGroupMembersChangedEvent event )
+    {
+        if ( event.getGroupRepository().getRepositoryKind().isFacetAvailable( M2YumGroupRepository.class )
+            && ( anyOfRepositoriesIsYumEnabled( event.getAddedRepositoryIds() )
+            || anyOfRepositoriesIsYumEnabled( event.getRemovedRepositoryIds() )
+            || anyOfRepositoriesIsYumEnabled( event.getReorderedRepositoryIds() ) ) )
+        {
+            yumRegistryProvider.get().createGroupRepository( event.getGroupRepository() );
         }
     }
 
@@ -116,6 +131,30 @@ public class EventsRouter
     {
         String[] parts = item.getParentPath().split( "/" );
         return parts[parts.length - 1];
+    }
+
+    private boolean anyOfRepositoriesIsYumEnabled( final List<String> repositoryIds )
+    {
+        if ( repositoryIds != null )
+        {
+            for ( final String repositoryId : repositoryIds )
+            {
+                try
+                {
+                    final Repository repository = repositoryRegistry.get().getRepository( repositoryId );
+                    if ( repository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class )
+                        && new File( RepositoryUtils.getBaseDir( repository ), "repodata/repomd.xml" ).exists() )
+                    {
+                        return true;
+                    }
+                }
+                catch ( final Exception e )
+                {
+                    // TODO check if we should silently ignore this
+                }
+            }
+        }
+        return false;
     }
 
 }
