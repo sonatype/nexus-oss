@@ -44,25 +44,18 @@
       <artifactId>nexus-capabilities-model</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
+      <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <type>${nexusPluginType}</type>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-eventbus</artifactId>
@@ -81,19 +74,7 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
-      <classifier>tests</classifier>
+      <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

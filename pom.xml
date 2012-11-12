@@ -57,7 +57,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <nexus.version>2.3-SNAPSHOT</nexus.version>
-    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
+    <nexusPluginType>nexus-plugin</nexusPluginType>
 
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
@@ -94,18 +94,12 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-api</artifactId>
+        <artifactId>nexus-plugin-api</artifactId>
         <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-app</artifactId>
-        <version>${nexus.version}</version>
-        <classifier>tests</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-configuration</artifactId>
+        <artifactId>nexus-plugin-test-api</artifactId>
         <version>${nexus.version}</version>
       </dependency>
       <dependency>
@@ -119,33 +113,6 @@
         <version>${it.nexus.bundle.version}</version>
         <type>zip</type>
         <classifier>bundle</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-proxy</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-proxy</artifactId>
-        <version>${nexus.version}</version>
-        <classifier>tests</classifier>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-rest-api</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-rest-api-model</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-test-common</artifactId>
-        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
@@ -173,6 +140,19 @@
         <version>13.0.1</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-model</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-plugin</artifactId>
+        <type>${nexusPluginType}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
       <!-- Internal -->
       <dependency>
         <groupId>org.sonatype.nexus.capabilities</groupId>
@@ -187,13 +167,13 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-capabilities-plugin</artifactId>
+        <type>${nexusPluginType}</type>
         <version>2.2-SNAPSHOT</version>
-        <type>${nexus.plugin.type}</type>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.capabilities</groupId>
         <artifactId>nexus-capabilities-testsuite-helper</artifactId>
-        <type>${nexus.plugin.type}</type>
+        <type>${nexusPluginType}</type>
         <version>2.2-SNAPSHOT</version>
       </dependency>
 
@@ -350,7 +330,7 @@
     <profile>
       <id>idea</id>
       <properties>
-        <nexus.plugin.type>jar</nexus.plugin.type>
+        <nexusPluginType>jar</nexusPluginType>
       </properties>
     </profile>
   </profiles>
