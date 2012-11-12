@@ -27,7 +27,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import junit.framework.Assert;
 import org.sonatype.sisu.litmus.testsupport.group.External;
 
-@Category(External.class)
+@Category(External.class) // This test contacts external servers
 public class BasicJerseyNexusClientIT
     extends JerseyNexusClientTestSupport
 {
