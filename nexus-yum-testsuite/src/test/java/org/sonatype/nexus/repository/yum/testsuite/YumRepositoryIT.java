@@ -39,7 +39,28 @@ public class YumRepositoryIT
     }
 
     @Test
-    public void shouldRemoveRpmFromYumRepoIfRemovedByWebGui()
+    public void addRpm()
+        throws Exception
+    {
+        final MavenHostedRepository repository = repositories().create(
+            MavenHostedRepository.class, repositoryIdForTest()
+        ).save();
+
+        mavenArtifact().upload(
+            new UploadRequest(
+                repository.id(), GROUP_ID, ARTIFACT_ID, VERSION, "pom", "", "rpm",
+                testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
+            )
+        );
+
+        sleep( 20, SECONDS );
+
+        final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
+        assertThat( primaryXml, containsString( ARTIFACT_ID ) );
+    }
+
+    @Test
+    public void removeRpm()
         throws Exception
     {
         final MavenHostedRepository repository = repositories().create(
