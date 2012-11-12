@@ -101,6 +101,10 @@
           <groupId>org.sonatype.plugin</groupId>
           <artifactId>plugin-host-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
