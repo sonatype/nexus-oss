@@ -15,6 +15,7 @@ package org.sonatype.nexus.client.rest.jersey;
 import java.net.MalformedURLException;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.condition.EditionConditions;
 import org.sonatype.nexus.client.core.condition.LogicalConditions;
@@ -24,8 +25,10 @@ import org.sonatype.nexus.client.rest.BaseUrl;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
 import com.sun.jersey.api.client.ClientHandlerException;
 import junit.framework.Assert;
+import org.sonatype.sisu.litmus.testsupport.group.External;
 
-public class BasicJerseyNexusClientTest
+@Category(External.class)
+public class BasicJerseyNexusClientIT
     extends JerseyNexusClientTestSupport
 {
 
