@@ -29,6 +29,7 @@ import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemp
 public class M2YumRepositoryTemplate
     extends AbstractMavenRepositoryTemplate
 {
+
     public M2YumRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
                                     RepositoryPolicy repositoryPolicy )
     {
@@ -66,13 +67,15 @@ public class M2YumRepositoryTemplate
 
         CRepositoryCoreConfiguration result =
             new CRepositoryCoreConfiguration( getTemplateProvider().getApplicationConfiguration(), repo,
-                new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
-                {
-                    public M2RepositoryConfiguration createExternalConfigurationHolder( CRepository config )
-                    {
-                        return new M2RepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
-                    }
-                } );
+                                              new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
+                                              {
+                                                  public M2RepositoryConfiguration createExternalConfigurationHolder(
+                                                      CRepository config )
+                                                  {
+                                                      return new M2RepositoryConfiguration(
+                                                          (Xpp3Dom) config.getExternalConfiguration() );
+                                                  }
+                                              } );
 
         return result;
     }

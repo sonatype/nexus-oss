@@ -29,7 +29,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.internal.rest.AliasNotFoundException;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -39,7 +38,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * aliases for artifact versions. E.g. you can introduce "trunk", "testing" and "production" aliases for the versions
  * "91.0.0", "90.0.0" and "89.0.0" and can access the RPMs via
  * http://localhost:8080/nexus/service/local/yum-alias/<repo-id>/alias.rpm
- * 
+ *
  * @author sherold
  */
 @Component( role = PlexusResource.class, hint = "RepositoryVersionAliasResource" )
@@ -49,6 +48,7 @@ public class RepositoryVersionAliasResource
     extends AbstractPlexusResource
     implements PlexusResource
 {
+
     public static final String URL_PREFIX = "yum/alias";
 
     private static final String PATH_PATTERN_TO_PROTECT = "/" + URL_PREFIX + "/**";

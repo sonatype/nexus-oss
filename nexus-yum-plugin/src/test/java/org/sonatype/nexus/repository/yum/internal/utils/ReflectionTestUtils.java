@@ -15,10 +15,9 @@ package org.sonatype.nexus.repository.yum.internal.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import com.google.common.base.Throwables;
-
 public class ReflectionTestUtils
 {
+
     public static void setField( Object obj, String fieldName, Object value )
     {
         boolean found = false;

@@ -23,13 +23,12 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.repository.yum.Yum;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.task.RepositoryScanningTask;
 import org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.repository.yum.Yum;
-import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 

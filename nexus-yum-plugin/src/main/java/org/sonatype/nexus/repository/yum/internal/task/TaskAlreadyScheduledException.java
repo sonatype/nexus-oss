@@ -19,6 +19,7 @@ import org.sonatype.scheduling.ScheduledTask;
 public class TaskAlreadyScheduledException
     extends RejectedExecutionException
 {
+
     private static final long serialVersionUID = 1L;
 
     private final ScheduledTask<?> original;

@@ -77,7 +77,8 @@ public class YumImplDeletionsTest
         );
 
         yum = new YumImpl(
-            mock( RepositoryURLBuilder.class ), nexusScheduler, config, new ScheduledThreadPoolExecutor(10), repository
+            mock( RepositoryURLBuilder.class ), nexusScheduler, config, new ScheduledThreadPoolExecutor( 10 ),
+            repository
         );
     }
 

@@ -16,7 +16,7 @@ import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 
 /**
  * The upload service at URI of {@code /service/local/artifact/maven}.
- * 
+ *
  * @author cstamas
  */
 public interface MavenArtifact
@@ -24,7 +24,7 @@ public interface MavenArtifact
 
     /**
      * Uploads a file to a Nexus repostory
-     * 
+     *
      * @param req contains repository, meta data and file information
      * @return
      */
@@ -32,7 +32,7 @@ public interface MavenArtifact
 
     /**
      * Deletes a given artifact from a Nexus repository
-     * 
+     *
      * @param req
      */
     void delete( ResolveRequest req );

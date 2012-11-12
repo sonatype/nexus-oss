@@ -20,11 +20,10 @@ import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.repository.yum.internal.rest.UrlPathInterpretation;
-import org.sonatype.nexus.repository.yum.internal.rest.UrlPathParser;
 
 public class UrlPathParserTest
 {
+
     private static final String DOMAIN = "http://localhost:8081";
 
     private static final String BASE_PATH = "/nexus/service/local";

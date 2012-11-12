@@ -21,13 +21,10 @@ import javax.ws.rs.Path;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.rest.AbstractYumRepositoryResource;
-import org.sonatype.nexus.repository.yum.internal.rest.UrlPathInterpretation;
-import org.sonatype.nexus.repository.yum.internal.rest.AliasNotFoundException;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 

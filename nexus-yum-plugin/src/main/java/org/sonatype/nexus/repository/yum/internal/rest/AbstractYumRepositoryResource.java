@@ -19,15 +19,13 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.repository.yum.internal.rest.IndexRepresentation;
-import org.sonatype.nexus.repository.yum.internal.rest.UrlPathInterpretation;
-import org.sonatype.nexus.repository.yum.internal.rest.YumFileRepresentation;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 
 public abstract class AbstractYumRepositoryResource
     extends AbstractPlexusResource
 {
+
     private final UrlPathParser requestSegmentInterpetor;
 
     public AbstractYumRepositoryResource()

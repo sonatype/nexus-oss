@@ -14,11 +14,11 @@ package org.sonatype.nexus.repository.yum.internal.config;
 
 import java.io.File;
 
-import org.sonatype.nexus.repository.yum.internal.config.YumConfiguration;
 import org.sonatype.nexus.repository.yum.internal.rest.AliasNotFoundException;
 
 public interface YumPluginConfiguration
 {
+
     public String getVersion( String repositoryId, String alias )
         throws AliasNotFoundException;
 

@@ -23,10 +23,10 @@ import java.util.List;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.rest.UrlPathInterpretation;
 
 public class UrlPathParser
 {
+
     private static final int FIRST_PARAM = 0;
 
     private static final int SECOND_PARAM = 1;
@@ -56,7 +56,7 @@ public class UrlPathParser
         {
             repoUrl =
                 new URL( request.getResourceRef().getHostIdentifier() + "/"
-                    + join( segments.subList( 0, yumIndex + segmentsAfterPrefix + 1 ), "/" ) );
+                             + join( segments.subList( 0, yumIndex + segmentsAfterPrefix + 1 ), "/" ) );
         }
         catch ( MalformedURLException e )
         {
@@ -85,7 +85,7 @@ public class UrlPathParser
             if ( lastSegments.size() == 1 )
             {
                 return new UrlPathInterpretation( repoUrl, YumRepository.YUM_REPOSITORY_DIR_NAME, true, true,
-                    pathToIndex( segments ) );
+                                                  pathToIndex( segments ) );
             }
 
             if ( lastSegments.get( SECOND_PARAM ).length() == 0 )

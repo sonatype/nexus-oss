@@ -25,7 +25,7 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 /**
  * TODO
- * 
+ *
  * @since 1.0
  */
 @Named
@@ -56,6 +56,6 @@ public class JerseyMavenArtifactSubsystemFactory
     public MavenArtifact create( final JerseyNexusClient nexusClient )
     {
         return new JerseyMavenArtifact( nexusClient, artifactMavenSubsystemFactory.create( nexusClient ),
-            repositoriesFactory.create( nexusClient ) );
+                                        repositoriesFactory.create( nexusClient ) );
     }
 }

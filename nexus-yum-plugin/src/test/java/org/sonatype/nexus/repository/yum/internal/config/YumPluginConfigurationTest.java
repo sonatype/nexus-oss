@@ -40,8 +40,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import org.sonatype.nexus.repository.yum.internal.rest.AliasNotFoundException;
+import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import org.xml.sax.SAXException;
 
 /**

@@ -26,7 +26,6 @@ import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;

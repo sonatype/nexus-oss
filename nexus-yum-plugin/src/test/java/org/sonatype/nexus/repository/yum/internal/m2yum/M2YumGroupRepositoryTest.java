@@ -19,10 +19,10 @@ import static org.junit.Assert.assertThat;
 import javax.inject.Inject;
 
 import org.junit.Test;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
 
 public class M2YumGroupRepositoryTest
     extends AbstractRepositoryTester

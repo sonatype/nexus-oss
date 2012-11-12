@@ -15,14 +15,17 @@ package org.sonatype.nexus.repository.yum.internal.utils;
 import static java.io.File.pathSeparator;
 import static java.lang.System.getenv;
 import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FilenameFilter;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CheckCreateRepoAvailable
 {
+
     private static final Logger LOG = LoggerFactory.getLogger( CheckCreateRepoAvailable.class );
 
     @Test

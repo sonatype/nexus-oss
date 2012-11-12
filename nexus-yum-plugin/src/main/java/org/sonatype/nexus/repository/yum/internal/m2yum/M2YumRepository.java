@@ -21,12 +21,14 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.plugin.Managed;
 
-@Component( role = Repository.class, hint = M2YumRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2-Yum Repository" )
+@Component( role = Repository.class, hint = M2YumRepository.ID, instantiationStrategy = "per-lookup",
+            description = "Maven2-Yum Repository" )
 @Managed
 @SuppressWarnings( "deprecation" )
 public class M2YumRepository
     extends M2Repository
 {
+
     public static final String ID = "maven2yum";
 
     @Override

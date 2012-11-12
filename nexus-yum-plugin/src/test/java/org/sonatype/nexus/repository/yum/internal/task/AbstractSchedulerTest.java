@@ -13,12 +13,10 @@
 package org.sonatype.nexus.repository.yum.internal.task;
 
 import java.io.File;
-
 import javax.inject.Inject;
 
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
-import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
 import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -26,6 +24,7 @@ import org.sonatype.scheduling.SchedulerTask;
 public abstract class AbstractSchedulerTest
     extends AbstractYumNexusTestCase
 {
+
     @Inject
     protected NexusScheduler nexusScheduler;
 

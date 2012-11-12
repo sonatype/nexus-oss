@@ -21,6 +21,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 public class M2YumContentClass
     extends AbstractIdContentClass
 {
+
     private static final int STAGING_VALIDATION_METHOD_INDEX = 2;
 
     public static final String ID = "maven2yum";

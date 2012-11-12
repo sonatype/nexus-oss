@@ -34,9 +34,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.internal.rest.RepositoryVersionAliasResource;
+import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -45,6 +44,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class RepositoryVersionAliasResourceTest
     extends AbstractYumNexusTestCase
 {
+
     private static final String EXISTING_VERSION = "trunk";
 
     private static final String RELEASES = "releases";

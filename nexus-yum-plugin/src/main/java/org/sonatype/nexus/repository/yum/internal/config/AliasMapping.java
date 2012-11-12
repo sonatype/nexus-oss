@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType( XmlAccessType.FIELD )
 public class AliasMapping
 {
+
     private final String repoId;
 
     private final String alias;

@@ -18,20 +18,22 @@
   <active>true</active>
 
   <!-- timeout for requests for a filtered (versioned) repository -->
-  <repositoryCreationTimeout>150</repositoryCreationTimeout><!-- in seconds -->
-  
+  <repositoryCreationTimeout>150</repositoryCreationTimeout>
+  <!-- in seconds -->
+
   <!-- enables or disables the creation of a repository of repositories -->
   <repositoryOfRepositoryVersionsActive>true</repositoryOfRepositoryVersionsActive>
-  
+
   <!-- enables or disables of delete rpm events via nexus -->
   <deleteProcessing>true</deleteProcessing>
-  
+
   <!-- delay after which the rebuild of a repository is triggered in which one or more rpms got deleted -->
-  <delayAfterDeletion>10</delayAfterDeletion><!-- in seconds -->
-  
+  <delayAfterDeletion>10</delayAfterDeletion>
+  <!-- in seconds -->
+
   <!-- maximal number of parallel createrepo executions -->
   <maxParallelThreadCount>10</maxParallelThreadCount>
-  
+
   <!-- configured aliases -->
   <aliasMappings>
     <aliasMapping>

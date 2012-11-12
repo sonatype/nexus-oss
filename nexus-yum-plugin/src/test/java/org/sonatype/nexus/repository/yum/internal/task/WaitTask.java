@@ -26,6 +26,7 @@ import org.sonatype.scheduling.SchedulerTask;
 public class WaitTask
     extends AbstractNexusTask<Object>
 {
+
     public static final Logger LOG = LoggerFactory.getLogger( WaitTask.class );
 
     @Override

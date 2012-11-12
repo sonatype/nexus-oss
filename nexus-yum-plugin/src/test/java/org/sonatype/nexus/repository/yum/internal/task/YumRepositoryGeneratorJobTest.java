@@ -21,12 +21,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.internal.task.AbstractSchedulerTest;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
 
 public class YumRepositoryGeneratorJobTest
     extends AbstractSchedulerTest
 {
+
     private static final File PATH_NOT_EXISTS = new File( "/data/path/not/exists" );
 
     private static final String SNAPSHOTS = "snapshots";
@@ -56,7 +56,8 @@ public class YumRepositoryGeneratorJobTest
     public void shouldCreateRepo()
         throws Exception
     {
-        executeJob( createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
+        executeJob(
+            createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
         RepositoryTestUtils.assertRepository( RepositoryTestUtils.REPODATA_DIR, "default" );
 
     }
@@ -66,7 +67,8 @@ public class YumRepositoryGeneratorJobTest
         throws Exception
     {
         yumConfig.setActive( false );
-        executeJob( createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
+        executeJob(
+            createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
         Assert.assertFalse( RepositoryTestUtils.REPODATA_DIR.exists() );
     }
 
@@ -75,7 +77,7 @@ public class YumRepositoryGeneratorJobTest
         throws Exception
     {
         executeJob( createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR,
-            BASE_VERSIONED_URL, SNAPSHOTS, VERSION, null, true ) );
+                                BASE_VERSIONED_URL, SNAPSHOTS, VERSION, null, true ) );
         RepositoryTestUtils.assertRepository( RepositoryTestUtils.REPODATA_DIR, "filtering" );
     }
 

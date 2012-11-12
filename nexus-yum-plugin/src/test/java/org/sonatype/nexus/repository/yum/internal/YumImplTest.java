@@ -22,13 +22,12 @@ import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.YumImpl;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
+import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import junit.framework.Assert;
 
 public class YumImplTest

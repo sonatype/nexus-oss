@@ -15,8 +15,6 @@ package org.sonatype.nexus.repository.yum.internal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
-
 public class YumRepositoryCache
 {
 

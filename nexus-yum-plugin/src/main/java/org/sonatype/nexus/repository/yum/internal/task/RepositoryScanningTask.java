@@ -17,7 +17,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Component;

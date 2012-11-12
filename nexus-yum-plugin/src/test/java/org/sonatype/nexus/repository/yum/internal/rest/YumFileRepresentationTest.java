@@ -17,8 +17,6 @@ import static org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusT
 
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.repository.yum.internal.rest.UrlPathInterpretation;
-import org.sonatype.nexus.repository.yum.internal.rest.YumFileRepresentation;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
 
 public class YumFileRepresentationTest

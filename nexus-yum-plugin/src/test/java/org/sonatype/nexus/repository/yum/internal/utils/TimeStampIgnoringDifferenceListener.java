@@ -26,6 +26,7 @@ import org.w3c.dom.Node;
 public class TimeStampIgnoringDifferenceListener
     implements DifferenceListener
 {
+
     @Override
     public void skippedComparison( Node node1, Node node2 )
     {
@@ -41,14 +42,14 @@ public class TimeStampIgnoringDifferenceListener
 
         if ( testNodeXpathContains( difference, "/requires[", "/provides[", "/format[1]" )
             || testNodeXpathMatches( difference, "^/repomd.{4,5}data.{4,5}(open-)?size.*$",
-                "^/repomd.{4,5}(data.{4,5})?text.{5,6}$", "^/repomd.{4,5}revision.*$" ) )
+                                     "^/repomd.{4,5}(data.{4,5})?text.{5,6}$", "^/repomd.{4,5}revision.*$" ) )
         {
             return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
         }
 
         if ( isNodeName( difference, "checksum", "timestamp", "packager", "open-checksum", "time@build", "time@file",
-            "size@package", "summary", "description", "buildhost", "header-range@end", "checksum@type",
-            "open-checksum@type" ) )
+                         "size@package", "summary", "description", "buildhost", "header-range@end", "checksum@type",
+                         "open-checksum@type" ) )
         {
             return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
         }
@@ -97,9 +98,10 @@ public class TimeStampIgnoringDifferenceListener
     {
         return difference.getControlNodeDetail().getXpathLocation() != null
             && difference.getControlNodeDetail().getXpathLocation().matches(
-                "/metadata.{4,5}package.{4,5}format.{4,5}requires.{4,5}entry.{3}" )
+            "/metadata.{4,5}package.{4,5}format.{4,5}requires.{4,5}entry.{3}" )
             && controlNode( difference ).getAttributes().getNamedItem( "name" ) != null
-            && controlNode( difference ).getAttributes().getNamedItem( "name" ).getTextContent().startsWith( "rpmlib(" );
+            && controlNode( difference ).getAttributes().getNamedItem( "name" ).getTextContent().startsWith(
+            "rpmlib(" );
     }
 
     private boolean hasSameText( Difference difference )

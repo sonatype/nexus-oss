@@ -14,36 +14,36 @@
 
 -->
 <metadata xmlns="http://linux.duke.edu/metadata/common"
-  xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="1">
+          xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="1">
   <package type="rpm">
     <name>is24-rel-snapshots-0.1.2-snapshot-repo</name>
     <arch>noarch</arch>
-    <version epoch="0" ver="1" rel="1" />
+    <version epoch="0" ver="1" rel="1"/>
     <checksum type="sha" pkgid="YES">e0d6716c722bc4f14f54bf2ec4a33be5c8534cf2
     </checksum>
     <summary>(none)</summary>
     <description>(none)</description>
     <packager>maven - sherold</packager>
-    <url />
-    <time file="1309502546" build="1309502546" />
-    <size package="1865" installed="252" archive="672" />
+    <url/>
+    <time file="1309502546" build="1309502546"/>
+    <size package="1865" installed="252" archive="672"/>
     <location xml:base="http://localhost:8080/nexus/service/local/yum/repo"
-      href="is24-rel-snapshots-0.1.2-snapshot-repo-1-1.noarch.rpm" />
+              href="is24-rel-snapshots-0.1.2-snapshot-repo-1-1.noarch.rpm"/>
     <format>
-      <rpm:license />
+      <rpm:license/>
       <rpm:vendor>IS24</rpm:vendor>
       <rpm:group>is24</rpm:group>
       <rpm:buildhost>isdeblnmac39</rpm:buildhost>
       <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
       </rpm:sourcerpm>
-      <rpm:header-range start="280" end="1561" />
+      <rpm:header-range start="280" end="1561"/>
       <rpm:requires>
         <rpm:entry name="rpmlib(PayloadFilesHavePrefix)"
-          flags="LE" epoch="0" ver="4.0" rel="1" />
+                   flags="LE" epoch="0" ver="4.0" rel="1"/>
         <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE"
-          epoch="0" ver="3.0.4" rel="1" />
+                   epoch="0" ver="3.0.4" rel="1"/>
         <rpm:entry name="rpmlib(VersionedDependencies)" flags="LE"
-          epoch="0" ver="3.0.3" rel="1" />
+                   epoch="0" ver="3.0.3" rel="1"/>
       </rpm:requires>
       <file>/etc/yum.repos.d/is24-rel-snapshots-0.1.2-snapshot.repo
       </file>

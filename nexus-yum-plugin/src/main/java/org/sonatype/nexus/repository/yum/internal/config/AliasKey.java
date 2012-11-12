@@ -20,6 +20,7 @@ package org.sonatype.nexus.repository.yum.internal.config;
  */
 public class AliasKey
 {
+
     private final String repoId;
 
     private final String alias;

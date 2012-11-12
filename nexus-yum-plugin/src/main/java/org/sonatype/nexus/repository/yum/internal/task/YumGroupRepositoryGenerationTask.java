@@ -29,14 +29,13 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.internal.task.CommandLineExecutor;
-import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -84,7 +83,7 @@ public class YumGroupRepositoryGenerationTask
             {
                 final File groupRepoData = new File( repoBaseDir, "repodata" );
                 LOG.debug( "Remove group repository repodata, because at maximum one yum member-repository left : {}",
-                          groupRepoData );
+                           groupRepoData );
                 deleteQuietly( groupRepoData );
             }
             return new YumRepositoryImpl( repoBaseDir, groupRepository.getId(), null );

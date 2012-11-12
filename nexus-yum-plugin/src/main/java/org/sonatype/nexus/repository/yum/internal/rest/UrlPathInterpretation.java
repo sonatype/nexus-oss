@@ -16,6 +16,7 @@ import java.net.URL;
 
 public class UrlPathInterpretation
 {
+
     private final URL repoUrl;
 
     private final String path;

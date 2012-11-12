@@ -13,7 +13,7 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<repomd xmlns="http://linux.duke.edu/metadata/repo" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
+<repomd xmlns="http://linux.duke.edu/metadata/repo">
   <revision>1330536861</revision>
   <data type="other_db">
     <location href="repodata/other.sqlite.bz2"/>

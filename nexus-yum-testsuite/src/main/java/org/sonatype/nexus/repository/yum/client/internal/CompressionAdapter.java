@@ -20,6 +20,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 public class CompressionAdapter
 {
+
     private final CompressionType compression;
 
     public CompressionAdapter( CompressionType compression )

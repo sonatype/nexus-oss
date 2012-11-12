@@ -22,8 +22,8 @@ import java.net.URLEncoder;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.repository.yum.client.Yum;
 import org.sonatype.nexus.repository.yum.client.MetadataType;
+import org.sonatype.nexus.repository.yum.client.Yum;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 

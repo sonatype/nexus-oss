@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.repository.yum.internal.task;
 
-import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.PARAM_REPO_DIR;
-import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.PARAM_REPO_ID;
 import static java.util.Arrays.asList;
 import static org.sonatype.nexus.formfields.FormField.MANDATORY;
 import static org.sonatype.nexus.formfields.FormField.OPTIONAL;
+import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.PARAM_REPO_DIR;
+import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.PARAM_REPO_ID;
 
 import java.util.List;
 
@@ -27,14 +27,17 @@ import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = YumMetadataGenerationTask.ID, description = YumMetadataGenerationTaskDescriptor.NAME )
+@Component( role = ScheduledTaskDescriptor.class, hint = YumMetadataGenerationTask.ID,
+            description = YumMetadataGenerationTaskDescriptor.NAME )
 public class YumMetadataGenerationTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
+
     public static final String NAME = "Yum Createrepo Task";
 
     private final RepoComboFormField repoField = new RepoComboFormField( PARAM_REPO_ID, "Repostiory for createrepo",
-        "Maven Repository for which the yum metadata is generated via createrepo.", MANDATORY );
+                                                                         "Maven Repository for which the yum metadata is generated via createrepo.",
+                                                                         MANDATORY );
 
     private final StringTextFormField outputField =
         new StringTextFormField(

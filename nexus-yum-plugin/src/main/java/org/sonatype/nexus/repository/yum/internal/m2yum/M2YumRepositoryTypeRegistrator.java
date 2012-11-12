@@ -17,4 +17,5 @@ import org.sonatype.plugin.Managed;
 @Managed
 public interface M2YumRepositoryTypeRegistrator
 {
+
 }

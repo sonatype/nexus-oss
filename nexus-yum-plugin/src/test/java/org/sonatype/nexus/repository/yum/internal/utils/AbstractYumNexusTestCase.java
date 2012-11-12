@@ -58,7 +58,7 @@ public class AbstractYumNexusTestCase
     @Override
     protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
     {
-        super.customizeContainerConfiguration(configuration );
+        super.customizeContainerConfiguration( configuration );
         configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 

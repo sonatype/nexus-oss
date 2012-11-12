@@ -23,6 +23,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 public class RepositoryUtilsTest
 {
+
     @Test
     public void shouldConvertRepositoryLocalUrlToFile()
         throws Exception

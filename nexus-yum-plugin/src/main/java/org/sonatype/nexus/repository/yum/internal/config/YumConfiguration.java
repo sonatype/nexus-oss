@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.yum.internal.config;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -29,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement( name = "configuration" )
 public class YumConfiguration
 {
+
     protected static final int DEFAULT_DELAY_AFTER_DELETION_IN_SEC = 10;
 
     protected static final boolean DEFAULT_DELETE_PROCESSING = true;

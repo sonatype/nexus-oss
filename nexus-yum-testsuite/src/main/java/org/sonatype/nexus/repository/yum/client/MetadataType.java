@@ -21,9 +21,9 @@ import org.sonatype.nexus.repository.yum.client.internal.CompressionType;
 public enum MetadataType
 {
     REPOMD_XML( "/repodata/repomd.xml", NONE ), PRIMARY_XML( "/repodata/primary.xml.gz", GZIP ), PRIMARY_SQLITE(
-        "/repodata/primary.sqlite.bz2", BZIP2 ), FILELIST_XML( "/repodata/filelist.xml.gz", GZIP ), FILELIST_SQLITE(
-        "/repodata/filelist.sqlite.bz2", BZIP2 ), OTHER_XML( "/repodata/other.xml.gz", GZIP ), OTHER_SQLITE(
-        "/repodata/other.sqlite.bz2", BZIP2 ), INDEX( "/", NONE );
+    "/repodata/primary.sqlite.bz2", BZIP2 ), FILELIST_XML( "/repodata/filelist.xml.gz", GZIP ), FILELIST_SQLITE(
+    "/repodata/filelist.sqlite.bz2", BZIP2 ), OTHER_XML( "/repodata/other.xml.gz", GZIP ), OTHER_SQLITE(
+    "/repodata/other.sqlite.bz2", BZIP2 ), INDEX( "/", NONE );
 
     private final String path;
 

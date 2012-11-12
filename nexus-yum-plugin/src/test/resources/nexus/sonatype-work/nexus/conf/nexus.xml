@@ -28,7 +28,7 @@
     </nonProxyHosts>
   </globalHttpProxySettings>
   <restApi>
-  	<baseUrl>http://localhost:8080/nexus</baseUrl>
+    <baseUrl>http://localhost:8080/nexus</baseUrl>
   </restApi>
   <httpProxy>
     <enabled>true</enabled>
@@ -39,7 +39,7 @@
     <resolveLinks>true</resolveLinks>
   </routing>
   <repositories>
-  	<!-- proxy repositories slow down nexus -->
+    <!-- proxy repositories slow down nexus -->
     <repository>
       <id>releases</id>
       <name>Releases</name>
@@ -249,5 +249,5 @@
     <jiraUrl>https://issues.sonatype.org</jiraUrl>
     <jiraProject>PR</jiraProject>
   </errorReporting>
-  <notification />
+  <notification/>
 </nexusConfiguration>

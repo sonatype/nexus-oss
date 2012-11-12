@@ -7,7 +7,6 @@
  */
 package org.sonatype.nexus.repository.yum.internal.guice;
 
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import javax.inject.Named;
 

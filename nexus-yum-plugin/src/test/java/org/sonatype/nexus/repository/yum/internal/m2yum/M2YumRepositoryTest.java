@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.yum.internal.m2yum;
 
 import java.util.Arrays;
 import java.util.Collection;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,12 +25,13 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith( Parameterized.class )
 public class M2YumRepositoryTest
 {
+
     private M2YumRepository repository;
 
     @Parameters
     public static Collection<Object[]> data()
     {
-        return Arrays.asList( new Object[][] { { "/repodata/repomd.xml", true }, { "/repodata/primary.xml.gz", true },
+        return Arrays.asList( new Object[][]{ { "/repodata/repomd.xml", true }, { "/repodata/primary.xml.gz", true },
             { "/maven-metadata.xml", true }, { "/de/testproject/maven-metadata.xml", true },
             { "/de/testproject/test.rpm", false }, { "/de/testproject/repodata/repomd.xml", false } } );
     }
@@ -54,7 +56,7 @@ public class M2YumRepositoryTest
     public void should_mark_files_as_metadata()
     {
         Assert.assertEquals( "path: " + path + " has not the expected value: " + expectedMetaData, expectedMetaData,
-            repository.isMavenMetadataPath( path ) );
+                             repository.isMavenMetadataPath( path ) );
 
     }
 
