@@ -118,11 +118,6 @@
         <version>${nexus.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-inject-plexus</artifactId>
-        <version>2.3.1</version>
-      </dependency>
-      <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
         <version>1.5-SNAPSHOT</version>
@@ -285,8 +280,6 @@
               <exclude>**/nb-configuration.xml</exclude>
               <!-- IntelliJ IDEA project directory-->
               <exclude>**/.idea/**</exclude>
-              <!-- The classes in guava package are copied over from com.google.common.eventbus in order to make then extensible (they are package protected) -->
-              <exclude>**/org/sonatype/nexus/eventbus/internal/guava/**</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>
