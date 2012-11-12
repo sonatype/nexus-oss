@@ -12,16 +12,14 @@
  */
 package org.sonatype.nexus.repository.yum;
 
-import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
 
 public interface YumRegistry
 {
 
-    Yum register( Repository repository );
+    Yum register( MavenRepository repository );
 
     Yum unregister( String repositoryId );
 

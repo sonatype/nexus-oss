@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.task.RepositoryScanningTask;
 import org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask;
@@ -55,7 +56,7 @@ public class YumRegistryImpl
     }
 
     @Override
-    public Yum register( Repository repository )
+    public Yum register( final MavenRepository repository )
     {
         if ( !yums.containsKey( repository.getId() ) )
         {
