@@ -18,6 +18,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -43,6 +44,7 @@ public class CapabilityOfTypeActiveCondition
         return super.isSatisfiedBy( reference ) && reference.context().isActive();
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final CapabilityEvent.AfterActivated event )
     {
@@ -52,6 +54,7 @@ public class CapabilityOfTypeActiveCondition
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final CapabilityEvent.BeforePassivated event )
     {

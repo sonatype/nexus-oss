@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities.testsuite;
 
-import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
@@ -20,15 +19,12 @@ import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParamet
 import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 import java.util.Collection;
-import javax.inject.Inject;
 
-import org.junit.Before;
 import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.capabilities.client.Capabilities;
-import org.sonatype.nexus.client.core.NexusClient;
-import org.sonatype.nexus.client.rest.NexusClientFactory;
-import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
+import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
@@ -48,13 +44,6 @@ public abstract class CapabilitiesITSupport
         ).load();
     }
 
-    protected static final String TEST_REPOSITORY = "releases";
-
-    @Inject
-    private NexusClientFactory nexusClientFactory;
-
-    private NexusClient nexusClient;
-
     public CapabilitiesITSupport( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
@@ -63,28 +52,34 @@ public abstract class CapabilitiesITSupport
     @Override
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
-        return configuration.addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
-            ),
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.capabilities", "nexus-capabilities-testsuite-helper"
-            )
-        );
-    }
-
-    @Before
-    public void createNexusClient()
-    {
-        nexusClient = nexusClientFactory.createFor(
-            baseUrlFrom( nexus().getUrl() ),
-            new UsernamePasswordAuthenticationInfo( "admin", "admin123" )
-        );
+        return configuration
+            .setLogPattern( "%d{HH:mm:ss.SSS} %-5level - %msg%n" )
+            .setLogLevel( "org.sonatype.nexus.plugins.capabilities", "DEBUG" )
+            .setLogLevel( "org.sonatype.sisu.goodies.eventbus", "DEBUG" )
+            .setSystemProperty( "guava.eventBus", "default" )
+            .addPlugins(
+                artifactResolver().resolvePluginFromDependencyManagement(
+                    "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
+                ),
+                artifactResolver().resolvePluginFromDependencyManagement(
+                    "org.sonatype.nexus.capabilities", "nexus-capabilities-testsuite-helper"
+                )
+            );
     }
 
     protected Capabilities capabilities()
     {
-        return nexusClient.getSubsystem( Capabilities.class );
+        return client().getSubsystem( Capabilities.class );
+    }
+
+    protected Repositories repositories()
+    {
+        return client().getSubsystem( Repositories.class );
+    }
+
+    protected CapabilityPropertyResource p( final String name, final String value )
+    {
+        return new CapabilityPropertyResource().withKey( name ).withValue( value );
     }
 
 }

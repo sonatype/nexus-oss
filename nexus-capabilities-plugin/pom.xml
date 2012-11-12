@@ -28,8 +28,6 @@
 
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus Capabilities :: Plugin</name>
-
   <properties>
     <debug-js>false</debug-js>
 
@@ -54,17 +52,6 @@
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <type>${nexusPluginType}</type>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-eventbus</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>

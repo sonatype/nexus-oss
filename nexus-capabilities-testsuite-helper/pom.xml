@@ -26,8 +26,6 @@
   <artifactId>nexus-capabilities-testsuite-helper</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus Capabilities :: Testsuite Helper</name>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -45,6 +46,7 @@ public class RepositoryProxyModeCondition
     }
 
     @Override
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final RepositoryRegistryEventAdd event )
     {
@@ -57,6 +59,7 @@ public class RepositoryProxyModeCondition
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final RepositoryEventProxyModeChanged event )
     {
@@ -66,6 +69,7 @@ public class RepositoryProxyModeCondition
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final RepositoryRegistryEventRemove event )
     {

@@ -34,7 +34,15 @@ public interface Capabilities
     List<CapabilityListItemResource> list();
 
     /**
-     * Retrieve all capabilities.
+     * Retrieve a capability given its id.
+     *
+     * @param id of capability to be retrieved
+     * @return capability with given id
+     */
+    CapabilityListItemResource list( String id );
+
+    /**
+     * Retrieve a capability.
      *
      * @param includeHidden whether or not hidden capabilities should be included
      * @return all capabilities
@@ -46,7 +54,7 @@ public interface Capabilities
      *
      * @return all capabilities of specified type and having specified properties
      */
-    List<CapabilityListItemResource> list( String type, CapabilityPropertyResource... props);
+    List<CapabilityListItemResource> list( String type, CapabilityPropertyResource... props );
 
     /**
      * Retrieve a capability given its id.

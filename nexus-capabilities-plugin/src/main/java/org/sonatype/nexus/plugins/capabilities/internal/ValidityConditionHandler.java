@@ -24,6 +24,7 @@ import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 
@@ -65,6 +66,7 @@ public class ValidityConditionHandler
         return validityCondition != null && validityCondition.isSatisfied();
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final ConditionEvent.Satisfied event )
     {
@@ -74,6 +76,7 @@ public class ValidityConditionHandler
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final ConditionEvent.Unsatisfied event )
     {

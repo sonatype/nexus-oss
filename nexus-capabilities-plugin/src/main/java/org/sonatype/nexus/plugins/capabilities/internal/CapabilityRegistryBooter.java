@@ -16,10 +16,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -29,14 +30,14 @@ import com.google.common.eventbus.Subscribe;
  */
 @Named
 @Singleton
+@EventBus.Managed
 public class CapabilityRegistryBooter
-    implements EventBus.LoadOnStart
 {
 
-    private final DefaultCapabilityRegistry capabilityRegistry;
+    private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
 
     @Inject
-    public CapabilityRegistryBooter( final DefaultCapabilityRegistry capabilityRegistry )
+    public CapabilityRegistryBooter( final Provider<DefaultCapabilityRegistry> capabilityRegistry )
     {
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
     }
@@ -46,7 +47,7 @@ public class CapabilityRegistryBooter
     {
         try
         {
-            capabilityRegistry.load();
+            capabilityRegistry.get().load();
         }
         catch ( final Exception e )
         {

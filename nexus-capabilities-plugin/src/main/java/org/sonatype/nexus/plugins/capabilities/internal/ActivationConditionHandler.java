@@ -24,6 +24,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondi
 import org.sonatype.nexus.plugins.capabilities.internal.condition.UnsatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 
@@ -61,6 +62,7 @@ public class ActivationConditionHandler
         return activationCondition != null && activationCondition.isSatisfied();
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final ConditionEvent.Satisfied event )
     {
@@ -70,6 +72,7 @@ public class ActivationConditionHandler
         }
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void handle( final ConditionEvent.Unsatisfied event )
     {
