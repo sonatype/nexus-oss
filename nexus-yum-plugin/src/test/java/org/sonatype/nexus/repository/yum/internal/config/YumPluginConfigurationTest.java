@@ -36,6 +36,7 @@ import java.util.LinkedHashSet;
 import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,6 +82,7 @@ public class YumPluginConfigurationTest
     @Before
     public void loadYumConfig()
     {
+        XMLUnit.setIgnoreWhitespace( true );
         yumConfiguration.load();
     }
 
