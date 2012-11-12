@@ -18,6 +18,7 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
 
 import java.io.File;
 
+import org.apache.maven.index.artifact.Gav;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -50,9 +51,13 @@ public class NXCM1312UploadCompressedBundleIT
 
         getEventInspectorsUtil().waitForCalmPeriod();
 
-        Assert.assertEquals( getSearchMessageUtil().searchForGav( "nxcm1312", "artifact", "2.0" ).size(), 1 );
-        Assert.assertEquals( getSearchMessageUtil()
-            .searchForGav( "org.nxcm1312", "maven-deploy-released", "1.0" ).size(), 1 );
+        // force index before searching, else we are dependent on very specific timing for this to pass... and even asis it might still fail due to timing
+
+        getSearchMessageUtil().reindexGAV(REPO_TEST_HARNESS_REPO, new Gav("nxcm1312", "artifact", "2.0"));
+        Assert.assertEquals(getSearchMessageUtil().searchForGav("nxcm1312", "artifact", "2.0").size(), 1);
+
+        getSearchMessageUtil().reindexGAV(REPO_TEST_HARNESS_REPO, new Gav("org.nxcm1312", "maven-deploy-released", "1.0"));
+        Assert.assertEquals(getSearchMessageUtil().searchForGav("org.nxcm1312", "maven-deploy-released", "1.0").size(), 1);
     }
 
     @Test( dependsOnMethods = "upload" )
