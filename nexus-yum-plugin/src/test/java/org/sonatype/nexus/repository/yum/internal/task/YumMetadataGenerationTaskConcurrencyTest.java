@@ -43,12 +43,12 @@ import org.mockito.cglib.proxy.MethodInterceptor;
 import org.mockito.cglib.proxy.MethodProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.repository.yum.internal.task.AbstractSchedulerTest;
-import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -109,7 +109,7 @@ public class YumMetadataGenerationTaskConcurrencyTest
         throws Exception
     {
         final File tmpDir = RepositoryTestUtils.copyToTempDir( RepositoryTestUtils.RPM_BASE_FILE );
-        final Repository repository = mock( Repository.class );
+        final MavenRepository repository = mock( MavenRepository.class );
         when( repository.getId() ).thenReturn( "REPO" );
         when( repository.getLocalUrl() ).thenReturn( tmpDir.getAbsolutePath() );
         when( repository.getProviderRole() ).thenReturn( Repository.class.getName() );
