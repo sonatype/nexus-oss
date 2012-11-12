@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
@@ -69,6 +71,11 @@ public class DefaultRepositoryRouterTest
     {
         super.setUp();
 
+        // loads up config, defaults
+        nexusConfiguration = this.lookup( NexusConfiguration.class );
+        nexusConfiguration.loadConfiguration( false );
+        nexusConfiguration.saveConfiguration();
+
         applicationConfiguration = this.lookup( ApplicationConfiguration.class );
         applicationConfiguration.saveConfiguration();
 
@@ -92,8 +99,16 @@ public class DefaultRepositoryRouterTest
         // URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
         // FileUtils.copyURLToFile( url, new File( getConfHomeDir(), "security-configuration.xml" ) );
 
-        // create a target
         TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
+
+        // shave off defaults
+        final Collection<Target> targets = new ArrayList<Target>( targetRegistry.getRepositoryTargets() );
+        for ( Target t : targets )
+        {
+            targetRegistry.removeRepositoryTarget( t.getId() );
+        }
+
+        // create a target
         Target t1 =
             new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList( new String[] { ".*" } ) );
         targetRegistry.addRepositoryTarget( t1 );
@@ -104,9 +119,7 @@ public class DefaultRepositoryRouterTest
         // setup security
         this.securitySystem = this.lookup( SecuritySystem.class );
         this.securitySystem.setRealms( Collections.singletonList( "default" ) );
-        this.securitySystem.setAnonymousAccessEnabled( false );
         this.securitySystem.start();
-
     }
 
     @Override
@@ -121,6 +134,11 @@ public class DefaultRepositoryRouterTest
         {
             super.tearDown();
         }
+    }
+
+    protected boolean loadConfigurationAtSetUp()
+    {
+        return false;
     }
 
     @Test

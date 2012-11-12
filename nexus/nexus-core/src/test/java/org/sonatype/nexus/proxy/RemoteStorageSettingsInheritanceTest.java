@@ -18,7 +18,10 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -39,8 +42,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public class RemoteStorageSettingsInheritanceTest
-    extends AbstractProxyTestEnvironment
+    extends NexusAppTestSupport
 {
+
     protected ApplicationConfiguration applicationConfiguration;
 
     protected ProxyRepository aProxyRepository;
@@ -48,68 +52,14 @@ public class RemoteStorageSettingsInheritanceTest
     public void setUp()
         throws Exception
     {
+        // loads up config, defaults
+        lookup( Nexus.class );
+
         super.setUp();
 
         applicationConfiguration = lookup( ApplicationConfiguration.class );
-
-        aProxyRepository = lookup( RepositoryRegistry.class ).getRepositoryWithFacet( "central", ProxyRepository.class );
-    }
-
-    @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
-        throws Exception
-    {
-        return new EnvironmentBuilder()
-        {
-            public void stopService()
-                throws Exception
-            {
-                // nothing
-            }
-
-            public void startService()
-                throws Exception
-            {
-                // nothing
-            }
-
-            public void buildEnvironment( AbstractProxyTestEnvironment abstractProxyTestEnvironment )
-                throws ConfigurationException, IOException, ComponentLookupException
-            {
-                // building a "mock" proxy repo we will not use at all
-                M2Repository repo = (M2Repository) getContainer().lookup( Repository.class, "maven2" );
-
-                CRepository repoConf = new DefaultCRepository();
-
-                repoConf.setProviderRole( Repository.class.getName() );
-                repoConf.setProviderHint( "maven2" );
-                repoConf.setId( "central" );
-                repoConf.setName( "Fake Central" );
-
-                repoConf.setLocalStorage( new CLocalStorage() );
-                repoConf.getLocalStorage().setProvider( "file" );
-                repoConf.getLocalStorage().setUrl(
-                    abstractProxyTestEnvironment.getApplicationConfiguration().getWorkingDirectory(
-                        "proxy/store/central" ).toURI().toURL().toString() );
-
-                Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-                repoConf.setExternalConfiguration( ex );
-                M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-                exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-                exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-
-                repoConf.setRemoteStorage( new CRemoteStorage() );
-                repoConf.getRemoteStorage().setProvider( abstractProxyTestEnvironment.getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
-                repoConf.getRemoteStorage().setUrl( "http://whatever.server/foo/but/be/a/valid/url" );
-
-                repo.configure( repoConf );
-
-                abstractProxyTestEnvironment.getApplicationConfiguration().getConfigurationModel().addRepository(
-                    repoConf );
-
-                abstractProxyTestEnvironment.getRepositoryRegistry().addRepository( repo );
-            }
-        };
+        aProxyRepository =
+            lookup( RepositoryRegistry.class ).getRepositoryWithFacet( "central", ProxyRepository.class );
     }
 
     @Test
@@ -119,21 +69,16 @@ public class RemoteStorageSettingsInheritanceTest
         int rscChange = aProxyRepository.getRemoteStorageContext().getGeneration();
 
         RemoteProxySettings proxy = aProxyRepository.getRemoteProxySettings();
-
         assertFalse( "Should no proxy be set!", proxy.isEnabled() );
-
         proxy.setHostname( "192.168.1.1" );
-
         proxy.setPort( 1234 );
-
         // TODO: this is the spurious part!!! Make it not needed! Config framework DOES know it changed!
         // If you remove this, test will fail
-        // aProxyRepository.setRemoteProxySettings( proxy );
-
+        aProxyRepository.setRemoteProxySettings( proxy );
         applicationConfiguration.saveConfiguration();
 
         assertTrue( "The change should be detected",
-            aProxyRepository.getRemoteStorageContext().getGeneration() > rscChange );
+                    aProxyRepository.getRemoteStorageContext().getGeneration() > rscChange );
     }
 
     @Test
@@ -145,21 +90,17 @@ public class RemoteStorageSettingsInheritanceTest
         // and the problem now
         // change the global proxy
         RemoteProxySettings proxy =
-            getApplicationConfiguration().getGlobalRemoteStorageContext().getRemoteProxySettings();
-
+            applicationConfiguration.getGlobalRemoteStorageContext().getRemoteProxySettings();
         proxy.setHostname( "192.168.1.1" );
-
         proxy.setPort( 1234 );
-
-        applicationConfiguration.saveConfiguration();
-
         // TODO: this is the spurious part!!! Make it not needed! Config framework DOES know it changed!
         // If you remove this, test will fail
         applicationConfiguration.getGlobalRemoteStorageContext().setRemoteProxySettings( proxy );
 
+        applicationConfiguration.saveConfiguration();
+
         assertTrue( "The change should be detected",
-            aProxyRepository.getRemoteStorageContext().getGeneration() > rscChange );
+                    aProxyRepository.getRemoteStorageContext().getGeneration() > rscChange );
 
     }
-
 }

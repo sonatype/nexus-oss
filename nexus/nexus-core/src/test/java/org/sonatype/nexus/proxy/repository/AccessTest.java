@@ -14,7 +14,10 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +27,9 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -44,32 +49,38 @@ public class AccessTest
 {
     private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
 
-    protected ApplicationConfiguration applicationConfiguration;
-
     @Override
     public void setUp()
         throws Exception
     {
-        applicationConfiguration = this.lookup( ApplicationConfiguration.class );
-        applicationConfiguration.saveConfiguration();
+        // loads up config, defaults
+        lookup( Nexus.class );
 
         super.setUp();
 
-        //String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
-        //URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
-        //FileUtils.copyURLToFile( url, new File( getConfHomeDir(), "security-configuration.xml" ) );
+        final TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
 
-        TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
+        // shave off defaults
+        final Collection<Target> targets = new ArrayList<Target>( targetRegistry.getRepositoryTargets() );
+        for ( Target t : targets )
+        {
+            targetRegistry.removeRepositoryTarget( t.getId() );
+        }
 
+        // add target
         Target t1 =
             new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList( new String[] { ".*" } ) );
 
         targetRegistry.addRepositoryTarget( t1 );
 
-        applicationConfiguration.saveConfiguration();
+        getApplicationConfiguration().saveConfiguration();
 
         // setup security
-        this.lookup( SecuritySystem.class ).start(); // need to call start to clear caches
+        // setup security
+        final SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
+        securitySystem.setRealms( Collections.singletonList( "default" ) );
+        securitySystem.setSecurityEnabled( true );
+        securitySystem.start();
     }
 
     @Override
