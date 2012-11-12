@@ -20,8 +20,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase.UTIL;
 import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase.UTIL;
 import static org.sonatype.nexus.repository.yum.internal.utils.ReflectionTestUtils.setField;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -34,18 +34,17 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
+import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @SuppressWarnings( "unchecked" )
 public class YumMetadataGenerationTaskTest
@@ -109,9 +108,9 @@ public class YumMetadataGenerationTaskTest
     {
         // given
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
-            mock( EventBus.class ),
             repoRegistry(),
             mock( YumPluginConfiguration.class ),
+            mock( YumRegistry.class ),
             mock( RepositoryURLBuilder.class )
         );
         task.setRpmDir( RPM_DIR.getAbsolutePath() );
@@ -129,9 +128,9 @@ public class YumMetadataGenerationTaskTest
     {
         // given
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
-            mock( EventBus.class ),
             repoRegistry(),
             mock( YumPluginConfiguration.class ),
+            mock( YumRegistry.class ),
             repositoryURLBuilder()
         );
         task.setRepositoryId( REPO );

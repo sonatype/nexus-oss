@@ -38,14 +38,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.ListFileFactory;
 import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.repository.yum.internal.RpmListWriter;
-import org.sonatype.nexus.repository.yum.internal.YumRepositoryGenerateEvent;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
+import org.sonatype.nexus.repository.yum.internal.m2yum.M2YumGroupRepository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
@@ -90,32 +92,31 @@ public class YumMetadataGenerationTask
 
     public static final String PARAM_SINGLE_RPM_PER_DIR = "yumMetadataGenerationSingleRpmPerDir";
 
-    private final EventBus eventBus;
-
     private final RepositoryRegistry repositoryRegistry;
 
     private final YumPluginConfiguration yumConfig;
 
     private final RepositoryURLBuilder repositoryURLBuilder;
 
+    private final YumRegistry yumRegistry;
+
     @VisibleForTesting
     protected YumMetadataGenerationTask()
     {
-        this.eventBus = null;
         this.repositoryRegistry = null;
         this.yumConfig = null;
         this.repositoryURLBuilder = null;
+        this.yumRegistry = null;
     }
 
     @Inject
-    public YumMetadataGenerationTask( final EventBus eventBus,
-                                      final RepositoryRegistry repositoryRegistry,
+    public YumMetadataGenerationTask( final RepositoryRegistry repositoryRegistry,
                                       final YumPluginConfiguration yumConfig,
+                                      final YumRegistry yumRegistry,
                                       final RepositoryURLBuilder repositoryURLBuilder )
     {
         super( null );
-
-        this.eventBus = checkNotNull( eventBus );
+        this.yumRegistry = yumRegistry;
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.yumConfig = checkNotNull( yumConfig );
         this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
@@ -149,7 +150,7 @@ public class YumMetadataGenerationTask
             Thread.sleep( 100 );
             LOG.info( "Generation complete." );
 
-            sendNotificationEvent();
+            regenerateMetadataForGroups();
             return new YumRepositoryImpl( getRepoDir(), getRepositoryId(), getVersion() );
         }
 
@@ -257,17 +258,24 @@ public class YumMetadataGenerationTask
         return SUBMITTED.equals( scheduledTask.getTaskState() ) || SLEEPING.equals( scheduledTask.getTaskState() );
     }
 
-    private void sendNotificationEvent()
+    private void regenerateMetadataForGroups()
     {
         if ( StringUtils.isBlank( getVersion() ) )
         {
             try
             {
                 final Repository repository = repositoryRegistry.getRepository( getRepositoryId() );
-                eventBus.post( new YumRepositoryGenerateEvent( repository ) );
+                for ( GroupRepository groupRepository : repositoryRegistry.getGroupsOfRepository( repository ) )
+                {
+                    if ( groupRepository.getRepositoryKind().isFacetAvailable( M2YumGroupRepository.class ) )
+                    {
+                        yumRegistry.createGroupRepository( groupRepository );
+                    }
+                }
             }
             catch ( NoSuchRepositoryException e )
             {
+                logger.warn( "Failed to fully regenerate Yum metadata for {}", getRepositoryId(), e );
             }
         }
     }

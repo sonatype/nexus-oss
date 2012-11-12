@@ -59,19 +59,6 @@ public class EventsRouter
     }
 
     @Subscribe
-    public void on( final YumRepositoryGenerateEvent event )
-    {
-        final Repository repository = event.getRepository();
-        for ( GroupRepository groupRepository : repositoryRegistry.get().getGroupsOfRepository( repository ) )
-        {
-            if ( groupRepository.getRepositoryKind().isFacetAvailable( M2YumGroupRepository.class ) )
-            {
-                yumRegistryProvider.get().createGroupRepository( groupRepository );
-            }
-        }
-    }
-
-    @Subscribe
     public void on( final RepositoryRegistryEventAdd event )
     {
         if ( event.getRepository().getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
