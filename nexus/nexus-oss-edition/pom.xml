@@ -27,7 +27,7 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
+      <artifactId>nexus-core</artifactId>
     </dependency>
   </dependencies>
 

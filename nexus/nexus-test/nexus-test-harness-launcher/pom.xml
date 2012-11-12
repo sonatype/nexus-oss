@@ -34,7 +34,7 @@
     <!-- All of Nexus needed on classpath -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
+      <artifactId>nexus-core</artifactId>
     </dependency>
      <dependency>
       <groupId>org.sonatype.nexus</groupId>

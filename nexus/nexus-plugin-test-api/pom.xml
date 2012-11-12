@@ -44,12 +44,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
-      <classifier>tests</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
+      <artifactId>nexus-core</artifactId>
       <classifier>tests</classifier>
     </dependency>
   </dependencies>
