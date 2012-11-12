@@ -77,7 +77,7 @@ public class YumGroupRepositoryIT
 
         final MavenHostedRepository repo3 = repositories().create(
             MavenHostedRepository.class, repositoryIdForTest( "3" )
-        ).save();
+        ).excludeFromSearchResults().save();
 
         mavenArtifact().upload(
             new UploadRequest(
@@ -109,11 +109,11 @@ public class YumGroupRepositoryIT
     {
         final MavenHostedRepository repo1 = repositories().create(
             MavenHostedRepository.class, repositoryIdForTest( "1" )
-        ).save();
+        ).excludeFromSearchResults().save();
 
         final MavenHostedRepository repo2 = repositories().create(
             MavenHostedRepository.class, repositoryIdForTest( "2" )
-        ).save();
+        ).excludeFromSearchResults().save();
 
         final YumGroupRepository groupRepo = repositories().create( YumGroupRepository.class, repositoryIdForTest() )
             .ofRepositories( repo1.id(), repo2.id() )

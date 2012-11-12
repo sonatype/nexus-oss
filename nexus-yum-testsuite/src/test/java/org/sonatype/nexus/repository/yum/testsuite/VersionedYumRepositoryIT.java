@@ -78,7 +78,7 @@ public class VersionedYumRepositoryIT
     {
         final MavenHostedRepository repository = repositories().create(
             MavenHostedRepository.class, repositoryIdForTest()
-        ).save();
+        ).excludeFromSearchResults().save();
 
         mavenArtifact().upload(
             new UploadRequest(

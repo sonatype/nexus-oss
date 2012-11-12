@@ -44,7 +44,7 @@ public class YumRepositoryIT
     {
         final MavenHostedRepository repository = repositories().create(
             MavenHostedRepository.class, repositoryIdForTest()
-        ).save();
+        ).excludeFromSearchResults().save();
 
         mavenArtifact().upload(
             new UploadRequest(
@@ -65,7 +65,7 @@ public class YumRepositoryIT
     {
         final MavenHostedRepository repository = repositories().create(
             MavenHostedRepository.class, repositoryIdForTest()
-        ).save();
+        ).excludeFromSearchResults().save();
 
         mavenArtifact().upload(
             new UploadRequest(
