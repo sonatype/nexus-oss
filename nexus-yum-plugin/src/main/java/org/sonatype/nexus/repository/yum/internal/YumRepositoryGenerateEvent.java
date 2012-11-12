@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.yum.internal;
 
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 

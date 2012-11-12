@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.repository.yum.internal.config;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
