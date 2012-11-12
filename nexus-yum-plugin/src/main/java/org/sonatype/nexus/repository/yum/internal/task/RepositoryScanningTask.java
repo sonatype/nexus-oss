@@ -77,7 +77,7 @@ public class RepositoryScanningTask
         }
         catch ( Exception e )
         {
-            getLogger().error( "Could not scan repository " + yum.getId(), e );
+            getLogger().error( "Could not scan repository " + yum.getRepository().getId(), e );
         }
     }
 
