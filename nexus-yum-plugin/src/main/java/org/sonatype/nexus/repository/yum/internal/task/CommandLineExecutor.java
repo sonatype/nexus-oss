@@ -27,14 +27,14 @@ public final class CommandLineExecutor
     public int exec( String command )
         throws IOException
     {
-        LOG.info( "Execute command : {}", command );
+        LOG.debug( "Execute command : {}", command );
 
         CommandLine cmdLine = CommandLine.parse( command );
         DefaultExecutor executor = new DefaultExecutor();
         executor.setStreamHandler( new PumpStreamHandler() );
 
         int exitValue = executor.execute( cmdLine );
-        LOG.info( "Execution finished with exit code : {}", exitValue );
+        LOG.debug( "Execution finished with exit code : {}", exitValue );
         return exitValue;
     }
 }

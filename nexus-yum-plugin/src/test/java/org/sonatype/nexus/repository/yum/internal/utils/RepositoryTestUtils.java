@@ -36,7 +36,6 @@ import org.custommonkey.xmlunit.Diff;
 import org.freecompany.redline.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.repository.yum.internal.utils.TimeStampIgnoringDifferenceListener;
 
 public final class RepositoryTestUtils
 {
@@ -63,12 +62,12 @@ public final class RepositoryTestUtils
 
     public static final String PRIMARY_XML_GZ = PRIMARY_XML + ".gz";
 
-    private static final Logger log = LoggerFactory.getLogger( RepositoryTestUtils.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RepositoryTestUtils.class );
 
     public static void assertRepository( File repodataDir, String templateName )
         throws Exception
     {
-        log.info( "Testing Repo {} ...", repodataDir );
+        LOG.debug( "Testing Repo {} ...", repodataDir );
         assertTrue( repodataDir.exists() );
         assertRepomdXml( repodataDir, templateName );
         assertPrimaryXml( repodataDir, templateName );
@@ -78,7 +77,7 @@ public final class RepositoryTestUtils
         throws Exception
     {
         File primaryXmlFile = new File( repodataDir, PRIMARY_XML_GZ );
-        log.info( "Testing file {} ...", primaryXmlFile );
+        LOG.debug( "Testing file {} ...", primaryXmlFile );
 
         GZIPInputStream gzipInputStream = new GZIPInputStream( new FileInputStream( primaryXmlFile ) );
         Diff xmlDiff =
@@ -90,7 +89,7 @@ public final class RepositoryTestUtils
         }
         catch ( AssertionError e )
         {
-            log.error( "Primary.xml failed test for template {} with following content : {}", templateName,
+            LOG.error( "Primary.xml failed test for template {} with following content : {}", templateName,
                        IOUtils.toString( new GZIPInputStream( new FileInputStream( primaryXmlFile ) ) ) );
             throw e;
         }

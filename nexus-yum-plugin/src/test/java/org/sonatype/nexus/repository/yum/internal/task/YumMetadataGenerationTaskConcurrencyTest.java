@@ -189,7 +189,7 @@ public class YumMetadataGenerationTaskConcurrencyTest
             if ( "doRun".equals( method.getName() ) )
             {
                 String threadName = Thread.currentThread().getName();
-                LOG.info( "Thread name : {}", threadName );
+                LOG.debug( "Thread name : {}", threadName );
                 if ( !threadNames.add( threadName ) )
                 {
                     Assert.fail( "Uses the same thread : " + threadName );

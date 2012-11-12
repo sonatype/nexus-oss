@@ -38,7 +38,7 @@ public class YumPluginConfigurationImpl
 
     public static final String YUM_XML = "yum.xml";
 
-    private static final Logger log = LoggerFactory.getLogger( YumPluginConfigurationImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( YumPluginConfigurationImpl.class );
 
     private static final Object LOAD_WRITE_MUTEX = new Object();
 
@@ -88,7 +88,7 @@ public class YumPluginConfigurationImpl
             }
             catch ( JAXBException e )
             {
-                log.warn( "can't load config file staing with old config", e );
+                LOG.warn( "can't load config file staing with old config", e );
             }
         }
     }

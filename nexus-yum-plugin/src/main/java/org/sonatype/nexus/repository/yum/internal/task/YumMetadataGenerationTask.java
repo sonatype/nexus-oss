@@ -137,7 +137,7 @@ public class YumMetadataGenerationTask
         {
             setDefaults();
 
-            LOG.info( "Generating Yum-Repository for '{}' ...", getRpmDir() );
+            LOG.debug( "Generating Yum-Repository for '{}' ...", getRpmDir() );
             try
             {
                 getRepoDir().mkdirs();
@@ -152,8 +152,9 @@ public class YumMetadataGenerationTask
                 LOG.warn( "Generating Yum-Repo failed", e );
                 throw new IOException( "Generating Yum-Repo failed", e );
             }
+            // TODO dubious
             Thread.sleep( 100 );
-            LOG.info( "Generation complete." );
+            LOG.debug( "Generation complete." );
 
             regenerateMetadataForGroups();
             return new YumRepositoryImpl( getRepoDir(), getRepositoryId(), getVersion() );

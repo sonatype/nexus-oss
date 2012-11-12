@@ -76,14 +76,14 @@ public class YumGroupRepositoryGenerationTask
             final List<File> memberRepoBaseDirs = validYumRepositoryBaseDirs();
             if ( memberRepoBaseDirs.size() > 1 )
             {
-                LOG.info( "Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName() );
+                LOG.debug( "Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName() );
                 new CommandLineExecutor().exec( buildCommand( repoBaseDir, memberRepoBaseDirs ) );
-                LOG.info( "Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName() );
+                LOG.debug( "Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName() );
             }
             else
             {
                 final File groupRepoData = new File( repoBaseDir, "repodata" );
-                LOG.info( "Remove group repository repodata, because at maximum one yum member-repository left : {}",
+                LOG.debug( "Remove group repository repodata, because at maximum one yum member-repository left : {}",
                           groupRepoData );
                 deleteQuietly( groupRepoData );
             }
@@ -128,7 +128,7 @@ public class YumGroupRepositoryGenerationTask
             } );
             for ( File yumTmpDir : yumTmpDirs )
             {
-                LOG.info( "Deleting yum cache dir : {}", yumTmpDir );
+                LOG.debug( "Deleting yum cache dir : {}", yumTmpDir );
                 deleteQuietly( yumTmpDir );
             }
         }

@@ -53,7 +53,7 @@ public class ConcurrentRpmDeployedListenerTest
     extends AbstractRepositoryTester
 {
 
-    private static final Logger log = LoggerFactory.getLogger( ConcurrentRpmDeployedListenerTest.class );
+    private static final Logger LOG = LoggerFactory.getLogger( ConcurrentRpmDeployedListenerTest.class );
 
     @Rule
     public ConcurrentRule concurrently = new ConcurrentRule();
@@ -94,7 +94,7 @@ public class ConcurrentRpmDeployedListenerTest
         {
             shouldCreateRepoForRpm( j );
         }
-        log.info( "done" );
+        LOG.debug( "done" );
     }
 
     private void shouldCreateRepoForRpm( int index )
@@ -120,7 +120,7 @@ public class ConcurrentRpmDeployedListenerTest
         handler.on( new RepositoryItemEventStoreCreate( repo, storageItem ) );
 
         final int activeWorker = getRunningTasks();
-        log.info( "active worker: " + activeWorker );
+        LOG.debug( "active worker: " + activeWorker );
         assertThat( activeWorker, is( lessThanOrEqualTo( 10 ) ) );
     }
 

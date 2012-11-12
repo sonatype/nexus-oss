@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class CheckCreateRepoAvailable
 {
-    private static final Logger log = LoggerFactory.getLogger( CheckCreateRepoAvailable.class );
+    private static final Logger LOG = LoggerFactory.getLogger( CheckCreateRepoAvailable.class );
 
     @Test
     public void shouldHaveCreaterepoInPath()
@@ -32,7 +32,7 @@ public class CheckCreateRepoAvailable
         String[] paths = getenv( "PATH" ).split( pathSeparator );
         for ( String path : paths )
         {
-            log.info( "Search for createrepo in {} ...", path );
+            LOG.debug( "Search for createrepo in {} ...", path );
 
             String[] files = new File( path ).list( new FilenameFilter()
             {
@@ -43,7 +43,7 @@ public class CheckCreateRepoAvailable
             } );
             if ( files.length > 0 )
             {
-                log.info( "Found createrepo in {} !", path );
+                LOG.debug( "Found createrepo in {} !", path );
                 return;
             }
         }

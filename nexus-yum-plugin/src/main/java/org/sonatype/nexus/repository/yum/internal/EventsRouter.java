@@ -21,9 +21,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -46,8 +43,6 @@ import com.google.common.eventbus.Subscribe;
 @EventBus.Managed
 public class EventsRouter
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger( EventsRouter.class );
 
     private final Provider<RepositoryRegistry> repositoryRegistry;
 

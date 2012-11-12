@@ -51,7 +51,7 @@ public class YumImpl
     implements Yum
 {
 
-    private final static Logger log = LoggerFactory.getLogger( YumImpl.class );
+    private final static Logger LOG = LoggerFactory.getLogger( YumImpl.class );
 
     private final RepositoryURLBuilder repositoryURLBuilder;
 
@@ -110,7 +110,7 @@ public class YumImpl
     public void addVersion( final String version )
     {
         versions.add( version );
-        log.debug( "Added version '{}' to repository '{}", version, getRepository().getId() );
+        LOG.debug( "Added version '{}' to repository '{}", version, getRepository().getId() );
     }
 
     @Override
@@ -259,7 +259,7 @@ public class YumImpl
         {
             if ( findDelayedParentDirectory( path ) == null )
             {
-                log.info( "Delete rpm {} / {}", repository.getId(), path );
+                LOG.debug( "Delete rpm {} / {}", repository.getId(), path );
                 recreateRepository();
             }
         }
@@ -334,14 +334,14 @@ public class YumImpl
             }
             if ( isDeleted( path ) )
             {
-                log.info(
+                LOG.debug(
                     "Recreate yum repository {} because of removed path {}", getRepository().getId(), path
                 );
                 recreateRepository();
             }
             else if ( executionCount < MAX_EXECUTION_COUNT )
             {
-                log.info(
+                LOG.debug(
                     "Rescheduling creation of yum repository {} because path {} not deleted.",
                     getRepository().getId(), path
                 );
@@ -349,7 +349,7 @@ public class YumImpl
             }
             else
             {
-                log.warn(
+                LOG.warn(
                     "Deleting path {} in repository {} took too long - retried {} times.",
                     path, getRepository().getId(), MAX_EXECUTION_COUNT
                 );

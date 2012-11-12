@@ -63,7 +63,7 @@ public class YumRegistryImpl
             final Yum yum = yumFactory.create( repository );
             yums.put( repository.getId(), yum );
 
-            LOG.info( "Marked repository as RPM-repository : {}", repository.getId() );
+            LOG.debug( "Marked repository as RPM-repository : {}", repository.getId() );
 
             runScanningTask( yum );
 

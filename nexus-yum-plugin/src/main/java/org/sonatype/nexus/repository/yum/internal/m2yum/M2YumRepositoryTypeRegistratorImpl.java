@@ -30,7 +30,6 @@ import com.google.inject.Singleton;
 public class M2YumRepositoryTypeRegistratorImpl
     implements M2YumRepositoryTypeRegistrator
 {
-    private static final Logger LOG = LoggerFactory.getLogger( M2YumRepositoryTypeRegistratorImpl.class );
 
     @Inject
     private RepositoryTypeRegistry repositoryTypeRegistry;
@@ -38,7 +37,6 @@ public class M2YumRepositoryTypeRegistratorImpl
     @Inject
     public void registerRepositoryType()
     {
-        LOG.info( "Try register my M2YumRepository and M2YumGroupRepository to the RepositoryTypeRegistry" );
         repositoryTypeRegistry.registerRepositoryTypeDescriptors( m2yumDescriptor() );
         repositoryTypeRegistry.registerRepositoryTypeDescriptors( m2yumGroupDescriptor() );
     }

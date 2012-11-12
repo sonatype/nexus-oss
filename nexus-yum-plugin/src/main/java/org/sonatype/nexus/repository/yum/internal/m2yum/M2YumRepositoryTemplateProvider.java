@@ -24,13 +24,10 @@ import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
 public class M2YumRepositoryTemplateProvider
     extends DefaultRepositoryTemplateProvider
 {
-    private static final Logger LOG = LoggerFactory.getLogger( M2YumRepositoryTemplateProvider.class );
 
     @Override
     public TemplateSet getTemplates()
     {
-        LOG.info( "Generate M2YumRepositoryTemplates" );
-
         final TemplateSet templates = new TemplateSet( null );
 
         templates.add( new M2YumRepositoryTemplate( this, "maven2yum_hosted_release", "Maven2 Yum (hosted, release)",

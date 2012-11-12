@@ -82,7 +82,7 @@ public class RpmListWriter
     {
         if ( rpmListFile.exists() )
         {
-            LOG.info( "Reuse existing rpm list file : {}", rpmListFile );
+            LOG.debug( "Reuse existing rpm list file : {}", rpmListFile );
             List<String> rpmFileList = pruneToExistingRpms();
 
             if ( isNotBlank( version ) )
@@ -146,11 +146,11 @@ public class RpmListWriter
         if ( !fileList.contains( filename ) )
         {
             fileList.add( filename );
-            LOG.info( "Added rpm {} to file list.", filename );
+            LOG.debug( "Added rpm {} to file list.", filename );
         }
         else
         {
-            LOG.info( "Rpm {} already exists in file list.", filename );
+            LOG.debug( "Rpm {} already exists in file list.", filename );
         }
         return filename;
     }
@@ -163,7 +163,7 @@ public class RpmListWriter
         {
             if ( !new File( baseRpmDir, files.get( i ) ).exists() )
             {
-                LOG.info( "Removed {} from rpm list.", files.get( i ) );
+                LOG.debug( "Removed {} from rpm list.", files.get( i ) );
                 files.remove( i );
                 i--;
 
@@ -187,7 +187,7 @@ public class RpmListWriter
             writeLines( files, "\n", outputStream );
             if ( files.isEmpty() )
             {
-                LOG.info(
+                LOG.debug(
                     "Write non existing package to rpm list file {} to avoid an empty packge list that would cause createrepo to scan the whole directory",
                     rpmListOutputFile );
                 write(
@@ -199,7 +199,7 @@ public class RpmListWriter
         {
             outputStream.close();
         }
-        LOG.info( "Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListFile );
+        LOG.debug( "Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListFile );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -241,28 +241,21 @@ public class RpmListWriter
     }
 
     private void rewriteFileList( Map<String, String> fileMap )
+        throws IOException
     {
+        Writer writer = new FileWriter( rpmListFile );
         try
         {
-            Writer writer = new FileWriter( rpmListFile );
-            try
+            for ( Entry<String, String> entry : fileMap.entrySet() )
             {
-                for ( Entry<String, String> entry : fileMap.entrySet() )
-                {
-                    writer.append( format( "%s%s\n", entry.getKey(), entry.getValue() ) );
-                }
+                writer.append( format( "%s%s\n", entry.getKey(), entry.getValue() ) );
             }
-            finally
-            {
-                writer.close();
-            }
-            LOG.info( "Wrote temporary package list to {}", rpmListFile.getAbsoluteFile() );
         }
-        catch ( IOException e )
+        finally
         {
-            LOG.warn( "Could not write temporary package list file", e );
+            writer.close();
         }
-
+        LOG.debug( "Wrote temporary package list to {}", rpmListFile.getAbsoluteFile() );
     }
 
     private Map<String, String> getSortedFilteredFileList()

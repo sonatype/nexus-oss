@@ -32,7 +32,7 @@ public class WaitTask
     protected Object doRun()
         throws Exception
     {
-        LOG.info( "Go to sleep for a sec." );
+        LOG.debug( "Go to sleep for a sec." );
         Thread.sleep( 1000 );
         return null;
     }
