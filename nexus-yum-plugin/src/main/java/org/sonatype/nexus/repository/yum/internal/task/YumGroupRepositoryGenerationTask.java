@@ -68,7 +68,7 @@ public class YumGroupRepositoryGenerationTask
     protected YumRepository doRun()
         throws Exception
     {
-        if ( yumConfig.isActive() && isValidRepository( groupRepository ) )
+        if ( yumConfig.isActive() && isValidRepository() )
         {
             cleanYumCacheDir();
 
@@ -184,7 +184,7 @@ public class YumGroupRepositoryGenerationTask
         return groupRepository;
     }
 
-    private boolean isValidRepository( GroupRepository groupRepository2 )
+    private boolean isValidRepository()
     {
         return groupRepository != null && !groupRepository.getMemberRepositories().isEmpty();
     }
