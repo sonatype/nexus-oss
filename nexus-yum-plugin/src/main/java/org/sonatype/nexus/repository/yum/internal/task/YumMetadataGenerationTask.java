@@ -45,6 +45,7 @@ import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.ListFileFactory;
 import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.repository.yum.internal.RpmListWriter;
+import org.sonatype.nexus.repository.yum.internal.RpmScanner;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.m2yum.M2YumGroupRepository;
@@ -52,7 +53,6 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
@@ -100,6 +100,8 @@ public class YumMetadataGenerationTask
 
     private final YumRegistry yumRegistry;
 
+    private final RpmScanner scanner;
+
     @VisibleForTesting
     protected YumMetadataGenerationTask()
     {
@@ -107,16 +109,19 @@ public class YumMetadataGenerationTask
         this.yumConfig = null;
         this.repositoryURLBuilder = null;
         this.yumRegistry = null;
+        scanner = null;
     }
 
     @Inject
     public YumMetadataGenerationTask( final RepositoryRegistry repositoryRegistry,
                                       final YumPluginConfiguration yumConfig,
                                       final YumRegistry yumRegistry,
-                                      final RepositoryURLBuilder repositoryURLBuilder )
+                                      final RepositoryURLBuilder repositoryURLBuilder,
+                                      final RpmScanner scanner )
     {
         super( null );
-        this.yumRegistry = yumRegistry;
+        this.yumRegistry = checkNotNull( yumRegistry );
+        this.scanner = checkNotNull( scanner );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.yumConfig = checkNotNull( yumConfig );
         this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
@@ -292,8 +297,15 @@ public class YumMetadataGenerationTask
     private File createRpmListFile()
         throws IOException
     {
-        return new RpmListWriter( getRepositoryId(), getRpmDir(), getAddedFiles(), getVersion(),
-                                  isSingleRpmPerDirectory(), this ).writeList();
+        return new RpmListWriter(
+            getRepositoryId(),
+            new File( getRpmDir() ),
+            getAddedFiles(),
+            getVersion(),
+            isSingleRpmPerDirectory(),
+            this,
+            scanner
+        ).writeList();
     }
 
     private File createCacheDir()

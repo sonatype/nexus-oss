@@ -24,12 +24,14 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.sonatype.nexus.repository.yum.internal.ListFileFactory;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
-import org.sonatype.nexus.repository.yum.internal.RpmListWriter;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
 public class RpmListWriterTest
+    extends TestSupport
 {
+
     private static final String REPO_ID = "repoId";
 
     private static final String FILE_CONTENT = "another-artifact/0.0.1/another-artifact-0.0.1-1.noarch.rpm\n"
@@ -63,12 +65,19 @@ public class RpmListWriterTest
         throws Exception
     {
         File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
-        rpmListFile =
-            new RpmListWriter( REPO_ID,
-                new File( RepositoryTestUtils.RPM_BASE_FILE, "tomcat-mysql-jdbc/5.1.15-2" ).getAbsolutePath(),
-                "/is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm", null, true, wrap( rpmListFile ) ).writeList();
+
+        rpmListFile = new RpmListWriter(
+            REPO_ID,
+            new File( RepositoryTestUtils.RPM_BASE_FILE, "tomcat-mysql-jdbc/5.1.15-2" ),
+            "/is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm",
+            null,
+            true,
+            wrap( rpmListFile ),
+            new RpmScanner( new SerialScanner() )
+        ).writeList();
+
         assertEquals( "is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm\n",
-            IOUtils.toString( new FileInputStream( rpmListFile ) ) );
+                      IOUtils.toString( new FileInputStream( rpmListFile ) ) );
     }
 
     @Test
@@ -76,9 +85,16 @@ public class RpmListWriterTest
         throws Exception
     {
         File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
-        rpmListFile =
-            new RpmListWriter( REPO_ID, RepositoryTestUtils.RPM_BASE_FILE.getAbsolutePath(), null, null, true,
-                wrap( rpmListFile ) ).writeList();
+
+        rpmListFile = new RpmListWriter(
+            REPO_ID,
+            RepositoryTestUtils.RPM_BASE_FILE,
+            null,
+            null,
+            true,
+            wrap( rpmListFile ),
+            new RpmScanner( new SerialScanner() )
+        ).writeList();
         assertEquals( FILE_CONTENT, IOUtils.toString( new FileInputStream( rpmListFile ) ) );
     }
 
@@ -88,7 +104,7 @@ public class RpmListWriterTest
     {
         File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, "2.2-2", null );
         assertEquals( "conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm\n",
-            IOUtils.toString( new FileInputStream( rpmListFile ) ) );
+                      IOUtils.toString( new FileInputStream( rpmListFile ) ) );
     }
 
     @Test
@@ -96,9 +112,16 @@ public class RpmListWriterTest
         throws Exception
     {
         File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
-        rpmListFile =
-            new RpmListWriter( REPO_ID, RepositoryTestUtils.RPM_BASE_FILE.getAbsolutePath(),
-                "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm", null, true, wrap( rpmListFile ) ).writeList();
+
+        rpmListFile = new RpmListWriter(
+            REPO_ID,
+            RepositoryTestUtils.RPM_BASE_FILE,
+            "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm",
+            null,
+            true,
+            wrap( rpmListFile ),
+            new RpmScanner( new SerialScanner() )
+        ).writeList();
         assertEquals( FILE_CONTENT, IOUtils.toString( new FileInputStream( rpmListFile ) ) );
     }
 
@@ -109,9 +132,15 @@ public class RpmListWriterTest
         // given written list file
         File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
         // when create two files and recreate list
-        rpmListFile =
-            new RpmListWriter( REPO_ID, RepositoryTestUtils.RPM_BASE_FILE.getAbsolutePath(), NEW_RPM1 + pathSeparator
-                + NEW_RPM2, null, false, wrap( rpmListFile ) ).writeList();
+        rpmListFile = new RpmListWriter(
+            REPO_ID,
+            RepositoryTestUtils.RPM_BASE_FILE,
+            NEW_RPM1 + pathSeparator + NEW_RPM2,
+            null,
+            false,
+            wrap( rpmListFile ),
+            new RpmScanner( new SerialScanner() )
+        ).writeList();
         // then
         final String content = IOUtils.toString( new FileInputStream( rpmListFile ) );
         assertThat( content, containsString( NEW_RPM1 ) );
@@ -125,7 +154,16 @@ public class RpmListWriterTest
         File rpmListFile = File.createTempFile( "package.", ".txt" );
         rpmListFile.delete();
 
-        new RpmListWriter( REPO_ID, rpmBaseDir.getAbsolutePath(), addedFile, version, true, wrap( rpmListFile ) ).writeList();
+        new RpmListWriter(
+            REPO_ID,
+            rpmBaseDir,
+            addedFile,
+            version,
+            true,
+            wrap( rpmListFile ),
+            new RpmScanner( new SerialScanner() )
+        ).writeList();
+
         return rpmListFile;
     }
 

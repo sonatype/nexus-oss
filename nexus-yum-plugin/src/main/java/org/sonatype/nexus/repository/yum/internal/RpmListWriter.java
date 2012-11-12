@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.yum.internal;
 import static java.io.File.pathSeparator;
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.IOUtils.readLines;
 import static org.apache.commons.io.IOUtils.write;
 import static org.apache.commons.io.IOUtils.writeLines;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 public class RpmListWriter
 {
+
     private static final int POSITION_AFTER_SLASH = 1;
 
     private static final Logger LOG = LoggerFactory.getLogger( RpmListWriter.class );
@@ -51,14 +51,21 @@ public class RpmListWriter
 
     private final String repositoryId;
 
-    private final String baseRpmDir;
+    private final File baseRpmDir;
 
     private final boolean singleRpmPerDirectory;
 
     private final ListFileFactory fileFactory;
 
-    public RpmListWriter( String repositoryId, String baseRpmDir, String addedFiles, String version,
-                          boolean singleRpmPerDirectory, ListFileFactory fileFactory )
+    private final RpmScanner scanner;
+
+    public RpmListWriter( final String repositoryId,
+                          final File baseRpmDir,
+                          final String addedFiles,
+                          final String version,
+                          final boolean singleRpmPerDirectory,
+                          final ListFileFactory fileFactory,
+                          final RpmScanner scanner )
     {
         this.repositoryId = repositoryId;
         this.baseRpmDir = baseRpmDir;
@@ -66,6 +73,7 @@ public class RpmListWriter
         this.version = version;
         this.singleRpmPerDirectory = singleRpmPerDirectory;
         this.fileFactory = fileFactory;
+        this.scanner = scanner;
         this.rpmListFile = fileFactory.getRpmListFile( repositoryId );
     }
 
@@ -218,18 +226,16 @@ public class RpmListWriter
         }
         else
         {
-            writeRpmFileList( getRelativeFilenames( getRpmFileList() ), rpmListFile );
+            writeRpmFileList( getRelativeFilenames( scanner.scan( baseRpmDir ) ), rpmListFile );
         }
     }
 
     private List<String> getRelativeFilenames( Collection<File> rpmFileList )
     {
-        String absoluteBasePath = baseRpmDir + separator;
-
         List<String> result = new ArrayList<String>( rpmFileList.size() );
         for ( File rpmFile : rpmFileList )
         {
-            result.add( getRelativePath( rpmFile, absoluteBasePath ) );
+            result.add( getRelativePath( rpmFile ) );
         }
         return result;
     }
@@ -265,12 +271,12 @@ public class RpmListWriter
 
         Map<String, String> fileMap = new TreeMap<String, String>();
 
-        for ( File file : getRpmFileList() )
+        for ( File file : scanner.scan( baseRpmDir ) )
         {
             File parentFile = file.getParentFile();
             if ( matchesRequestedVersion( parentFile ) )
             {
-                String parentDir = getRelativePath( parentFile, absoluteBasePath );
+                String parentDir = getRelativePath( parentFile );
                 putLatestArtifactInMap( parentDir, file.getName(), fileMap );
             }
         }
@@ -285,19 +291,13 @@ public class RpmListWriter
         }
     }
 
-    @SuppressWarnings( "unchecked" )
-    private Collection<File> getRpmFileList()
+    private String getRelativePath( final File file )
     {
-        Collection<File> result = listFiles( new File( baseRpmDir ), new String[] { "rpm" }, true );
-        return result;
-    }
-
-    private String getRelativePath( File file, String baseDirectory )
-    {
+        String baseDirPath = baseRpmDir.getAbsolutePath() + ( baseRpmDir.isDirectory() ? separator : "" );
         String filePath = file.getAbsolutePath() + ( file.isDirectory() ? separator : "" );
-        if ( filePath.startsWith( baseDirectory ) )
+        if ( filePath.startsWith( baseDirPath ) )
         {
-            filePath = filePath.substring( baseDirectory.length() );
+            filePath = filePath.substring( baseDirPath.length() );
         }
         return filePath;
     }

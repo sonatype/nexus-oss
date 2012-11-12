@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.RpmScanner;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.scheduling.DefaultScheduledTask;
@@ -111,7 +112,8 @@ public class YumMetadataGenerationTaskTest
             repoRegistry(),
             mock( YumPluginConfiguration.class ),
             mock( YumRegistry.class ),
-            mock( RepositoryURLBuilder.class )
+            mock( RepositoryURLBuilder.class ),
+            mock( RpmScanner.class )
         );
         task.setRpmDir( RPM_DIR.getAbsolutePath() );
         task.setRpmUrl( RPM_URL );
@@ -131,7 +133,8 @@ public class YumMetadataGenerationTaskTest
             repoRegistry(),
             mock( YumPluginConfiguration.class ),
             mock( YumRegistry.class ),
-            repositoryURLBuilder()
+            repositoryURLBuilder(),
+            mock( RpmScanner.class )
         );
         task.setRepositoryId( REPO );
         setField( task, "repositoryRegistry", repoRegistry() );

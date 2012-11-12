@@ -12,15 +12,18 @@
  */
 package org.sonatype.nexus.repository.yum.internal.task;
 
-import static org.apache.commons.io.FileUtils.listFiles;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
+import org.sonatype.nexus.repository.yum.internal.RpmScanner;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -40,35 +43,32 @@ public class RepositoryScanningTask
 
     public static final String ID = "RepositoryScanningTask";
 
-    private static final String[] RPM_EXTENSIONS = new String[]{ "rpm" };
-
     private Yum yum;
+
+    private final RpmScanner scanner;
+
+    @Inject
+    public RepositoryScanningTask( final RpmScanner scanner )
+    {
+        this.scanner = checkNotNull( scanner );
+    }
 
     @Override
     protected Object doRun()
         throws Exception
     {
-        if ( yum == null )
-        {
-            throw new IllegalArgumentException( "Please provide a Yum" );
-        }
+        checkNotNull( yum, "Yum must be set" );
 
-        scanRepository();
-
-        return null;
-    }
-
-    private void scanRepository()
-    {
         getLogger().debug(
             "Scanning repository '{}' base dir '{}' for RPMs ", yum.getRepository().getId(), yum.getBaseDir()
         );
 
-        // TODO this should use Nexus walker
-        for ( File file : listFiles( yum.getBaseDir(), RPM_EXTENSIONS, true ) )
+        for ( final File rpm : scanner.scan( yum.getBaseDir() ) )
         {
-            yum.addVersion( file.getParentFile().getName() );
+            yum.addVersion( rpm.getParentFile().getName() );
         }
+
+        return null;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class RepositoryScanningTask
         return "Scanning repository '" + yum.getRepository().getId() + "'";
     }
 
-    public void setYum( Yum yum )
+    public void setYum( final Yum yum )
     {
         this.yum = yum;
     }
