@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.repository.yum.internal.task;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.yum.YumRepository.REPOMD_XML;
 import static org.sonatype.nexus.repository.yum.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -36,17 +36,16 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.internal.task.CommandLineExecutor;
-import org.sonatype.nexus.repository.yum.internal.YumRepositoryGenerateEvent;
-import org.sonatype.nexus.repository.yum.internal.ListFileFactory;
-import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
-import org.sonatype.nexus.repository.yum.internal.RpmListWriter;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.ListFileFactory;
+import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
+import org.sonatype.nexus.repository.yum.internal.RpmListWriter;
+import org.sonatype.nexus.repository.yum.internal.YumRepositoryGenerateEvent;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
+import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
