@@ -28,9 +28,6 @@
   <version>2.1-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus :: Plugin :: P2 Bridge</name>
-  <description>Bridge between Nexus and P2 Eclipse Runtime</description>
-
   <licenses>
     <license>
       <name>Eclipse Public License</name>
@@ -47,78 +44,41 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
     <nexus.version>2.3-SNAPSHOT</nexus.version>
     <p2-bridge.version>1.1.4</p2-bridge.version>
+
+    <nexus.plugin.name>Nexus P2 Bridge Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Bridge between Nexus and P2 Eclipse Runtime</nexus.plugin.description>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-bean</artifactId>
-      <version>2.3.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.2</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.p2.bridge</groupId>
-      <artifactId>eclipse-bridge</artifactId>
-      <version>${p2-bridge.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.p2.bridge</groupId>
-      <artifactId>org.sonatype.p2.bridge.api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-manager</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-  </dependencies>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>3.0.8</version>
-        <scope>provided</scope>
-      </dependency>
       <dependency>
         <groupId>org.sonatype.p2.bridge</groupId>
         <artifactId>org.sonatype.p2.bridge.api</artifactId>
         <version>${p2-bridge.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.p2.bridge</groupId>
         <artifactId>org.sonatype.p2.bridge.model</artifactId>
         <version>${p2-bridge.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.p2.bridge</groupId>
         <artifactId>org.sonatype.p2.bridge.impl</artifactId>
         <version>${p2-bridge.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.p2.bridge</groupId>
         <artifactId>p2-runtime</artifactId>
         <version>${p2-bridge.version}</version>
         <type>zip</type>
       </dependency>
+
       <dependency>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>org.eclipse.tycho.noopsecurity</artifactId>
@@ -126,6 +86,33 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.p2.bridge</groupId>
+      <artifactId>eclipse-bridge</artifactId>
+      <version>${p2-bridge.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.p2.bridge</groupId>
+      <artifactId>org.sonatype.p2.bridge.api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-manager</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <pluginManagement>
@@ -295,6 +282,8 @@
         <extensions>true</extensions>
         <configuration>
           <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/p2</pluginSiteUrl>
+          <pluginName>${nexus.plugin.name}</pluginName>
+          <pluginDescription>${nexus.plugin.description}</pluginDescription>
           <assemblyDescriptor>src/main/assemble/bundle.xml</assemblyDescriptor>
         </configuration>
         <dependencies>
