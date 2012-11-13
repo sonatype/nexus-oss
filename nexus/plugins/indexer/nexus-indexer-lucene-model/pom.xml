@@ -23,9 +23,6 @@
   </parent>
 
   <artifactId>nexus-indexer-lucene-model</artifactId>
-  <packaging>jar</packaging>
-
-  <name>Nexus Maven Indexer :: Model</name>
 
   <dependencies>
     <dependency>

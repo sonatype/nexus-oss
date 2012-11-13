@@ -35,7 +35,6 @@
       <artifactId>server-provider</artifactId>
     </dependency>
 
-    <!-- Needed as runtime for many tests to work at all -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-web-utils</artifactId>
@@ -46,6 +45,12 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
       <classifier>tests</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-oss-edition</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-restlight-core-client</artifactId>
-  <name>Nexus : Clients : Lightweight REST : Core</name>
 
   <dependencies>
     <dependency>

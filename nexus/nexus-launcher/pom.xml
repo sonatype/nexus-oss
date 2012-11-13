@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-launcher</artifactId>
-  <name>Nexus : Launcher</name>
 
   <dependencies>
     <dependency>

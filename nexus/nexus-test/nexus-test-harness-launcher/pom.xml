@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-test-harness-launcher</artifactId>
-  <name>Nexus : Test Harness : Test Harness Launcher</name>
 
   <dependencies>
     <dependency>
@@ -52,10 +51,6 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-metadata</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
     </dependency>
 
     <dependency>

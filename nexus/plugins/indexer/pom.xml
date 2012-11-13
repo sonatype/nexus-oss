@@ -26,9 +26,6 @@
   <artifactId>nexus-indexer-lucene</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus Maven Indexer (Parent)</name>
-  <description>Adds search capabilities for repository content.</description>
-
   <modules>
     <module>nexus-indexer-lucene-model</module>
     <module>nexus-indexer-lucene-client</module>

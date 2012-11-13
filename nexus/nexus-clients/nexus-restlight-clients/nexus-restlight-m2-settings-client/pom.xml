@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-restlight-m2-settings-client</artifactId>
-  <name>Nexus : Clients : Lightweight REST : M2 Settings</name>
 
   <dependencies>
     <dependency>

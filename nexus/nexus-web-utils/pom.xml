@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-web-utils</artifactId>
-  <name>Nexus : Web Utils</name>
 
   <dependencies>
     <dependency>

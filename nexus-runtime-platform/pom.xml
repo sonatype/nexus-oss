@@ -29,7 +29,6 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-runtime-platform</artifactId>
-  <name>Nexus : Runtime Platform</name>
   <packaging>pom</packaging>
 
   <version>2.3-SNAPSHOT</version>

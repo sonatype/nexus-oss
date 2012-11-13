@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-logging-extras</artifactId>
-  <name>Nexus : Logging Extras</name>
 
   <dependencies>
     <dependency>
