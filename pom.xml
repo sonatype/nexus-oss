@@ -92,21 +92,6 @@
         <version>${nexus.version}</version>
         <scope>test</scope>
       </dependency>
-      <!-- More for UTs -->
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-app</artifactId>
-        <version>${nexus.version}</version>
-        <classifier>tests</classifier>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-proxy</artifactId>
-        <version>${nexus.version}</version>
-        <classifier>tests</classifier>
-        <scope>test</scope>
-      </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
@@ -167,14 +152,6 @@
             <groupId>junit</groupId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <!-- TODO Drop this dependency when we have proper client for repository -->
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-test-utils</artifactId>
-        <version>${nexus.version}</version>
-        <scope>test</scope>
       </dependency>
 
       <dependency>
