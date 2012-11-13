@@ -153,14 +153,21 @@
         <artifactId>app-lifecycle-maven-plugin</artifactId>
         <configuration>
           <sharedDependencies>
+            <!-- Legacy REST API model -->
             <sharedDependency>org.sonatype.nexus.plugins:nexus-restlet1x-model</sharedDependency>
+            <!-- Plexus bridge for Restlet1x -->
             <sharedDependency>org.sonatype.plexus:plexus-restlet-bridge</sharedDependency>
+            <!-- Restlet API and imple -->
             <sharedDependency>org.restlet:org.restlet</sharedDependency>
-            <sharedDependency>org.sonatype.security:security-rest-api</sharedDependency>
-            <sharedDependency>org.sonatype.security:security-rest-model</sharedDependency>
-            <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
             <sharedDependency>com.noelios.restlet:com.noelios.restlet</sharedDependency>
             <sharedDependency>com.noelios.restlet:com.noelios.restlet.ext.servlet</sharedDependency>
+            <!-- Security REST API model and imple -->
+            <sharedDependency>org.sonatype.security:security-rest-api</sharedDependency>
+            <sharedDependency>org.sonatype.security:security-rest-model</sharedDependency>
+            <!-- Used by org.sonatype.nexus.rest.ResourceSupport, but as it is copied from goodies, who knows what else uses it -->
+            <!-- Anyway, the rationale here (as this is ancient version) that no plugin will depend on TWO rest plugins in nexus, ever -->
+            <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
+            <!-- Participates in public API of Plexus bridge for Restlet1x, is must for consumer to have it -->
             <sharedDependency>commons-fileupload:commons-fileupload</sharedDependency>
           </sharedDependencies>
         </configuration>
