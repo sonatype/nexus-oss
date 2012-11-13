@@ -18,12 +18,15 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Properties;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.sonatype.jettytestsuite.ServletInfo;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 
+import com.google.inject.Binder;
 import com.sonatype.security.realms.kenai.config.model.Configuration;
 
 public abstract class AbstractKenaiRealmTest
@@ -43,6 +46,12 @@ public abstract class AbstractKenaiRealmTest
     protected int getTotalNumberOfProjects()
     {
         return 10;
+    }
+
+    public void configure( final Binder binder )
+    {
+        super.configure( binder );
+        binder.bind( HttpClient.class ).toInstance( new DefaultHttpClient() );
     }
 
     protected ServletServer getServletServer()
