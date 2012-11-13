@@ -23,9 +23,6 @@
   </parent>
 
   <artifactId>nexus-site-repository-testsuite</artifactId>
-  <packaging>jar</packaging>
-
-  <name>Nexus Site Repository:: Testsuite</name>
 
   <dependencies>
     <dependency>
@@ -33,10 +30,12 @@
       <artifactId>nexus-testsuite-support</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.repository.site</groupId>
       <artifactId>nexus-site-repository-client</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
@@ -52,7 +51,6 @@
           <name>it</name>
         </property>
       </activation>
-
       <build>
         <plugins>
           <plugin>
@@ -79,6 +77,7 @@
               </execution>
             </executions>
           </plugin>
+
           <plugin>
             <artifactId>maven-invoker-plugin</artifactId>
             <configuration>
@@ -101,6 +100,7 @@
               </execution>
             </executions>
           </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>

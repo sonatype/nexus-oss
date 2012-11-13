@@ -23,9 +23,6 @@
   </parent>
 
   <artifactId>nexus-site-repository-client</artifactId>
-  <packaging>jar</packaging>
-
-  <name>Nexus Site Repository:: Client</name>
 
   <dependencies>
     <dependency>

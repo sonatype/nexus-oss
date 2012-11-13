@@ -26,20 +26,15 @@
   <artifactId>nexus-site-repository-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus Site Repository :: Plugin</name>
-  <description>Adds a repository type for deploying web sites.</description>
+  <properties>
+    <nexus.plugin.name>Nexus Site Repository Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds a repository type for deploying web sites.</nexus.plugin.description>
+  </properties>
 
   <dependencies>
-
-    <!-- This is a plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration-model</artifactId>
+      <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -48,7 +43,6 @@
       <artifactId>litmus-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>

@@ -13,7 +13,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -26,9 +27,6 @@
   <artifactId>nexus-site-repository</artifactId>
   <version>1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <name>Nexus Site Repository (Parent)</name>
-  <description>Adds a repository type for deploying web sites.</description>
 
   <licenses>
     <license>
@@ -55,8 +53,8 @@
 
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-
-    <arguments />
+    <nexusPluginType>nexus-plugin</nexusPluginType>
+    <arguments/>
   </properties>
 
   <modules>
@@ -93,12 +91,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-app</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-configuration-model</artifactId>
+        <artifactId>nexus-plugin-api</artifactId>
         <version>${nexus.version}</version>
       </dependency>
 
@@ -137,7 +130,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-site-repository-plugin</artifactId>
-        <type>nexus-plugin</type>
+        <type>${nexusPluginType}</type>
         <version>1.1-SNAPSHOT</version>
       </dependency>
 
@@ -299,12 +292,22 @@
           </dependency>
         </dependencies>
         <configuration>
-          <pluginSiteUrl>
-            http://links.sonatype.com/products/nexus/oss/plugins/site
-          </pluginSiteUrl>
+          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/site</pluginSiteUrl>
+          <pluginName>${nexus.plugin.name}</pluginName>
+          <pluginDescription>${nexus.plugin.description}</pluginDescription>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <profile>
+      <id>idea</id>
+      <properties>
+        <nexusPluginType>jar</nexusPluginType>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
