@@ -28,9 +28,6 @@
   <version>2.3-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus :: Plugin :: P2 Repository</name>
-  <description>Adds P2 repository support</description>
-
   <licenses>
     <license>
       <name>Eclipse Public License</name>
@@ -50,7 +47,10 @@
 
     <nexus.version>2.3-SNAPSHOT</nexus.version>
     <capabilities-plugin.version>2.2-SNAPSHOT</capabilities-plugin.version>
-    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
+
+    <nexus.plugin.name>Nexus P2 Repository Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds P2 repository support.</nexus.plugin.description>
+    <nexusPluginType>nexus-plugin</nexusPluginType>
 
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
@@ -59,47 +59,17 @@
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
 
-    <arguments />
+    <arguments/>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${nexus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-bean</artifactId>
-      <version>2.3.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.2</version>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>org.eclipse.tycho</groupId>
       <artifactId>tycho-metadata-model</artifactId>
@@ -116,20 +86,15 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-p2-bridge-plugin</artifactId>
       <version>2.1-SNAPSHOT</version>
-      <type>${nexus.plugin.type}</type>
+      <type>${nexusPluginType}</type>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.p2.bridge</groupId>
       <artifactId>org.sonatype.p2.bridge.api</artifactId>
       <version>1.1.4</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-resource-scanner</artifactId>
-      <version>1.0.1</version>
     </dependency>
 
     <dependency>
@@ -145,12 +110,14 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-library</artifactId>
       <version>1.3.RC2</version>
       <scope>test</scope>
     </dependency>
+
     <!-- core To override any version from transitive dependencies. -->
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -160,19 +127,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-jetty-testsuite</artifactId>
-      <!-- For nexus 2.0.x -->
-      <!--version>1.8</version-->
-      <!-- For nexus 2.1+ -->
       <version>2.1</version>
       <scope>test</scope>
     </dependency>
@@ -183,6 +139,7 @@
       <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
@@ -195,11 +152,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
       <version>${capabilities-plugin.version}</version>
-      <type>${nexus.plugin.type}</type>
+      <type>${nexusPluginType}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -221,8 +179,8 @@
       <groupId>org.sonatype.nexus.capabilities</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
       <version>${capabilities-plugin.version}</version>
+      <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -322,6 +280,7 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
@@ -329,6 +288,8 @@
         <extensions>true</extensions>
         <configuration>
           <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/p2</pluginSiteUrl>
+          <pluginName>${nexus.plugin.name}</pluginName>
+          <pluginDescription>${nexus.plugin.description}</pluginDescription>
         </configuration>
         <dependencies>
           <dependency>
@@ -338,6 +299,7 @@
           </dependency>
         </dependencies>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -356,6 +318,7 @@
           </systemProperties>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -446,11 +409,10 @@
       </build>
     </profile>
 
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
     <profile>
       <id>idea</id>
       <properties>
-        <nexus.plugin.type>jar</nexus.plugin.type>
+        <nexusPluginType>jar</nexusPluginType>
       </properties>
     </profile>
   </profiles>
