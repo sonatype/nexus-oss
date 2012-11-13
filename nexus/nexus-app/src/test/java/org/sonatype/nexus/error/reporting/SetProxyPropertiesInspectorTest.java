@@ -63,7 +63,7 @@ public class SetProxyPropertiesInspectorTest
     @Before
     public void prepareSysProps()
     {
-        System.setProperties( new Properties( sysProps ) );
+        System.setProperties( new Properties( ) );
     }
 
     @After
