@@ -51,8 +51,18 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-logging-extras</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
     </dependency>
 
     <dependency>
@@ -68,6 +78,11 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-mailer</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-velocity</artifactId>
     </dependency>
 
     <dependency>
