@@ -13,10 +13,7 @@
 package org.sonatype.nexus.plugins.p2.repository.its.meclipse0465x01;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
 
 import java.io.File;
 
@@ -37,7 +34,7 @@ public class MECLIPSE0465x01ProxyAuthenticatedP2RepoIT
         throws Exception
     {
         installAndVerifyP2Feature();
-        assertThat( new File( "target/nexus/nexus-work-dir/conf/eclipse.secure_storage" ), exists() );
+        assertThat( new File( nexusWorkDir + "/conf/eclipse.secure_storage" ), exists() );
     }
 
 }

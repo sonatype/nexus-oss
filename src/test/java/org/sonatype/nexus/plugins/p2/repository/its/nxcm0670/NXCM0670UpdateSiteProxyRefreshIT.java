@@ -37,8 +37,8 @@ public class NXCM0670UpdateSiteProxyRefreshIT
     public void test()
         throws Exception
     {
-        final File nexusDir = new File( "target/nexus/nexus-work-dir/storage/nxcm0670" );
-        final File remoteDir = new File( "target/nexus/proxy-repo/nxcm0670" );
+        final File nexusDir = new File( nexusWorkDir + "/storage/nxcm0670" );
+        final File remoteDir = new File( localStorageDir + "/nxcm0670" );
 
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();

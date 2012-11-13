@@ -13,13 +13,8 @@
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1941;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
@@ -44,10 +39,12 @@ public class NXCM1941P2ProxyWithFTPMirrorIT
         final String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
         assertThat( proxyRepoBaseUrl, startsWith( "http://" ) );
 
-        replaceInFile( "target/nexus/proxy-repo/nxcm1941/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
-        replaceInFile( "target/nexus/proxy-repo/nxcm1941/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
-        replaceInFile( "target/nexus/proxy-repo/nxcm1941/mirrors.xml", "${ftp-proxy-repo-base-url}", "ftp"
-            + proxyRepoBaseUrl.substring( 4 ) );
+        replaceInFile( localStorageDir + "/nxcm1941/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
+        replaceInFile( localStorageDir + "/nxcm1941/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
+        replaceInFile(
+            localStorageDir + "/nxcm1941/mirrors.xml",
+            "${ftp-proxy-repo-base-url}", "ftp" + proxyRepoBaseUrl.substring( 4 )
+        );
     }
 
     @Test
