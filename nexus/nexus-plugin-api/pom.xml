@@ -74,12 +74,6 @@
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-api</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
 </project>
