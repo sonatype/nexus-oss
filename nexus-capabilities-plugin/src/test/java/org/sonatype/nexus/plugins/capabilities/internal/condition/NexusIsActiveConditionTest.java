@@ -38,9 +38,6 @@ public class NexusIsActiveConditionTest
         throws Exception
     {
         underTest = new NexusIsActiveCondition( eventBus );
-        underTest.bind();
-
-        verify( eventBus ).register( underTest );
     }
 
     /**
@@ -75,17 +72,6 @@ public class NexusIsActiveConditionTest
         assertThat( underTest.isSatisfied(), is( false ) );
 
         verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
-    }
-
-    /**
-     * Event bus handler is removed when releasing.
-     */
-    @Test
-    public void releaseRemovesItselfAsHandler()
-    {
-        underTest.release();
-
-        verify( eventBus ).unregister( underTest );
     }
 
 }

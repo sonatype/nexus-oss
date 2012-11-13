@@ -65,13 +65,13 @@ public class NexusIsActiveCondition
     @Override
     protected void doBind()
     {
-        getEventBus().register( this );
+        // do nothing (EventBus registration already done via @EventBus.Managed)
     }
 
     @Override
     protected void doRelease()
     {
-        getEventBus().unregister( this );
+        // do nothing (EventBus un-registration already done via @EventBus.Managed)
     }
 
     @Override
