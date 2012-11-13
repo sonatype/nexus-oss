@@ -41,7 +41,12 @@
     <!-- Nexus dependencies -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
       <scope>provided</scope>
     </dependency>
 
