@@ -161,6 +161,7 @@
             <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
             <sharedDependency>com.noelios.restlet:com.noelios.restlet</sharedDependency>
             <sharedDependency>com.noelios.restlet:com.noelios.restlet.ext.servlet</sharedDependency>
+            <sharedDependency>commons-fileupload:commons-fileupload</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>
