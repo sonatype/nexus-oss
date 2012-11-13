@@ -111,7 +111,7 @@ public abstract class NexusRunningITSupport
             );
         }
 
-        assertThat( "Nexus is running before test starts", nexus().isRunning(), is( true ) );
+        assertThat( "Nexus was not in running state", nexus().isRunning() );
 
         logRemoteThatTestIs( "STARTING" );
     }
@@ -119,10 +119,12 @@ public abstract class NexusRunningITSupport
     @After
     public void afterTestWasRunning()
     {
-        logRemoteThatTestIs( "FINISHED" );
-
         if ( nexus != null )
         {
+            if ( nexus.isRunning() )
+            {
+                logRemoteThatTestIs( "FINISHED" );
+            }
             testIndex().recordLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
             testIndex().recordLink( "nexus.log", new File( nexus.getWorkDirectory(), "logs/nexus.log" ) );
         }
