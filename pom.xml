@@ -53,6 +53,13 @@
     <developerConnection>scm:git:https://github.com/sonatype/nexus-yum-plugin.git</developerConnection>
   </scm>
 
+  <repositories>
+    <repository>
+      <id>rso-public-grid</id>
+      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
+    </repository>
+  </repositories>
+
   <modules>
     <module>nexus-yum-plugin</module>
     <module>nexus-yum-testsuite</module>
