@@ -390,6 +390,9 @@ Ext.namespace('Sonatype.panels');
             child.on('cancel', this.cancelHandler.createDelegate(this, [child]), this);
           }
           else {
+            panel.tabPanel.items.sort('ASC', function(a,b) {
+              return a.tabTitle >= b.tabTitle;
+            });
             panel.tabPanel.on('beforetabchange', function(tabpanel, newtab, currenttab) {
               // don't want to set this unless user clicked
               if (currenttab) {
