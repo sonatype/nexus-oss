@@ -443,7 +443,7 @@ public abstract class AbstractNexusIntegrationTest
 
     protected File getNexusLogFile()
     {
-        return new File( "target/logs/" + getTestId() + "/nexus.log" );
+        return new File( nexusLogDir + "/" + getTestId() + "/nexus.log" );
     }
 
     protected void beforeStartClean()
