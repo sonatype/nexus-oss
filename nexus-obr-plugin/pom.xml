@@ -27,18 +27,15 @@
   <artifactId>nexus-obr-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus OBR :: Plugin</name>
   <description>Adds a repository type for OBR repositories.</description>
 
   <dependencies>
 
-    <!-- Real dependency -->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.osgi.service.obr</artifactId>
     </dependency>
 
-    <!-- Nexus dependencies -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
@@ -50,7 +47,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- AllInOne for UTs -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>

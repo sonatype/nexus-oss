@@ -29,8 +29,6 @@
 
   <packaging>pom</packaging>
 
-  <name>Nexus OBR (Parent)</name>
-
   <licenses>
     <license>
       <name>Eclipse Public License</name>
@@ -46,8 +44,8 @@
 
   <modules>
     <module>nexus-obr-plugin</module>
-    <module>nexus-obr-testsuite</module>
     <module>nexus-obr-client</module>
+    <module>nexus-obr-testsuite</module>
   </modules>
 
   <properties>
@@ -66,14 +64,12 @@
   <dependencyManagement>
     <dependencies>
 
-      <!-- Real dependency -->
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.osgi.service.obr</artifactId>
         <version>1.0.2</version>
       </dependency>
 
-      <!-- Nexus dependencies -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-api</artifactId>
@@ -85,7 +81,6 @@
         <version>${nexus.version}</version>
       </dependency>
 
-      <!-- AllInOne for UTs -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-test-api</artifactId>
@@ -105,7 +100,6 @@
         <version>1</version>
       </dependency>
 
-      <!-- AllInOne for ITs -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-harness-launcher</artifactId>
@@ -113,7 +107,6 @@
         <scope>test</scope>
       </dependency>
 
-      <!-- Other test stuff -->
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.main.distribution</artifactId>
