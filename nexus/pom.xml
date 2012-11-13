@@ -169,7 +169,7 @@
     <aether.version>1.13.1</aether.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.26.1</enunciate.version>
-    <jetty.version>8.1.7.v20120910</jetty.version>
+    <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
     <plexus-security.version>3.0-SNAPSHOT</plexus-security.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
