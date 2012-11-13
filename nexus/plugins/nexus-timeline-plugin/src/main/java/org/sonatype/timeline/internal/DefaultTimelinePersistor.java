@@ -46,12 +46,6 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class DefaultTimelinePersistor
 {
-
-    private enum Version
-    {
-        V1, V2, V3;
-    }
-
     // == V3
 
     private static final String V3_DATA_FILE_NAME_PREFIX = "timeline.";
@@ -63,31 +57,6 @@ public class DefaultTimelinePersistor
     private static final Pattern V3_DATA_FILE_NAME_PATTERN = Pattern.compile( "^" + V3_DATA_FILE_NAME_PREFIX.replace(
         ".", "\\." ) + "(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2}[+-]\\d{4})" + V3_DATA_FILE_NAME_SUFFIX.replace(
         ".", "\\." ) + "$" );
-
-    // == V2
-
-    @Deprecated
-    private static final String V2_DATA_FILE_NAME_PREFIX = V3_DATA_FILE_NAME_PREFIX;
-
-    @Deprecated
-    private static final String V2_DATA_FILE_NAME_SUFFIX = ".dat";
-
-    @Deprecated
-    private static final String V2_DATA_FILE_NAME_DATE_FORMAT = V3_DATA_FILE_NAME_DATE_FORMAT;
-
-    @Deprecated
-    private static final Pattern V2_DATA_FILE_NAME_PATTERN = Pattern.compile( "^" + V2_DATA_FILE_NAME_PREFIX.replace(
-        ".", "\\." ) + "(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2}[+-]\\d{4})" + V2_DATA_FILE_NAME_SUFFIX.replace(
-        ".", "\\." ) + "$" );
-
-    // == V1
-
-    @Deprecated
-    private static final String V1_DATA_FILE_NAME_DATE_FORMAT = "yyyy-MM-dd.HH-mm-ss";
-
-    @Deprecated
-    private static final Pattern V1_DATA_FILE_NAME_PATTERN =
-        Pattern.compile( "^timeline\\.(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2})\\.dat$" );
 
     // ==
 
@@ -186,9 +155,7 @@ public class DefaultTimelinePersistor
         {
             public boolean accept( File dir, String fname )
             {
-                return V3_DATA_FILE_NAME_PATTERN.matcher( fname ).matches()
-                    || V2_DATA_FILE_NAME_PATTERN.matcher( fname ).matches()
-                    || V1_DATA_FILE_NAME_PATTERN.matcher( fname ).matches();
+                return V3_DATA_FILE_NAME_PATTERN.matcher( fname ).matches();
             }
         } );
 
@@ -265,11 +232,8 @@ public class DefaultTimelinePersistor
             else
             {
                 final File file = result.get( filePtr );
-                // V1 and V2 uses same format, so for reading telling is it V3 or less is enough
-                final Version version =
-                    V3_DATA_FILE_NAME_PATTERN.matcher( file.getName() ).matches() ? Version.V3 : Version.V2;
                 // jump to next file
-                currentIterator = readFile( version, file );
+                currentIterator = readFile( file );
                 filePtr++;
                 continue;
             }
@@ -283,33 +247,19 @@ public class DefaultTimelinePersistor
      * @param file
      * @return
      */
-    protected Iterator<TimelineRecord> readFile( Version version, File file )
+    protected Iterator<TimelineRecord> readFile( File file )
     {
         final ArrayList<TimelineRecord> result = new ArrayList<TimelineRecord>();
         InputStream in = null;
         try
         {
             in = new FileInputStream( file );
-            if ( Version.V3 == version )
+            // V3 uses delimited format
+            TimelineRecord rec = fromProto( TimeLineRecordProtos.TimeLineRecord.parseDelimitedFrom( in ) );
+            while ( rec != null )
             {
-                // V3 uses delimited format
-                TimelineRecord rec = fromProto( TimeLineRecordProtos.TimeLineRecord.parseDelimitedFrom( in ) );
-                while ( rec != null )
-                {
-                    result.add( rec );
-                    rec = fromProto( TimeLineRecordProtos.TimeLineRecord.parseDelimitedFrom( in ) );
-                }
-            }
-            else
-            {
-                // V1 and V2 suffers from NEXUS-5372
-                while ( in.available() > 0 )
-                {
-                    int length = in.read();
-                    byte[] bytes = new byte[length];
-                    in.read( bytes, 0, length );
-                    result.add( fromProto( TimeLineRecordProtos.TimeLineRecord.parseFrom( bytes ) ) );
-                }
+                result.add( rec );
+                rec = fromProto( TimeLineRecordProtos.TimeLineRecord.parseDelimitedFrom( in ) );
             }
         }
         catch ( Exception e )
@@ -359,34 +309,6 @@ public class DefaultTimelinePersistor
             try
             {
                 return new SimpleDateFormat( V3_DATA_FILE_NAME_DATE_FORMAT ).parse( datePattern ).getTime();
-            }
-            catch ( ParseException e )
-            {
-                // silently go to next try
-            }
-        }
-
-        final Matcher v2FnMatcher = V2_DATA_FILE_NAME_PATTERN.matcher( file.getName() );
-        if ( v2FnMatcher.matches() )
-        {
-            final String datePattern = v2FnMatcher.group( 1 );
-            try
-            {
-                return new SimpleDateFormat( V2_DATA_FILE_NAME_DATE_FORMAT ).parse( datePattern ).getTime();
-            }
-            catch ( ParseException e )
-            {
-                // silently go to next try
-            }
-        }
-
-        final Matcher v1FnMatcher = V1_DATA_FILE_NAME_PATTERN.matcher( file.getName() );
-        if ( v1FnMatcher.matches() )
-        {
-            final String datePattern = v1FnMatcher.group( 1 );
-            try
-            {
-                return new SimpleDateFormat( V1_DATA_FILE_NAME_DATE_FORMAT ).parse( datePattern ).getTime();
             }
             catch ( ParseException e )
             {
