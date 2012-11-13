@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-test-utils</artifactId>
-  <name>Nexus : Test Harness : Test Utils</name>
 
   <dependencies>
     <dependency>

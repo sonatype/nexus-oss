@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-rest-client-java</artifactId>
-  <name>Nexus : Clients : Java REST</name>
 
   <dependencies>
     <dependency>

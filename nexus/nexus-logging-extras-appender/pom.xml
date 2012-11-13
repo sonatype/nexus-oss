@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-logging-extras-appender</artifactId>
-  <name>Nexus : Logging Extras - Appender</name>
 
   <dependencies>
     <dependency>

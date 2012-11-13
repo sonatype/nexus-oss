@@ -25,16 +25,13 @@
 
   <groupId>org.sonatype.nexus.client</groupId>
   <artifactId>nexus-client-core-testsuite</artifactId>
-  <name>Nexus : Client Testsuite</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-testsuite-support</artifactId>
       <version>2.3-SNAPSHOT</version>
     </dependency>
-
   </dependencies>
 
 </project>

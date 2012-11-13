@@ -22,8 +22,6 @@
   <version>2.3-SNAPSHOT</version>
 
   <packaging>pom</packaging>
-  <name>Nexus : Aggregator</name>
-  <description>Sonatype Nexus Aggregator</description>
 
   <scm>
     <connection>scm:git:git://github.com/sonatype/nexus.git</connection>

@@ -25,7 +25,6 @@
 
   <groupId>org.sonatype.nexus.restlight</groupId>
   <artifactId>nexus-restlight-clients</artifactId>
-  <name>Nexus : Clients : Lightweight REST</name>
   <packaging>pom</packaging>
 
   <dependencyManagement>
