@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.Condition;
@@ -36,8 +37,14 @@ public class NexusIsActiveCondition
     implements Condition
 {
 
-    @Inject
     NexusIsActiveCondition( final EventBus eventBus )
+    {
+        super( eventBus, false );
+        bind();
+    }
+
+    @Inject
+    NexusIsActiveCondition( final Provider<EventBus> eventBus )
     {
         super( eventBus, false );
         bind();

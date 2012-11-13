@@ -14,10 +14,12 @@ package org.sonatype.nexus.plugins.capabilities.support.condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.sisu.goodies.eventbus.EventBus;
+import javax.inject.Provider;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * {@link Condition} implementation support.
@@ -29,7 +31,7 @@ public abstract class ConditionSupport
     implements Condition
 {
 
-    private final EventBus eventBus;
+    private final Provider<EventBus> eventBusProvider;
 
     private boolean satisfied;
 
@@ -42,14 +44,31 @@ public abstract class ConditionSupport
 
     protected ConditionSupport( final EventBus eventBus, final boolean satisfied )
     {
-        this.eventBus = checkNotNull( eventBus );
+        this( new Provider<EventBus>()
+        {
+            @Override
+            public EventBus get()
+            {
+                return eventBus;
+            }
+        }, satisfied );
+    }
+
+    protected ConditionSupport( final Provider<EventBus> eventBusProvider )
+    {
+        this( eventBusProvider, false );
+    }
+
+    protected ConditionSupport( final Provider<EventBus> eventBusProvider, final boolean satisfied )
+    {
+        this.eventBusProvider = checkNotNull( eventBusProvider );
         this.satisfied = satisfied;
         active = false;
     }
 
     public EventBus getEventBus()
     {
-        return eventBus;
+        return eventBusProvider.get();
     }
 
     @Override
@@ -121,11 +140,11 @@ public abstract class ConditionSupport
             {
                 if ( this.satisfied )
                 {
-                    eventBus.post( new ConditionEvent.Satisfied( this ) );
+                    getEventBus().post( new ConditionEvent.Satisfied( this ) );
                 }
                 else
                 {
-                    eventBus.post( new ConditionEvent.Unsatisfied( this ) );
+                    getEventBus().post( new ConditionEvent.Unsatisfied( this ) );
                 }
             }
         }
