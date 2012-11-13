@@ -31,10 +31,14 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.jettytestsuite.BlockingServer;
 
 public class AuthenticationServer
 {
+
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final Server server;
 
@@ -49,11 +53,13 @@ public class AuthenticationServer
 
     public AuthenticationServer( Integer port )
     {
+        logger.info( "Starting Authentication Server on port {}", port );
+
         server = new BlockingServer( port );
 
         Constraint constraint = new Constraint();
         constraint.setName( Constraint.__BASIC_AUTH );
-        constraint.setRoles( new String[] { "user", "admin", "moderator" } );
+        constraint.setRoles( new String[]{ "user", "admin", "moderator" } );
         constraint.setAuthenticate( true );
 
         ConstraintMapping cm = new ConstraintMapping();
@@ -63,14 +69,15 @@ public class AuthenticationServer
         ConstraintSecurityHandler sh = new ConstraintSecurityHandler();
         loginService = new HashLoginService( "MyRealm" );
         sh.setLoginService( loginService );
-        sh.setConstraintMappings( new ConstraintMapping[] { cm } );
+        sh.setConstraintMappings( new ConstraintMapping[]{ cm } );
         sh.setStrict( false );
 
         accessedUri = new ArrayList<String>();
 
         Handler handler = new AbstractHandler()
         {
-            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
+            public void handle( String target, Request baseRequest, HttpServletRequest request,
+                HttpServletResponse response )
                 throws IOException, ServletException
             {
                 response.setContentType( "text/html" );
@@ -82,7 +89,7 @@ public class AuthenticationServer
         };
 
         HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers( new Handler[] { handler, new DefaultHandler() } );
+        handlers.setHandlers( new Handler[]{ handler, new DefaultHandler() } );
 
         sh.setHandler( handlers );
         server.setHandler( sh );
