@@ -16,7 +16,8 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
   // Repository main Controller(conglomerate) Singleton
   Sonatype.repoServer.RepoServer = (function() {
     var cfg = Sonatype.config.repos,
-        sp = Sonatype.lib.Permissions;
+        sp = Sonatype.lib.Permissions,
+          lastFormHeight = -1;
 
     // ************************************
     return {
@@ -29,6 +30,21 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
 
         defaultType : 'textfield',
         monitorValid : true,
+        listeners : {
+          clientvalidation : function(form, valid) {
+            // IE does not resize the window when invalid messages are shown
+            var window, formHeight = form.getHeight();
+
+            if ( lastFormHeight !== formHeight ) {
+              window = form.findParentByType('window');
+              if ( window !== undefined ) {
+                lastFormHeight = formHeight;
+                window.setHeight(formHeight + form.getToolbarHeight());
+              }
+            }
+          },
+          scope : this
+        },
 
         items : [{
               id : 'usernamefield',
@@ -164,7 +180,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
               },
               autoWidth : false,
               width : 300,
-              autoHeight : true,
               modal : true,
               constrain : true,
               resizable : false,
