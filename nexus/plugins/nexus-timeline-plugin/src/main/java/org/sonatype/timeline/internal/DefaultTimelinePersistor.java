@@ -12,6 +12,8 @@
  */
 package org.sonatype.timeline.internal;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -100,7 +102,7 @@ public class DefaultTimelinePersistor
         OutputStream out = null;
         try
         {
-            out = new FileOutputStream( getDataFile(), true );
+            out = new BufferedOutputStream( new FileOutputStream( getDataFile(), true ) );
             for ( TimelineRecord record : records )
             {
                 toProto( record ).writeDelimitedTo( out );
@@ -253,7 +255,7 @@ public class DefaultTimelinePersistor
         InputStream in = null;
         try
         {
-            in = new FileInputStream( file );
+            in = new BufferedInputStream( new FileInputStream( file ) );
             // V3 uses delimited format
             TimelineRecord rec = fromProto( TimeLineRecordProtos.TimeLineRecord.parseDelimitedFrom( in ) );
             while ( rec != null )
