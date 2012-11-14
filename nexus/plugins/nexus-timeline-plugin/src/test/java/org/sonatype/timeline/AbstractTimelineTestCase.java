@@ -25,6 +25,12 @@ import org.sonatype.timeline.internal.DefaultTimeline;
 public abstract class AbstractTimelineTestCase
     extends InjectedTestCase
 {
+    static
+    {
+        // This setting is only checked once per-testsuite and is needed for Nexus tests.
+        // So in case this test runs first, make sure we have the right setting in place.
+        System.setProperty( "guice.disable.misplaced.annotation.check", "true" );
+    }
 
     private static final String loremIpsum =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur rutrum urna ac est sagittis in lacinia "
