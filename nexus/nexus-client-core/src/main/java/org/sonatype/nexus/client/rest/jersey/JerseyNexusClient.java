@@ -22,17 +22,15 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusErrorMessageException;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
-import org.sonatype.nexus.client.core.spi.rest.jersey.UniformRequestBuilder;
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.internal.rest.AbstractXStreamNexusClient;
-import org.sonatype.nexus.client.internal.rest.jersey.NexusUniformRequestBuilder;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterface;
+import com.sun.jersey.api.client.WebResource;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -90,34 +88,36 @@ public class JerseyNexusClient
         return resolvePath( "service/local/" + path );
     }
 
-    public UniformRequestBuilder serviceResource( final String uri )
+    public WebResource.Builder serviceResource( final String uri )
     {
-        return new NexusUniformRequestBuilder(
-            getClient().resource( resolveServicePath( uri ) ).type( getMediaType() ).accept( getMediaType() )
-        );
+        return getClient()
+            .resource( resolveServicePath( uri ) )
+            .type( getMediaType() )
+            .accept( getMediaType() );
     }
 
-    public UniformRequestBuilder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public WebResource.Builder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return new NexusUniformRequestBuilder(
-            getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).type(
-                getMediaType() ).accept(
-                getMediaType() )
-        );
+        return getClient()
+            .resource( resolveServicePath( uri ) )
+            .queryParams( queryParameters )
+            .type( getMediaType() )
+            .accept( getMediaType() );
     }
 
-    public UniformRequestBuilder uri( final String uri )
+    public WebResource.Builder uri( final String uri )
     {
-        return new NexusUniformRequestBuilder(
-            getClient().resource( resolvePath( uri ) ).getRequestBuilder()
-        );
+        return getClient()
+            .resource( resolvePath( uri ) )
+            .getRequestBuilder();
     }
 
-    public UniformRequestBuilder uri( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public WebResource.Builder uri( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return new NexusUniformRequestBuilder(
-            getClient().resource( resolvePath( uri ) ).queryParams( queryParameters ).getRequestBuilder()
-        );
+        return getClient()
+            .resource( resolvePath( uri ) )
+            .queryParams( queryParameters )
+            .getRequestBuilder();
     }
 
     @Override
