@@ -309,7 +309,9 @@ public class DefaultTimeline
                     }
                     catch ( final IOException ee )
                     {
-                        getLogger().warn( "Unable to operate against Timeline indexer after repair!", e );
+                        // it is only the Work declaring IOEx, it will be not thrown
+                        // in markIndexerDead method!
+                        getLogger().warn( "Unable to cleanly disable Timeline indexer.", e );
                     }
                 }
                 finally
@@ -340,14 +342,20 @@ public class DefaultTimeline
     private volatile boolean indexerIsDead = false;
 
     protected void markIndexerDead( final Exception e )
-        throws IOException
     {
         if ( !indexerIsDead )
         {
             getLogger().warn( "Timeline index got corrupted and is disabled. Repair will be tried on next boot.", e );
             // we need to stop it and signal to not try any other thread
             indexerIsDead = true;
-            indexer.stop();
+            try
+            {
+                indexer.stop();
+            }
+            catch ( IOException ex )
+            {
+                getLogger().warn( "Timeline index can't be stopped cleanly after it's corruption.", ex );
+            }
         }
     }
 }
