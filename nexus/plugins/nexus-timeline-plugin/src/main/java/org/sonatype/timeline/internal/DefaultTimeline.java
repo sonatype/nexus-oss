@@ -103,9 +103,36 @@ public class DefaultTimeline
                     }
                     catch ( IOException e )
                     {
-                        // we are staring, so repair must be tried at least once
-                        // so we are passing the actual generation, and we are within exclusive lock
-                        repairTimelineIndexer( e, indexer.getGeneration() );
+                        // we are starting, so repair must be tried
+                        getLogger().info( "Timeline index got corrupted, trying to repair it.", e );
+                        // stopping it cleanly
+                        indexer.stop();
+                        // deleting index files
+                        FileUtils.cleanDirectory( configuration.getIndexDirectory() );
+                        try
+                        {
+                            // creating new index from scratch
+                            indexer.start( configuration );
+                            // pouring over records from persisted into indexer
+                            final RepairBatch rb = new RepairBatch( indexer );
+                            persistor.readAllSinceDays( configuration.getRepairDaysCountRestored(), rb );
+                            rb.finish();
+
+                            getLogger().info(
+                                "Timeline index is succesfully repaired, the last "
+                                    + configuration.getRepairDaysCountRestored() + " days were restored." );
+                        }
+                        catch ( IOException ex )
+                        {
+                            markIndexerDead( ex );
+                            throw ex;
+                        }
+                        catch ( Exception ex )
+                        {
+                            markIndexerDead( ex );
+                            throw new IOException( "Failed to repair indexer!", ex );
+                        }
+
                     }
                     DefaultTimeline.this.started = true;
                     getLogger().info( "Started Timeline..." );
@@ -195,7 +222,7 @@ public class DefaultTimeline
 
     protected void addToIndexer( final TimelineRecord... records )
     {
-        doTryRepair( new Work<Void>()
+        doShared( new Work<Void>()
         {
             @Override
             public Void doIt()
@@ -210,7 +237,7 @@ public class DefaultTimeline
     protected int purgeFromIndexer( final long timestamp, final Set<String> types, final Set<String> subTypes,
         final TimelineFilter filter )
     {
-        return doTryRepair( new Work<Integer>()
+        return doShared( new Work<Integer>()
         {
             @Override
             public Integer doIt()
@@ -225,7 +252,7 @@ public class DefaultTimeline
         final Set<String> types, final Set<String> subTypes, final TimelineFilter filter,
         final TimelineCallback callback )
     {
-        doTryRepair( new Work<Void>()
+        doShared( new Work<Void>()
         {
             @Override
             public Void doIt()
@@ -247,20 +274,18 @@ public class DefaultTimeline
 
     }
 
-    protected <E> E doTryRepair( final Work<E> work )
+    protected <E> E doShared( final Work<E> work )
     {
         if ( timelineLock.readLock().tryLock() )
         {
             if ( started && !indexerIsDead )
             {
-                final int indexerGeneration = indexer.getGeneration();
                 try
                 {
                     return work.doIt();
                 }
                 catch ( final IOException e )
                 {
-                    getLogger().debug( "Unable to operate against Timeline indexer!", e );
                     try
                     {
                         timelineLock.readLock().unlock();
@@ -272,7 +297,7 @@ public class DefaultTimeline
                             {
                                 try
                                 {
-                                    repairTimelineIndexer( e, indexerGeneration );
+                                    markIndexerDead( e );
                                 }
                                 finally
                                 {
@@ -281,7 +306,6 @@ public class DefaultTimeline
                                 return null;
                             }
                         } );
-                        return work.doIt();
                     }
                     catch ( final IOException ee )
                     {
@@ -315,46 +339,15 @@ public class DefaultTimeline
 
     private volatile boolean indexerIsDead = false;
 
-    protected void repairTimelineIndexer( final Exception e, final int generation )
+    protected void markIndexerDead( final Exception e )
         throws IOException
     {
-        // check for any previous attempt or flagged dead indexer
-        if ( !indexerIsDead && ( indexer.getGeneration() == generation ) )
+        if ( !indexerIsDead )
         {
-            getLogger().info( "Timeline index got corrupted, trying to repair it.", e );
-            // stopping it cleanly
+            getLogger().warn( "Timeline index got corrupted and is disabled. Repair will be tried on next boot.", e );
+            // we need to stop it and signal to not try any other thread
+            indexerIsDead = true;
             indexer.stop();
-            // deleting index files
-            FileUtils.cleanDirectory( configuration.getIndexDirectory() );
-            try
-            {
-                // creating new index from scratch
-                indexer.start( configuration );
-                // pouring over records from persisted into indexer
-                final RepairBatch rb = new RepairBatch( indexer );
-                persistor.readAllSinceDays( configuration.getRepairDaysCountRestored(), rb );
-                rb.finish();
-
-                getLogger().info(
-                    "Timeline index is succesfully repaired, the last "
-                        + configuration.getRepairDaysCountRestored() + " days were restored." );
-            }
-            catch ( IOException ex )
-            {
-                getLogger().warn( "Timeline index was corrupted and repair of it failed!", e );
-                // we need to stop it and signal to not try any other thread
-                indexerIsDead = true;
-                indexer.stop();
-                throw ex;
-            }
-            catch ( Exception ex )
-            {
-                getLogger().warn( "Timeline index was corrupted and repair of it failed!", e );
-                // we need to stop it and signal to not try any other thread
-                indexerIsDead = true;
-                indexer.stop();
-                throw new IOException( "Failed to repair indexer!", ex );
-            }
         }
     }
 }
