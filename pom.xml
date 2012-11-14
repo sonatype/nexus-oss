@@ -62,6 +62,7 @@
 
   <modules>
     <module>nexus-yum-plugin</module>
+    <module>nexus-yum-client</module>
     <module>nexus-yum-testsuite</module>
     <module>nexus-yum-testhelper</module>
   </modules>
@@ -160,6 +161,22 @@
         <version>1.4.1</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus.client</groupId>
+        <artifactId>nexus-client-core</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>1.9.10</version>
+      </dependency>
+
       <!-- Pure Java RPM-library -->
       <dependency>
         <groupId>org.redline-rpm</groupId>
@@ -182,6 +199,11 @@
         <artifactId>nexus-yum-plugin</artifactId>
         <version>2.2-SNAPSHOT</version>
         <type>${nexus.plugin.type}</type>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.yum</groupId>
+        <artifactId>nexus-yum-client</artifactId>
+        <version>2.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.yum</groupId>

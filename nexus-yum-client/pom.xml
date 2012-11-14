@@ -25,65 +25,31 @@
     <version>2.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-yum-testsuite</artifactId>
+  <artifactId>nexus-yum-client</artifactId>
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-testsuite-support</artifactId>
-      <scope>test</scope>
+      <groupId>org.sonatype.nexus.client</groupId>
+      <artifactId>nexus-client-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus.yum</groupId>
-      <artifactId>nexus-yum-client</artifactId>
-      <scope>test</scope>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus.yum</groupId>
-      <artifactId>nexus-yum-testhelper</artifactId>
-      <scope>test</scope>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-multipart</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>it</id>
-      <activation>
-        <property>
-          <name>it</name>
-        </property>
-      </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
-            <version>3.0-SNAPSHOT</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>export</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>
 
