@@ -21,6 +21,11 @@
   <dependencies>
 
     <!--
+      Build Note: In order to build this project you will need to add the release repository  
+                  http://repository.sonatype.org/content/groups/sonatype-public-grid/
+                  to your setup.
+    -->
+    <!--
       Note: there are two sets of dependencies here, the basic (minimal dependencies needed to build Nexus plugins), and the
       ITset, that is needed if you want to write IT tests using real Nexus environment to test your plugins. If you are using
       other technique (like having separate module for IT tests), you can freely remove or just move outside of this module
@@ -120,7 +125,7 @@
       <!-- Have to set source level to at least Java5, we use annotations (Nexus requries 1.6) -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
+        <version>2.5.1</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
