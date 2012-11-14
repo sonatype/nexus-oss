@@ -579,9 +579,14 @@ public class NexusUniformRequestBuilder
         }
         catch ( final UniformInterfaceException e )
         {
-            final ClientResponse response = e.getResponse();
+            ClientResponse response = null;
             try
             {
+                response = e.getResponse();
+
+                // buffer entity so callers may consume it if needed
+                response.bufferEntity();
+
                 if ( response.getStatus() == ClientResponse.Status.BAD_REQUEST.getStatusCode() )
                 {
                     if ( response.hasEntity() )
@@ -607,7 +612,10 @@ public class NexusUniformRequestBuilder
             }
             finally
             {
-                response.close();
+                if ( response != null )
+                {
+                    response.close();
+                }
             }
         }
     }
