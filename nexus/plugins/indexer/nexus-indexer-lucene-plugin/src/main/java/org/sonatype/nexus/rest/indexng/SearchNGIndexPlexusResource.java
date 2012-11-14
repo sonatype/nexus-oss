@@ -67,11 +67,13 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
-@Component( role = PlexusResource.class, hint = "SearchNGIndexPlexusResource" )
+@Component( role = PlexusResource.class, hint = SearchNGIndexPlexusResource.ROLE_HINT )
 @Path( SearchNGIndexPlexusResource.RESOURCE_URI )
 public class SearchNGIndexPlexusResource
     extends AbstractIndexerNexusPlexusResource
 {
+    public static final String ROLE_HINT = "SearchNGIndexPlexusResource";
+    
     /**
      * Capping the number of Lucene Documents to process, to avoid potention problems and DOS-like attacks. If someone
      * needs more results, download the index instead and process it in-situ.
@@ -187,7 +189,7 @@ public class SearchNGIndexPlexusResource
     @ResourceMethodSignature( queryParams = { @QueryParam( "q" ), @QueryParam( "g" ), @QueryParam( "a" ),
         @QueryParam( "v" ), @QueryParam( "p" ), @QueryParam( "c" ), @QueryParam( "cn" ), @QueryParam( "sha1" ),
         @QueryParam( "from" ), @QueryParam( "count" ), @QueryParam( "repositoryId" ) }, output = SearchResponse.class )
-    public Object get( Context context, Request request, Response response, Variant variant )
+    public SearchNGResponse get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         Form form = request.getResourceRef().getQueryAsForm();
@@ -289,7 +291,17 @@ public class SearchNGIndexPlexusResource
             {
                 IteratorSearchResponse searchResult =
                     searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters,
-                                   searchers );
+                        searchers );
+
+                if ( collapseResults && searchResult == null )
+                {
+                    collapseResults = false;
+
+                    searchResult =
+                        searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults,
+                            filters, searchers );
+                }
+
                 if ( searchResult != null )
                 {
                     try
