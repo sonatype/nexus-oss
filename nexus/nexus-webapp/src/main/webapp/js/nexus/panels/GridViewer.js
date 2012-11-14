@@ -391,7 +391,10 @@ Ext.namespace('Sonatype.panels');
           }
           else {
             panel.tabPanel.items.sort('ASC', function(a,b) {
-              return a.tabTitle >= b.tabTitle;
+              if (a.tabTitle <= b.tabTitle) {
+                return a.tabTitle < b.tabTitle ? -1 : 0;
+              }
+              return 1;
             });
             panel.tabPanel.on('beforetabchange', function(tabpanel, newtab, currenttab) {
               // don't want to set this unless user clicked
