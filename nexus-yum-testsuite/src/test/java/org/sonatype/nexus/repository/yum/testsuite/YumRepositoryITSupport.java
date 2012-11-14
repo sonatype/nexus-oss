@@ -22,7 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.client.core.subsystem.artifact.MavenArtifact;
+import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactMaven;
+import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.repository.yum.client.Yum;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
@@ -71,9 +72,14 @@ public class YumRepositoryITSupport
         return client().getSubsystem( Repositories.class );
     }
 
-    protected MavenArtifact mavenArtifact()
+    protected ArtifactMaven artifactMaven()
     {
-        return client().getSubsystem( MavenArtifact.class );
+        return client().getSubsystem( ArtifactMaven.class );
+    }
+
+    protected Content content()
+    {
+        return client().getSubsystem( Content.class );
     }
 
     public static void sleep( int timeout, TimeUnit unit )

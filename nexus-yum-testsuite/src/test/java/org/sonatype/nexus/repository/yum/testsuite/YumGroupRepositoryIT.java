@@ -16,13 +16,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
 import static org.sonatype.nexus.repository.yum.client.MetadataType.PRIMARY_XML;
-
-import java.net.URISyntaxException;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.repository.yum.client.YumGroupRepository;
@@ -79,11 +77,9 @@ public class YumGroupRepositoryIT
             MavenHostedRepository.class, repositoryIdForTest( "3" )
         ).excludeFromSearchResults().save();
 
-        mavenArtifact().upload(
-            new UploadRequest(
-                repo3.id(), "a_group3", "an_artifact3", "3.0", "pom", "", "rpm",
-                testData().resolveFile( "/rpms/foo-bar-5.1.2-1.noarch.rpm" )
-            )
+        content().upload(
+            repositoryLocation( repo3.id(), "a_group3/an_artifact3/3.0/an_artifact3-3.0.rpm" ),
+            testData().resolveFile( "/rpms/foo-bar-5.1.2-1.noarch.rpm" )
         );
 
         sleep( 5, SECONDS );
@@ -105,7 +101,7 @@ public class YumGroupRepositoryIT
     }
 
     private YumGroupRepository givenGroupRepoWith2RPMs()
-        throws InterruptedException, URISyntaxException
+        throws Exception
     {
         final MavenHostedRepository repo1 = repositories().create(
             MavenHostedRepository.class, repositoryIdForTest( "1" )
@@ -121,17 +117,14 @@ public class YumGroupRepositoryIT
 
         sleep( 5, SECONDS );
 
-        mavenArtifact().upload(
-            new UploadRequest(
-                repo1.id(), "a_group1", "an_artifact1", "1.0", "pom", "", "rpm",
-                testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
-            )
+        content().upload(
+            repositoryLocation( repo1.id(), "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm" ),
+            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
-        mavenArtifact().upload(
-            new UploadRequest(
-                repo2.id(), "a_group2", "an_artifact2", "2.0", "pom", "", "rpm",
-                testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
-            )
+
+        content().upload(
+            repositoryLocation( repo1.id(), "a_group2/an_artifact2/2.0/an_artifact2-2.0.rpm" ),
+            testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
         );
 
         sleep( 5, SECONDS );

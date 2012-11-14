@@ -16,22 +16,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
 import static org.sonatype.nexus.repository.yum.client.MetadataType.PRIMARY_XML;
 
 import org.junit.Test;
-import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
-import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 
 public class YumRepositoryIT
     extends YumRepositoryITSupport
 {
-
-    private static final String GROUP_ID = "test";
-
-    private static final String VERSION = "0.0.1";
-
-    private static final String ARTIFACT_ID = "test-artifact";
 
     public YumRepositoryIT( final String nexusBundleCoordinates )
     {
@@ -46,17 +39,15 @@ public class YumRepositoryIT
             MavenHostedRepository.class, repositoryIdForTest()
         ).excludeFromSearchResults().save();
 
-        mavenArtifact().upload(
-            new UploadRequest(
-                repository.id(), GROUP_ID, ARTIFACT_ID, VERSION, "pom", "", "rpm",
-                testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
-            )
+        content().upload(
+            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
+            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
 
         sleep( 20, SECONDS );
 
         final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
-        assertThat( primaryXml, containsString( ARTIFACT_ID ) );
+        assertThat( primaryXml, containsString( "test-artifact" ) );
     }
 
     @Test
@@ -67,22 +58,20 @@ public class YumRepositoryIT
             MavenHostedRepository.class, repositoryIdForTest()
         ).excludeFromSearchResults().save();
 
-        mavenArtifact().upload(
-            new UploadRequest(
-                repository.id(), GROUP_ID, ARTIFACT_ID, VERSION, "pom", "", "rpm",
-                testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
-            )
+        content().upload(
+            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
+            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
 
         sleep( 5, SECONDS );
 
-        mavenArtifact().delete(
-            new ResolveRequest( repository.id(), GROUP_ID, ARTIFACT_ID, VERSION, null, null, "rpm", true )
+        content().delete(
+            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" )
         );
 
         sleep( 20, SECONDS );
 
         final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
-        assertThat( primaryXml, not( containsString( ARTIFACT_ID ) ) );
+        assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
     }
 }

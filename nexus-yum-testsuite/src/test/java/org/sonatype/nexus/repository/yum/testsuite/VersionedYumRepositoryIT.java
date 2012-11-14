@@ -15,27 +15,16 @@ package org.sonatype.nexus.repository.yum.testsuite;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
 import static org.sonatype.nexus.repository.yum.client.MetadataType.INDEX;
 import static org.sonatype.nexus.repository.yum.client.MetadataType.PRIMARY_XML;
 
-import java.net.URISyntaxException;
-
 import org.junit.Test;
-import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
-import org.sonatype.nexus.repository.yum.client.Yum;
 
 public class VersionedYumRepositoryIT
     extends YumRepositoryITSupport
 {
-
-    private static final String VERSION = "1.0";
-
-    private static final String ARTIFACT_ID = "artifact";
-
-    private static final String GROUP_ID = "group";
-
-    private static final String ALIAS = "alias";
 
     public VersionedYumRepositoryIT( final String nexusBundleCoordinates )
     {
@@ -47,8 +36,7 @@ public class VersionedYumRepositoryIT
         throws Exception
     {
         final String repoName = givenRepositoryWithRpm();
-        final Yum yum = client().getSubsystem( Yum.class );
-        final String content = yum.getMetadata( repoName, VERSION, PRIMARY_XML, String.class );
+        final String content = yum().getMetadata( repoName, "1.0", PRIMARY_XML, String.class );
         assertThat( content, containsString( "test-artifact" ) );
     }
 
@@ -57,9 +45,8 @@ public class VersionedYumRepositoryIT
         throws Exception
     {
         final String repoName = givenRepositoryWithRpm();
-        final Yum yum = client().getSubsystem( Yum.class );
-        yum.createOrUpdateAlias( repoName, ALIAS, VERSION );
-        final String content = yum.getMetadata( repoName, ALIAS, PRIMARY_XML, String.class );
+        yum().createOrUpdateAlias( repoName, "alias", "1.0" );
+        final String content = yum().getMetadata( repoName, "alias", PRIMARY_XML, String.class );
         assertThat( content, containsString( "test-artifact" ) );
     }
 
@@ -68,23 +55,20 @@ public class VersionedYumRepositoryIT
         throws Exception
     {
         final String repoName = givenRepositoryWithRpm();
-        final Yum yum = client().getSubsystem( Yum.class );
-        final String content = yum.getMetadata( repoName, VERSION, INDEX, String.class );
+        final String content = yum().getMetadata( repoName, "1.0", INDEX, String.class );
         assertThat( content, containsString( "<a href=\"repodata/\">repodata/</a>" ) );
     }
 
     private String givenRepositoryWithRpm()
-        throws URISyntaxException, InterruptedException
+        throws Exception
     {
         final MavenHostedRepository repository = repositories().create(
             MavenHostedRepository.class, repositoryIdForTest()
         ).excludeFromSearchResults().save();
 
-        mavenArtifact().upload(
-            new UploadRequest(
-                repository.id(), GROUP_ID, ARTIFACT_ID, VERSION, "pom", "", "rpm",
-                testData.resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
-            )
+        content().upload(
+            repositoryLocation( repository.id(), "group/artifact/1.0/artifact-1.0.rpm" ),
+            testData.resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
         sleep( 5, SECONDS );
 
