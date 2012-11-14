@@ -25,6 +25,17 @@ import org.sonatype.timeline.internal.DefaultTimeline;
 public abstract class AbstractTimelineTestCase
     extends InjectedTestCase
 {
+
+    private static final String loremIpsum =
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur rutrum urna ac est sagittis in lacinia "
+            + "tortor porta. Maecenas accumsan hendrerit nulla vel lobortis. Phasellus purus sapien, fermentum non "
+            + "aliquet vitae, vulputate a nulla. Nunc a diam eget augue accumsan suscipit nec at tellus. Donec sit "
+            + "amet tellus mi, vitae gravida justo. Nulla iaculis ullamcorper sodales. Pellentesque ut viverra tellus. "
+            + "Pellentesque quis lacus velit. Nullam nec orci id ante pharetra dictum. In tincidunt fringilla metus, "
+            + "id faucibus ligula condimentum id. Aenean augue odio, auctor fermentum sodales non, gravida sit amet "
+            + "diam. Maecenas ac dolor at lorem ullamcorper pretium convallis ut felis. Mauris ut nisi ut leo "
+            + "fringilla auctor sed et lectus.";
+
     protected DefaultTimeline timeline;
 
     @Override
@@ -68,11 +79,12 @@ public abstract class AbstractTimelineTestCase
         data.put( "k1", "v1" );
         data.put( "k2", "v2" );
         data.put( "k3", "v3" );
+        data.put( "k4", loremIpsum );
         return createTimelineRecord( ts, "type", "subType", data );
     }
 
     protected TimelineRecord createTimelineRecord( final long ts, final String type, final String subType,
-                                                   final Map<String, String> data )
+        final Map<String, String> data )
     {
         return new TimelineRecord( ts, type, subType, data );
     }
@@ -80,6 +92,7 @@ public abstract class AbstractTimelineTestCase
     public static class AsList
         implements TimelineCallback
     {
+
         private final ArrayList<TimelineRecord> records = new ArrayList<TimelineRecord>();
 
         @Override

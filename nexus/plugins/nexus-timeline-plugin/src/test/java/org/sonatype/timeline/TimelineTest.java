@@ -13,6 +13,7 @@
 package org.sonatype.timeline;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.junit.Test;
 public class TimelineTest
     extends AbstractTimelineTestCase
 {
+
     protected File persistDirectory;
 
     protected File indexDirectory;
@@ -109,21 +111,26 @@ public class TimelineTest
         FileUtils.copyDirectoryStructure( crashedPersistDir, persistDirectory );
         FileUtils.copyDirectoryStructure( carshedIndexDir, indexDirectory );
 
-        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
+        // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
+        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory,
+                                                   TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
+                                                   Integer.MAX_VALUE ) );
 
-        Map<String, String> data = new HashMap<String, String>();
-        data.put( "k1", "v1" );
-        data.put( "k2", "v2" );
-        data.put( "k3", "v3" );
-
-        Set<String> types = new HashSet<String>();
-        types.add( "typeA" );
-        AsList cb = new AsList();
-        timeline.retrieve( 0, 10, types, null, null, cb );
-        List<TimelineRecord> results = cb.getRecords();
-
-        assertEquals( 1, results.size() );
-        assertEquals( data, results.get( 0 ).getData() );
+        {
+            // all records have this type, so we should have them as many as we asked for but max 100
+            // as many records are in test persist directory
+            AsList cb = new AsList();
+            timeline.retrieve( 0, 1000, Collections.singleton( "type" ), null, null, cb );
+            List<TimelineRecord> results = cb.getRecords();
+            assertEquals( 100, results.size() );
+        }
+        {
+            // no records have this type, so we should have 0
+            AsList cb = new AsList();
+            timeline.retrieve( 0, 10, Collections.singleton( "badtype" ), null, null, cb );
+            List<TimelineRecord> results = cb.getRecords();
+            assertEquals( 0, results.size() );
+        }
     }
 
     @Test
@@ -135,11 +142,26 @@ public class TimelineTest
         FileUtils.copyDirectoryStructure( crashedPersistDir, persistDirectory );
         FileUtils.copyDirectoryStructure( carshedIndexDir, indexDirectory );
 
-        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
+        // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
+        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory,
+                                                   TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
+                                                   Integer.MAX_VALUE ) );
 
-        AsList cb = new AsList();
-        timeline.retrieve( 0, 10, null, null, null, cb );
-        assertTrue( cb.getRecords().size() > 0 );
+        {
+            // all records have this type, so we should have them as many as we asked for but max 100
+            // as many records are in test persist directory
+            AsList cb = new AsList();
+            timeline.retrieve( 0, 1000, Collections.singleton( "type" ), null, null, cb );
+            List<TimelineRecord> results = cb.getRecords();
+            assertEquals( 100, results.size() );
+        }
+        {
+            // no records have this type, so we should have 0
+            AsList cb = new AsList();
+            timeline.retrieve( 0, 10, Collections.singleton( "badtype" ), null, null, cb );
+            List<TimelineRecord> results = cb.getRecords();
+            assertEquals( 0, results.size() );
+        }
     }
 
     @Test
@@ -152,7 +174,10 @@ public class TimelineTest
         FileUtils.copyDirectoryStructure( persistDir, persistDirectory );
         FileUtils.copyDirectoryStructure( goodIndexDir, indexDirectory );
 
-        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
+        // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
+        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory,
+                                                   TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
+                                                   Integer.MAX_VALUE ) );
 
         {
             // add, this should pass without any exception
@@ -167,7 +192,10 @@ public class TimelineTest
         timeline.stop();
         cleanDirectory( indexDirectory );
         FileUtils.copyDirectoryStructure( crashedIndexDir, indexDirectory );
-        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
+        // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
+        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory,
+                                                   TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
+                                                   Integer.MAX_VALUE ) );
 
         {
             // add again, this should also pass without any exception
@@ -189,16 +217,22 @@ public class TimelineTest
         FileUtils.copyDirectoryStructure( persistDir, persistDirectory );
         FileUtils.copyDirectoryStructure( goodIndexDir, indexDirectory );
 
-        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
+        // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
+        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory,
+                                                   TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
+                                                   Integer.MAX_VALUE ) );
 
-        assertTrue( timeline.purge( System.currentTimeMillis(), null, null, null ) > 0 );
+        // here, the "good" index really contains 6 records only
+        assertEquals( 6, timeline.purge( System.currentTimeMillis(), null, null, null ) );
 
         // pretend that when timeline is running, the index is manually changed
         timeline.stop();
         cleanDirectory( indexDirectory );
         FileUtils.copyDirectoryStructure( crashedIndexDir, indexDirectory );
-        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory ) );
-
-        assertTrue( timeline.purge( System.currentTimeMillis(), null, null, null ) > 0 );
+        // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
+        timeline.start( new TimelineConfiguration( persistDirectory, indexDirectory,
+                                                   TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
+                                                   Integer.MAX_VALUE ) );
+        assertEquals( 100, timeline.purge( System.currentTimeMillis(), null, null, null ) );
     }
 }
