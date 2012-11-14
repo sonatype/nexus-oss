@@ -51,7 +51,7 @@ final class SystemNexusPluginRepository
 
     public int getPriority()
     {
-        return 0;
+        return 50;
     }
 
     // ----------------------------------------------------------------------
