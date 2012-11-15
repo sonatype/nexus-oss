@@ -28,8 +28,9 @@ Ext.override(Ext.data.Connection, {
     }
     return url;
   },
+  doFormUploadOrig : Ext.data.Connection.prototype.doFormUpload,
   doFormUpload : function(o, ps, url) {
-    this.superclass.doFormUpload.call(this, o, ps, this.extendFormUploadURL(url));
+    this.doFormUploadOrig.call(this, o, ps, this.extendFormUploadURL(url));
   }
 });
 });
