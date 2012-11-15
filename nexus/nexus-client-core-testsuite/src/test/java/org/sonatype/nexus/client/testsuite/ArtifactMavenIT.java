@@ -22,7 +22,7 @@ import java.io.IOException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.sonatype.nexus.client.core.NotFoundException;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactMaven;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
@@ -69,7 +69,7 @@ public class ArtifactMavenIT
     @Test
     public void artifactMavenResolveFailure()
     {
-        thrown.expect( NotFoundException.class );
+        thrown.expect( NexusClientNotFoundException.class );
         artifacts().resolve(
             new ResolveRequest(
                 "releases", "com.sonatype.nexus.plugin", "nexus-staging-plugin", ResolveRequest.VERSION_RELEASE

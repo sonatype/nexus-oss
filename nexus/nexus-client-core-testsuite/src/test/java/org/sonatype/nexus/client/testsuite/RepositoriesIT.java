@@ -20,7 +20,10 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepository;
@@ -32,9 +35,20 @@ public class RepositoriesIT
     extends NexusClientITSupport
 {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     public RepositoriesIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
+    }
+
+    @Test
+    public void getInexistentRepository()
+    {
+        thrown.expect( NexusClientNotFoundException.class );
+        thrown.expectMessage( "Repository with id 'getInexistentRepository' was not found" );
+        repositories().get( repositoryIdForTest() );
     }
 
     @Test

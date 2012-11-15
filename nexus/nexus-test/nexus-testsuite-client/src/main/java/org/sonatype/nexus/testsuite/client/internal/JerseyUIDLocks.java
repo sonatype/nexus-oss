@@ -15,9 +15,12 @@ package org.sonatype.nexus.testsuite.client.internal;
 import static java.lang.String.format;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
+import org.sonatype.nexus.client.rest.jersey.JerseyExceptions;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.testsuite.client.UIDLocks;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Jersey based {@link UIDLocks} Nexus Client Subsystem implementation.
@@ -38,14 +41,29 @@ public class JerseyUIDLocks
     public void lock( final String repository, final String path, final LockType lockType )
     {
         final String uri = format( "nexus-it-helper-plugin/uid/lock/%s/%s/%s", repository, lockType.name(), path );
-        getNexusClient().serviceResource( uri ).get( ClientResponse.class ).close();
+        try
+        {
+            getNexusClient()
+                .serviceResource( uri )
+                .get( ClientResponse.class );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw JerseyExceptions.convertAndPropagate( e );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw JerseyExceptions.convertAndPropagate( e );
+        }
     }
 
     @Override
     public void unlock( final String repository, final String path )
     {
         final String uri = format( "nexus-it-helper-plugin/uid/lock/%s/unlock/%s", repository, path );
-        getNexusClient().serviceResource( uri ).delete();
+        getNexusClient()
+            .serviceResource( uri )
+            .delete( ClientResponse.class );
     }
 
 }

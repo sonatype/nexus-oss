@@ -17,6 +17,7 @@ import java.util.Date;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.subsystem.Utilities;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 
 /**
@@ -35,7 +36,17 @@ public class JerseyUtilities
     @Override
     public Date getLastModified( final String uri )
     {
-        final ClientResponse response = getNexusClient().uri( uri ).head();
-        return response.getLastModified();
+        try
+        {
+            final ClientResponse response = getNexusClient()
+                .uri( uri )
+                .head();
+
+            return response.getLastModified();
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 }

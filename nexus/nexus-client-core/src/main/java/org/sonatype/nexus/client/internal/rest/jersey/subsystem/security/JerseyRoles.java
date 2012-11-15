@@ -27,6 +27,8 @@ import org.sonatype.security.rest.model.RoleResourceResponse;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Jersey based {@link Roles} implementation.
@@ -52,14 +54,43 @@ public class JerseyRoles
     @Override
     public Role get( final String id )
     {
-        return convert( getNexusClient().serviceResource( path( id ) ).get( RoleResourceResponse.class ).getData() );
+        try
+        {
+            return convert(
+                getNexusClient()
+                    .serviceResource( path( id ) )
+                    .get( RoleResourceResponse.class )
+                    .getData()
+            );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
     public Collection<Role> get()
     {
-        final RoleListResourceResponse roles = getNexusClient().serviceResource( "roles" )
-            .get( RoleListResourceResponse.class );
+        final RoleListResourceResponse roles;
+        try
+        {
+            roles = getNexusClient()
+                .serviceResource( "roles" )
+                .get( RoleListResourceResponse.class );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
 
         return Collections2.transform( roles.getData(), new Function<RoleResource, Role>()
         {
