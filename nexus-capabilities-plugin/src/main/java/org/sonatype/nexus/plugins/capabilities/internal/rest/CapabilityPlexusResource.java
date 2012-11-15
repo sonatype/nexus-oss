@@ -96,23 +96,17 @@ public class CapabilityPlexusResource
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
-        try
+        final CapabilityIdentity capabilityId = getCapabilityIdentity( request );
+        final CapabilityReference reference = capabilityRegistry.get( capabilityId );
+        if ( reference == null )
         {
-            final CapabilityIdentity capabilityId = getCapabilityIdentity( request );
-            final CapabilityReference reference = capabilityRegistry.get( capabilityId );
-            if ( reference == null )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, String.format(
-                    "Cannot find a capability with specified if of %s", capabilityId ) );
-            }
+            throw new ResourceException(
+                Status.CLIENT_ERROR_NOT_FOUND,
+                String.format( "Cannot find a capability with specified if of %s", capabilityId )
+            );
+        }
 
-            return asCapabilityResponseResource( reference );
-        }
-        catch ( final Exception e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                                         "Could not manage capabilities configuration persistence store" );
-        }
+        return asCapabilityResponseResource( reference );
     }
 
     /**
