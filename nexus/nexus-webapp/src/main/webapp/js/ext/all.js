@@ -12,7 +12,7 @@
  */
 /*global define*/
 define('ext/all',
-      ['extjs', 'ext/ux', 'ext/data', 'ext/dd', 'ext/form', 'ext/grid',
+      ['extjs', 'ext/ux', 'ext/data', 'ext/dd', 'ext/form',
         'ext/layout', 'ext/lib', 'ext/tree', 'ext/component', 
         'ext/string', 'ext/tooltip'],
       function(Ext) {
