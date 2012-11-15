@@ -22,10 +22,14 @@ public class SleepRepositoryTask
     extends AbstractNexusRepositoriesTask<Object>
 {
 
+    private boolean cancellable;
+
     @Override
     protected Object doRun()
         throws Exception
     {
+        cancellable = Boolean.parseBoolean( getParameter( "cancellable" ) );
+
         getLogger().debug( getMessage() );
 
         final int time = getTime();
@@ -41,7 +45,9 @@ public class SleepRepositoryTask
         for ( int i = 0; i < time; i++ )
         {
             Thread.sleep( 1000 / 2 );
-            checkInterruption();
+            if ( cancellable ) {
+                checkInterruption();
+            }
         }
     }
 
@@ -68,7 +74,7 @@ public class SleepRepositoryTask
     @Override
     protected String getMessage()
     {
-        return "Sleeping for " + getTime() + " seconds!";
+        return "Sleeping for " + getTime() + " seconds (cancellable: "+ cancellable + ")!";
     }
 
 }

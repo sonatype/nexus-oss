@@ -72,6 +72,7 @@ public class Nexus4341RunningTaskNotEditableIT
         ScheduledServiceListResource running = createTask();
 
         waitForState( running, "RUNNING" );
+        verifyNoUpdate( running );
 
         ScheduledServiceListResource sleeping = createTask();
 
@@ -80,12 +81,9 @@ public class Nexus4341RunningTaskNotEditableIT
         verifyNoUpdate( sleeping );
         TaskScheduleUtil.cancel( sleeping.getId() );
 
-        verifyNoUpdate( running );
         TaskScheduleUtil.cancel( running.getId() );
-
-        ScheduledServiceListResource cancelled = TaskScheduleUtil.getTask( running.getName() );
-        assertThat( cancelled.getStatus(), is( "CANCELLING" ) );
-        verifyNoUpdate( cancelled );
+        waitForState( running, "CANCELLING" );
+        verifyNoUpdate( running );
     }
 
     private void waitForState( ScheduledServiceListResource task, String state )
