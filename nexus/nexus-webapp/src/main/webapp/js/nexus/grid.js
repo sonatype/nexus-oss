@@ -11,8 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/grid',
+define('nexus/grid',
       [
-        'ext/grid/checkcolumn'
+        'nexus/grid/checkcolumn'
       ],
       function() {});
