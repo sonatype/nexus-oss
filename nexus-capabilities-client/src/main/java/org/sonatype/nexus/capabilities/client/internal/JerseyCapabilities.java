@@ -20,10 +20,12 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.capabilities.model.XStreamConfigurator;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
+import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
@@ -36,6 +38,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
@@ -135,9 +139,21 @@ public class JerseyCapabilities
     @Override
     public CapabilityResource get( final String id )
     {
-        return getNexusClient().serviceResource( "capabilities/" + id )
-            .get( CapabilityResponseResource.class )
-            .getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( "capabilities/" + id )
+                .get( CapabilityResponseResource.class )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( contextAware( e, id ) );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
@@ -145,9 +161,21 @@ public class JerseyCapabilities
     {
         final CapabilityRequestResource envelope = new CapabilityRequestResource();
         envelope.setData( capability );
-        return getNexusClient().serviceResource( "capabilities" )
-            .post( CapabilityStatusResponseResource.class, envelope )
-            .getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( "capabilities" )
+                .post( CapabilityStatusResponseResource.class, envelope )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
@@ -155,16 +183,56 @@ public class JerseyCapabilities
     {
         final CapabilityRequestResource envelope = new CapabilityRequestResource();
         envelope.setData( capability );
-        return getNexusClient().serviceResource( "capabilities/" + capability.getId() )
-            .put( CapabilityStatusResponseResource.class, envelope )
-            .getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( "capabilities/" + capability.getId() )
+                .put( CapabilityStatusResponseResource.class, envelope )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( contextAware( e, capability.getId() ) );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
     public void delete( final String id )
     {
-        getNexusClient().serviceResource( "capabilities/" + id )
-            .delete();
+        try
+        {
+            getNexusClient()
+                .serviceResource( "capabilities/" + id )
+                .delete();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( contextAware( e, id ) );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+    }
+
+    private ContextAwareUniformInterfaceException contextAware( final UniformInterfaceException e, final String id )
+    {
+        return new ContextAwareUniformInterfaceException( e.getResponse() )
+        {
+            @Override
+            public String getMessage( final int status )
+            {
+                if ( status == Response.Status.NOT_FOUND.getStatusCode() )
+                {
+                    return String.format( "Capability with id '%s' was not found", id );
+                }
+                return null;
+            }
+        };
     }
 
     @Override
