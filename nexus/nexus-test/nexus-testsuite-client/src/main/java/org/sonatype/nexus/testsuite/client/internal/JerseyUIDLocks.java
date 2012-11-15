@@ -44,7 +44,8 @@ public class JerseyUIDLocks
         {
             getNexusClient()
                 .serviceResource( uri )
-                .get( ClientResponse.class );
+                .get( ClientResponse.class )
+                .close();
         }
         catch ( ClientHandlerException e )
         {
@@ -60,9 +61,20 @@ public class JerseyUIDLocks
     public void unlock( final String repository, final String path )
     {
         final String uri = format( "nexus-it-helper-plugin/uid/lock/%s/unlock/%s", repository, path );
-        getNexusClient()
-            .serviceResource( uri )
-            .delete( ClientResponse.class );
+        try
+        {
+            getNexusClient()
+                .serviceResource( uri )
+                .delete();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
 }
