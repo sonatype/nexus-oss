@@ -33,32 +33,6 @@
       <artifactId>nexus-restlet1x-model</artifactId>
     </dependency>
 
-    <!-- Security Models -->
-    <!-- Sadly, littered over Core models, so even if we do not publicize any "security related" client ops -->
-    <!-- we still drag this along with Core Models -->
-    <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-rest-model</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.thoughtworks.xstream</groupId>
-          <artifactId>xstream</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-library</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- = Other client dependencies = -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -111,13 +85,12 @@
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
-      <version>1.12</version>
+      <version>1.15</version>
     </dependency>
-
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
-      <version>1.12</version>
+      <version>1.15</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -135,20 +108,19 @@
       </exclusions>
     </dependency>
 
+    <!-- For Jersey client: complete HC4 stack + logger -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- @Inject, optional -->

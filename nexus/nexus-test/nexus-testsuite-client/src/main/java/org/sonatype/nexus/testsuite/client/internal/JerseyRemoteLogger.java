@@ -77,11 +77,11 @@ public class JerseyRemoteLogger
         }
         catch ( UniformInterfaceException e )
         {
-            throw JerseyNexusClient.convert( e );
+            throw getNexusClient().convert( e );
         }
         catch ( ClientHandlerException e )
         {
-            throw JerseyNexusClient.convert( e );
+            throw getNexusClient().convert( e );
         }
     }
 
