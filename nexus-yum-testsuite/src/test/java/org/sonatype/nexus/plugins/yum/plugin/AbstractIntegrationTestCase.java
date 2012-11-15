@@ -31,7 +31,7 @@ public class AbstractIntegrationTestCase
     @Override
     protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
     {
-        return configuration.addPlugins( getPluginFile() );// .enableDebugging( 8000, true );
+        return configuration.addPlugins( getPluginFile() ).enableDebugging( 8008, false );
     }
 
     protected YumClient yum()

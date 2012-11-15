@@ -53,4 +53,18 @@ public class M2YumRepository
         return path.startsWith( "/repodata/" );
     }
 
+    /**
+     * Override the default implementation to force yum proxy repositories to always reload metadata from the original
+     * maven 2 yum repository
+     */
+    @Override
+    protected boolean isOld( int maxAge, StorageItem item, boolean shouldCalculate )
+    {
+        if ( isYumRepoPath( item.getPath() ) )
+        {
+            return true;
+        }
+
+        return super.isOld( maxAge, item, shouldCalculate );
+    }
 }
