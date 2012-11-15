@@ -11,70 +11,24 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/dd/droptarget',['extjs'], function(Ext){
-Ext.dd.DropTarget = function(el, config) {
-  this.el = Ext.get(el);
+define('ext/dd/droptarget', ['extjs'], function(Ext) {
+  Ext.override(Ext.dd.DropTarget, {
+    constructor : function(el, config) {
+      this.el = Ext.get(el);
 
-  Ext.apply(this, config);
+      Ext.apply(this, config);
 
-  if (this.containerScroll)
-  {
-    Ext.dd.ScrollManager.register(this.el);
-  }
+      if (this.containerScroll) {
+        Ext.dd.ScrollManager.register(this.el);
+      }
 
-  Ext.dd.DropTarget.superclass.constructor.call(this, this.el.dom, this.ddGroup || this.group,
+      Ext.dd.DropTarget.superclass.constructor.call(this, this.el.dom, this.ddGroup || this.group,
         // Sonatype: allow config to pass thru to Ext.dd.DDTarget constructor so padding may
         // be passed from Ext.tree.TreePanel config when it need to have the whole drop panel
         // set as the drop zone because this is not done by the library
         config || {
           isTarget : true
         });
-};
-
-Ext.dd.DropTarget = function(el, config) {
-  this.el = Ext.get(el);
-
-  Ext.apply(this, config);
-
-  if (this.containerScroll)
-  {
-    Ext.dd.ScrollManager.register(this.el);
-  }
-
-  Ext.dd.DropTarget.superclass.constructor.call(this, this.el.dom, this.ddGroup || this.group,
-        // Sonatype: allow config to pass thru to Ext.dd.DDTarget constructor so
-        // padding may
-        // be passed from Ext.tree.TreePanel config when it need to have the whole
-        // drop panel
-        // set as the drop zone because this is not done by the library
-        config || {
-          isTarget : true
-        });
-};
-
-Ext.extend(Ext.dd.DropTarget, Ext.dd.DDTarget, {
-  dropAllowed : "x-dd-drop-ok",
-  dropNotAllowed : "x-dd-drop-nodrop",
-  isTarget : true,
-  isNotifyTarget : true,
-  notifyEnter : function(dd, e, data) {
-    if (this.overClass)
-    {
-      this.el.addClass(this.overClass);
     }
-    return this.dropAllowed;
-  },
-  notifyOver : function(dd, e, data) {
-    return this.dropAllowed;
-  },
-  notifyOut : function(dd, e, data) {
-    if (this.overClass)
-    {
-      this.el.removeClass(this.overClass);
-    }
-  },
-  notifyDrop : function(dd, e, data) {
-    return false;
-  }
-});
+  });
 });
