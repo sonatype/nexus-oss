@@ -135,11 +135,17 @@ public class YumMetadataGenerationTask
             Thread.sleep( 100 );
             LOG.info( "Generation complete." );
 
+            expireCaches();
             sendNotificationEvent();
             return new YumRepository( getRepoDir(), getRepositoryId(), getVersion() );
         }
 
         return null;
+    }
+
+    private void expireCaches()
+    {
+
     }
 
     protected void setDefaults()
@@ -245,7 +251,7 @@ public class YumMetadataGenerationTask
 
     private void sendNotificationEvent()
     {
-        if ( StringUtils.isBlank( getVersion() ) )
+        if ( isBlank( getVersion() ) )
         {
             try
             {

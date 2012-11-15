@@ -33,9 +33,9 @@ public class M2YumRepositoryTemplateProvider
 
         final TemplateSet templates = new TemplateSet( null );
 
-        templates.add( new M2YumRepositoryTemplate( this, "maven2yum_hosted_release", "Maven2 Yum (hosted, release)",
+        templates.add( new M2YumHostedRepositoryTemplate( this, "maven2yum_hosted_release", "Maven2 Yum (hosted, release)",
             RepositoryPolicy.RELEASE ) );
-        templates.add( new M2YumRepositoryTemplate( this, "maven2yum_hosted_snapshot", "Maven2 Yum (hosted, snapshot)",
+        templates.add( new M2YumHostedRepositoryTemplate( this, "maven2yum_hosted_snapshot", "Maven2 Yum (hosted, snapshot)",
             RepositoryPolicy.SNAPSHOT ) );
         templates.add( new M2YumGroupRepositoryTemplate( this, "maven2yum_group", "Maven2 Yum (group)" ) );
 

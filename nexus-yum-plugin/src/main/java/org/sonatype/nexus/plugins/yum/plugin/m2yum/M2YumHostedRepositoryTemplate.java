@@ -26,10 +26,10 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate;
 
-public class M2YumRepositoryTemplate
+public class M2YumHostedRepositoryTemplate
     extends AbstractMavenRepositoryTemplate
 {
-    public M2YumRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
+    public M2YumHostedRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
                                     RepositoryPolicy repositoryPolicy )
     {
         super( provider, id, description, new Maven2ContentClass(), MavenHostedRepository.class, repositoryPolicy );
