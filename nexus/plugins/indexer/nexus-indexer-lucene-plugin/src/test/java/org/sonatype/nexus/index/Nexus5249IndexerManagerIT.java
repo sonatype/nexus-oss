@@ -87,40 +87,6 @@ public class Nexus5249IndexerManagerIT
     protected void prepare( final IOException failure )
         throws Exception
     {
-        // count total of indexed, and total of indexed proxy repositories, and set the one to make it really go
-        // remotely
-        indexedRepositories = 0;
-        indexedProxyRepositories = 0;
-        for ( Repository repository : repositoryRegistry.getRepositories() )
-        {
-            if ( !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
-                && !repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
-                && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) && repository.isIndexable() )
-            {
-                indexedRepositories++;
-            }
-            // leave only one to download remote indexes explicitly
-            if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
-            {
-                final MavenProxyRepository mavenProxyRepository = repository.adaptToFacet( MavenProxyRepository.class );
-                if ( repository.getId().equals( apacheSnapshots.getId() ) )
-                {
-                    mavenProxyRepository.setDownloadRemoteIndexes( true );
-                    failingRepository = mavenProxyRepository;
-                    indexedProxyRepositories++;
-                }
-                else
-                {
-                    mavenProxyRepository.setDownloadRemoteIndexes( false );
-                }
-                mavenProxyRepository.commitChanges();
-            }
-        }
-
-        // as things above will trigger some bg tasks (failingRepository will be reindexed with a task)
-        waitForTasksToStop();
-        wairForAsyncEventsToCalmDown();
-
         // faking IndexUpdater that will fail with given exception for given "failing" repository
         final IndexUpdater realUpdater = lookup( IndexUpdater.class );
         // predicate to match invocation when the arguments are for the failingRepository
@@ -166,6 +132,44 @@ public class Nexus5249IndexerManagerIT
         final DefaultIndexerManager dim = (DefaultIndexerManager) indexerManager;
         dim.setIndexUpdater( fakeUpdater );
         dim.setScanner( fakeScanner );
+
+        // count total of indexed, and total of indexed proxy repositories, and set the one to make it really go
+        // remotely
+        indexedRepositories = 0;
+        indexedProxyRepositories = 0;
+        for ( Repository repository : repositoryRegistry.getRepositories() )
+        {
+            if ( !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
+                && !repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
+                && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) && repository.isIndexable() )
+            {
+                indexedRepositories++;
+            }
+            // leave only one to download remote indexes explicitly
+            if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+            {
+                final MavenProxyRepository mavenProxyRepository = repository.adaptToFacet( MavenProxyRepository.class );
+                if ( repository.getId().equals( apacheSnapshots.getId() ) )
+                {
+                    mavenProxyRepository.setDownloadRemoteIndexes( true );
+                    failingRepository = mavenProxyRepository;
+                    indexedProxyRepositories++;
+                }
+                else
+                {
+                    mavenProxyRepository.setDownloadRemoteIndexes( false );
+                }
+                mavenProxyRepository.commitChanges();
+            }
+        }
+
+        // as things above will trigger some bg tasks (failingRepository will be reindexed with a task)
+        waitForTasksToStop();
+        wairForAsyncEventsToCalmDown();
+
+        // reset counters
+        fetchCountingInvocationHandler.reset();
+        scanInvocationCount = 0;
     }
 
     @Test
@@ -311,6 +315,11 @@ public class Nexus5249IndexerManagerIT
         public int getInvocationCount()
         {
             return count;
+        }
+        
+        public void reset()
+        {
+            count = 0;
         }
     }
 
