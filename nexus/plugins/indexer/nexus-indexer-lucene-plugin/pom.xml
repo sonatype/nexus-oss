@@ -143,8 +143,29 @@
       </plugin>
 
       <plugin>
-        <groupId>net.alchim31.maven</groupId>
+        <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>js</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.directory}/classes/static/js/${project.artifactId}-all.js</output>
+            </configuration>
+          </execution>
+          <execution>
+            <id>css</id>
+            <goals>
+              <goal>aggregate-css</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.directory}/classes/static/css/${project.artifactId}-all.css</output>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
