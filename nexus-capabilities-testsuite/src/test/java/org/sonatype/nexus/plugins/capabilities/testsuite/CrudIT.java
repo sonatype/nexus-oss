@@ -21,13 +21,19 @@ import static org.sonatype.nexus.plugins.capabilities.internal.rest.dto.Capabili
 
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 
 public class CrudIT
     extends CapabilitiesITSupport
 {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     public CrudIT( final String nexusBundleCoordinates )
     {
@@ -82,6 +88,32 @@ public class CrudIT
         final CapabilityListItemResource enabled = capabilities().disable( created.getId() );
 
         assertThat( enabled.isEnabled(), is( false ) );
+    }
+
+    @Test
+    public void getInexistent()
+    {
+        thrown.expect( NexusClientNotFoundException.class );
+        thrown.expectMessage( "Capability with id 'getInexistent' was not found" );
+        capabilities().get( "getInexistent" );
+    }
+
+    @Test
+    public void updateInexistent()
+    {
+        thrown.expect( NexusClientNotFoundException.class );
+        thrown.expectMessage( "Capability with id 'updateInexistent' was not found" );
+        final CapabilityResource cap = messageCapability();
+        cap.setId( "updateInexistent" );
+        capabilities().update( cap );
+    }
+
+    @Test
+    public void deleteInexistent()
+    {
+        thrown.expect( NexusClientNotFoundException.class );
+        thrown.expectMessage( "Capability with id 'deleteInexistent' was not found" );
+        capabilities().delete( "deleteInexistent" );
     }
 
     private CapabilityResource messageCapability()
