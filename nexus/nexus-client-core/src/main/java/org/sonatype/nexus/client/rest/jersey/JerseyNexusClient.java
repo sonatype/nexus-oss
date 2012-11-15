@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.client.rest.jersey;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -222,7 +223,7 @@ public class JerseyNexusClient
             return new NexusClientNotFoundException(
                 getMessageIfPresent( ClientResponse.Status.NOT_FOUND.getStatusCode(), e ),
                 response.getClientResponseStatus().getReasonPhrase(),
-                consume( response )
+                getResponseBody( response )
             );
         }
         return null;
@@ -237,11 +238,12 @@ public class JerseyNexusClient
             ErrorResponse errorResponse = null;
             try
             {
-                errorResponse = response.getEntity( ErrorResponse.class );
+                errorResponse = (ErrorResponse) getXStream().fromXML( body, new ErrorResponse() );
             }
             catch ( Exception e1 )
             {
                 // ignore
+                // XStreamException if body is not ErrorResponse
             }
             if ( errorResponse != null )
             {
@@ -275,7 +277,7 @@ public class JerseyNexusClient
             getMessageIfPresent( e.getResponse().getClientResponseStatus().getStatusCode(), e ),
             e.getResponse().getClientResponseStatus().getStatusCode(),
             e.getResponse().getClientResponseStatus().getReasonPhrase(),
-            consume( e.getResponse() )
+            getResponseBody( e.getResponse() )
         );
     }
 
@@ -301,28 +303,17 @@ public class JerseyNexusClient
         throw new NexusClientHandlerException( e );
     }
 
-    public String consume( final ClientResponse response )
-    {
-        try
-        {
-            return response.getEntity( String.class );
-        }
-        catch ( Exception e )
-        {
-            // maybe already consumed
-            return null;
-        }
-    }
-
     public static String getResponseBody( final ClientResponse response )
     {
         try
         {
-            return IOUtil.toString( response.getEntityInputStream(), "UTF-8" );
+            final byte[] body = IOUtil.toByteArray( response.getEntityInputStream() );
+            response.setEntityInputStream( new ByteArrayInputStream( body ) );
+            return IOUtil.toString( body, "UTF-8" );
         }
         catch ( IOException e )
         {
-            return null;
+            throw new IllegalStateException( "Jersey unexpectedly refused to rewind buffered entity." );
         }
     }
 
