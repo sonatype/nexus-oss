@@ -15,11 +15,8 @@ package org.sonatype.nexus.mindexer.client.internal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.sonatype.nexus.client.core.NexusUnexpectedResponseException;
-import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.mindexer.client.SearchRequest;
 import org.sonatype.nexus.mindexer.client.SearchResponse;
@@ -31,8 +28,8 @@ import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
 import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
-
-import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
@@ -84,29 +81,22 @@ public class JerseyMavenIndexer
             queryParams.add( "collapseresults", request.getCollapseresults().toString() );
         }
 
-        final ClientResponse clientResponse =
-            getNexusClient().serviceResource( "lucene/search", queryParams ).get( ClientResponse.class );
         try
         {
-            if ( clientResponse.getClientResponseStatus().getStatusCode() == 200 )
-            {
-                return toResponse( request, clientResponse.getEntity( SearchNGResponse.class ) );
-            }
-            else if ( clientResponse.getClientResponseStatus().getStatusCode() == 400 )
-            {
-                final ErrorResponse errorResponse = clientResponse.getEntity( ErrorResponse.class );
-                throw getNexusClient().convertErrorResponse( clientResponse.getClientResponseStatus().getStatusCode(),
-                    clientResponse.getClientResponseStatus().getReasonPhrase(), errorResponse );
-            }
-            else
-            {
-                throw new NexusUnexpectedResponseException( clientResponse.getClientResponseStatus().getStatusCode(),
-                    clientResponse.getClientResponseStatus().getReasonPhrase() );
-            }
+            return toResponse(
+                request,
+                getNexusClient()
+                    .serviceResource( "lucene/search", queryParams )
+                    .get( SearchNGResponse.class )
+            );
         }
-        finally
+        catch ( UniformInterfaceException e )
         {
-            clientResponse.close();
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
         }
     }
 

@@ -10,16 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core.spi.rest.jersey;
-
-import com.sun.jersey.api.client.RequestBuilder;
-import com.sun.jersey.api.client.UniformInterface;
+package org.sonatype.nexus.client.core.exception;
 
 /**
- * @since 2.3
+ * Generic runtime exception to be thrown by Subsystems, when some error is reported by Nexus. This exception here is
+ * solely for purpose of not proliferating possible runtime exceptions of underlying implementation.
+ *
+ * @since 2.1
  */
-public interface UniformRequestBuilder
-    extends UniformInterface, RequestBuilder<UniformRequestBuilder>
+@SuppressWarnings( "serial" )
+public abstract class NexusClientException
+    extends RuntimeException
 {
+
+    public NexusClientException( String message )
+    {
+        super( message );
+    }
+
+    public NexusClientException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
+
+    public NexusClientException( Throwable cause )
+    {
+        super( cause );
+    }
 
 }

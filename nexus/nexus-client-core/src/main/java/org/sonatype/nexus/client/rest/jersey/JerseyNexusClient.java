@@ -12,27 +12,34 @@
  */
 package org.sonatype.nexus.client.rest.jersey;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.client.core.Condition;
-import org.sonatype.nexus.client.core.NexusErrorMessageException;
 import org.sonatype.nexus.client.core.NexusStatus;
+import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
+import org.sonatype.nexus.client.core.exception.NexusClientException;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
+import org.sonatype.nexus.client.core.exception.NexusClientResponseException;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
-import org.sonatype.nexus.client.core.spi.rest.jersey.UniformRequestBuilder;
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.internal.rest.AbstractXStreamNexusClient;
-import org.sonatype.nexus.client.internal.rest.jersey.NexusUniformRequestBuilder;
 import org.sonatype.nexus.client.internal.util.Check;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterface;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -55,9 +62,9 @@ public class JerseyNexusClient
     private final LinkedHashMap<Class<?>, SubsystemFactory<?, JerseyNexusClient>> subsystemFactoryMap;
 
     public JerseyNexusClient( final Condition connectionCondition,
-                              final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories,
-                              final ConnectionInfo connectionInfo, final XStream xstream, final Client client,
-                              final MediaType mediaType )
+        final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories,
+        final ConnectionInfo connectionInfo, final XStream xstream, final Client client,
+        final MediaType mediaType )
     {
         super( connectionInfo, xstream );
         this.client = Check.notNull( client, Client.class );
@@ -90,46 +97,62 @@ public class JerseyNexusClient
         return resolvePath( "service/local/" + path );
     }
 
-    public UniformRequestBuilder serviceResource( final String uri )
+    public WebResource.Builder serviceResource( final String uri )
     {
-        return new NexusUniformRequestBuilder(
-            getClient().resource( resolveServicePath( uri ) ).type( getMediaType() ).accept( getMediaType() )
-        );
+        return getClient()
+            .resource( resolveServicePath( uri ) )
+            .type( getMediaType() )
+            .accept( getMediaType() );
     }
 
-    public UniformRequestBuilder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public WebResource.Builder serviceResource( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return new NexusUniformRequestBuilder(
-            getClient().resource( resolveServicePath( uri ) ).queryParams( queryParameters ).type(
-                getMediaType() ).accept(
-                getMediaType() )
-        );
+        return getClient()
+            .resource( resolveServicePath( uri ) )
+            .queryParams( queryParameters )
+            .type( getMediaType() )
+            .accept( getMediaType() );
     }
 
-    public UniformRequestBuilder uri( final String uri )
+    public WebResource.Builder uri( final String uri )
     {
-        return new NexusUniformRequestBuilder(
-            getClient().resource( resolvePath( uri ) ).getRequestBuilder()
-        );
+        return getClient()
+            .resource( resolvePath( uri ) )
+            .getRequestBuilder();
     }
 
-    public UniformRequestBuilder uri( final String uri, final MultivaluedMap<String, String> queryParameters )
+    public WebResource.Builder uri( final String uri, final MultivaluedMap<String, String> queryParameters )
     {
-        return new NexusUniformRequestBuilder(
-            getClient().resource( resolvePath( uri ) ).queryParams( queryParameters ).getRequestBuilder()
-        );
+        return getClient()
+            .resource( resolvePath( uri ) )
+            .queryParams( queryParameters )
+            .getRequestBuilder();
     }
 
     @Override
     public NexusStatus getStatus()
     {
-        final StatusResource response = serviceResource( "status" ).get( StatusResourceResponse.class ).getData();
-        return new NexusStatus( response.getAppName(), response.getFormattedAppName(), response.getVersion(),
-                                response.getApiVersion(), response.getEditionLong(), response.getEditionShort(),
-                                response.getState(),
-                                response.getInitializedAt(), response.getStartedAt(), response.getLastConfigChange(),
-                                -1,
-                                response.getBaseUrl() );
+        try
+        {
+            final StatusResource response = serviceResource( "status" )
+                .get( StatusResourceResponse.class )
+                .getData();
+            return new NexusStatus( response.getAppName(), response.getFormattedAppName(), response.getVersion(),
+                                    response.getApiVersion(), response.getEditionLong(), response.getEditionShort(),
+                                    response.getState(),
+                                    response.getInitializedAt(), response.getStartedAt(),
+                                    response.getLastConfigChange(),
+                                    -1,
+                                    response.getBaseUrl() );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw convert( e );
+        }
     }
 
     @Override
@@ -192,21 +215,115 @@ public class JerseyNexusClient
         }
     }
 
-    // ==
-
-    /**
-     * Internal method to be used by subsystem implementations to convert Jersey specific exception to
-     * {@link NexusErrorMessageException}.
-     */
-    public NexusErrorMessageException convertErrorResponse( final int statusCode, final String reasonPhrase,
-                                                            final ErrorResponse errorResponse )
+    public NexusClientNotFoundException convertIf404( final UniformInterfaceException e )
     {
-        final Map<String, String> errors = new LinkedHashMap<String, String>();
-        for ( ErrorMessage errorMessage : errorResponse.getErrors() )
+        final ClientResponse response = e.getResponse();
+        if ( ClientResponse.Status.NOT_FOUND.equals( response.getClientResponseStatus() ) )
         {
-            errors.put( errorMessage.getId(), errorMessage.getMsg() );
+            return new NexusClientNotFoundException(
+                getMessageIfPresent( ClientResponse.Status.NOT_FOUND.getStatusCode(), e ),
+                response.getClientResponseStatus().getReasonPhrase(),
+                getResponseBody( response )
+            );
+        }
+        return null;
+    }
+
+    public NexusClientErrorResponseException convertIf400WithErrorMessage( final UniformInterfaceException e )
+    {
+        final ClientResponse response = e.getResponse();
+        if ( ClientResponse.Status.BAD_REQUEST.equals( response.getClientResponseStatus() ) )
+        {
+            final String body = getResponseBody( response );
+            ErrorResponse errorResponse = null;
+            try
+            {
+                errorResponse = (ErrorResponse) getXStream().fromXML( body, new ErrorResponse() );
+            }
+            catch ( Exception e1 )
+            {
+                // ignore
+                // XStreamException if body is not ErrorResponse
+            }
+            if ( errorResponse != null )
+            {
+                // convert them to hide stupid "old" REST model, and not have it leak out
+                final ArrayList<NexusClientErrorResponseException.ErrorMessage> errors =
+                    new ArrayList<NexusClientErrorResponseException.ErrorMessage>( errorResponse.getErrors().size() );
+                for ( ErrorMessage message : errorResponse.getErrors() )
+                {
+                    errors.add(
+                        new NexusClientErrorResponseException.ErrorMessage( message.getId(), message.getMsg() ) );
+                }
+                return new NexusClientErrorResponseException(
+                    response.getClientResponseStatus().getReasonPhrase(),
+                    body,
+                    errors
+                );
+            }
+        }
+        return null;
+    }
+
+    public NexusClientException convert( final UniformInterfaceException e )
+    {
+        NexusClientException exception = convertIfKnown( e );
+        if ( exception != null )
+        {
+            return exception;
         }
 
-        return new NexusErrorMessageException( statusCode, reasonPhrase, errors );
+        return new NexusClientResponseException(
+            getMessageIfPresent( e.getResponse().getClientResponseStatus().getStatusCode(), e ),
+            e.getResponse().getClientResponseStatus().getStatusCode(),
+            e.getResponse().getClientResponseStatus().getReasonPhrase(),
+            getResponseBody( e.getResponse() )
+        );
     }
+
+    public NexusClientException convertIfKnown( final UniformInterfaceException e )
+    {
+        NexusClientException exception = convertIf404( e );
+        if ( exception != null )
+        {
+            return exception;
+        }
+
+        exception = convertIf400WithErrorMessage( e );
+        if ( exception != null )
+        {
+            return exception;
+        }
+
+        return null;
+    }
+
+    public NexusClientException convert( final ClientHandlerException e )
+    {
+        throw new NexusClientHandlerException( e );
+    }
+
+    public static String getResponseBody( final ClientResponse response )
+    {
+        try
+        {
+            final byte[] body = IOUtil.toByteArray( response.getEntityInputStream() );
+            response.setEntityInputStream( new ByteArrayInputStream( body ) );
+            return IOUtil.toString( body, "UTF-8" );
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalStateException( "Jersey unexpectedly refused to rewind buffered entity." );
+        }
+    }
+
+    private String getMessageIfPresent( final int status, final UniformInterfaceException e )
+    {
+        if ( e instanceof ContextAwareUniformInterfaceException )
+        {
+            return ( (ContextAwareUniformInterfaceException) e ).getMessage( status );
+        }
+        return null;
+    }
+
 }

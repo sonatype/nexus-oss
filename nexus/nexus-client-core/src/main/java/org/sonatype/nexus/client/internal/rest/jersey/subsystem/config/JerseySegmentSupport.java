@@ -22,6 +22,8 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 public abstract class JerseySegmentSupport<ME extends Segment, S>
     extends SubsystemSupport<JerseyNexusClient>
@@ -92,11 +94,21 @@ public abstract class JerseySegmentSupport<ME extends Segment, S>
     @VisibleForTesting
     GlobalConfigurationResource getConfiguration()
     {
-        final GlobalConfigurationResourceResponse response = getNexusClient()
-            .serviceResource( "global_settings/current" )
-            .get( GlobalConfigurationResourceResponse.class );
-
-        return response.getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( "global_settings/current" )
+                .get( GlobalConfigurationResourceResponse.class )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @VisibleForTesting
@@ -105,7 +117,18 @@ public abstract class JerseySegmentSupport<ME extends Segment, S>
         final GlobalConfigurationResourceResponse request = new GlobalConfigurationResourceResponse();
         request.setData( configuration );
 
-        getNexusClient().serviceResource( "global_settings/current" ).put( request );
+        try
+        {
+            getNexusClient().serviceResource( "global_settings/current" ).put( request );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
 }

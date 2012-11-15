@@ -10,18 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core;
+package org.sonatype.nexus.client.rest.jersey;
+
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * @since 2.3
  */
-public class NotFoundException
-    extends NexusClientException
+@SuppressWarnings( "serial" )
+public abstract class ContextAwareUniformInterfaceException
+    extends UniformInterfaceException
 {
 
-    public NotFoundException()
+    public ContextAwareUniformInterfaceException( final ClientResponse response )
     {
-        super( "" );
+        super( response );
     }
+
+    public abstract String getMessage( int status );
 
 }

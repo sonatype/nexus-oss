@@ -28,6 +28,8 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Jersey based {@link GroupRepository} implementation.
@@ -79,11 +81,21 @@ public class JerseyGroupRepository<T extends GroupRepository>
     @Override
     RepositoryGroupResource doGet()
     {
-        final RepositoryGroupResourceResponse response = getNexusClient()
-            .serviceResource( uri() + "/" + id() )
-            .get( RepositoryGroupResourceResponse.class );
-
-        return response.getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( uri() + "/" + id() )
+                .get( RepositoryGroupResourceResponse.class )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
@@ -92,11 +104,21 @@ public class JerseyGroupRepository<T extends GroupRepository>
         final RepositoryGroupResourceResponse request = new RepositoryGroupResourceResponse();
         request.setData( settings() );
 
-        final RepositoryGroupResourceResponse response = getNexusClient()
-            .serviceResource( uri() )
-            .post( RepositoryGroupResourceResponse.class, request );
-
-        return response.getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( uri() )
+                .post( RepositoryGroupResourceResponse.class, request )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
@@ -105,11 +127,21 @@ public class JerseyGroupRepository<T extends GroupRepository>
         final RepositoryGroupResourceResponse request = new RepositoryGroupResourceResponse();
         request.setData( settings() );
 
-        final RepositoryGroupResourceResponse response = getNexusClient()
-            .serviceResource( uri() + "/" + id() )
-            .put( RepositoryGroupResourceResponse.class, request );
-
-        return response.getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( uri() + "/" + id() )
+                .put( RepositoryGroupResourceResponse.class, request )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override

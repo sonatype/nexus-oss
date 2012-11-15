@@ -10,36 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core;
+package org.sonatype.nexus.client.core.exception;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import org.sonatype.nexus.client.internal.msg.ErrorMessage;
-import org.sonatype.nexus.client.internal.msg.ErrorResponse;
+import javax.ws.rs.core.Response;
 
 /**
  * @since 2.3
  */
-public class BadRequestException
-    extends NexusClientException
+public class NexusClientErrorResponseException
+    extends NexusClientResponseException
 {
 
     private final List<ErrorMessage> errors;
 
-    public BadRequestException( final ErrorResponse response )
+    public NexusClientErrorResponseException( final String reasonPhrase,
+        final String responseBody,
+        final List<ErrorMessage> errorMessages )
     {
-        super( message( checkNotNull( response ) ) );
+        super( message( errorMessages ), Response.Status.BAD_REQUEST.getStatusCode(), reasonPhrase, responseBody );
         errors = Collections.unmodifiableList(
-            response.getErrors() == null ? Collections.<ErrorMessage>emptyList() : response.getErrors()
+            errorMessages == null ? Collections.<ErrorMessage>emptyList() : errorMessages
         );
     }
 
-    private static String message( final ErrorResponse response )
+    private static String message( final Collection<ErrorMessage> errors )
     {
-        final List<ErrorMessage> errors = response.getErrors();
         if ( errors != null && !errors.isEmpty() )
         {
             final StringBuilder sb = new StringBuilder();
@@ -53,7 +51,7 @@ public class BadRequestException
                 {
                     sb.append( "[" ).append( error.getId() ).append( "] " );
                 }
-                sb.append( error.getMsg() );
+                sb.append( error.getMessage() );
             }
             if ( errors.size() > 1 )
             {
@@ -69,4 +67,29 @@ public class BadRequestException
         return errors;
     }
 
+    // ==
+
+    public static class ErrorMessage
+    {
+
+        private final String id;
+
+        private final String message;
+
+        public ErrorMessage( final String id, final String message )
+        {
+            this.id = id;
+            this.message = message;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
+
+        public String getMessage()
+        {
+            return message;
+        }
+    }
 }

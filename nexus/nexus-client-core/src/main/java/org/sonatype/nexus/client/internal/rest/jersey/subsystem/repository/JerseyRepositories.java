@@ -20,12 +20,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
+import javax.ws.rs.core.Response;
 
-import org.sonatype.nexus.client.core.NotFoundException;
+import org.sonatype.nexus.client.core.exception.NexusClientException;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.core.spi.subsystem.repository.RepositoryFactory;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
+import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
@@ -35,6 +38,8 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Jersey based {@link Repositories} implementation.
@@ -66,17 +71,54 @@ public class JerseyRepositories
         {
             return convert(
                 id,
-                getNexusClient().serviceResource( "repositories/" + id )
-                    .get( RepositoryResourceResponse.class ).getData()
+                getNexusClient()
+                    .serviceResource( "repositories/" + id )
+                    .get( RepositoryResourceResponse.class )
+                    .getData()
             );
         }
-        catch ( final NotFoundException e )
+        catch ( final UniformInterfaceException e )
         {
-            return convert(
-                id,
-                getNexusClient().serviceResource( "repo_groups/" + id )
-                    .get( RepositoryGroupResourceResponse.class ).getData()
-            );
+            final NexusClientException converted = getNexusClient().convert( e );
+            if ( converted instanceof NexusClientNotFoundException )
+            {
+                try
+                {
+                    return convert(
+                        id,
+                        getNexusClient()
+                            .serviceResource( "repo_groups/" + id )
+                            .get( RepositoryGroupResourceResponse.class )
+                            .getData()
+                    );
+                }
+                catch ( UniformInterfaceException e2 )
+                {
+                    throw getNexusClient().convert(
+                        new ContextAwareUniformInterfaceException( e2.getResponse() )
+                        {
+                            @Override
+                            public String getMessage( final int status )
+                            {
+                                if ( status == Response.Status.NOT_FOUND.getStatusCode() )
+                                {
+                                    return String.format( "Repository with id '%s' was not found", id );
+                                }
+                                return null;
+                            }
+                        }
+                    );
+                }
+                catch ( ClientHandlerException e2 )
+                {
+                    throw getNexusClient().convert( e2 );
+                }
+            }
+            throw converted;
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
         }
     }
 
@@ -98,23 +140,34 @@ public class JerseyRepositories
     @Override
     public Collection<Repository> get()
     {
-        final RepositoryListResourceResponse response = getNexusClient()
-            .serviceResource( "repositories" )
-            .get( RepositoryListResourceResponse.class );
-
-        if ( response == null || response.getData() == null || response.getData().isEmpty() )
+        try
         {
-            return Collections.emptyList();
+            final RepositoryListResourceResponse response = getNexusClient()
+                .serviceResource( "repositories" )
+                .get( RepositoryListResourceResponse.class );
+
+            if ( response.getData() == null || response.getData().isEmpty() )
+            {
+                return Collections.emptyList();
+            }
+
+            List<Repository> repositories = Lists.newArrayList();
+
+            for ( final RepositoryListResource resource : response.getData() )
+            {
+                repositories.add( get( resource.getId() ) );
+            }
+
+            return repositories;
         }
-
-        List<Repository> repositories = Lists.newArrayList();
-
-        for ( final RepositoryListResource resource : response.getData() )
+        catch ( UniformInterfaceException e )
         {
-            repositories.add( get( resource.getId() ) );
+            throw getNexusClient().convert( e );
         }
-
-        return repositories;
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @SuppressWarnings( "unchecked" )
