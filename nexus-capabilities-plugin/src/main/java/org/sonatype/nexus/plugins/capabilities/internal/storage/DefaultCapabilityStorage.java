@@ -88,7 +88,7 @@ public class DefaultCapabilityStorage
     }
 
     @Override
-    public void update( final CapabilityStorageItem item )
+    public boolean update( final CapabilityStorageItem item )
         throws IOException
     {
         try
@@ -99,12 +99,14 @@ public class DefaultCapabilityStorage
 
             final CCapability stored = getInternal( capability.getId() );
 
-            if ( stored != null )
+            if ( stored == null )
             {
-                load().removeCapability( stored );
-                load().addCapability( capability );
-                save();
+                return false;
             }
+            load().removeCapability( stored );
+            load().addCapability( capability );
+            save();
+            return true;
         }
         finally
         {
@@ -113,7 +115,7 @@ public class DefaultCapabilityStorage
     }
 
     @Override
-    public void remove( final CapabilityIdentity id )
+    public boolean remove( final CapabilityIdentity id )
         throws IOException
     {
         try
@@ -121,11 +123,13 @@ public class DefaultCapabilityStorage
             lock.lock();
 
             final CCapability stored = getInternal( id.toString() );
-            if ( stored != null )
+            if ( stored == null )
             {
-                load().removeCapability( stored );
-                save();
+                return false;
             }
+            load().removeCapability( stored );
+            save();
+            return true;
         }
         finally
         {
