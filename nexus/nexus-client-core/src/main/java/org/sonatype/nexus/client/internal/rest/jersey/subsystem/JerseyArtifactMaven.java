@@ -21,6 +21,8 @@ import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.ArtifactResolveResource;
 import org.sonatype.nexus.rest.model.ArtifactResolveResourceResponse;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
@@ -58,14 +60,26 @@ public class JerseyArtifactMaven
             queryParams.add( "e", req.getExtension() );
         }
 
-        final ArtifactResolveResource data = getNexusClient().serviceResource( "artifact/maven/resolve", queryParams )
-            .get( ArtifactResolveResourceResponse.class ).getData();
+        try
+        {
+            final ArtifactResolveResource data = getNexusClient()
+                .serviceResource( "artifact/maven/resolve", queryParams )
+                .get( ArtifactResolveResourceResponse.class ).getData();
 
-        return new ResolveResponse( data.isPresentLocally(), data.getGroupId(), data.getArtifactId(),
-                                    data.getVersion(), data.getBaseVersion(), data.getClassifier(),
-                                    data.getExtension(), data.isSnapshot(),
-                                    data.getSnapshotBuildNumber(), data.getSnapshotTimeStamp(), data.getFileName(),
-                                    data.getSha1(),
-                                    data.getRepositoryPath() );
+            return new ResolveResponse( data.isPresentLocally(), data.getGroupId(), data.getArtifactId(),
+                                        data.getVersion(), data.getBaseVersion(), data.getClassifier(),
+                                        data.getExtension(), data.isSnapshot(),
+                                        data.getSnapshotBuildNumber(), data.getSnapshotTimeStamp(), data.getFileName(),
+                                        data.getSha1(),
+                                        data.getRepositoryPath() );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 }

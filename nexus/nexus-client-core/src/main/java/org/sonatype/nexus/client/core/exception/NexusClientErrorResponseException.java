@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.client.core.exception;
 
 import java.util.Collections;
 import java.util.List;
+import javax.ws.rs.core.Response;
 
 import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
@@ -23,15 +22,17 @@ import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 /**
  * @since 2.3
  */
-public class BadRequestException
-    extends NexusClientException
+public class NexusClientErrorResponseException
+    extends NexusClientResponseException
 {
 
     private final List<ErrorMessage> errors;
 
-    public BadRequestException( final ErrorResponse response )
+    public NexusClientErrorResponseException( final String reasonPhrase,
+                                              final String responseBody,
+                                              final ErrorResponse response )
     {
-        super( message( checkNotNull( response ) ) );
+        super( message( response ), Response.Status.BAD_REQUEST.getStatusCode(), reasonPhrase, responseBody );
         errors = Collections.unmodifiableList(
             response.getErrors() == null ? Collections.<ErrorMessage>emptyList() : response.getErrors()
         );

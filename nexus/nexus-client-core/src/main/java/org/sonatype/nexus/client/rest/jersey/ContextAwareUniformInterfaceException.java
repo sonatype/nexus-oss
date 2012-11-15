@@ -10,31 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core;
+package org.sonatype.nexus.client.rest.jersey;
+
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
- * Generic runtime exception to be thrown by Subsystems, when some error is reported by Nexus. This exception here is
- * solely for purpose of not proliferating possible runtime exceptions of underlying implementation.
- *
- * @since 2.1
+ * @since 2.3
  */
 @SuppressWarnings( "serial" )
-public abstract class NexusClientException
-    extends RuntimeException
+public abstract class ContextAwareUniformInterfaceException
+    extends UniformInterfaceException
 {
 
-    public NexusClientException( String message )
+    public ContextAwareUniformInterfaceException( final ClientResponse response )
     {
-        super( message );
+        super( response );
     }
 
-    public NexusClientException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+    public abstract String getMessage( int status );
 
-    public NexusClientException( Throwable cause )
-    {
-        super( cause );
-    }
 }
