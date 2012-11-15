@@ -304,7 +304,7 @@ public class JerseyNexusClient
         }
     }
 
-    private static String getResponseBody( final ClientResponse response )
+    public static String getResponseBody( final ClientResponse response )
     {
         try
         {
