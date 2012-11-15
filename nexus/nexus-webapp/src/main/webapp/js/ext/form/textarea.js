@@ -15,28 +15,10 @@
 define('ext/form/textarea',['extjs'], function(Ext) {
 Ext.override(Ext.form.TextArea, {
   wordWrap : true,
+  onRenderOriginal : Ext.form.TextArea.prototype.onRender,
   onRender : function(ct, position) {
-    if (!this.el)
-    {
-      this.defaultAutoCreate = {
-        tag : "textarea",
-        style : "width:100px;height:60px;",
-        autocomplete : "off"
-      };
-    }
-    Ext.form.TextArea.superclass.onRender.call(this, ct, position);
-    if (this.grow)
-    {
-      this.textSizeEl = Ext.DomHelper.append(document.body, {
-        tag : "pre",
-        cls : "x-form-grow-sizer"
-      });
-      if (this.preventScrollbars)
-      {
-        this.el.setStyle("overflow", "hidden");
-      }
-      this.el.setHeight(this.growMin);
-    }
+    this.onRenderOriginal.apply(this, arguments);
+
     this.el.setOverflow('auto');
     if (this.wordWrap === false)
     {
