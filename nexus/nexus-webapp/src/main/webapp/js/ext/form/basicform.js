@@ -27,33 +27,31 @@ Ext.override(Ext.form.BasicForm, {
    */
   findField : function(id) {
     var
-          field = null,
+          findMatchingField,
+          field = this.items.get(id),
           fallbackField = null;
-    this.items.each(function(f) {
-      if (f.isFormField && (f.dataIndex === id || f.id === id || f.getName() === id))
-      {
-        // Only want to grab the first one found, to match default
-        // behaviour
-        if (!fallbackField)
-        {
-          fallbackField = f;
-        }
 
-        // If the field isn't disabled use it
-        if (f.disabled === false)
-        {
-          field = f;
-          return false;
+    if (!Ext.isObject(field)) {
+      //searches for the field corresponding to the given id. Used recursively for composite fields
+      findMatchingField = function(f) {
+        if (f.isFormField) {
+          if (f.dataIndex === id || f.id === id || f.getName() === id) {
+            fallbackField = f;
+            if (!f.disabled) {
+              field = f;
+              return false;
+            }
+          } else if (f.isComposite) {
+            return f.items.each(findMatchingField);
+          } else if (f instanceof Ext.form.CheckboxGroup && f.rendered) {
+            return f.eachItem(findMatchingField);
+          }
         }
-      }
-    });
+      };
 
-    if (!field)
-    {
-      field = Ext.value(fallbackField, this.items.get(id));
+      this.items.each(findMatchingField);
     }
-
-    return field || null;
+    return field || fallbackField;
   }
 });
 });

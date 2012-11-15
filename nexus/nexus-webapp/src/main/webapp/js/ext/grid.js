@@ -13,7 +13,6 @@
 /*global define*/
 define('ext/grid',
       [
-        'ext/grid/checkcolumn',
-        'ext/grid/gridview'
+        'ext/grid/checkcolumn'
       ],
       function() {});
