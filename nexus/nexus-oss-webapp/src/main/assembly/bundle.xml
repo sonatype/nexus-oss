@@ -35,6 +35,7 @@
         <exclude>**/nexus</exclude>
         <exclude>**/*.bat</exclude>
         <exclude>**/wrapper*</exclude>
+        <exclude>**/.placeholder</exclude>
       </excludes>
     </fileSet>
 
