@@ -96,9 +96,6 @@ public class JerseyNexusClientFactory
         config.getSingletons().add( new XStreamXmlProvider( xstream, APPLICATION_XML_UTF8_TYPE ) );
         // set _real_ URL for baseUrl, and not a redirection (typically http instead of https)
         config.getProperties().put( ApacheHttpClient4Config.PROPERTY_FOLLOW_REDIRECTS, Boolean.FALSE );
-        config.getProperties().put(
-            ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER, new ThreadSafeClientConnManager(  )
-        );
         applyAuthenticationIfAny( connectionInfo, config );
         applyProxyIfAny( connectionInfo, config );
 
