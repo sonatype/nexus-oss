@@ -236,7 +236,14 @@ public abstract class NexusRunningITSupport
      */
     private void logRemoteThatTestIs( final String doingWhat )
     {
-        logRemoteThatTestIs( remoteLogger(), doingWhat );
+        try
+        {
+            logRemoteThatTestIs( remoteLogger(), doingWhat );
+        }
+        catch ( final Exception e )
+        {
+            logger.warn( "Failed to log remote that test was '{}' ({})", doingWhat, e.getMessage() );
+        }
     }
 
     private void startNexus( final NexusBundle nexusBundle )
