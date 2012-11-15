@@ -29,8 +29,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusRequestResource;
@@ -90,19 +90,22 @@ public class CapabilityStatusPlexusResource
         final CapabilityStatusRequestResource envelope = (CapabilityStatusRequestResource) payload;
         try
         {
-            final CapabilityReference reference = capabilityRegistry.get( capabilityId );
-            if ( reference == null )
+            CapabilityReference reference;
+
+            try
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, String.format(
-                    "Cannot find a capability with specified if of %s", capabilityId ) );
+                if ( envelope.getData().isEnabled() )
+                {
+                    reference = capabilityRegistry.enable( capabilityId );
+                }
+                else
+                {
+                    reference = capabilityRegistry.disable( capabilityId );
+                }
             }
-            if ( envelope.getData().isEnabled() )
+            catch ( CapabilityNotFoundException e )
             {
-                capabilityRegistry.enable( capabilityId );
-            }
-            else
-            {
-                capabilityRegistry.disable( capabilityId );
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
 
             return asCapabilityStatusResponseResource(
@@ -110,15 +113,11 @@ public class CapabilityStatusPlexusResource
                 request.getResourceRef().toString()
             );
         }
-        catch ( final InvalidConfigurationException e )
-        {
-            handleConfigurationException( e );
-            return null;
-        }
         catch ( final IOException e )
         {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                                         "Could not manage capabilities configuration persistence store" );
+            throw new ResourceException(
+                Status.SERVER_ERROR_INTERNAL, "Could not manage capabilities configuration persistence store"
+            );
         }
     }
 

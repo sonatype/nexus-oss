@@ -35,13 +35,16 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.configuration.DefaultConfigurationIdGenerator;
+import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -67,6 +70,9 @@ public class DefaultCapabilityRegistryTest
 {
 
     static final CapabilityType CAPABILITY_TYPE = capabilityType( "test" );
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Mock
     private EventBus eventBus;
@@ -176,9 +182,9 @@ public class DefaultCapabilityRegistryTest
         throws Exception
     {
         underTest.add( CAPABILITY_TYPE, true, null, null );
-        final CapabilityReference reference1 = underTest.remove( capabilityIdentity( "foo" ) );
 
-        assertThat( reference1, is( nullValue() ) );
+        thrown.expect( CapabilityNotFoundException.class );
+        underTest.remove( capabilityIdentity( "foo" ) );
     }
 
     /**

@@ -32,7 +32,6 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -41,6 +40,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
@@ -50,6 +50,7 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -133,10 +134,7 @@ public class DefaultCapabilityRegistry
                 descriptor.version(), generatedId, type, enabled, notes, props
             ) );
 
-            getLogger().debug(
-                "Added capability '{}' of type '{}' with properties '{}'",
-                new Object[]{ generatedId, type, props }
-            );
+            getLogger().debug( "Added capability '{}' of type '{}' with properties '{}'", generatedId, type, props );
 
             final DefaultCapabilityReference reference = create( generatedId, type, descriptor );
 
@@ -180,9 +178,9 @@ public class DefaultCapabilityRegistry
             );
 
             getLogger().debug(
-                "Updated capability '{}' of type '{}' with properties '{}'",
-                new Object[]{ id, reference.type(), props }
+                "Updated capability '{}' of type '{}' with properties '{}'", id, reference.type(), props
             );
+
             if ( reference.isEnabled() && !enabled )
             {
                 reference.disable();
@@ -211,6 +209,8 @@ public class DefaultCapabilityRegistry
         {
             lock.writeLock().lock();
 
+            validateId( id );
+
             capabilityStorage.remove( id );
             getLogger().debug( "Removed capability with '{}'", id );
 
@@ -229,7 +229,7 @@ public class DefaultCapabilityRegistry
 
     @Override
     public CapabilityReference enable( final CapabilityIdentity id )
-        throws InvalidConfigurationException, IOException
+        throws IOException
     {
         try
         {
@@ -239,7 +239,14 @@ public class DefaultCapabilityRegistry
 
             final DefaultCapabilityReference reference = get( id );
 
-            return update( reference.context().id(), true, reference.notes(), reference.properties() );
+            try
+            {
+                return update( reference.context().id(), true, reference.notes(), reference.properties() );
+            }
+            catch ( InvalidConfigurationException e )
+            {
+                throw new RuntimeException( "Unexpected", e );
+            }
         }
         finally
         {
@@ -249,7 +256,7 @@ public class DefaultCapabilityRegistry
 
     @Override
     public CapabilityReference disable( final CapabilityIdentity id )
-        throws InvalidConfigurationException, IOException
+        throws IOException
     {
         try
         {
@@ -259,7 +266,14 @@ public class DefaultCapabilityRegistry
 
             final DefaultCapabilityReference reference = get( id );
 
-            return update( reference.context().id(), false, reference.notes(), reference.properties() );
+            try
+            {
+                return update( reference.context().id(), false, reference.notes(), reference.properties() );
+            }
+            catch ( InvalidConfigurationException e )
+            {
+                throw new RuntimeException( "Unexpected", e );
+            }
         }
         finally
         {
@@ -437,18 +451,11 @@ public class DefaultCapabilityRegistry
     }
 
     private void validateId( final CapabilityIdentity id )
-        throws InvalidConfigurationException
+        throws CapabilityNotFoundException
     {
-        final ValidationResponse vr = new ValidationResponse();
-
         if ( get( id ) == null )
         {
-            vr.addValidationError( new ValidationMessage( "*", "Capability with id '" + id + "' does not exist" ) );
-        }
-
-        if ( vr.getValidationErrors().size() > 0 )
-        {
-            throw new InvalidConfigurationException( vr );
+            throw new CapabilityNotFoundException( id );
         }
     }
 

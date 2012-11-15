@@ -32,7 +32,7 @@ public interface CapabilityRegistry
      * @param enabled    whether or not created capability should be enabled
      * @param notes      optional capability notes (can be null)
      * @param properties optional capability properties (can be null)
-     * @return reference to created capability
+     * @return reference to created capability (never null)
      * @throws InvalidConfigurationException If validation failed
      * @throws IOException                   If capabilities could not be stored
      */
@@ -49,47 +49,49 @@ public interface CapabilityRegistry
      * @param enabled    whether or not updated capability should be enabled
      * @param notes      optional capability notes (can be null)
      * @param properties optional capability properties (can be null)
-     * @return reference to updated capability
+     * @return reference to updated capability (never null)
      * @throws InvalidConfigurationException If validation failed
      * @throws IOException                   If capabilities could not be stored
+     * @throws CapabilityNotFoundException   If capability with specified id does not exist
      */
     CapabilityReference update( CapabilityIdentity id,
                                 boolean enabled,
                                 String notes,
                                 Map<String, String> properties )
-        throws InvalidConfigurationException, IOException;
+        throws InvalidConfigurationException, IOException, CapabilityNotFoundException;
 
     /**
      * Removes a capability.
      *
      * @param id of capability to be removed
-     * @return reference of removed capability
-     * @throws IOException If capabilities could not be stored
+     * @return reference of removed capability (never null)
+     * @throws IOException                 If capabilities could not be stored
+     * @throws CapabilityNotFoundException If capability with specified id does not exist
      */
     CapabilityReference remove( CapabilityIdentity id )
-        throws IOException;
+        throws IOException, CapabilityNotFoundException;
 
     /**
      * Enables a capability.
      *
      * @param id of capability to be enabled
-     * @return reference to enabled capability
-     * @throws InvalidConfigurationException If validation failed
-     * @throws IOException                   If capabilities could not be stored
+     * @return reference to enabled capability (never null)
+     * @throws IOException                 If capabilities could not be stored
+     * @throws CapabilityNotFoundException If capability with specified id does not exist
      */
     CapabilityReference enable( CapabilityIdentity id )
-        throws InvalidConfigurationException, IOException;
+        throws IOException, CapabilityNotFoundException;
 
     /**
      * Disables a capability.
      *
      * @param id of capability to be disabled
      * @return reference to disabled capability
-     * @throws InvalidConfigurationException If validation failed
-     * @throws IOException                   If capabilities could not be stored
+     * @throws IOException                 If capabilities could not be stored
+     * @throws CapabilityNotFoundException If capability with specified id does not exist
      */
     CapabilityReference disable( CapabilityIdentity id )
-        throws InvalidConfigurationException, IOException;
+        throws IOException, CapabilityNotFoundException;
 
     /**
      * Retrieves the capability from registry with specified id. If there is no capability with specified id in the

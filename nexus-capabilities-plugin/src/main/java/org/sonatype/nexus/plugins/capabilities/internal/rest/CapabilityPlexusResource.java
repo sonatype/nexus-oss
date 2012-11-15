@@ -35,6 +35,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
@@ -132,6 +133,10 @@ public class CapabilityPlexusResource
                 createChildReference( request, this, capabilityId.toString() ).toString()
             );
         }
+        catch ( CapabilityNotFoundException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
         catch ( final InvalidConfigurationException e )
         {
             handleConfigurationException( e );
@@ -157,10 +162,15 @@ public class CapabilityPlexusResource
             capabilityRegistry.remove( getCapabilityIdentity( request ) );
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }
+        catch ( CapabilityNotFoundException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
         catch ( final IOException e )
         {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                                         "Could not manage capabilities configuration persistence store" );
+            throw new ResourceException(
+                Status.SERVER_ERROR_INTERNAL, "Could not manage capabilities configuration persistence store"
+            );
         }
     }
 
