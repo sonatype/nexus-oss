@@ -15,10 +15,8 @@ package org.sonatype.nexus.mindexer.client.internal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.sonatype.nexus.client.core.NexusUnexpectedResponseException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.mindexer.client.SearchRequest;
 import org.sonatype.nexus.mindexer.client.SearchResponse;
@@ -30,7 +28,6 @@ import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
 import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
-
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
@@ -95,11 +92,11 @@ public class JerseyMavenIndexer
         }
         catch ( UniformInterfaceException e )
         {
-            throw JerseyNexusClient.convert( e );
+            throw getNexusClient().convert( e );
         }
         catch ( ClientHandlerException e )
         {
-            throw JerseyNexusClient.convert( e );
+            throw getNexusClient().convert( e );
         }
     }
 

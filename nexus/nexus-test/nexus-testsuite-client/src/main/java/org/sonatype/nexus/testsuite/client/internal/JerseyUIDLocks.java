@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.client.internal;
 import static java.lang.String.format;
 
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
-import org.sonatype.nexus.client.rest.jersey.JerseyExceptions;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.testsuite.client.UIDLocks;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -49,11 +48,11 @@ public class JerseyUIDLocks
         }
         catch ( ClientHandlerException e )
         {
-            throw JerseyExceptions.convertAndPropagate( e );
+            throw getNexusClient().convert( e );
         }
         catch ( UniformInterfaceException e )
         {
-            throw JerseyExceptions.convertAndPropagate( e );
+            throw getNexusClient().convert( e );
         }
     }
 

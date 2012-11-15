@@ -13,6 +13,7 @@
 package org.sonatype.nexus.client.rest.jersey;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import javax.ws.rs.core.MediaType;
@@ -26,6 +27,7 @@ import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.exception.NexusClientResponseException;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
+import org.sonatype.nexus.client.internal.msg.ErrorMessage;
 import org.sonatype.nexus.client.internal.msg.ErrorResponse;
 import org.sonatype.nexus.client.internal.rest.AbstractXStreamNexusClient;
 import org.sonatype.nexus.client.internal.util.Check;
@@ -59,9 +61,9 @@ public class JerseyNexusClient
     private final LinkedHashMap<Class<?>, SubsystemFactory<?, JerseyNexusClient>> subsystemFactoryMap;
 
     public JerseyNexusClient( final Condition connectionCondition,
-                              final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories,
-                              final ConnectionInfo connectionInfo, final XStream xstream, final Client client,
-                              final MediaType mediaType )
+        final SubsystemFactory<?, JerseyNexusClient>[] subsystemFactories,
+        final ConnectionInfo connectionInfo, final XStream xstream, final Client client,
+        final MediaType mediaType )
     {
         super( connectionInfo, xstream );
         this.client = Check.notNull( client, Client.class );
@@ -243,10 +245,18 @@ public class JerseyNexusClient
             }
             if ( errorResponse != null )
             {
+                // convert them to hide stupid "old" REST model, and not have it leak out
+                final ArrayList<NexusClientErrorResponseException.ErrorMessage> errors =
+                    new ArrayList<NexusClientErrorResponseException.ErrorMessage>( errorResponse.getErrors().size() );
+                for ( ErrorMessage message : errorResponse.getErrors() )
+                {
+                    errors.add(
+                        new NexusClientErrorResponseException.ErrorMessage( message.getId(), message.getMsg() ) );
+                }
                 return new NexusClientErrorResponseException(
                     response.getClientResponseStatus().getReasonPhrase(),
                     body,
-                    errorResponse
+                    errors
                 );
             }
         }
