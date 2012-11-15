@@ -309,7 +309,6 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
                         break;
                     }
                 }
-              alert('clipEl.width: ' + width + '\nclipEl.height: ' + height);
                 this.clipEl.setSize(width, height);
             }
         }
