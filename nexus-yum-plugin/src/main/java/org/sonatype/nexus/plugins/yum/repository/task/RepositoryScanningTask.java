@@ -115,7 +115,7 @@ public class RepositoryScanningTask
     @Override
     protected String getMessage()
     {
-        return "Scanning repository" + mavenRepositoryInfo.getRepository();
+        return "Scanning repository [" + mavenRepositoryInfo.getRepository() +"]";
     }
 
     public MavenRepositoryInfo getMavenRepositoryInfo()

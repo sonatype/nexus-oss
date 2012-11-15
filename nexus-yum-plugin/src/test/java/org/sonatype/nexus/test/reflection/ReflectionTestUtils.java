@@ -15,10 +15,14 @@ package org.sonatype.nexus.test.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import com.google.common.base.Throwables;
+
 public class ReflectionTestUtils
 {
     public static void setField( Object obj, String fieldName, Object value )
     {
+        boolean found = false;
+
         Class<?> clazz = obj.getClass();
         while ( !Object.class.equals( clazz ) )
         {
@@ -27,15 +31,20 @@ public class ReflectionTestUtils
                 Field decField = clazz.getDeclaredField( fieldName );
                 decField.setAccessible( true );
                 decField.set( obj, value );
-                return;
+
+                found = true;
             }
             catch ( Exception e )
             {
+                // try on super
             }
             clazz = clazz.getSuperclass();
         }
 
-        throw new NoSuchFieldError( fieldName );
+        if ( !found )
+        {
+            throw new NoSuchFieldError( fieldName );
+        }
     }
 
     public static Method findMethod( Class<?> clazz, String name, Class<?>... parameterTypes )

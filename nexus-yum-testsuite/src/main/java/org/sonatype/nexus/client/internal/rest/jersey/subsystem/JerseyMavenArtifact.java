@@ -28,12 +28,8 @@ import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
 import org.sonatype.nexus.client.core.subsystem.artifact.UploadRequest;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
-import org.sonatype.nexus.client.core.subsystem.repository.Repository;
-import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.ArtifactCoordinate;
-import org.sonatype.nexus.rest.model.RepositoryResource;
-
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.FormDataMultiPart;
@@ -48,7 +44,8 @@ public class JerseyMavenArtifact
 
     private final Repositories repositories;
 
-    public JerseyMavenArtifact( final JerseyNexusClient nexusClient, final ArtifactMaven artifactMaven,
+    public JerseyMavenArtifact( final JerseyNexusClient nexusClient,
+                                final ArtifactMaven artifactMaven,
                                 final Repositories repositories )
     {
         super( nexusClient );
@@ -61,7 +58,8 @@ public class JerseyMavenArtifact
     {
         final FormDataMultiPart entity = createEntity( req );
         final ClientResponse response =
-            getNexusClient().serviceResource( "artifact/maven/content" ).type( addBoundary( MULTIPART_FORM_DATA_TYPE ) ).accept(
+            getNexusClient().serviceResource( "artifact/maven/content" ).type(
+                addBoundary( MULTIPART_FORM_DATA_TYPE ) ).accept(
                 TEXT_HTML ).post( ClientResponse.class, entity );
 
         final String content = response.getEntity( String.class );
@@ -72,21 +70,21 @@ public class JerseyMavenArtifact
         }
 
         throw new ClientHandlerException( "Upload failed due to status code " + response.getStatus() + ".\nResponse: "
-            + content );
+                                              + content );
     }
 
     @Override
     public void delete( ResolveRequest req )
     {
-
-        final Repository<MavenHostedRepository, RepositoryResource> repository =
-            repositories.get( req.getRepositoryId() );
         final ResolveResponse resolvedArtifact = artifactMaven.resolve( req );
         if ( resolvedArtifact == null )
         {
             throw new IllegalArgumentException( "Could not find artifact for given request." );
         }
-        final String urlToDelete = repository.settings().getContentResourceURI() + resolvedArtifact.getRepositoryPath();
+
+        final String urlToDelete = repositories.get( req.getRepositoryId() ).contentUri()
+            + resolvedArtifact.getRepositoryPath();
+
         getNexusClient().getClient().resource( urlToDelete ).accept( getNexusClient().getMediaType() ).delete();
     }
 
@@ -110,14 +108,15 @@ public class JerseyMavenArtifact
         if ( req.isHasPom() )
         {
             entity.field( "hasPom", "true" ).field( "c", defaultIfEmpty( req.getClassifier(), "" ) ).field( "e",
-                req.getExtension() ).bodyPart(
+                                                                                                            req.getExtension() ).bodyPart(
                 new FileDataBodyPart( "file", req.getPomFile(), APPLICATION_OCTET_STREAM_TYPE ) );
         }
         else
         {
-            entity.field( "g", req.getGroupId() ).field( "a", req.getArtifactId() ).field( "v", req.getVersion() ).field(
+            entity.field( "g", req.getGroupId() ).field( "a", req.getArtifactId() ).field( "v",
+                                                                                           req.getVersion() ).field(
                 "p", req.getPackaging() ).field( "c", defaultIfEmpty( req.getClassifier(), "" ) ).field( "e",
-                req.getExtension() );
+                                                                                                         req.getExtension() );
         }
         entity.bodyPart( new FileDataBodyPart( "file", req.getFile(), APPLICATION_OCTET_STREAM_TYPE ) );
         return entity;

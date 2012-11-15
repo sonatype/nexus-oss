@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.AbstractSchedulerTest;
 import org.sonatype.nexus.plugins.yum.repository.utils.RepositoryTestUtils;
 
@@ -39,7 +39,7 @@ public class YumRepositoryGeneratorJobTest
         + VERSION;
 
     @Requirement
-    private YumConfiguration yumConfig;
+    private YumPluginConfiguration yumConfig;
 
     @Override
     public void setUp()

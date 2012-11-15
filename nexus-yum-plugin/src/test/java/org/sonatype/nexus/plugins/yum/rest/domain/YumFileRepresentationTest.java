@@ -13,6 +13,8 @@
 package org.sonatype.nexus.plugins.yum.rest.domain;
 
 import static org.junit.Assert.assertEquals;
+import static org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase.UTIL;
+
 import java.io.File;
 import org.junit.Test;
 import org.restlet.data.MediaType;
@@ -49,6 +51,6 @@ public class YumFileRepresentationTest
     private YumFileRepresentation createRepresentation( String filename )
     {
         return new YumFileRepresentation( new UrlPathInterpretation( null, filename, false ), new YumRepository(
-            new File( "." ), null, null ) );
+            UTIL.getBaseDir(), null, null ) );
     }
 }

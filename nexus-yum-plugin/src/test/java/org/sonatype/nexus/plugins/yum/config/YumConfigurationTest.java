@@ -76,7 +76,7 @@ public class YumConfigurationTest
     private static final String MYREPO_ID = "releases";
 
     @Inject
-    private YumConfiguration yumConfiguration;
+    private YumPluginConfiguration yumConfiguration;
 
     @Inject
     private NexusConfiguration nexusConfiguration;
@@ -180,7 +180,7 @@ public class YumConfigurationTest
         File tmpDir = createTmpDir();
         assertThat( new File( tmpDir, YUM_XML ).exists(), is( FALSE ) );
 
-        DefaultYumConfiguration yumConfigurationHandler = new DefaultYumConfiguration();
+        DefaultYumPluginConfiguration yumConfigurationHandler = new DefaultYumPluginConfiguration();
         yumConfigurationHandler.setNexusConfiguration( createNexusConfig( tmpDir ) );
         yumConfigurationHandler.load();
         assertThat( new File( tmpDir, YUM_XML ).exists(), is( TRUE ) );
@@ -191,9 +191,9 @@ public class YumConfigurationTest
         throws Exception
     {
         // given
-        final DefaultYumConfiguration config = new DefaultYumConfiguration();
+        final DefaultYumPluginConfiguration config = new DefaultYumPluginConfiguration();
         final NexusConfiguration nexusConfig = mock( NexusConfiguration.class );
-        when( nexusConfig.getConfigurationDirectory() ).thenReturn( new File( "target/test-classes/config/empty" ) );
+        when( nexusConfig.getConfigurationDirectory() ).thenReturn( UTIL.resolveFile( "target/test-classes/config/empty" ) );
         setField( config, "nexusConfiguration", nexusConfig );
         // when
         config.load();

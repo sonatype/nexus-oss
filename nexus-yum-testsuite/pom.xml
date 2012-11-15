@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2012 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
 <!-- Sonatype Nexus (TM) Open Source Version Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions. This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0, which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html. 
   Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -13,16 +27,10 @@
 
   <artifactId>nexus-yum-testsuite</artifactId>
 
-  <name>Nexus Yum :: Testsuite</name>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-testsuite-support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-testsuite-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.yum</groupId>
@@ -39,65 +47,34 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <testResources>
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-      <testResource>
-        <directory>${project.basedir}/src/test/filtered-resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-    </testResources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-plugin-bundle</id>
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-yum-plugin</artifactId>
-                  <version>${project.version}</version>
-                  <type>zip</type>
-                  <classifier>bundle</classifier>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                  <destFileName>plugin.zip</destFileName>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <profiles>
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
 
 

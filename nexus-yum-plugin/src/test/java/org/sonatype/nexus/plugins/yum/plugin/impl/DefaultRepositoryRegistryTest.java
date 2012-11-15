@@ -15,30 +15,28 @@ package org.sonatype.nexus.plugins.yum.plugin.impl;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
-
 import javax.inject.Inject;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.yum.AbstractRepositoryTester;
-import org.sonatype.nexus.plugins.yum.plugin.RepositoryRegistry;
+import org.sonatype.nexus.plugins.yum.plugin.YumRepositories;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
-
 import com.google.code.tempusfugit.temporal.Condition;
 
 public class DefaultRepositoryRegistryTest
     extends AbstractRepositoryTester
 {
+
     private static final String REPO_ID = "rpm-snapshots";
 
     @Inject
-    private RepositoryRegistry repositoryRegistry;
+    private YumRepositories repositoryRegistry;
 
     @Inject
     private NexusScheduler nexusScheduler;
@@ -49,7 +47,9 @@ public class DefaultRepositoryRegistryTest
     {
         final MavenRepository repository = mock( MavenRepository.class );
         when( repository.getId() ).thenReturn( REPO_ID );
-        when( repository.getLocalUrl() ).thenReturn( new File( ".", "target/test-classes/repo" ).toURI().toString() );
+        when( repository.getLocalUrl() ).thenReturn(
+            UTIL.resolveFile( "target/test-classes/repo" ).toURI().toString()
+        );
 
         repositoryRegistry.registerRepository( repository );
         waitForAllTasksToBeDone();
@@ -72,6 +72,7 @@ public class DefaultRepositoryRegistryTest
         extends ArrayList<Event<?>>
         implements EventListener
     {
+
         @Override
         public void onEvent( Event<?> evt )
         {

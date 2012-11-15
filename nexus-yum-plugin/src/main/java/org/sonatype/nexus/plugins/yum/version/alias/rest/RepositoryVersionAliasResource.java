@@ -28,7 +28,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.version.alias.AliasNotFoundException;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -60,7 +60,7 @@ public class RepositoryVersionAliasResource
     public static final String RESOURCE_URI = "/" + URL_PREFIX + "/{" + REPOSITORY_ID_PARAM + "}/{" + ALIAS_PARAM + "}";
 
     @Inject
-    private YumConfiguration aliasMapper;
+    private YumPluginConfiguration aliasMapper;
 
     public RepositoryVersionAliasResource()
     {

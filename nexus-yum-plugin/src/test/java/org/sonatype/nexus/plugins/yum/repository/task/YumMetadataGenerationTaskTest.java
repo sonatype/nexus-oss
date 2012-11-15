@@ -20,6 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.yum.AbstractYumNexusTestCase.UTIL;
 import static org.sonatype.nexus.plugins.yum.repository.task.YumMetadataGenerationTask.ID;
 import static org.sonatype.nexus.test.reflection.ReflectionTestUtils.setField;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -43,10 +44,12 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @SuppressWarnings( "unchecked" )
 public class YumMetadataGenerationTaskTest
 {
+
     private static final String ANOTHER_REPO = "repo2";
 
     private static final String ANOTHER_VERSION = "version2";
@@ -61,7 +64,7 @@ public class YumMetadataGenerationTaskTest
 
     private static final String RPM_URL = BASE_URL + "/content/repositories/" + REPO;
 
-    private static final File RPM_DIR = new File( "." );
+    private static final File RPM_DIR = UTIL.getBaseDir();
 
     @Test
     public void shouldNotExecuteIfOperateOnSameRepository()
@@ -69,7 +72,7 @@ public class YumMetadataGenerationTaskTest
     {
         YumMetadataGenerationTask task = task( REPO, NO_VERSION );
         assertFalse( task.allowConcurrentExecution( createMap( scheduledTask( task ),
-            scheduledTask( REPO, NO_VERSION, RUNNING ) ) ) );
+                                                               scheduledTask( REPO, NO_VERSION, RUNNING ) ) ) );
     }
 
     @Test
@@ -78,7 +81,7 @@ public class YumMetadataGenerationTaskTest
     {
         YumMetadataGenerationTask task = task( REPO, VERSION );
         assertFalse( task.allowConcurrentExecution( createMap( scheduledTask( task ),
-            scheduledTask( REPO, VERSION, RUNNING ) ) ) );
+                                                               scheduledTask( REPO, VERSION, RUNNING ) ) ) );
     }
 
     @Test
@@ -87,7 +90,7 @@ public class YumMetadataGenerationTaskTest
     {
         YumMetadataGenerationTask task = task( REPO, VERSION );
         assertTrue( task.allowConcurrentExecution( createMap( scheduledTask( task ),
-            scheduledTask( REPO, ANOTHER_VERSION, RUNNING ) ) ) );
+                                                              scheduledTask( REPO, ANOTHER_VERSION, RUNNING ) ) ) );
     }
 
     @Test
@@ -96,7 +99,7 @@ public class YumMetadataGenerationTaskTest
     {
         YumMetadataGenerationTask task = task( REPO, NO_VERSION );
         assertTrue( task.allowConcurrentExecution( createMap( scheduledTask( task ),
-            scheduledTask( ANOTHER_REPO, NO_VERSION, RUNNING ) ) ) );
+                                                              scheduledTask( ANOTHER_REPO, NO_VERSION, RUNNING ) ) ) );
     }
 
     @Test
@@ -104,8 +107,12 @@ public class YumMetadataGenerationTaskTest
         throws Exception
     {
         // given
-        YumMetadataGenerationTask task = new YumMetadataGenerationTask();
-        setField( task, "repositoryRegistry", repoRegistry() );
+        YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+            mock( EventBus.class ),
+            repoRegistry(),
+            mock( YumPluginConfiguration.class ),
+            mock( RepositoryURLBuilder.class )
+        );
         task.setRpmDir( RPM_DIR.getAbsolutePath() );
         task.setRpmUrl( RPM_URL );
         // when
@@ -120,7 +127,12 @@ public class YumMetadataGenerationTaskTest
         throws Exception
     {
         // given
-        YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+        YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+            mock( EventBus.class ),
+            repoRegistry(),
+            mock( YumPluginConfiguration.class ),
+            repositoryURLBuilder()
+        );
         task.setRepositoryId( REPO );
         setField( task, "repositoryRegistry", repoRegistry() );
         setField( task, "repositoryURLBuilder", repositoryURLBuilder() );
@@ -191,7 +203,7 @@ public class YumMetadataGenerationTaskTest
         task.setAddedFiles( null );
         task.setSingleRpmPerDirectory( true );
 
-        final YumConfiguration yumConfig = mock( YumConfiguration.class );
+        final YumPluginConfiguration yumConfig = mock( YumPluginConfiguration.class );
         when( yumConfig.getMaxParallelThreadCount() ).thenReturn( 10 );
         setField( task, "yumConfig", yumConfig );
         return task;

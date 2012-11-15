@@ -21,7 +21,7 @@
 		<role>
 			<id>nexus-yum-user</id>
 			<name>Nexus Yum Reader</name>
-			<description>Gives access to read versionized yum repositories</description>
+			<description>Gives access to read versioned yum repositories</description>
 			<sessionTimeout>60</sessionTimeout>
 			<privileges>
 				<privilege>yum-repository-read</privilege>
@@ -30,7 +30,7 @@
         <role>
           <id>nexus-yum-admin</id>
           <name>Nexus Yum Admin</name>
-          <description>Gives access to read versionized yum repositories and administrate version aliases</description>
+          <description>Gives access to read versioned yum repositories and administrate version aliases</description>
           <sessionTimeout>60</sessionTimeout>
           <privileges>
             <privilege>yum-repository-read</privilege>
@@ -43,8 +43,8 @@
         <privilege>
             <id>yum-repository-read</id>
             <type>method</type>
-            <name>Yum Versionized Repositories - (read)</name>
-            <description>Give permission to read versionized repositories.</description>
+            <name>Yum Versioned Repositories - (read)</name>
+            <description>Give permission to read versioned repositories.</description>
             <properties>
                 <property>
                     <key>method</key>
@@ -52,7 +52,7 @@
                 </property>
                 <property>
                     <key>permission</key>
-                    <value>nexus:yumVersionizedRepositories</value>
+                    <value>nexus:yumVersionedRepositories</value>
                 </property>
             </properties>
         </privilege>

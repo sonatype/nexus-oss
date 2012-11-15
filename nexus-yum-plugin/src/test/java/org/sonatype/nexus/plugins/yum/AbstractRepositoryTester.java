@@ -22,7 +22,6 @@ import static org.sonatype.scheduling.TaskState.RUNNING;
 import java.io.File;
 import java.util.List;
 import java.util.Map.Entry;
-
 import javax.inject.Inject;
 
 import org.junit.After;
@@ -35,12 +34,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
-
 import com.google.code.tempusfugit.temporal.Condition;
 
 public abstract class AbstractRepositoryTester
     extends AbstractYumNexusTestCase
 {
+
     private static final String SNAPSHOTS = "snapshots";
 
     @Inject
@@ -89,11 +88,20 @@ public abstract class AbstractRepositoryTester
         final RepositoryKind kind = mock( RepositoryKind.class );
         when( kind.isFacetAvailable( MavenHostedRepository.class ) ).thenReturn( isMavenHostedRepository );
 
-        final MavenRepository repository = mock( MavenRepository.class );
+        final MavenHostedRepository repository = mock( MavenHostedRepository.class );
         when( repository.getRepositoryKind() ).thenReturn( kind );
         when( repository.getId() ).thenReturn( repoId );
         when( repository.getProviderRole() ).thenReturn( Repository.class.getName() );
         when( repository.getProviderHint() ).thenReturn( "maven2" );
+
+        if ( isMavenHostedRepository )
+        {
+            when( repository.adaptToFacet( MavenHostedRepository.class ) ).thenReturn( repository );
+        }
+        else
+        {
+            when( repository.adaptToFacet( MavenHostedRepository.class ) ).thenThrow( new ClassCastException() );
+        }
 
         final File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );
         repoDir.mkdirs();

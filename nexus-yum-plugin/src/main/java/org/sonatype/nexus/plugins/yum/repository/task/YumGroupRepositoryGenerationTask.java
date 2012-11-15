@@ -29,7 +29,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.yum.config.YumConfiguration;
+import org.sonatype.nexus.plugins.yum.config.YumPluginConfiguration;
 import org.sonatype.nexus.plugins.yum.execution.CommandLineExecutor;
 import org.sonatype.nexus.plugins.yum.repository.RepositoryUtils;
 import org.sonatype.nexus.plugins.yum.repository.YumRepository;
@@ -55,7 +55,7 @@ public class YumGroupRepositoryGenerationTask
     private GroupRepository groupRepository;
 
     @Requirement
-    private YumConfiguration yumConfig;
+    private YumPluginConfiguration yumConfig;
 
     public void setGroupRepository( GroupRepository groupRepository )
     {

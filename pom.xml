@@ -14,24 +14,17 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.sonatype.nexus.yum</groupId>
   <artifactId>nexus-yum</artifactId>
   <version>2.2-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>Nexus Yum (Parent)</name>
-  <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
-  <url>https://github.com/sonatype/nexus-yum-plugin</url>
 
-  <licenses>
-    <license>
-      <name>Eclipse Public License</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-    </license>
-  </licenses>
+  <packaging>pom</packaging>
+
+  <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
 
   <developers>
     <developer>
@@ -41,24 +34,18 @@
     </developer>
   </developers>
 
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+    </license>
+  </licenses>
+
   <scm>
     <url>scm:git:https://github.com/sonatype/nexus-yum-plugin.git</url>
     <connection>scm:git:https://github.com/sonatype/nexus-yum-plugin.git</connection>
     <developerConnection>scm:git:https://github.com/sonatype/nexus-yum-plugin.git</developerConnection>
   </scm>
-
-  <distributionManagement>
-    <repository>
-      <id>releases</id>
-      <name>Local Repository</name>
-      <url>${nexus.url}/content/repositories/production/</url>
-    </repository>
-    <snapshotRepository>
-      <id>snapshots</id>
-      <name>Local Snapshots</name>
-      <url>${nexus.url}/content/repositories/snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
 
   <modules>
     <module>nexus-yum-plugin</module>
@@ -67,76 +54,48 @@
   </modules>
 
   <properties>
-    <!-- Set the Nexus version here, against which you build the plugin -->
-    <nexus.version>2.2</nexus.version>
-    <nexus-testsuite-support.version>2.2</nexus-testsuite-support.version>
-    <nexus-oss-webapp.version>2.2</nexus-oss-webapp.version>
-    <app.lifecycle.version>1.6</app.lifecycle.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hamcrest.version>1.2.1</hamcrest.version>
-    <jersey.version>1.14</jersey.version>
-    <skip.unittests>false</skip.unittests>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <nexus.version>2.3-SNAPSHOT</nexus.version>
+    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
+
+    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
+
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
+
+    <arguments/>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <!-- This dependency is only needed if you want to include REST Resources -->
+
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-rest-api</artifactId>
         <version>${nexus.version}</version>
       </dependency>
 
-      <!-- Basic testing -->
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.10</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-test-api</artifactId>
-        <version>${nexus.version}</version>
-        <scope>test</scope>
-      </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-utils</artifactId>
         <version>${nexus.version}</version>
-        <scope>test</scope>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-support</artifactId>
-        <version>${nexus-testsuite-support.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-testsuite-client</artifactId>
-        <version>${nexus-testsuite-support.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
 
-      <!-- #ITSet BEGINS -->
-      <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
-      <!-- There are plugins connected to this dependency, see below! -->
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-test-harness-launcher</artifactId>
-        <scope>test</scope>
-        <version>${nexus.version}</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>maven-toolchain</artifactId>
-            <groupId>org.apache.maven</groupId>
-          </exclusion>
-          <exclusion>
-            <artifactId>testng</artifactId>
-            <groupId>org.testng</groupId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.sonatype.sisu.litmus</groupId>
+        <artifactId>litmus-testsupport</artifactId>
+        <version>1.5-SNAPSHOT</version>
       </dependency>
-      <!-- #ITSet ENDS -->
 
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -155,34 +114,19 @@
         <version>1.1</version>
         <scope>test</scope>
       </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-library</artifactId>
-        <version>${hamcrest.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <version>${hamcrest.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>1.9.0</version>
-        <scope>test</scope>
-      </dependency>
+
       <dependency>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-multipart</artifactId>
-        <version>${jersey.version}</version>
+        <version>1.12</version>
       </dependency>
+
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
         <version>1.4.1</version>
       </dependency>
+
       <!-- Pure Java RPM-library -->
       <dependency>
         <groupId>org.redline-rpm</groupId>
@@ -191,24 +135,68 @@
         <scope>test</scope>
       </dependency>
 
+      <dependency>
+        <groupId>${it.nexus.bundle.groupId}</groupId>
+        <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+        <version>${it.nexus.bundle.version}</version>
+        <type>zip</type>
+        <classifier>bundle</classifier>
+      </dependency>
+
       <!-- Internal Dependencies -->
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
-        <version>${project.version}</version>
-        <type>nexus-plugin</type>
+        <version>2.2-SNAPSHOT</version>
+        <type>${nexus.plugin.type}</type>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.yum</groupId>
         <artifactId>nexus-yum-testhelper</artifactId>
-        <version>${project.version}</version>
+        <version>2.2-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+    </testResources>
+
     <pluginManagement>
       <plugins>
+        <!--
+          To perform a release run separately
+          mvn release:prepare -Darguments="-Pquick"
+          mvn release:perform
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.2.1</version>
+          <configuration>
+            <autoVersionSubmodules>true</autoVersionSubmodules>
+            <useReleaseProfile>false</useReleaseProfile>
+            <goals>deploy</goals>
+            <!-- Use a quick build to verify the tag, and a full build with ITs for the deploy -->
+            <arguments>${arguments}</arguments>
+            <releaseProfiles>release</releaseProfiles>
+            <tagNameFormat>nexus-yum-plugin-@{version}</tagNameFormat>
+          </configuration>
+        </plugin>
         <!-- Have to set source level to Java 6, we use annotations ;-) -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -219,29 +207,98 @@
           </configuration>
         </plugin>
 
-        <!-- Fork Tests because of problems with Sisu-Guice-Version -->
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.9</version>
+          <version>2.12</version>
           <configuration>
-            <skip>${skip.unittests}</skip>
-            <forkMode>always</forkMode>
-            <threadCount>1</threadCount>
+            <failIfNoTests>false</failIfNoTests>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <!-- force use of property -->
+            <forkMode>once</forkMode>
+            <argLine>-ea</argLine>
+            <workingDirectory>${project.build.directory}</workingDirectory>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+            </systemPropertyVariables>
+            <excludes>
+              <exclude>**/Abstract*.java</exclude>
+              <exclude>**/Test*.java</exclude>
+            </excludes>
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
           </configuration>
         </plugin>
-        
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.9</version>
+          <version>2.12</version>
+          <configuration>
+            <failIfNoTests>false</failIfNoTests>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <!--
+            For each test, so that we can use the process timeout.
+            forkMode=always will cause duplicate "T E S T S" header to be rendered :-(
+            -->
+            <forkMode>always</forkMode>
+            <argLine>-ea</argLine>
+            <workingDirectory>${project.build.directory}</workingDirectory>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+            </systemPropertyVariables>
+          </configuration>
         </plugin>
-        
+
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.3</version>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <version>1.9.0</version>
+          <configuration>
+            <header>header-eplv1.txt</header>
+            <encoding>UTF-8</encoding>
+            <strictCheck>true</strictCheck>
+            <useDefaultExcludes>false</useDefaultExcludes>
+            <includes>
+              <include>**/*.java</include>
+              <include>**/*.vm</include>
+              <include>**/*.xml</include>
+              <include>**/*.groovy</include>
+              <include>**/*.aj</include>
+              <include>**/*.css</include>
+              <include>**/*.html</include>
+              <include>**/*.js</include>
+            </includes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <!-- grid makes this directory -->
+              <exclude>.maven/**</exclude>
+              <!-- eclipse makes this directory -->
+              <exclude>**/.settings/**</exclude>
+              <!-- netbeans adds these -->
+              <exclude>**/nbactions*.xml</exclude>
+              <exclude>**/nb-configuration.xml</exclude>
+              <!-- IntelliJ IDEA project directory-->
+              <exclude>**/.idea/**</exclude>
+              <!-- IT resources -->
+              <exclude>**/it-resources/**</exclude>
+            </excludes>
+            <mapping>
+              <vm>XML_STYLE</vm>
+              <groovy>JAVADOC_STYLE</groovy>
+              <aj>JAVADOC_STYLE</aj>
+            </mapping>
+            <properties>
+              <year>2012</year>
+            </properties>
+            <!-- this is important for multi-module project -->
+            <aggregate>true</aggregate>
+          </configuration>
+          <goals>
+            <goal>check</goal>
+          </goals>
         </plugin>
-      
+
         <!-- Make project M2e friendly -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
@@ -271,5 +328,28 @@
 
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+
   </build>
+
+  <profiles>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <profile>
+      <id>idea</id>
+      <properties>
+        <nexusPluginType>jar</nexusPluginType>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>
