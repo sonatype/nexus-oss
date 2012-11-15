@@ -14,6 +14,7 @@ package org.sonatype.nexus.integrationtests.nexus4066;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.sonatype.nexus.test.utils.TaskScheduleUtil.newProperty;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -130,8 +131,10 @@ public class Nexus4066TaskMutualExclusionIT
     {
         final String taskName = "SleepRepositoryTask_" + repo + "_" + System.nanoTime();
         TaskScheduleUtil.runTask( taskName, "SleepRepositoryTask", 0,
-            TaskScheduleUtil.newProperty( "repositoryId", repo ),
-            TaskScheduleUtil.newProperty( "time", String.valueOf( 50 ) ) );
+            newProperty( "repositoryId", repo ),
+            newProperty( "time", String.valueOf( 50 ) ),
+            newProperty( "cancellable", Boolean.toString( true ) )
+        );
 
         Thread.sleep( 2000 );
 
