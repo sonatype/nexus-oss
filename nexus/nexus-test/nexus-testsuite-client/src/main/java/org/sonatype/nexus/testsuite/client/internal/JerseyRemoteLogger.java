@@ -73,7 +73,8 @@ public class JerseyRemoteLogger
         {
             getNexusClient()
                 .serviceResource( "loghelper", queryParams )
-                .get( ClientResponse.class );
+                .get( ClientResponse.class )
+                .close();
         }
         catch ( UniformInterfaceException e )
         {
