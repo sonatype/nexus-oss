@@ -303,7 +303,7 @@ public class JerseyNexusClient
         throw new NexusClientHandlerException( e );
     }
 
-    public static String getResponseBody( final ClientResponse response )
+    public String getResponseBody( final ClientResponse response )
     {
         try
         {
