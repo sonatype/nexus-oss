@@ -46,7 +46,9 @@ public class ConditionsIT
     {
         final String rId = repositoryIdForTest();
 
-        final MavenHostedRepository repository = repositories().create( MavenHostedRepository.class, rId ).save();
+        final MavenHostedRepository repository = repositories().create( MavenHostedRepository.class, rId )
+            .excludeFromSearchResults()
+            .save();
 
         CapabilityListItemResource capability = capabilities().add(
             capability().withTypeId( "[repositoryIsInService]" )
@@ -75,6 +77,7 @@ public class ConditionsIT
         final String rId = repositoryIdForTest();
 
         final MavenHostedRepository repository = repositories().create( MavenHostedRepository.class, rId )
+            .excludeFromSearchResults()
             .save()
             .putOutOfService();
 
@@ -99,8 +102,12 @@ public class ConditionsIT
         final String rIdActive = repositoryIdForTest( "active" );
         final String rIdInactive = repositoryIdForTest( "inactive" );
 
-        repositories().create( MavenHostedRepository.class, rIdActive ).save();
-        repositories().create( MavenHostedRepository.class, rIdInactive ).save().putOutOfService();
+        repositories().create( MavenHostedRepository.class, rIdActive )
+            .excludeFromSearchResults()
+            .save();
+        repositories().create( MavenHostedRepository.class, rIdInactive )
+            .excludeFromSearchResults()
+            .save().putOutOfService();
 
         CapabilityListItemResource capability = capabilities().add(
             capability().withTypeId( "[repositoryIsInService]" )
@@ -211,6 +218,7 @@ public class ConditionsIT
         final String rId = repositoryIdForTest();
 
         final MavenHostedRepository repository = repositories().create( MavenHostedRepository.class, rId )
+            .excludeFromSearchResults()
             .save()
             .putOutOfService();
 
