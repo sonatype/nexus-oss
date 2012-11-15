@@ -37,6 +37,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.TieredMergePolicy;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -48,6 +50,7 @@ import org.apache.maven.index.ArtifactContextProducer;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.ArtifactInfoPostprocessor;
+import org.apache.maven.index.DefaultScannerListener;
 import org.apache.maven.index.Field;
 import org.apache.maven.index.FlatSearchRequest;
 import org.apache.maven.index.FlatSearchResponse;
@@ -123,8 +126,6 @@ import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
 import com.google.common.annotations.VisibleForTesting;
-
-import copied.org.apache.maven.index.DefaultScannerListener;
 
 /**
  * <p>
@@ -426,9 +427,41 @@ public class DefaultIndexerManager
         else
         {
             // add context for repository
-            ctx =
-                mavenIndexer.addIndexingContextForced( getContextId( repository.getId() ), repository.getId(),
-                                                       repoRoot, indexDirectory, null, null, indexCreators );
+            try
+            {
+                ctx = new DefaultIndexingContext( getContextId( repository.getId() ), // id
+                                                  repository.getId(), // repositoryId
+                                                  repoRoot, // repository
+                                                  indexDirectory, // indexDirectoryFile
+                                                  null, // repositoryUrl
+                                                  null, // indexUpdateUrl
+                                                  indexCreators, //
+                                                  true // reclaimIndex
+                    )
+                    {
+                        @Override
+                        protected IndexWriterConfig getWriterConfig()
+                        {
+                            final IndexWriterConfig writerConfig = super.getWriterConfig();
+
+                            // NEXUS-5380 force use of compound lucene index file to postpone "Too many open files"
+
+                            final TieredMergePolicy mergePolicy = new TieredMergePolicy();
+                            mergePolicy.setUseCompoundFile( true );
+                            mergePolicy.setNoCFSRatio( 1.0 );
+
+                            writerConfig.setMergePolicy( mergePolicy );
+
+                            return writerConfig;
+                        }
+                    };
+                mavenIndexer.addIndexingContext( ctx );
+            }
+            catch ( UnsupportedExistingLuceneIndexException e )
+            {
+                // this will never happen because reclaimIndex=true
+                throw new IOException( e );
+            }
         }
         ctx.setSearchable( repository.isSearchable() );
 
