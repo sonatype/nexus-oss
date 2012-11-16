@@ -63,6 +63,10 @@ public class YumImpl
 
     private final Repository repository;
 
+    private boolean processDeletes;
+
+    private long deleteProcessingDelay;
+
     private final File baseDir;
 
     private final Set<String> versions = new HashSet<String>();
@@ -89,6 +93,9 @@ public class YumImpl
         this.executor = executor;
         this.repository = repository;
 
+        this.processDeletes = true;
+        this.deleteProcessingDelay = DEFAULT_DELETE_PROCESSING_DELAY;
+
         this.baseDir = RepositoryUtils.getBaseDir( repository );
     }
 
@@ -98,6 +105,32 @@ public class YumImpl
     public Set<String> getVersions()
     {
         return versions;
+    }
+
+    @Override
+    public Yum setProcessDeletes( final boolean processDeletes )
+    {
+        this.processDeletes = processDeletes;
+        return this;
+    }
+
+    @Override
+    public Yum setDeleteProcessingDelay( final long numberOfSeconds )
+    {
+        this.deleteProcessingDelay = numberOfSeconds;
+        return this;
+    }
+
+    @Override
+    public boolean shouldProcessDeletes()
+    {
+        return processDeletes;
+    }
+
+    @Override
+    public long deleteProcessingDelay()
+    {
+        return deleteProcessingDelay;
     }
 
     @Override
@@ -255,7 +288,7 @@ public class YumImpl
     @Override
     public void deleteRpm( String path )
     {
-        if ( yumConfig.isDeleteProcessing() )
+        if ( shouldProcessDeletes() )
         {
             if ( findDelayedParentDirectory( path ) == null )
             {
@@ -268,7 +301,7 @@ public class YumImpl
     @Override
     public void deleteDirectory( String path )
     {
-        if ( yumConfig.isDeleteProcessing() )
+        if ( shouldProcessDeletes() )
         {
             if ( findDelayedParentDirectory( path ) == null )
             {
@@ -279,7 +312,7 @@ public class YumImpl
 
     private void schedule( DelayedDirectoryDeletionTask task )
     {
-        final ScheduledFuture<?> future = executor.schedule( task, yumConfig.getDelayAfterDeletion(), SECONDS );
+        final ScheduledFuture<?> future = executor.schedule( task, deleteProcessingDelay(), SECONDS );
         taskMap.put( future, task );
         reverseTaskMap.put( task, future );
     }

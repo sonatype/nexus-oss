@@ -155,13 +155,6 @@ public class YumPluginConfigurationImpl
     }
 
     @Override
-    public boolean isRepositoryOfRepositoryVersionsActive()
-    {
-        checkForUpdates();
-        return xmlYumConfiguration.isRepositoryOfRepositoryVersionsActive();
-    }
-
-    @Override
     public YumConfiguration getXmlYumConfiguration()
     {
         checkForUpdates();
@@ -207,36 +200,6 @@ public class YumPluginConfigurationImpl
                 aliasMap.put( aliasMapping.getAliasKey(), aliasMapping.getVersion() );
             }
         }
-    }
-
-    @Override
-    public boolean isDeleteProcessing()
-    {
-        checkForUpdates();
-        return xmlYumConfiguration.isDeleteProcessing();
-    }
-
-    @Override
-    public void setDeleteProcessing( boolean active )
-    {
-        final YumConfiguration newConfig = new YumConfiguration( xmlYumConfiguration );
-        newConfig.setDeleteProcessing( active );
-        saveConfig( newConfig );
-    }
-
-    @Override
-    public long getDelayAfterDeletion()
-    {
-        checkForUpdates();
-        return xmlYumConfiguration.getDelayAfterDeletion();
-    }
-
-    @Override
-    public void setDelayAfterDeletion( long timeout )
-    {
-        final YumConfiguration newConfig = new YumConfiguration( xmlYumConfiguration );
-        newConfig.setDelayAfterDeletion( timeout );
-        saveConfig( newConfig );
     }
 
     @Override

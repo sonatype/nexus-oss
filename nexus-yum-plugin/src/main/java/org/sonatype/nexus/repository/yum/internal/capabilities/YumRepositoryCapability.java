@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Map;
 import javax.inject.Inject;
@@ -26,6 +27,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import com.google.common.base.Throwables;
 
@@ -88,6 +90,10 @@ public class YumRepositoryCapability
         throws Exception
     {
         configuration = createConfiguration( context().properties() );
+        if ( isConfigured() )
+        {
+            configureYum( service.get( configuration.repository() ) );
+        }
     }
 
     @Override
@@ -103,7 +109,7 @@ public class YumRepositoryCapability
         try
         {
             final Repository repository = repositoryRegistry.getRepository( configuration.repository() );
-            service.register( repository.adaptToFacet( MavenRepository.class ) );
+            configureYum( service.register( repository.adaptToFacet( MavenRepository.class ) ) );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -150,6 +156,14 @@ public class YumRepositoryCapability
     private boolean isConfigured()
     {
         return configuration != null;
+    }
+
+    private void configureYum( final Yum yum )
+    {
+        checkNotNull( yum );
+        checkState( isConfigured() );
+        yum.setProcessDeletes( configuration.shouldProcessDeletes() );
+        yum.setDeleteProcessingDelay( configuration.deleteProcessingDelay() );
     }
 
     private YumRepositoryCapabilityConfiguration createConfiguration( final Map<String, String> properties )

@@ -13,13 +13,16 @@
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+import static org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityConfiguration.DELETE_PROCESSING;
 import static org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityConfiguration.REPOSITORY_ID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -48,13 +51,22 @@ public class YumRepositoryCapabilityDescriptor
         super(
             TYPE,
             "Yum Repository capability",
-            "Automatically generates Yum repositories"
-                + "<br/>\n"
-                + "<br/>\n"
-                + "<span style=\"font-weight: bold;\">EXPERIMENTAL</span>\n"
-                + "<br/>"
-                + "This is an experimental, unsupported feature.",
-            new RepoOrGroupComboFormField( REPOSITORY_ID, FormField.MANDATORY )
+            "Automatically generates Yum repositories.",
+            new RepoOrGroupComboFormField( REPOSITORY_ID, FormField.MANDATORY ),
+            new CheckboxFormField(
+                DELETE_PROCESSING,
+                "Process deletes",
+                "Check if removing an RPM from this repository should regenerate Yum repository"
+                    + " (default true)",
+                FormField.OPTIONAL
+            ),
+            new NumberTextFormField(
+                YumRepositoryCapabilityConfiguration.DELETE_PROCESSING_DELAY,
+                "Delete process delay",
+                "Number of seconds to wait before regenerating Yum repository when an RPM is removed"
+                    + " (default 10 seconds)",
+                FormField.OPTIONAL
+            )
         );
         this.validators = validators;
     }

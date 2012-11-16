@@ -22,6 +22,16 @@ import org.sonatype.scheduling.ScheduledTask;
 public interface Yum
 {
 
+    public static final long DEFAULT_DELETE_PROCESSING_DELAY = 10;
+
+    Yum setProcessDeletes( boolean processDeletes );
+
+    Yum setDeleteProcessingDelay( final long numberOfSeconds );
+
+    boolean shouldProcessDeletes();
+
+    long deleteProcessingDelay();
+
     File getBaseDir();
 
     Set<String> getVersions();

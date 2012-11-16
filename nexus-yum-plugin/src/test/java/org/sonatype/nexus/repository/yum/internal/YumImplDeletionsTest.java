@@ -64,8 +64,6 @@ public class YumImplDeletionsTest
     {
         final YumPluginConfiguration config = mock( YumPluginConfiguration.class );
         when( config.isActive() ).thenReturn( true );
-        when( config.isDeleteProcessing() ).thenReturn( true );
-        when( config.getDelayAfterDeletion() ).thenReturn( TIMEOUT_IN_SEC );
 
         repository = mock( Repository.class );
         when( repository.getId() ).thenReturn( REPO_ID );
@@ -79,7 +77,8 @@ public class YumImplDeletionsTest
         yum = new YumImpl(
             mock( RepositoryURLBuilder.class ), nexusScheduler, config, new ScheduledThreadPoolExecutor( 10 ),
             repository
-        );
+        ).setProcessDeletes( true )
+        .setDeleteProcessingDelay( TIMEOUT_IN_SEC );
     }
 
     @Test

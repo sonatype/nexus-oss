@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 
+import org.sonatype.nexus.repository.yum.Yum;
 import com.google.common.collect.Maps;
 
 /**
@@ -28,12 +29,38 @@ public class YumRepositoryCapabilityConfiguration
 
     public static final String REPOSITORY_ID = "repository";
 
+    public static final String DELETE_PROCESSING = "deleteProcessing";
+
+    public static final String DELETE_PROCESSING_DELAY = "deleteProcessingDelay";
+
     private String repository;
+
+    private boolean processDeletes;
+
+    private long deleteProcessingDelay;
 
     public YumRepositoryCapabilityConfiguration( final Map<String, String> properties )
     {
         checkNotNull( properties );
         this.repository = properties.get( REPOSITORY_ID );
+
+        boolean processDeletes = true;
+        if ( properties.containsKey( DELETE_PROCESSING ) )
+        {
+            processDeletes = Boolean.parseBoolean( DELETE_PROCESSING );
+        }
+        this.processDeletes = processDeletes;
+
+        long deleteProcessingDelay = Yum.DEFAULT_DELETE_PROCESSING_DELAY;
+        try
+        {
+            deleteProcessingDelay = Long.parseLong( properties.get( DELETE_PROCESSING_DELAY ) );
+        }
+        catch ( NumberFormatException e )
+        {
+            // will use default
+        }
+        this.deleteProcessingDelay = deleteProcessingDelay;
     }
 
     public String repository()
@@ -41,16 +68,22 @@ public class YumRepositoryCapabilityConfiguration
         return repository;
     }
 
-    public YumRepositoryCapabilityConfiguration setRepository( final String repository )
+    public long deleteProcessingDelay()
     {
-        this.repository = repository;
-        return this;
+        return deleteProcessingDelay;
+    }
+
+    public boolean shouldProcessDeletes()
+    {
+        return processDeletes;
     }
 
     public Map<String, String> asMap()
     {
         final Map<String, String> props = Maps.newHashMap();
         props.put( REPOSITORY_ID, repository );
+        props.put( DELETE_PROCESSING, String.valueOf( processDeletes ) );
+        props.put( DELETE_PROCESSING_DELAY, String.valueOf( deleteProcessingDelay ) );
         return props;
     }
 

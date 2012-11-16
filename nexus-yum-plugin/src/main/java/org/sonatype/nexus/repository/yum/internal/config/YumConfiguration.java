@@ -29,10 +29,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class YumConfiguration
 {
 
-    protected static final int DEFAULT_DELAY_AFTER_DELETION_IN_SEC = 10;
-
-    protected static final boolean DEFAULT_DELETE_PROCESSING = true;
-
     protected static final int DEFAULT_TIMEOUT_IN_SEC = 120;
 
     protected static final boolean DEFAULT_REPOSITORY_OF_REPOSITORY_VERSIONS = true;
@@ -49,10 +45,6 @@ public class YumConfiguration
     @XmlElementWrapper
     private Set<AliasMapping> aliasMappings = new LinkedHashSet<AliasMapping>();
 
-    private boolean deleteProcessing = DEFAULT_DELETE_PROCESSING;
-
-    private long delayAfterDeletion = DEFAULT_DELAY_AFTER_DELETION_IN_SEC;
-
     private int maxParallelThreadCount = DEFAULT_MAX_PARALLEL_THREAD_COUNT;
 
     public YumConfiguration()
@@ -66,8 +58,6 @@ public class YumConfiguration
         repositoryCreationTimeout = other.getRepositoryCreationTimeout();
         repositoryOfRepositoryVersionsActive = other.isRepositoryOfRepositoryVersionsActive();
         aliasMappings = other.getAliasMappings();
-        deleteProcessing = other.isDeleteProcessing();
-        delayAfterDeletion = other.getDelayAfterDeletion();
         maxParallelThreadCount = other.getMaxParallelThreadCount();
     }
 
@@ -165,26 +155,6 @@ public class YumConfiguration
     public void setRepositoryOfRepositoryVersionsActive( boolean repositoryOfRepositoryVersionsActive )
     {
         this.repositoryOfRepositoryVersionsActive = repositoryOfRepositoryVersionsActive;
-    }
-
-    public boolean isDeleteProcessing()
-    {
-        return deleteProcessing;
-    }
-
-    public void setDeleteProcessing( boolean deleteProcessing )
-    {
-        this.deleteProcessing = deleteProcessing;
-    }
-
-    public long getDelayAfterDeletion()
-    {
-        return delayAfterDeletion;
-    }
-
-    public void setDelayAfterDeletion( long delayAfterDeletion )
-    {
-        this.delayAfterDeletion = delayAfterDeletion;
     }
 
     public int getMaxParallelThreadCount()

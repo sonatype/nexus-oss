@@ -36,16 +36,6 @@ public interface YumPluginConfiguration
 
     public void setRepositoryOfRepositoryVersionsActive( boolean active );
 
-    public boolean isRepositoryOfRepositoryVersionsActive();
-
-    public boolean isDeleteProcessing();
-
-    public void setDeleteProcessing( boolean active );
-
-    public long getDelayAfterDeletion();
-
-    public void setDelayAfterDeletion( long timeout );
-
     public File getBaseTempDir();
 
     public int getMaxParallelThreadCount();
