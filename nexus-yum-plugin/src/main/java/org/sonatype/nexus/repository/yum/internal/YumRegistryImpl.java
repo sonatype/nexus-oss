@@ -23,14 +23,10 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.task.RepositoryScanningTask;
-import org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
 
 @Named
 @Singleton
@@ -62,7 +58,7 @@ public class YumRegistryImpl
             final Yum yum = yumFactory.create( repository );
             yums.put( repository.getId(), yum );
 
-            LOG.debug( "Marked repository as RPM-repository : {}", repository.getId() );
+            LOG.info( "Registered repository '{}' as Yum repository", repository.getId() );
 
             runScanningTask( yum );
 
@@ -74,7 +70,13 @@ public class YumRegistryImpl
     @Override
     public Yum unregister( final String repositoryId )
     {
-        return yums.remove( repositoryId );
+        final Yum yum = yums.remove( repositoryId );
+        if ( yum != null )
+        {
+            LOG.info( "Unregistered repository '{}' as Yum repository", repositoryId );
+        }
+        return yum;
+
     }
 
     @Override
