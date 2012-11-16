@@ -131,14 +131,8 @@ Ext.extend(Nexus.ext.TwinPanelController, Ext.Panel, {
           }
           if (moveAll)
           {
-            for (i = 0; i < fromRoot.childNodes.length; i=i+1)
-            {
-              node = fromRoot.childNodes[i];
-              if (checkIfDragAllowed(node))
-              {
-                toRoot.appendChild(node);
-                i = i-1;
-              }
+            while (fromRoot.firstChild) {
+              toRoot.appendChild(fromRoot.firstChild);
             }
           }
           else
@@ -152,7 +146,6 @@ Ext.extend(Nexus.ext.TwinPanelController, Ext.Panel, {
                 if (checkIfDragAllowed(node))
                 {
                   toRoot.appendChild(node);
-                  i = i-1;
                 }
               }
             }
