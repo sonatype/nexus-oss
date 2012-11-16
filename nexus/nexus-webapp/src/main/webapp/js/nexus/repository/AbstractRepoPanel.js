@@ -10,65 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*
- * Repository panel superclass
- */
-define('repoServer/AbstractRepoPanel',['sonatype/all'], function(){
+
+/*global define*/
+define('nexus/repository/AbstractRepoPanel',['extjs', 'sonatype/all', 'nexus', 'nexus/repository/action'], function(Ext, Sonatype, Nexus, Action){
 
 /*
+ * Repository panel superclass
+ *
  * config options: { id: the is of this panel instance [required] title: title
  * of this panel (shows in tab) }
  */
-
-/*global Ext, Sonatype, Nexus*/
 Sonatype.repoServer.AbstractRepoPanel = function(cfg) {
   var
         config = cfg || {},
         defaultConfig = {},
-        sp = Sonatype.lib.Permissions,
-        Action;
+        sp = Sonatype.lib.Permissions;
 
   Ext.apply(this, config, defaultConfig);
 
   this.ctxRecord = null;
   this.reposGridPanel = null;
-
-  Action = function(cfg) {
-    var
-          _action = this,
-          conditions = [];
-
-    if ( cfg.condition )
-    {
-      conditions.push(cfg.condition);
-    }
-
-    this.maybeAddToMenu = function(menu, repo, content) {
-      if ( _action.isApplicable(repo, content) ) {
-        menu.add(cfg.action);
-      }
-    };
-
-    this.addCondition = function(condition) {
-      if ( typeof(condition) === 'function' ) {
-        conditions.push(condition);
-      } else {
-        Nexus.log('Tried to add non-function condition, ignoring');
-      }
-    };
-
-    this.isApplicable = function(repo, content) {
-      var i, condition;
-      for( i = 0; i < conditions.length; i = i+1 )
-      {
-        condition = conditions[i];
-        if ( !condition(repo, content) ) {
-          return false;
-        }
-      }
-      return true;
-    };
-  };
 
   this.repoActions = {
     downloadRemoteItem : new Action({
@@ -189,13 +150,15 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         return this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection();
       },
 
+  /*
       viewHandler : function() {
         if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection())
         {
-          var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
+          var rec = this.ctxRecord || this.reposGridPanel.getSelectionModel().getSelected();
           this.viewRepo(rec);
         }
       },
+      */
 
       repoActionAjaxSuccessHandler : function(response, options) {
         var statusResp = Ext.decode(response.responseText);
@@ -310,7 +273,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         }
 
         var
-              remoteStatus = ('' + status.remoteStatus).toLowerCase(),
+              remoteStatus = (String(status.remoteStatus)).toLowerCase(),
               sOut = (status.localStatus === 'IN_SERVICE') ? 'In Service' : 'Out of Service';
 
         if (parent.repoType === 'proxy')
@@ -341,6 +304,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       },
 
       updateRepoStatuses : function(status, rec) {
+        var i, status2, rec2;
         rec.beginEdit();
         rec.data.status = status;
         rec.set('displayStatus', this.statusConverter(status, rec.data));
@@ -349,10 +313,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
         if (status.dependentRepos)
         {
-          for (var i = 0; i < status.dependentRepos.length; i++)
+          for (i = 0; i < status.dependentRepos.length; i+=1)
           {
-            var status2 = status.dependentRepos[i];
-            var rec2 = rec.store.getById(Sonatype.config.host + Sonatype.config.repos.urls.repositories + '/' + status2.id);
+            status2 = status.dependentRepos[i];
+            rec2 = rec.store.getById(Sonatype.config.host + Sonatype.config.repos.urls.repositories + '/' + status2.id);
             if (rec2)
             {
               rec2.beginEdit();
@@ -448,10 +412,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
               repo = repoRecord.data,
               actions = this.repoActions;
 
-        if (contentRecord.data.resourceURI == null)
-        {
-          contentRecord.data.resourceURI = contentRecord.data.id;
-        }
+        contentRecord.data.resourceURI = contentRecord.data.resourceURI || contentRecord.data.id;
 
         actions.clearCache.maybeAddToMenu(menu, repo, contentRecord);
         actions.rebuildMetadata.maybeAddToMenu(menu, repo, contentRecord);
