@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Ve
 public class NexusMergeOperation
     implements MetadataOperation
 {
+
     private Metadata sourceMetadata;
 
     private Version sourceModelVersion;
@@ -116,13 +117,15 @@ public class NexusMergeOperation
             && !sourceMetadata.getGroupId().equals( targetMetadata.getGroupId() ) )
         {
             throw new MetadataException( "Could not merge metadata with different groupId: '"
-                + sourceMetadata.getGroupId() + "' and '" + targetMetadata.getGroupId() + "'" );
+                                             + sourceMetadata.getGroupId() + "' and '" + targetMetadata.getGroupId()
+                                             + "'" );
         }
         if ( sourceMetadata.getArtifactId() != null && targetMetadata.getArtifactId() != null
             && !sourceMetadata.getArtifactId().equals( targetMetadata.getArtifactId() ) )
         {
             throw new MetadataException( "Could not merge metadata with different artifactId: '"
-                + sourceMetadata.getArtifactId() + "' and '" + targetMetadata.getArtifactId() + "'" );
+                                             + sourceMetadata.getArtifactId() + "' and '"
+                                             + targetMetadata.getArtifactId() + "'" );
         }
 
         // versioning
@@ -151,17 +154,17 @@ public class NexusMergeOperation
                     {
                         timestamp =
                             Long.parseLong( targetMetadata.getVersioning().getSnapshot().getTimestamp().replace( ".",
-                                "" ) );
+                                                                                                                 "" ) );
                     }
                     catch ( NumberFormatException e )
                     {
                     }
                 }
 
+                long sourceTimestamp = -1;
+
                 if ( sourceSnapshot.getTimestamp() != null )
                 {
-                    long sourceTimestamp = -1;
-
                     try
                     {
                         sourceTimestamp = Long.parseLong( sourceSnapshot.getTimestamp().replace( ".", "" ) );
@@ -169,13 +172,24 @@ public class NexusMergeOperation
                     catch ( NumberFormatException e )
                     {
                     }
+                }
 
-                    if ( sourceTimestamp > timestamp )
-                    {
-                        ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceModelVersion,
-                            sourceSnapshot.getTimestamp().replace( ".", "" ), sourceSnapshot,
-                            sourceMetadata.getVersioning().getSnapshotVersions() ) ) );
-                    }
+                // set snapshot element if source has it, and if target either does not have it, or is older
+                if ( sourceTimestamp != -1 && ( timestamp == -1 || ( timestamp < sourceTimestamp ) ) )
+                {
+                    // set Snapshot and add extras
+                    ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceModelVersion,
+                                                                            sourceMetadata.getVersioning().getLastUpdated(),
+                                                                            sourceSnapshot,
+                                                                            sourceMetadata.getVersioning().getSnapshotVersions() ) ) );
+                }
+                else
+                {
+                    // do not set Snapshot and add extras
+                    ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceModelVersion,
+                                                                            sourceMetadata.getVersioning().getLastUpdated(),
+                                                                            null,
+                                                                            sourceMetadata.getVersioning().getSnapshotVersions() ) ) );
                 }
             }
         }
@@ -198,7 +212,7 @@ public class NexusMergeOperation
         if ( data == null || !( data instanceof MetadataOperand ) )
         {
             throw new MetadataException( "Operand is not correct: expected MetadataOperand, but got "
-                + ( data == null ? "null" : data.getClass().getName() ) );
+                                             + ( data == null ? "null" : data.getClass().getName() ) );
 
         }
 
