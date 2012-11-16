@@ -18,7 +18,10 @@ import static org.junit.Assert.assertThat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.client.core.exception.NexusClientResponseException;
 import org.sonatype.nexus.client.core.subsystem.security.User;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
 import org.sonatype.nexus.repository.yum.client.Yum;
@@ -36,34 +39,44 @@ public class SecurityIT
 
     private static final String PASSWORD = "yum123";
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     public SecurityIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
 
-    @Test( expected = UniformInterfaceException.class )
+    @Test
     public void shouldNotHaveReadAccessToAliasesForAnonymous()
         throws Exception
     {
         final String alias = uniqueName();
         yum().createOrUpdateAlias( REPO, alias, VERSION );
+
+        thrown.expect( NexusClientResponseException.class );
+        thrown.expectMessage( "401" );
         createNexusClientForAnonymous( nexus() ).getSubsystem( Yum.class ).getAliasVersion( REPO, alias );
     }
 
-    @Test( expected = UniformInterfaceException.class )
+    @Test
     public void shouldNotCreateAliasForAnonymous()
         throws Exception
     {
+        thrown.expect( NexusClientResponseException.class );
+        thrown.expectMessage( "401" );
         createNexusClientForAnonymous( nexus() ).getSubsystem( Yum.class )
             .createOrUpdateAlias( REPO, uniqueName(), VERSION );
     }
 
-    @Test( expected = UniformInterfaceException.class )
+    @Test
     public void shouldNotHaveUpdateAccessToAliasesForAnonymous()
         throws Exception
     {
         final String alias = uniqueName();
         yum().createOrUpdateAlias( REPO, alias, VERSION );
+        thrown.expect( NexusClientResponseException.class );
+        thrown.expectMessage( "401" );
         createNexusClientForAnonymous( nexus() ).getSubsystem( Yum.class )
             .createOrUpdateAlias( REPO, alias, "3.2.1" );
     }

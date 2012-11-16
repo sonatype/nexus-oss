@@ -24,6 +24,7 @@ import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.repository.yum.client.MetadataType;
 import org.sonatype.nexus.repository.yum.client.Yum;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
@@ -43,55 +44,109 @@ public class JerseyYum
     @Override
     public String getAliasVersion( String repositoryId, String alias )
     {
-        return getNexusClient().serviceResource( getUrlPath( repositoryId, alias ) ).get( String.class );
+        try
+        {
+            return getNexusClient()
+                .serviceResource( getUrlPath( repositoryId, alias ) )
+                .get( String.class );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
     public void createOrUpdateAlias( String repositoryId, String alias, String version )
     {
-        getNexusClient().serviceResource( getUrlPath( repositoryId, alias ) ).type( TEXT_PLAIN ).post( String.class,
-                                                                                                       version );
+        try
+        {
+            getNexusClient()
+                .serviceResource( getUrlPath( repositoryId, alias ) )
+                .type( TEXT_PLAIN )
+                .post( String.class, version );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
-    public <T> T getMetadata( String repositoryId, MetadataType metadataType, Class<T> returnType )
+    public <T> T getMetadata( final String repositoryId,
+                              final MetadataType metadataType,
+                              final Class<T> returnType )
+        throws IOException
     {
-        final String url = repositories.get( repositoryId ).contentUri() + metadataType.getPath();
-        final ClientResponse clientResponse = getNexusClient().getClient().resource( url ).get( ClientResponse.class );
-        return handleResponse( clientResponse, returnType, metadataType.getCompression() );
+        try
+        {
+            return handleResponse(
+                getNexusClient().getClient()
+                    .resource( repositories.get( repositoryId ).contentUri() + metadataType.getPath() )
+                    .get( ClientResponse.class ),
+                returnType,
+                metadataType.getCompression()
+            );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
-    public <T> T getMetadata( String repositoryId, String version, MetadataType metadataType, Class<T> returnType )
+    public <T> T getMetadata( final String repositoryId,
+                              final String version,
+                              final MetadataType metadataType,
+                              final Class<T> returnType )
+        throws IOException
     {
-        final String url = "yum/repos/" + repositoryId + "/" + version + metadataType.getPath();
-        final ClientResponse clientResponse = getNexusClient().serviceResource( url ).get( ClientResponse.class );
-        return handleResponse( clientResponse, returnType, metadataType.getCompression() );
+        try
+        {
+            return handleResponse(
+                getNexusClient().serviceResource( "yum/repos/" + repositoryId + "/" + version + metadataType.getPath() )
+                    .get( ClientResponse.class ),
+                returnType,
+                metadataType.getCompression()
+            );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     private <T> T handleResponse( final ClientResponse clientResponse,
                                   final Class<T> returnType,
                                   final CompressionType compression )
+        throws IOException
     {
         try
         {
             if ( clientResponse.getStatus() < 300 )
             {
-                try
-                {
-                    clientResponse.setEntityInputStream(
-                        new CompressionAdapter( compression ).adapt( clientResponse.getEntityInputStream() )
-                    );
-                }
-                catch ( IOException e )
-                {
-                    throw new RuntimeException( "Could not decompress response.", e );
-                }
+                clientResponse.setEntityInputStream(
+                    new CompressionAdapter( compression ).adapt( clientResponse.getEntityInputStream() )
+                );
                 return clientResponse.getEntity( returnType );
             }
-            throw new UniformInterfaceException(
-                "Could not get yum metatdata. Status: " + clientResponse.getStatus(), clientResponse
-            );
+            throw getNexusClient().convert( new UniformInterfaceException( clientResponse ) );
         }
         finally
         {

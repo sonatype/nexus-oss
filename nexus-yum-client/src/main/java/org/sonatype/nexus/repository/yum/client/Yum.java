@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.yum.client;
 
+import java.io.IOException;
+
 /**
  * Interface to access nexus-yum-plugin functionality in tests
  *
@@ -46,7 +48,8 @@ public interface Yum
      * @return the content of the metadata file. If the file is gzipped or bzipped the returning content is uncompressed
      *         automatically
      */
-    <T> T getMetadata( String repositoryId, MetadataType metadataType, Class<T> returnType );
+    <T> T getMetadata( String repositoryId, MetadataType metadataType, Class<T> returnType )
+        throws IOException;
 
     /**
      * Retrieves the given metadata type (primary.xml, repomd.xml, etc.) from the repository and version
@@ -57,6 +60,7 @@ public interface Yum
      * @return the content of the metadata file. If the file is gzipped or bzipped the returning content is uncompressed
      *         automatically
      */
-    <T> T getMetadata( String repositoryId, String version, MetadataType metadataType, Class<T> returnType );
+    <T> T getMetadata( String repositoryId, String version, MetadataType metadataType, Class<T> returnType )
+        throws IOException;
 
 }
