@@ -25,7 +25,6 @@ import org.sonatype.nexus.client.core.exception.NexusClientResponseException;
 import org.sonatype.nexus.client.core.subsystem.security.User;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
 import org.sonatype.nexus.repository.yum.client.Yum;
-import com.sun.jersey.api.client.UniformInterfaceException;
 
 public class SecurityIT
     extends YumRepositoryITSupport

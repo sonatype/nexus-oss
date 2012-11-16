@@ -13,8 +13,6 @@
 package org.sonatype.nexus.repository.yum;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.scheduling.ScheduledTask;
 
 public interface YumRegistry
 {
