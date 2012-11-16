@@ -37,7 +37,7 @@ public class StopMonitorCommand
     @Override
     public boolean execute()
     {
-        log.info( "Requesting monitor stop" );
+        log.debug( "Requesting monitor stop" );
         return true;
     }
 

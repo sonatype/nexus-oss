@@ -87,7 +87,7 @@ public class CommandMonitorThread
     @Override
     public void run()
     {
-        log.info( "Listening for commands: {}", socket );
+        log.debug( "Listening for commands: {}", socket );
 
         boolean running = true;
         while ( running )
@@ -131,7 +131,7 @@ public class CommandMonitorThread
             // ignore
         }
 
-        log.info( "Stopped" );
+        log.debug( "Stopped" );
     }
 
     /**

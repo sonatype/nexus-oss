@@ -48,7 +48,7 @@ public class StopApplicationCommand
     @Override
     public boolean execute()
     {
-        log.info( "Requesting application stop" );
+        log.debug( "Requesting application stop" );
         shutdown.run();
 
         // Do not terminate the monitor on application stop, leave that to the jvm death
