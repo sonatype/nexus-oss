@@ -15,11 +15,9 @@ package org.sonatype.nexus.repository.yum.internal;
 import javax.inject.Inject;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
@@ -49,25 +47,6 @@ public class EventsRouterTest
     public void reactivateRepo()
     {
         yumConfig.setActive( true );
-    }
-
-    @Test
-    public void shouldRegisterRepository()
-        throws Exception
-    {
-        Repository repo = createRepository( true );
-        handler.on( new RepositoryRegistryEventAdd( null, repo ) );
-        Assert.assertTrue( repositoryRegistry.isRegistered( repo.getId() ) );
-    }
-
-    @Test
-    public void shouldNotRegisterRepository()
-        throws Exception
-    {
-        Repository repo = createRepository( false );
-        repositoryRegistry.unregister( repo.getId() );
-        handler.on( new RepositoryRegistryEventAdd( null, repo ) );
-        Assert.assertFalse( repositoryRegistry.isRegistered( repo.getId() ) );
     }
 
     @Test

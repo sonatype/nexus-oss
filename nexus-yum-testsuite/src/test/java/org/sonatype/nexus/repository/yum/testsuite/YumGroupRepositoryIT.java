@@ -26,8 +26,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
-import org.sonatype.nexus.repository.yum.client.YumGroupRepository;
 import org.sonatype.nexus.test.os.IgnoreOn;
 import org.sonatype.nexus.test.os.OsTestRule;
 
@@ -123,7 +123,7 @@ public class YumGroupRepositoryIT
         return yum().getMetadata( groupRepo.id(), PRIMARY_XML, String.class );
     }
 
-    private YumGroupRepository givenAYumGroupRepoWith2RPMs()
+    private GroupRepository givenAYumGroupRepoWith2RPMs()
         throws Exception
     {
         final MavenHostedRepository repo1 = repositories().create(
@@ -138,7 +138,7 @@ public class YumGroupRepositoryIT
             MavenHostedRepository.class, repositoryIdForTest( "X" )
         ).excludeFromSearchResults().save();
 
-        final YumGroupRepository groupRepo = repositories().create( YumGroupRepository.class, repositoryIdForTest() )
+        final GroupRepository groupRepo = repositories().create( MavenGroupRepository.class, repositoryIdForTest() )
             .ofRepositories( repo1.id(), repo2.id(), repoX.id() )
             .save();
 

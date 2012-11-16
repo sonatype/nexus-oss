@@ -25,15 +25,11 @@ import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.m2yum.M2YumGroupRepository;
 import org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -64,19 +60,9 @@ public class EventsRouter
 
     @AllowConcurrentEvents
     @Subscribe
-    public void on( final RepositoryRegistryEventAdd event )
-    {
-        if ( event.getRepository().getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
-        {
-            yumRegistryProvider.get().register( event.getRepository().adaptToFacet( MavenHostedRepository.class ) );
-        }
-    }
-
-    @AllowConcurrentEvents
-    @Subscribe
     public void on( final RepositoryGroupMembersChangedEvent event )
     {
-        if ( event.getGroupRepository().getRepositoryKind().isFacetAvailable( M2YumGroupRepository.class )
+        if ( yumRegistryProvider.get().isRegistered( event.getGroupRepository().getId() )
             && ( anyOfRepositoriesIsYumEnabled( event.getAddedRepositoryIds() )
             || anyOfRepositoriesIsYumEnabled( event.getRemovedRepositoryIds() )
             || anyOfRepositoriesIsYumEnabled( event.getReorderedRepositoryIds() ) ) )
@@ -141,19 +127,25 @@ public class EventsRouter
         {
             for ( final String repositoryId : repositoryIds )
             {
-                try
+                if ( yumRegistryProvider.get().isRegistered( repositoryId ) )
                 {
-                    final Repository repository = repositoryRegistry.get().getRepository( repositoryId );
-                    if ( repository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class )
-                        // TODO this is suspicious. Should not directly use FS
-                        && new File( RepositoryUtils.getBaseDir( repository ), "repodata/repomd.xml" ).exists() )
+                    final Yum yum = yumRegistryProvider.get().get( repositoryId );
+                    try
                     {
-                        return true;
+                        // TODO this is suspicious. Should not directly use FS
+                        final File repomd = new File(
+                            RepositoryUtils.getBaseDir( yum.getRepository() ), "repodata/repomd.xml"
+                        );
+                        if ( repomd.exists() )
+                        {
+                            return true;
+                        }
                     }
-                }
-                catch ( final Exception e )
-                {
-                    // TODO check if we should silently ignore this
+                    catch ( final Exception e )
+                    {
+                        // TODO check if we should silently ignore this
+                    }
+
                 }
             }
         }

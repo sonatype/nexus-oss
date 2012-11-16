@@ -64,6 +64,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-plugin</artifactId>
+      <type>${nexus.plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-utils</artifactId>
       <scope>test</scope>

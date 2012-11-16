@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.ListFileFactory;
 import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
@@ -47,7 +48,6 @@ import org.sonatype.nexus.repository.yum.internal.RpmListWriter;
 import org.sonatype.nexus.repository.yum.internal.RpmScanner;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
-import org.sonatype.nexus.repository.yum.internal.m2yum.M2YumGroupRepository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -102,6 +102,8 @@ public class YumMetadataGenerationTask
 
     private final NexusScheduler nexusScheduler;
 
+    private final YumRegistry yumRegistry;
+
     @VisibleForTesting
     protected YumMetadataGenerationTask()
     {
@@ -110,16 +112,19 @@ public class YumMetadataGenerationTask
         this.repositoryURLBuilder = null;
         this.scanner = null;
         this.nexusScheduler = null;
+        this.yumRegistry = null;
     }
 
     @Inject
     public YumMetadataGenerationTask( final RepositoryRegistry repositoryRegistry,
+                                      final YumRegistry yumRegistry,
                                       final YumPluginConfiguration yumConfig,
                                       final RepositoryURLBuilder repositoryURLBuilder,
                                       final RpmScanner scanner,
                                       final NexusScheduler nexusScheduler )
     {
         super( null );
+        this.yumRegistry = checkNotNull( yumRegistry );
         this.nexusScheduler = checkNotNull( nexusScheduler );
         this.scanner = checkNotNull( scanner );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
@@ -264,7 +269,7 @@ public class YumMetadataGenerationTask
                 final Repository repository = repositoryRegistry.getRepository( getRepositoryId() );
                 for ( GroupRepository groupRepository : repositoryRegistry.getGroupsOfRepository( repository ) )
                 {
-                    if ( groupRepository.getRepositoryKind().isFacetAvailable( M2YumGroupRepository.class ) )
+                    if ( yumRegistry.isRegistered( repository.getId() ) )
                     {
                         YumGroupRepositoryGenerationTask.createTaskFor( nexusScheduler, groupRepository );
                     }

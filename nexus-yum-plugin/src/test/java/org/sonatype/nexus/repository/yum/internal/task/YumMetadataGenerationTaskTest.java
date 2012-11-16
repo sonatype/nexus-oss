@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.RpmScanner;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
@@ -110,6 +111,7 @@ public class YumMetadataGenerationTaskTest
         // given
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
             repoRegistry(),
+            mock( YumRegistry.class ),
             mock( YumPluginConfiguration.class ),
             mock( RepositoryURLBuilder.class ),
             mock( RpmScanner.class ),
@@ -131,6 +133,7 @@ public class YumMetadataGenerationTaskTest
         // given
         YumMetadataGenerationTask task = new YumMetadataGenerationTask(
             repoRegistry(),
+            mock( YumRegistry.class ),
             mock( YumPluginConfiguration.class ),
             repositoryURLBuilder(),
             mock( RpmScanner.class ),
