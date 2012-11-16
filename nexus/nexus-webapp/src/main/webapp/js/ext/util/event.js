@@ -11,12 +11,22 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/all',
-      ['extjs', 'ext/ux', 'ext/data', 'ext/dd', 'ext/form',
-        'ext/layout', 'ext/lib', 'ext/tree', 'ext/component', 
-        'ext/string', 'ext/tooltip', 'ext/util'],
-      function(Ext) {
-        Ext.BLANK_IMAGE_URL = "ext-3.4.0/resources/images/default/s.gif";
-        return Ext;
-      }
-);
+define('ext/util/event', ['extjs', 'nexus/log', 'nexus/error/ErrorHandler'], function(Ext, Log, ErrorHandler){
+  Ext.util.Event = Ext.extend(Ext.util.Event, {
+    createListener : function() {
+      var
+            listener = Ext.util.Event.superclass.createListener.apply(this, arguments),
+            fireFn = listener.fireFn;
+
+      listener.fireFn = function() {
+        try {
+          return fireFn.apply(this, arguments);
+        } catch(e) {
+          ErrorHandler.handleError(e);
+        }
+      };
+
+      return listener;
+    }
+  });
+});
