@@ -20,7 +20,7 @@ import static org.sonatype.nexus.client.core.subsystem.content.Location.reposito
 import static org.sonatype.nexus.repository.yum.client.MetadataType.PRIMARY_XML;
 
 import org.junit.Test;
-import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 
 public class YumRepositoryIT
     extends YumRepositoryITSupport
@@ -35,9 +35,7 @@ public class YumRepositoryIT
     public void addRpm()
         throws Exception
     {
-        final MavenHostedRepository repository = repositories().create(
-            MavenHostedRepository.class, repositoryIdForTest()
-        ).excludeFromSearchResults().save();
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
 
         content().upload(
             repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
@@ -54,9 +52,7 @@ public class YumRepositoryIT
     public void removeRpm()
         throws Exception
     {
-        final MavenHostedRepository repository = repositories().create(
-            MavenHostedRepository.class, repositoryIdForTest()
-        ).excludeFromSearchResults().save();
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
 
         content().upload(
             repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),

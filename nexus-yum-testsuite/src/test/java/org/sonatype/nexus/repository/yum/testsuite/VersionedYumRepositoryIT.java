@@ -20,7 +20,7 @@ import static org.sonatype.nexus.repository.yum.client.MetadataType.INDEX;
 import static org.sonatype.nexus.repository.yum.client.MetadataType.PRIMARY_XML;
 
 import org.junit.Test;
-import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 
 public class VersionedYumRepositoryIT
     extends YumRepositoryITSupport
@@ -35,8 +35,9 @@ public class VersionedYumRepositoryIT
     public void shouldGenerateVersionedRepoForVersion()
         throws Exception
     {
-        final String repoName = givenRepositoryWithRpm();
-        final String content = yum().getMetadata( repoName, "1.0", PRIMARY_XML, String.class );
+        final Repository repository = givenRepositoryWithOneRpm();
+
+        final String content = yum().getMetadata( repository.id(), "1.0", PRIMARY_XML, String.class );
         assertThat( content, containsString( "test-artifact" ) );
     }
 
@@ -44,9 +45,10 @@ public class VersionedYumRepositoryIT
     public void shouldGenerateVersionedRepoForAlias()
         throws Exception
     {
-        final String repoName = givenRepositoryWithRpm();
-        yum().createOrUpdateAlias( repoName, "alias", "1.0" );
-        final String content = yum().getMetadata( repoName, "alias", PRIMARY_XML, String.class );
+        final Repository repository = givenRepositoryWithOneRpm();
+
+        yum().createOrUpdateAlias( repository.id(), "alias", "1.0" );
+        final String content = yum().getMetadata( repository.id(), "alias", PRIMARY_XML, String.class );
         assertThat( content, containsString( "test-artifact" ) );
     }
 
@@ -54,17 +56,16 @@ public class VersionedYumRepositoryIT
     public void shouldGenerateIndexHtml()
         throws Exception
     {
-        final String repoName = givenRepositoryWithRpm();
-        final String content = yum().getMetadata( repoName, "1.0", INDEX, String.class );
+        final Repository repository = givenRepositoryWithOneRpm();
+
+        final String content = yum().getMetadata( repository.id(), "1.0", INDEX, String.class );
         assertThat( content, containsString( "<a href=\"repodata/\">repodata/</a>" ) );
     }
 
-    private String givenRepositoryWithRpm()
+    private Repository givenRepositoryWithOneRpm()
         throws Exception
     {
-        final MavenHostedRepository repository = repositories().create(
-            MavenHostedRepository.class, repositoryIdForTest()
-        ).excludeFromSearchResults().save();
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
 
         content().upload(
             repositoryLocation( repository.id(), "group/artifact/1.0/artifact-1.0.rpm" ),
@@ -72,6 +73,6 @@ public class VersionedYumRepositoryIT
         );
         sleep( 5, SECONDS );
 
-        return repository.id();
+        return repository;
     }
 }

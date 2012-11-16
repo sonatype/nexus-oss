@@ -26,8 +26,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
-import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepository;
-import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.test.os.IgnoreOn;
 import org.sonatype.nexus.test.os.OsTestRule;
 
@@ -95,9 +94,7 @@ public class YumGroupRepositoryIT
     {
         final GroupRepository groupRepo = givenAYumGroupRepoWith2RPMs();
 
-        final MavenHostedRepository repo3 = repositories().create(
-            MavenHostedRepository.class, repositoryIdForTest( "3" )
-        ).excludeFromSearchResults().save();
+        final Repository repo3 = createYumEnabledRepository( repositoryIdForTest( "3" ) );
 
         content().upload(
             repositoryLocation( repo3.id(), "a_group3/an_artifact3/3.0/an_artifact3-3.0.rpm" ),
@@ -126,21 +123,13 @@ public class YumGroupRepositoryIT
     private GroupRepository givenAYumGroupRepoWith2RPMs()
         throws Exception
     {
-        final MavenHostedRepository repo1 = repositories().create(
-            MavenHostedRepository.class, repositoryIdForTest( "1" )
-        ).excludeFromSearchResults().save();
+        final Repository repo1 = createYumEnabledRepository( repositoryIdForTest( "1" ) );
+        final Repository repo2 = createYumEnabledRepository( repositoryIdForTest( "2" ) );
+        final Repository repoX = createYumEnabledRepository( repositoryIdForTest( "X" ) );
 
-        final MavenHostedRepository repo2 = repositories().create(
-            MavenHostedRepository.class, repositoryIdForTest( "2" )
-        ).excludeFromSearchResults().save();
-
-        final MavenHostedRepository repoX = repositories().create(
-            MavenHostedRepository.class, repositoryIdForTest( "X" )
-        ).excludeFromSearchResults().save();
-
-        final GroupRepository groupRepo = repositories().create( MavenGroupRepository.class, repositoryIdForTest() )
-            .ofRepositories( repo1.id(), repo2.id(), repoX.id() )
-            .save();
+        final GroupRepository groupRepo = createYumEnabledGroupRepository(
+            repositoryIdForTest(), repo1.id(), repo2.id(), repoX.id()
+        );
 
         sleep( 5, SECONDS );
 
