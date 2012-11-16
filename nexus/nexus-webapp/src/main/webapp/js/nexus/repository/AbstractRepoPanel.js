@@ -183,7 +183,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
         Ext.Ajax.request({
               url : url,
-              failure : this.repoActionAjaxFailureHandlerFactory('The server did not clear the repository\'s cache.'),
+              failure : this.repoActionAjaxFailureHandlerFactory("The server did not clear the repository's cache."),
               scope : this,
               method : 'DELETE'
             });
@@ -374,7 +374,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                           options.contentNode.parentNode.removeChild(options.contentNode);
                         },
                         failure : function(response, options) {
-                          Sonatype.MessageBox.alert('Error', response.status === 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
+                          Sonatype.MessageBox.alert('Error', response.status === 401 ? "You don't have permission to delete artifacts in this repository" : "The server did not delete the file/folder from the repository");
                         },
                         scope : this,
                         contentNode : node,
