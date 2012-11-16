@@ -483,7 +483,7 @@ public class DefaultIndexerManager
                 }
                 else
                 {
-                    logger.warn( "Could not remove null indexing context for repository {}", repository.getId() );
+                    logger.debug( "Could not remove null indexing context for repository {}", repository.getId() );
                 }
             }
         } );
