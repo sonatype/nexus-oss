@@ -14,7 +14,7 @@
  * Repository Maintenance panel layout and controller
  */
 
-define('repoServer/RepoMaintPanel',['sonatype/all'], function(){
+define('repoServer/RepoMaintPanel',['sonatype/all', 'nexus/repository/AbstractRepoPanel'], function(Sonatype){
 /*
  * config options: { id: the is of this panel instance [required] title: title
  * of this panel (shows in tab) }
