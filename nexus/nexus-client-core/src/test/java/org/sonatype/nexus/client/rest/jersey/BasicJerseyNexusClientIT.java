@@ -23,11 +23,10 @@ import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.condition.VersionConditions;
 import org.sonatype.nexus.client.rest.BaseUrl;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
-import com.sun.jersey.api.client.ClientHandlerException;
-import junit.framework.Assert;
 import org.sonatype.sisu.litmus.testsupport.group.External;
+import junit.framework.Assert;
 
-@Category(External.class) // This test contacts external servers
+@Category( External.class ) // This test contacts external servers
 public class BasicJerseyNexusClientIT
     extends JerseyNexusClientTestSupport
 {
@@ -78,7 +77,7 @@ public class BasicJerseyNexusClientIT
         }
     }
 
-    @Test( expected = ClientHandlerException.class )
+    @Test( expected = NexusClientHandlerException.class )
     public void createWithWrongBaseUrlNotExists()
         throws MalformedURLException
     {
@@ -87,7 +86,7 @@ public class BasicJerseyNexusClientIT
         factory.createFor( BaseUrl.baseUrlFrom( "https://foobar123.sonatype.org/" ) );
     }
 
-    @Test( expected = ClientHandlerException.class )
+    @Test( expected = NexusClientHandlerException.class )
     public void createWithWrongBaseUrlNotANexus()
         throws MalformedURLException
     {
