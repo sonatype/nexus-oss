@@ -133,5 +133,5 @@ Ext.extend(Sonatype.panels.AutoTabPanel, Ext.Panel, {
       }
     });
 
-
+  return Sonatype.panels.AutoTabPanel;
 });
