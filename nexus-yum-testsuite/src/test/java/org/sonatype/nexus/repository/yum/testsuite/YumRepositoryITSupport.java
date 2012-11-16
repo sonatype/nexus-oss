@@ -80,7 +80,7 @@ public class YumRepositoryITSupport
             .excludeFromSearchResults()
             .save();
 
-        createYumCapabilityFor( repositoryId );
+        createYumRepositoryCapabilityFor( repositoryId );
 
         return repository;
     }
@@ -91,16 +91,25 @@ public class YumRepositoryITSupport
             .ofRepositories( memberIds )
             .save();
 
-        createYumCapabilityFor( repositoryId );
+        createYumGroupCapabilityFor( repositoryId );
 
         return repository;
     }
 
-    private void createYumCapabilityFor( final String repositoryId )
+    private void createYumRepositoryCapabilityFor( final String repositoryId )
     {
         capabilities().add(
             new CapabilityResource()
                 .withTypeId( "yum.repository" )
+                .withProperty( new CapabilityPropertyResource().withKey( "repository" ).withValue( repositoryId ) )
+        );
+    }
+
+    private void createYumGroupCapabilityFor( final String repositoryId )
+    {
+        capabilities().add(
+            new CapabilityResource()
+                .withTypeId( "yum.group" )
                 .withProperty( new CapabilityPropertyResource().withKey( "repository" ).withValue( repositoryId ) )
         );
     }

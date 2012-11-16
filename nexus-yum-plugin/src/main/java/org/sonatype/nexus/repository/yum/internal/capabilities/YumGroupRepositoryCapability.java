@@ -12,44 +12,31 @@
  */
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 
-@Named( YumRepositoryCapabilityDescriptor.TYPE_ID )
-public class YumRepositoryCapability
-    extends YumCapabilitySupport<YumRepositoryCapabilityConfiguration>
+@Named( YumGroupRepositoryCapabilityDescriptor.TYPE_ID )
+public class YumGroupRepositoryCapability
+    extends YumCapabilitySupport<YumCapabilityConfiguration>
 {
 
     @Inject
-    public YumRepositoryCapability( final YumRegistry yumRegistry,
-                                    final Conditions conditions,
-                                    final RepositoryRegistry repositoryRegistry )
+    public YumGroupRepositoryCapability( final YumRegistry service,
+                                         final Conditions conditions,
+                                         final RepositoryRegistry repositoryRegistry )
     {
-        super( yumRegistry, conditions, repositoryRegistry );
+        super( service, conditions, repositoryRegistry );
     }
 
     @Override
-    void configureYum( final Yum yum )
+    YumCapabilityConfiguration createConfiguration( final Map<String, String> properties )
     {
-        checkNotNull( yum );
-        checkState( isConfigured() );
-        yum.setProcessDeletes( configuration().shouldProcessDeletes() );
-        yum.setDeleteProcessingDelay( configuration().deleteProcessingDelay() );
-    }
-
-    @Override
-    YumRepositoryCapabilityConfiguration createConfiguration( final Map<String, String> properties )
-    {
-        return new YumRepositoryCapabilityConfiguration( properties );
+        return new YumCapabilityConfiguration( properties );
     }
 
 }

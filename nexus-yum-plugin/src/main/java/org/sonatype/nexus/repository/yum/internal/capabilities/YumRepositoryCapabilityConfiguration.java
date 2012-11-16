@@ -12,12 +12,9 @@
  */
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Map;
 
 import org.sonatype.nexus.repository.yum.Yum;
-import com.google.common.collect.Maps;
 
 /**
  * Configuration adapter for {@link YumRepositoryCapability}.
@@ -25,15 +22,12 @@ import com.google.common.collect.Maps;
  * @since 2.2
  */
 public class YumRepositoryCapabilityConfiguration
+    extends YumCapabilityConfiguration
 {
-
-    public static final String REPOSITORY_ID = "repository";
 
     public static final String DELETE_PROCESSING = "deleteProcessing";
 
     public static final String DELETE_PROCESSING_DELAY = "deleteProcessingDelay";
-
-    private String repository;
 
     private boolean processDeletes;
 
@@ -41,8 +35,7 @@ public class YumRepositoryCapabilityConfiguration
 
     public YumRepositoryCapabilityConfiguration( final Map<String, String> properties )
     {
-        checkNotNull( properties );
-        this.repository = properties.get( REPOSITORY_ID );
+        super( properties );
 
         boolean processDeletes = true;
         if ( properties.containsKey( DELETE_PROCESSING ) )
@@ -63,11 +56,6 @@ public class YumRepositoryCapabilityConfiguration
         this.deleteProcessingDelay = deleteProcessingDelay;
     }
 
-    public String repository()
-    {
-        return repository;
-    }
-
     public long deleteProcessingDelay()
     {
         return deleteProcessingDelay;
@@ -80,18 +68,10 @@ public class YumRepositoryCapabilityConfiguration
 
     public Map<String, String> asMap()
     {
-        final Map<String, String> props = Maps.newHashMap();
-        props.put( REPOSITORY_ID, repository );
+        final Map<String, String> props = super.asMap();
         props.put( DELETE_PROCESSING, String.valueOf( processDeletes ) );
         props.put( DELETE_PROCESSING_DELAY, String.valueOf( deleteProcessingDelay ) );
         return props;
     }
 
-    @Override
-    public String toString()
-    {
-        return getClass().getSimpleName() + "{" +
-            "repository=" + repository +
-            '}';
-    }
 }
