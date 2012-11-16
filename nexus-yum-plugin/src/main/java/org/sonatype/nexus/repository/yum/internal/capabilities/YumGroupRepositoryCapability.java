@@ -22,7 +22,7 @@ import org.sonatype.nexus.repository.yum.YumRegistry;
 
 @Named( YumGroupRepositoryCapabilityDescriptor.TYPE_ID )
 public class YumGroupRepositoryCapability
-    extends YumCapabilitySupport<YumCapabilityConfiguration>
+    extends YumRepositoryCapabilitySupport<YumGroupRepositoryCapabilityConfiguration>
 {
 
     @Inject
@@ -34,9 +34,9 @@ public class YumGroupRepositoryCapability
     }
 
     @Override
-    YumCapabilityConfiguration createConfiguration( final Map<String, String> properties )
+    YumGroupRepositoryCapabilityConfiguration createConfiguration( final Map<String, String> properties )
     {
-        return new YumCapabilityConfiguration( properties );
+        return new YumGroupRepositoryCapabilityConfiguration( properties );
     }
 
 }

@@ -26,7 +26,7 @@ import org.sonatype.nexus.repository.yum.YumRegistry;
 
 @Named( YumRepositoryCapabilityDescriptor.TYPE_ID )
 public class YumRepositoryCapability
-    extends YumCapabilitySupport<YumRepositoryCapabilityConfiguration>
+    extends YumRepositoryCapabilitySupport<YumRepositoryCapabilityConfiguration>
 {
 
     @Inject

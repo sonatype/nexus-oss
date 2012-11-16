@@ -29,7 +29,7 @@ import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import com.google.common.base.Throwables;
 
-public abstract class YumCapabilitySupport<C extends YumCapabilityConfiguration>
+public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapabilityConfigurationSupport>
     extends CapabilitySupport
 {
 
@@ -42,9 +42,9 @@ public abstract class YumCapabilitySupport<C extends YumCapabilityConfiguration>
     private C configuration;
 
     @Inject
-    public YumCapabilitySupport( final YumRegistry service,
-                                 final Conditions conditions,
-                                 final RepositoryRegistry repositoryRegistry )
+    public YumRepositoryCapabilitySupport( final YumRegistry service,
+                                           final Conditions conditions,
+                                           final RepositoryRegistry repositoryRegistry )
     {
         this.service = checkNotNull( service );
         this.conditions = checkNotNull( conditions );

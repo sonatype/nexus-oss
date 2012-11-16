@@ -20,11 +20,11 @@ import org.sonatype.nexus.repository.yum.Yum;
 import com.google.common.collect.Maps;
 
 /**
- * Configuration adapter for {@link org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapability}.
+ * Support class for Yum repository capability configurations.
  *
  * @since 2.2
  */
-public class YumCapabilityConfiguration
+public abstract class YumRepositoryCapabilityConfigurationSupport
 {
 
     public static final String REPOSITORY_ID = "repository";
@@ -32,7 +32,7 @@ public class YumCapabilityConfiguration
     private String repository;
 
 
-    public YumCapabilityConfiguration( final Map<String, String> properties )
+    public YumRepositoryCapabilityConfigurationSupport( final Map<String, String> properties )
     {
         checkNotNull( properties );
         this.repository = properties.get( REPOSITORY_ID );

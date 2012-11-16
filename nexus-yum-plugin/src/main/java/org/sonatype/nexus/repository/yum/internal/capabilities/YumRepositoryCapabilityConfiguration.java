@@ -22,7 +22,7 @@ import org.sonatype.nexus.repository.yum.Yum;
  * @since 2.2
  */
 public class YumRepositoryCapabilityConfiguration
-    extends YumCapabilityConfiguration
+    extends YumRepositoryCapabilityConfigurationSupport
 {
 
     public static final String DELETE_PROCESSING = "deleteProcessing";
