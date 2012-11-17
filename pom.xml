@@ -271,15 +271,10 @@
             </includes>
             <excludes>
               <exclude>**/target/**</exclude>
-              <!-- grid makes this directory -->
-              <exclude>.maven/**</exclude>
-              <!-- eclipse makes this directory -->
-              <exclude>**/.settings/**</exclude>
+              <exclude>**/.*/**</exclude>
               <!-- netbeans adds these -->
               <exclude>**/nbactions*.xml</exclude>
               <exclude>**/nb-configuration.xml</exclude>
-              <!-- IntelliJ IDEA project directory-->
-              <exclude>**/.idea/**</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>
