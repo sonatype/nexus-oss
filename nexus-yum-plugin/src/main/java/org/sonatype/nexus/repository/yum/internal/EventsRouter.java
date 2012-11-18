@@ -46,12 +46,12 @@ public class EventsRouter
 
     private final Provider<YumRegistry> yumRegistryProvider;
 
-    private final NexusScheduler nexusScheduler;
+    private final Provider<NexusScheduler> nexusScheduler;
 
     @Inject
     public EventsRouter( final Provider<RepositoryRegistry> repositoryRegistry,
                          final Provider<YumRegistry> yumRegistryProvider,
-                         final NexusScheduler nexusScheduler )
+                         final Provider<NexusScheduler> nexusScheduler )
     {
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.yumRegistryProvider = checkNotNull( yumRegistryProvider );
@@ -67,7 +67,7 @@ public class EventsRouter
             || anyOfRepositoriesIsYumEnabled( event.getRemovedRepositoryIds() )
             || anyOfRepositoriesIsYumEnabled( event.getReorderedRepositoryIds() ) ) )
         {
-            YumGroupRepositoryGenerationTask.createTaskFor( nexusScheduler, event.getGroupRepository() );
+            YumGroupRepositoryGenerationTask.createTaskFor( nexusScheduler.get(), event.getGroupRepository() );
         }
     }
 
