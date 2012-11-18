@@ -13,67 +13,6 @@
 /*global define*/
 define('ext/form/field',['extjs','sonatype'], function(Ext, Sonatype) {
 Ext.override(Ext.form.Field, {
-  adjustWidth : function(tag, w) {
-    tag = tag.toLowerCase();
-    // Sonatype: modified input text sizing for Safari3 in strict mode bug.
-    if (typeof w === 'number')
-    {
-      if (Ext.isIE && (tag === 'input' || tag === 'textarea'))
-      {
-        if (tag === 'input' && !Ext.isStrict)
-        {
-          return this.inEditor ? w : w - 3;
-        }
-        if (tag === 'input' && Ext.isStrict)
-        {
-          return w - (Ext.isIE6 ? 4 : 1);
-        }
-        if (tag === 'textarea' && Ext.isStrict)
-        {
-          return w - 2;
-        }
-      }
-      else if (Ext.isOpera && Ext.isStrict)
-      {
-        if (tag === 'input')
-        {
-          return w + 2;
-        }
-        if (tag === 'textarea')
-        {
-          return w - 2;
-        }
-      }
-      else if (Ext.isSafari3)
-      {
-        // Sonatype: assumes we are serving xhtml transitional doctype
-        if (tag === 'input')
-        {
-          return w - 8;
-        }
-      }
-    }
-    return w;
-  },
-  onEnable : function() {
-    this.getActionEl().removeClass(this.disabledClass);
-    if (this.actionMode === 'container')
-    {
-      // in some cases the action mode seems to change after rendering,
-      // so we may need to clean up the disabled class from this.el
-      this.el.removeClass(this.disabledClass);
-
-      //also check for wrap
-      if ( this.wrap ) {
-        this.wrap.removeClass(this.disabledClass);
-      }
-    }
-    this.el.dom.readOnly = false;
-  },
-  onDisable : function() {
-    this.getActionEl().addClass(this.disabledClass);
-    this.el.dom.readOnly = true;
-  },
   /*
    * Override default form field rendering to include help text quick tip on
    * question mark rendered after field label.

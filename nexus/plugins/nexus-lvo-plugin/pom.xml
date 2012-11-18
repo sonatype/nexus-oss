@@ -23,7 +23,6 @@
   </parent>
 
   <artifactId>nexus-lvo-plugin</artifactId>
-
   <packaging>nexus-plugin</packaging>
 
   <properties>

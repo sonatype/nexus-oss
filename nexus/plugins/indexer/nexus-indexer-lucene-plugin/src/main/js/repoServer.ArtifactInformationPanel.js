@@ -12,6 +12,13 @@
  */
 Ext.form.RepositoryUrlDisplayField = Ext.extend(Ext.form.DisplayField, {
       setValue : function(repositories) {
+        if (typeof repositories === 'string') {
+          // display value was already set when field was not visible - repositories already
+          // contains the raw value.
+          this.setRawValue(repositories);
+          return this;
+        }
+
         var links = '';
 
         for (var i = 0; i < repositories.length; i++)

@@ -16,7 +16,8 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
   // Repository main Controller(conglomerate) Singleton
   Sonatype.repoServer.RepoServer = (function() {
     var cfg = Sonatype.config.repos,
-        sp = Sonatype.lib.Permissions;
+        sp = Sonatype.lib.Permissions,
+          lastFormHeight = -1;
 
     // ************************************
     return {
@@ -29,6 +30,21 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
 
         defaultType : 'textfield',
         monitorValid : true,
+        listeners : {
+          clientvalidation : function(form, valid) {
+            // IE does not resize the window when invalid messages are shown
+            var window, formHeight = form.getHeight();
+
+            if ( lastFormHeight !== formHeight ) {
+              window = form.findParentByType('window');
+              if ( window !== undefined ) {
+                lastFormHeight = formHeight;
+                window.setHeight(formHeight + form.getToolbarHeight());
+              }
+            }
+          },
+          scope : this
+        },
 
         items : [{
               id : 'usernamefield',
@@ -164,7 +180,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
               },
               autoWidth : false,
               width : 300,
-              autoHeight : true,
               modal : true,
               constrain : true,
               resizable : false,
@@ -539,14 +554,12 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
         Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
 
         // set closable to false again, mainTabPanel.defaults contains 'closable : true'
-        // FIXME this will still show the closable tool button, so we need to actively reject close
         Sonatype.view.welcomeTab.closable = false;
-        Sonatype.view.welcomeTab.on('beforeclose', function(panel) {
-          return false;
-        });
+
+        // HACK: close is not a tool button, so we need to hide it manually
+        Ext.get(Sonatype.view.welcomeTab.tabEl).down('a.x-tab-strip-close').toggleClass('x-hidden');
 
         Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
-
       },
 
       recoverLogin : function(e, target) {

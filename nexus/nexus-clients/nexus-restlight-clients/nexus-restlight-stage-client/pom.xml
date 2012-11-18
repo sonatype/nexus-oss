@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-restlight-stage-client</artifactId>
-  <name>Nexus : Clients : Lightweight REST : Staging/BP</name>
 
   <dependencies>
     <dependency>

@@ -12,6 +12,8 @@
  */
 package org.sonatype.timeline.internal;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -46,25 +48,19 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class DefaultTimelinePersistor
 {
+    // == V3
 
-    @Deprecated
-    private static final String V1_DATA_FILE_NAME_DATE_FORMAT = "yyyy-MM-dd.HH-mm-ss";
+    private static final String V3_DATA_FILE_NAME_PREFIX = "timeline.";
 
-    @Deprecated
-    private static final Pattern V1_DATA_FILE_NAME_PATTERN =
-        Pattern.compile( "^timeline\\.(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2})\\.dat$" );
+    private static final String V3_DATA_FILE_NAME_SUFFIX = "-v3.dat";
+
+    private static final String V3_DATA_FILE_NAME_DATE_FORMAT = "yyyy-MM-dd.HH-mm-ssZ";
+
+    private static final Pattern V3_DATA_FILE_NAME_PATTERN = Pattern.compile( "^" + V3_DATA_FILE_NAME_PREFIX.replace(
+        ".", "\\." ) + "(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2}[+-]\\d{4})" + V3_DATA_FILE_NAME_SUFFIX.replace(
+        ".", "\\." ) + "$" );
 
     // ==
-
-    private static final String V2_DATA_FILE_NAME_PREFIX = "timeline.";
-
-    private static final String V2_DATA_FILE_NAME_SUFFIX = ".dat";
-
-    private static final String V2_DATA_FILE_NAME_DATE_FORMAT = "yyyy-MM-dd.HH-mm-ssZ";
-
-    private static final Pattern V2_DATA_FILE_NAME_PATTERN = Pattern.compile( "^" + V2_DATA_FILE_NAME_PREFIX.replace(
-        ".", "\\." ) + "(\\d{4}-\\d{2}-\\d{2}\\.\\d{2}-\\d{2}-\\d{2}[+-]\\d{4})" + V2_DATA_FILE_NAME_SUFFIX.replace(
-        ".", "\\." ) + "$" );
 
     private int rollingIntervalMillis;
 
@@ -106,14 +102,12 @@ public class DefaultTimelinePersistor
         OutputStream out = null;
         try
         {
+            out = new BufferedOutputStream( new FileOutputStream( getDataFile(), true ) );
             for ( TimelineRecord record : records )
             {
-                out = new FileOutputStream( getDataFile(), true );
-                byte[] bytes = toProto( record ).toByteArray();
-                out.write( bytes.length );
-                out.write( bytes );
-                out.flush();
+                toProto( record ).writeDelimitedTo( out );
             }
+            out.flush();
         }
         finally
         {
@@ -163,8 +157,7 @@ public class DefaultTimelinePersistor
         {
             public boolean accept( File dir, String fname )
             {
-                return V2_DATA_FILE_NAME_PATTERN.matcher( fname ).matches()
-                    || V1_DATA_FILE_NAME_PATTERN.matcher( fname ).matches();
+                return V3_DATA_FILE_NAME_PATTERN.matcher( fname ).matches();
             }
         } );
 
@@ -240,8 +233,9 @@ public class DefaultTimelinePersistor
             }
             else
             {
+                final File file = result.get( filePtr );
                 // jump to next file
-                currentIterator = readFile( result.get( filePtr ) );
+                currentIterator = readFile( file );
                 filePtr++;
                 continue;
             }
@@ -261,13 +255,13 @@ public class DefaultTimelinePersistor
         InputStream in = null;
         try
         {
-            in = new FileInputStream( file );
-            while ( in.available() > 0 )
+            in = new BufferedInputStream( new FileInputStream( file ) );
+            // V3 uses delimited format
+            TimelineRecord rec = fromProto( TimeLineRecordProtos.TimeLineRecord.parseDelimitedFrom( in ) );
+            while ( rec != null )
             {
-                int length = in.read();
-                byte[] bytes = new byte[length];
-                in.read( bytes, 0, length );
-                result.add( fromProto( TimeLineRecordProtos.TimeLineRecord.parseFrom( bytes ) ) );
+                result.add( rec );
+                rec = fromProto( TimeLineRecordProtos.TimeLineRecord.parseDelimitedFrom( in ) );
             }
         }
         catch ( Exception e )
@@ -276,16 +270,7 @@ public class DefaultTimelinePersistor
         }
         finally
         {
-            if ( in != null )
-            {
-                try
-                {
-                    in.close();
-                }
-                catch ( IOException e )
-                {
-                }
-            }
+            IOUtil.close( in );
         }
 
         return result.iterator();
@@ -293,6 +278,10 @@ public class DefaultTimelinePersistor
 
     protected TimelineRecord fromProto( TimeLineRecordProtos.TimeLineRecord rec )
     {
+        if ( rec == null )
+        {
+            return null;
+        }
         final Map<String, String> dataMap = new HashMap<String, String>();
         for ( TimeLineRecordProtos.TimeLineRecord.Data data : rec.getDataList() )
         {
@@ -305,37 +294,23 @@ public class DefaultTimelinePersistor
 
     protected String buildTimestampedFileName()
     {
-        final SimpleDateFormat dateFormat = new SimpleDateFormat( V2_DATA_FILE_NAME_DATE_FORMAT );
+        final SimpleDateFormat dateFormat = new SimpleDateFormat( V3_DATA_FILE_NAME_DATE_FORMAT );
         final StringBuilder fileName = new StringBuilder();
-        fileName.append( V2_DATA_FILE_NAME_PREFIX ).append(
+        fileName.append( V3_DATA_FILE_NAME_PREFIX ).append(
             dateFormat.format( new Date( System.currentTimeMillis() ) ) ).append(
-            V2_DATA_FILE_NAME_SUFFIX );
+            V3_DATA_FILE_NAME_SUFFIX );
         return fileName.toString();
     }
 
     protected long getTimestampedFileNameTimestamp( final File file )
     {
-        final Matcher fnMatcher = V2_DATA_FILE_NAME_PATTERN.matcher( file.getName() );
-        if ( fnMatcher.matches() )
+        final Matcher v3FnMatcher = V3_DATA_FILE_NAME_PATTERN.matcher( file.getName() );
+        if ( v3FnMatcher.matches() )
         {
-            final String datePattern = fnMatcher.group( 1 );
+            final String datePattern = v3FnMatcher.group( 1 );
             try
             {
-                return new SimpleDateFormat( V2_DATA_FILE_NAME_DATE_FORMAT ).parse( datePattern ).getTime();
-            }
-            catch ( ParseException e )
-            {
-                // silently go to next try
-            }
-        }
-
-        final Matcher oldFnMatcher = V1_DATA_FILE_NAME_PATTERN.matcher( file.getName() );
-        if ( oldFnMatcher.matches() )
-        {
-            final String datePattern = oldFnMatcher.group( 1 );
-            try
-            {
-                return new SimpleDateFormat( V1_DATA_FILE_NAME_DATE_FORMAT ).parse( datePattern ).getTime();
+                return new SimpleDateFormat( V3_DATA_FILE_NAME_DATE_FORMAT ).parse( datePattern ).getTime();
             }
             catch ( ParseException e )
             {

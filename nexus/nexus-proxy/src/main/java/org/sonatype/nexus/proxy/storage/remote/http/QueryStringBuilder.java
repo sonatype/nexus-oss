@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Constructs optional query-string to append to requests.
  *
- * This class is part of Nexus internal implementation and can be changed or removed without prio notice.
+ * This class is part of Nexus internal implementation and can be changed or removed without prior notice.
  *
  * @since 2.2
  */

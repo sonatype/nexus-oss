@@ -308,6 +308,9 @@
                   <includes>
                     <include>**/*.css</include>
                   </includes>
+                  <excludes>
+                    <exclude>Sonatype-content.css</exclude>
+                  </excludes>
                 </aggregation>
               </aggregations>
             </configuration>

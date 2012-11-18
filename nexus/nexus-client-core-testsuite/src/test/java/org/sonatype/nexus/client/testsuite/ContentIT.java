@@ -17,12 +17,12 @@ import static org.sonatype.nexus.client.core.subsystem.content.Location.reposito
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.matchSha1;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 
@@ -61,9 +61,9 @@ public class ContentIT
     public void wrongUploadLocation()
         throws IOException
     {
-        thrown.expect( FileNotFoundException.class );
+        thrown.expect( NexusClientNotFoundException.class );
         thrown.expectMessage(
-            "Inexistent Nexus path: repositories/foo/aopalliance/aopalliance/1.0/aopalliance-1.0.pom"
+            "Inexistent path: repositories/foo/aopalliance/aopalliance/1.0/aopalliance-1.0.pom"
         );
         content().upload( repositoryLocation( "foo", AOP_POM ), testData().resolveFile( "artifacts/" + AOP_POM ) );
     }
@@ -72,9 +72,9 @@ public class ContentIT
     public void wrongDownloadLocation()
         throws IOException
     {
-        thrown.expect( FileNotFoundException.class );
+        thrown.expect( NexusClientNotFoundException.class );
         thrown.expectMessage(
-            "Inexistent Nexus path: repositories/foo/aopalliance/aopalliance/1.0/aopalliance-1.0.pom"
+            "Inexistent path: repositories/foo/aopalliance/aopalliance/1.0/aopalliance-1.0.pom"
         );
         content().download(
             repositoryLocation( "foo", AOP_POM ),
@@ -86,9 +86,9 @@ public class ContentIT
     public void wrongDeleteLocation()
         throws IOException
     {
-        thrown.expect( FileNotFoundException.class );
+        thrown.expect( NexusClientNotFoundException.class );
         thrown.expectMessage(
-            "Inexistent Nexus path: repositories/foo/aopalliance/aopalliance/1.0/aopalliance-1.0.pom"
+            "Inexistent path: repositories/foo/aopalliance/aopalliance/1.0/aopalliance-1.0.pom"
         );
         content().delete( repositoryLocation( "foo", AOP_POM ) );
     }

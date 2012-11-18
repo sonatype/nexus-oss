@@ -24,6 +24,8 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Jersey based {@link User} implementation.
@@ -57,9 +59,21 @@ public class JerseyUser
     @Override
     protected UserResource doGet()
     {
-        return getNexusClient().serviceResource( path( id() ) )
-            .get( UserResourceResponse.class )
-            .getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( path( id() ) )
+                .get( UserResourceResponse.class )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
@@ -67,9 +81,21 @@ public class JerseyUser
     {
         final UserResourceRequest request = new UserResourceRequest();
         request.setData( settings() );
-        return getNexusClient().serviceResource( "users" )
-            .post( UserResourceResponse.class, request )
-            .getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( "users" )
+                .post( UserResourceResponse.class, request )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
@@ -77,15 +103,40 @@ public class JerseyUser
     {
         final UserResourceRequest request = new UserResourceRequest();
         request.setData( settings() );
-        return getNexusClient().serviceResource( path( id() ) )
-            .put( UserResourceResponse.class, request )
-            .getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( path( id() ) )
+                .put( UserResourceResponse.class, request )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
     protected void doRemove()
     {
-        getNexusClient().serviceResource( path( id() ) ).delete();
+        try
+        {
+            getNexusClient()
+                .serviceResource( path( id() ) )
+                .delete();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override

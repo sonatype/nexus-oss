@@ -8,9 +8,9 @@ define('ext/ux/browsebutton',['extjs'], function(Ext){
 Ext.namespace('Ext.ux.form');
 
 // @author 4Him
-if(typeof Ext.isIE8 !== 'boolean') { // Ext 2.x (at least 2.1) doesn't know IE8. Let's tell him about it...
-    Ext.isIE8 = Ext.isIE && navigator.userAgent.toLowerCase().indexOf("msie 8")>-1;
-}
+//if(typeof Ext.isIE8 !== 'boolean') { // Ext 2.x (at least 2.1) doesn't know IE8. Let's tell him about it...
+//    Ext.isIE8 = Ext.isIE && navigator.userAgent.toLowerCase().indexOf("msie 8")>-1;
+//}
 
 /**
  * @class Ext.ux.form.BrowseButton
@@ -50,6 +50,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * Name to use for the hidden input file DOM element.  Deaults to "file".
      */
     inputFileName: 'file',
+
     /**
      * @cfg {Boolean} debug
      * Toggle for turning on debug mode.
@@ -57,8 +58,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * In addition, clipEl is given a green background and floatEl a red background to see how well they are positioned.
      */
     debug: false,
-    
-    
+
     /*
      * Private constants:
      */
@@ -146,6 +146,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      */
     BROWSERS_OFFSETS: {
         Ext2: {
+            IE9:   {left: -8, top: -16, width: 16,  height: 22},
             IE8:   {left: -8, top: -16, width: 16,  height: 22},
             IE:    {left: -8, top: -3,  width: 16,  height: 6},
             Opera: {left: -8, top: -3,  width: -18, height: -1},
@@ -153,6 +154,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
             Safari:{left: -4, top: -2,  width: 6,   height: 6}
         },
         Ext3: {
+            IE9:   {left: -7,           width: 10},
             IE8:   {left: -7,           width: 10},
             IE:    {left: -3,           width: 6},
             Gecko: {                    width: 11}
@@ -296,7 +298,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
             // (unless deferredRender is set to true). 
             // In this case, the clip size can't be determined, so we attempt to set it later.
             // This check repeats until the button container has a size. 
-            if (width === 0 || (height === 0 && !Ext.isIE8)) {  // ugly hack (Ext.isIE8) by 4Him
+            if (width === 0 || (height === 0 && (!Ext.isIE8 && !Ext.isIE9)) ) {  // ugly hack (Ext.isIE8) by 4Him
                 this.setClipSize.defer(100, this);
             } else {
                 // Loop by 4Him
@@ -342,7 +344,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
         });
         this.inputFileEl = this.inputFileEl.child('input') || this.inputFileEl;
         // IE8 needs opacity on the 'file input' element - @author 4Him
-        if(Ext.isIE8) {
+        if(Ext.isIE8 || Ext.isIE9) {
             this.inputFileEl.setOpacity(0.0);
         }
         

@@ -22,8 +22,6 @@
   <version>2.3-SNAPSHOT</version>
 
   <packaging>pom</packaging>
-  <name>Nexus : Aggregator</name>
-  <description>Sonatype Nexus Aggregator</description>
 
   <scm>
     <connection>scm:git:git://github.com/sonatype/nexus.git</connection>
@@ -77,6 +75,7 @@
               <include>**/*.js</include>
             </includes>
             <excludes>
+              <exclude>**/.*/**</exclude>
               <!-- we have target pattern in this format because of target package in nexus-api and nexus-proxy modules -->
               <exclude>**/nexus*/target/**</exclude>
               <exclude>**/ldap-common/target/**</exclude>
@@ -92,10 +91,6 @@
               <exclude>**/gwt/ext/ui/**/*.css</exclude>
               <!-- already has a lgpl license -->
               <exclude>**/Ext.ux.form.LovCombo.css</exclude>
-              <!-- grid makes this directory -->
-              <exclude>.maven/**</exclude>
-              <!-- eclipse makes this directory -->
-              <exclude>**/.settings/**</exclude>
               <!-- temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check -->
               <exclude>**/dependency-reduced-pom.xml</exclude>
               <!-- netbeans adds these -->

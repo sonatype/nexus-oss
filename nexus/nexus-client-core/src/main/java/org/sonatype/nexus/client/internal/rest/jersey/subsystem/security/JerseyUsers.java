@@ -27,6 +27,8 @@ import org.sonatype.security.rest.model.UserResourceResponse;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Jersey based {@link Users} implementation.
@@ -52,14 +54,43 @@ public class JerseyUsers
     @Override
     public User get( final String id )
     {
-        return convert( getNexusClient().serviceResource( path( id ) ).get( UserResourceResponse.class ).getData() );
+        try
+        {
+            return convert(
+                getNexusClient()
+                    .serviceResource( path( id ) )
+                    .get( UserResourceResponse.class )
+                    .getData()
+            );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
     public Collection<User> get()
     {
-        final UserListResourceResponse users = getNexusClient().serviceResource( "users" )
-            .get( UserListResourceResponse.class );
+        final UserListResourceResponse users;
+        try
+        {
+            users = getNexusClient()
+                .serviceResource( "users" )
+                .get( UserListResourceResponse.class );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
 
         return Collections2.transform( users.getData(), new Function<UserResource, User>()
         {

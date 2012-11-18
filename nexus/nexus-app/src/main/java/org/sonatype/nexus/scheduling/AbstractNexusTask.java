@@ -31,6 +31,7 @@ import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.base.Throwables;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractSchedulerTask<T>
@@ -174,9 +175,9 @@ public abstract class AbstractNexusTask<T>
 
             return result;
         }
-        catch ( Exception e )
+        catch ( final Throwable e )
         {
-            // this if below is to catch TaskInterrputedEx in tasks that does not handle it
+            // this if below is to catch TaskInterruptedException in tasks that does not handle it
             // and let it propagate.
             if ( e instanceof TaskInterruptedException )
             {
@@ -194,7 +195,8 @@ public abstract class AbstractNexusTask<T>
                 // notify that there was a failure
                 eventBus.post( new NexusTaskEventStoppedFailed<T>( this, startedEvent, e ) );
 
-                throw e;
+                Throwables.propagateIfInstanceOf( e, Exception.class );
+                throw Throwables.propagate( e );
             }
         }
         finally

@@ -403,7 +403,13 @@ public class DefaultIndexerManager
     private void addRepositoryIndexContext( final Repository repository, IndexingContext oldContext )
         throws IOException
     {
-        // TODO igorf, oldContext should be null, need to through exception
+        if ( oldContext != null )
+        {
+            // this is really an error, the oldContext is expected to be null here
+            mavenIndexer.removeIndexingContext( oldContext, true );
+            logger.warn( "Removed old/stale indexing context {} for repository {}", oldContext.getId(),
+                         repository.getId() );
+        }
 
         if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
         {
@@ -434,6 +440,8 @@ public class DefaultIndexerManager
                                                        repoRoot, indexDirectory, null, null, indexCreators );
         }
         ctx.setSearchable( repository.isSearchable() );
+
+        logger.debug( "Added indexing context {} for repository {}", ctx.getId(), repository.getId() );
     }
 
     private File getRepositoryIndexDirectory( final Repository repository )
@@ -451,7 +459,7 @@ public class DefaultIndexerManager
         removeRepositoryIndexContext( repository, deleteFiles );
     }
 
-    public void removeRepositoryIndexContext( Repository repository, final boolean deleteFiles )
+    public void removeRepositoryIndexContext( final Repository repository, final boolean deleteFiles )
         throws IOException
     {
         if ( !isIndexingSupported( repository ) )
@@ -467,7 +475,16 @@ public class DefaultIndexerManager
             public void run( final IndexingContext context )
                 throws IOException
             {
-                mavenIndexer.removeIndexingContext( context, deleteFiles );
+                if ( context != null )
+                {
+                    mavenIndexer.removeIndexingContext( context, deleteFiles );
+
+                    logger.debug( "Removed indexing context {} for repository {}", context.getId(), repository.getId() );
+                }
+                else
+                {
+                    logger.debug( "Could not remove null indexing context for repository {}", repository.getId() );
+                }
             }
         } );
     }
@@ -529,7 +546,7 @@ public class DefaultIndexerManager
                     catch ( NoSuchRepositoryException e )
                     {
                         // this can only happen if the repository was removed or changed type by another thread
-                        logger.debug( "Could not add repository index context", e );
+                        logger.debug( "Could not add indexing context for repository {}", repositoryId, e );
                     }
                 }
             }
@@ -1028,6 +1045,7 @@ public class DefaultIndexerManager
                 {
                     sharedSingle( repository, runnable );
                 }
+                logger.debug( "Reindexed repository {}", repository.getId() );
             }
             finally
             {
@@ -1181,9 +1199,8 @@ public class DefaultIndexerManager
             return;
         }
 
-        logger.info(
-                         RepositoryStringUtils.getFormattedMessage( "Trying to get remote index for repository %s",
-                             repository ) );
+        logger.info( RepositoryStringUtils.getFormattedMessage( "Trying to get remote index for repository %s",
+                                                                repository ) );
 
         // this will force remote check for newer files
         repository.expireCaches( new ResourceStoreRequest( PUBLISHING_PATH_PREFIX ) );

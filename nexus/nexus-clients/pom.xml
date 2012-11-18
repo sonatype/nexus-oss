@@ -22,7 +22,6 @@
   </parent>
 
   <artifactId>nexus-clients</artifactId>
-  <name>Nexus : Clients</name>
   <packaging>pom</packaging>
 
   <modules>

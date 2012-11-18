@@ -10,46 +10,45 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define('repoServer/Documentation',['sonatype/all'], function(){
-Sonatype.repoServer.Documentation = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
-  Ext.apply(this, config, defaultConfig);
+/*global define*/
+define('repoServer/Documentation', ['extjs', 'sonatype'], function(Ext, Sonatype) {
+  Ext.namespace('Sonatype.repoServer');
+  Sonatype.repoServer.Documentation = function(cfg) {
+    Ext.apply(this, cfg || {});
 
-  Sonatype.repoServer.Documentation.superclass.constructor
-      .call(
-          this,
+    Sonatype.repoServer.Documentation.superclass.constructor.call(this,
           {
-            layout :'border',
-            autoScroll :false,
-            width :'100%',
-            height :'100%',
+            layout : 'border',
+            autoScroll : false,
+            width : '100%',
+            height : '100%',
             items : [
               {
-                xtype :'panel',
-                region :'center',
-                layout :'fit',
+                xtype : 'panel',
+                region : 'center',
+                layout : 'fit',
                 html : this.getHelpText()
               }
             ]
           });
-};
+  };
 
-Ext.extend(Sonatype.repoServer.Documentation, Ext.Panel, {
-  getHelpText : function() {
-    return '<div class="little-padding">'
-    + 'Sonatype Nexus&trade; '
-    + Sonatype.utils.edition
-    + ' Version'
-    + '<br><a href="http://nexus.sonatype.org/" target="_new">Nexus Home</a>'
-    + '<br><a href="http://links.sonatype.com/products/nexus/oss/docs" target="_new">Getting Started</a>'
-    + '<br><a href="http://links.sonatype.com/products/nexus/oss/wiki" target="_new">Nexus Wiki</a>'
-    + '<br><a href="http://links.sonatype.com/products/nexus/oss/docs" target="_new">Nexus Book</a>'
-    + '<br><a href="http://links.sonatype.com/products/maven/docs" target="_new">Maven Book</a>'
-    + '<br><a href="http://links.sonatype.com/products/nexus/oss/release-notes" target="_new">Release Notes</a>'
-    + '</div>'
-  }
-});
+  Ext.extend(Sonatype.repoServer.Documentation, Ext.Panel, {
+    getHelpText : function() {
+      return '<div class="little-padding">'
+            + 'Sonatype Nexus&trade; '
+            + Sonatype.utils.edition
+            + ' Version'
+            + '<br><a href="http://nexus.sonatype.org/" target="_new">Nexus Home</a>'
+            + '<br><a href="http://links.sonatype.com/products/nexus/oss/docs" target="_new">Getting Started</a>'
+            + '<br><a href="http://links.sonatype.com/products/nexus/oss/wiki" target="_new">Nexus Wiki</a>'
+            + '<br><a href="http://links.sonatype.com/products/nexus/oss/docs" target="_new">Nexus Book</a>'
+            + '<br><a href="http://links.sonatype.com/products/maven/docs" target="_new">Maven Book</a>'
+            + '<br><a href="http://links.sonatype.com/products/nexus/oss/release-notes" target="_new">Release Notes</a>'
+            + '</div>';
+    }
+  });
 
+  return Sonatype.repoServer.Documentation;
 });
 

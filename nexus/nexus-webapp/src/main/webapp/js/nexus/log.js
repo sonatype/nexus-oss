@@ -11,67 +11,67 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('nexus/log',['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype){
-/**
- * Nexus logging utility.
- *
- * @static
- */
-Nexus.Log = (function() {
-  var log = Ext.emptyFn;
+define('nexus/log', ['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype) {
+  /**
+   * Nexus logging utility.
+   *
+   * @static
+   */
+  Nexus.Log = (function() {
+    var log = Ext.emptyFn;
 
-  try {
-    if ( typeof(console) === "object" && console.log !== undefined ) {
-      log = function(level, msg) {
-        console.log(level + ' ' + msg);
-      };
-    }
-  } catch (e) {
-    // ignore, nothing left to do
-  }
-
-  return {
-    /**
-     * @static
-     * @param msg {String} The message to log.
-     */
-    debug : function(msg) {
-      // Sonatype.config may be undefined if Nexus.log is called on setup of ext js extensions
-      // it should always be there on runtime for UI components, but better safe than sorry
-      if ( Sonatype.config && Sonatype.config.isDebug )
-      {
-        log('DEBUG', msg);
+    try {
+      if (typeof(console) === "object" && console.log !== undefined) {
+        log = function(level, msg) {
+          console.log(level + ' ' + msg);
+        };
       }
-    },
-    /**
-     * @static
-     * @param msg {String} The message to log.
-     */
-    info : function(msg) {
-      log('INFO', msg);
-    },
-    /**
-     * @static
-     * @param msg {String} The message to log.
-     */
-    warn : function(msg) {
-      log('WARN', msg);
-    },
-    /**
-     * @static
-     * @param msg {String} The message to log.
-     */
-    error : function(msg) {
-      log('ERROR', msg);
     }
-  };
-}());
+    catch (e) {
+      // ignore, nothing left to do
+    }
 
-/**
- * @static
- * @see Nexus.Log.debug
- */
-Nexus.log = Nexus.Log.debug;
+    return {
+      /**
+       * @static
+       * @param msg {String} The message to log.
+       */
+      debug : function(msg) {
+        // Sonatype.config may be undefined if Nexus.log is called on setup of ext js extensions
+        // it should always be there on runtime for UI components, but better safe than sorry
+        if (Sonatype.config && Sonatype.config.isDebug) {
+          log('DEBUG', msg);
+        }
+      },
+      /**
+       * @static
+       * @param msg {String} The message to log.
+       */
+      info : function(msg) {
+        log('INFO', msg);
+      },
+      /**
+       * @static
+       * @param msg {String} The message to log.
+       */
+      warn : function(msg) {
+        log('WARN', msg);
+      },
+      /**
+       * @static
+       * @param msg {String} The message to log.
+       */
+      error : function(msg) {
+        log('ERROR', msg);
+      }
+    };
+  }());
 
-  return Nexus;
+  /**
+   * @static
+   * @see Nexus.Log.debug
+   */
+  Nexus.log = Nexus.Log.debug;
+
+  return Nexus.Log;
 });

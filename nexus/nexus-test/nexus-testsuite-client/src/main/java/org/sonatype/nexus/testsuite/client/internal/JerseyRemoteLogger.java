@@ -20,7 +20,9 @@ import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
@@ -67,7 +69,21 @@ public class JerseyRemoteLogger
                 queryParams.add( "exceptionMessage", exceptionMessage );
             }
         }
-        getNexusClient().serviceResource( "loghelper", queryParams ).get( ClientResponse.class ).close();
+        try
+        {
+            getNexusClient()
+                .serviceResource( "loghelper", queryParams )
+                .get( ClientResponse.class )
+                .close();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     private void formatAndLog( final String level, final String format, final Object arg1, final Object arg2 )

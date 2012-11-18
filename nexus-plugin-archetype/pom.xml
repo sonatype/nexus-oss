@@ -25,7 +25,6 @@
   
   <groupId>org.sonatype.nexus.archetypes</groupId>
   <artifactId>nexus-plugin-archetype</artifactId>
-  <name>Nexus : Nexus Plugin Archetype</name>
   <packaging>maven-archetype</packaging>
 
   <build>

@@ -24,6 +24,8 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import com.google.common.base.Throwables;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
  * Jersey based {@link Repository} implementation.
@@ -192,11 +194,21 @@ public abstract class JerseyRepository<T extends Repository, S extends Repositor
 
     S doGet()
     {
-        final RepositoryResourceResponse response = getNexusClient()
-            .serviceResource( uri() + "/" + id() )
-            .get( RepositoryResourceResponse.class );
-
-        return (S) response.getData();
+        try
+        {
+            return (S) getNexusClient()
+                .serviceResource( uri() + "/" + id() )
+                .get( RepositoryResourceResponse.class )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     S doCreate()
@@ -204,11 +216,21 @@ public abstract class JerseyRepository<T extends Repository, S extends Repositor
         final RepositoryResourceResponse request = new RepositoryResourceResponse();
         request.setData( settings() );
 
-        final RepositoryResourceResponse response = getNexusClient()
-            .serviceResource( uri() )
-            .post( RepositoryResourceResponse.class, request );
-
-        return (S) response.getData();
+        try
+        {
+            return (S) getNexusClient()
+                .serviceResource( uri() )
+                .post( RepositoryResourceResponse.class, request )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     S doUpdate()
@@ -216,18 +238,39 @@ public abstract class JerseyRepository<T extends Repository, S extends Repositor
         final RepositoryResourceResponse request = new RepositoryResourceResponse();
         request.setData( settings() );
 
-        final RepositoryResourceResponse response = getNexusClient()
-            .serviceResource( uri() + "/" + id() )
-            .put( RepositoryResourceResponse.class, request );
-
-        return (S) response.getData();
+        try
+        {
+            return (S) getNexusClient()
+                .serviceResource( uri() + "/" + id() )
+                .put( RepositoryResourceResponse.class, request )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     private void doRemove()
     {
-        getNexusClient()
-            .serviceResource( uri() + "/" + id() )
-            .delete();
+        try
+        {
+            getNexusClient()
+                .serviceResource( uri() + "/" + id() )
+                .delete();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     U convertStatus( final RepositoryStatusResource status )
@@ -241,19 +284,42 @@ public abstract class JerseyRepository<T extends Repository, S extends Repositor
 
     RepositoryStatusResource doGetStatus()
     {
-        return getNexusClient()
-            .serviceResource( "repositories/" + id() + "/status" )
-            .get( RepositoryStatusResourceResponse.class ).getData();
+        try
+        {
+            return getNexusClient()
+                .serviceResource( "repositories/" + id() + "/status" )
+                .get( RepositoryStatusResourceResponse.class )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     RepositoryStatusResource doUpdateStatus( final RepositoryStatusResource status )
     {
         final RepositoryStatusResourceResponse request = new RepositoryStatusResourceResponse();
         request.setData( status );
-        final RepositoryStatusResourceResponse response = getNexusClient()
-            .serviceResource( "repositories/" + id() + "/status" )
-            .put( RepositoryStatusResourceResponse.class, request );
-        return this.status = response.getData();
+        try
+        {
+            return this.status = getNexusClient()
+                .serviceResource( "repositories/" + id() + "/status" )
+                .put( RepositoryStatusResourceResponse.class, request )
+                .getData();
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
 }

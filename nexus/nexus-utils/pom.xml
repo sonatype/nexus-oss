@@ -22,7 +22,6 @@
   </parent>
 
   <artifactId>nexus-utils</artifactId>
-  <name>Nexus : Utilities</name>
 
   <dependencies>
     <dependency>

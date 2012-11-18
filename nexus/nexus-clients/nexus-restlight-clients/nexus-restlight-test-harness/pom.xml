@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-restlight-test-harness</artifactId>
-  <name>Nexus : Clients : Lightweight REST : ITs</name>
 
   <dependencies>
     <dependency>

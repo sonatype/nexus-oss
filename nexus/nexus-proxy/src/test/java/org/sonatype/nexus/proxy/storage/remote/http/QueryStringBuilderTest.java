@@ -15,20 +15,30 @@ package org.sonatype.nexus.proxy.storage.remote.http;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+/**
+ * Tests for {@link QueryStringBuilder}.
+ */
 public class QueryStringBuilderTest
+    extends TestSupport
 {
+    @Mock
+    private ProxyRepository proxyRepository;
+
     @Test
     public void testNoQueryString()
     {
         QueryStringBuilder subject = new QueryStringBuilder( Collections.<QueryStringContributor> emptyList() );
-        Assert.assertNull( subject.getQueryString( getRemoteStorageContext( null ), null ) );
+        Assert.assertNull( subject.getQueryString( getRemoteStorageContext( null ), proxyRepository ) );
     }
 
     @Test
@@ -39,7 +49,7 @@ public class QueryStringBuilderTest
         String configuredString = "configuredString";
 
         Assert.assertEquals( configuredString,
-                             subject.getQueryString( getRemoteStorageContext( configuredString ), null ) );
+                             subject.getQueryString( getRemoteStorageContext( configuredString ), proxyRepository ) );
     }
 
     @Test
@@ -55,7 +65,7 @@ public class QueryStringBuilderTest
             }
         };
         QueryStringBuilder subject = new QueryStringBuilder( Collections.singletonList( contributor ) );
-        Assert.assertEquals( contributedString, subject.getQueryString( getRemoteStorageContext( null ), null ) );
+        Assert.assertEquals( contributedString, subject.getQueryString( getRemoteStorageContext( null ), proxyRepository ) );
     }
 
     @Test
@@ -80,7 +90,7 @@ public class QueryStringBuilderTest
 
         QueryStringBuilder subject = new QueryStringBuilder( Arrays.asList( contributor1, contributor2 ) );
         Assert.assertEquals( "contributedString1&contributedString2",
-                             subject.getQueryString( getRemoteStorageContext( null ), null ) );
+                             subject.getQueryString( getRemoteStorageContext( null ), proxyRepository ) );
     }
 
     @Test
@@ -96,10 +106,10 @@ public class QueryStringBuilderTest
         };
         QueryStringBuilder subject = new QueryStringBuilder( Collections.singletonList( contributor ) );
         Assert.assertEquals( "configuredString&contributedString",
-                             subject.getQueryString( getRemoteStorageContext( "configuredString" ), null ) );
+                             subject.getQueryString( getRemoteStorageContext( "configuredString" ), proxyRepository ) );
     }
 
-    private DefaultRemoteStorageContext getRemoteStorageContext( String configuredString )
+    private DefaultRemoteStorageContext getRemoteStorageContext( @Nullable String configuredString )
     {
         DefaultRemoteConnectionSettings settings = new DefaultRemoteConnectionSettings();
         settings.setQueryString( configuredString );

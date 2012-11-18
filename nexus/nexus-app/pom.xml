@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>nexus-app</artifactId>
-  <name>Nexus : Application</name>
 
   <dependencies>
     <dependency>
