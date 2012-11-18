@@ -38,7 +38,7 @@ public class YumGroupRepositoryCapabilityDescriptor
 
     public static final String TYPE_ID = "yum.group";
 
-    private static final CapabilityType TYPE = capabilityType( TYPE_ID );
+    public static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
     private final Validators validators;
 

@@ -12,9 +12,12 @@
  */
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Map;
 
 import org.sonatype.nexus.repository.yum.Yum;
+import com.google.common.collect.Maps;
 
 /**
  * Configuration adapter for {@link YumRepositoryCapability}.
@@ -25,17 +28,36 @@ public class YumRepositoryCapabilityConfiguration
     extends YumRepositoryCapabilityConfigurationSupport
 {
 
+    public static final String ALIASES = "aliases";
+
     public static final String DELETE_PROCESSING = "deleteProcessing";
 
     public static final String DELETE_PROCESSING_DELAY = "deleteProcessingDelay";
+
+    private Map<String, String> aliases;
 
     private boolean processDeletes;
 
     private long deleteProcessingDelay;
 
+    public YumRepositoryCapabilityConfiguration( final String repository,
+                                                 final Map<String, String> aliases,
+                                                 final boolean processDeletes,
+                                                 final long deleteProcessingDelay )
+    {
+        super( repository );
+        this.aliases = Maps.newTreeMap();
+        this.aliases.putAll( checkNotNull( aliases ) );
+        this.processDeletes = processDeletes;
+        this.deleteProcessingDelay = deleteProcessingDelay;
+    }
+
     public YumRepositoryCapabilityConfiguration( final Map<String, String> properties )
     {
         super( properties );
+
+        this.aliases = Maps.newTreeMap();
+        aliases.putAll( new AliasMappings( properties.get( ALIASES ) ).aliases() );
 
         boolean processDeletes = true;
         if ( properties.containsKey( DELETE_PROCESSING ) )
@@ -56,6 +78,11 @@ public class YumRepositoryCapabilityConfiguration
         this.deleteProcessingDelay = deleteProcessingDelay;
     }
 
+    public Map<String, String> aliases()
+    {
+        return aliases;
+    }
+
     public long deleteProcessingDelay()
     {
         return deleteProcessingDelay;
@@ -69,6 +96,7 @@ public class YumRepositoryCapabilityConfiguration
     public Map<String, String> asMap()
     {
         final Map<String, String> props = super.asMap();
+        props.put( ALIASES, new AliasMappings( aliases ).toString() );
         props.put( DELETE_PROCESSING, String.valueOf( processDeletes ) );
         props.put( DELETE_PROCESSING_DELAY, String.valueOf( deleteProcessingDelay ) );
         return props;

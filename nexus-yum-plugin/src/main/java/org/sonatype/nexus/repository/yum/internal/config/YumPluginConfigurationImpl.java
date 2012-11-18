@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 
 import java.io.File;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,7 +27,6 @@ import javax.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.repository.yum.internal.rest.AliasNotFoundException;
 
 @Named
 @Singleton
@@ -51,8 +49,6 @@ public class YumPluginConfigurationImpl
     private File baseTempDir;
 
     private YumConfiguration xmlYumConfiguration = new YumConfiguration();
-
-    private final ConcurrentHashMap<AliasKey, String> aliasMap = new ConcurrentHashMap<AliasKey, String>();
 
     private final Unmarshaller unmarshaller;
 
@@ -84,7 +80,6 @@ public class YumPluginConfigurationImpl
             {
                 xmlYumConfiguration = (YumConfiguration) unmarshaller.unmarshal( configFile );
                 fileLastModified = getConfigFile().lastModified();
-                fillAliasMap();
             }
             catch ( JAXBException e )
             {
@@ -122,31 +117,6 @@ public class YumPluginConfigurationImpl
     }
 
     @Override
-    public String getVersion( String repositoryId, String alias )
-        throws AliasNotFoundException
-    {
-        checkForUpdates();
-
-        final AliasKey aliasKey = new AliasKey( repositoryId, alias );
-        final String resultVersion = aliasMap.get( aliasKey );
-        if ( resultVersion == null )
-        {
-            throw new AliasNotFoundException( "for " + aliasKey );
-        }
-        return resultVersion;
-    }
-
-    @Override
-    public void setAlias( String repositoryId, String alias, String version )
-    {
-        final YumConfiguration newConfig = new YumConfiguration( xmlYumConfiguration );
-        final AliasMapping newAliasMapping = new AliasMapping( repositoryId, alias, version );
-        newConfig.getAliasMappings().add( newAliasMapping );
-        saveConfig( newConfig );
-        aliasMap.put( newAliasMapping.getAliasKey(), newAliasMapping.getVersion() );
-    }
-
-    @Override
     public void setRepositoryOfRepositoryVersionsActive( boolean active )
     {
         final YumConfiguration newConfig = new YumConfiguration( xmlYumConfiguration );
@@ -169,11 +139,6 @@ public class YumPluginConfigurationImpl
         }
     }
 
-    public String getFilename()
-    {
-        return filename;
-    }
-
     @Override
     public void setFilename( String filename )
     {
@@ -188,18 +153,6 @@ public class YumPluginConfigurationImpl
             saveConfig( xmlYumConfiguration );
         }
         return configFile;
-    }
-
-    private void fillAliasMap()
-    {
-        aliasMap.clear();
-        if ( xmlYumConfiguration.getAliasMappings() != null )
-        {
-            for ( AliasMapping aliasMapping : xmlYumConfiguration.getAliasMappings() )
-            {
-                aliasMap.put( aliasMapping.getAliasKey(), aliasMapping.getVersion() );
-            }
-        }
     }
 
     @Override

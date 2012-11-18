@@ -12,12 +12,8 @@
  */
 package org.sonatype.nexus.repository.yum.internal.config;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -41,10 +37,6 @@ public class YumConfiguration
 
     private boolean repositoryOfRepositoryVersionsActive = DEFAULT_REPOSITORY_OF_REPOSITORY_VERSIONS;
 
-    @XmlElement( name = "aliasMapping" )
-    @XmlElementWrapper
-    private Set<AliasMapping> aliasMappings = new LinkedHashSet<AliasMapping>();
-
     private int maxParallelThreadCount = DEFAULT_MAX_PARALLEL_THREAD_COUNT;
 
     public YumConfiguration()
@@ -57,7 +49,6 @@ public class YumConfiguration
         setActive( other.isActive() );
         repositoryCreationTimeout = other.getRepositoryCreationTimeout();
         repositoryOfRepositoryVersionsActive = other.isRepositoryOfRepositoryVersionsActive();
-        aliasMappings = other.getAliasMappings();
         maxParallelThreadCount = other.getMaxParallelThreadCount();
     }
 
@@ -81,22 +72,11 @@ public class YumConfiguration
         this.repositoryCreationTimeout = repositoryCreationTimeout;
     }
 
-    public Set<AliasMapping> getAliasMappings()
-    {
-        return aliasMappings;
-    }
-
-    public void setAliasMappings( Set<AliasMapping> aliasMappings )
-    {
-        this.aliasMappings = aliasMappings;
-    }
-
     @Override
     public int hashCode()
     {
         final int prime = 31;
         int result = 1;
-        result = ( prime * result ) + ( ( aliasMappings == null ) ? 0 : aliasMappings.hashCode() );
         result = ( prime * result ) + repositoryCreationTimeout;
         return result;
     }
@@ -118,17 +98,6 @@ public class YumConfiguration
         }
 
         YumConfiguration other = (YumConfiguration) obj;
-        if ( aliasMappings == null )
-        {
-            if ( other.aliasMappings != null )
-            {
-                return false;
-            }
-        }
-        else if ( !aliasMappings.equals( other.aliasMappings ) )
-        {
-            return false;
-        }
         if ( repositoryCreationTimeout != other.repositoryCreationTimeout )
         {
             return false;
@@ -143,8 +112,7 @@ public class YumConfiguration
     @Override
     public String toString()
     {
-        return "XmlYumConfiguration [repositoryCreationTimeout=" + repositoryCreationTimeout + ", aliasMappings="
-            + aliasMappings + "]";
+        return "XmlYumConfiguration [repositoryCreationTimeout=" + repositoryCreationTimeout;
     }
 
     public boolean isRepositoryOfRepositoryVersionsActive()

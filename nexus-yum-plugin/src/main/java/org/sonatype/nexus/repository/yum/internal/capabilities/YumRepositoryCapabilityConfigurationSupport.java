@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 
-import org.sonatype.nexus.repository.yum.Yum;
 import com.google.common.collect.Maps;
 
 /**
@@ -31,6 +30,10 @@ public abstract class YumRepositoryCapabilityConfigurationSupport
 
     private String repository;
 
+    public YumRepositoryCapabilityConfigurationSupport( final String repository )
+    {
+        this.repository = checkNotNull( repository );
+    }
 
     public YumRepositoryCapabilityConfigurationSupport( final Map<String, String> properties )
     {

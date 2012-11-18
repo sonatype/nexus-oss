@@ -23,7 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -44,6 +43,8 @@ import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 
 @Named
@@ -52,6 +53,8 @@ public class YumImpl
 {
 
     private final static Logger LOG = LoggerFactory.getLogger( YumImpl.class );
+
+    private static final int MAX_EXECUTION_COUNT = 100;
 
     private final RepositoryURLBuilder repositoryURLBuilder;
 
@@ -69,9 +72,9 @@ public class YumImpl
 
     private final File baseDir;
 
-    private final Set<String> versions = new HashSet<String>();
+    private final Set<String> versions;
 
-    private static final int MAX_EXECUTION_COUNT = 100;
+    private final Map<String, String> aliases;
 
     private final Map<ScheduledFuture<?>, DelayedDirectoryDeletionTask> taskMap =
         new HashMap<ScheduledFuture<?>, DelayedDirectoryDeletionTask>();
@@ -95,6 +98,9 @@ public class YumImpl
 
         this.processDeletes = true;
         this.deleteProcessingDelay = DEFAULT_DELETE_PROCESSING_DELAY;
+
+        this.versions = Sets.newHashSet();
+        this.aliases = Maps.newHashMap();
 
         this.baseDir = RepositoryUtils.getBaseDir( repository );
     }
@@ -144,6 +150,35 @@ public class YumImpl
     {
         versions.add( version );
         LOG.debug( "Added version '{}' to repository '{}", version, getRepository().getId() );
+    }
+
+    @Override
+    public Yum addAlias( final String alias, final String version )
+    {
+        aliases.put( alias, version );
+        return this;
+    }
+
+    @Override
+    public Yum removeAlias( final String alias )
+    {
+        aliases.remove( alias );
+        return this;
+    }
+
+    @Override
+    public Yum setAliases( final Map<String, String> aliases )
+    {
+        this.aliases.clear();
+        this.aliases.putAll( aliases );
+
+        return this;
+    }
+
+    @Override
+    public String getVersion( final String alias )
+    {
+        return aliases.get( alias );
     }
 
     @Override

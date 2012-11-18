@@ -75,7 +75,7 @@
     <privilege>
       <id>yum-alias-create-read</id>
       <type>method</type>
-      <name>Capabilities - (update,read)</name>
+      <name>Yum Alias - (update,read)</name>
       <description>Give permission to create,update and read yum version aliases.</description>
       <properties>
         <property>

@@ -33,6 +33,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
@@ -70,7 +71,8 @@ public class VersionedYumRepositoryResourceTest
         {
             repository = createRepository( TESTREPO );
         }
-        yumRegistry.register( repository );
+        final Yum yum = yumRegistry.register( repository );
+        yum.addAlias( ALIAS, VERSION );
         waitFor( new Condition()
         {
             @Override
@@ -79,7 +81,6 @@ public class VersionedYumRepositoryResourceTest
                 return yumRegistry.get( TESTREPO ).getVersions().size() == 5;
             }
         } );
-        yumPluginConfiguration.setAlias( TESTREPO, ALIAS, VERSION );
     }
 
     @Test( expected = ResourceException.class )

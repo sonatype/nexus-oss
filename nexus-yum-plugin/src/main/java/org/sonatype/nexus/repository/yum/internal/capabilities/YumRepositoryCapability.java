@@ -42,6 +42,8 @@ public class YumRepositoryCapability
     {
         checkNotNull( yum );
         checkState( isConfigured() );
+
+        yum.setAliases( configuration().aliases() );
         yum.setProcessDeletes( configuration().shouldProcessDeletes() );
         yum.setDeleteProcessingDelay( configuration().deleteProcessingDelay() );
     }

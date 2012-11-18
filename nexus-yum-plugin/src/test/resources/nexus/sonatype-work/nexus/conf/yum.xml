@@ -27,17 +27,4 @@
   <!-- maximal number of parallel createrepo executions -->
   <maxParallelThreadCount>10</maxParallelThreadCount>
 
-  <!-- configured aliases -->
-  <aliasMappings>
-    <aliasMapping>
-      <repoId>releases</repoId>
-      <alias>trunk</alias>
-      <version>5.1.15-2</version>
-    </aliasMapping>
-    <aliasMapping>
-      <repoId>releases</repoId>
-      <alias>production</alias>
-      <version>5.1.15-1</version>
-    </aliasMapping>
-  </aliasMappings>
 </configuration>

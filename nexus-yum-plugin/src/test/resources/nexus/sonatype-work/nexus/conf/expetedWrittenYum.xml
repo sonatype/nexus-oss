@@ -17,22 +17,5 @@
   <active>true</active>
   <repositoryCreationTimeout>150</repositoryCreationTimeout>
   <repositoryOfRepositoryVersionsActive>true</repositoryOfRepositoryVersionsActive>
-  <aliasMappings>
-    <aliasMapping>
-      <repoId>releases</repoId>
-      <alias>trunk</alias>
-      <version>5.1.15-2</version>
-    </aliasMapping>
-    <aliasMapping>
-      <repoId>releases</repoId>
-      <alias>production</alias>
-      <version>5.1.15-1</version>
-    </aliasMapping>
-    <aliasMapping>
-      <repoId>writeRepo</repoId>
-      <alias>writeAlias</alias>
-      <version>aliasVersion</version>
-    </aliasMapping>
-  </aliasMappings>
   <maxParallelThreadCount>10</maxParallelThreadCount>
 </configuration>

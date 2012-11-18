@@ -29,7 +29,7 @@ public interface Yum
      * @param alias
      * @return
      */
-    String getAliasVersion( String repositoryId, String alias );
+    String getAlias( String repositoryId, String alias );
 
     /**
      * Creates for the given repository an alias to a specific

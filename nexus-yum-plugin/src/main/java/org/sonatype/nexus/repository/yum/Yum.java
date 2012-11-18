@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.yum;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -37,6 +38,14 @@ public interface Yum
     Set<String> getVersions();
 
     void addVersion( String version );
+
+    Yum addAlias( String alias, String version );
+
+    Yum removeAlias( String alias );
+
+    Yum setAliases( Map<String, String> aliases );
+
+    String getVersion( String alias );
 
     Repository getRepository();
 

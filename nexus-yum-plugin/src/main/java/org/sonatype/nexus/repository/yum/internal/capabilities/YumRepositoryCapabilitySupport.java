@@ -33,7 +33,7 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
     extends CapabilitySupport
 {
 
-    private final YumRegistry service;
+    private final YumRegistry yumRegistry;
 
     private final Conditions conditions;
 
@@ -42,11 +42,11 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
     private C configuration;
 
     @Inject
-    public YumRepositoryCapabilitySupport( final YumRegistry service,
+    public YumRepositoryCapabilitySupport( final YumRegistry yumRegistry,
                                            final Conditions conditions,
                                            final RepositoryRegistry repositoryRegistry )
     {
-        this.service = checkNotNull( service );
+        this.yumRegistry = checkNotNull( yumRegistry );
         this.conditions = checkNotNull( conditions );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
     }
@@ -87,7 +87,12 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
         throws Exception
     {
         configuration = createConfiguration( context().properties() );
-        configureYum( service.get( configuration.repository() ) );
+        final Yum yum = yumRegistry.get( configuration.repository() );
+        // yum is not present when repository is changed
+        if ( yum != null )
+        {
+            configureYum( yum );
+        }
     }
 
     @Override
@@ -103,7 +108,7 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
         try
         {
             final Repository repository = repositoryRegistry.getRepository( configuration.repository() );
-            configureYum( service.register( repository.adaptToFacet( MavenRepository.class ) ) );
+            configureYum( yumRegistry.register( repository.adaptToFacet( MavenRepository.class ) ) );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -115,7 +120,7 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
     @Override
     public void onPassivate()
     {
-        service.unregister( configuration.repository() );
+        yumRegistry.unregister( configuration.repository() );
     }
 
     @Override
@@ -130,7 +135,9 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
                     return isConfigured() ? configuration.repository() : null;
                 }
             } ),
-            conditions.capabilities().passivateCapabilityDuringUpdate()
+            conditions.capabilities().passivateCapabilityWhenPropertyChanged(
+                YumRepositoryCapabilityConfigurationSupport.REPOSITORY_ID
+            )
         );
     }
 
@@ -147,7 +154,7 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
         } );
     }
 
-    C configuration()
+    public C configuration()
     {
         return configuration;
     }

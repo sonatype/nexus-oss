@@ -24,6 +24,8 @@ import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.formfields.TextAreaFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
@@ -41,7 +43,7 @@ public class YumRepositoryCapabilityDescriptor
 
     public static final String TYPE_ID = "yum.repository";
 
-    private static final CapabilityType TYPE = capabilityType( TYPE_ID );
+    public static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
     private final Validators validators;
 
@@ -53,8 +55,14 @@ public class YumRepositoryCapabilityDescriptor
             "Yum Repository capability",
             "Automatically generates Yum repositories.",
             new RepoOrGroupComboFormField( REPOSITORY_ID, FormField.MANDATORY ),
+            new TextAreaFormField(
+                YumRepositoryCapabilityConfiguration.ALIASES,
+                "Aliases",
+                "Format: <alias>=<version>[,<alias>=<version>]",
+                FormField.OPTIONAL
+            ),
             new CheckboxFormField(
-                DELETE_PROCESSING,
+                YumRepositoryCapabilityConfiguration.DELETE_PROCESSING,
                 "Process deletes",
                 "Check if removing an RPM from this repository should regenerate Yum repository"
                     + " (default true)",

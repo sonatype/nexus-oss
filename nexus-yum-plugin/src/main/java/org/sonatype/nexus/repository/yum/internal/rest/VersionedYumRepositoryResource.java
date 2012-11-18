@@ -88,21 +88,22 @@ public class VersionedYumRepositoryResource
         }
 
         final String aliasVersion;
+
         if ( yum.getVersions().contains( version ) )
         {
             aliasVersion = version;
         }
         else
         {
-            try
-            {
-                aliasVersion = yumConfiguration.getVersion( repositoryId, version );
-            }
-            catch ( AliasNotFoundException ex )
-            {
-                throw new ResourceException( CLIENT_ERROR_NOT_FOUND, "Couldn't find version or alias '" + version
-                    + "' in repository '" + repositoryId + "'", ex );
-            }
+            aliasVersion = yum.getVersion( version );
+        }
+
+        if ( aliasVersion == null )
+        {
+            throw new ResourceException(
+                CLIENT_ERROR_NOT_FOUND,
+                "Couldn't find version or alias '" + version + "' in repository '" + repositoryId + "'"
+            );
         }
 
         return yum.getYumRepository( aliasVersion, interpretation.getRepositoryUrl() );

@@ -42,7 +42,7 @@ public class JerseyYum
     }
 
     @Override
-    public String getAliasVersion( String repositoryId, String alias )
+    public String getAlias( String repositoryId, String alias )
     {
         try
         {
