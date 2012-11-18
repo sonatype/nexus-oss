@@ -37,6 +37,7 @@ public abstract class AbstractNexusTask<T>
     extends AbstractSchedulerTask<T>
     implements NexusTask<T>
 {
+
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
     @Requirement
@@ -59,11 +60,17 @@ public abstract class AbstractNexusTask<T>
         }
     }
 
+    protected AbstractNexusTask( final EventBus eventBus, final String name )
+    {
+        this( name );
+        this.eventBus = eventBus;
+    }
+
     protected void notifyEventListeners( final Event<?> event )
     {
         eventBus.post( event );
     }
-    
+
     // TODO: finish this thread!
     public RepositoryTaskActivityDescriptor getTaskActivityDescriptor()
     {
