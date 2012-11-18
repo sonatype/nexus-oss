@@ -28,6 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
+import com.google.common.collect.Maps;
 
 /**
  * {@link PassivateCapabilityDuringUpdateCondition} UTs.
@@ -73,8 +74,12 @@ public class PassivateCapabilityDuringUpdateConditionTest
     @Test
     public void passivateDuringUpdate()
     {
-        underTest.handle( new CapabilityEvent.BeforeUpdate( capabilityRegistry, reference ) );
-        underTest.handle( new CapabilityEvent.AfterUpdate( capabilityRegistry, reference ) );
+        underTest.handle( new CapabilityEvent.BeforeUpdate(
+            capabilityRegistry, reference, Maps.<String, String>newHashMap(), Maps.<String, String>newHashMap()
+        ) );
+        underTest.handle( new CapabilityEvent.AfterUpdate(
+            capabilityRegistry, reference, Maps.<String, String>newHashMap(), Maps.<String, String>newHashMap()
+        ) );
 
         verifyEventBusEvents( unsatisfied( underTest ), satisfied( underTest ) );
     }

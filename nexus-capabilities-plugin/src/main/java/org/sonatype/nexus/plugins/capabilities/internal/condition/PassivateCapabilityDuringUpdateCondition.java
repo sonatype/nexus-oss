@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
@@ -37,9 +36,13 @@ public class PassivateCapabilityDuringUpdateCondition
 
     private CapabilityIdentity id;
 
-    public PassivateCapabilityDuringUpdateCondition( final EventBus eventBus )
+    private final String[] propertyNames;
+
+    public PassivateCapabilityDuringUpdateCondition( final EventBus eventBus,
+                                                     final String... propertyNames )
     {
         super( eventBus, true );
+        this.propertyNames = propertyNames == null || propertyNames.length == 0 ? null : propertyNames;
     }
 
     @Override
@@ -71,7 +74,30 @@ public class PassivateCapabilityDuringUpdateCondition
     {
         if ( event.getReference().context().id().equals( id ) )
         {
-            setSatisfied( false );
+            if ( propertyNames == null )
+            {
+                setSatisfied( false );
+            }
+            else
+            {
+                for ( final String propertyName : propertyNames )
+                {
+                    String oldValue = event.properties().get( propertyName );
+                    if ( oldValue == null )
+                    {
+                        oldValue = "";
+                    }
+                    String newValue = event.previousProperties().get( propertyName );
+                    if ( newValue == null )
+                    {
+                        newValue = "";
+                    }
+                    if ( isSatisfied() && !oldValue.equals( newValue ) )
+                    {
+                        setSatisfied( false );
+                    }
+                }
+            }
         }
     }
 

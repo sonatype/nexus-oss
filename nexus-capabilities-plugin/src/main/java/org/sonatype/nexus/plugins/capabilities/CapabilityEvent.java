@@ -12,7 +12,9 @@
  */
 package org.sonatype.nexus.plugins.capabilities;
 
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Map;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
 
@@ -100,16 +102,34 @@ public class CapabilityEvent
         extends CapabilityEvent
     {
 
+        private final Map<String, String> properties;
+
+        private final Map<String, String> previousProperties;
+
         public BeforeUpdate( final CapabilityRegistry capabilityRegistry,
-                             final CapabilityReference reference )
+                             final CapabilityReference reference,
+                             final Map<String, String> properties,
+                             final Map<String, String> previousProperties )
         {
             super( capabilityRegistry, reference );
+            this.properties = checkNotNull( properties );
+            this.previousProperties = checkNotNull( previousProperties );
         }
 
         @Override
         public String toString()
         {
             return "Before update of " + super.toString();
+        }
+
+        public Map<String, String> properties()
+        {
+            return properties;
+        }
+
+        public Map<String, String> previousProperties()
+        {
+            return previousProperties;
         }
 
     }
@@ -123,16 +143,34 @@ public class CapabilityEvent
         extends CapabilityEvent
     {
 
+        private final Map<String, String> properties;
+
+        private final Map<String, String> previousProperties;
+
         public AfterUpdate( final CapabilityRegistry capabilityRegistry,
-                            final CapabilityReference reference )
+                            final CapabilityReference reference,
+                            final Map<String, String> properties,
+                            final Map<String, String> previousProperties )
         {
             super( capabilityRegistry, reference );
+            this.properties = checkNotNull( properties );
+            this.previousProperties = checkNotNull( previousProperties );
         }
 
         @Override
         public String toString()
         {
             return "After update of " + super.toString();
+        }
+
+        public Map<String, String> properties()
+        {
+            return properties;
+        }
+
+        public Map<String, String> previousProperties()
+        {
+            return previousProperties;
         }
 
     }

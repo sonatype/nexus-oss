@@ -19,7 +19,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Condition;
@@ -87,6 +86,18 @@ public class CapabilityConditions
     public Condition passivateCapabilityDuringUpdate()
     {
         return new PassivateCapabilityDuringUpdateCondition( eventBus );
+    }
+
+    /**
+     * Creates a new condition that is becoming unsatisfied before an capability is updated and becomes satisfied after
+     * capability was updated when one of the enumerated properties changes.
+     *
+     * @param propertyNames list of properties names that should be checked if updated
+     * @return created condition
+     */
+    public Condition passivateCapabilityWhenPropertyChanged( final String... propertyNames )
+    {
+        return new PassivateCapabilityDuringUpdateCondition( eventBus, propertyNames );
     }
 
     /**

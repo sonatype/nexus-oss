@@ -554,13 +554,17 @@ public class DefaultCapabilityReference
             try
             {
                 eventBus.post(
-                    new CapabilityEvent.BeforeUpdate( capabilityRegistry, DefaultCapabilityReference.this )
+                    new CapabilityEvent.BeforeUpdate(
+                        capabilityRegistry, DefaultCapabilityReference.this, properties, previousProperties
+                    )
                 );
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
                 capability.onUpdate();
                 resetLastException();
                 eventBus.post(
-                    new CapabilityEvent.AfterUpdate( capabilityRegistry, DefaultCapabilityReference.this )
+                    new CapabilityEvent.AfterUpdate(
+                        capabilityRegistry, DefaultCapabilityReference.this, properties, previousProperties
+                    )
                 );
             }
             catch ( Exception e )
