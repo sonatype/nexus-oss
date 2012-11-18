@@ -48,7 +48,7 @@ public class EventsRouterTest
     }
 
     @Test
-    public void shouldCreateRepoForPom()
+    public void shouldCreateRepoForRpm()
     {
         MavenRepository repo = createRepository( true );
         repositoryRegistry.register( repo );
