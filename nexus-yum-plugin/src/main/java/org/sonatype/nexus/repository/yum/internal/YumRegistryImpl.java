@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.yum.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
@@ -22,6 +23,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
@@ -38,16 +40,23 @@ public class YumRegistryImpl
 
     private final Map<String, Yum> yums = new ConcurrentHashMap<String, Yum>();
 
+    private final NexusConfiguration nexusConfiguration;
+
     private final NexusScheduler nexusScheduler;
 
     private final YumFactory yumFactory;
 
+    private int maxNumberOfParallelThreads;
+
     @Inject
-    public YumRegistryImpl( final NexusScheduler nexusScheduler,
+    public YumRegistryImpl( final NexusConfiguration nexusConfiguration,
+                            final NexusScheduler nexusScheduler,
                             final YumFactory yumFactory )
     {
+        this.nexusConfiguration = checkNotNull( nexusConfiguration );
         this.nexusScheduler = checkNotNull( nexusScheduler );
         this.yumFactory = checkNotNull( yumFactory );
+        this.maxNumberOfParallelThreads = DEFAULT_MAX_NUMBER_PARALLEL_THREADS;
     }
 
     @Override
@@ -55,7 +64,7 @@ public class YumRegistryImpl
     {
         if ( !yums.containsKey( repository.getId() ) )
         {
-            final Yum yum = yumFactory.create( repository );
+            final Yum yum = yumFactory.create( getTemporaryDirectory(), repository );
             yums.put( repository.getId(), yum );
 
             LOG.info( "Registered repository '{}' as Yum repository", repository.getId() );
@@ -96,6 +105,26 @@ public class YumRegistryImpl
     public boolean isRegistered( String repositoryId )
     {
         return yums.containsKey( repositoryId );
+    }
+
+    @Override
+    public YumRegistry setMaxNumberOfParallelThreads( final int maxNumberOfParallelThreads )
+    {
+        this.maxNumberOfParallelThreads = maxNumberOfParallelThreads;
+
+        return this;
+    }
+
+    @Override
+    public int maxNumberOfParallelThreads()
+    {
+        return maxNumberOfParallelThreads;
+    }
+
+    @Override
+    public File getTemporaryDirectory()
+    {
+        return new File( nexusConfiguration.getTemporaryDirectory(), "nexus-yum-plugin" );
     }
 
 }

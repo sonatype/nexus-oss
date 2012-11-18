@@ -14,14 +14,11 @@ package org.sonatype.nexus.repository.yum.internal;
 
 import javax.inject.Inject;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
 
 public class EventsRouterTest
@@ -34,21 +31,6 @@ public class EventsRouterTest
     @Inject
     private YumRegistry repositoryRegistry;
 
-    @Inject
-    private YumPluginConfiguration yumConfig;
-
-    @Before
-    public void activateRepo()
-    {
-        yumConfig.setActive( true );
-    }
-
-    @After
-    public void reactivateRepo()
-    {
-        yumConfig.setActive( true );
-    }
-
     @Test
     public void shouldNotCreateRepo()
     {
@@ -60,8 +42,6 @@ public class EventsRouterTest
     @Test
     public void shouldNotCreateRepoForPom()
     {
-        yumConfig.setActive( false );
-
         MavenRepository repo = createRepository( true );
         repositoryRegistry.register( repo );
         handler.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
@@ -70,8 +50,6 @@ public class EventsRouterTest
     @Test
     public void shouldCreateRepoForPom()
     {
-        yumConfig.setActive( false );
-
         MavenRepository repo = createRepository( true );
         repositoryRegistry.register( repo );
         handler.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );

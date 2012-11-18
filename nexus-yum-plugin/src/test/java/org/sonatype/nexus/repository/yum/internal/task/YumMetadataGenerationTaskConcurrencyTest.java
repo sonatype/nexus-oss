@@ -19,12 +19,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
-import static org.sonatype.nexus.repository.yum.internal.utils.ReflectionTestUtils.findMethod;
-import static org.sonatype.nexus.repository.yum.internal.utils.ReflectionTestUtils.setField;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,17 +35,17 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.cglib.proxy.Enhancer;
-import org.mockito.cglib.proxy.MethodInterceptor;
-import org.mockito.cglib.proxy.MethodProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.RpmScanner;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
+import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -157,36 +154,18 @@ public class YumMetadataGenerationTaskConcurrencyTest
     private YumMetadataGenerationTask createYumRepositoryTask( final int repositoryId )
         throws Exception
     {
-        final YumTaskInterceptor interceptor =
-            new YumTaskInterceptor( nexusScheduler.createTaskInstance( YumMetadataGenerationTask.class ), threadNames );
-        final Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass( YumMetadataGenerationTask.class );
-        enhancer.setCallback( interceptor );
-        final YumMetadataGenerationTask task = (YumMetadataGenerationTask) enhancer.create();
-        setField( task, "eventBus", lookup( EventBus.class ) );
-        task.setRepositoryId( "REPO_" + repositoryId );
-        return task;
-    }
-
-    private static class YumTaskInterceptor
-        implements MethodInterceptor
-    {
-
-        private final YumMetadataGenerationTask task;
-
-        private final Set<String> threadNames;
-
-        public YumTaskInterceptor( YumMetadataGenerationTask task, Set<String> threadNames )
+        final YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+            mock( EventBus.class ),
+            mock( RepositoryRegistry.class ),
+            yumRegistry,
+            mock( RepositoryURLBuilder.class ),
+            mock( RpmScanner.class ),
+            nexusScheduler
+        )
         {
-            this.task = task;
-            this.threadNames = threadNames;
-        }
-
-        @Override
-        public Object intercept( Object obj, Method method, Object[] args, MethodProxy proxy )
-            throws Throwable
-        {
-            if ( "doRun".equals( method.getName() ) )
+            @Override
+            protected YumRepository doRun()
+                throws Exception
             {
                 String threadName = Thread.currentThread().getName();
                 LOG.debug( "Thread name : {}", threadName );
@@ -197,11 +176,9 @@ public class YumMetadataGenerationTaskConcurrencyTest
                 Thread.sleep( 100 );
                 return null;
             }
-
-            Method origMethod =
-                findMethod( YumMetadataGenerationTask.class, method.getName(), method.getParameterTypes() );
-            return origMethod.invoke( task, args );
-        }
-
+        };
+        task.setRepositoryId( "REPO_" + repositoryId );
+        return task;
     }
+
 }

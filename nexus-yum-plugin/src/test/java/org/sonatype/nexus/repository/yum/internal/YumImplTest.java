@@ -26,7 +26,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import junit.framework.Assert;
 
@@ -40,21 +39,14 @@ public class YumImplTest
 
     private static final String SNAPSHOTS = "snapshots";
 
-    // private static final String FILE_PATH1 = "path1.rpm";
-    // private static final String FILE_PATH2 = "path2.rpm";
-
     @Inject
     private YumRegistry yumRegistry;
-
-    @Inject
-    private YumPluginConfiguration yumConfig;
 
     private YumImpl yum;
 
     @Before
     public void activateService()
     {
-        yumConfig.setActive( true );
         yum = (YumImpl) yumRegistry.register( createRepository( SNAPSHOTS ) );
     }
 
@@ -79,14 +71,6 @@ public class YumImplTest
         YumRepository repo2 = yum.getYumRepository( VERSION_1_0, new URL( REPO_BASE_URL ) );
 
         assertNotSame( repo1, repo2 );
-    }
-
-    @Test
-    public void shouldNotCreateYumRepo()
-        throws Exception
-    {
-        yumConfig.setActive( false );
-        Assert.assertNull( yum.createYumRepository() );
     }
 
     @Test

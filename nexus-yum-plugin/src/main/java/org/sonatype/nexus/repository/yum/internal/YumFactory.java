@@ -12,12 +12,14 @@
  */
 package org.sonatype.nexus.repository.yum.internal;
 
+import java.io.File;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 
 public interface YumFactory
 {
 
-    Yum create( Repository repository );
+    Yum create( File temporaryDirectory, Repository repository );
 
 }

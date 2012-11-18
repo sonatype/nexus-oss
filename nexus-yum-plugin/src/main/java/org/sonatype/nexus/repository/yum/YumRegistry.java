@@ -12,10 +12,14 @@
  */
 package org.sonatype.nexus.repository.yum;
 
+import java.io.File;
+
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 public interface YumRegistry
 {
+
+    static final int DEFAULT_MAX_NUMBER_PARALLEL_THREADS = 10;
 
     Yum register( MavenRepository repository );
 
@@ -24,5 +28,11 @@ public interface YumRegistry
     Yum get( String repositoryId );
 
     boolean isRegistered( String repositoryId );
+
+    YumRegistry setMaxNumberOfParallelThreads( int maxNumberOfParallelThreads );
+
+    int maxNumberOfParallelThreads();
+
+    File getTemporaryDirectory();
 
 }

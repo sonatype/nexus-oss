@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.yum.internal.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
 
@@ -24,9 +25,9 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import com.google.common.base.Preconditions;
 
 @Component( role = PlexusResource.class, hint = "VersionedYumRepositoryResource" )
 @Path( VersionedYumRepositoryResource.RESOURCE_URI )
@@ -48,11 +49,13 @@ public class VersionedYumRepositoryResource
     public static final String RESOURCE_URI = YUM_REPO_PREFIX + "/{" + REPOSITORY_URL_PARAM + "}/{" + VERSION_URL_PARAM
         + "}";
 
-    @Inject
-    private YumPluginConfiguration yumConfiguration;
+    private final YumRegistry yumRegistry;
 
     @Inject
-    private YumRegistry yumRegistry;
+    public VersionedYumRepositoryResource( final YumRegistry yumRegistry )
+    {
+        this.yumRegistry = checkNotNull( yumRegistry );
+    }
 
     @Override
     protected String getUrlPrefixName()

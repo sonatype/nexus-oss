@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -57,9 +56,6 @@ public class VersionedYumRepositoryResourceTest
 
     @Inject
     private YumRegistry yumRegistry;
-
-    @Inject
-    private YumPluginConfiguration yumPluginConfiguration;
 
     private MavenRepository repository;
 

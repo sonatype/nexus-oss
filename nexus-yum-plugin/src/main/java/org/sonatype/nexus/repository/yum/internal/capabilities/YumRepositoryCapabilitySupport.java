@@ -127,6 +127,7 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
     public Condition activationCondition()
     {
         return conditions.logical().and(
+            conditions.capabilities().capabilityOfTypeActive( YumCapabilityDescriptor.TYPE ),
             conditions.repository().repositoryIsInService( new RepositoryConditions.RepositoryId()
             {
                 @Override

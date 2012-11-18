@@ -18,7 +18,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask.ID;
-import static org.sonatype.nexus.repository.yum.internal.utils.ReflectionTestUtils.setField;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
@@ -37,11 +36,11 @@ import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
 import org.sonatype.nexus.test.os.IgnoreOn;
 import org.sonatype.nexus.test.os.OsTestRule;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class YumGroupRepositoryGenerationTaskTest
@@ -75,7 +74,7 @@ public class YumGroupRepositoryGenerationTaskTest
     public void shouldNotAllowConcurrentExecutionForSameRepo()
         throws Exception
     {
-        final YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
+        final YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask( mock( EventBus.class ) );
         final GroupRepository groupRepo = mock( GroupRepository.class );
         when( groupRepo.getId() ).thenReturn( GROUP_ID_1 );
         task.setGroupRepository( groupRepo );
@@ -86,7 +85,7 @@ public class YumGroupRepositoryGenerationTaskTest
     public void shouldNotAllowConcurrentExecutionIfAnotherTaskIsRunning()
         throws Exception
     {
-        final YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
+        final YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask( mock( EventBus.class ) );
         final GroupRepository groupRepo = mock( GroupRepository.class );
         when( groupRepo.getId() ).thenReturn( GROUP_ID_1 );
         final GroupRepository groupRepo2 = mock( GroupRepository.class );
@@ -121,11 +120,8 @@ public class YumGroupRepositoryGenerationTaskTest
     private void thenGenerateYumRepo()
         throws Exception
     {
-        YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
+        YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask( mock( EventBus.class ) );
         task.setGroupRepository( groupRepo );
-        final YumPluginConfiguration yumConfig = mock( YumPluginConfiguration.class );
-        when( yumConfig.isActive() ).thenReturn( true );
-        setField( task, "yumConfig", yumConfig );
         task.doRun();
     }
 

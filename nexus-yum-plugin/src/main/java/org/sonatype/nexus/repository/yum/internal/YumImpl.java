@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.yum.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.io.File.pathSeparator;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -37,7 +38,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.task.TaskAlreadyScheduledException;
 import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
@@ -60,11 +60,11 @@ public class YumImpl
 
     private final NexusScheduler nexusScheduler;
 
-    private final YumPluginConfiguration yumConfig;
-
     private final ScheduledThreadPoolExecutor executor;
 
     private final Repository repository;
+
+    private final File temporaryDirectory;
 
     private boolean processDeletes;
 
@@ -85,16 +85,17 @@ public class YumImpl
     @Inject
     public YumImpl( final RepositoryURLBuilder repositoryURLBuilder,
                     final NexusScheduler nexusScheduler,
-                    final YumPluginConfiguration yumConfig,
                     final ScheduledThreadPoolExecutor executor,
-                    final @Assisted Repository repository )
+                    final @Assisted Repository repository,
+                    final @Assisted File temporaryDirectory )
         throws MalformedURLException, URISyntaxException
+
     {
-        this.repositoryURLBuilder = repositoryURLBuilder;
-        this.nexusScheduler = nexusScheduler;
-        this.yumConfig = yumConfig;
-        this.executor = executor;
-        this.repository = repository;
+        this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
+        this.nexusScheduler = checkNotNull( nexusScheduler );
+        this.executor = checkNotNull( executor );
+        this.repository = checkNotNull( repository );
+        this.temporaryDirectory = checkNotNull( temporaryDirectory );
 
         this.processDeletes = true;
         this.deleteProcessingDelay = DEFAULT_DELETE_PROCESSING_DELAY;
@@ -194,24 +195,19 @@ public class YumImpl
         try
         {
             File rpmBaseDir = RepositoryUtils.getBaseDir( repository );
-            if ( yumConfig.isActive() )
-            {
-                YumMetadataGenerationTask task = createTask();
-                task.setRpmDir( rpmBaseDir.getAbsolutePath() );
-                task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
-                task.setRepoDir( yumRepoBaseDir );
-                task.setRepoUrl( yumRepoUrl.toString() );
-                task.setRepositoryId( repository.getId() );
-                task.setVersion( version );
-                return submitTask( task );
-            }
+            YumMetadataGenerationTask task = createTask();
+            task.setRpmDir( rpmBaseDir.getAbsolutePath() );
+            task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
+            task.setRepoDir( yumRepoBaseDir );
+            task.setRepoUrl( yumRepoUrl.toString() );
+            task.setRepositoryId( repository.getId() );
+            task.setVersion( version );
+            return submitTask( task );
         }
         catch ( Exception e )
         {
             throw new RuntimeException( "Unable to create repository", e );
         }
-
-        return null;
     }
 
     @Override
@@ -260,22 +256,17 @@ public class YumImpl
         try
         {
             File rpmBaseDir = RepositoryUtils.getBaseDir( repository );
-            if ( yumConfig.isActive() )
-            {
-                YumMetadataGenerationTask task = createTask();
-                task.setRpmDir( rpmBaseDir.getAbsolutePath() );
-                task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
-                task.setRepositoryId( repository.getId() );
-                task.setAddedFiles( filePath );
-                return submitTask( task );
-            }
+            YumMetadataGenerationTask task = createTask();
+            task.setRpmDir( rpmBaseDir.getAbsolutePath() );
+            task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
+            task.setRepositoryId( repository.getId() );
+            task.setAddedFiles( filePath );
+            return submitTask( task );
         }
         catch ( Exception e )
         {
             throw new RuntimeException( "Unable to create repository", e );
         }
-
-        return null;
     }
 
     @SuppressWarnings( "unchecked" )
@@ -317,7 +308,7 @@ public class YumImpl
 
     private File createRepositoryTempDir( Repository repository, String version )
     {
-        return new File( yumConfig.getBaseTempDir(), repository.getId() + File.separator + version );
+        return new File( temporaryDirectory, repository.getId() + File.separator + version );
     }
 
     @Override

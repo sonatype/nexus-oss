@@ -19,6 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -30,7 +31,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -62,9 +62,6 @@ public class YumImplDeletionsTest
     public void prepareService()
         throws MalformedURLException, URISyntaxException
     {
-        final YumPluginConfiguration config = mock( YumPluginConfiguration.class );
-        when( config.isActive() ).thenReturn( true );
-
         repository = mock( Repository.class );
         when( repository.getId() ).thenReturn( REPO_ID );
         when( repository.getLocalUrl() ).thenReturn( "/target" );
@@ -75,10 +72,13 @@ public class YumImplDeletionsTest
         );
 
         yum = new YumImpl(
-            mock( RepositoryURLBuilder.class ), nexusScheduler, config, new ScheduledThreadPoolExecutor( 10 ),
-            repository
+            mock( RepositoryURLBuilder.class ),
+            nexusScheduler,
+            new ScheduledThreadPoolExecutor( 10 ),
+            repository,
+            new File( util.getTargetDir(), "tmp" )
         ).setProcessDeletes( true )
-        .setDeleteProcessingDelay( TIMEOUT_IN_SEC );
+            .setDeleteProcessingDelay( TIMEOUT_IN_SEC );
     }
 
     @Test

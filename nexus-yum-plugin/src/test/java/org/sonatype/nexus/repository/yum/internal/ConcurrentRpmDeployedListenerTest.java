@@ -36,7 +36,6 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -69,21 +68,6 @@ public class ConcurrentRpmDeployedListenerTest
 
     @Inject
     private YumRegistry repositoryRegistry;
-
-    @Inject
-    private YumPluginConfiguration yumConfig;
-
-    @Before
-    public void activateRepo()
-    {
-        yumConfig.setActive( true );
-    }
-
-    @After
-    public void reactivateRepo()
-    {
-        yumConfig.setActive( true );
-    }
 
     @Concurrent( count = 1 )
     @Test

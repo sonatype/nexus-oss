@@ -24,9 +24,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -35,14 +35,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-@Component( role = SchedulerTask.class, hint = YumGroupRepositoryGenerationTask.ID,
-            instantiationStrategy = "per-lookup" )
+@Named( YumGroupRepositoryGenerationTask.ID )
 public class YumGroupRepositoryGenerationTask
     extends AbstractNexusTask<YumRepository>
 {
@@ -56,10 +54,13 @@ public class YumGroupRepositoryGenerationTask
 
     private GroupRepository groupRepository;
 
-    @Requirement
-    private YumPluginConfiguration yumConfig;
+    @Inject
+    public YumGroupRepositoryGenerationTask( final EventBus eventBus )
+    {
+        super( eventBus, null );
+    }
 
-    public void setGroupRepository( GroupRepository groupRepository )
+    public void setGroupRepository( final GroupRepository groupRepository )
     {
         this.groupRepository = groupRepository;
     }
@@ -68,7 +69,7 @@ public class YumGroupRepositoryGenerationTask
     protected YumRepository doRun()
         throws Exception
     {
-        if ( yumConfig.isActive() && isValidRepository() )
+        if ( isValidRepository() )
         {
             cleanYumCacheDir();
 

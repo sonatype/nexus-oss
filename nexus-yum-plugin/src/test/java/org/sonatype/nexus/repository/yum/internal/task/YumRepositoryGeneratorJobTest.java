@@ -17,10 +17,7 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
 
 public class YumRepositoryGeneratorJobTest
@@ -38,9 +35,6 @@ public class YumRepositoryGeneratorJobTest
     private static final String BASE_VERSIONED_URL = "http://localhost:8080/nexus/service/local/yum/snapshots/"
         + VERSION;
 
-    @Requirement
-    private YumPluginConfiguration yumConfig;
-
     @Override
     public void setUp()
         throws Exception
@@ -48,8 +42,6 @@ public class YumRepositoryGeneratorJobTest
         super.setUp();
         deleteDirectory( RepositoryTestUtils.PACKAGE_CACHE_DIR );
         deleteDirectory( RepositoryTestUtils.REPODATA_DIR );
-        deleteDirectory( yumConfig.getBaseTempDir() );
-        yumConfig.setActive( true );
     }
 
     @Test
@@ -60,16 +52,6 @@ public class YumRepositoryGeneratorJobTest
             createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
         RepositoryTestUtils.assertRepository( RepositoryTestUtils.REPODATA_DIR, "default" );
 
-    }
-
-    @Test
-    public void shouldNotExecuteCreateRepoIfDeactivated()
-        throws Exception
-    {
-        yumConfig.setActive( false );
-        executeJob(
-            createTask( RepositoryTestUtils.RPM_BASE_FILE, BASE_URL, RepositoryTestUtils.TARGET_DIR, SNAPSHOTS ) );
-        Assert.assertFalse( RepositoryTestUtils.REPODATA_DIR.exists() );
     }
 
     @Test

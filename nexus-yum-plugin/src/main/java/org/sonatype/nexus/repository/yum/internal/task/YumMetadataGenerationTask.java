@@ -47,12 +47,12 @@ import org.sonatype.nexus.repository.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.repository.yum.internal.RpmListWriter;
 import org.sonatype.nexus.repository.yum.internal.RpmScanner;
 import org.sonatype.nexus.repository.yum.internal.YumRepositoryImpl;
-import org.sonatype.nexus.repository.yum.internal.config.YumPluginConfiguration;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
@@ -82,8 +82,6 @@ public class YumMetadataGenerationTask
 
     public static final String PARAM_VERSION = "yumMetadataGenerationVersion";
 
-    public static final String PARAM_CACHE_DIR = "yumMetadataGenerationCacheDir";
-
     public static final String PARAM_RPM_URL = "yumMetadataGenerationRpmUrl";
 
     public static final String PARAM_REPO_URL = "yumMetadataGenerationRepoUrl";
@@ -94,8 +92,6 @@ public class YumMetadataGenerationTask
 
     private final RepositoryRegistry repositoryRegistry;
 
-    private final YumPluginConfiguration yumConfig;
-
     private final RepositoryURLBuilder repositoryURLBuilder;
 
     private final RpmScanner scanner;
@@ -104,31 +100,19 @@ public class YumMetadataGenerationTask
 
     private final YumRegistry yumRegistry;
 
-    @VisibleForTesting
-    protected YumMetadataGenerationTask()
-    {
-        this.repositoryRegistry = null;
-        this.yumConfig = null;
-        this.repositoryURLBuilder = null;
-        this.scanner = null;
-        this.nexusScheduler = null;
-        this.yumRegistry = null;
-    }
-
     @Inject
-    public YumMetadataGenerationTask( final RepositoryRegistry repositoryRegistry,
+    public YumMetadataGenerationTask( final EventBus eventBus,
+                                      final RepositoryRegistry repositoryRegistry,
                                       final YumRegistry yumRegistry,
-                                      final YumPluginConfiguration yumConfig,
                                       final RepositoryURLBuilder repositoryURLBuilder,
                                       final RpmScanner scanner,
                                       final NexusScheduler nexusScheduler )
     {
-        super( null );
+        super( eventBus, null );
         this.yumRegistry = checkNotNull( yumRegistry );
         this.nexusScheduler = checkNotNull( nexusScheduler );
         this.scanner = checkNotNull( scanner );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
-        this.yumConfig = checkNotNull( yumConfig );
         this.repositoryURLBuilder = checkNotNull( repositoryURLBuilder );
 
         getParameters().put( PARAM_SINGLE_RPM_PER_DIR, Boolean.toString( true ) );
@@ -138,33 +122,28 @@ public class YumMetadataGenerationTask
     protected YumRepository doRun()
         throws Exception
     {
-        if ( yumConfig.isActive() )
+        setDefaults();
+
+        LOG.debug( "Generating Yum-Repository for '{}' ...", getRpmDir() );
+        try
         {
-            setDefaults();
+            getRepoDir().mkdirs();
 
-            LOG.debug( "Generating Yum-Repository for '{}' ...", getRpmDir() );
-            try
-            {
-                getRepoDir().mkdirs();
+            File rpmListFile = createRpmListFile();
+            new CommandLineExecutor().exec( buildCreateRepositoryCommand( rpmListFile ) );
 
-                File rpmListFile = createRpmListFile();
-                new CommandLineExecutor().exec( buildCreateRepositoryCommand( rpmListFile ) );
-
-                replaceUrl();
-            }
-            catch ( IOException e )
-            {
-                LOG.warn( "Generating Yum-Repo failed", e );
-                throw new IOException( "Generating Yum-Repo failed", e );
-            }
-            // TODO dubious
-            Thread.sleep( 100 );
-
-            regenerateMetadataForGroups();
-            return new YumRepositoryImpl( getRepoDir(), getRepositoryId(), getVersion() );
+            replaceUrl();
         }
+        catch ( IOException e )
+        {
+            LOG.warn( "Generating Yum-Repo failed", e );
+            throw new IOException( "Generating Yum-Repo failed", e );
+        }
+        // TODO dubious
+        Thread.sleep( 100 );
 
-        return null;
+        regenerateMetadataForGroups();
+        return new YumRepositoryImpl( getRepoDir(), getRepositoryId(), getVersion() );
     }
 
     protected void setDefaults()
@@ -231,7 +210,7 @@ public class YumMetadataGenerationTask
                     activeRunningTasks++;
                 }
             }
-            return activeRunningTasks < yumConfig.getMaxParallelThreadCount();
+            return activeRunningTasks < yumRegistry.maxNumberOfParallelThreads();
         }
 
         return true;
@@ -305,13 +284,6 @@ public class YumMetadataGenerationTask
         ).writeList();
     }
 
-    private File createCacheDir()
-    {
-        File cacheDir = new File( getCacheDir(), getRepositoryIdVersion() );
-        cacheDir.mkdirs();
-        return cacheDir;
-    }
-
     private String getRepositoryIdVersion()
     {
         return getRepositoryId() + ( isNotBlank( getVersion() ) ? ( "-version-" + getVersion() ) : "" );
@@ -321,7 +293,7 @@ public class YumMetadataGenerationTask
         throws IOException
     {
         File repomd = new File( getRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML );
-        if ( yumConfig.isActive() && repomd.exists() && getRepoUrl() != null )
+        if ( repomd.exists() && getRepoUrl() != null )
         {
             String repomdStr = FileUtils.readFileToString( repomd );
             repomdStr = repomdStr.replace( getRpmUrl(), getRepoUrl() );
@@ -343,16 +315,23 @@ public class YumMetadataGenerationTask
         return new File( createPackageDir(), getRepositoryId() + ".txt" );
     }
 
-    private File createPackageDir()
+    private File createCacheDir()
     {
-        File PackageDir = new File( getCacheDir(), PACKAGE_FILE_DIR_NAME );
-        PackageDir.mkdirs();
-        return PackageDir;
+        return getCacheDir( getRepositoryIdVersion() );
     }
 
-    private File getCacheDir()
+    private File createPackageDir()
     {
-        return new File( yumConfig.getBaseTempDir(), CACHE_DIR_PREFIX + getRepositoryId() );
+        return getCacheDir( PACKAGE_FILE_DIR_NAME );
+    }
+
+    private File getCacheDir( final String name )
+    {
+        final File cacheDir = new File(
+            new File( yumRegistry.getTemporaryDirectory(), CACHE_DIR_PREFIX + getRepositoryId() ), name
+        );
+        cacheDir.mkdirs();
+        return cacheDir;
     }
 
     @Override
@@ -369,11 +348,6 @@ public class YumMetadataGenerationTask
     public void setRepositoryId( String repositoryId )
     {
         getParameters().put( PARAM_REPO_ID, repositoryId );
-    }
-
-    public void setRepository( Repository repository )
-    {
-        setRepositoryId( repository.getId() );
     }
 
     public String getAddedFiles()
