@@ -25,7 +25,7 @@ import com.google.common.collect.Maps;
 public class YumCapabilityConfiguration
 {
 
-    public static final String MAX_PARALLEL_THREADS = "maxParallelThreads";
+    public static final String MAX_NUMBER_PARALLEL_THREADS = "maxNumberParallelThreads";
 
     private int maxParallelThreads;
 
@@ -39,7 +39,7 @@ public class YumCapabilityConfiguration
         int maxParallelThreads = YumRegistry.DEFAULT_MAX_NUMBER_PARALLEL_THREADS;
         try
         {
-            maxParallelThreads = Integer.parseInt( properties.get( MAX_PARALLEL_THREADS ) );
+            maxParallelThreads = Integer.parseInt( properties.get( MAX_NUMBER_PARALLEL_THREADS ) );
         }
         catch ( NumberFormatException e )
         {
@@ -56,7 +56,7 @@ public class YumCapabilityConfiguration
     public Map<String, String> asMap()
     {
         final Map<String, String> props = Maps.newHashMap();
-        props.put( MAX_PARALLEL_THREADS, String.valueOf( maxParallelThreads ) );
+        props.put( MAX_NUMBER_PARALLEL_THREADS, String.valueOf( maxParallelThreads ) );
         return props;
     }
 
