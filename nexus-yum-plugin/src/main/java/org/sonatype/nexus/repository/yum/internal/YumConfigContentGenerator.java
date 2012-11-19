@@ -101,4 +101,9 @@ public class YumConfigContentGenerator
         };
     }
 
+    public static String configFilePath( final String repositoryId )
+    {
+        return ".meta/" + repositoryId + ".repo";
+    }
+
 }

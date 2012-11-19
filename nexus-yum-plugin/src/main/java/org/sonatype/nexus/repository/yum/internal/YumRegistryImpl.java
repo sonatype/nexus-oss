@@ -136,7 +136,7 @@ public class YumRegistryImpl
     {
         DefaultStorageFileItem file = new DefaultStorageFileItem(
             repository,
-            new ResourceStoreRequest( ".meta/" + repository.getId() + ".repo" ),
+            new ResourceStoreRequest( YumConfigContentGenerator.configFilePath( repository.getId() ) ),
             true,
             false,
             new StringContentLocator( YumConfigContentGenerator.ID )

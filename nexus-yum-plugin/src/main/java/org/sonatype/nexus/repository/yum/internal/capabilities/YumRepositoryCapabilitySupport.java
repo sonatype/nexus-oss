@@ -14,20 +14,27 @@ package org.sonatype.nexus.repository.yum.internal.capabilities;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.InputStream;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.apache.commons.io.IOUtils;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.internal.YumConfigContentGenerator;
 import com.google.common.base.Throwables;
+import com.google.common.io.Closeables;
 
 public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapabilityConfigurationSupport>
     extends CapabilitySupport
@@ -54,7 +61,7 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
     @Override
     public String description()
     {
-        if ( configuration != null )
+        if ( isConfigured() )
         {
             try
             {
@@ -153,6 +160,43 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
                 return isConfigured() ? configuration.repository() : null;
             }
         } );
+    }
+
+    @Override
+    public String status()
+    {
+        if ( isConfigured() )
+        {
+            try
+            {
+                final Repository repository = repositoryRegistry.getRepository( configuration.repository() );
+                final StorageItem storageItem = repository.retrieveItem(
+                    new ResourceStoreRequest( YumConfigContentGenerator.configFilePath( repository.getId() ), true )
+                );
+                if ( storageItem instanceof StorageFileItem )
+                {
+                    InputStream in = null;
+                    try
+                    {
+                        in = ( (StorageFileItem) storageItem ).getInputStream();
+                        return
+                            "<b>Example Yum configuration file:</b><br/><br/>"
+                                + "<pre>"
+                                + IOUtils.toString( in )
+                                + "</pre>";
+                    }
+                    finally
+                    {
+                        Closeables.closeQuietly( in );
+                    }
+                }
+            }
+            catch ( Exception e )
+            {
+                return super.status();
+            }
+        }
+        return null;
     }
 
     public C configuration()
