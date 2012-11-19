@@ -17,6 +17,8 @@ import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase.UTIL;
 
 import java.io.File;
@@ -36,6 +38,12 @@ import org.custommonkey.xmlunit.Diff;
 import org.freecompany.redline.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.RequestContext;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 public final class RepositoryTestUtils
 {
@@ -63,6 +71,8 @@ public final class RepositoryTestUtils
     public static final String PRIMARY_XML_GZ = PRIMARY_XML + ".gz";
 
     private static final Logger LOG = LoggerFactory.getLogger( RepositoryTestUtils.class );
+
+    private static final String REPO = "foo";
 
     public static void assertRepository( File repodataDir, String templateName )
         throws Exception
@@ -150,6 +160,50 @@ public final class RepositoryTestUtils
         final File destDir = new File( BASE_TMP_FILE, RandomStringUtils.randomAlphabetic( 20 ) );
         copyDirectory( srcDir, destDir );
         return destDir;
+    }
+
+    public static MavenRepository createRepository( final boolean isMavenHostedRepository )
+    {
+        return createRepository( isMavenHostedRepository, REPO );
+    }
+
+    public static MavenRepository createRepository( final boolean isMavenHostedRepository,
+                                                    final String repoId )
+    {
+        final RepositoryKind kind = mock( RepositoryKind.class );
+        when( kind.isFacetAvailable( MavenHostedRepository.class ) ).thenReturn( isMavenHostedRepository );
+
+        final MavenHostedRepository repository = mock( MavenHostedRepository.class );
+        when( repository.getRepositoryKind() ).thenReturn( kind );
+        when( repository.getId() ).thenReturn( repoId );
+        when( repository.getProviderRole() ).thenReturn( Repository.class.getName() );
+        when( repository.getProviderHint() ).thenReturn( "maven2" );
+
+        if ( isMavenHostedRepository )
+        {
+            when( repository.adaptToFacet( MavenHostedRepository.class ) ).thenReturn( repository );
+        }
+        else
+        {
+            when( repository.adaptToFacet( MavenHostedRepository.class ) ).thenThrow( new ClassCastException() );
+        }
+
+        final File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );
+        repoDir.mkdirs();
+        when( repository.getLocalUrl() ).thenReturn( repoDir.toURI().toString() );
+
+        return repository;
+    }
+
+    public static StorageItem createItem( String version, String filename )
+    {
+        final StorageItem item = mock( StorageItem.class );
+
+        when( item.getPath() ).thenReturn( "blalu/" + version + "/" + filename );
+        when( item.getParentPath() ).thenReturn( "blalu/" + version );
+        when( item.getItemContext() ).thenReturn( new RequestContext() );
+
+        return item;
     }
 
     private static class Marker

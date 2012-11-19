@@ -40,8 +40,6 @@ public abstract class AbstractRepositoryTester
     extends AbstractYumNexusTestCase
 {
 
-    private static final String SNAPSHOTS = "snapshots";
-
     @Inject
     private NexusScheduler nexusScheduler;
 
@@ -78,46 +76,4 @@ public abstract class AbstractRepositoryTester
         BASE_CACHE_DIR.mkdirs();
     }
 
-    protected MavenRepository createRepository( final boolean isMavenHostedRepository )
-    {
-        return createRepository( isMavenHostedRepository, SNAPSHOTS );
-    }
-
-    protected MavenRepository createRepository( final boolean isMavenHostedRepository, final String repoId )
-    {
-        final RepositoryKind kind = mock( RepositoryKind.class );
-        when( kind.isFacetAvailable( MavenHostedRepository.class ) ).thenReturn( isMavenHostedRepository );
-
-        final MavenHostedRepository repository = mock( MavenHostedRepository.class );
-        when( repository.getRepositoryKind() ).thenReturn( kind );
-        when( repository.getId() ).thenReturn( repoId );
-        when( repository.getProviderRole() ).thenReturn( Repository.class.getName() );
-        when( repository.getProviderHint() ).thenReturn( "maven2" );
-
-        if ( isMavenHostedRepository )
-        {
-            when( repository.adaptToFacet( MavenHostedRepository.class ) ).thenReturn( repository );
-        }
-        else
-        {
-            when( repository.adaptToFacet( MavenHostedRepository.class ) ).thenThrow( new ClassCastException() );
-        }
-
-        final File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );
-        repoDir.mkdirs();
-        when( repository.getLocalUrl() ).thenReturn( repoDir.toURI().toString() );
-
-        return repository;
-    }
-
-    protected StorageItem createItem( String version, String filename )
-    {
-        final StorageItem item = mock( StorageItem.class );
-
-        when( item.getPath() ).thenReturn( "blalu/" + version + "/" + filename );
-        when( item.getParentPath() ).thenReturn( "blalu/" + version );
-        when( item.getItemContext() ).thenReturn( new RequestContext() );
-
-        return item;
-    }
 }

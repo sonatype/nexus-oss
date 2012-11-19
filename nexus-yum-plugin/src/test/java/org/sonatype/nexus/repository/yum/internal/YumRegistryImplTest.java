@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.yum.internal;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createRepository;
 
 import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;

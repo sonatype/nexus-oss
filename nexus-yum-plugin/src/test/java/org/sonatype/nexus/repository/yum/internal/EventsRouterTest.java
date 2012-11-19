@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.yum.internal;
 
+import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createItem;
+import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createRepository;
+
 import javax.inject.Inject;
 
 import org.junit.Test;

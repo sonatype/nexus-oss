@@ -16,6 +16,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createItem;
+import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createRepository;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
@@ -26,8 +28,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import javax.inject.Inject;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
