@@ -250,6 +250,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       setWarningLabel : function(s) {
         this.clearWarningLabel();
         this.warningLabel = this.searchToolbar.addText('<span class="x-toolbar-warning">' + s + '</span>');
+        this.searchToolbar.doLayout();
       },
       // clear the warning in the toolbar
       clearWarningLabel : function() {
@@ -257,6 +258,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
         {
           this.warningLabel.destroy();
           this.warningLabel = null;
+          this.searchToolbar.doLayout();
         }
       },
       // start the search
