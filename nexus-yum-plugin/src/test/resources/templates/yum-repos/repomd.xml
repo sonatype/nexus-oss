@@ -15,40 +15,40 @@
 -->
 <repomd xmlns="http://linux.duke.edu/metadata/repo">
   <data type="other_db">
-    <location xml:base="http://localhost:8080/nexus/service/local/yum/repo" href="repodata/other.sqlite.bz2"/>
+    <location href="repodata/other.sqlite.bz2"/>
     <checksum type="sha">112b36980ce8def7a2cbef9b92d7ab5203a94106</checksum>
     <timestamp>1309502546</timestamp>
     <open-checksum type="sha">f24edd89871ee397e4b040c1b0b2c611061b370f</open-checksum>
     <database_version>10</database_version>
   </data>
   <data type="other">
-    <location xml:base="http://localhost:8080/nexus/service/local/yum/repo" href="repodata/other.xml.gz"/>
+    <location href="repodata/other.xml.gz"/>
     <checksum type="sha">63317d5f293abf11503cbdaac43cd71d8a56f474</checksum>
     <timestamp>1309502546</timestamp>
     <open-checksum type="sha">0869eb19dca5a39bc52164deead7537926e1b1a0</open-checksum>
   </data>
   <data type="filelists_db">
-    <location xml:base="http://localhost:8080/nexus/service/local/yum/repo" href="repodata/filelists.sqlite.bz2"/>
+    <location href="repodata/filelists.sqlite.bz2"/>
     <checksum type="sha">26b41511cf2fc205a861fdac05662091e72a4673</checksum>
     <timestamp>1309502546</timestamp>
     <open-checksum type="sha">afd8a832cfa4e224a95ee7dd70fee7440479695d</open-checksum>
     <database_version>10</database_version>
   </data>
   <data type="filelists">
-    <location xml:base="http://localhost:8080/nexus/service/local/yum/repo" href="repodata/filelists.xml.gz"/>
+    <location href="repodata/filelists.xml.gz"/>
     <checksum type="sha">6f33f09cc8d761b413cac05b60a03896887f4363</checksum>
     <timestamp>1309502546</timestamp>
     <open-checksum type="sha">77ef9f1b49a70e13d534148c3de8cb59f3c80d97</open-checksum>
   </data>
   <data type="primary_db">
-    <location xml:base="http://localhost:8080/nexus/service/local/yum/repo" href="repodata/primary.sqlite.bz2"/>
+    <location href="repodata/primary.sqlite.bz2"/>
     <checksum type="sha">7ea4d6da46d92c770ea05d77c405efc0cad5de20</checksum>
     <timestamp>1309502546</timestamp>
     <open-checksum type="sha">e861519aac12ab7703a89774f5b2828720642eed</open-checksum>
     <database_version>10</database_version>
   </data>
   <data type="primary">
-    <location xml:base="http://localhost:8080/nexus/service/local/yum/repo" href="repodata/primary.xml.gz"/>
+    <location href="repodata/primary.xml.gz"/>
     <checksum type="sha">0a25bf7a5c30f01f895119776f8c355d31dc723d</checksum>
     <timestamp>1309502546</timestamp>
     <open-checksum type="sha">35b703d07bc620e93cf77de6cc6bf4d846e848d8</open-checksum>

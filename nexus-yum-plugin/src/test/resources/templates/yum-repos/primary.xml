@@ -27,8 +27,7 @@
     <url/>
     <time file="1309502546" build="1309502546"/>
     <size package="1865" installed="252" archive="672"/>
-    <location xml:base="http://localhost:8080/nexus/service/local/yum/repo"
-              href="is24-rel-snapshots-0.1.2-snapshot-repo-1-1.noarch.rpm"/>
+    <location href="is24-rel-snapshots-0.1.2-snapshot-repo-1-1.noarch.rpm"/>
     <format>
       <rpm:license/>
       <rpm:vendor>IS24</rpm:vendor>
