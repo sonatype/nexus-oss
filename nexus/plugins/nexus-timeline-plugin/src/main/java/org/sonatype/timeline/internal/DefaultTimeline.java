@@ -116,17 +116,12 @@ public class DefaultTimeline
                             "Timeline index is succesfully repaired, the last "
                                 + configuration.getRepairDaysCountRestored() + " days were restored." );
                     }
-                    catch ( IOException ex )
-                    {
-                        markIndexerDead( ex );
-                        throw ex;
-                    }
                     catch ( Exception ex )
                     {
+                        // do not propagate the exception for indexer
+                        // we have persistor started, and that's enough
                         markIndexerDead( ex );
-                        throw new IOException( "Failed to repair indexer!", ex );
                     }
-
                 }
                 DefaultTimeline.this.started = true;
                 getLogger().info( "Started Timeline..." );
