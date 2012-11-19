@@ -49,8 +49,7 @@ public class YumGroupRepositoryGenerationTask
 
     public static final String ID = "YumGroupRepositoryGenerationTask";
 
-    private static final int MAXIMAL_PARALLEL_RUNS = 1; // we need to clean the
-    // yum cache repo first
+    private static final int MAXIMAL_PARALLEL_RUNS = 1;
 
     private GroupRepository groupRepository;
 
