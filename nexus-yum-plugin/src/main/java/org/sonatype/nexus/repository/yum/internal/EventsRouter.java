@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask;
@@ -63,9 +64,9 @@ public class EventsRouter
     public void on( final RepositoryGroupMembersChangedEvent event )
     {
         if ( yumRegistryProvider.get().isRegistered( event.getGroupRepository().getId() )
-            && ( anyOfRepositoriesIsYumEnabled( event.getAddedRepositoryIds() )
-            || anyOfRepositoriesIsYumEnabled( event.getRemovedRepositoryIds() )
-            || anyOfRepositoriesIsYumEnabled( event.getReorderedRepositoryIds() ) ) )
+            && ( anyOfRepositoriesHasYumRepository( event.getAddedRepositoryIds() )
+            || anyOfRepositoriesHasYumRepository( event.getRemovedRepositoryIds() )
+            || anyOfRepositoriesHasYumRepository( event.getReorderedRepositoryIds() ) ) )
         {
             YumGroupRepositoryGenerationTask.createTaskFor( nexusScheduler.get(), event.getGroupRepository() );
         }
@@ -121,31 +122,21 @@ public class EventsRouter
         return parts[parts.length - 1];
     }
 
-    private boolean anyOfRepositoriesIsYumEnabled( final List<String> repositoryIds )
+    private boolean anyOfRepositoriesHasYumRepository( final List<String> repositoryIds )
     {
         if ( repositoryIds != null )
         {
             for ( final String repositoryId : repositoryIds )
             {
-                if ( yumRegistryProvider.get().isRegistered( repositoryId ) )
+                try
                 {
-                    final Yum yum = yumRegistryProvider.get().get( repositoryId );
-                    try
-                    {
-                        // TODO this is suspicious. Should not directly use FS
-                        final File repomd = new File(
-                            RepositoryUtils.getBaseDir( yum.getRepository() ), "repodata/repomd.xml"
-                        );
-                        if ( repomd.exists() )
-                        {
-                            return true;
-                        }
-                    }
-                    catch ( final Exception e )
-                    {
-                        // TODO check if we should silently ignore this
-                    }
-
+                    final Repository repository = repositoryRegistry.get().getRepository( repositoryId );
+                    // TODO this is suspicious. Should not directly use FS
+                    return new File( RepositoryUtils.getBaseDir( repository ), "repodata/repomd.xml" ).exists();
+                }
+                catch ( final Exception e )
+                {
+                    // TODO check if we should silently ignore this
                 }
             }
         }
