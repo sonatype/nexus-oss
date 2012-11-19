@@ -68,21 +68,8 @@ public class AbstractYumNexusTestCase
     {
         initConfigurations();
         super.setUp();
-        copyTestConf();
         initRestApiSettings();
         injectFields();
-    }
-
-    private void copyTestConf()
-    {
-        try
-        {
-            copyDirectory( NEXUS_CONF_DIR, getConfHomeDir() );
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( "Could not copy nexus configuration to a temp dir : " + NEXUS_CONF_DIR, e );
-        }
     }
 
     private void injectFields()
