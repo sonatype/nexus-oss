@@ -600,6 +600,7 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                   }]
             } // end notification settings
         ],
+        buttonAlign : 'center',
         buttons : [{
               id : 'savebutton',
               text : 'Save',
