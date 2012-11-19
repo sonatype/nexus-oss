@@ -31,7 +31,7 @@
 
   <link rel="stylesheet" href="ext-3.4.0/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="ext-3.4.0/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="style/sonatype-all.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
+  <link rel="stylesheet" href="style/$buildQualifier/sonatype-all.css" type="text/css" media="screen" title="no title" charset="utf-8">
 
 ##  <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
     <script src="ext-3.4.0/adapter/ext/ext-base$!{debug}.js" type="text/javascript" charset="utf-8"></script>
@@ -48,7 +48,7 @@
 
   #if ($!debug != "-debug")
       ## load aggregated module definitions
-      <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+      <script src="js/$buildQualifier/sonatype-all.js" type="text/javascript" charset="utf-8"></script>
   #end
 
     <script type="text/javascript" charset="utf-8">
