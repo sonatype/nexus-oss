@@ -21,14 +21,17 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Ve
 
 /**
  * adds new snapshot to metadata
- * 
+ *
  * @author Oleg Gusakov
  * @version $Id: SetSnapshotOperation.java 743040 2009-02-10 18:20:26Z ogusakov $
  */
 public class SetSnapshotOperation
     implements MetadataOperation
 {
+
     private SnapshotOperand operand;
+
+    private final VersionComparator versionComparator;
 
     /**
      * @throws MetadataException
@@ -36,6 +39,7 @@ public class SetSnapshotOperation
     public SetSnapshotOperation( SnapshotOperand data )
         throws MetadataException
     {
+        this.versionComparator = new VersionComparator();
         setOperand( data );
     }
 
@@ -45,14 +49,14 @@ public class SetSnapshotOperation
         if ( data == null || !( data instanceof SnapshotOperand ) )
         {
             throw new MetadataException( "Operand is not correct: expected SnapshotOperand, but got "
-                + ( data == null ? "null" : data.getClass().getName() ) );
+                                             + ( data == null ? "null" : data.getClass().getName() ) );
         }
         this.operand = (SnapshotOperand) data;
     }
 
     /**
      * add/replace snapshot to the in-memory metadata instance
-     * 
+     *
      * @param metadata
      * @return
      * @throws MetadataException
@@ -104,7 +108,7 @@ public class SetSnapshotOperation
                 }
                 else
                 {
-                    if ( new VersionComparator().compare( current.getVersion(), extra.getVersion() ) < 0 )
+                    if ( versionComparator.compare( current.getVersion(), extra.getVersion() ) < 0 )
                     {
                         currents.remove( current );
                         currents.add( extra );
@@ -112,7 +116,7 @@ public class SetSnapshotOperation
                 }
             }
         }
-        else if ( Version.V100 == operand.getOriginModelVersion() )
+        else if ( Version.V100 == operand.getOriginModelVersion() && operand.getSnapshot() != null )
         {
             for ( SnapshotVersion current : currents )
             {
