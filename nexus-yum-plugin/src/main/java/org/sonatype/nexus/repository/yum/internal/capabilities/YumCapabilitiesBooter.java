@@ -17,6 +17,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityBooterSupport;
+import org.sonatype.nexus.repository.yum.YumRegistry;
 
 /**
  * Automatically create Yum capability.
@@ -33,7 +34,13 @@ public class YumCapabilitiesBooter
     protected void boot( final CapabilityRegistry registry )
         throws Exception
     {
-        maybeAddCapability( registry, YumCapabilityDescriptor.TYPE, true, null, null );
+        maybeAddCapability(
+            registry,
+            YumCapabilityDescriptor.TYPE,
+            true, // enabled
+            null, // no notes
+            new YumCapabilityConfiguration( YumRegistry.DEFAULT_MAX_NUMBER_PARALLEL_THREADS ).asMap()
+        );
     }
 
 }
