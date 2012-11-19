@@ -24,6 +24,9 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
@@ -68,6 +71,8 @@ public class YumRegistryImpl
             yums.put( repository.getId(), yum );
 
             LOG.info( "Registered repository '{}' as Yum repository", repository.getId() );
+
+            createRepositoryYumConfigFile( repository );
 
             runScanningTask( yum );
 
@@ -125,6 +130,27 @@ public class YumRegistryImpl
     public File getTemporaryDirectory()
     {
         return new File( nexusConfiguration.getTemporaryDirectory(), "nexus-yum-plugin" );
+    }
+
+    private void createRepositoryYumConfigFile( final MavenRepository repository )
+    {
+        DefaultStorageFileItem file = new DefaultStorageFileItem(
+            repository,
+            new ResourceStoreRequest( ".meta/" + repository.getId() + ".repo" ),
+            true,
+            false,
+            new StringContentLocator( YumConfigContentGenerator.ID )
+        );
+        file.setContentGeneratorId( YumConfigContentGenerator.ID );
+
+        try
+        {
+            repository.storeItem( false, file );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Could not store '{}'", file, e );
+        }
     }
 
 }
