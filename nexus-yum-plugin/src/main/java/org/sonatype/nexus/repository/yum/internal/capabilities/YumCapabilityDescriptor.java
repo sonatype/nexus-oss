@@ -48,7 +48,7 @@ public class YumCapabilityDescriptor
             "Yum capability",
             "Yum plugin configuration.",
             new NumberTextFormField(
-                YumRepositoryCapabilityConfiguration.DELETE_PROCESSING_DELAY,
+                YumCapabilityConfiguration.MAX_NUMBER_PARALLEL_THREADS,
                 "Max number of parallel threads",
                 "Maximum number of threads to be used for generating Yum repositories"
                     + " (default 10 threads)",
