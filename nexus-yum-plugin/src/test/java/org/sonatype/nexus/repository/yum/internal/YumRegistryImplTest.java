@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.yum.internal;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createRepository;
@@ -67,6 +71,22 @@ public class YumRegistryImplTest
 
         yumRegistry.unregister( repository.getId() );
         Assert.assertFalse( yumRegistry.isRegistered( repository.getId() ) );
+    }
+
+    @Test
+    public void shouldNotFindRepository()
+        throws Exception
+    {
+        assertThat( yumRegistry.get( "blablup" ), is( nullValue() ) );
+    }
+
+    @Test
+    public void shouldFindRepository()
+        throws Exception
+    {
+        final MavenRepository repository = createRepository( true );
+        yumRegistry.register( repository );
+        assertThat( yumRegistry.get( repository.getId() ), is( notNullValue() ) );
     }
 
     private void waitForAllTasksToBeDone()

@@ -73,21 +73,6 @@ public class YumImplTest
         assertNotSame( repo1, repo2 );
     }
 
-    @Test
-    public void shouldNotFindRepository()
-        throws Exception
-    {
-        Assert.assertNull( yumRegistry.get( "blablup" ) );
-    }
-
-    @Test
-    public void shouldFindRepository()
-        throws Exception
-    {
-        yumRegistry.register( createRepository( SNAPSHOTS ) );
-        Assert.assertNotNull( yumRegistry.get( SNAPSHOTS ) );
-    }
-
     public static MavenRepository createRepository( String id )
     {
         final MavenRepository repo = mock( MavenRepository.class );
