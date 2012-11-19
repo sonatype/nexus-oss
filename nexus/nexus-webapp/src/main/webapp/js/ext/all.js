@@ -14,7 +14,7 @@
 define('ext/all',
       ['extjs', 'ext/ux', 'ext/data', 'ext/dd', 'ext/form',
         'ext/layout', 'ext/lib', 'ext/tree', 'ext/component', 
-        'ext/string', 'ext/tooltip'],
+        'ext/string', 'ext/tooltip', 'ext/util'],
       function(Ext) {
         Ext.BLANK_IMAGE_URL = "ext-3.4.0/resources/images/default/s.gif";
         return Ext;

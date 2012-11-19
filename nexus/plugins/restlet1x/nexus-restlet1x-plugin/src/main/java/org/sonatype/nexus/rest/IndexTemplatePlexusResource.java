@@ -18,6 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.velocity.VelocityContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
@@ -39,33 +43,45 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
+import org.sonatype.nexus.plugins.restlet1x.BuildNumberService;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.sisu.velocity.Velocity;
 
-@Component( role = ManagedPlexusResource.class, hint = "indexTemplate" )
+@Named("indexTemplate")
+@Singleton
 public class IndexTemplatePlexusResource
     extends AbstractPlexusResource
-    implements ManagedPlexusResource, Initializable
+    implements ManagedPlexusResource
 {
-    @Requirement
     private Nexus nexus;
 
-    @Requirement( role = NexusIndexHtmlCustomizer.class )
     private Map<String, NexusIndexHtmlCustomizer> bundles;
     
-    @Requirement
     private Velocity velocity;
 
-    @Configuration( value = "${index.template.file}" )
+    private BuildNumberService buildNumberService;
+
     String templateFilename;
+
+    @Inject
+    public IndexTemplatePlexusResource( final Map<String, NexusIndexHtmlCustomizer> bundles, final Nexus nexus,
+                                        final @Named("${index.template.file:-templates/index.vm}") String templateFilename,
+                                        final Velocity velocity, final BuildNumberService buildNumberService )
+    {
+        this();
+
+        this.bundles = bundles;
+        this.nexus = nexus;
+        this.templateFilename = templateFilename;
+        this.velocity = velocity;
+        this.buildNumberService = buildNumberService;
+    }
 
     public IndexTemplatePlexusResource()
     {
-        super();
-
         setReadable( true );
 
         setModifiable( false );
@@ -193,12 +209,9 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "pluginJsFiles", pluginJsFiles );
 
         final String query = request.getResourceRef().getQuery();
-        String debug = null;
-        if ( query != null && query.contains( "debug" ) )
-        {
-            debug = "-debug";
-        }
-        templatingContext.put( "debug", debug );
+        templatingContext.put( "debug", (query != null && query.contains( "debug" )) );
+
+        templatingContext.put( "buildQualifier", buildNumberService.getBuildNumber() );
 
         return new VelocityRepresentation( context, templateFilename, getClass().getClassLoader(), templatingContext, MediaType.TEXT_HTML );
     }
@@ -230,16 +243,6 @@ public class IndexTemplatePlexusResource
                     "Got Exception exception during Velocity invocation!",
                     e );
             }
-        }
-    }
-
-    public void initialize()
-        throws InitializationException
-    {
-        // Hasn't been interpolated
-        if ( "${index.template.file}".equals( templateFilename ) )
-        {
-            templateFilename = "templates/index.vm";
         }
     }
 }

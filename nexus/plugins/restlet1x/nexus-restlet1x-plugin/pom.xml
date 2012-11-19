@@ -29,6 +29,9 @@
   <properties>
     <nexus.plugin.name>Nexus Restlet 1.x Plugin</nexus.plugin.name>
     <nexus.plugin.description>Provides Restlet 1.x REST API.</nexus.plugin.description>
+
+    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+    <build.timestamp>${maven.build.timestamp}</build.timestamp>
   </properties>
 
   <dependencies>
@@ -147,6 +150,15 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/filtered-resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>

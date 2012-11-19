@@ -10,6 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define('sonatype/all',['sonatype', 'sonatype/lib', 'sonatype/utils', 'sonatype/view', 'nexus/panels', 'nexus/ext'], function(Sonatype) {
-  return Sonatype;
+/*global define*/
+define('ext/util/event', ['extjs', 'nexus/log', 'nexus/error/ErrorHandler'], function(Ext, Log, ErrorHandler){
+  Ext.util.Event = Ext.extend(Ext.util.Event, {
+    createListener : function() {
+      var
+            listener = Ext.util.Event.superclass.createListener.apply(this, arguments),
+            fireFn = listener.fireFn;
+
+      listener.fireFn = function() {
+        try {
+          return fireFn.apply(this, arguments);
+        } catch(e) {
+          ErrorHandler.handleError(e);
+        }
+      };
+
+      return listener;
+    }
+  });
 });

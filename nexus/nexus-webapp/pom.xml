@@ -261,7 +261,7 @@
               <aggregations>
                 <aggregation>
                   <insertNewLine>true</insertNewLine>
-                  <output>${compressed-dir}/js/sonatype-all.js</output>
+                  <output>${project.build.outputDirectory}/js/sonatype-all.js</output>
                   <inputDir>${project.build.directory}/generated-sources/yuicompressor/js</inputDir>
                   <excludes>
                     <exclude>lib/require*.js</exclude>
@@ -271,7 +271,7 @@
                   </includes> 
                 </aggregation>
                 <aggregation>
-                  <output>${compressed-dir}/style/sonatype-all.css</output>
+                  <output>${project.build.outputDirectory}/style/sonatype-all.css</output>
                   <inputDir>${project.build.directory}/generated-sources/yuicompressor/style</inputDir>
                   <includes>
                     <include>**/*.css</include>
@@ -337,15 +337,6 @@
             js/lib/*,
             style/sonatype-all.css
           </warSourceIncludes>
-          <webResources>
-            <webResource>
-              <directory>${compressed-dir}</directory>
-              <includes>
-                <include>**/sonatype-all.js</include>
-                <include>**/sonatype-all.css</include>
-              </includes>
-            </webResource>
-          </webResources>
         </configuration>
       </plugin>
 
