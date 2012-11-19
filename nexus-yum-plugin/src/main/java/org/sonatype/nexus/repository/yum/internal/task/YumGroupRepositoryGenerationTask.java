@@ -29,7 +29,6 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRepository;
@@ -73,18 +72,21 @@ public class YumGroupRepositoryGenerationTask
             cleanYumCacheDir();
 
             final File repoBaseDir = RepositoryUtils.getBaseDir( groupRepository );
-            final List<File> memberRepoBaseDirs = validYumRepositoryBaseDirs();
-            if ( memberRepoBaseDirs.size() > 1 )
+            final List<File> memberReposBaseDirs = getMemberReposBaseDirs();
+            if ( memberReposBaseDirs.size() > 1 )
             {
                 LOG.debug( "Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName() );
-                new CommandLineExecutor().exec( buildCommand( repoBaseDir, memberRepoBaseDirs ) );
+                new CommandLineExecutor().exec( buildCommand( repoBaseDir, memberReposBaseDirs ) );
                 LOG.debug( "Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName() );
             }
             else
             {
                 final File groupRepoData = new File( repoBaseDir, "repodata" );
-                LOG.debug( "Remove group repository repodata, because at maximum one yum member-repository left : {}",
-                           groupRepoData );
+                LOG.debug(
+                    "Remove group repository repodata, because at maximum one yum member-repository left : {}",
+                    groupRepoData
+                );
+                // TODO this should be done via repo API
                 deleteQuietly( groupRepoData );
             }
             return new YumRepositoryImpl( repoBaseDir, groupRepository.getId(), null );
@@ -92,19 +94,16 @@ public class YumGroupRepositoryGenerationTask
         return null;
     }
 
-    private List<File> validYumRepositoryBaseDirs()
+    private List<File> getMemberReposBaseDirs()
         throws URISyntaxException, MalformedURLException
     {
         final List<File> memberRepoBaseDirs = new ArrayList<File>();
         for ( Repository memberRepository : groupRepository.getMemberRepositories() )
         {
-            if ( memberRepository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
+            final File memberRepoBaseDir = RepositoryUtils.getBaseDir( memberRepository );
+            if ( new File( memberRepoBaseDir, "repodata/repomd.xml" ).exists() )
             {
-                final File memberRepoBaseDir = RepositoryUtils.getBaseDir( memberRepository );
-                if ( new File( memberRepoBaseDir, "repodata/repomd.xml" ).exists() )
-                {
-                    memberRepoBaseDirs.add( memberRepoBaseDir );
-                }
+                memberRepoBaseDirs.add( memberRepoBaseDir );
             }
         }
         return memberRepoBaseDirs;
