@@ -49,32 +49,6 @@ Sonatype.SearchStore = function(config) {
                   name : 'latestSnapshotRepositoryId'
                 }])),
         listeners : {
-          'beforeload' : {
-            fn : function(store, options) {
-              store.proxy.getConnection().on('requestcomplete', function(conn, response, options) {
-                    if (response.responseText)
-                    {
-                      var statusResp = Ext.decode(response.responseText);
-                      if (statusResp)
-                      {
-                        this.grid.totalRecords = statusResp.totalCount;
-                        if (statusResp.tooManyResults)
-                        {
-                          this.grid.setWarningLabel('Too many results, please refine the search condition.');
-                        }
-                        else
-                        {
-                          this.grid.clearWarningLabel();
-                        }
-                      }
-                    }
-                  }, this, {
-                    single : true
-                  });
-              return true;
-            },
-            scope : this
-          },
           'load' : {
             fn : function(store, records, options) {
               this.grid.updateRowTotals(this.grid);
@@ -100,6 +74,26 @@ Sonatype.SearchStore = function(config) {
           }
         }
       });
+
+  // FIXME it's stupid to do it this way, because getConnection usually returns Ext.Ajax and this ends up firing for all calls.
+  this.proxy.getConnection().on('requestcomplete', function(conn, response, options) {
+    if (response.responseText && options.url.indexOf(this.searchUrl) !== -1)
+    {
+      var statusResp = Ext.decode(response.responseText);
+      if (statusResp)
+      {
+        this.grid.totalRecords = statusResp.totalCount;
+        if (statusResp.tooManyResults)
+        {
+          this.grid.setWarningLabel('Too many results, please refine the search condition.');
+        }
+        else
+        {
+          this.grid.clearWarningLabel();
+        }
+      }
+    }
+  }, this);
 };
 
 Ext.extend(Sonatype.SearchStore, Ext.data.Store, {});
