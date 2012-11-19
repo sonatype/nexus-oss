@@ -172,4 +172,11 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
         return configuration != null;
     }
 
+    @Override
+    public String toString()
+    {
+        return this.getClass().getSimpleName()
+            + ( isConfigured() ? "{repository=" + configuration.repository() + "}" : "" );
+    }
+
 }

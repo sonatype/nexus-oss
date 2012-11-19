@@ -70,6 +70,12 @@ public class YumCapability
         yumRegistry.setMaxNumberOfParallelThreads( configuration.maxNumberParallelThreads() );
     }
 
+    @Override
+    public String toString()
+    {
+        return this.getClass().getSimpleName();
+    }
+
     YumCapabilityConfiguration createConfiguration( final Map<String, String> properties )
     {
         return new YumCapabilityConfiguration( properties );
