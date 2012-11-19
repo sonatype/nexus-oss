@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityConfiguration.DELETE_PROCESSING;
+import static org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityConfiguration.ALIASES;
 import static org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityConfiguration.REPOSITORY_ID;
 
 import javax.inject.Inject;
@@ -24,7 +24,6 @@ import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
-import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.formfields.TextAreaFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -84,7 +83,8 @@ public class YumRepositoryCapabilityDescriptor
     {
         return validators.logical().and(
             validators.repository().repositoryOfType( TYPE, REPOSITORY_ID, MavenRepository.class ),
-            validators.capability().uniquePer( TYPE, REPOSITORY_ID )
+            validators.capability().uniquePer( TYPE, REPOSITORY_ID ),
+            new AliasMappingsValidator( ALIASES )
         );
     }
 
@@ -93,7 +93,8 @@ public class YumRepositoryCapabilityDescriptor
     {
         return validators.logical().and(
             validators.repository().repositoryOfType( TYPE, REPOSITORY_ID, MavenRepository.class ),
-            validators.capability().uniquePerExcluding( id, TYPE, REPOSITORY_ID )
+            validators.capability().uniquePerExcluding( id, TYPE, REPOSITORY_ID ),
+            new AliasMappingsValidator( ALIASES )
         );
     }
 

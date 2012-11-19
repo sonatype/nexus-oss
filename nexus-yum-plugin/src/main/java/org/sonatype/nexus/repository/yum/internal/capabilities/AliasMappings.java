@@ -50,19 +50,22 @@ public class AliasMappings
     {
         final Map<String, String> parsedAliases = Maps.newHashMap();
 
-        if ( mappings != null )
+        if ( mappings != null && !mappings.trim().isEmpty() )
         {
             final String[] segments = mappings.split( "," );
             for ( final String segment : segments )
             {
-                final String[] parts = segment.split( "=" );
-                if ( parts.length != 2 )
+                if ( !segment.trim().isEmpty() )
                 {
-                    throw new IllegalArgumentException(
-                        "Invalid format for entry '" + segment + "'. Expected <alias>=<version>"
-                    );
+                    final String[] parts = segment.split( "=" );
+                    if ( parts.length != 2 )
+                    {
+                        throw new IllegalArgumentException(
+                            "Invalid format for entry '" + segment + "'. Expected <alias>=<version>"
+                        );
+                    }
+                    parsedAliases.put( parts[0], parts[1] );
                 }
-                parsedAliases.put( parts[0], parts[1] );
             }
         }
 
