@@ -22,8 +22,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.client.core.subsystem.artifact.MavenArtifact;
+import org.sonatype.nexus.capabilities.client.Capabilities;
+import org.sonatype.nexus.client.core.subsystem.content.Content;
+import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
+import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepository;
+import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.repository.yum.client.Yum;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
@@ -53,12 +60,58 @@ public class YumRepositoryITSupport
     protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
     {
         return configuration
-            .setLogLevel( "org.sonatype.nexus.plugins.yum", "DEBUG" )
+            .setLogPattern( "%d{HH:mm:ss.SSS} %-5level - %msg%n" )
+            .setLogLevel( "org.sonatype.nexus.repository.yum", "DEBUG" )
+            .setLogLevel( "org.sonatype.nexus.plugins.capabilities", "DEBUG" )
             .addPlugins(
+                artifactResolver().resolvePluginFromDependencyManagement(
+                    "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
+                ),
                 artifactResolver().resolvePluginFromDependencyManagement(
                     "org.sonatype.nexus.plugins", "nexus-yum-plugin"
                 )
             );
+    }
+
+    protected Repository createYumEnabledRepository( final String repositoryId )
+    {
+        final Repository repository = repositories()
+            .create( MavenHostedRepository.class, repositoryId )
+            .excludeFromSearchResults()
+            .save();
+
+        createYumRepositoryCapabilityFor( repositoryId );
+
+        return repository;
+    }
+
+    protected GroupRepository createYumEnabledGroupRepository( final String repositoryId, final String... memberIds )
+    {
+        final GroupRepository repository = repositories().create( MavenGroupRepository.class, repositoryId )
+            .ofRepositories( memberIds )
+            .save();
+
+        createYumGroupCapabilityFor( repositoryId );
+
+        return repository;
+    }
+
+    private void createYumRepositoryCapabilityFor( final String repositoryId )
+    {
+        capabilities().add(
+            new CapabilityResource()
+                .withTypeId( "yum.repository" )
+                .withProperty( new CapabilityPropertyResource().withKey( "repository" ).withValue( repositoryId ) )
+        );
+    }
+
+    private void createYumGroupCapabilityFor( final String repositoryId )
+    {
+        capabilities().add(
+            new CapabilityResource()
+                .withTypeId( "yum.group" )
+                .withProperty( new CapabilityPropertyResource().withKey( "repository" ).withValue( repositoryId ) )
+        );
     }
 
     protected Yum yum()
@@ -66,14 +119,19 @@ public class YumRepositoryITSupport
         return client().getSubsystem( Yum.class );
     }
 
-    protected Repositories repositories()
+    private Repositories repositories()
     {
         return client().getSubsystem( Repositories.class );
     }
 
-    protected MavenArtifact mavenArtifact()
+    protected Content content()
     {
-        return client().getSubsystem( MavenArtifact.class );
+        return client().getSubsystem( Content.class );
+    }
+
+    private Capabilities capabilities()
+    {
+        return client().getSubsystem( Capabilities.class );
     }
 
     public static void sleep( int timeout, TimeUnit unit )

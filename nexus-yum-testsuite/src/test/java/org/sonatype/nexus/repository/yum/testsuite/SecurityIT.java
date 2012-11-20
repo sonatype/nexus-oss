@@ -18,11 +18,14 @@ import static org.junit.Assert.assertThat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.client.core.exception.NexusClientResponseException;
+import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.security.User;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
 import org.sonatype.nexus.repository.yum.client.Yum;
-import com.sun.jersey.api.client.UniformInterfaceException;
 
 public class SecurityIT
     extends YumRepositoryITSupport
@@ -32,53 +35,69 @@ public class SecurityIT
 
     private static final String VERSION = "1.2.3";
 
-    private static final String REPO = "releases";
-
     private static final String PASSWORD = "yum123";
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     public SecurityIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
 
-    @Test( expected = UniformInterfaceException.class )
+    @Test
     public void shouldNotHaveReadAccessToAliasesForAnonymous()
         throws Exception
     {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
         final String alias = uniqueName();
-        yum().createOrUpdateAlias( REPO, alias, VERSION );
-        createNexusClientForAnonymous( nexus() ).getSubsystem( Yum.class ).getAliasVersion( REPO, alias );
+        yum().createOrUpdateAlias( repository.id(), alias, VERSION );
+
+        thrown.expect( NexusClientResponseException.class );
+        thrown.expectMessage( "401" );
+        createNexusClientForAnonymous( nexus() ).getSubsystem( Yum.class ).getAlias( repository.id(), alias );
     }
 
-    @Test( expected = UniformInterfaceException.class )
+    @Test
     public void shouldNotCreateAliasForAnonymous()
         throws Exception
     {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
+        thrown.expect( NexusClientResponseException.class );
+        thrown.expectMessage( "401" );
         createNexusClientForAnonymous( nexus() ).getSubsystem( Yum.class )
-            .createOrUpdateAlias( REPO, uniqueName(), VERSION );
+            .createOrUpdateAlias( repository.id(), uniqueName(), VERSION );
     }
 
-    @Test( expected = UniformInterfaceException.class )
+    @Test
     public void shouldNotHaveUpdateAccessToAliasesForAnonymous()
         throws Exception
     {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
         final String alias = uniqueName();
-        yum().createOrUpdateAlias( REPO, alias, VERSION );
+        yum().createOrUpdateAlias( repository.id(), alias, VERSION );
+        thrown.expect( NexusClientResponseException.class );
+        thrown.expectMessage( "401" );
         createNexusClientForAnonymous( nexus() ).getSubsystem( Yum.class )
-            .createOrUpdateAlias( REPO, alias, "3.2.1" );
+            .createOrUpdateAlias( repository.id(), alias, "3.2.1" );
     }
 
     @Test
     public void shouldAllowAccessForYumAdmin()
         throws Exception
     {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
         final User user = givenYumAdminUser();
         final Yum yum = createNexusClient( nexus(), user.id(), PASSWORD ).getSubsystem( Yum.class );
         final String alias = uniqueName();
-        yum.createOrUpdateAlias( REPO, alias, VERSION );
-        assertThat( yum.getAliasVersion( REPO, alias ), is( VERSION ) );
-        yum.createOrUpdateAlias( REPO, alias, ANOTHER_VERSION );
-        assertThat( yum.getAliasVersion( REPO, alias ), is( ANOTHER_VERSION ) );
+        yum.createOrUpdateAlias( repository.id(), alias, VERSION );
+        assertThat( yum.getAlias( repository.id(), alias ), is( VERSION ) );
+        yum.createOrUpdateAlias( repository.id(), alias, ANOTHER_VERSION );
+        assertThat( yum.getAlias( repository.id(), alias ), is( ANOTHER_VERSION ) );
     }
 
     private User givenYumAdminUser()
