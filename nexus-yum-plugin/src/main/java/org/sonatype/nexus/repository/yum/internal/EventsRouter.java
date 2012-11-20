@@ -31,7 +31,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.task.YumGroupRepositoryGenerationTask;
+import org.sonatype.nexus.repository.yum.internal.task.MergeMetadataTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -68,7 +68,7 @@ public class EventsRouter
             || anyOfRepositoriesHasYumRepository( event.getRemovedRepositoryIds() )
             || anyOfRepositoriesHasYumRepository( event.getReorderedRepositoryIds() ) ) )
         {
-            YumGroupRepositoryGenerationTask.createTaskFor( nexusScheduler.get(), event.getGroupRepository() );
+            MergeMetadataTask.createTaskFor( nexusScheduler.get(), event.getGroupRepository() );
         }
     }
 

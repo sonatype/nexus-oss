@@ -53,7 +53,6 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
@@ -250,7 +249,7 @@ public class YumMetadataGenerationTask
                 {
                     if ( yumRegistry.isRegistered( repository.getId() ) )
                     {
-                        YumGroupRepositoryGenerationTask.createTaskFor( nexusScheduler, groupRepository );
+                        MergeMetadataTask.createTaskFor( nexusScheduler, groupRepository );
                     }
                 }
             }

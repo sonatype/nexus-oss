@@ -39,21 +39,21 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-@Named( YumGroupRepositoryGenerationTask.ID )
-public class YumGroupRepositoryGenerationTask
+@Named( MergeMetadataTask.ID )
+public class MergeMetadataTask
     extends AbstractNexusTask<YumRepository>
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( YumGroupRepositoryGenerationTask.class );
+    private static final Logger LOG = LoggerFactory.getLogger( MergeMetadataTask.class );
 
-    public static final String ID = "YumGroupRepositoryGenerationTask";
+    public static final String ID = "MergeMetadataTask";
 
     private static final int MAXIMAL_PARALLEL_RUNS = 1;
 
     private GroupRepository groupRepository;
 
     @Inject
-    public YumGroupRepositoryGenerationTask( final EventBus eventBus )
+    public MergeMetadataTask( final EventBus eventBus )
     {
         super( eventBus, null );
     }
@@ -147,7 +147,7 @@ public class YumGroupRepositoryGenerationTask
             {
                 if ( RUNNING.equals( scheduledTask.getTaskState() ) )
                 {
-                    if ( conflictsWith( (YumGroupRepositoryGenerationTask) scheduledTask.getTask() ) )
+                    if ( conflictsWith( (MergeMetadataTask) scheduledTask.getTask() ) )
                     {
                         return false;
                     }
@@ -162,7 +162,7 @@ public class YumGroupRepositoryGenerationTask
         }
     }
 
-    private boolean conflictsWith( YumGroupRepositoryGenerationTask task )
+    private boolean conflictsWith( MergeMetadataTask task )
     {
         return task.getGroupRepository() != null && this.getGroupRepository() != null
             && task.getGroupRepository().getId().equals( getGroupRepository().getId() );
@@ -206,11 +206,11 @@ public class YumGroupRepositoryGenerationTask
     public static ScheduledTask<YumRepository> createTaskFor( final NexusScheduler nexusScheduler,
                                                               final GroupRepository groupRepository )
     {
-        final YumGroupRepositoryGenerationTask task = nexusScheduler.createTaskInstance(
-            YumGroupRepositoryGenerationTask.class
+        final MergeMetadataTask task = nexusScheduler.createTaskInstance(
+            MergeMetadataTask.class
         );
         task.setGroupRepository( groupRepository );
-        return nexusScheduler.submit( YumGroupRepositoryGenerationTask.ID, task );
+        return nexusScheduler.submit( MergeMetadataTask.ID, task );
     }
 
 }
