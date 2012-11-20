@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -31,6 +32,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.task.MergeMetadataTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -130,13 +132,13 @@ public class EventsRouter
             {
                 try
                 {
-                    final Repository repository = repositoryRegistry.get().getRepository( repositoryId );
-                    // TODO this is suspicious. Should not directly use FS
-                    return new File( RepositoryUtils.getBaseDir( repository ), "repodata/repomd.xml" ).exists();
+                    repositoryRegistry.get().getRepository( repositoryId ).retrieveItem(
+                        new ResourceStoreRequest( YumRepository.PATH_OF_REPOMD_XML )
+                    );
                 }
-                catch ( final Exception e )
+                catch ( final Exception ignore )
                 {
-                    // TODO check if we should silently ignore this
+                    // we could not get the repository or repomd.xml so looks like we do not have an yum repository
                 }
             }
         }
