@@ -427,41 +427,33 @@ public class DefaultIndexerManager
         else
         {
             // add context for repository
-            try
-            {
-                ctx = new DefaultIndexingContext( getContextId( repository.getId() ), // id
-                                                  repository.getId(), // repositoryId
-                                                  repoRoot, // repository
-                                                  indexDirectory, // indexDirectoryFile
-                                                  null, // repositoryUrl
-                                                  null, // indexUpdateUrl
-                                                  indexCreators, //
-                                                  true // reclaimIndex
-                    )
+            ctx = new DefaultIndexingContext( getContextId( repository.getId() ), // id
+                                              repository.getId(), // repositoryId
+                                              repoRoot, // repository
+                                              indexDirectory, // indexDirectoryFile
+                                              null, // repositoryUrl
+                                              null, // indexUpdateUrl
+                                              indexCreators, //
+                                              true // reclaimIndex
+                )
+                {
+                    @Override
+                    protected IndexWriterConfig getWriterConfig()
                     {
-                        @Override
-                        protected IndexWriterConfig getWriterConfig()
-                        {
-                            final IndexWriterConfig writerConfig = super.getWriterConfig();
+                        final IndexWriterConfig writerConfig = super.getWriterConfig();
 
-                            // NEXUS-5380 force use of compound lucene index file to postpone "Too many open files"
+                        // NEXUS-5380 force use of compound lucene index file to postpone "Too many open files"
 
-                            final TieredMergePolicy mergePolicy = new TieredMergePolicy();
-                            mergePolicy.setUseCompoundFile( true );
-                            mergePolicy.setNoCFSRatio( 1.0 );
+                        final TieredMergePolicy mergePolicy = new TieredMergePolicy();
+                        mergePolicy.setUseCompoundFile( true );
+                        mergePolicy.setNoCFSRatio( 1.0 );
 
-                            writerConfig.setMergePolicy( mergePolicy );
+                        writerConfig.setMergePolicy( mergePolicy );
 
-                            return writerConfig;
-                        }
-                    };
-                mavenIndexer.addIndexingContext( ctx );
-            }
-            catch ( UnsupportedExistingLuceneIndexException e )
-            {
-                // this will never happen because reclaimIndex=true
-                throw new IOException( e );
-            }
+                        return writerConfig;
+                    }
+                };
+            mavenIndexer.addIndexingContext( ctx );
         }
         ctx.setSearchable( repository.isSearchable() );
 
@@ -2368,24 +2360,14 @@ public class DefaultIndexerManager
             throw new IOException( "Could not create temporary directory " + location );
         }
 
-        final DefaultIndexingContext temporary;
-        try
-        {
-            temporary = new DefaultIndexingContext( indexId, //
-                repository.getId(), //
-                getRepositoryLocalStorageAsFile( repository ), // repository local storage
-                FSDirectory.open( location ), //
-                null, // repository url
-                null, // repository update url
-                indexCreators,
-                true );
-        }
-        catch ( UnsupportedExistingLuceneIndexException e )
-        {
-            // Can't really happen because we use empty new directory
-            throw new IOException( e.getMessage(), e );
-        }
-        
+        final DefaultIndexingContext temporary =
+            new DefaultIndexingContext( indexId, //
+                                        repository.getId(), //
+                                        getRepositoryLocalStorageAsFile( repository ), // repository local storage
+                                        FSDirectory.open( location ), //
+                                        null, // repository url
+                                        null, // repository update url
+                                        indexCreators, true );
         logger.debug( "Created temporary indexing context " + location + " for repository " + repository.getId() );
 
         try

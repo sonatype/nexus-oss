@@ -28,7 +28,7 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <maven.indexer.version>5.1.0-SNAPSHOT</maven.indexer.version>
+    <maven.indexer.version>5.1.0</maven.indexer.version>
 
     <nexus.plugin.name>Nexus Indexer Lucene Plugin</nexus.plugin.name>
     <nexus.plugin.description>Adds search capabilities for repository content.</nexus.plugin.description>
