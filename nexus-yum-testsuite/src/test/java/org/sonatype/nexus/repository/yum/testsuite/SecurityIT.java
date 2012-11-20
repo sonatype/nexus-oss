@@ -28,7 +28,7 @@ import org.sonatype.nexus.client.core.subsystem.security.Users;
 import org.sonatype.nexus.repository.yum.client.Yum;
 
 public class SecurityIT
-    extends YumRepositoryITSupport
+    extends YumITSupport
 {
 
     private static final String ANOTHER_VERSION = "4.3.1";

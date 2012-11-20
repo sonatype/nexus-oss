@@ -14,60 +14,65 @@ package org.sonatype.nexus.repository.yum.testsuite;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
+import static org.sonatype.nexus.repository.yum.client.MetadataType.INDEX;
 import static org.sonatype.nexus.repository.yum.client.MetadataType.PRIMARY_XML;
 
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 
-public class YumRepositoryIT
-    extends YumRepositoryITSupport
+public class VersionedIT
+    extends YumITSupport
 {
 
-    public YumRepositoryIT( final String nexusBundleCoordinates )
+    public VersionedIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
 
     @Test
-    public void addRpm()
+    public void shouldGenerateVersionedRepoForVersion()
         throws Exception
     {
-        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+        final Repository repository = givenRepositoryWithOneRpm();
 
-        content().upload(
-            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
-            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
-        );
-
-        sleep( 20, SECONDS );
-
-        final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
-        assertThat( primaryXml, containsString( "test-artifact" ) );
+        final String content = yum().getMetadata( repository.id(), "1.0", PRIMARY_XML, String.class );
+        assertThat( content, containsString( "test-artifact" ) );
     }
 
     @Test
-    public void removeRpm()
+    public void shouldGenerateVersionedRepoForAlias()
+        throws Exception
+    {
+        final Repository repository = givenRepositoryWithOneRpm();
+
+        yum().createOrUpdateAlias( repository.id(), "alias", "1.0" );
+        final String content = yum().getMetadata( repository.id(), "alias", PRIMARY_XML, String.class );
+        assertThat( content, containsString( "test-artifact" ) );
+    }
+
+    @Test
+    public void shouldGenerateIndexHtml()
+        throws Exception
+    {
+        final Repository repository = givenRepositoryWithOneRpm();
+
+        final String content = yum().getMetadata( repository.id(), "1.0", INDEX, String.class );
+        assertThat( content, containsString( "<a href=\"repodata/\">repodata/</a>" ) );
+    }
+
+    private Repository givenRepositoryWithOneRpm()
         throws Exception
     {
         final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
 
         content().upload(
-            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
-            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
+            repositoryLocation( repository.id(), "group/artifact/1.0/artifact-1.0.rpm" ),
+            testData.resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
-
         sleep( 5, SECONDS );
 
-        content().delete(
-            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" )
-        );
-
-        sleep( 20, SECONDS );
-
-        final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
-        assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
+        return repository;
     }
 }

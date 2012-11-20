@@ -30,8 +30,8 @@ import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.test.os.IgnoreOn;
 import org.sonatype.nexus.test.os.OsTestRule;
 
-public class YumGroupRepositoryIT
-    extends YumRepositoryITSupport
+public class MergeMetadataIT
+    extends YumITSupport
 {
 
     @Rule
@@ -40,7 +40,7 @@ public class YumGroupRepositoryIT
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    public YumGroupRepositoryIT( final String nexusBundleCoordinates )
+    public MergeMetadataIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }

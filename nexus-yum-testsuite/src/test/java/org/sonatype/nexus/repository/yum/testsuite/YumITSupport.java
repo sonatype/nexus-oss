@@ -36,7 +36,7 @@ import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
-public class YumRepositoryITSupport
+public class YumITSupport
     extends NexusRunningParametrizedITSupport
 {
 
@@ -51,7 +51,7 @@ public class YumRepositoryITSupport
         ).load();
     }
 
-    public YumRepositoryITSupport( final String nexusBundleCoordinates )
+    public YumITSupport( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
