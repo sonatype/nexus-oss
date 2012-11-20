@@ -69,7 +69,7 @@ public class YumGroupRepositoryGenerationTask
     {
         if ( isValidRepository() )
         {
-            cleanYumCacheDir();
+            deleteYumTempDirs();
 
             final File repoBaseDir = RepositoryUtils.getBaseDir( groupRepository );
             final List<File> memberReposBaseDirs = getMemberReposBaseDirs();
@@ -89,6 +89,9 @@ public class YumGroupRepositoryGenerationTask
                 // TODO this should be done via repo API
                 deleteQuietly( groupRepoData );
             }
+
+            deleteYumTempDirs();
+
             return new YumRepositoryImpl( repoBaseDir, groupRepository.getId(), null );
         }
         return null;
@@ -109,7 +112,7 @@ public class YumGroupRepositoryGenerationTask
         return memberRepoBaseDirs;
     }
 
-    private void cleanYumCacheDir()
+    private void deleteYumTempDirs()
         throws IOException
     {
         final String yumTmpDirPrefix = "yum-" + System.getProperty( "user.name" );
@@ -127,7 +130,7 @@ public class YumGroupRepositoryGenerationTask
             } );
             for ( File yumTmpDir : yumTmpDirs )
             {
-                LOG.debug( "Deleting yum cache dir : {}", yumTmpDir );
+                LOG.debug( "Deleting yum temp dir : {}", yumTmpDir );
                 deleteQuietly( yumTmpDir );
             }
         }
