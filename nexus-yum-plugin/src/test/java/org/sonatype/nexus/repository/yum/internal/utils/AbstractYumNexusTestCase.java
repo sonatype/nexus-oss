@@ -30,6 +30,9 @@ import javax.inject.Inject;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.junit.Before;
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
@@ -48,6 +51,17 @@ public class AbstractYumNexusTestCase
     public static final String TMP_DIR_KEY = "java.io.tmpdir";
 
     private String oldTmpDir;
+
+    @Inject
+    private GlobalRestApiSettings globalRestApiSettings;
+
+    @Before
+    public void setBaseUrl()
+        throws ConfigurationException
+    {
+        globalRestApiSettings.setBaseUrl( "http://localhost:8080/nexus" );
+        globalRestApiSettings.commitChanges();
+    }
 
     protected void waitFor( Condition condition )
         throws TimeoutException, InterruptedException

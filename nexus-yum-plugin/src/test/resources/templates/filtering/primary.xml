@@ -27,7 +27,8 @@
     <url/>
     <time file="1320389088" build="1320389077"/>
     <size package="1368" installed="0" archive="124"/>
-    <location href="conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm"/>
+    <location xml:base="http://localhost:8080/nexus/content/snapshots"
+              href="conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm"/>
     <format>
       <rpm:license/>
       <rpm:vendor>IS24</rpm:vendor>

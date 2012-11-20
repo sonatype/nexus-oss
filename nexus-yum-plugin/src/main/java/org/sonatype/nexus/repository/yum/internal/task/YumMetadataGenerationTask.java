@@ -14,8 +14,11 @@ package org.sonatype.nexus.repository.yum.internal.task;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.sonatype.nexus.repository.yum.YumRepository.REPOMD_XML;
+import static org.sonatype.nexus.repository.yum.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 import static org.sonatype.scheduling.TaskState.SLEEPING;
 import static org.sonatype.scheduling.TaskState.SUBMITTED;
@@ -28,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
@@ -49,6 +53,7 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
@@ -126,6 +131,8 @@ public class YumMetadataGenerationTask
 
             File rpmListFile = createRpmListFile();
             new CommandLineExecutor().exec( buildCreateRepositoryCommand( rpmListFile ) );
+
+            replaceUrl();
         }
         catch ( IOException e )
         {
@@ -136,7 +143,6 @@ public class YumMetadataGenerationTask
         Thread.sleep( 100 );
 
         regenerateMetadataForGroups();
-
         return new YumRepositoryImpl( getRepoDir(), getRepositoryId(), getVersion() );
     }
 
@@ -283,14 +289,24 @@ public class YumMetadataGenerationTask
         return getRepositoryId() + ( isNotBlank( getVersion() ) ? ( "-version-" + getVersion() ) : "" );
     }
 
-    private String buildCreateRepositoryCommand( final File packageList )
+    private void replaceUrl()
+        throws IOException
+    {
+        File repomd = new File( getRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML );
+        if ( repomd.exists() && getRepoUrl() != null )
+        {
+            String repomdStr = FileUtils.readFileToString( repomd );
+            repomdStr = repomdStr.replace( getRpmUrl(), getRepoUrl() );
+            writeStringToFile( repomd, repomdStr );
+        }
+    }
+
+    private String buildCreateRepositoryCommand( File packageList )
     {
         String packageFile = packageList.getAbsolutePath();
         String cacheDir = createCacheDir().getAbsolutePath();
-        return format(
-            "createrepo --update -o %s -v -d -i %s -c %s %s",
-            getRepoDir().getAbsolutePath(), packageFile, cacheDir, getRpmDir()
-        );
+        return format( "createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getRepoDir().getAbsolutePath(),
+                       getRpmUrl(), packageFile, cacheDir, getRpmDir() );
     }
 
     @Override
