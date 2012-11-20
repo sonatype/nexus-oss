@@ -341,5 +341,7 @@ Ext.extend(Nexus.ext.FormPanel, Ext.FormPanel, {
 
 Sonatype.ext.FormPanel = Nexus.ext.FormPanel;
 
+return Nexus.ext.FormPanel;
+
 });
 
