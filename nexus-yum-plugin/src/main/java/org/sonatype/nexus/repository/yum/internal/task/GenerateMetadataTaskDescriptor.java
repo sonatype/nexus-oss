@@ -15,8 +15,8 @@ package org.sonatype.nexus.repository.yum.internal.task;
 import static java.util.Arrays.asList;
 import static org.sonatype.nexus.formfields.FormField.MANDATORY;
 import static org.sonatype.nexus.formfields.FormField.OPTIONAL;
-import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.PARAM_REPO_DIR;
-import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.PARAM_REPO_ID;
+import static org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask.PARAM_REPO_DIR;
+import static org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask.PARAM_REPO_ID;
 
 import java.util.List;
 
@@ -27,9 +27,9 @@ import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = YumMetadataGenerationTask.ID,
-            description = YumMetadataGenerationTaskDescriptor.NAME )
-public class YumMetadataGenerationTaskDescriptor
+@Component( role = ScheduledTaskDescriptor.class, hint = GenerateMetadataTask.ID,
+            description = GenerateMetadataTaskDescriptor.NAME )
+public class GenerateMetadataTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
 
@@ -49,7 +49,7 @@ public class YumMetadataGenerationTaskDescriptor
     @Override
     public String getId()
     {
-        return YumMetadataGenerationTask.ID;
+        return GenerateMetadataTask.ID;
     }
 
     @Override

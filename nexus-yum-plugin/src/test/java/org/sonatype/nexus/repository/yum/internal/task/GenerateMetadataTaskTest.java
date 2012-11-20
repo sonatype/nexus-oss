@@ -20,7 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask.ID;
 import static org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase.UTIL;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -49,7 +49,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 @SuppressWarnings( "unchecked" )
-public class YumMetadataGenerationTaskTest
+public class GenerateMetadataTaskTest
     extends TestSupport
 {
 
@@ -73,7 +73,7 @@ public class YumMetadataGenerationTaskTest
     public void shouldNotExecuteIfOperateOnSameRepository()
         throws Exception
     {
-        YumMetadataGenerationTask task = task( REPO, NO_VERSION );
+        GenerateMetadataTask task = task( REPO, NO_VERSION );
         assertFalse( task.allowConcurrentExecution( createMap( scheduledTask( task ),
                                                                scheduledTask( REPO, NO_VERSION, RUNNING ) ) ) );
     }
@@ -82,7 +82,7 @@ public class YumMetadataGenerationTaskTest
     public void shouldNotExecuteIfOperateOnSameRepositoryAndSameVersion()
         throws Exception
     {
-        YumMetadataGenerationTask task = task( REPO, VERSION );
+        GenerateMetadataTask task = task( REPO, VERSION );
         assertFalse( task.allowConcurrentExecution( createMap( scheduledTask( task ),
                                                                scheduledTask( REPO, VERSION, RUNNING ) ) ) );
     }
@@ -91,7 +91,7 @@ public class YumMetadataGenerationTaskTest
     public void shouldExecuteIfOperateOnSameRepositoryAndAnotherVersion()
         throws Exception
     {
-        YumMetadataGenerationTask task = task( REPO, VERSION );
+        GenerateMetadataTask task = task( REPO, VERSION );
         assertTrue( task.allowConcurrentExecution( createMap( scheduledTask( task ),
                                                               scheduledTask( REPO, ANOTHER_VERSION, RUNNING ) ) ) );
     }
@@ -100,7 +100,7 @@ public class YumMetadataGenerationTaskTest
     public void shouldExecuteIfOperateOnAnotherRepository()
         throws Exception
     {
-        YumMetadataGenerationTask task = task( REPO, NO_VERSION );
+        GenerateMetadataTask task = task( REPO, NO_VERSION );
         assertTrue( task.allowConcurrentExecution( createMap( scheduledTask( task ),
                                                               scheduledTask( ANOTHER_REPO, NO_VERSION, RUNNING ) ) ) );
     }
@@ -110,7 +110,7 @@ public class YumMetadataGenerationTaskTest
         throws Exception
     {
         // given
-        YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+        GenerateMetadataTask task = new GenerateMetadataTask(
             mock( EventBus.class ),
             repoRegistry(),
             mock( YumRegistry.class ),
@@ -132,7 +132,7 @@ public class YumMetadataGenerationTaskTest
         throws Exception
     {
         // given
-        YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+        GenerateMetadataTask task = new GenerateMetadataTask(
             mock( EventBus.class ),
             repoRegistry(),
             mock( YumRegistry.class ),
@@ -181,17 +181,17 @@ public class YumMetadataGenerationTaskTest
         return scheduledTask( repo, version, state, new Date() );
     }
 
-    private MockScheduledTask<YumRepository> scheduledTask( YumMetadataGenerationTask task )
+    private MockScheduledTask<YumRepository> scheduledTask( GenerateMetadataTask task )
     {
         return new MockScheduledTask<YumRepository>( task );
     }
 
-    private YumMetadataGenerationTask task( String repo, String version )
+    private GenerateMetadataTask task( String repo, String version )
     {
         final YumRegistry yumRegistry = mock( YumRegistry.class );
         when( yumRegistry.maxNumberOfParallelThreads() ).thenReturn( YumRegistry.DEFAULT_MAX_NUMBER_PARALLEL_THREADS );
 
-        YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+        GenerateMetadataTask task = new GenerateMetadataTask(
             mock( EventBus.class ),
             mock( RepositoryRegistry.class ),
             yumRegistry,

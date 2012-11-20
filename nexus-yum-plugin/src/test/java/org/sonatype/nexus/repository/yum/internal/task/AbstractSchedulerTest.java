@@ -28,20 +28,20 @@ public abstract class AbstractSchedulerTest
     @Inject
     protected NexusScheduler nexusScheduler;
 
-    protected YumRepository executeJob( YumMetadataGenerationTask task )
+    protected YumRepository executeJob( GenerateMetadataTask task )
         throws Exception
     {
-        final ScheduledTask<YumRepository> scheduledTask = nexusScheduler.submit( YumMetadataGenerationTask.ID, task );
+        final ScheduledTask<YumRepository> scheduledTask = nexusScheduler.submit( GenerateMetadataTask.ID, task );
         return scheduledTask.get();
     }
 
-    protected YumMetadataGenerationTask createTask( File rpmDir, String rpmUrl, File repoDir, String repoUrl,
-                                                    String id, String version, String addedFile,
-                                                    boolean singleRpmPerDirectory )
+    protected GenerateMetadataTask createTask( File rpmDir, String rpmUrl, File repoDir, String repoUrl,
+                                               String id, String version, String addedFile,
+                                               boolean singleRpmPerDirectory )
         throws Exception
     {
-        YumMetadataGenerationTask yumTask =
-            (YumMetadataGenerationTask) lookup( SchedulerTask.class, YumMetadataGenerationTask.ID );
+        GenerateMetadataTask yumTask =
+            (GenerateMetadataTask) lookup( SchedulerTask.class, GenerateMetadataTask.ID );
         yumTask.setRepositoryId( id );
         yumTask.setRepoDir( repoDir );
         yumTask.setRepoUrl( repoUrl );
@@ -53,7 +53,7 @@ public abstract class AbstractSchedulerTest
         return yumTask;
     }
 
-    protected YumMetadataGenerationTask createTask( File rpmDir, String rpmUrl, File repoDir, String id )
+    protected GenerateMetadataTask createTask( File rpmDir, String rpmUrl, File repoDir, String id )
         throws Exception
     {
         return createTask( rpmDir, rpmUrl, repoDir, null, id, null, null, true );

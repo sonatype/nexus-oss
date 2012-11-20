@@ -59,19 +59,19 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
  *
  * @author sherold
  */
-@Component( role = SchedulerTask.class, hint = YumMetadataGenerationTask.ID, instantiationStrategy = "per-lookup" )
-public class YumMetadataGenerationTask
+@Component( role = SchedulerTask.class, hint = GenerateMetadataTask.ID, instantiationStrategy = "per-lookup" )
+public class GenerateMetadataTask
     extends AbstractNexusTask<YumRepository>
     implements ListFileFactory
 {
 
-    public static final String ID = "YumMetadataGenerationTask";
+    public static final String ID = "GenerateMetadataTask";
 
     private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
 
     private static final String CACHE_DIR_PREFIX = ".cache-";
 
-    private static final Logger LOG = LoggerFactory.getLogger( YumMetadataGenerationTask.class );
+    private static final Logger LOG = LoggerFactory.getLogger( GenerateMetadataTask.class );
 
     public static final String PARAM_REPO_ID = "yumMetadataGenerationRepoId";
 
@@ -100,12 +100,12 @@ public class YumMetadataGenerationTask
     private final YumRegistry yumRegistry;
 
     @Inject
-    public YumMetadataGenerationTask( final EventBus eventBus,
-                                      final RepositoryRegistry repositoryRegistry,
-                                      final YumRegistry yumRegistry,
-                                      final RepositoryURLBuilder repositoryURLBuilder,
-                                      final RpmScanner scanner,
-                                      final NexusScheduler nexusScheduler )
+    public GenerateMetadataTask( final EventBus eventBus,
+                                 final RepositoryRegistry repositoryRegistry,
+                                 final YumRegistry yumRegistry,
+                                 final RepositoryURLBuilder repositoryURLBuilder,
+                                 final RpmScanner scanner,
+                                 final NexusScheduler nexusScheduler )
     {
         super( eventBus, null );
         this.yumRegistry = checkNotNull( yumRegistry );
@@ -202,7 +202,7 @@ public class YumMetadataGenerationTask
             {
                 if ( RUNNING.equals( scheduledTask.getTaskState() ) )
                 {
-                    if ( conflictsWith( (YumMetadataGenerationTask) scheduledTask.getTask() ) )
+                    if ( conflictsWith( (GenerateMetadataTask) scheduledTask.getTask() ) )
                     {
                         return false;
                     }
@@ -223,7 +223,7 @@ public class YumMetadataGenerationTask
             for ( ScheduledTask<?> scheduledTask : activeTasks.get( ID ) )
             {
                 if ( isSubmitted( scheduledTask )
-                    && conflictsWith( (YumMetadataGenerationTask) scheduledTask.getTask() ) )
+                    && conflictsWith( (GenerateMetadataTask) scheduledTask.getTask() ) )
                 {
                     throw new TaskAlreadyScheduledException( scheduledTask, "Found same task in scheduler queue." );
                 }
@@ -260,7 +260,7 @@ public class YumMetadataGenerationTask
         }
     }
 
-    private boolean conflictsWith( YumMetadataGenerationTask task )
+    private boolean conflictsWith( GenerateMetadataTask task )
     {
         if ( StringUtils.equals( getRepositoryId(), task.getRepositoryId() ) )
         {

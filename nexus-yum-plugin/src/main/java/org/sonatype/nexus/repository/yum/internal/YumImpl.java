@@ -17,7 +17,7 @@ import static java.io.File.pathSeparator;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask.ID;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -38,8 +38,8 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRepository;
+import org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask;
 import org.sonatype.nexus.repository.yum.internal.task.TaskAlreadyScheduledException;
-import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
@@ -195,7 +195,7 @@ public class YumImpl
         try
         {
             File rpmBaseDir = RepositoryUtils.getBaseDir( repository );
-            YumMetadataGenerationTask task = createTask();
+            GenerateMetadataTask task = createTask();
             task.setRpmDir( rpmBaseDir.getAbsolutePath() );
             task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
             task.setRepoDir( yumRepoBaseDir );
@@ -226,7 +226,7 @@ public class YumImpl
         return yumRepository;
     }
 
-    private ScheduledTask<YumRepository> submitTask( YumMetadataGenerationTask task )
+    private ScheduledTask<YumRepository> submitTask( GenerateMetadataTask task )
     {
         try
         {
@@ -256,7 +256,7 @@ public class YumImpl
         try
         {
             File rpmBaseDir = RepositoryUtils.getBaseDir( repository );
-            YumMetadataGenerationTask task = createTask();
+            GenerateMetadataTask task = createTask();
             task.setRpmDir( rpmBaseDir.getAbsolutePath() );
             task.setRpmUrl( repositoryURLBuilder.getRepositoryContentUrl( repository ) );
             task.setRepositoryId( repository.getId() );
@@ -271,11 +271,11 @@ public class YumImpl
 
     @SuppressWarnings( "unchecked" )
     private ScheduledTask<YumRepository> mergeAddedFiles( ScheduledTask<?> existingScheduledTask,
-                                                          YumMetadataGenerationTask taskToMerge )
+                                                          GenerateMetadataTask taskToMerge )
     {
         if ( isNotBlank( taskToMerge.getAddedFiles() ) )
         {
-            final YumMetadataGenerationTask existingTask = (YumMetadataGenerationTask) existingScheduledTask.getTask();
+            final GenerateMetadataTask existingTask = (GenerateMetadataTask) existingScheduledTask.getTask();
             if ( isBlank( existingTask.getAddedFiles() ) )
             {
                 existingTask.setAddedFiles( taskToMerge.getAddedFiles() );
@@ -294,13 +294,13 @@ public class YumImpl
         return addToYumRepository( null );
     }
 
-    private YumMetadataGenerationTask createTask()
+    private GenerateMetadataTask createTask()
     {
-        final YumMetadataGenerationTask task = nexusScheduler.createTaskInstance( YumMetadataGenerationTask.class );
+        final GenerateMetadataTask task = nexusScheduler.createTaskInstance( GenerateMetadataTask.class );
         if ( task == null )
         {
             throw new IllegalStateException(
-                "Could not create a task fo type " + YumMetadataGenerationTask.class.getName()
+                "Could not create a task fo type " + GenerateMetadataTask.class.getName()
             );
         }
         return task;

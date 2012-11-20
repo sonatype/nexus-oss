@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.yum.internal;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
-import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask.ID;
 import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createItem;
 import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createRepository;
 import static org.sonatype.scheduling.TaskState.RUNNING;

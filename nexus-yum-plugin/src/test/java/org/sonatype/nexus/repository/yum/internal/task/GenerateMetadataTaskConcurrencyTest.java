@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask.ID;
+import static org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask.ID;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,7 +51,7 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.code.tempusfugit.temporal.Condition;
 
-public class YumMetadataGenerationTaskConcurrencyTest
+public class GenerateMetadataTaskConcurrencyTest
     extends AbstractSchedulerTest
 {
 
@@ -61,7 +61,7 @@ public class YumMetadataGenerationTaskConcurrencyTest
 
     public static final int PARALLEL_THREAD_COUNT = 5;
 
-    public static final Logger LOG = LoggerFactory.getLogger( YumMetadataGenerationTaskConcurrencyTest.class );
+    public static final Logger LOG = LoggerFactory.getLogger( GenerateMetadataTaskConcurrencyTest.class );
 
     private static final int MAX_PARALLEL_SCHEDULER_THREADS = 20;
 
@@ -133,7 +133,7 @@ public class YumMetadataGenerationTaskConcurrencyTest
         waitFor( futures );
         // then
         assertThat( second, is( first ) );
-        assertThat( ( (YumMetadataGenerationTask) first.getTask() ).getAddedFiles(),
+        assertThat( ( (GenerateMetadataTask) first.getTask() ).getAddedFiles(),
                     is( file1 + pathSeparator + file2 ) );
         final String content =
             IOUtils.toString(
@@ -151,10 +151,10 @@ public class YumMetadataGenerationTaskConcurrencyTest
         }
     }
 
-    private YumMetadataGenerationTask createYumRepositoryTask( final int repositoryId )
+    private GenerateMetadataTask createYumRepositoryTask( final int repositoryId )
         throws Exception
     {
-        final YumMetadataGenerationTask task = new YumMetadataGenerationTask(
+        final GenerateMetadataTask task = new GenerateMetadataTask(
             mock( EventBus.class ),
             mock( RepositoryRegistry.class ),
             yumRegistry,

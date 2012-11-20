@@ -31,7 +31,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.Yum;
-import org.sonatype.nexus.repository.yum.internal.task.YumMetadataGenerationTask;
+import org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -67,8 +67,8 @@ public class YumImplDeletionsTest
         when( repository.getLocalUrl() ).thenReturn( "/target" );
 
         nexusScheduler = mock( NexusScheduler.class );
-        when( nexusScheduler.createTaskInstance( YumMetadataGenerationTask.class ) ).thenReturn(
-            mock( YumMetadataGenerationTask.class )
+        when( nexusScheduler.createTaskInstance( GenerateMetadataTask.class ) ).thenReturn(
+            mock( GenerateMetadataTask.class )
         );
 
         yum = new YumImpl(
@@ -88,7 +88,7 @@ public class YumImplDeletionsTest
         yum.deleteDirectory( BASE_PATH );
         sleep( TIMEOUT_IN_SEC * 2000 );
         verify( nexusScheduler, times( 0 ) ).submit(
-            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+            Mockito.anyString(), Mockito.any( GenerateMetadataTask.class )
         );
     }
 
@@ -105,7 +105,7 @@ public class YumImplDeletionsTest
         sleep( TIMEOUT_IN_SEC * 2000 );
 
         verify( nexusScheduler, times( 1 ) ).submit(
-            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+            Mockito.anyString(), Mockito.any( GenerateMetadataTask.class )
         );
     }
 
@@ -124,7 +124,7 @@ public class YumImplDeletionsTest
         sleep( TIMEOUT_IN_SEC * 2000 );
 
         verify( nexusScheduler, times( 1 ) ).submit(
-            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+            Mockito.anyString(), Mockito.any( GenerateMetadataTask.class )
         );
     }
 
@@ -143,12 +143,12 @@ public class YumImplDeletionsTest
 
         sleep( TIMEOUT_IN_SEC * 1500 );
         verify( nexusScheduler, times( 0 ) ).submit(
-            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+            Mockito.anyString(), Mockito.any( GenerateMetadataTask.class )
         );
 
         sleep( TIMEOUT_IN_SEC * 2500 );
         verify( nexusScheduler, times( 1 ) ).submit(
-            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+            Mockito.anyString(), Mockito.any( GenerateMetadataTask.class )
         );
     }
 
@@ -158,7 +158,7 @@ public class YumImplDeletionsTest
     {
         yum.deleteRpm( SUB_PATH1 );
         verify( nexusScheduler, times( 1 ) ).submit(
-            Mockito.anyString(), Mockito.any( YumMetadataGenerationTask.class )
+            Mockito.anyString(), Mockito.any( GenerateMetadataTask.class )
         );
     }
 }
