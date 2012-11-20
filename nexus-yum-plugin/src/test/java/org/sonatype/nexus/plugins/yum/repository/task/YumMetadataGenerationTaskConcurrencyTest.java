@@ -192,6 +192,11 @@ public class YumMetadataGenerationTaskConcurrencyTest
                 return null;
             }
 
+            if ( "toString".equals( method.getName() ) )
+            {
+                return this.toString();
+            }
+
             Method origMethod =
                 findMethod( YumMetadataGenerationTask.class, method.getName(), method.getParameterTypes() );
             return origMethod.invoke( task, args );
