@@ -29,6 +29,10 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRepository;
@@ -72,7 +76,7 @@ public class MergeMetadataTask
             deleteYumTempDirs();
 
             final File repoBaseDir = RepositoryUtils.getBaseDir( groupRepository );
-            final List<File> memberReposBaseDirs = getMemberReposBaseDirs();
+            final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
             if ( memberReposBaseDirs.size() > 1 )
             {
                 LOG.debug( "Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName() );
@@ -97,19 +101,32 @@ public class MergeMetadataTask
         return null;
     }
 
-    private List<File> getMemberReposBaseDirs()
+    private List<File> getBaseDirsOfMemberRepositories()
         throws URISyntaxException, MalformedURLException
     {
-        final List<File> memberRepoBaseDirs = new ArrayList<File>();
-        for ( Repository memberRepository : groupRepository.getMemberRepositories() )
+        final List<File> baseDirs = new ArrayList<File>();
+        for ( final Repository memberRepository : groupRepository.getMemberRepositories() )
         {
-            final File memberRepoBaseDir = RepositoryUtils.getBaseDir( memberRepository );
-            if ( new File( memberRepoBaseDir, "repodata/repomd.xml" ).exists() )
+            try
             {
-                memberRepoBaseDirs.add( memberRepoBaseDir );
+                // TODO check if sqlite are mandatory
+                for ( final String metadataFile : YumRepository.METADATA_FILES )
+                {
+                    // retrieve the item from repository
+                    // this will trigger going remote for proxy repositories
+                    memberRepository.retrieveItem( new ResourceStoreRequest( metadataFile ) );
+                }
+                // all metadata files are available by now so lets use it
+                baseDirs.add(
+                    new File( RepositoryUtils.getBaseDir( memberRepository ), YumRepository.PATH_OF_REPODATA )
+                );
+            }
+            catch ( Exception ignore )
+            {
+                // we do not have all the necessary files in member repository to get it merged
             }
         }
-        return memberRepoBaseDirs;
+        return baseDirs;
     }
 
     private void deleteYumTempDirs()
