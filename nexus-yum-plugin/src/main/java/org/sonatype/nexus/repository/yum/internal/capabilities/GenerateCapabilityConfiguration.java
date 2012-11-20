@@ -25,7 +25,7 @@ import com.google.common.collect.Maps;
  * @since 2.2
  */
 public class GenerateCapabilityConfiguration
-    extends YumRepositoryCapabilityConfigurationSupport
+    extends RepositoryCapabilityConfigurationSupport
 {
 
     public static final String ALIASES = "aliases";

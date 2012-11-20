@@ -36,7 +36,7 @@ import org.sonatype.nexus.repository.yum.internal.YumConfigContentGenerator;
 import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
 
-public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapabilityConfigurationSupport>
+public abstract class RepositoryCapabilitySupport<C extends RepositoryCapabilityConfigurationSupport>
     extends CapabilitySupport
 {
 
@@ -49,9 +49,9 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
     private C configuration;
 
     @Inject
-    public YumRepositoryCapabilitySupport( final YumRegistry yumRegistry,
-                                           final Conditions conditions,
-                                           final RepositoryRegistry repositoryRegistry )
+    public RepositoryCapabilitySupport( final YumRegistry yumRegistry,
+                                        final Conditions conditions,
+                                        final RepositoryRegistry repositoryRegistry )
     {
         this.yumRegistry = checkNotNull( yumRegistry );
         this.conditions = checkNotNull( conditions );
@@ -144,7 +144,7 @@ public abstract class YumRepositoryCapabilitySupport<C extends YumRepositoryCapa
                 }
             } ),
             conditions.capabilities().passivateCapabilityWhenPropertyChanged(
-                YumRepositoryCapabilityConfigurationSupport.REPOSITORY_ID
+                RepositoryCapabilityConfigurationSupport.REPOSITORY_ID
             )
         );
     }

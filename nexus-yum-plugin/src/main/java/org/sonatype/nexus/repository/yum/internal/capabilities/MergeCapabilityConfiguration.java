@@ -20,7 +20,7 @@ import java.util.Map;
  * @since 2.2
  */
 public class MergeCapabilityConfiguration
-    extends YumRepositoryCapabilityConfigurationSupport
+    extends RepositoryCapabilityConfigurationSupport
 {
 
     public MergeCapabilityConfiguration( final Map<String, String> properties )

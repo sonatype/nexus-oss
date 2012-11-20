@@ -22,7 +22,7 @@ import org.sonatype.nexus.repository.yum.YumRegistry;
 
 @Named( MergeCapabilityDescriptor.TYPE_ID )
 public class MergeCapability
-    extends YumRepositoryCapabilitySupport<MergeCapabilityConfiguration>
+    extends RepositoryCapabilitySupport<MergeCapabilityConfiguration>
 {
 
     @Inject

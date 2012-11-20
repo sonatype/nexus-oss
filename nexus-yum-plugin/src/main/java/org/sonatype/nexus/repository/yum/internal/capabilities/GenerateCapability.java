@@ -26,7 +26,7 @@ import org.sonatype.nexus.repository.yum.YumRegistry;
 
 @Named( GenerateCapabilityDescriptor.TYPE_ID )
 public class GenerateCapability
-    extends YumRepositoryCapabilitySupport<GenerateCapabilityConfiguration>
+    extends RepositoryCapabilitySupport<GenerateCapabilityConfiguration>
 {
 
     @Inject
