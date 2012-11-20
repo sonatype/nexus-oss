@@ -73,21 +73,21 @@ public class GenerateMetadataTask
 
     private static final Logger LOG = LoggerFactory.getLogger( GenerateMetadataTask.class );
 
-    public static final String PARAM_REPO_ID = "yumMetadataGenerationRepoId";
+    public static final String PARAM_REPO_ID = "repoId";
 
-    public static final String PARAM_RPM_DIR = "yumMetadataGenerationRpmDir";
+    public static final String PARAM_RPM_DIR = "rpmDir";
 
-    public static final String PARAM_REPO_DIR = "yumMetadataGenerationRepoDir";
+    public static final String PARAM_REPO_DIR = "repoDir";
 
-    public static final String PARAM_VERSION = "yumMetadataGenerationVersion";
+    public static final String PARAM_VERSION = "version";
 
-    public static final String PARAM_RPM_URL = "yumMetadataGenerationRpmUrl";
+    public static final String PARAM_RPM_URL = "rpmUrl";
 
-    public static final String PARAM_REPO_URL = "yumMetadataGenerationRepoUrl";
+    public static final String PARAM_REPO_URL = "repoUrl";
 
-    public static final String PARAM_ADDED_FILES = "yumMetadataGenerationAddedFiles";
+    public static final String PARAM_ADDED_FILES = "addedFiles";
 
-    public static final String PARAM_SINGLE_RPM_PER_DIR = "yumMetadataGenerationSingleRpmPerDir";
+    public static final String PARAM_SINGLE_RPM_PER_DIR = "singleRpmPerDir";
 
     private final RepositoryRegistry repositoryRegistry;
 
@@ -135,8 +135,8 @@ public class GenerateMetadataTask
         }
         catch ( IOException e )
         {
-            LOG.warn( "Generating Yum-Repo failed", e );
-            throw new IOException( "Generating Yum-Repo failed", e );
+            LOG.warn( "Yum metadata generation failed", e );
+            throw new IOException( "Yum metadata generation failed", e );
         }
         // TODO dubious
         Thread.sleep( 100 );
@@ -182,13 +182,13 @@ public class GenerateMetadataTask
     @Override
     protected String getAction()
     {
-        return "Generation YUM repository metadata";
+        return "Yum metadata generation";
     }
 
     @Override
     protected String getMessage()
     {
-        return "Generation YUM repository metadata";
+        return "Yum metadata generation";
     }
 
     @Override
