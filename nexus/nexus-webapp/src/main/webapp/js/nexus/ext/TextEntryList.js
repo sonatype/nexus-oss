@@ -29,10 +29,10 @@ Nexus.ext.TextEntryList = function(cfg) {
 
   this.textEntryField = new Ext.form.Field({
         xtype : 'textfield',
-        fieldLabel : config.entryLabel,
         helpText : config.entryHelpText,
         name : 'entryName',
-        width : 300
+        width : 300,
+        helpMarker : true
       });
 
   this.addEntryButton = new Ext.Button({
@@ -109,11 +109,12 @@ Nexus.ext.TextEntryList = function(cfg) {
         },
         items : [{
               xtype : 'panel',
+              fieldLabel : config.entryLabel,
               layout : 'column',
-              items : [{
+              items : [
+                {
                     xtype : 'panel',
-                    layout : 'form',
-                    width : 500,
+                    width : 320,
                     items : [this.textEntryField]
                   }, {
                     xtype : 'panel',
@@ -122,9 +123,9 @@ Nexus.ext.TextEntryList = function(cfg) {
                   }]
             }, {
               xtype : 'panel',
+              fieldLabel : config.listLabel,
               layout : 'column',
               autoHeight : true,
-              style : 'padding-left: 180px',
               items : [this.entryList, {
                     xtype : 'panel',
                     width : 120,
@@ -135,7 +136,7 @@ Nexus.ext.TextEntryList = function(cfg) {
 
 };
 
-Ext.extend(Nexus.ext.TextEntryList, Ext.Panel, {
+Ext.extend(Nexus.ext.TextEntryList, Ext.FormPanel, {
 
       addEntryNode : function(treePanel, entry) {
         var id = Ext.id();
@@ -223,8 +224,4 @@ Ext.extend(Nexus.ext.TextEntryList, Ext.Panel, {
     });
 
 Ext.reg('textentrylist', Nexus.ext.TextEntryList);
-});
-
-define('sonatype/ext/TextEntryList', ['sonatype', 'nexus/ext/TextEntryList'], function(Sonatype, Nexus){
-  Sonatype.ext.TextEntryList = Nexus.ext.TextEntryList;
 });
