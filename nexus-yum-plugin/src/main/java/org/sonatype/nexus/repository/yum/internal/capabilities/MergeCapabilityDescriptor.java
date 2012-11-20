@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityConfiguration.REPOSITORY_ID;
+import static org.sonatype.nexus.repository.yum.internal.capabilities.MergeCapabilityConfiguration.REPOSITORY_ID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
