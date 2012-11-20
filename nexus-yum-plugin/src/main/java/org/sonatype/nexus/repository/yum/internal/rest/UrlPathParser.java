@@ -80,17 +80,18 @@ public class UrlPathParser
             return new UrlPathInterpretation( repoUrl, null, true );
         }
 
-        if ( YumRepository.YUM_REPOSITORY_DIR_NAME.equals( lastSegments.get( FIRST_PARAM ) ) )
+        if ( YumRepository.PATH_OF_REPODATA.equals( lastSegments.get( FIRST_PARAM ) ) )
         {
             if ( lastSegments.size() == 1 )
             {
-                return new UrlPathInterpretation( repoUrl, YumRepository.YUM_REPOSITORY_DIR_NAME, true, true,
-                                                  pathToIndex( segments ) );
+                return new UrlPathInterpretation(
+                    repoUrl, YumRepository.PATH_OF_REPODATA, true, true, pathToIndex( segments )
+                );
             }
 
             if ( lastSegments.get( SECOND_PARAM ).length() == 0 )
             {
-                return new UrlPathInterpretation( repoUrl, YumRepository.YUM_REPOSITORY_DIR_NAME, true );
+                return new UrlPathInterpretation( repoUrl, YumRepository.PATH_OF_REPODATA, true );
             }
 
             if ( lastSegments.size() == 2 )
