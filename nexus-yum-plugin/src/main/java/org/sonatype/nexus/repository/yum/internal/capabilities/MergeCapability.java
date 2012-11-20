@@ -20,23 +20,23 @@ import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 
-@Named( YumGroupRepositoryCapabilityDescriptor.TYPE_ID )
-public class YumGroupRepositoryCapability
-    extends YumRepositoryCapabilitySupport<YumGroupRepositoryCapabilityConfiguration>
+@Named( MergeCapabilityDescriptor.TYPE_ID )
+public class MergeCapability
+    extends YumRepositoryCapabilitySupport<MergeCapabilityConfiguration>
 {
 
     @Inject
-    public YumGroupRepositoryCapability( final YumRegistry service,
-                                         final Conditions conditions,
-                                         final RepositoryRegistry repositoryRegistry )
+    public MergeCapability( final YumRegistry service,
+                            final Conditions conditions,
+                            final RepositoryRegistry repositoryRegistry )
     {
         super( service, conditions, repositoryRegistry );
     }
 
     @Override
-    YumGroupRepositoryCapabilityConfiguration createConfiguration( final Map<String, String> properties )
+    MergeCapabilityConfiguration createConfiguration( final Map<String, String> properties )
     {
-        return new YumGroupRepositoryCapabilityConfiguration( properties );
+        return new MergeCapabilityConfiguration( properties );
     }
 
 }

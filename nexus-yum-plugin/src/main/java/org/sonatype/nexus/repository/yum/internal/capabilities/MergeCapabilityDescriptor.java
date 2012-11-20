@@ -30,25 +30,25 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
 @Singleton
-@Named( YumGroupRepositoryCapabilityDescriptor.TYPE_ID )
-public class YumGroupRepositoryCapabilityDescriptor
+@Named( MergeCapabilityDescriptor.TYPE_ID )
+public class MergeCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
-    public static final String TYPE_ID = "yum.group";
+    public static final String TYPE_ID = "yum.merge";
 
     public static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
     private final Validators validators;
 
     @Inject
-    public YumGroupRepositoryCapabilityDescriptor( final Validators validators )
+    public MergeCapabilityDescriptor( final Validators validators )
     {
         super(
             TYPE,
-            "Yum Group Repository capability",
-            "Automatically merges member Yum repositories.",
+            "Yum Merge capability",
+            "Merges Yum repositories from group members.",
             new RepoOrGroupComboFormField( REPOSITORY_ID, FormField.MANDATORY )
         );
         this.validators = validators;

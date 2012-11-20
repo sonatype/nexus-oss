@@ -109,7 +109,7 @@ public class YumRepositoryITSupport
     {
         capabilities().add(
             new CapabilityResource()
-                .withTypeId( "yum.group" )
+                .withTypeId( "yum.merge" )
                 .withProperty( new CapabilityPropertyResource().withKey( "repository" ).withValue( repositoryId ) )
         );
     }
