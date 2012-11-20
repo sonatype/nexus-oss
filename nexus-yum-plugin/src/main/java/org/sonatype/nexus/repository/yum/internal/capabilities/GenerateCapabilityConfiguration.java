@@ -20,11 +20,11 @@ import org.sonatype.nexus.repository.yum.Yum;
 import com.google.common.collect.Maps;
 
 /**
- * Configuration adapter for {@link YumRepositoryCapability}.
+ * Configuration adapter for {@link GenerateCapability}.
  *
  * @since 2.2
  */
-public class YumRepositoryCapabilityConfiguration
+public class GenerateCapabilityConfiguration
     extends YumRepositoryCapabilityConfigurationSupport
 {
 
@@ -40,10 +40,10 @@ public class YumRepositoryCapabilityConfiguration
 
     private long deleteProcessingDelay;
 
-    public YumRepositoryCapabilityConfiguration( final String repository,
-                                                 final Map<String, String> aliases,
-                                                 final boolean processDeletes,
-                                                 final long deleteProcessingDelay )
+    public GenerateCapabilityConfiguration( final String repository,
+                                            final Map<String, String> aliases,
+                                            final boolean processDeletes,
+                                            final long deleteProcessingDelay )
     {
         super( repository );
         this.aliases = Maps.newTreeMap();
@@ -52,7 +52,7 @@ public class YumRepositoryCapabilityConfiguration
         this.deleteProcessingDelay = deleteProcessingDelay;
     }
 
-    public YumRepositoryCapabilityConfiguration( final Map<String, String> properties )
+    public GenerateCapabilityConfiguration( final Map<String, String> properties )
     {
         super( properties );
 

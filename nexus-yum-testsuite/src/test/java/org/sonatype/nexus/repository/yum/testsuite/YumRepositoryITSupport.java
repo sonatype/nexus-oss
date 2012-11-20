@@ -100,7 +100,7 @@ public class YumRepositoryITSupport
     {
         capabilities().add(
             new CapabilityResource()
-                .withTypeId( "yum.repository" )
+                .withTypeId( "yum.generate" )
                 .withProperty( new CapabilityPropertyResource().withKey( "repository" ).withValue( repositoryId ) )
         );
     }

@@ -49,8 +49,8 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapability;
-import org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityConfiguration;
+import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapability;
+import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapabilityConfiguration;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import com.google.common.base.Predicate;
@@ -94,17 +94,17 @@ public class AliasResourceTest
         final CapabilityReference reference = mock( CapabilityReference.class );
         final Collection<CapabilityReference> references = Lists.newArrayList();
         references.add( reference );
-        final YumRepositoryCapability yumRepositoryCapability = mock( YumRepositoryCapability.class );
+        final GenerateCapability yumRepositoryCapability = mock( GenerateCapability.class );
         final CapabilityContext capabilityContext = mock( CapabilityContext.class );
         when( reference.context() ).thenReturn( capabilityContext );
         when( capabilityContext.id() ).thenReturn( CapabilityIdentity.capabilityIdentity( "ID" ) );
         when( capabilityContext.isEnabled() ).thenReturn( true );
         when( capabilityContext.notes() ).thenReturn( "Notes" );
-        when( reference.capabilityAs( YumRepositoryCapability.class ) ).thenReturn( yumRepositoryCapability );
+        when( reference.capabilityAs( GenerateCapability.class ) ).thenReturn( yumRepositoryCapability );
         Map<String, String> aliases = Maps.newHashMap();
         aliases.put( "foo", "bar" );
         when( yumRepositoryCapability.configuration() ).thenReturn(
-            new YumRepositoryCapabilityConfiguration( RELEASES, aliases, true, 1 )
+            new GenerateCapabilityConfiguration( RELEASES, aliases, true, 1 )
         );
 
         doReturn( references ).when( capabilityRegistry ).get( Mockito.<Predicate<CapabilityReference>>any() );
@@ -212,12 +212,12 @@ public class AliasResourceTest
         );
 
         final Map<String, String> actualMap = mapCaptor.getValue();
-        assertThat( actualMap.get( YumRepositoryCapabilityConfiguration.REPOSITORY_ID ), is( RELEASES ) );
-        assertThat( actualMap.get( YumRepositoryCapabilityConfiguration.ALIASES ), is(
+        assertThat( actualMap.get( GenerateCapabilityConfiguration.REPOSITORY_ID ), is( RELEASES ) );
+        assertThat( actualMap.get( GenerateCapabilityConfiguration.ALIASES ), is(
             ALIAS_TO_CREATE + "=" + VERSION_TO_CREATE + ",foo=bar" )
         );
-        assertThat( actualMap.get( YumRepositoryCapabilityConfiguration.DELETE_PROCESSING ), is( "true" ) );
-        assertThat( actualMap.get( YumRepositoryCapabilityConfiguration.DELETE_PROCESSING_DELAY ), is( "1" ) );
+        assertThat( actualMap.get( GenerateCapabilityConfiguration.DELETE_PROCESSING ), is( "true" ) );
+        assertThat( actualMap.get( GenerateCapabilityConfiguration.DELETE_PROCESSING_DELAY ), is( "1" ) );
     }
 
     private void assert400OnPost( final String repositoryId, final String alias, final Object payload )

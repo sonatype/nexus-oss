@@ -39,9 +39,9 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapability;
-import org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityConfiguration;
-import org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapabilityDescriptor;
+import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapability;
+import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapabilityConfiguration;
+import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapabilityDescriptor;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -160,9 +160,9 @@ public class AliasResource
                 public boolean apply( final CapabilityReference reference )
                 {
                     final String capabilityRepositoryId = reference.context().properties().get(
-                        YumRepositoryCapabilityConfiguration.REPOSITORY_ID
+                        GenerateCapabilityConfiguration.REPOSITORY_ID
                     );
-                    return YumRepositoryCapabilityDescriptor.TYPE.equals( reference.context().type() )
+                    return GenerateCapabilityDescriptor.TYPE.equals( reference.context().type() )
                         && repositoryId.equals( capabilityRepositoryId );
                 }
             } );
@@ -175,8 +175,8 @@ public class AliasResource
         }
 
         final CapabilityReference capabilityReference = capabilities.iterator().next();
-        final YumRepositoryCapabilityConfiguration configuration =
-            capabilityReference.capabilityAs( YumRepositoryCapability.class ).configuration();
+        final GenerateCapabilityConfiguration configuration =
+            capabilityReference.capabilityAs( GenerateCapability.class ).configuration();
 
         final String version = payload.toString();
 
@@ -184,8 +184,8 @@ public class AliasResource
         newAliases.putAll( configuration.aliases() );
         newAliases.put( alias, version );
 
-        final YumRepositoryCapabilityConfiguration newConfiguration =
-            new YumRepositoryCapabilityConfiguration(
+        final GenerateCapabilityConfiguration newConfiguration =
+            new GenerateCapabilityConfiguration(
                 configuration.repository(),
                 newAliases,
                 configuration.shouldProcessDeletes(),
