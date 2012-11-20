@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define('repoServer/MirrorConfigPanel',['sonatype/all'], function(){
+/*global define*/
+define('repoServer/MirrorConfigPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
 var MIRROR_URL_REGEXP = /^(?:http|https):\/\//i;
 
 Sonatype.repoServer.AbstractMirrorPanel = function(config) {
-  var config = config || {};
-
   this.mirrorStatusTask = {
     run : function() {
       Ext.Ajax.request({
@@ -82,44 +81,42 @@ Sonatype.repoServer.AbstractMirrorPanel = function(config) {
     }
   };
 
-  Ext.apply(this, config, defaultConfig);
+  Ext.apply(this, config || {}, defaultConfig);
 
   Sonatype.repoServer.AbstractMirrorPanel.superclass.constructor.call(this, {});
 };
 
 Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
       addNewMirrorUrl : function() {
-        var treePanel = this.find('name', 'mirror-url-list')[0];
-        var urlField = this.find('name', 'mirrorUrl')[0];
-        if (urlField.isValid())
+        var
+              i,
+              treePanel = this.find('name', 'mirror-url-list')[0],
+              nodes = treePanel.root.childNodes,
+              urlField = this.find('name', 'mirrorUrl')[0],
+              url = urlField.getRawValue();
+
+        if (urlField.isValid() && url)
         {
-          var url = urlField.getRawValue();
-
-          if (url)
+          for (i = 0; i < nodes.length; i+=1)
           {
-            var nodes = treePanel.root.childNodes;
-            for (var i = 0; i < nodes.length; i++)
+            if (url === nodes[i].attributes.payload.url)
             {
-              if (url == nodes[i].attributes.payload.url)
-              {
-                urlField.markInvalid('This URL already exists');
-                return;
-              }
+              urlField.markInvalid('This URL already exists');
+              return;
             }
-
-            urlField.clearInvalid();
-
-            this.addUrlNode(treePanel, url, url, Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif');
-            urlField.setRawValue('');
-            urlField.setValue('');
           }
+
+          urlField.clearInvalid();
+
+          this.addUrlNode(treePanel, url, url, Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif');
+          urlField.setRawValue('');
+          urlField.setValue('');
         }
       },
 
       addUrlNode : function(treePanel, url, id, icon) {
-        var validId;
-        var manualUrl;
-        if (url == id)
+        var validId, manualUrl;
+        if (url === id)
         {
           validId = Ext.id();
           manualUrl = true;
@@ -146,9 +143,10 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
       },
 
       removeMirrorUrl : function() {
-        var treePanel = this.find('name', 'mirror-url-list')[0];
+        var
+              treePanel = this.find('name', 'mirror-url-list')[0],
+              selectedNode = treePanel.getSelectionModel().getSelectedNode();
 
-        var selectedNode = treePanel.getSelectionModel().getSelectedNode();
         if (selectedNode)
         {
           treePanel.root.removeChild(selectedNode);
@@ -156,8 +154,9 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
       },
 
       removeAllMirrorUrls : function() {
-        var treePanel = this.find('name', 'mirror-url-list')[0];
-        var treeRoot = treePanel.root;
+        var
+              treePanel = this.find('name', 'mirror-url-list')[0],
+              treeRoot = treePanel.root;
 
         while (treeRoot.lastChild)
         {
@@ -166,20 +165,20 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
       },
 
       loadMirrors : function(arr, srcObj, fpanel) {
-        var treePanel = this.find('name', 'mirror-url-list')[0];
+        var
+              i, j, childNodes, found,
+              treePanel = this.find('name', 'mirror-url-list')[0],
+              mirrorArray = [];
 
-        var mirrorArray = new Array();
-
-        for (var i = 0; i < arr.length; i++)
+        for (i = 0; i < arr.length; i+=1)
         {
-          var treePanel = this.find('name', 'mirror-url-list')[0];
-          var childNodes = treePanel.getRootNode().childNodes;
-          var found = false;
+          childNodes = treePanel.getRootNode().childNodes;
+          found = false;
           if (childNodes && childNodes.length)
           {
-            for (var j = 0; j < childNodes.length; j++)
+            for (j = 0; j < childNodes.length; j+=1)
             {
-              if (arr[i].id == childNodes[j].id)
+              if (arr[i].id === childNodes[j].id)
               {
                 mirrorArray[i] = {
                   id : arr[i].id,
@@ -203,7 +202,7 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
 
         this.removeAllMirrorUrls();
 
-        for (var i = 0; i < arr.length; i++)
+        for (i = 0; i < arr.length; i+=1)
         {
           this.addUrlNode(treePanel, mirrorArray[i].url, mirrorArray[i].id, mirrorArray[i].icon);
         }
@@ -212,12 +211,13 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
       },
 
       saveMirrors : function(val, fpanel) {
-        var treePanel = this.find('name', 'mirror-url-list')[0];
+        var
+              i,
+              treePanel = this.find('name', 'mirror-url-list')[0],
+              outputArr = [],
+              nodes = treePanel.root.childNodes;
 
-        var outputArr = [];
-        var nodes = treePanel.root.childNodes;
-
-        for (var i = 0; i < nodes.length; i++)
+        for (i = 0; i < nodes.length; i+=1)
         {
           outputArr[i] = nodes[i].attributes.payload;
         }
@@ -236,24 +236,27 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
       statusCallback : function(options, success, response) {
         if (success)
         {
-          var statusResp = Ext.decode(response.responseText);
+          var
+                i, j, data, item,
+                statusResp = Ext.decode(response.responseText),
+                treePanel = this.find('name', 'mirror-url-list')[0],
+                childNodes = treePanel.getRootNode().childNodes;
+
           if (statusResp.data)
           {
-            var data = statusResp.data;
+            data = statusResp.data;
             if (data && data.length)
             {
-              for (var i = 0; i < data.length; i++)
+              for (i = 0; i < data.length; i+=1)
               {
-                var item = data[i];
-                var treePanel = this.find('name', 'mirror-url-list')[0];
-                var childNodes = treePanel.getRootNode().childNodes;
+                item = data[i];
                 if (childNodes && childNodes.length)
                 {
-                  for (var j = 0; j < childNodes.length; j++)
+                  for (j = 0; j < childNodes.length; j+=1)
                   {
-                    if (item.id == childNodes[j].id)
+                    if (item.id === childNodes[j].id)
                     {
-                      childNodes[j].getUI().getIconEl().src = item.status == 'Blacklisted' ? (Sonatype.config.extPath + '/resources/images/default/tree/drop-no.gif') : (Sonatype.config.extPath + '/resources/images/default/tree/drop-yes.gif');
+                      childNodes[j].getUI().getIconEl().src = item.status === 'Blacklisted' ? (Sonatype.config.extPath + '/resources/images/default/tree/drop-no.gif') : (Sonatype.config.extPath + '/resources/images/default/tree/drop-yes.gif');
                       break;
                     }
                   }
@@ -280,21 +283,21 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
             this.predefinedMirrorDataStore.load();
         }
 
-        if (panel.payload.data.repoType == 'proxy')
+        if (panel.payload.data.repoType === 'proxy')
         {
           Ext.TaskMgr.start(this.mirrorStatusTask);
         }
       },
 
       deactivateHandler : function(panel) {
-        if (panel.payload.data.repoType == 'proxy')
+        if (panel.payload.data.repoType === 'proxy')
         {
           Ext.TaskMgr.stop(this.mirrorStatusTask);
         }
       },
 
       destroyHandler : function(component) {
-        if (component.payload.data.repoType == 'proxy')
+        if (component.payload.data.repoType === 'proxy')
         {
           Ext.TaskMgr.stop(this.mirrorStatusTask);
         }
@@ -302,8 +305,7 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
     });
 
 Sonatype.repoServer.ProxyMirrorEditor = function(config) {
-  var config = config || {};
-  Ext.apply(this, config, {});
+  Ext.apply(this, config || {}, {});
   var ht = Sonatype.repoServer.resources.help.repoMirrors;
 
   this.mirrorRecordConstructor = Ext.data.Record.create([{
@@ -432,8 +434,7 @@ Sonatype.repoServer.ProxyMirrorEditor = function(config) {
 Ext.extend(Sonatype.repoServer.ProxyMirrorEditor, Sonatype.repoServer.AbstractMirrorPanel, {});
 
 Sonatype.repoServer.HostedMirrorEditor = function(config) {
-  var config = config || {};
-  Ext.apply(this, config, {});
+  Ext.apply(this, config || {});
   var ht = Sonatype.repoServer.resources.help.repoMirrors;
 
   Sonatype.repoServer.HostedMirrorEditor.superclass.constructor.call(this, {
@@ -532,9 +533,9 @@ Ext.extend(Sonatype.repoServer.HostedMirrorEditor, Sonatype.repoServer.AbstractM
 
 Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
       var sp = Sonatype.lib.Permissions;
-      if (rec.data.resourceURI && sp.checkPermission('nexus:repositorymirrors', sp.READ) && rec.data.userManaged == true && (rec.data.repoType == 'proxy' || rec.data.repoType == 'hosted'))
+      if (rec.data.resourceURI && sp.checkPermission('nexus:repositorymirrors', sp.READ) &&  rec.data.userManaged)
       {
-        if (rec.data.repoType == 'proxy')
+        if (rec.data.repoType === 'proxy')
         {
           cardPanel.add(new Sonatype.repoServer.ProxyMirrorEditor({
                 payload : rec,
@@ -542,7 +543,7 @@ Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
                 name : 'mirrors'
               }));
         }
-        else if (rec.data.repoType == 'hosted')
+        else if (rec.data.repoType === 'hosted')
         {
           cardPanel.add(new Sonatype.repoServer.HostedMirrorEditor({
                 payload : rec,

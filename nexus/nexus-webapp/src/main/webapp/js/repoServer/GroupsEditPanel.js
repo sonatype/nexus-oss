@@ -10,14 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
 /*
  * Repository Groups Edit/Create panel layout and controller
  */
-
-define('repoServer/GroupsEditPanel',['sonatype/all', 'nexus/ext/formpanel'], function(){
+define('repoServer/GroupsEditPanel', ['extjs', 'sonatype/all', 'nexus/ext/formpanel'], function(Ext, Sonatype, FormPanel){
 Sonatype.repoServer.RepositoryGroupEditor = function(config) {
-  var config = config || {};
-  var defaultConfig = {
+  var
+        ht = Sonatype.repoServer.resources.help.groups,
+  defaultConfig = {
     dataModifiers : {
       load : {
         repositories : this.loadRepositories.createDelegate(this),
@@ -34,9 +35,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
     referenceData : Sonatype.repoServer.referenceData.group,
     uri : Sonatype.config.repos.urls.groups
   };
-  Ext.apply(this, config, defaultConfig);
-
-  var ht = Sonatype.repoServer.resources.help.groups;
+  Ext.apply(this, config || {}, defaultConfig);
 
   this.tfStore = new Ext.data.SimpleStore({
         fields : ['value'],
@@ -181,7 +180,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
       });
 };
 
-Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
+Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, FormPanel, {
 
       isValid : function() {
         if (!this.form.isValid())
@@ -197,18 +196,17 @@ Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
       },
 
       loadRepositories : function(arr, srcObject, fpanel) {
-        var repoBox = fpanel.find('name', 'repositories')[0];
+        var i, repoBox = fpanel.find('name', 'repositories')[0];
         this.repoStore.filterBy(function(rec, id) {
-              var contentClass = this.contentClassStore.getById( rec.data.format );
+              var compatibleClasses, contentClass = this.contentClassStore.getById( rec.data.format );
               
               // if we have the content class
               // and the content class is compatible with the repo type
-              if ( contentClass
-                && rec.data.id != srcObject.id ) {
-                var compatibleClasses = contentClass.get( 'compatibleTypes' );
+              if ( contentClass && rec.data.id !== srcObject.id ) {
+                compatibleClasses = contentClass.get( 'compatibleTypes' );
                 
-                for ( var i = 0 ; i < compatibleClasses.length ; i++ ) {
-                  if ( compatibleClasses[i] == srcObject.format ) {
+                for ( i = 0 ; i < compatibleClasses.length ; i+=1 ) {
+                  if ( compatibleClasses[i] === srcObject.format ) {
                     return true;
                   }
                 }
@@ -225,11 +223,12 @@ Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
       },
 
       saveRepositories : function(value, fpanel) {
-        var repoBox = fpanel.find('name', 'repositories')[0];
-        var repoIds = repoBox.getValue();
+        var
+              i, response = [],
+              repoBox = fpanel.find('name', 'repositories')[0],
+              repoIds = repoBox.getValue();
 
-        var response = [];
-        for (var i = 0; i < repoIds.length; i++)
+        for (i = 0; i < repoIds.length; i+=1)
         {
           response.push({
                 id : repoIds[i]
@@ -263,11 +262,11 @@ Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
 
       // @override
       addSorted : function(store, rec) {
-        var insertIndex;
-        for (var i = 0; i < store.getCount(); i++)
+        var i, insertIndex, tempRec;
+        for (i = 0; i < store.getCount(); i+=1)
         {
-          var tempRec = store.getAt(i);
-          if (tempRec.get('repoType') != 'group')
+          tempRec = store.getAt(i);
+          if (tempRec.get('repoType') !== 'group')
           {
             insertIndex = i;
             break;
@@ -288,12 +287,12 @@ Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
     });
 
 Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
-      var sp = Sonatype.lib.Permissions;
+      var sp = Sonatype.lib.Permissions, editor;
 
-      if (rec.data.repoType == 'group' && rec.data.userManaged && sp.checkPermission('nexus:repogroups', sp.READ) && (sp.checkPermission('nexus:repogroups', sp.CREATE) || sp.checkPermission('nexus:repogroups', sp.EDIT)))
+      if (rec.data.repoType === 'group' && rec.data.userManaged && sp.checkPermission('nexus:repogroups', sp.READ) && (sp.checkPermission('nexus:repogroups', sp.CREATE) || sp.checkPermission('nexus:repogroups', sp.EDIT)))
       {
 
-        var editor = new Sonatype.repoServer.RepositoryGroupEditor({
+        editor = new Sonatype.repoServer.RepositoryGroupEditor({
               tabTitle : 'Configuration',
               name : 'configuration',
               payload : rec
