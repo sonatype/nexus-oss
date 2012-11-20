@@ -31,7 +31,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 
 @Singleton
 @Named( YumRepositoryCapabilityDescriptor.TYPE_ID )
@@ -82,7 +82,7 @@ public class YumRepositoryCapabilityDescriptor
     public Validator validator()
     {
         return validators.logical().and(
-            validators.repository().repositoryOfType( TYPE, REPOSITORY_ID, MavenRepository.class ),
+            validators.repository().repositoryOfType( TYPE, REPOSITORY_ID, MavenHostedRepository.class ),
             validators.capability().uniquePer( TYPE, REPOSITORY_ID ),
             new AliasMappingsValidator( ALIASES )
         );
@@ -92,7 +92,7 @@ public class YumRepositoryCapabilityDescriptor
     public Validator validator( final CapabilityIdentity id )
     {
         return validators.logical().and(
-            validators.repository().repositoryOfType( TYPE, REPOSITORY_ID, MavenRepository.class ),
+            validators.repository().repositoryOfType( TYPE, REPOSITORY_ID, MavenHostedRepository.class ),
             validators.capability().uniquePerExcluding( id, TYPE, REPOSITORY_ID ),
             new AliasMappingsValidator( ALIASES )
         );
