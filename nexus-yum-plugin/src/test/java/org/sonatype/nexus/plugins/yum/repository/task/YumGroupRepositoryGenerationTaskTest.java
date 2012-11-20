@@ -47,7 +47,7 @@ import org.sonatype.scheduling.ScheduledTask;
 public class YumGroupRepositoryGenerationTaskTest
 {
 
-    private static final String BASE_REPO_DIR = "src/test/yum-repo";
+    private static final String BASE_REPO_DIR = AbstractYumNexusTestCase.UTIL.resolvePath( "src/test/yum-repo" );
 
     private static final File REPO_DIR1 = new File( BASE_REPO_DIR + "/repo1" );
 
