@@ -20,7 +20,12 @@ Ext.override(Ext.form.Field, {
   afterRenderOrig : Ext.form.Field.prototype.afterRender,
   afterRender : function() {
     var helpClass = null, wrapDiv = null, helpMark = null;
-    if (this.getXType() === 'combo' || this.getXType() === 'uxgroupcombo' || this.getXType() === 'datefield' || this.getXType() === 'timefield')
+    if ( this.helpMarker === true )
+    {
+      wrapDiv = this.getEl().up('div');
+      helpClass = 'form-label-helpmark';
+    }
+    else if (this.getXType() === 'combo' || this.getXType() === 'uxgroupcombo' || this.getXType() === 'datefield' || this.getXType() === 'timefield')
     {
       wrapDiv = this.getEl().up('div.x-form-field-wrap');
       helpClass = 'form-label-helpmark-combo';
@@ -34,6 +39,11 @@ Ext.override(Ext.form.Field, {
     {
       wrapDiv = this.getEl().up('div.x-form-element');
       helpClass = 'form-label-helpmark-textarea';
+    }
+    else if ( this.getXType() === 'textentrylist' )
+    {
+      wrapDiv = this.getEl().up();
+      helpClass = 'form-label-helpmark';
     }
     else
     {
