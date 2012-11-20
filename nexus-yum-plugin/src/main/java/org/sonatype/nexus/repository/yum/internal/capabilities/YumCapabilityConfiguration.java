@@ -18,7 +18,7 @@ import org.sonatype.nexus.repository.yum.YumRegistry;
 import com.google.common.collect.Maps;
 
 /**
- * Configuration adapter for {@link org.sonatype.nexus.repository.yum.internal.capabilities.YumRepositoryCapability}.
+ * Configuration adapter for {@link YumCapability}.
  *
  * @since 2.2
  */
