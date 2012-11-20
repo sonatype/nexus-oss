@@ -17,9 +17,29 @@ import java.io.File;
 public interface YumRepository
 {
 
-    public static final String YUM_REPOSITORY_DIR_NAME = "repodata";
+    public static final String PATH_OF_FILELISTS_SQLLITE = "repodata/filelists.sqlite.bz2";
 
-    public static final String REPOMD_XML = "repomd.xml";
+    public static final String PATH_OF_FILELISTS_XML = "repodata/filelists.xml.gz";
+
+    public static final String PATH_OF_OTHER_SQLLITE = "repodata/other.sqlite.bz2";
+
+    public static final String PATH_OF_OTHER_XML = "repodata/other.xml.gz";
+
+    public static final String PATH_OF_PRIMARY_SQLLITE = "repodata/primary.sqlite.bz2";
+
+    public static final String PATH_OF_PRIMARY_XML = "repodata/primary.xml.gz";
+
+    public static final String PATH_OF_REPOMD_XML = "repodata/repomd.xml";
+
+    public static final String[] METADATA_FILES = {
+        PATH_OF_FILELISTS_SQLLITE,
+        PATH_OF_FILELISTS_XML,
+        PATH_OF_OTHER_SQLLITE,
+        PATH_OF_OTHER_XML,
+        PATH_OF_PRIMARY_SQLLITE,
+        PATH_OF_PRIMARY_XML,
+        PATH_OF_REPOMD_XML
+    };
 
     public File getBaseDir();
 

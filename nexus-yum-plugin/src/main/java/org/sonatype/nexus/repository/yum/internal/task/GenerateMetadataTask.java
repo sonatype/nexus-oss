@@ -17,8 +17,6 @@ import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.sonatype.nexus.repository.yum.YumRepository.REPOMD_XML;
-import static org.sonatype.nexus.repository.yum.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 import static org.sonatype.scheduling.TaskState.SLEEPING;
 import static org.sonatype.scheduling.TaskState.SUBMITTED;
@@ -291,7 +289,7 @@ public class GenerateMetadataTask
     private void replaceUrl()
         throws IOException
     {
-        File repomd = new File( getRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML );
+        File repomd = new File( getRepoDir(), YumRepository.PATH_OF_REPOMD_XML );
         if ( repomd.exists() && getRepoUrl() != null )
         {
             String repomdStr = FileUtils.readFileToString( repomd );
