@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.task.RepositoryScanningTask;
@@ -74,7 +75,10 @@ public class YumRegistryImpl
 
             createRepositoryYumConfigFile( repository );
 
-            runScanningTask( yum );
+            if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+            {
+                runScanningTask( yum );
+            }
 
             return yum;
         }
