@@ -39,9 +39,9 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapability;
-import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapabilityConfiguration;
-import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapabilityDescriptor;
+import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateMetadataCapability;
+import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration;
+import org.sonatype.nexus.repository.yum.internal.capabilities.GenerateMetadataCapabilityDescriptor;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -160,9 +160,9 @@ public class AliasResource
                 public boolean apply( final CapabilityReference reference )
                 {
                     final String capabilityRepositoryId = reference.context().properties().get(
-                        GenerateCapabilityConfiguration.REPOSITORY_ID
+                        GenerateMetadataCapabilityConfiguration.REPOSITORY_ID
                     );
-                    return GenerateCapabilityDescriptor.TYPE.equals( reference.context().type() )
+                    return GenerateMetadataCapabilityDescriptor.TYPE.equals( reference.context().type() )
                         && repositoryId.equals( capabilityRepositoryId );
                 }
             } );
@@ -175,8 +175,8 @@ public class AliasResource
         }
 
         final CapabilityReference capabilityReference = capabilities.iterator().next();
-        final GenerateCapabilityConfiguration configuration =
-            capabilityReference.capabilityAs( GenerateCapability.class ).configuration();
+        final GenerateMetadataCapabilityConfiguration configuration =
+            capabilityReference.capabilityAs( GenerateMetadataCapability.class ).configuration();
 
         final String version = payload.toString();
 
@@ -184,8 +184,8 @@ public class AliasResource
         newAliases.putAll( configuration.aliases() );
         newAliases.put( alias, version );
 
-        final GenerateCapabilityConfiguration newConfiguration =
-            new GenerateCapabilityConfiguration(
+        final GenerateMetadataCapabilityConfiguration newConfiguration =
+            new GenerateMetadataCapabilityConfiguration(
                 configuration.repository(),
                 newAliases,
                 configuration.shouldProcessDeletes(),

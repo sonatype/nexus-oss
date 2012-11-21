@@ -24,15 +24,15 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 
-@Named( GenerateCapabilityDescriptor.TYPE_ID )
-public class GenerateCapability
-    extends RepositoryCapabilitySupport<GenerateCapabilityConfiguration>
+@Named( GenerateMetadataCapabilityDescriptor.TYPE_ID )
+public class GenerateMetadataCapability
+    extends MetadataCapabilitySupport<GenerateMetadataCapabilityConfiguration>
 {
 
     @Inject
-    public GenerateCapability( final YumRegistry yumRegistry,
-                               final Conditions conditions,
-                               final RepositoryRegistry repositoryRegistry )
+    public GenerateMetadataCapability( final YumRegistry yumRegistry,
+                                       final Conditions conditions,
+                                       final RepositoryRegistry repositoryRegistry )
     {
         super( yumRegistry, conditions, repositoryRegistry );
     }
@@ -49,9 +49,9 @@ public class GenerateCapability
     }
 
     @Override
-    GenerateCapabilityConfiguration createConfiguration( final Map<String, String> properties )
+    GenerateMetadataCapabilityConfiguration createConfiguration( final Map<String, String> properties )
     {
-        return new GenerateCapabilityConfiguration( properties );
+        return new GenerateMetadataCapabilityConfiguration( properties );
     }
 
 }

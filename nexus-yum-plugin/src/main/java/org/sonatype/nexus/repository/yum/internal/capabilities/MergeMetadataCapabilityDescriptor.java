@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.repository.yum.internal.capabilities.MergeCapabilityConfiguration.REPOSITORY_ID;
+import static org.sonatype.nexus.repository.yum.internal.capabilities.MergeMetadataCapabilityConfiguration.REPOSITORY_ID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,8 +30,8 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
 @Singleton
-@Named( MergeCapabilityDescriptor.TYPE_ID )
-public class MergeCapabilityDescriptor
+@Named( MergeMetadataCapabilityDescriptor.TYPE_ID )
+public class MergeMetadataCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
@@ -43,7 +43,7 @@ public class MergeCapabilityDescriptor
     private final Validators validators;
 
     @Inject
-    public MergeCapabilityDescriptor( final Validators validators )
+    public MergeMetadataCapabilityDescriptor( final Validators validators )
     {
         super(
             TYPE,

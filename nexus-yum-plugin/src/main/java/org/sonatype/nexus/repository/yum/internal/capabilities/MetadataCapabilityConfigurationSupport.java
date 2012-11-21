@@ -23,19 +23,19 @@ import com.google.common.collect.Maps;
  *
  * @since 2.2
  */
-public abstract class RepositoryCapabilityConfigurationSupport
+public abstract class MetadataCapabilityConfigurationSupport
 {
 
     public static final String REPOSITORY_ID = "repository";
 
     private String repository;
 
-    public RepositoryCapabilityConfigurationSupport( final String repository )
+    public MetadataCapabilityConfigurationSupport( final String repository )
     {
         this.repository = checkNotNull( repository );
     }
 
-    public RepositoryCapabilityConfigurationSupport( final Map<String, String> properties )
+    public MetadataCapabilityConfigurationSupport( final Map<String, String> properties )
     {
         checkNotNull( properties );
         this.repository = properties.get( REPOSITORY_ID );

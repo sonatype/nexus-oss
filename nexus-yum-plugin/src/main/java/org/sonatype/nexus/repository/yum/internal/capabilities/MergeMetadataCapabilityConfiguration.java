@@ -15,15 +15,15 @@ package org.sonatype.nexus.repository.yum.internal.capabilities;
 import java.util.Map;
 
 /**
- * Configuration adapter for {@link MergeCapability}.
+ * Configuration adapter for {@link MergeMetadataCapability}.
  *
  * @since 2.2
  */
-public class MergeCapabilityConfiguration
-    extends RepositoryCapabilityConfigurationSupport
+public class MergeMetadataCapabilityConfiguration
+    extends MetadataCapabilityConfigurationSupport
 {
 
-    public MergeCapabilityConfiguration( final Map<String, String> properties )
+    public MergeMetadataCapabilityConfiguration( final Map<String, String> properties )
     {
         super( properties );
     }

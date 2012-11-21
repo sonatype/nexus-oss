@@ -20,12 +20,12 @@ import org.sonatype.nexus.repository.yum.Yum;
 import com.google.common.collect.Maps;
 
 /**
- * Configuration adapter for {@link GenerateCapability}.
+ * Configuration adapter for {@link GenerateMetadataCapability}.
  *
  * @since 2.2
  */
-public class GenerateCapabilityConfiguration
-    extends RepositoryCapabilityConfigurationSupport
+public class GenerateMetadataCapabilityConfiguration
+    extends MetadataCapabilityConfigurationSupport
 {
 
     public static final String ALIASES = "aliases";
@@ -40,10 +40,10 @@ public class GenerateCapabilityConfiguration
 
     private long deleteProcessingDelay;
 
-    public GenerateCapabilityConfiguration( final String repository,
-                                            final Map<String, String> aliases,
-                                            final boolean processDeletes,
-                                            final long deleteProcessingDelay )
+    public GenerateMetadataCapabilityConfiguration( final String repository,
+                                                    final Map<String, String> aliases,
+                                                    final boolean processDeletes,
+                                                    final long deleteProcessingDelay )
     {
         super( repository );
         this.aliases = Maps.newTreeMap();
@@ -52,7 +52,7 @@ public class GenerateCapabilityConfiguration
         this.deleteProcessingDelay = deleteProcessingDelay;
     }
 
-    public GenerateCapabilityConfiguration( final Map<String, String> properties )
+    public GenerateMetadataCapabilityConfiguration( final Map<String, String> properties )
     {
         super( properties );
 

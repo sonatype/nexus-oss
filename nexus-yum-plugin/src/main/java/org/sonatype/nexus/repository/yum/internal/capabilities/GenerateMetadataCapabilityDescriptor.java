@@ -13,8 +13,8 @@
 package org.sonatype.nexus.repository.yum.internal.capabilities;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapabilityConfiguration.ALIASES;
-import static org.sonatype.nexus.repository.yum.internal.capabilities.GenerateCapabilityConfiguration.REPOSITORY_ID;
+import static org.sonatype.nexus.repository.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.ALIASES;
+import static org.sonatype.nexus.repository.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration.REPOSITORY_ID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,8 +34,8 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 
 @Singleton
-@Named( GenerateCapabilityDescriptor.TYPE_ID )
-public class GenerateCapabilityDescriptor
+@Named( GenerateMetadataCapabilityDescriptor.TYPE_ID )
+public class GenerateMetadataCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
@@ -47,7 +47,7 @@ public class GenerateCapabilityDescriptor
     private final Validators validators;
 
     @Inject
-    public GenerateCapabilityDescriptor( final Validators validators )
+    public GenerateMetadataCapabilityDescriptor( final Validators validators )
     {
         super(
             TYPE,
@@ -55,20 +55,20 @@ public class GenerateCapabilityDescriptor
             "Automatically generates Yum repositories.",
             new RepoOrGroupComboFormField( REPOSITORY_ID, FormField.MANDATORY ),
             new TextAreaFormField(
-                GenerateCapabilityConfiguration.ALIASES,
+                GenerateMetadataCapabilityConfiguration.ALIASES,
                 "Aliases",
                 "Format: <alias>=<version>[,<alias>=<version>]",
                 FormField.OPTIONAL
             ),
             new CheckboxFormField(
-                GenerateCapabilityConfiguration.DELETE_PROCESSING,
+                GenerateMetadataCapabilityConfiguration.DELETE_PROCESSING,
                 "Process deletes",
                 "Check if removing an RPM from this repository should regenerate Yum repository"
                     + " (default true)",
                 FormField.OPTIONAL
             ),
             new NumberTextFormField(
-                GenerateCapabilityConfiguration.DELETE_PROCESSING_DELAY,
+                GenerateMetadataCapabilityConfiguration.DELETE_PROCESSING_DELAY,
                 "Delete process delay",
                 "Number of seconds to wait before regenerating Yum repository when an RPM is removed"
                     + " (default 10 seconds)",
