@@ -28,11 +28,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.support.AbstractYumNexusTestCase;
+import org.sonatype.nexus.repository.yum.internal.support.YumNexusTestSupport;
 import junit.framework.Assert;
 
 public class YumImplTest
-    extends AbstractYumNexusTestCase
+    extends YumNexusTestSupport
 {
 
     private static final String REPO_BASE_URL = "http://localhost:8081/nexus/service/local/snapshots/1.0";

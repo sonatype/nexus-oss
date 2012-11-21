@@ -19,7 +19,7 @@ import static org.freecompany.redline.header.RpmType.BINARY;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.yum.internal.support.AbstractYumNexusTestCase.UTIL;
+import static org.sonatype.nexus.repository.yum.internal.support.YumNexusTestSupport.UTIL;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -123,12 +123,6 @@ public final class RepositoryTestUtils
         return new FileReader( new File( TEMPLATE_DIR, templateName + File.separator + fileName ) );
     }
 
-    public static File createDummyRpm( String name, String version )
-        throws NoSuchAlgorithmException, IOException
-    {
-        return createDummyRpm( name, version, new File( BASE_TMP_FILE, "dummy-rpms" ) );
-    }
-
     public static File createDummyRpm( String name, String version, File outputDirectory )
         throws NoSuchAlgorithmException, IOException
     {
@@ -207,8 +201,4 @@ public final class RepositoryTestUtils
         return item;
     }
 
-    private static class Marker
-    {
-
-    }
 }

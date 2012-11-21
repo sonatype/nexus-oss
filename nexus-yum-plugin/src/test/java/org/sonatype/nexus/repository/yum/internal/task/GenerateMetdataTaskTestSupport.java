@@ -16,13 +16,13 @@ import java.io.File;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.support.AbstractYumNexusTestCase;
+import org.sonatype.nexus.repository.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 public abstract class GenerateMetdataTaskTestSupport
-    extends AbstractYumNexusTestCase
+    extends YumNexusTestSupport
 {
 
     protected static final String NO_REPO_URL = null;

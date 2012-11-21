@@ -27,8 +27,8 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import com.google.code.tempusfugit.temporal.Condition;
 
-public abstract class AbstractRepositoryTester
-    extends AbstractYumNexusTestCase
+public abstract class SchedulerYumNexusTestSupport
+    extends YumNexusTestSupport
 {
 
     @Inject

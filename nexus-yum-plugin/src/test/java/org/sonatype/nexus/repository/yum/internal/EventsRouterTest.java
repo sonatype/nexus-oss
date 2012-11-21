@@ -22,10 +22,10 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.support.AbstractRepositoryTester;
+import org.sonatype.nexus.repository.yum.internal.support.SchedulerYumNexusTestSupport;
 
 public class EventsRouterTest
-    extends AbstractRepositoryTester
+    extends SchedulerYumNexusTestSupport
 {
 
     @Inject

@@ -37,7 +37,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.EventsRouter;
-import org.sonatype.nexus.repository.yum.internal.support.AbstractRepositoryTester;
+import org.sonatype.nexus.repository.yum.internal.support.SchedulerYumNexusTestSupport;
 import org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
@@ -50,7 +50,7 @@ import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
  * @author bvoss
  */
 public class GenerateMetadataTaskConcurrencyLimitTest
-    extends AbstractRepositoryTester
+    extends SchedulerYumNexusTestSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( GenerateMetadataTaskConcurrencyLimitTest.class );

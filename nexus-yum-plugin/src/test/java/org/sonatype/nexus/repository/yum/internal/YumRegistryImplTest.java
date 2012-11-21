@@ -29,12 +29,12 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.support.AbstractRepositoryTester;
+import org.sonatype.nexus.repository.yum.internal.support.SchedulerYumNexusTestSupport;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import com.google.code.tempusfugit.temporal.Condition;
 
 public class YumRegistryImplTest
-    extends AbstractRepositoryTester
+    extends SchedulerYumNexusTestSupport
 {
 
     private static final String REPO_ID = "rpm-snapshots";

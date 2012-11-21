@@ -37,14 +37,14 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.support.AbstractYumNexusTestCase;
+import org.sonatype.nexus.repository.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
 
 public class VersionedResourceTest
-    extends AbstractYumNexusTestCase
+    extends YumNexusTestSupport
 {
 
     private static final String VERSION = "2.2-1";

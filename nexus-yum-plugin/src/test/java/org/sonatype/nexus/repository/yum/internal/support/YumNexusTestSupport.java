@@ -40,7 +40,7 @@ import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
 
-public class AbstractYumNexusTestCase
+public class YumNexusTestSupport
     extends NexusTestSupport
 {
 
