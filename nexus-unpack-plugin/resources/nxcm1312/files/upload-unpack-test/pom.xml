@@ -22,7 +22,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.sonatype.maven.plugins</groupId>
+        <groupId>org.sonatype.plugins</groupId>
         <artifactId>maven-upload-plugin</artifactId>
         <version>0.0.1</version>
         <executions>

@@ -209,7 +209,7 @@
                 <xml>nekohtml:nekohtml:1.9.6.2</xml>
                 <xml>org.apache.maven.skins:maven-default-skin:1.0</xml>
                 <!-- nexus maven site plugin -->
-                <xml>com.sonatype.maven.plugins:maven-upload-plugin:0.0.1:maven-plugin</xml>
+                <xml>org.sonatype.plugins:maven-upload-plugin:0.0.1:maven-plugin</xml>
               </extraArtifacts>
             </configuration>
             <executions>
