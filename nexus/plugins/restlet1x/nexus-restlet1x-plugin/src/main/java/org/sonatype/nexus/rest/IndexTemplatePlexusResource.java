@@ -44,6 +44,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.restlet1x.BuildNumberService;
+import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
@@ -58,6 +59,8 @@ public class IndexTemplatePlexusResource
 {
     private Nexus nexus;
 
+    private ReferenceFactory referenceFactory;
+
     private Map<String, NexusIndexHtmlCustomizer> bundles;
     
     private Velocity velocity;
@@ -68,6 +71,7 @@ public class IndexTemplatePlexusResource
 
     @Inject
     public IndexTemplatePlexusResource( final Map<String, NexusIndexHtmlCustomizer> bundles, final Nexus nexus,
+                                        final ReferenceFactory referenceFactory,
                                         final @Named("${index.template.file:-templates/index.vm}") String templateFilename,
                                         final Velocity velocity, final BuildNumberService buildNumberService )
     {
@@ -75,6 +79,7 @@ public class IndexTemplatePlexusResource
 
         this.bundles = bundles;
         this.nexus = nexus;
+        this.referenceFactory = referenceFactory;
         this.templateFilename = templateFilename;
         this.velocity = velocity;
         this.buildNumberService = buildNumberService;
@@ -135,7 +140,7 @@ public class IndexTemplatePlexusResource
 
         templatingContext.put( "nexusVersion", nexus.getSystemStatus().getVersion() );
 
-        templatingContext.put( "nexusRoot", request.getRootRef().toString() );
+        templatingContext.put( "nexusRoot", referenceFactory.getContextRoot(request).toString() );
 
         // gather plugin stuff
 
