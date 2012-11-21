@@ -231,28 +231,6 @@
         <nexusPluginType>jar</nexusPluginType>
       </properties>
     </profile>
-
-    <profile>
-      <id>noit</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <skipITs>true</skipITs>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.sonatype.nexus.plugins</groupId>
-            <artifactId>nexus-test-environment-maven-plugin</artifactId>
-            <configuration>
-              <pluginSkip>true</pluginSkip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 
 </project>
