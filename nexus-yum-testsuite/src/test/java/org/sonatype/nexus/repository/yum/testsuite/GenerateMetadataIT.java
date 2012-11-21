@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.yum.testsuite;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -42,7 +41,7 @@ public class GenerateMetadataIT
             testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
 
-        sleep( 20, SECONDS );
+        waitForNexusToSettleDown();
 
         final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
         assertThat( primaryXml, containsString( "test-artifact" ) );
@@ -59,13 +58,13 @@ public class GenerateMetadataIT
             testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
 
-        sleep( 5, SECONDS );
+        waitForNexusToSettleDown();
 
         content().delete(
             repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" )
         );
 
-        sleep( 20, SECONDS );
+        waitForNexusToSettleDown();
 
         final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
         assertThat( primaryXml, not( containsString( "test-artifact" ) ) );

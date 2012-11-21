@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.yum.testsuite;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;

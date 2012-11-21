@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.yum.testsuite;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
@@ -71,7 +70,8 @@ public class VersionedIT
             repositoryLocation( repository.id(), "group/artifact/1.0/artifact-1.0.rpm" ),
             testData.resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
         );
-        sleep( 5, SECONDS );
+
+        waitForNexusToSettleDown();
 
         return repository;
     }

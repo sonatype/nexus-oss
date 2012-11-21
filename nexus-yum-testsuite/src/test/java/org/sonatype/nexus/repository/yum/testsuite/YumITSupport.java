@@ -18,7 +18,6 @@ import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParamet
 import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.runners.Parameterized;
@@ -168,12 +167,6 @@ public class YumITSupport
         tasks.waitForAllTasksToStop();
         events.waitForCalmPeriod();
         LOG.info( "Nexus settled down, continuing..." );
-    }
-
-    public static void sleep( int timeout, TimeUnit unit )
-        throws InterruptedException
-    {
-        Thread.sleep( unit.toMillis( timeout ) );
     }
 
 }
