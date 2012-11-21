@@ -123,6 +123,30 @@
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>maven-enunciate-slim-plugin</artifactId>
+        <version>1.26</version>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>docs</goal>
+            </goals>
+            <configuration>
+              <docsDir>${project.build.outputDirectory}/docs</docsDir>
+              <configFile>enunciate.xml</configFile>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>enunciate-docs</artifactId>
+            <version>1.26</version>
+          </dependency>
+        </dependencies>
+      </plugin>
     </plugins>
   </build>
 
