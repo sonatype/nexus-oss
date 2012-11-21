@@ -29,7 +29,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <description>A plugin that will automatically unpack deployed bundles</description>
+  <description>Automatically unpack deployed bundles</description>
 
   <licenses>
     <license>
@@ -50,8 +50,8 @@
 
     <nexus.version>2.3-SNAPSHOT</nexus.version>
 
-    <nexus.plugin.name>Nexus P2 Repository Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds P2 repository support.</nexus.plugin.description>
+    <nexus.plugin.name>Nexus Unpack Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Automatically unpack deployed bundles.</nexus.plugin.description>
     <nexusPluginType>nexus-plugin</nexusPluginType>
 
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
@@ -220,27 +220,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.6</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.6</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <pluginSiteUrl>
-            http://links.sonatype.com/products/nexus/oss/plugins/unpack
-          </pluginSiteUrl>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 
   <profiles>

@@ -27,7 +27,7 @@
   <artifactId>nexus-unpack-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <description>A plugin that will automatically unpack deployed bundles</description>
+  <description>Automatically unpack deployed bundles</description>
 
   <dependencies>
 
@@ -102,6 +102,29 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>1.7</version>
+        <extensions>true</extensions>
+        <configuration>
+          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/unpack</pluginSiteUrl>
+          <pluginName>${nexus.plugin.name}</pluginName>
+          <pluginDescription>${nexus.plugin.description}</pluginDescription>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>1.7</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
 
   <profiles>
     <profile>
