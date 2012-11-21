@@ -38,7 +38,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.support.YumNexusTestSupport;
-import org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
@@ -194,7 +193,7 @@ public class VersionedResourceTest
     {
         final MavenRepository repo = mock( MavenRepository.class );
         when( repo.getId() ).thenReturn( id );
-        when( repo.getLocalUrl() ).thenReturn( "file:" + RepositoryTestUtils.RPM_BASE_FILE.getAbsolutePath() );
+        when( repo.getLocalUrl() ).thenReturn( "file:" + RPM_BASE_FILE.getAbsolutePath() );
         when( repo.getProviderRole() ).thenReturn( Repository.class.getName() );
         when( repo.getProviderHint() ).thenReturn( "maven2" );
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );

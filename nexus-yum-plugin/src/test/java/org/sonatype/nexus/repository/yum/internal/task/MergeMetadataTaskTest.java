@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.yum.internal.support.YumNexusTestSupport.assertRepository;
 import static org.sonatype.nexus.repository.yum.internal.task.MergeMetadataTask.ID;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -31,14 +32,13 @@ import java.util.concurrent.Callable;
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.internal.support.IgnoreOn;
 import org.sonatype.nexus.repository.yum.internal.support.OsTestRule;
-import org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils;
+import org.sonatype.nexus.repository.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -67,7 +67,7 @@ public class MergeMetadataTaskTest
     {
         givenGroupRepoWith2YumRepos();
         thenGenerateYumRepo();
-        RepositoryTestUtils.assertRepository( util.resolveFile( "target/tmp/group-repo/repodata" ), "group-repo" );
+        assertRepository( util.resolveFile( "target/tmp/group-repo/repodata" ), "group-repo" );
     }
 
     @Test

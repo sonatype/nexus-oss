@@ -13,8 +13,6 @@
 package org.sonatype.nexus.repository.yum.internal.support;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.BASE_CACHE_DIR;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.BASE_TMP_FILE;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.util.List;

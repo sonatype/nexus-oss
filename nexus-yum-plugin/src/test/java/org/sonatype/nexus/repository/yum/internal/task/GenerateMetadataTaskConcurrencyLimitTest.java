@@ -15,8 +15,6 @@ package org.sonatype.nexus.repository.yum.internal.task;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.createItem;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.createRepository;
 import static org.sonatype.nexus.repository.yum.internal.task.GenerateMetadataTask.ID;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -38,7 +36,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.EventsRouter;
 import org.sonatype.nexus.repository.yum.internal.support.SchedulerYumNexusTestSupport;
-import org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
@@ -98,7 +95,7 @@ public class GenerateMetadataTaskConcurrencyLimitTest
     {
         String versionStr = version + ".1";
         File outputDirectory = new File( new URL( repo.getLocalUrl() + "/blalu/" + versionStr ).toURI() );
-        File rpmFile = RepositoryTestUtils.createDummyRpm( "test-artifact", versionStr, outputDirectory );
+        File rpmFile = createDummyRpm( "test-artifact", versionStr, outputDirectory );
 
         StorageItem storageItem = createItem( versionStr, rpmFile.getName() );
 

@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.repository.yum.internal.support.YumNexusTestSupport.RPM_BASE_FILE;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +25,6 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
@@ -47,7 +47,7 @@ public class RpmListWriterTest
     public void shouldListFileInSubDirs()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
+        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
         assertEquals( FILE_CONTENT, IOUtils.toString( new FileInputStream( rpmListFile ) ) );
     }
 
@@ -56,7 +56,7 @@ public class RpmListWriterTest
         throws Exception
     {
         File rpmListFile =
-            writeRpmListFile( new File( RepositoryTestUtils.RPM_BASE_FILE, "conflict-artifact/2.2-2" ), null, null );
+            writeRpmListFile( new File( RPM_BASE_FILE, "conflict-artifact/2.2-2" ), null, null );
         assertEquals( "conflict-artifact-2.2-2.noarch.rpm\n", IOUtils.toString( new FileInputStream( rpmListFile ) ) );
     }
 
@@ -64,11 +64,11 @@ public class RpmListWriterTest
     public void shouldRemoveNotExistingRpmsAndAddNewlyAddedFile()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
+        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
 
         rpmListFile = new RpmListWriter(
             REPO_ID,
-            new File( RepositoryTestUtils.RPM_BASE_FILE, "tomcat-mysql-jdbc/5.1.15-2" ),
+            new File( RPM_BASE_FILE, "tomcat-mysql-jdbc/5.1.15-2" ),
             "/is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm",
             null,
             true,
@@ -84,11 +84,11 @@ public class RpmListWriterTest
     public void shouldReuseExistingPackageFile()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
+        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
 
         rpmListFile = new RpmListWriter(
             REPO_ID,
-            RepositoryTestUtils.RPM_BASE_FILE,
+            RPM_BASE_FILE,
             null,
             null,
             true,
@@ -102,7 +102,7 @@ public class RpmListWriterTest
     public void shouldCreateVersionSpecificRpmListFile()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, "2.2-2", null );
+        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, "2.2-2", null );
         assertEquals( "conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm\n",
                       IOUtils.toString( new FileInputStream( rpmListFile ) ) );
     }
@@ -111,11 +111,11 @@ public class RpmListWriterTest
     public void shouldNotAddDuplicateToList()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
+        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
 
         rpmListFile = new RpmListWriter(
             REPO_ID,
-            RepositoryTestUtils.RPM_BASE_FILE,
+            RPM_BASE_FILE,
             "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm",
             null,
             true,
@@ -130,11 +130,11 @@ public class RpmListWriterTest
         throws Exception
     {
         // given written list file
-        File rpmListFile = writeRpmListFile( RepositoryTestUtils.RPM_BASE_FILE, null, null );
+        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
         // when create two files and recreate list
         rpmListFile = new RpmListWriter(
             REPO_ID,
-            RepositoryTestUtils.RPM_BASE_FILE,
+            RPM_BASE_FILE,
             NEW_RPM1 + pathSeparator + NEW_RPM2,
             null,
             false,

@@ -13,11 +13,6 @@
 package org.sonatype.nexus.repository.yum.internal.task;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.PACKAGE_CACHE_DIR;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.REPODATA_DIR;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.RPM_BASE_FILE;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.TARGET_DIR;
-import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.assertRepository;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;

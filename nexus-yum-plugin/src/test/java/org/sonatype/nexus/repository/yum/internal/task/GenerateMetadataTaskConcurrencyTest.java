@@ -46,7 +46,6 @@ import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.nexus.repository.yum.internal.RpmScanner;
-import org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
@@ -107,7 +106,7 @@ public class GenerateMetadataTaskConcurrencyTest
     public void shouldReuseQueuedTaskOfTheSameType()
         throws Exception
     {
-        final File tmpDir = RepositoryTestUtils.copyToTempDir( RepositoryTestUtils.RPM_BASE_FILE );
+        final File tmpDir = copyToTempDir( RPM_BASE_FILE );
 
         final MavenRepository repository = mock( MavenRepository.class );
         when( repository.getId() ).thenReturn( "REPO" );
@@ -118,8 +117,8 @@ public class GenerateMetadataTaskConcurrencyTest
         when( repositoryKind.isFacetAvailable( HostedRepository.class ) ).thenReturn( true );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
 
-        final File rpm1 = RepositoryTestUtils.createDummyRpm( RPM_NAME_1, "1", new File( tmpDir, "rpm1" ) );
-        final File rpm2 = RepositoryTestUtils.createDummyRpm( RPM_NAME_2, "2", new File( tmpDir, "rpm2" ) );
+        final File rpm1 = createDummyRpm( RPM_NAME_1, "1", new File( tmpDir, "rpm1" ) );
+        final File rpm2 = createDummyRpm( RPM_NAME_2, "2", new File( tmpDir, "rpm2" ) );
 
         // given executions blocking all thread of the scheduler
         final List<ScheduledTask<?>> futures = new ArrayList<ScheduledTask<?>>();
