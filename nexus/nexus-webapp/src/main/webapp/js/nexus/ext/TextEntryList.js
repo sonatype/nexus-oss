@@ -23,7 +23,9 @@ Ext.namespace('Nexus.ext');
 Nexus.ext.TextEntryList = function(cfg) {
   var
         config = cfg || {},
-        defaultConfig = {};
+        defaultConfig = {
+          layout : 'form'
+        };
 
   Ext.apply(this, config, defaultConfig);
 
@@ -136,7 +138,7 @@ Nexus.ext.TextEntryList = function(cfg) {
 
 };
 
-Ext.extend(Nexus.ext.TextEntryList, Ext.FormPanel, {
+Ext.extend(Nexus.ext.TextEntryList, Ext.Panel, {
 
       addEntryNode : function(treePanel, entry) {
         var id = Ext.id();
