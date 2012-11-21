@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createRepository;
+import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.createRepository;
 
 import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
@@ -29,7 +29,7 @@ import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
+import org.sonatype.nexus.repository.yum.internal.support.AbstractRepositoryTester;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import com.google.code.tempusfugit.temporal.Condition;
 

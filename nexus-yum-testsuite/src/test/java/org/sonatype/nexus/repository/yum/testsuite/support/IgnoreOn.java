@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.test.os;
+package org.sonatype.nexus.repository.yum.testsuite.support;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
+import org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 

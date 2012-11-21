@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.yum.internal.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase.UTIL;
+import static org.sonatype.nexus.repository.yum.internal.support.AbstractYumNexusTestCase.UTIL;
 
 import org.junit.Test;
 import org.restlet.data.MediaType;

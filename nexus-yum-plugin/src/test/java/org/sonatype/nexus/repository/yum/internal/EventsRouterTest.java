@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.repository.yum.internal;
 
-import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createItem;
-import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.createRepository;
+import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.createItem;
+import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.createRepository;
 
 import javax.inject.Inject;
 
@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
+import org.sonatype.nexus.repository.yum.internal.support.AbstractRepositoryTester;
 
 public class EventsRouterTest
     extends AbstractRepositoryTester

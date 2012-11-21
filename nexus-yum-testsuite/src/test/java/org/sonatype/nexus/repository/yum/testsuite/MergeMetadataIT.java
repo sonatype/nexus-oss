@@ -27,8 +27,8 @@ import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
-import org.sonatype.nexus.test.os.IgnoreOn;
-import org.sonatype.nexus.test.os.OsTestRule;
+import org.sonatype.nexus.repository.yum.testsuite.support.IgnoreOn;
+import org.sonatype.nexus.repository.yum.testsuite.support.OsTestRule;
 
 public class MergeMetadataIT
     extends YumITSupport

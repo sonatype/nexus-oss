@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum.internal.utils;
+package org.sonatype.nexus.repository.yum.internal.support;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.freecompany.redline.header.Architecture.NOARCH;
@@ -19,7 +19,7 @@ import static org.freecompany.redline.header.RpmType.BINARY;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase.UTIL;
+import static org.sonatype.nexus.repository.yum.internal.support.AbstractYumNexusTestCase.UTIL;
 
 import java.io.File;
 import java.io.FileInputStream;

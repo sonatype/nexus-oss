@@ -10,17 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum.internal.utils;
+package org.sonatype.nexus.repository.yum.internal.support;
 
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.WaitFor.waitOrTimeout;
 import static java.util.Arrays.asList;
-import static org.apache.commons.io.FileUtils.copyDirectory;
-import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.BASE_CACHE_DIR;
+import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.BASE_CACHE_DIR;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;

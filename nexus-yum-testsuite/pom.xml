@@ -39,11 +39,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus.yum</groupId>
-      <artifactId>nexus-yum-testhelper</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.nexus.capabilities</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
       <scope>test</scope>

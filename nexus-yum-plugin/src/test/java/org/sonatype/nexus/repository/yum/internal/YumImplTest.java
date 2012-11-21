@@ -28,7 +28,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
-import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
+import org.sonatype.nexus.repository.yum.internal.support.AbstractYumNexusTestCase;
 import junit.framework.Assert;
 
 public class YumImplTest

@@ -10,28 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum.internal.utils;
+package org.sonatype.nexus.repository.yum.internal.support;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.BASE_CACHE_DIR;
-import static org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils.BASE_TMP_FILE;
+import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.BASE_CACHE_DIR;
+import static org.sonatype.nexus.repository.yum.internal.support.RepositoryTestUtils.BASE_TMP_FILE;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
-import org.sonatype.nexus.proxy.RequestContext;
-import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import com.google.code.tempusfugit.temporal.Condition;
