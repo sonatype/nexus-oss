@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.unpack.it.nxcm1312;
+package org.sonatype.nexus.unpack.it.nxcm1312;
 
 import java.io.File;
 
@@ -19,7 +19,7 @@ import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.sonatype.nexus.unpack.it.AbstractUnpackIT;
+import org.sonatype.nexus.unpack.it.AbstractUnpackIT;
 
 public class NXCM1312UploadMavenSiteIT
     extends AbstractUnpackIT
