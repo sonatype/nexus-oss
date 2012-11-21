@@ -30,9 +30,6 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.yum.YumRepository;
@@ -117,9 +114,7 @@ public class MergeMetadataTask
                     memberRepository.retrieveItem( new ResourceStoreRequest( metadataFile ) );
                 }
                 // all metadata files are available by now so lets use it
-                baseDirs.add(
-                    new File( RepositoryUtils.getBaseDir( memberRepository ), YumRepository.PATH_OF_REPODATA )
-                );
+                baseDirs.add( RepositoryUtils.getBaseDir( memberRepository ) );
             }
             catch ( Exception ignore )
             {
