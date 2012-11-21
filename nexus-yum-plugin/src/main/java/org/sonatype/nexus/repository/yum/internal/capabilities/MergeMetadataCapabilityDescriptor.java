@@ -47,8 +47,8 @@ public class MergeMetadataCapabilityDescriptor
     {
         super(
             TYPE,
-            "Yum Merge capability",
-            "Merges Yum repositories from group members.",
+            "Yum: Merge Metadata",
+            "Merges Yum metadata from group members.",
             new RepoOrGroupComboFormField( REPOSITORY_ID, FormField.MANDATORY )
         );
         this.validators = validators;

@@ -45,7 +45,7 @@ public class YumCapabilityDescriptor
     {
         super(
             TYPE,
-            "Yum capability",
+            "Yum: Configuration",
             "Yum plugin configuration.",
             new NumberTextFormField(
                 YumCapabilityConfiguration.MAX_NUMBER_PARALLEL_THREADS,

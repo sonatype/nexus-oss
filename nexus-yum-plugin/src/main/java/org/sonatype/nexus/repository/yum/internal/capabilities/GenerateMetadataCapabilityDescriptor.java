@@ -51,8 +51,8 @@ public class GenerateMetadataCapabilityDescriptor
     {
         super(
             TYPE,
-            "Yum Repository capability",
-            "Automatically generates Yum repositories.",
+            "Yum: Generate Metadata",
+            "Generates Yum metadata.",
             new RepoOrGroupComboFormField( REPOSITORY_ID, FormField.MANDATORY ),
             new TextAreaFormField(
                 GenerateMetadataCapabilityConfiguration.ALIASES,
