@@ -26,7 +26,7 @@ public class YumSecurityResource
     @Override
     protected String getResourcePath()
     {
-        return "/META-INF/org.sonatype.nexus.yum-security.xml";
+        return "/META-INF/nexus-yum-plugin-security.xml";
     }
 
 }
