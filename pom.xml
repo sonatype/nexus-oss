@@ -14,22 +14,21 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>12</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
-  <artifactId>nexus-unpack-parent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <groupId>org.sonatype.nexus.unpack</groupId>
+  <artifactId>nexus-unpack</artifactId>
+  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Nexus Plugin :: Unpack</name>
   <description>A plugin that will automatically unpack deployed bundles</description>
 
   <licenses>
@@ -48,9 +47,21 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
     <nexus.version>2.1.1</nexus.version>
-    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
-    <arguments />
+
+    <nexus.plugin.name>Nexus P2 Repository Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds P2 repository support.</nexus.plugin.description>
+    <nexusPluginType>nexus-plugin</nexusPluginType>
+
+    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
+    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
+    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
+
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
+
+    <arguments/>
   </properties>
 
   <modules>
@@ -70,6 +81,23 @@
   </dependencyManagement>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+    </testResources>
+
     <pluginManagement>
       <plugins>
         <plugin>
@@ -86,52 +114,48 @@
           <version>1.7</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.12.2</version>
-        </plugin>
-        <plugin>
           <groupId>org.sonatype.nexus.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
           <version>${nexus.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.12.4</version>
+          <configuration>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <argLine>-Xmx512m</argLine>
+            <failIfNoTests>false</failIfNoTests>
+            <systemProperties>
+              <property>
+                <name>user.home</name>
+                <value>${project.build.directory}/user_home</value>
+              </property>
+            </systemProperties>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.12.2</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>integration-test</goal>
-                <goal>verify</goal>
-              </goals>
-              <configuration>
-                <forkMode>always</forkMode>
-                <argLine>-Xmx512m</argLine>
-                <junitArtifactName>none:none</junitArtifactName>
-                <testNGArtifactName>org.testng:testng</testNGArtifactName>
-                <failIfNoTests>false</failIfNoTests>
-                <excludes>
-                  <exclude>**/*$*</exclude>
-                  <exclude>**/Abstract*</exclude>
-                </excludes>
-                <properties>
-                  <property>
-                    <name>usedefaultlisteners</name>
-                    <value>true</value>
-                  </property>
-                  <property>
-                    <name>reporter</name>
-                    <value>org.testng.reporters.JUnitXMLReporter</value>
-                  </property>
-                  <property>
-                    <name>listener</name>
-                    <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
-                  </property>
-                </properties>
-              </configuration>
-            </execution>
-          </executions>
+          <version>2.12.4</version>
+          <configuration>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <forkMode>always</forkMode>
+            <argLine>-Xmx512m</argLine>
+            <junitArtifactName>none:none</junitArtifactName>
+            <testNGArtifactName>org.testng:testng</testNGArtifactName>
+            <failIfNoTests>false</failIfNoTests>
+            <junitArtifactName>none:none</junitArtifactName>
+            <testNGArtifactName>org.testng:testng</testNGArtifactName>
+            <workingDirectory>${project.build.directory}</workingDirectory>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+            </systemPropertyVariables>
+            <excludes>
+              <exclude>**/*$*</exclude>
+              <exclude>**/Abstract*</exclude>
+            </excludes>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -143,7 +167,7 @@
             <goals>deploy</goals>
             <arguments>${arguments}</arguments>
             <releaseProfiles>release noit</releaseProfiles>
-            <tagNameFormat>nexus-p2-repository-plugin-@{version}</tagNameFormat>
+            <tagNameFormat>nexus-unpack-plugin-@{version}</tagNameFormat>
           </configuration>
         </plugin>
 
@@ -225,7 +249,7 @@
     <profile>
       <id>idea</id>
       <properties>
-        <nexus.plugin.type>jar</nexus.plugin.type>
+        <nexusPluginType>jar</nexusPluginType>
       </properties>
     </profile>
 
