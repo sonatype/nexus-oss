@@ -49,8 +49,8 @@ public class NXCM1312UploadMavenSiteIT
         Assert.assertTrue( new File( root, "b.bin" ).exists() );
         Assert.assertTrue( new File( root, "x/a.txt" ).exists() );
         Assert.assertTrue( new File( root, "META-INF/MANIFEST.MF" ).exists() );
-        Assert.assertTrue( new File( root, "META-INF/maven/com.sonatype.tests/upload-unpack-test/pom.properties" ).exists() );
-        Assert.assertTrue( new File( root, "META-INF/maven/com.sonatype.tests/upload-unpack-test/pom.xml" ).exists() );
+        Assert.assertTrue( new File( root, "META-INF/maven/org.sonatype.nexus.unpack/upload-unpack-test/pom.properties" ).exists() );
+        Assert.assertTrue( new File( root, "META-INF/maven/org.sonatype.nexus.unpack/upload-unpack-test/pom.xml" ).exists() );
     }
 
 }
