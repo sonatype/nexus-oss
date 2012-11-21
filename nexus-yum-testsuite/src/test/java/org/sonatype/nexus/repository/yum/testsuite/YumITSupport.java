@@ -119,7 +119,7 @@ public class YumITSupport
         return client().getSubsystem( Yum.class );
     }
 
-    private Repositories repositories()
+    protected Repositories repositories()
     {
         return client().getSubsystem( Repositories.class );
     }
