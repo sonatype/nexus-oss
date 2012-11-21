@@ -27,11 +27,10 @@ import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import com.google.common.base.Preconditions;
 
 @Component( role = PlexusResource.class, hint = "VersionedYumRepositoryResource" )
-@Path( VersionedYumRepositoryResource.RESOURCE_URI )
-public class VersionedYumRepositoryResource
+@Path( VersionedResource.RESOURCE_URI )
+public class VersionedResource
     extends AbstractYumRepositoryResource
     implements PlexusResource
 {
@@ -52,7 +51,7 @@ public class VersionedYumRepositoryResource
     private final YumRegistry yumRegistry;
 
     @Inject
-    public VersionedYumRepositoryResource( final YumRegistry yumRegistry )
+    public VersionedResource( final YumRegistry yumRegistry )
     {
         this.yumRegistry = checkNotNull( yumRegistry );
     }

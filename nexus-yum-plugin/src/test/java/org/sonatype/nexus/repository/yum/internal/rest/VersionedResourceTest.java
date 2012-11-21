@@ -43,7 +43,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
 
-public class VersionedYumRepositoryResourceTest
+public class VersionedResourceTest
     extends AbstractYumNexusTestCase
 {
 

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.yum.internal;
+package org.sonatype.nexus.repository.yum.internal.task;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.repository.yum.YumRegistry;
+import org.sonatype.nexus.repository.yum.internal.EventsRouter;
 import org.sonatype.nexus.repository.yum.internal.utils.AbstractRepositoryTester;
 import org.sonatype.nexus.repository.yum.internal.utils.RepositoryTestUtils;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -48,11 +49,11 @@ import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
  * @author sherold
  * @author bvoss
  */
-public class ConcurrentRpmDeployedListenerTest
+public class GenerateMetadataTaskConcurrencyLimitTest
     extends AbstractRepositoryTester
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ConcurrentRpmDeployedListenerTest.class );
+    private static final Logger LOG = LoggerFactory.getLogger( GenerateMetadataTaskConcurrencyLimitTest.class );
 
     @Rule
     public ConcurrentRule concurrently = new ConcurrentRule();
