@@ -31,8 +31,10 @@ import org.restlet.data.Status;
 import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.utils.AbstractYumNexusTestCase;
@@ -195,6 +197,9 @@ public class VersionedYumRepositoryResourceTest
         when( repo.getLocalUrl() ).thenReturn( "file:" + RepositoryTestUtils.RPM_BASE_FILE.getAbsolutePath() );
         when( repo.getProviderRole() ).thenReturn( Repository.class.getName() );
         when( repo.getProviderHint() ).thenReturn( "maven2" );
+        final RepositoryKind repositoryKind = mock( RepositoryKind.class );
+        when( repo.getRepositoryKind() ).thenReturn( repositoryKind );
+        when( repositoryKind.isFacetAvailable( MavenHostedRepository.class ) ).thenReturn( true );
         return repo;
     }
 }
