@@ -55,7 +55,6 @@
 
   <modules>
     <module>nexus-unpack-plugin</module>
-    <module>nexus-unpack-plugin-its</module>
   </modules>
 
   <dependencyManagement>
