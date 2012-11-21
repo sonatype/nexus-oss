@@ -64,6 +64,8 @@
         <extensions>true</extensions>
         <configuration>
           <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/obr</pluginSiteUrl>
+          <pluginName>${nexus.plugin.name}</pluginName>
+          <pluginDescription>${nexus.plugin.description}</pluginDescription>
         </configuration>
         <dependencies>
           <dependency>

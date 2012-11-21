@@ -52,6 +52,9 @@
     <nexus.version>2.3-SNAPSHOT</nexus.version>
     <applifecycle.version>1.7</applifecycle.version>
 
+    <nexus.plugin.name>Nexus OBR Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Adds a repository type for OBR repositories.</nexus.plugin.description>
+
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
 
