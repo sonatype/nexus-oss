@@ -66,7 +66,7 @@ public class MergeMetadataIT
         final GroupRepository groupRepo = givenAYumGroupRepoWith2RPMs();
         groupRepo.removeMember( repositoryIdForTest( "2" ) ).save();
 
-        sleep( 5, SECONDS );
+        waitForNexusToSettleDown();
 
         final String primaryXml = getPrimaryXmlOf( groupRepo );
         assertThat( primaryXml, containsString( "test-artifact" ) );
@@ -82,7 +82,7 @@ public class MergeMetadataIT
         groupRepo.removeMember( repositoryIdForTest( "1" ) ).save();
         groupRepo.removeMember( repositoryIdForTest( "2" ) ).save();
 
-        sleep( 5, SECONDS );
+        waitForNexusToSettleDown();
 
         thrown.expect( NexusClientNotFoundException.class );
         getPrimaryXmlOf( groupRepo );
@@ -102,11 +102,11 @@ public class MergeMetadataIT
             testData().resolveFile( "/rpms/foo-bar-5.1.2-1.noarch.rpm" )
         );
 
-        sleep( 5, SECONDS );
+        waitForNexusToSettleDown();
 
         groupRepo.addMember( repo3.id() ).save();
 
-        sleep( 5, SECONDS );
+        waitForNexusToSettleDown();
 
         final String primaryXml = getPrimaryXmlOf( groupRepo );
 
@@ -132,8 +132,6 @@ public class MergeMetadataIT
             repositoryIdForTest(), repo2.id(), proxyRepo.id()
         );
 
-        sleep( 5, SECONDS );
-
         content().upload(
             repositoryLocation( repo1.id(), "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm" ),
             testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
@@ -144,7 +142,7 @@ public class MergeMetadataIT
             testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
         );
 
-        sleep( 5, SECONDS );
+        waitForNexusToSettleDown();
 
         final String primaryXml = getPrimaryXmlOf( groupRepo );
         assertThat( primaryXml, containsString( "test-artifact" ) );
@@ -168,8 +166,6 @@ public class MergeMetadataIT
             repositoryIdForTest(), repo1.id(), repo2.id(), repoX.id()
         );
 
-        sleep( 5, SECONDS );
-
         content().upload(
             repositoryLocation( repo1.id(), "a_group1/an_artifact1/1.0/an_artifact1-1.0.rpm" ),
             testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
@@ -180,7 +176,7 @@ public class MergeMetadataIT
             testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
         );
 
-        sleep( 5, SECONDS );
+        waitForNexusToSettleDown();
 
         return groupRepo;
     }

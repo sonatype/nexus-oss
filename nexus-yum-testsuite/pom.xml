@@ -48,6 +48,14 @@
       <artifactId>nexus-capabilities-client</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- TODO Drop this dependency when we have proper client for tasks/events -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-utils</artifactId>
+      <version>${nexus.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <profiles>

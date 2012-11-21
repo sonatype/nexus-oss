@@ -20,6 +20,7 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Before;
 import org.junit.runners.Parameterized;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.capabilities.client.Capabilities;
@@ -29,9 +30,13 @@ import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
+import org.sonatype.nexus.integrationtests.NexusRestClient;
+import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.repository.yum.client.Yum;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
+import org.sonatype.nexus.test.utils.TasksNexusRestClient;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
@@ -51,9 +56,27 @@ public class YumITSupport
         ).load();
     }
 
+    // TODO replace this with a proper tasks client
+    private TasksNexusRestClient tasks;
+
+    // TODO replace this with a proper events client
+    private EventInspectorsUtil events;
+
     public YumITSupport( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
+    }
+
+    @Before
+    public void initializeClients()
+    {
+        final NexusRestClient nexusRestClient = new NexusRestClient(
+            new TestContext()
+                .setNexusUrl( nexus().getUrl().toExternalForm() )
+                .setSecureTest( true )
+        );
+        tasks = new TasksNexusRestClient( nexusRestClient );
+        events = new EventInspectorsUtil( nexusRestClient );
     }
 
     @Override
@@ -132,6 +155,13 @@ public class YumITSupport
     private Capabilities capabilities()
     {
         return client().getSubsystem( Capabilities.class );
+    }
+
+    protected void waitForNexusToSettleDown()
+        throws Exception
+    {
+        tasks.waitForAllTasksToStop();
+        events.waitForCalmPeriod();
     }
 
     public static void sleep( int timeout, TimeUnit unit )
