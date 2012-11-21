@@ -29,7 +29,7 @@ public class EventsRouterTest
 {
 
     @Inject
-    private EventsRouter handler;
+    private EventsRouter eventsRouter;
 
     @Inject
     private YumRegistry repositoryRegistry;
@@ -39,7 +39,7 @@ public class EventsRouterTest
     {
         Repository repo = createRepository( true );
         repositoryRegistry.unregister( repo.getId() );
-        handler.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test-source.jar" ) ) );
+        eventsRouter.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test-source.jar" ) ) );
     }
 
     @Test
@@ -47,7 +47,7 @@ public class EventsRouterTest
     {
         MavenRepository repo = createRepository( true );
         repositoryRegistry.register( repo );
-        handler.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
+        eventsRouter.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.pom" ) ) );
     }
 
     @Test
@@ -55,7 +55,7 @@ public class EventsRouterTest
     {
         MavenRepository repo = createRepository( true );
         repositoryRegistry.register( repo );
-        handler.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );
+        eventsRouter.on( new RepositoryItemEventStoreCreate( repo, createItem( "VERSION", "test.rpm" ) ) );
     }
 
 }

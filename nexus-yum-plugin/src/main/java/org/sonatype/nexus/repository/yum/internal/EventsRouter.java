@@ -135,6 +135,7 @@ public class EventsRouter
                     repositoryRegistry.get().getRepository( repositoryId ).retrieveItem(
                         new ResourceStoreRequest( YumRepository.PATH_OF_REPOMD_XML )
                     );
+                    return true;
                 }
                 catch ( final Exception ignore )
                 {
