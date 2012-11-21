@@ -64,6 +64,13 @@
     <arguments/>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>rso-public-grid</id>
+      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
+    </repository>
+  </repositories>
+
   <modules>
     <module>nexus-unpack-plugin</module>
   </modules>
