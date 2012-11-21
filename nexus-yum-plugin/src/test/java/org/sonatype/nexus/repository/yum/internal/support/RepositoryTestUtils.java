@@ -42,6 +42,7 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
@@ -181,11 +182,11 @@ public final class RepositoryTestUtils
 
         if ( isMavenHostedRepository )
         {
-            when( repository.adaptToFacet( MavenHostedRepository.class ) ).thenReturn( repository );
+            when( repository.adaptToFacet( HostedRepository.class ) ).thenReturn( repository );
         }
         else
         {
-            when( repository.adaptToFacet( MavenHostedRepository.class ) ).thenThrow( new ClassCastException() );
+            when( repository.adaptToFacet( HostedRepository.class ) ).thenThrow( new ClassCastException() );
         }
 
         final File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );

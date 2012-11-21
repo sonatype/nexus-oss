@@ -25,8 +25,8 @@ import javax.inject.Inject;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.internal.support.AbstractRepositoryTester;
@@ -56,7 +56,7 @@ public class YumRegistryImplTest
         );
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
-        when( repositoryKind.isFacetAvailable( MavenHostedRepository.class ) ).thenReturn( true );
+        when( repositoryKind.isFacetAvailable( HostedRepository.class ) ).thenReturn( true );
 
         yumRegistry.register( repository );
 

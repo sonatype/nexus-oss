@@ -22,8 +22,8 @@ import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.YumRegistry;
@@ -84,7 +84,7 @@ public class YumImplTest
         when( repo.getProviderHint() ).thenReturn( "maven2" );
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
         when( repo.getRepositoryKind() ).thenReturn( repositoryKind );
-        when( repositoryKind.isFacetAvailable( MavenHostedRepository.class ) ).thenReturn( true );
+        when( repositoryKind.isFacetAvailable( HostedRepository.class ) ).thenReturn( true );
         return repo;
     }
 

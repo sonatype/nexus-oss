@@ -32,8 +32,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.internal.support.IgnoreOn;
@@ -144,7 +144,7 @@ public class MergeMetadataTaskTest
     {
         final Repository repo = mock( Repository.class );
         final RepositoryKind kind = mock( RepositoryKind.class );
-        when( kind.isFacetAvailable( Matchers.eq( MavenHostedRepository.class ) ) ).thenReturn( true );
+        when( kind.isFacetAvailable( HostedRepository.class ) ).thenReturn( true );
         when( repo.getLocalUrl() ).thenReturn(
             util.resolveFile( "src/test/yum-repo/" + repositoryId ).getAbsolutePath()
         );

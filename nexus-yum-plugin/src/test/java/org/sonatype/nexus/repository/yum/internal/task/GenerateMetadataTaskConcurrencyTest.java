@@ -39,7 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.repository.yum.Yum;
 import org.sonatype.nexus.repository.yum.YumRegistry;
 import org.sonatype.nexus.repository.yum.YumRepository;
@@ -106,13 +108,19 @@ public class GenerateMetadataTaskConcurrencyTest
         throws Exception
     {
         final File tmpDir = RepositoryTestUtils.copyToTempDir( RepositoryTestUtils.RPM_BASE_FILE );
+
         final MavenRepository repository = mock( MavenRepository.class );
         when( repository.getId() ).thenReturn( "REPO" );
         when( repository.getLocalUrl() ).thenReturn( tmpDir.getAbsolutePath() );
         when( repository.getProviderRole() ).thenReturn( Repository.class.getName() );
         when( repository.getProviderHint() ).thenReturn( "maven2" );
+        final RepositoryKind repositoryKind = mock( RepositoryKind.class );
+        when( repositoryKind.isFacetAvailable( HostedRepository.class ) ).thenReturn( true );
+        when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
+
         final File rpm1 = RepositoryTestUtils.createDummyRpm( RPM_NAME_1, "1", new File( tmpDir, "rpm1" ) );
         final File rpm2 = RepositoryTestUtils.createDummyRpm( RPM_NAME_2, "2", new File( tmpDir, "rpm2" ) );
+
         // given executions blocking all thread of the scheduler
         final List<ScheduledTask<?>> futures = new ArrayList<ScheduledTask<?>>();
         for ( int index = 0; index < MAX_PARALLEL_SCHEDULER_THREADS; index++ )
