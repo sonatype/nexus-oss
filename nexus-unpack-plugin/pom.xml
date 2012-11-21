@@ -41,8 +41,9 @@
 
     <!-- This is a plugin that contributes REST API -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <type>${nexusPluginType}</type>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>

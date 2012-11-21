@@ -48,7 +48,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <nexus.version>2.1.1</nexus.version>
+    <nexus.version>2.3-SNAPSHOT</nexus.version>
 
     <nexus.plugin.name>Nexus P2 Repository Plugin</nexus.plugin.name>
     <nexus.plugin.description>Adds P2 repository support.</nexus.plugin.description>
