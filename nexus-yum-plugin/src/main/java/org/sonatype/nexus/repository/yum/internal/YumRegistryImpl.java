@@ -73,7 +73,7 @@ public class YumRegistryImpl
 
             LOG.info( "Registered repository '{}' as Yum repository", repository.getId() );
 
-            createRepositoryYumConfigFile( repository );
+            createVirtualYumConfigFile( repository );
 
             if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
             {
@@ -136,7 +136,7 @@ public class YumRegistryImpl
         return new File( nexusConfiguration.getTemporaryDirectory(), "nexus-yum-plugin" );
     }
 
-    private void createRepositoryYumConfigFile( final MavenRepository repository )
+    private void createVirtualYumConfigFile( final MavenRepository repository )
     {
         DefaultStorageFileItem file = new DefaultStorageFileItem(
             repository,
