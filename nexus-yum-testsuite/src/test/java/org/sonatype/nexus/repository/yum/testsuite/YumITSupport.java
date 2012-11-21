@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.runners.Parameterized;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
@@ -44,6 +46,8 @@ import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 public class YumITSupport
     extends NexusRunningParametrizedITSupport
 {
+
+    protected static final Logger LOG = LoggerFactory.getLogger( YumITSupport.class );
 
     @Parameterized.Parameters
     public static Collection<Object[]> data()
@@ -160,8 +164,10 @@ public class YumITSupport
     protected void waitForNexusToSettleDown()
         throws Exception
     {
+        LOG.info( "Waiting for Nexus to settle down..." );
         tasks.waitForAllTasksToStop();
         events.waitForCalmPeriod();
+        LOG.info( "Nexus settled down, continuing..." );
     }
 
     public static void sleep( int timeout, TimeUnit unit )
