@@ -653,7 +653,6 @@ define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all'], function(Ext, So
           ]
         } // end notification settings
       ],
-      buttonAlign : 'center',
       buttons : [
         {
           id : 'savebutton',

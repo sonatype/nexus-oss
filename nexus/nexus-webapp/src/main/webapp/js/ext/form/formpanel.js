@@ -11,14 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/form',
-      [
-        'ext/form/basicform',
-        'ext/form/displayfield',
-        'ext/form/field',
-        'ext/form/formpanel',
-        'ext/form/textarea',
-        'ext/form/TextField',
-        'ext/form/VTypes'
-      ],
-      function() {});
+
+define('ext/form/formpanel', ['extjs'], function(Ext) {
+  Ext.override(Ext.FormPanel, {
+    buttonAlign : 'center'
+  });
+});
