@@ -43,7 +43,7 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-public class MergeMetadataTest
+public class MergeMetadataTaskTest
     extends TestSupport
 {
 

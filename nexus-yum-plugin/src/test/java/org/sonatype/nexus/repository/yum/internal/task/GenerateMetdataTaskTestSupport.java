@@ -21,14 +21,22 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
-public abstract class AbstractSchedulerTest
+public abstract class GenerateMetdataTaskTestSupport
     extends AbstractYumNexusTestCase
 {
+
+    protected static final String NO_REPO_URL = null;
+
+    protected static final String NO_VERSION = null;
+
+    protected static final String NO_ADDED_FILE = null;
+
+    protected static final boolean SINGLE_RPM_PER_DIRECTORY = true;
 
     @Inject
     protected NexusScheduler nexusScheduler;
 
-    protected YumRepository executeJob( GenerateMetadataTask task )
+    protected YumRepository executeJob( final GenerateMetadataTask task )
         throws Exception
     {
         final ScheduledTask<YumRepository> scheduledTask = nexusScheduler.submit( GenerateMetadataTask.ID, task );
@@ -36,13 +44,13 @@ public abstract class AbstractSchedulerTest
     }
 
     protected GenerateMetadataTask createTask( File rpmDir, String rpmUrl, File repoDir, String repoUrl,
-                                               String id, String version, String addedFile,
+                                               String repositoryId, String version, String addedFile,
                                                boolean singleRpmPerDirectory )
         throws Exception
     {
-        GenerateMetadataTask yumTask =
-            (GenerateMetadataTask) lookup( SchedulerTask.class, GenerateMetadataTask.ID );
-        yumTask.setRepositoryId( id );
+        GenerateMetadataTask yumTask = (GenerateMetadataTask) lookup( SchedulerTask.class, GenerateMetadataTask.ID );
+
+        yumTask.setRepositoryId( repositoryId );
         yumTask.setRepoDir( repoDir );
         yumTask.setRepoUrl( repoUrl );
         yumTask.setRpmDir( rpmDir.getAbsolutePath() );
@@ -50,12 +58,15 @@ public abstract class AbstractSchedulerTest
         yumTask.setVersion( version );
         yumTask.setAddedFiles( addedFile );
         yumTask.setSingleRpmPerDirectory( singleRpmPerDirectory );
+
         return yumTask;
     }
 
     protected GenerateMetadataTask createTask( File rpmDir, String rpmUrl, File repoDir, String id )
         throws Exception
     {
-        return createTask( rpmDir, rpmUrl, repoDir, null, id, null, null, true );
+        return createTask(
+            rpmDir, rpmUrl, repoDir, NO_REPO_URL, id, NO_VERSION, NO_ADDED_FILE, SINGLE_RPM_PER_DIRECTORY
+        );
     }
 }

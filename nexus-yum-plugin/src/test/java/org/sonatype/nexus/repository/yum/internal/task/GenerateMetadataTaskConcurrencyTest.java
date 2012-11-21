@@ -52,7 +52,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.code.tempusfugit.temporal.Condition;
 
 public class GenerateMetadataTaskConcurrencyTest
-    extends AbstractSchedulerTest
+    extends GenerateMetdataTaskTestSupport
 {
 
     private static final String RPM_NAME_2 = "hallomommy";
