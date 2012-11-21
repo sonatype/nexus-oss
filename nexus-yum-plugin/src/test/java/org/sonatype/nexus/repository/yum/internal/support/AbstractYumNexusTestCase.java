@@ -29,10 +29,12 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.Before;
+import org.junit.Rule;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
@@ -44,11 +46,12 @@ public class AbstractYumNexusTestCase
 
     public static final TestUtil UTIL = new TestUtil( new Marker() );
 
-    public static final File NEXUS_CONF_DIR = UTIL.resolveFile( "target/test-classes/nexus/sonatype-work/nexus/conf/" );
-
     public static final String TMP_DIR_KEY = "java.io.tmpdir";
 
     private String oldTmpDir;
+
+    @Rule
+    public final TestTracer tracer = new TestTracer( this );
 
     @Inject
     private GlobalRestApiSettings globalRestApiSettings;
