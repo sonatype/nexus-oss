@@ -76,14 +76,6 @@ public class MockedIndexerManager
     }
 
     @Override
-    public void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
-        throws IOException, NoSuchRepositoryException
-    {
-        throw new UnsupportedOperationException();
-
-    }
-
-    @Override
     public void addItemToIndex( Repository repository, StorageItem item )
         throws IOException
     {

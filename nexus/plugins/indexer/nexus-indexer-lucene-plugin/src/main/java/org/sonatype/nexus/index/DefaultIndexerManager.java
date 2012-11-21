@@ -570,37 +570,6 @@ public class DefaultIndexerManager
         return mavenIndexer.getIndexingContexts().get( getContextId( repository.getId() ) );
     }
 
-    public void setRepositoryIndexContextSearchable( final String repositoryId, final boolean searchable )
-        throws IOException, NoSuchRepositoryException
-    {
-        Repository repository = getRepository( repositoryId );
-
-        // cannot do "!repository.isIndexable()" since we may be called to handle that config change (using events)!
-        // the repo might be already non-indexable, but the context would still exist!
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        sharedSingle( repository, new Runnable()
-        {
-            @Override
-            public void run( IndexingContext context )
-                throws IOException
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "Searching on repository ID='" + repositoryId + "' is set to: "
-                                           + String.valueOf( searchable ) );
-                }
-
-                context.setSearchable( searchable );
-            }
-        } );
-    }
-
     /**
      * Extracts the repo root on local FS as File. It may return null!
      * 
@@ -2404,8 +2373,11 @@ public class DefaultIndexerManager
         lock.lock();
         try
         {
-            IndexingContext ctx = getRepositoryIndexContext( repository );
-            runnable.run( ctx );
+            if (repository.isIndexable())
+            {
+                IndexingContext ctx = getRepositoryIndexContext( repository );
+                runnable.run( ctx );
+            }
         }
         finally
         {
