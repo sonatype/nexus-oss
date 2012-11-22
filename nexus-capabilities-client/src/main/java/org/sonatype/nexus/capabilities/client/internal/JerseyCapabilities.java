@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.Filter;
+import org.sonatype.nexus.capabilities.client.exceptions.CapabilityFactoryNotAvailableException;
 import org.sonatype.nexus.capabilities.client.exceptions.MultipleCapabilitiesFoundException;
 import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
 import org.sonatype.nexus.capabilities.model.XStreamConfigurator;
@@ -133,6 +134,7 @@ public class JerseyCapabilities
 
     @Override
     public <C extends Capability> C create( final Class<C> type )
+        throws CapabilityFactoryNotAvailableException
     {
         return findFactoryOf( type ).create( getNexusClient() );
     }
@@ -207,9 +209,7 @@ public class JerseyCapabilities
                 return (JerseyCapabilityFactory<C>) factory;
             }
         }
-        throw new NexusClientException( "Could not find a factory for capability type '" + type.getName() + "'" )
-        {
-        };
+        throw new CapabilityFactoryNotAvailableException( (Class<Capability>) type );
     }
 
     private JerseyCapabilityFactory findFactoryOf( final String type )

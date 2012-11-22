@@ -14,6 +14,7 @@ package org.sonatype.nexus.capabilities.client;
 
 import java.util.Collection;
 
+import org.sonatype.nexus.capabilities.client.exceptions.CapabilityFactoryNotAvailableException;
 import org.sonatype.nexus.capabilities.client.exceptions.MultipleCapabilitiesFoundException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 
@@ -75,8 +76,11 @@ public interface Capabilities
      *
      * @param type capability type (cannot be null)
      * @return created capability (never null)
+     * @throws CapabilityFactoryNotAvailableException
+     *          If there is no capability factory configured for specified type
      */
-    <C extends Capability> C create( Class<C> type );
+    <C extends Capability> C create( Class<C> type )
+        throws CapabilityFactoryNotAvailableException;
 
     /**
      * Retrieves a capability by id.

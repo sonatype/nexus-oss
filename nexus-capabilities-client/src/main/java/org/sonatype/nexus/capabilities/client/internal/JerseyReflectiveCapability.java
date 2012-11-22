@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityProperty;
 import org.sonatype.nexus.capabilities.client.support.JerseyCapability;
+import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityImplementationException;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
@@ -79,9 +80,9 @@ public class JerseyReflectiveCapability
                 }
                 catch ( final Exception e )
                 {
-                    throw new NexusClientException( "Could not convert '" + value + "' to a " + method.getReturnType() )
-                    {
-                    };
+                    throw new ReflectiveCapabilityImplementationException(
+                        "Could not convert '" + value + "' to a " + method.getReturnType()
+                    );
                 }
             }
             else if ( args.length == 1 )
@@ -95,17 +96,13 @@ public class JerseyReflectiveCapability
                 {
                     return proxy;
                 }
-                throw new NexusClientException( "Could not reflectively implement " + method )
-                {
-                };
+                throw new ReflectiveCapabilityImplementationException( "Could not reflectively implement " + method );
             }
             else
             {
-                throw new NexusClientException(
+                throw new ReflectiveCapabilityImplementationException(
                     CapabilityProperty.class.getName() + " annotations are only allowed on setters and getters"
-                )
-                {
-                };
+                );
             }
         }
         try
@@ -120,9 +117,7 @@ public class JerseyReflectiveCapability
         }
         catch ( NoSuchMethodException e )
         {
-            throw new NexusClientException( "Could not reflectively implement " + method )
-            {
-            };
+            throw new ReflectiveCapabilityImplementationException( "Could not reflectively implement " + method );
         }
         catch ( InvocationTargetException e )
         {
