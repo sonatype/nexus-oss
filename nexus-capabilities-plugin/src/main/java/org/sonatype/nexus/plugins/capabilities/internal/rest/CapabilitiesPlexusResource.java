@@ -204,7 +204,7 @@ public class CapabilitiesPlexusResource
                         filter.active();
                     }
                 }
-                if ( $INCLUDE_NOT_EXPOSED.equals( paramName ) )
+                else if ( $INCLUDE_NOT_EXPOSED.equals( paramName ) )
                 {
                     if ( parameter == null || Boolean.valueOf( parameter.getValue() ) )
                     {
