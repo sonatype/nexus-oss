@@ -18,31 +18,31 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
-@Named( MessageCapabilityDescriptor.TYPE_ID )
+@Named( CapabilityBDescriptor.TYPE_ID )
 @Singleton
-public class MessageCapabilityDescriptor
+public class CapabilityBDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
-    static final String TYPE_ID = "[message]";
+    static final String TYPE_ID = "[b]";
 
     static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
-    static final String REPOSITORY = "repository";
+    static final String PROPERTY_B1 = "b1";
 
-    static final RepoOrGroupComboFormField REPOSITORY_FIELD = new RepoOrGroupComboFormField(
-        REPOSITORY, FormField.MANDATORY
+    static final StringTextFormField PROPERTY_A1_FIELD = new StringTextFormField(
+        PROPERTY_B1, "Property B1", "Some help text", FormField.MANDATORY
     );
 
-    protected MessageCapabilityDescriptor()
+    protected CapabilityBDescriptor()
     {
-        super( TYPE, "Message Capability", "What about me?", REPOSITORY_FIELD );
+        super( TYPE, "Capability B", "What about me?", PROPERTY_A1_FIELD );
     }
 
 }

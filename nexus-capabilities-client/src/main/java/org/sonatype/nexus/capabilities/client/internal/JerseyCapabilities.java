@@ -13,34 +13,34 @@
 package org.sonatype.nexus.capabilities.client.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.capabilities.client.Capabilities;
+import org.sonatype.nexus.capabilities.client.Capability;
+import org.sonatype.nexus.capabilities.client.Filter;
+import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
 import org.sonatype.nexus.capabilities.model.XStreamConfigurator;
+import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
-import com.google.common.base.Predicate;
+import com.google.common.base.Function;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * Jersey based Capabilities Nexus Client Subsystem implementation.
@@ -52,203 +52,238 @@ public class JerseyCapabilities
     implements Capabilities
 {
 
-    public JerseyCapabilities( JerseyNexusClient nexusClient )
+    private static final Logger LOG = LoggerFactory.getLogger( JerseyCapabilities.class );
+
+    private static final Filter ALL = null;
+
+    private final Set<JerseyCapabilityFactory> capabilityFactories;
+
+    public JerseyCapabilities( final JerseyNexusClient nexusClient,
+                               final Set<JerseyCapabilityFactory> capabilityFactories )
     {
         super( nexusClient );
         XStreamConfigurator.configureXStream( nexusClient.getXStream() );
+        this.capabilityFactories = checkNotNull( capabilityFactories );
     }
 
     @Override
-    public List<CapabilityListItemResource> list()
+    public Capability create( final String type )
     {
-        return list( false );
+        return findFactoryOf( type ).create( getNexusClient() );
     }
 
     @Override
-    public CapabilityListItemResource list( final String id )
+    public Capability get( final String id )
     {
-        final List<CapabilityListItemResource> capabilities = list( true );
-        final Collection<CapabilityListItemResource> filtered =
-            Collections2.filter( capabilities, new Predicate<CapabilityListItemResource>()
-            {
-                @Override
-                public boolean apply( @Nullable final CapabilityListItemResource input )
-                {
-                    return input != null && input.getId().equals( id );
-                }
-            } );
-        checkState( !filtered.isEmpty(), "Capability with id %s does not exist", id );
-        return filtered.iterator().next();
+        try
+        {
+            return convert(
+                getNexusClient()
+                    .serviceResource( pathStatus( id ) )
+                    .get( CapabilityStatusResponseResource.class )
+                    .getData()
+            );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( new CapabilityAwareUniformInterfaceException( e.getResponse(), id ) );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
     }
 
     @Override
-    public List<CapabilityListItemResource> list( final boolean includeHidden )
+    public Collection<Capability> get()
     {
-        final MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
-        queryParams.add( "includeHidden", String.valueOf( includeHidden ) );
-        return getNexusClient().serviceResource( "capabilities", queryParams )
-            .get( CapabilitiesListResponseResource.class )
-            .getData();
+        LOG.debug( "Retrieving all capabilities" );
+        return queryFor( ALL );
     }
 
     @Override
-    public List<CapabilityListItemResource> list( final String type, final CapabilityPropertyResource... props )
+    public Collection<Capability> get( final Filter filter )
+    {
+        LOG.debug( "Retrieving all capabilities using filter '{}'", checkNotNull( filter ).toQueryMap() );
+        return queryFor( filter );
+    }
+
+    @Override
+    public <C extends Capability> C create( final Class<C> type )
+    {
+        return findFactoryOf( type ).create( getNexusClient() );
+    }
+
+    @Override
+    public <C extends Capability> C get( final Class<C> type, final String id )
     {
         checkNotNull( type );
-        final List<CapabilityListItemResource> capabilities = list( true );
-        if ( capabilities != null && !capabilities.isEmpty() )
+        final Capability capability = get( id );
+        if ( !type.isAssignableFrom( capability.getClass() ) )
         {
-            return Lists.newArrayList( Collections2.filter( capabilities, new Predicate<CapabilityListItemResource>()
+            throw new ClassCastException(
+                String.format(
+                    "Expected an '%s' but found that capability is an '%s'",
+                    type.getName(), capability.getClass().getName()
+                )
+            );
+        }
+        return type.cast( capability );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    @Override
+    public <C extends Capability> Collection<C> get( final Class<C> type, final Filter filter )
+    {
+        LOG.debug( "Retrieving all capabilities of type {}", type.getName() );
+        final Collection<Capability> capabilities = queryFor( filter );
+        for ( final Capability capability : capabilities )
+        {
+            if ( !type.isAssignableFrom( capability.getClass() ) )
             {
-                @Override
-                public boolean apply( @Nullable final CapabilityListItemResource input )
-                {
-                    if ( input == null )
-                    {
-                        return false;
-                    }
-                    if ( !type.equals( input.getTypeId() ) )
-                    {
-                        return false;
-                    }
-                    if ( props != null && props.length > 0 )
-                    {
-                        Map<String, String> toHave = Maps.newHashMap();
-                        Map<String, String> has = Maps.newHashMap();
-                        for ( final CapabilityPropertyResource prop : props )
-                        {
-                            toHave.put( prop.getKey(), prop.getValue() );
-                        }
-                        final CapabilityResource capability = get( input.getId() );
-                        if ( capability.getProperties() != null )
-                        {
-                            for ( CapabilityPropertyResource prop : capability.getProperties() )
-                            {
-                                has.put( prop.getKey(), prop.getValue() );
-                            }
-                        }
-                        return Maps.difference( toHave, has ).entriesInCommon().size() == toHave.size();
-                    }
-                    return true;
-                }
-            } ) );
-        }
-        return Lists.newArrayList();
-    }
-
-    @Override
-    public CapabilityResource get( final String id )
-    {
-        try
-        {
-            return getNexusClient()
-                .serviceResource( "capabilities/" + id )
-                .get( CapabilityResponseResource.class )
-                .getData();
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( contextAware( e, id ) );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-    }
-
-    @Override
-    public CapabilityListItemResource add( final CapabilityResource capability )
-    {
-        final CapabilityRequestResource envelope = new CapabilityRequestResource();
-        envelope.setData( capability );
-        try
-        {
-            return getNexusClient()
-                .serviceResource( "capabilities" )
-                .post( CapabilityStatusResponseResource.class, envelope )
-                .getData();
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-    }
-
-    @Override
-    public CapabilityListItemResource update( final CapabilityResource capability )
-    {
-        final CapabilityRequestResource envelope = new CapabilityRequestResource();
-        envelope.setData( capability );
-        try
-        {
-            return getNexusClient()
-                .serviceResource( "capabilities/" + capability.getId() )
-                .put( CapabilityStatusResponseResource.class, envelope )
-                .getData();
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( contextAware( e, capability.getId() ) );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-    }
-
-    @Override
-    public void delete( final String id )
-    {
-        try
-        {
-            getNexusClient()
-                .serviceResource( "capabilities/" + id )
-                .delete();
-        }
-        catch ( UniformInterfaceException e )
-        {
-            throw getNexusClient().convert( contextAware( e, id ) );
-        }
-        catch ( ClientHandlerException e )
-        {
-            throw getNexusClient().convert( e );
-        }
-    }
-
-    private ContextAwareUniformInterfaceException contextAware( final UniformInterfaceException e, final String id )
-    {
-        return new ContextAwareUniformInterfaceException( e.getResponse() )
-        {
-            @Override
-            public String getMessage( final int status )
-            {
-                if ( status == Response.Status.NOT_FOUND.getStatusCode() )
-                {
-                    return String.format( "Capability with id '%s' was not found", id );
-                }
-                return null;
+                throw new ClassCastException(
+                    String.format(
+                        "Expected an '%s' but found that capability is an '%s'",
+                        type.getName(), capability.getClass().getName()
+                    )
+                );
             }
+        }
+        return (Collection<C>) capabilities;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private <C extends Capability> JerseyCapabilityFactory<C> findFactoryOf( final Class<C> type )
+    {
+        for ( final JerseyCapabilityFactory factory : capabilityFactories )
+        {
+            if ( factory.canCreate( (Class<Capability>) type ) )
+            {
+                LOG.debug(
+                    "Using factory {} for capability type {}",
+                    factory.getClass().getName(), type.getName()
+                );
+                return (JerseyCapabilityFactory<C>) factory;
+            }
+        }
+        throw new NexusClientException( "Could not find a factory for capability type '" + type.getName() + "'" )
+        {
         };
     }
 
-    @Override
-    public CapabilityListItemResource enable( final String id )
+    private JerseyCapabilityFactory findFactoryOf( final String type )
     {
-        final CapabilityResource capability = get( id );
-        capability.setEnabled( true );
-        return update( capability );
+        checkNotNull( type );
+        for ( final JerseyCapabilityFactory factory : capabilityFactories )
+        {
+            if ( factory.canCreate( type ) )
+            {
+                LOG.debug(
+                    "Using factory {} for type '{}'",
+                    factory.getClass().getName(), type
+                );
+                return factory;
+            }
+        }
+        LOG.debug(
+            "Using factory {} for type '{}'",
+            JerseyGenericCapabilityFactory.class.getName(), type
+        );
+        return new JerseyGenericCapabilityFactory( type );
     }
 
-    @Override
-    public CapabilityListItemResource disable( final String id )
+    private Collection<Capability> queryFor( final Filter filter )
     {
-        final CapabilityResource capability = get( id );
-        capability.setEnabled( false );
-        return update( capability );
+        final CapabilitiesListResponseResource resource;
+        try
+        {
+            if ( filter != null )
+            {
+                resource = getNexusClient()
+                    .serviceResource( "capabilities", filter.toQueryMap() )
+                    .get( CapabilitiesListResponseResource.class );
+            }
+            else
+            {
+                resource = getNexusClient()
+                    .serviceResource( "capabilities" )
+                    .get( CapabilitiesListResponseResource.class );
+            }
+        }
+        catch ( UniformInterfaceException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+
+        return Collections2.transform( resource.getData(), new Function<CapabilityListItemResource, Capability>()
+        {
+            @Override
+            public Capability apply( @Nullable final CapabilityListItemResource input )
+            {
+                return convert( input );
+            }
+        } );
+    }
+
+    private Capability convert( final CapabilityListItemResource resource )
+    {
+        if ( resource == null )
+        {
+            return null;
+        }
+        return findFactoryOf( resource.getTypeId() ).create( getNexusClient(), resource );
+    }
+
+    public static String path( final String id )
+    {
+        try
+        {
+            return "capabilities/" + URLEncoder.encode( id, "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw Throwables.propagate( e );
+        }
+    }
+
+    public static String pathStatus( final String id )
+    {
+        checkNotNull( id );
+        try
+        {
+            return "capabilities/" + URLEncoder.encode( id, "UTF-8" ) + "/status";
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw Throwables.propagate( e );
+        }
+    }
+
+    public static class CapabilityAwareUniformInterfaceException
+        extends ContextAwareUniformInterfaceException
+    {
+
+        private final String id;
+
+        public CapabilityAwareUniformInterfaceException( final ClientResponse response, final String id )
+        {
+            super( response );
+            this.id = id;
+        }
+
+        @Override
+        public String getMessage( final int status )
+        {
+            if ( status == Response.Status.NOT_FOUND.getStatusCode() )
+            {
+                return String.format( "Capability with id '%s' was not found", id );
+            }
+            return null;
+        }
     }
 
 }

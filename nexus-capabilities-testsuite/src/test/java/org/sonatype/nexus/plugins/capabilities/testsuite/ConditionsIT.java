@@ -14,14 +14,14 @@ package org.sonatype.nexus.plugins.capabilities.testsuite;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource.capability;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.capabilities.client.Capability;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 
 public class ConditionsIT
@@ -50,20 +50,19 @@ public class ConditionsIT
             .excludeFromSearchResults()
             .save();
 
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[repositoryIsInService]" )
-                .withProperty( repository( rId ) )
-        );
+        Capability capability = capabilities().create( "[repositoryIsInService]" )
+            .withProperty( "repository", rId )
+            .save();
         assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Put repository '{}' out of service", rId );
         repository.putOutOfService();
-        capability = capabilities().list( capability.getId() );
+        capability.refresh();
         assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Put repository '{}' back in service", rId );
         repository.putInService();
-        capability = capabilities().list( capability.getId() );
+        capability.refresh();
         assertThat( capability.isActive(), is( true ) );
     }
 
@@ -81,15 +80,14 @@ public class ConditionsIT
             .save()
             .putOutOfService();
 
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[repositoryIsInService]" )
-                .withProperty( repository( rId ) )
-        );
+        Capability capability = capabilities().create( "[repositoryIsInService]" )
+            .withProperty( "repository", rId )
+            .save();
         assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Put repository '{}' back in service", rId );
         repository.putInService();
-        capability = capabilities().list( capability.getId() );
+        capability.refresh();
         assertThat( capability.isActive(), is( true ) );
     }
 
@@ -109,16 +107,13 @@ public class ConditionsIT
             .excludeFromSearchResults()
             .save().putOutOfService();
 
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[repositoryIsInService]" )
-                .withProperty( repository( rIdActive ) )
-        );
+        Capability capability = capabilities().create( "[repositoryIsInService]" )
+            .withProperty( "repository", rIdActive )
+            .save();
         assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Change capability to use repository '{}'", rIdInactive );
-        capability = capabilities().update(
-            capabilities().get( capability.getId() ).withProperty( repository( rIdInactive ) )
-        );
+        capability.withProperty( "repository", rIdInactive ).save();
         assertThat( capability.isActive(), is( false ) );
     }
 
@@ -136,20 +131,19 @@ public class ConditionsIT
             .asProxyOf( repositories().get( "releases" ).contentUri() )
             .save();
 
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[repositoryIsNotBlocked]" )
-                .withProperty( repository( rId ) )
-        );
+        Capability capability = capabilities().create( "[repositoryIsNotBlocked]" )
+            .withProperty( "repository", rId )
+            .save();
         assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Block repository '{}'", rId );
         repository.block();
-        capability = capabilities().list( capability.getId() );
+        capability.refresh();
         assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Unblock repository '{}'", rId );
         repository.unblock();
-        capability = capabilities().list( capability.getId() );
+        capability.refresh();
         assertThat( capability.isActive(), is( true ) );
     }
 
@@ -167,15 +161,14 @@ public class ConditionsIT
             .save()
             .block();
 
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[repositoryIsNotBlocked]" )
-                .withProperty( repository( rId ) )
-        );
+        Capability capability = capabilities().create( "[repositoryIsNotBlocked]" )
+            .withProperty( "repository", rId )
+            .save();
         assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Unblock repository '{}'", rId );
         repository.unblock();
-        capability = capabilities().list( capability.getId() );
+        capability.refresh();
         assertThat( capability.isActive(), is( true ) );
     }
 
@@ -196,16 +189,13 @@ public class ConditionsIT
             .save()
             .block();
 
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[repositoryIsNotBlocked]" )
-                .withProperty( repository( rIdNotBlocked ) )
-        );
+        Capability capability = capabilities().create( "[repositoryIsNotBlocked]" )
+            .withProperty( "repository", rIdNotBlocked )
+            .save();
         assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Change capability to use repository '{}'", rIdBlocked );
-        capability = capabilities().update(
-            capabilities().get( capability.getId() ).withProperty( repository( rIdBlocked ) )
-        );
+        capability.withProperty( "repository", rIdBlocked ).save();
         assertThat( capability.isActive(), is( false ) );
     }
 
@@ -222,18 +212,17 @@ public class ConditionsIT
             .save()
             .putOutOfService();
 
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[repositoryIsInService]" )
-                .withProperty( repository( rId ) )
-        );
+        Capability capability = capabilities().create( "[repositoryIsInService]" )
+            .withProperty( "repository", rId )
+            .save();
         assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Remove repository '{}'", rId );
         repository.remove();
 
-        thrown.expect( IllegalStateException.class );
-        thrown.expectMessage( "does not exist" );
-        capabilities().list( capability.getId() );
+        thrown.expect( NexusClientNotFoundException.class );
+        thrown.expectMessage( String.format( "Capability with id '%s' was not found", capability.id() ) );
+        capability.refresh();
     }
 
     /**
@@ -243,56 +232,51 @@ public class ConditionsIT
     @Test
     public void capabilityOfTypeExists()
     {
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[capabilityOfTypeExists]" )
-        );
+        Capability capability = capabilities().create( "[capabilityOfTypeExists]" )
+            .save();
         assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Create a capability of type [message]" );
-        final CapabilityListItemResource messageCapability = capabilities().add(
-            capability().withTypeId( "[message]" )
-                .withProperty( repository( "releases" ) )
-                .withProperty( p( "message", "Whatever" ) )
-        );
-        capability = capabilities().list( capability.getId() );
+        final Capability messageCapability = capabilities().create( "[message]" )
+            .withProperty( "repository", "releases" )
+            .save();
+        capability.refresh();
         assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Remove capability of type [message]" );
-        capabilities().delete( messageCapability.getId() );
-        capability = capabilities().list( capability.getId() );
+        messageCapability.remove();
+        capability.refresh();
         assertThat( capability.isActive(), is( false ) );
     }
 
     @Test
     public void capabilityOfTypeIsActive()
     {
-        CapabilityListItemResource capability = capabilities().add(
-            capability().withTypeId( "[capabilityOfTypeActive]" )
-        );
+        Capability capability = capabilities().create( "[capabilityOfTypeActive]" )
+            .save();
         assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Create a capability of type [message]" );
-        final CapabilityListItemResource messageCapability = capabilities().add(
-            capability().withTypeId( "[message]" )
-                .withProperty( repository( "releases" ) )
-                .withProperty( p( "message", "Whatever" ) )
-        );
-        capability = capabilities().list( capability.getId() );
+        final Capability messageCapability = capabilities().create( "[message]" )
+            .withProperty( "repository", "releases" )
+            .save();
+
+        capability.refresh();
         assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Disable capability of type [message]" );
-        capabilities().disable( messageCapability.getId() );
-        capability = capabilities().list( capability.getId() );
+        messageCapability.disable();
+        capability.refresh();
         assertThat( capability.isActive(), is( false ) );
 
         logRemote( "Enable capability of type [message]" );
-        capabilities().enable( messageCapability.getId() );
-        capability = capabilities().list( capability.getId() );
+        messageCapability.enable();
+        capability.refresh();
         assertThat( capability.isActive(), is( true ) );
 
         logRemote( "Remove capability of type [message]" );
-        capabilities().delete( messageCapability.getId() );
-        capability = capabilities().list( capability.getId() );
+        messageCapability.remove();
+        capability.refresh();
         assertThat( capability.isActive(), is( false ) );
     }
 
