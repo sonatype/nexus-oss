@@ -14,6 +14,7 @@ package org.sonatype.nexus.capabilities.client;
 
 import java.util.Collection;
 
+import org.sonatype.nexus.capabilities.client.exceptions.MultipleCapabilitiesFoundException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 
 /**
@@ -39,7 +40,8 @@ public interface Capabilities
      * @return capability with specified id (never null)
      * @throws NexusClientNotFoundException If a capability with specified id does not exist
      */
-    Capability get( String id );
+    Capability get( String id )
+        throws NexusClientNotFoundException;
 
     /**
      * Retrieves all existing capabilities, except those that are not exposed.
@@ -55,6 +57,18 @@ public interface Capabilities
      * @return matching capabilities (never null, can be empty)
      */
     Collection<Capability> get( Filter filter );
+
+    /**
+     * Retrieves a unique capability that matches the filter.
+     *
+     * @param filter matching filter (cannot be null)
+     * @return matching capability (never null)
+     * @throws MultipleCapabilitiesFoundException
+     *                                      If more then one capability is matching the filter
+     * @throws NexusClientNotFoundException If a capability with filter does not exist
+     */
+    Capability getUnique( Filter filter )
+        throws MultipleCapabilitiesFoundException, NexusClientNotFoundException;
 
     /**
      * Creates a new capability of specified type.
@@ -73,7 +87,8 @@ public interface Capabilities
      * @throws NexusClientNotFoundException If a capability with specified id does not exist
      * @throws ClassCastException           If capability with specified id is of a different type then expected
      */
-    <C extends Capability> C get( Class<C> type, String id );
+    <C extends Capability> C get( Class<C> type, String id )
+        throws NexusClientNotFoundException, ClassCastException;
 
     /**
      * Retrieves all capabilities that matches the filter.
@@ -83,6 +98,21 @@ public interface Capabilities
      * @return matching capabilities (never null, can be empty)
      * @throws ClassCastException If any of matching capabilities is of a different type then expected
      */
-    <C extends Capability> Collection<C> get( Class<C> type, Filter filter );
+    <C extends Capability> Collection<C> get( Class<C> type, Filter filter )
+        throws ClassCastException;
+
+    /**
+     * Retrieves a unique capability that matches the filter.
+     *
+     * @param type   expected capabilities type (cannot be null)
+     * @param filter matching filter (cannot be null)
+     * @return matching capability (never null)
+     * @throws MultipleCapabilitiesFoundException
+     *                                      If more then one capability is matching the filter
+     * @throws NexusClientNotFoundException If a capability with filter does not exist
+     * @throws ClassCastException           If found capability is of a different type then expected
+     */
+    <C extends Capability> C getUnique( Class<C> type, Filter filter )
+        throws MultipleCapabilitiesFoundException, NexusClientNotFoundException, ClassCastException;
 
 }

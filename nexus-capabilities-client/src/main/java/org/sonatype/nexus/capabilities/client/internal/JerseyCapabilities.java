@@ -26,9 +26,11 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.Filter;
+import org.sonatype.nexus.capabilities.client.exceptions.MultipleCapabilitiesFoundException;
 import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
 import org.sonatype.nexus.capabilities.model.XStreamConfigurator;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
@@ -55,6 +57,8 @@ public class JerseyCapabilities
     private static final Logger LOG = LoggerFactory.getLogger( JerseyCapabilities.class );
 
     private static final Filter ALL = null;
+
+    public static final String NO_RESPONSE_BODY = null;
 
     private final Set<JerseyCapabilityFactory> capabilityFactories;
 
@@ -109,6 +113,25 @@ public class JerseyCapabilities
     }
 
     @Override
+    public Capability getUnique( final Filter filter )
+        throws MultipleCapabilitiesFoundException, NexusClientNotFoundException
+    {
+        final Collection<Capability> capabilities = get( filter );
+        if ( capabilities.size() == 0 )
+        {
+            throw new NexusClientNotFoundException(
+                String.format( "No capability found matching filter '%s'", filter ),
+                NO_RESPONSE_BODY
+            );
+        }
+        if ( capabilities.size() > 1 )
+        {
+            throw new MultipleCapabilitiesFoundException( filter, capabilities );
+        }
+        return capabilities.iterator().next();
+    }
+
+    @Override
     public <C extends Capability> C create( final Class<C> type )
     {
         return findFactoryOf( type ).create( getNexusClient() );
@@ -150,6 +173,24 @@ public class JerseyCapabilities
             }
         }
         return (Collection<C>) capabilities;
+    }
+
+    @Override
+    public <C extends Capability> C getUnique( final Class<C> type, final Filter filter )
+        throws MultipleCapabilitiesFoundException, NexusClientNotFoundException, ClassCastException
+    {
+        checkNotNull( type );
+        final Capability capability = getUnique( filter );
+        if ( !type.isAssignableFrom( capability.getClass() ) )
+        {
+            throw new ClassCastException(
+                String.format(
+                    "Expected an '%s' but found that capability is an '%s'",
+                    type.getName(), capability.getClass().getName()
+                )
+            );
+        }
+        return type.cast( capability );
     }
 
     @SuppressWarnings( "unchecked" )
