@@ -68,7 +68,7 @@ import com.google.common.eventbus.Subscribe;
 
 /**
  * Default implementation of {@link Hc4Provider}.
- * 
+ *
  * @author cstamas
  * @since 2.2
  */
@@ -78,6 +78,7 @@ public class Hc4ProviderImpl
     extends AbstractLoggingComponent
     implements Hc4Provider
 {
+
     /**
      * Key for customizing connection pool maximum size. Value should be integer equal to 0 or greater. Pool size of 0
      * will actually prevent use of pool. Any positive number means the actual size of the pool to be created. This is a
@@ -103,15 +104,15 @@ public class Hc4ProviderImpl
     private static final int CONNECTION_POOL_SIZE_DEFAULT = 20;
 
     /**
-     * Key for customizing connection pool keep-alive. In other words, how long open connections (sockets) are kept in
-     * pool before evicted and closed. Value is milliseconds.
+     * Key for customizing connection pool idle time. In other words, how long open connections (sockets) are kept in
+     * pool idle (unused) before they get evicted and closed. Value is milliseconds.
      */
-    private static final String CONNECTION_POOL_KEEPALIVE_KEY = "nexus.apacheHttpClient4x.connectionPoolKeepalive";
+    private static final String CONNECTION_POOL_IDLE_TIME_KEY = "nexus.apacheHttpClient4x.connectionPoolIdleTime";
 
     /**
-     * Default pool keep-alive: 1 minute.
+     * Default pool idle time: 1 minute.
      */
-    private static final long CONNECTION_POOL_KEEPALIVE_DEFAULT = TimeUnit.MINUTES.toMillis( 1 );
+    private static final long CONNECTION_POOL_IDLE_TIME_DEFAULT = TimeUnit.MINUTES.toMillis( 1 );
 
     /**
      * Key for customizing connection pool timeout. In other words, how long should a HTTP request execution be blocked
@@ -120,9 +121,20 @@ public class Hc4ProviderImpl
     private static final String CONNECTION_POOL_TIMEOUT_KEY = "nexus.apacheHttpClient4x.connectionPoolTimeout";
 
     /**
-     * Default pool timeout: equals to {@link #CONNECTION_POOL_KEEPALIVE_DEFAULT}.
+     * Default pool timeout: 1 minute.
      */
-    private static final long CONNECTION_POOL_TIMEOUT_DEFAULT = CONNECTION_POOL_KEEPALIVE_DEFAULT;
+    private static final long CONNECTION_POOL_TIMEOUT_DEFAULT = TimeUnit.MINUTES.toMillis( 1 );
+
+    /**
+     * Key for customizing default (and max) keep alive duration when remote server does not state anything,
+     * or states some unreal high value. Value is milliseconds.
+     */
+    private static final String KEEP_ALIVE_MAX_DURATION_KEY = "nexus.apacheHttpClient4x.keepAliveMaxDuration";
+
+    /**
+     * Default keep alive max duration: 1 minute.
+     */
+    private static final long KEEP_ALIVE_MAX_DURATION_DEFAULT = TimeUnit.MINUTES.toMillis( 1 );
 
     // ==
 
@@ -158,36 +170,38 @@ public class Hc4ProviderImpl
 
     /**
      * Constructor.
-     * 
+     *
      * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}.
-     * @param userAgentBuilder UA builder component.
-     * @param eventBus the event multicaster
-     * @param jmxInstaller installer to expose pool information over JMX.
+     * @param userAgentBuilder         UA builder component.
+     * @param eventBus                 the event multicaster
+     * @param jmxInstaller             installer to expose pool information over JMX.
      */
     @Inject
     public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
-                            final UserAgentBuilder userAgentBuilder,
-                            final EventBus eventBus,
-                            final PoolingClientConnectionManagerMBeanInstaller jmxInstaller )
+        final UserAgentBuilder userAgentBuilder,
+        final EventBus eventBus,
+        final PoolingClientConnectionManagerMBeanInstaller jmxInstaller )
     {
         this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
         this.userAgentBuilder = Preconditions.checkNotNull( userAgentBuilder );
         this.jmxInstaller = Preconditions.checkNotNull( jmxInstaller );
         this.sharedConnectionManager = createClientConnectionManager();
-        this.evictingThread = new EvictingThread( sharedConnectionManager, getConnectionPoolKeepalive() );
+        this.evictingThread = new EvictingThread( sharedConnectionManager, getConnectionPoolIdleTime() );
         this.evictingThread.start();
         this.eventBus = Preconditions.checkNotNull( eventBus );
         this.eventBus.register( this );
         this.jmxInstaller.register( sharedConnectionManager );
-        getLogger().info( "{} started up (keep-alive {} millis), listening for shutdown.", getClass().getSimpleName(),
-            getConnectionPoolKeepalive() );
+        getLogger().info(
+            "{} started up (connectionPoolMaxSize {}, connectionPoolSize {}, connectionPoolIdleTime {} ms, connectionPoolTimeout {} ms, keepAliveMaxDuration {} ms)",
+            getClass().getSimpleName(), getConnectionPoolMaxSize(), getConnectionPoolSize(),
+            getConnectionPoolIdleTime(), getConnectionPoolTimeout(), getKeepAliveMaxDuration() );
     }
 
     // configuration
 
     /**
      * Returns the pool max size.
-     * 
+     *
      * @return pool max size
      */
     protected int getConnectionPoolMaxSize()
@@ -197,7 +211,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool size per route.
-     * 
+     *
      * @return pool per route size
      */
     protected int getConnectionPoolSize()
@@ -206,18 +220,18 @@ public class Hc4ProviderImpl
     }
 
     /**
-     * Returns the keep alive (idle open) time in milliseconds.
-     * 
-     * @return keep alive in milliseconds.
+     * Returns the connection pool idle (idle as unused but pooled) time in milliseconds.
+     *
+     * @return idle time in milliseconds.
      */
-    protected long getConnectionPoolKeepalive()
+    protected long getConnectionPoolIdleTime()
     {
-        return SystemPropertiesHelper.getLong( CONNECTION_POOL_KEEPALIVE_KEY, CONNECTION_POOL_KEEPALIVE_DEFAULT );
+        return SystemPropertiesHelper.getLong( CONNECTION_POOL_IDLE_TIME_KEY, CONNECTION_POOL_IDLE_TIME_DEFAULT );
     }
 
     /**
      * Returns the pool timeout in milliseconds.
-     * 
+     *
      * @return pool timeout in milliseconds.
      */
     protected long getConnectionPoolTimeout()
@@ -226,8 +240,18 @@ public class Hc4ProviderImpl
     }
 
     /**
+     * Returns the maximum Keep-Alive duration in milliseconds.
+     *
+     * @return default Keep-Alive duration in milliseconds.
+     */
+    protected long getKeepAliveMaxDuration()
+    {
+        return SystemPropertiesHelper.getLong( KEEP_ALIVE_MAX_DURATION_KEY, KEEP_ALIVE_MAX_DURATION_DEFAULT );
+    }
+
+    /**
      * Returns the connection timeout in milliseconds. The timeout until connection is established.
-     * 
+     *
      * @param context
      * @return the connection timeout in milliseconds.
      */
@@ -246,7 +270,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the SO_SOCKET timeout in milliseconds. The timeout for waiting for data on established connection.
-     * 
+     *
      * @param context
      * @return the SO_SOCKET timeout in milliseconds.
      */
@@ -325,6 +349,7 @@ public class Hc4ProviderImpl
     private static class DefaultHttpClientImpl
         extends DefaultHttpClient
     {
+
         private DefaultHttpClientImpl( final ClientConnectionManager conman, final HttpParams params )
         {
             super( conman, params );
@@ -340,7 +365,7 @@ public class Hc4ProviderImpl
     }
 
     protected DefaultHttpClient createHttpClient( final RemoteStorageContext context,
-                                                  final ClientConnectionManager clientConnectionManager )
+        final ClientConnectionManager clientConnectionManager )
     {
         final DefaultHttpClient httpClient =
             new DefaultHttpClientImpl( clientConnectionManager, createHttpParams( context ) );
@@ -348,9 +373,11 @@ public class Hc4ProviderImpl
         configureProxy( httpClient, context.getRemoteProxySettings() );
         // obey the given retries count and apply it to client.
         final int retries =
-            context.getRemoteConnectionSettings() != null ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
+            context.getRemoteConnectionSettings() != null
+                ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
                 : 0;
         httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( retries, false ) );
+        httpClient.setKeepAliveStrategy( new NexusConnectionKeepAliveStrategy( getKeepAliveMaxDuration() ) );
         return httpClient;
     }
 
@@ -388,7 +415,7 @@ public class Hc4ProviderImpl
     // ==
 
     protected void configureAuthentication( final DefaultHttpClient httpClient, final RemoteAuthenticationSettings ras,
-                                            final HttpHost proxyHost )
+        final HttpHost proxyHost )
     {
         if ( ras != null )
         {
@@ -413,14 +440,15 @@ public class Hc4ProviderImpl
                 authorisationPreference.add( 0, AuthPolicy.NTLM );
                 getLogger().info( "... {} authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain() );
                 credentials =
-                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain() );
+                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(),
+                                       nras.getNtlmDomain() );
             }
             else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
             {
                 final UsernamePasswordRemoteAuthenticationSettings uras =
                     (UsernamePasswordRemoteAuthenticationSettings) ras;
                 getLogger().info( "... {} authentication setup for remote storage with username '{}'", authScope,
-                    uras.getUsername() );
+                                  uras.getUsername() );
                 credentials = new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() );
             }
 
