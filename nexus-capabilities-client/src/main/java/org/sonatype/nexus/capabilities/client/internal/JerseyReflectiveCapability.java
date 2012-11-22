@@ -25,6 +25,7 @@ import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityImplem
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
+import com.google.common.primitives.Primitives;
 
 /**
  * Reflection based capability implementation.
@@ -76,7 +77,9 @@ public class JerseyReflectiveCapability
                 }
                 try
                 {
-                    return method.getReturnType().getConstructor( String.class ).newInstance( value );
+                    return Primitives.wrap( method.getReturnType() )
+                        .getConstructor( String.class )
+                        .newInstance( value );
                 }
                 catch ( final Exception e )
                 {
