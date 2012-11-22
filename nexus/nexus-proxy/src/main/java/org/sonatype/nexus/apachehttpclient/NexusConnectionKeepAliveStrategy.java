@@ -15,6 +15,7 @@ package org.sonatype.nexus.apachehttpclient;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.protocol.HttpContext;
+import com.google.common.base.Preconditions;
 
 /**
  * Nexus connection keep alive strategy, that differs from the HC4 default one only in one thing: when server does
@@ -36,10 +37,13 @@ public class NexusConnectionKeepAliveStrategy
     /**
      * Constructor.
      *
-     * @param maxKeepAliveDuration     the max duration in millis for how long to pool the connection.
+     * @param maxKeepAliveDuration the max duration in millis for how long to pool the connection.
      */
     public NexusConnectionKeepAliveStrategy( final long maxKeepAliveDuration )
     {
+        Preconditions.checkArgument( maxKeepAliveDuration > -1,
+                                     "maxKeepAliveDuration must be 0 or higher, but is set to %s",
+                                     maxKeepAliveDuration );
         this.maxKeepAliveDuration = maxKeepAliveDuration;
     }
 
