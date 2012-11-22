@@ -12,8 +12,15 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.util.Properties;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.validator.AbstractFileTypeValidationUtilTest;
+import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator;
+import org.sonatype.nexus.proxy.repository.validator.FileTypeValidatorHub;
 
 /**
  * Tests for MavenFileTypeValidator specific file types.
@@ -21,6 +28,30 @@ import org.sonatype.nexus.proxy.repository.validator.AbstractFileTypeValidationU
 public class MavenFileTypeValidatorTest
     extends AbstractFileTypeValidationUtilTest
 {
+
+    private MavenFileTypeValidator underTest;
+
+    @Before
+    public void setup()
+        throws Exception
+    {
+        underTest = (MavenFileTypeValidator) lookup( FileTypeValidator.class, "maven" );
+    }
+
+    @Override
+    protected FileTypeValidatorHub getValidationUtil()
+        throws Exception
+    {
+        return new FileTypeValidatorHub()
+        {
+            @Override
+            public boolean isExpectedFileType( final StorageItem item )
+            {
+                return !FileTypeValidator.FileTypeValidity.INVALID.equals( underTest.isExpectedFileType( (StorageFileItem) item ) );
+            }
+        };
+    }
+
     @Test
     public void testJar()
         throws Exception
@@ -115,6 +146,18 @@ public class MavenFileTypeValidatorTest
         doTest( "something/else/file.jar.md5", "no-doctype-pom.xml", false );
         doTest( "something/else/file.jar.md5", "test.sha1", false );
         doTest( "something/else/file.jar.md5", "test.md5", true );
+    }
+
+    @Test
+    public void overrideRules()
+        throws Exception
+    {
+        doTest( "something/else/library.swc", "test.tar.bz2", false );
+        doTest( "something/else/library.swc", "test.tar.gz", true );
+        final Properties properties = new Properties();
+        properties.setProperty( "swc", "application/x-bzip2" );
+        underTest.addCustomMimetypes( properties );
+        doTest( "something/else/library.swc", "test.tar.bz2", true );
     }
 
 }
