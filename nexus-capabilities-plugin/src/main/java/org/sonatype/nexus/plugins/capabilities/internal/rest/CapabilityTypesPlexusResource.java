@@ -44,6 +44,7 @@ public class CapabilityTypesPlexusResource
 
     public static final String RESOURCE_URI = "/capabilityTypes";
 
+    public static final String $INCLUDE_NOT_EXPOSED = "$includeNotExposed";
 
     private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
@@ -79,11 +80,8 @@ public class CapabilityTypesPlexusResource
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
-        final boolean includeHidden = Boolean.parseBoolean(
-            request.getResourceRef().getQueryAsForm().getFirstValue( "includeHidden", true, "false" )
-        );
         final boolean includeNotExposed = Boolean.parseBoolean(
-            request.getResourceRef().getQueryAsForm().getFirstValue( "includeNotExposed", true, "false" )
+            request.getResourceRef().getQueryAsForm().getFirstValue( $INCLUDE_NOT_EXPOSED, true, "false" )
         );
         final CapabilityTypeResourceResponse envelope = new CapabilityTypeResourceResponse();
 
@@ -93,8 +91,7 @@ public class CapabilityTypesPlexusResource
         {
             for ( final CapabilityDescriptor descriptor : descriptors )
             {
-                if ( ( includeNotExposed || descriptor.isExposed() )
-                    && ( includeHidden || !descriptor.isHidden() ) )
+                if ( ( includeNotExposed || descriptor.isExposed() ) )
                 {
                     final CapabilityTypeResource capabilityTypeResource = new CapabilityTypeResource();
                     capabilityTypeResource.setId( descriptor.type().toString() );
