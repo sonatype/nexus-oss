@@ -28,6 +28,8 @@ public class Filter
 
     private static final String $TYPE = "$type";
 
+    private static final String $PROPERTY_PREFIX = "$p$";
+
     private static final String $ENABLED = "$enabled";
 
     private static final String $ACTIVE = "$active";
@@ -135,7 +137,7 @@ public class Filter
         }
         for ( Map.Entry<String, String> entry : properties.entrySet() )
         {
-            queryMap.putSingle( entry.getKey(), entry.getValue() == null ? "*" : entry.getValue() );
+            queryMap.putSingle( $PROPERTY_PREFIX + entry.getKey(), entry.getValue() == null ? "*" : entry.getValue() );
         }
         return queryMap;
     }

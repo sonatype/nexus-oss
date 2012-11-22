@@ -63,6 +63,8 @@ public class CapabilitiesPlexusResource
 
     private static final String $TYPE = "$type";
 
+    private static final String $PROPERTY_PREFIX = "$p$";
+
     private static final String $ENABLED = "$enabled";
 
     private static final String $ACTIVE = "$active";
@@ -171,7 +173,6 @@ public class CapabilitiesPlexusResource
         final Set<String> paramNames = queryAsForm.getNames();
         if ( paramNames != null )
         {
-            filter = CapabilityReferenceFilterBuilder.capabilities();
             for ( final String paramName : paramNames )
             {
                 final Parameter parameter = queryAsForm.getFirst( paramName );
@@ -179,52 +180,62 @@ public class CapabilitiesPlexusResource
                 {
                     if ( parameter != null )
                     {
-                        filter.withType( capabilityType( parameter.getValue() ) );
+                        filter = ensureFilter( filter ).withType( capabilityType( parameter.getValue() ) );
                     }
                 }
                 else if ( $ENABLED.equals( paramName ) )
                 {
                     if ( parameter != null )
                     {
-                        filter.enabled( Boolean.valueOf( parameter.getValue() ) );
+                        filter = ensureFilter( filter ).enabled( Boolean.valueOf( parameter.getValue() ) );
                     }
                     else
                     {
-                        filter.enabled();
+                        filter = ensureFilter( filter ).enabled();
                     }
                 }
                 else if ( $ACTIVE.equals( paramName ) )
                 {
                     if ( parameter != null )
                     {
-                        filter.active( Boolean.valueOf( parameter.getValue() ) );
+                        filter = ensureFilter( filter ).active( Boolean.valueOf( parameter.getValue() ) );
                     }
                     else
                     {
-                        filter.active();
+                        filter = ensureFilter( filter ).active();
                     }
                 }
                 else if ( $INCLUDE_NOT_EXPOSED.equals( paramName ) )
                 {
                     if ( parameter == null || Boolean.valueOf( parameter.getValue() ) )
                     {
-                        filter.includeNotExposed();
+                        filter = ensureFilter( filter ).includeNotExposed();
                     }
                 }
-                else
+                else if ( paramName.startsWith( $PROPERTY_PREFIX ) && paramName.length() > $PROPERTY_PREFIX.length() )
                 {
+                    final String propertyKey = paramName.substring( $PROPERTY_PREFIX.length() );
                     if ( parameter == null || "*".equals( parameter.getValue() ) )
                     {
-                        filter.withBoundedProperty( paramName );
+                        filter = ensureFilter( filter ).withBoundedProperty( propertyKey );
                     }
                     else
                     {
-                        filter.withProperty( paramName, parameter.getValue() );
+                        filter = ensureFilter( filter ).withProperty( propertyKey, parameter.getValue() );
                     }
                 }
             }
         }
         return filter;
+    }
+
+    private CapabilityReferenceFilter ensureFilter( final CapabilityReferenceFilter filter )
+    {
+        if ( filter != null )
+        {
+            return filter;
+        }
+        return CapabilityReferenceFilterBuilder.capabilities();
     }
 
 }
