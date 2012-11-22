@@ -92,7 +92,7 @@ public class RemoteIPFinder
                 InetAddress ipAdd;
                 try
                 {
-                    ipAdd = InetAddress.getByAddress( ip.getBytes() );
+                    ipAdd = InetAddress.getByName( ip );
                 }
                 catch ( UnknownHostException e )
                 {
