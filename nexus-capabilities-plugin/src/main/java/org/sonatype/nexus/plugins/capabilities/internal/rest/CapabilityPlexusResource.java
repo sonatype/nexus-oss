@@ -103,7 +103,7 @@ public class CapabilityPlexusResource
         {
             throw new ResourceException(
                 Status.CLIENT_ERROR_NOT_FOUND,
-                String.format( "Cannot find a capability with specified if of %s", capabilityId )
+                String.format( "Cannot find a capability with specified id of %s", capabilityId )
             );
         }
 
@@ -259,6 +259,18 @@ public class CapabilityPlexusResource
             item.setStatus( null );
         }
         item.setStateDescription( reference.context().stateDescription() );
+
+        if ( reference.context().properties() != null )
+        {
+            for ( final Map.Entry<String, String> entry : reference.context().properties().entrySet() )
+            {
+                final CapabilityPropertyResource resourceProp = new CapabilityPropertyResource();
+                resourceProp.setKey( entry.getKey() );
+                resourceProp.setValue( entry.getValue() );
+
+                item.addProperty( resourceProp );
+            }
+        }
 
         item.setResourceURI( uri );
 
