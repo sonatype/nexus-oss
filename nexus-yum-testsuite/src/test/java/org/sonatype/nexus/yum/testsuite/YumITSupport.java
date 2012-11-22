@@ -33,13 +33,13 @@ import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepos
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.integrationtests.NexusRestClient;
 import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.TasksNexusRestClient;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import org.sonatype.nexus.yum.client.Yum;
+import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
+import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
 
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class YumITSupport
@@ -106,7 +106,7 @@ public class YumITSupport
             .excludeFromSearchResults()
             .save();
 
-        createYumRepositoryCapabilityFor( repositoryId );
+        enableMetadataGenerationFor( repositoryId );
 
         return repository;
     }
@@ -117,27 +117,19 @@ public class YumITSupport
             .ofRepositories( memberIds )
             .save();
 
-        createYumGroupCapabilityFor( repositoryId );
+        enableMetadataMergeFor( repositoryId );
 
         return repository;
     }
 
-    private void createYumRepositoryCapabilityFor( final String repositoryId )
+    private void enableMetadataGenerationFor( final String repositoryId )
     {
-        capabilities().add(
-            new CapabilityResource()
-                .withTypeId( "yum.generate" )
-                .withProperty( new CapabilityPropertyResource().withKey( "repository" ).withValue( repositoryId ) )
-        );
+        capabilities().create( GenerateMetadataCapability.class ).withRepository( repositoryId ).enable();
     }
 
-    private void createYumGroupCapabilityFor( final String repositoryId )
+    private void enableMetadataMergeFor( final String repositoryId )
     {
-        capabilities().add(
-            new CapabilityResource()
-                .withTypeId( "yum.merge" )
-                .withProperty( new CapabilityPropertyResource().withKey( "repository" ).withValue( repositoryId ) )
-        );
+        capabilities().create( MergeMetadataCapability.class ).withRepository( repositoryId ).enable();
     }
 
     protected Yum yum()

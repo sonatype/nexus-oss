@@ -38,11 +38,6 @@
       <artifactId>nexus-yum-client</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus.capabilities</groupId>
-      <artifactId>nexus-capabilities-client</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <!-- TODO Drop this dependency when we have proper client for tasks/events -->
     <dependency>
