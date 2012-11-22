@@ -113,7 +113,8 @@ public class CapabilityReferenceFilterBuilder
             {
                 return false;
             }
-            if ( !input.context().descriptor().isExposed() && !includeNotExposed )
+            if ( input.context().descriptor() != null
+                && !input.context().descriptor().isExposed() && !includeNotExposed )
             {
                 return false;
             }
