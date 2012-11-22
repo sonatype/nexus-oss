@@ -20,6 +20,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -29,6 +30,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
@@ -76,6 +78,27 @@ public class CapabilityStatusPlexusResource
     public PathProtectionDescriptor getResourceProtection()
     {
         return new PathProtectionDescriptor( "/capabilities/*/status", "authcBasic,perms[nexus:capabilities]" );
+    }
+
+    @Override
+    @GET
+    public Object get( final Context context, final Request request, final Response response, final Variant variant )
+        throws ResourceException
+    {
+        final CapabilityIdentity capabilityId = getCapabilityIdentity( request );
+        final CapabilityReference reference = capabilityRegistry.get( capabilityId );
+        if ( reference == null )
+        {
+            throw new ResourceException(
+                Status.CLIENT_ERROR_NOT_FOUND,
+                String.format( "Cannot find a capability with specified id of %s", capabilityId )
+            );
+        }
+
+        return asCapabilityStatusResponseResource(
+            reference,
+            request.getResourceRef().toString()
+        );
     }
 
     /**
