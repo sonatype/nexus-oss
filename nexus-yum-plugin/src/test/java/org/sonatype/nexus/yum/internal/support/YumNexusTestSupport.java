@@ -46,6 +46,7 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.freecompany.redline.Builder;
 import org.junit.After;
 import org.junit.Before;
@@ -69,6 +70,7 @@ import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
+import org.w3c.dom.Element;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
@@ -188,6 +190,16 @@ public class YumNexusTestSupport
             new FileReader( new File( repodataDir, REPOMD_XML ) )
         );
         xmlDiff.overrideDifferenceListener( new TimeStampIgnoringDifferenceListener() );
+        xmlDiff.overrideElementQualifier(
+            new ElementNameAndAttributeQualifier( "type" )
+            {
+                @Override
+                protected boolean areAttributesComparable( final Element control, final Element test )
+                {
+                    return !"data".equals( control.getTagName() ) || super.areAttributesComparable( control, test );
+                }
+            }
+        );
         assertThat( xmlDiff.toString(), xmlDiff.similar(), is( true ) );
     }
 
