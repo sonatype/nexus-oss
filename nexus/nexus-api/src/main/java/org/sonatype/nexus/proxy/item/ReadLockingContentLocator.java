@@ -66,7 +66,7 @@ public class ReadLockingContentLocator
 
     // ==
 
-    private class ReadLockingInputStream
+    private static class ReadLockingInputStream
         extends WrappingInputStream
     {
         private volatile RepositoryItemUidLock lock;

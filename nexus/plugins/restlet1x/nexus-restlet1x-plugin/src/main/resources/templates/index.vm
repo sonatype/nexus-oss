@@ -99,7 +99,7 @@
             }
 
         #foreach( $js in $pluginJsFiles )
-            require([ '$nexusRoot/$js' ], init, errorCallback);
+            require([ '$js' ], init, errorCallback);
         #end
         });
     </script>
