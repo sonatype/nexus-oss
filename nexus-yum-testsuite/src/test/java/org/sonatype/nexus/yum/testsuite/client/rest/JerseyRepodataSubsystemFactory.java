@@ -10,8 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.client.rest;
+package org.sonatype.nexus.yum.testsuite.client.rest;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -19,14 +20,18 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.yum.client.Yum;
-import org.sonatype.nexus.yum.client.internal.JerseyYum;
+import org.sonatype.nexus.client.rest.jersey.subsystem.JerseyRepositoriesFactory;
+import org.sonatype.nexus.yum.testsuite.client.Repodata;
+import org.sonatype.nexus.yum.testsuite.client.internal.JerseyRepodata;
 
 @Named
 @Singleton
-public class JerseyYumSubsystemFactory
-    implements SubsystemFactory<Yum, JerseyNexusClient>
+public class JerseyRepodataSubsystemFactory
+    implements SubsystemFactory<Repodata, JerseyNexusClient>
 {
+
+    @Inject
+    private JerseyRepositoriesFactory repositoriesFactory;
 
     @Override
     public Condition availableWhen()
@@ -35,15 +40,15 @@ public class JerseyYumSubsystemFactory
     }
 
     @Override
-    public Class<Yum> getType()
+    public Class<Repodata> getType()
     {
-        return Yum.class;
+        return Repodata.class;
     }
 
     @Override
-    public Yum create( JerseyNexusClient nexusClient )
+    public Repodata create( JerseyNexusClient nexusClient )
     {
-        return new JerseyYum( nexusClient );
+        return new JerseyRepodata( nexusClient, repositoriesFactory.create( nexusClient ) );
     }
 
 }

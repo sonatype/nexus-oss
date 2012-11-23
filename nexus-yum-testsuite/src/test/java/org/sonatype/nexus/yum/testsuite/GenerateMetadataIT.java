@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.yum.client.MetadataType.PRIMARY_XML;
+import static org.sonatype.nexus.yum.testsuite.client.MetadataType.PRIMARY_XML;
 
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
@@ -43,7 +43,7 @@ public class GenerateMetadataIT
 
         waitForNexusToSettleDown();
 
-        final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
+        final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
         assertThat( primaryXml, containsString( "test-artifact" ) );
     }
 
@@ -66,7 +66,7 @@ public class GenerateMetadataIT
 
         waitForNexusToSettleDown();
 
-        final String primaryXml = yum().getMetadata( repository.id(), PRIMARY_XML, String.class );
+        final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
         assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
     }
 }

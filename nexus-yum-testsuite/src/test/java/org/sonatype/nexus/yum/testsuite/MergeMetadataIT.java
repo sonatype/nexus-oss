@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.yum.client.MetadataType.PRIMARY_XML;
+import static org.sonatype.nexus.yum.testsuite.client.MetadataType.PRIMARY_XML;
 
 import java.io.IOException;
 
@@ -151,7 +151,7 @@ public class MergeMetadataIT
     private String getPrimaryXmlOf( final GroupRepository groupRepo )
         throws IOException
     {
-        return yum().getMetadata( groupRepo.id(), PRIMARY_XML, String.class );
+        return repodata().getMetadata( groupRepo.id(), PRIMARY_XML, String.class );
     }
 
     private GroupRepository givenAYumGroupRepoWith2RPMs()

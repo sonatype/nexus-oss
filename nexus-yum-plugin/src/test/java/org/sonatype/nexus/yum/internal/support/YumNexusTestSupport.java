@@ -64,6 +64,7 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
@@ -87,8 +88,6 @@ public class YumNexusTestSupport
     public static final String REPOMD_XML = "repomd.xml";
 
     public static final String PRIMARY_XML = "primary.xml";
-
-    public static final String PRIMARY_XML_GZ = PRIMARY_XML + ".gz";
 
     protected final TestUtil util = new TestUtil( this );
 

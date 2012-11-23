@@ -43,6 +43,11 @@
       <artifactId>nexus-capabilities-client</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- TODO Drop this dependency when we have proper client for tasks/events -->
     <dependency>

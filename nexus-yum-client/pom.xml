@@ -37,10 +37,6 @@
       <artifactId>javax.inject</artifactId>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-    </dependency>
   </dependencies>
 
 </project>

@@ -40,6 +40,7 @@ import org.sonatype.nexus.test.utils.TasksNexusRestClient;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import org.sonatype.nexus.yum.client.Yum;
+import org.sonatype.nexus.yum.testsuite.client.Repodata;
 
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class YumITSupport
@@ -143,6 +144,11 @@ public class YumITSupport
     protected Yum yum()
     {
         return client().getSubsystem( Yum.class );
+    }
+
+    protected Repodata repodata()
+    {
+        return client().getSubsystem( Repodata.class );
     }
 
     protected Repositories repositories()

@@ -10,38 +10,45 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.client.internal;
+package org.sonatype.nexus.yum.testsuite.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
+import static org.sonatype.nexus.yum.testsuite.client.internal.CompressionType.BZIP2;
+import static org.sonatype.nexus.yum.testsuite.client.internal.CompressionType.GZIP;
 
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.sonatype.nexus.yum.testsuite.client.internal.CompressionType;
 
-public class CompressionAdapter
+public enum MetadataType
 {
+    PRIMARY_XML( "primary", GZIP ),
+
+    PRIMARY_SQLITE( "primary_db", BZIP2 ),
+
+    FILELISTs_XML( "filelists", GZIP ),
+
+    FILELISTS_SQLITE( "filelists_db", BZIP2 ),
+
+    OTHER_XML( "other", GZIP ),
+
+    OTHER_SQLITE( "other_db", BZIP2 );
+
+    private final String type;
 
     private final CompressionType compression;
 
-    public CompressionAdapter( CompressionType compression )
+    private MetadataType( String type, CompressionType compression )
     {
+        this.type = type;
         this.compression = compression;
     }
 
-    public InputStream adapt( InputStream inputStream )
-        throws IOException
+    public CompressionType getCompression()
     {
-        switch ( compression )
-        {
-            case NONE:
-                return inputStream;
-            case GZIP:
-                return new GZIPInputStream( inputStream );
-            case BZIP2:
-                return new BZip2CompressorInputStream( inputStream );
-            default:
-                throw new IllegalArgumentException( "Could not adapt unknown compression " + compression );
-        }
+        return compression;
+    }
+
+    public String getType()
+    {
+        return type;
     }
 
 }

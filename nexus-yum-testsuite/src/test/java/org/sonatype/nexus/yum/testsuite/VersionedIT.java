@@ -15,8 +15,7 @@ package org.sonatype.nexus.yum.testsuite;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.yum.client.MetadataType.INDEX;
-import static org.sonatype.nexus.yum.client.MetadataType.PRIMARY_XML;
+import static org.sonatype.nexus.yum.testsuite.client.MetadataType.PRIMARY_XML;
 
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
@@ -36,7 +35,7 @@ public class VersionedIT
     {
         final Repository repository = givenRepositoryWithOneRpm();
 
-        final String content = yum().getMetadata( repository.id(), "1.0", PRIMARY_XML, String.class );
+        final String content = repodata().getMetadata( repository.id(), "1.0", PRIMARY_XML, String.class );
         assertThat( content, containsString( "test-artifact" ) );
     }
 
@@ -47,7 +46,7 @@ public class VersionedIT
         final Repository repository = givenRepositoryWithOneRpm();
 
         yum().createOrUpdateAlias( repository.id(), "alias", "1.0" );
-        final String content = yum().getMetadata( repository.id(), "alias", PRIMARY_XML, String.class );
+        final String content = repodata().getMetadata( repository.id(), "alias", PRIMARY_XML, String.class );
         assertThat( content, containsString( "test-artifact" ) );
     }
 
@@ -57,7 +56,7 @@ public class VersionedIT
     {
         final Repository repository = givenRepositoryWithOneRpm();
 
-        final String content = yum().getMetadata( repository.id(), "1.0", INDEX, String.class );
+        final String content = repodata().getIndex( repository.id(), "1.0" );
         assertThat( content, containsString( "<a href=\"repodata/\">repodata/</a>" ) );
     }
 
