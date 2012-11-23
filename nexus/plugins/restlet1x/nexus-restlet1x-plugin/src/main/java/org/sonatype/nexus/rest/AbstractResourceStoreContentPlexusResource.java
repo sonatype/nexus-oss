@@ -195,10 +195,12 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     private void addNoCacheHeaders( final Response response )
     {
-        // NXCM-5155 Force browsers to not cache this page
+        // NEXUS-5155 Force browsers to not cache this page
         final Series<Parameter> headers = ( (HttpResponse) response ).getHttpCall().getResponseHeaders();
-        headers.add( "Pragma", "no-cache" );
-        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
+        headers.add( "Pragma", "no-cache" ); // HTTP/1.0
+        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" ); // HTTP/1.1
+        headers.add( "Cache-Control", "post-check=0, pre-check=0" ); // MS IE
+        headers.add( "Expires", "0" ); // No caching on Proxies in between client and Nexus
     }
 
     @Override
