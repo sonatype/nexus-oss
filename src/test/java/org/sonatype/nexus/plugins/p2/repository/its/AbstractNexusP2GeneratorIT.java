@@ -22,26 +22,21 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import org.sonatype.nexus.capabilities.client.Capabilities;
+import org.sonatype.nexus.capabilities.client.Capability;
 import org.sonatype.nexus.capabilities.client.rest.JerseyCapabilitiesSubsystemFactory;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClientFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
-import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
-import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapabilityDescriptor;
-import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor;
 import com.google.common.base.Throwables;
 
 public abstract class AbstractNexusP2GeneratorIT
     extends AbstractNexusP2IT
 {
 
-    private String p2RepositoryAggregatorCapabilityId;
+    private Capability p2RepositoryAggregatorCapability;
 
     private NexusClient nexusClient;
 
@@ -71,7 +66,7 @@ public abstract class AbstractNexusP2GeneratorIT
         return nexusClient;
     }
 
-    public Capabilities capabilities()
+    private Capabilities capabilities()
     {
         return client().getSubsystem( Capabilities.class );
     }
@@ -79,47 +74,31 @@ public abstract class AbstractNexusP2GeneratorIT
     protected void createP2MetadataGeneratorCapability()
         throws Exception
     {
-        final CapabilityResource capability = new CapabilityResource();
-        capability.setNotes( P2MetadataGenerator.class.getName() );
-        capability.setTypeId( P2MetadataGeneratorCapabilityDescriptor.TYPE_ID );
-
-        final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
-        repoProp.setKey( P2MetadataGeneratorConfiguration.REPOSITORY );
-        repoProp.setValue( getTestRepositoryId() );
-
-        capability.addProperty( repoProp );
-
-        capabilities().add( capability );
+        capabilities().create( "p2.repository.metadata.generator" )
+            .withNotes( P2MetadataGenerator.class.getName() )
+            .withProperty( "repositoryId", getTestRepositoryId() )
+            .enable();
     }
 
     protected void createP2RepositoryAggregatorCapability()
         throws Exception
     {
-        final CapabilityResource capability = new CapabilityResource();
-        capability.setNotes( P2RepositoryAggregator.class.getName() );
-        capability.setTypeId( P2RepositoryAggregatorCapabilityDescriptor.TYPE_ID );
-
-        final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
-        repoProp.setKey( P2RepositoryAggregatorConfiguration.REPOSITORY );
-        repoProp.setValue( getTestRepositoryId() );
-
-        capability.addProperty( repoProp );
-
-        p2RepositoryAggregatorCapabilityId = capabilities().add( capability ).getId();
+        p2RepositoryAggregatorCapability = capabilities().create( "p2.repository.aggregator" )
+            .withNotes( P2RepositoryAggregator.class.getName() )
+            .withProperty( "repositoryId", getTestRepositoryId() )
+            .enable();
     }
 
     protected void removeP2RepositoryAggregatorCapability()
         throws Exception
     {
-        capabilities().delete( p2RepositoryAggregatorCapabilityId );
+        p2RepositoryAggregatorCapability.remove();
     }
 
     protected void passivateP2RepositoryAggregatorCapability()
         throws Exception
     {
-        final CapabilityResource capabilityResource = capabilities().get( p2RepositoryAggregatorCapabilityId );
-        capabilityResource.setEnabled( false );
-        capabilities().update( capabilityResource );
+        p2RepositoryAggregatorCapability.disable();
     }
 
     protected void deployArtifact( final String repoId, final File fileToDeploy, final String path )
