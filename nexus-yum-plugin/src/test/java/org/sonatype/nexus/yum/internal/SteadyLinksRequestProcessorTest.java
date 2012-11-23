@@ -18,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.yum.YumRepository.PATH_OF_PRIMARY_XML;
 
 import java.io.InputStream;
 
@@ -75,14 +74,14 @@ public class SteadyLinksRequestProcessorTest
         final ResourceStoreRequest request = mock( ResourceStoreRequest.class );
         final RequestContext context = mock( RequestContext.class );
         when( request.getRequestContext() ).thenReturn( context );
-        when( request.getRequestPath() ).thenReturn( "/" + PATH_OF_PRIMARY_XML );
+        when( request.getRequestPath() ).thenReturn( "/repodata/primary.xml.gz" );
 
         new SteadyLinksRequestProcessor()
         {
             @Override
             String matchRequestPath( final String requestPath, final InputStream repomd )
             {
-                assertThat( requestPath, is( "/" + PATH_OF_PRIMARY_XML ) );
+                assertThat( requestPath, is( "/repodata/primary.xml.gz" ) );
                 return "/repodata/XYZ-primary.xml.gz";
             }
         }.process(
@@ -90,7 +89,7 @@ public class SteadyLinksRequestProcessorTest
         );
 
         verify( request ).pushRequestPath( "/repodata/XYZ-primary.xml.gz" );
-        verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_ORIGINAL, "/" + PATH_OF_PRIMARY_XML );
+        verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_ORIGINAL, "/repodata/primary.xml.gz" );
         verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_NEW, "/repodata/XYZ-primary.xml.gz" );
     }
 
@@ -100,14 +99,14 @@ public class SteadyLinksRequestProcessorTest
         final ResourceStoreRequest request = mock( ResourceStoreRequest.class );
         final RequestContext context = mock( RequestContext.class );
         when( request.getRequestContext() ).thenReturn( context );
-        when( request.getRequestPath() ).thenReturn( "/foo/" + PATH_OF_PRIMARY_XML );
+        when( request.getRequestPath() ).thenReturn( "/foo/repodata/primary.xml.gz" );
 
         new SteadyLinksRequestProcessor()
         {
             @Override
             String matchRequestPath( final String requestPath, final InputStream repomd )
             {
-                assertThat( requestPath, is( "/foo/" + PATH_OF_PRIMARY_XML ) );
+                assertThat( requestPath, is( "/foo/repodata/primary.xml.gz" ) );
                 return "/foo/repodata/XYZ-primary.xml.gz";
             }
         }.process(
@@ -115,7 +114,7 @@ public class SteadyLinksRequestProcessorTest
         );
 
         verify( request ).pushRequestPath( "/foo/repodata/XYZ-primary.xml.gz" );
-        verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_ORIGINAL, "/foo/" + PATH_OF_PRIMARY_XML );
+        verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_ORIGINAL, "/foo/repodata/primary.xml.gz" );
         verify( context ).put( SteadyLinksRequestProcessor.REQUEST_PATH_NEW, "/foo/repodata/XYZ-primary.xml.gz" );
     }
 
@@ -125,14 +124,14 @@ public class SteadyLinksRequestProcessorTest
         final ResourceStoreRequest request = mock( ResourceStoreRequest.class );
         final RequestContext context = mock( RequestContext.class );
         when( request.getRequestContext() ).thenReturn( context );
-        when( request.getRequestPath() ).thenReturn( "/" + PATH_OF_PRIMARY_XML );
+        when( request.getRequestPath() ).thenReturn( "/repodata/primary.xml.gz" );
 
         new SteadyLinksRequestProcessor()
         {
             @Override
             String matchRequestPath( final String requestPath, final InputStream repomd )
             {
-                assertThat( requestPath, is( "/" + PATH_OF_PRIMARY_XML ) );
+                assertThat( requestPath, is( "/repodata/primary.xml.gz" ) );
                 return null;
             }
         }.process(
