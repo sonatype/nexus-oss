@@ -20,13 +20,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capabilities.client.Capabilities;
-import org.sonatype.nexus.capabilities.client.Capability;
+import org.sonatype.nexus.capabilities.client.internal.JerseyCapabilities;
 import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.capabilities.client.internal.JerseyCapabilities;
+import com.google.common.collect.Sets;
 
 /**
  * Jersey based Capabilities Nexus Client Subsystem factory.
@@ -41,8 +41,13 @@ public class JerseyCapabilitiesSubsystemFactory
 
     private final Set<JerseyCapabilityFactory> capabilityFactories;
 
+    public JerseyCapabilitiesSubsystemFactory()
+    {
+        this.capabilityFactories = Sets.newHashSet();
+    }
+
     @Inject
-    protected JerseyCapabilitiesSubsystemFactory( final Set<JerseyCapabilityFactory> capabilityFactories )
+    public JerseyCapabilitiesSubsystemFactory( final Set<JerseyCapabilityFactory> capabilityFactories )
     {
         this.capabilityFactories = checkNotNull( capabilityFactories );
     }
