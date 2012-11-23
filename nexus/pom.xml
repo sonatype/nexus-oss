@@ -172,7 +172,7 @@
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
     <plexus-security.version>3.0-SNAPSHOT</plexus-security.version>
-    <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
+    <restlet.version>1.1.6-SONATYPE-5348-V6</restlet.version>
     <shiro.version>1.2.1</shiro.version>
     <surefire.version>2.12.4</surefire.version>
     <jackson.version>1.9.10</jackson.version>
