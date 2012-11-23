@@ -37,6 +37,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.TieredMergePolicy;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -48,6 +50,7 @@ import org.apache.maven.index.ArtifactContextProducer;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.ArtifactInfoPostprocessor;
+import org.apache.maven.index.DefaultScannerListener;
 import org.apache.maven.index.Field;
 import org.apache.maven.index.FlatSearchRequest;
 import org.apache.maven.index.FlatSearchResponse;
@@ -124,8 +127,6 @@ import org.sonatype.scheduling.TaskUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import copied.org.apache.maven.index.DefaultScannerListener;
-
 /**
  * <p>
  * Indexer Manager. This is a thin layer above Nexus Indexer and simply manages indexingContext additions, updates and
@@ -190,6 +191,48 @@ public class DefaultIndexerManager
     public static final String PUBLISHING_PATH_PREFIX = "/.index";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    /**
+     * Indexing is supported for this repository.
+     */
+    private boolean SUPPORTED( Repository repository )
+    {
+        return !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
+            && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
+            && repository.getRepositoryContentClass().isCompatible( maven2 );
+    }
+
+    /**
+     * Index is maintained for the repository. Implies SUPPORTED.
+     */
+    private boolean INDEXABLE( Repository repository )
+    {
+        return SUPPORTED( repository ) && repository.isIndexable();
+    }
+
+    /**
+     * The repository is in service for indexing purposes
+     */
+    private boolean INSERVICE( Repository repository )
+    {
+        return LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() );
+    }
+
+    /**
+     * Repository is a proxy repository.
+     */
+    private boolean ISPROXY( Repository repository )
+    {
+        return repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class );
+    }
+
+    /**
+     * Repository is a group repository.
+     */
+    private boolean ISGROUP(Repository repository)
+    {
+        return repository.getRepositoryKind().isFacetAvailable( GroupRepository.class );
+    }
 
     @Requirement
     private NexusIndexer mavenIndexer;
@@ -318,55 +361,6 @@ public class DefaultIndexerManager
     // Context management et al
     // ----------------------------------------------------------------------------
 
-    protected boolean isIndexingSupported( Repository repository )
-    {
-        // indexing is supported if:
-        // repo has NO Shadow facet available (is not a shadow)
-        // repo has facet MavenRepository available (is implementation tied)
-        // repo had contentClass compatible with Maven2 contentClass
-        return !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
-            && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
-            && repository.getRepositoryContentClass().isCompatible( maven2 );
-    }
-
-    protected void logSkippingRepositoryMessage( Repository repository )
-    {
-        boolean isSupported = isIndexingSupported( repository );
-        boolean isIndexed = repository.isIndexable();
-
-        if ( logger.isDebugEnabled() )
-        {
-            StringBuilder sb = new StringBuilder( "Indexing is " );
-
-            if ( !isSupported )
-            {
-                sb.append( "not " );
-            }
-
-            sb.append( "supported on repository \"" + repository.getName() + "\" (ID=\"" + repository.getId() + "\")" );
-
-            if ( isSupported )
-            {
-                sb.append( " and is set as " );
-
-                if ( !isIndexed )
-                {
-                    sb.append( "not " );
-                }
-
-                sb.append( "indexed. " );
-            }
-            else
-            {
-                sb.append( ". " );
-            }
-
-            sb.append( "Skipping it." );
-
-            logger.debug( sb.toString() );
-        }
-    }
-
     public void addRepositoryIndexContext( String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
@@ -378,6 +372,11 @@ public class DefaultIndexerManager
     public void addRepositoryIndexContext( final Repository repository )
         throws IOException, NoSuchRepositoryException
     {
+        if (!INDEXABLE( repository ))
+        {
+            return;
+        }
+        
         if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
             // group repository
@@ -411,13 +410,6 @@ public class DefaultIndexerManager
                          repository.getId() );
         }
 
-        if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
         IndexingContext ctx = null;
 
         File indexDirectory = getRepositoryIndexDirectory( repository );
@@ -435,9 +427,33 @@ public class DefaultIndexerManager
         else
         {
             // add context for repository
-            ctx =
-                mavenIndexer.addIndexingContextForced( getContextId( repository.getId() ), repository.getId(),
-                                                       repoRoot, indexDirectory, null, null, indexCreators );
+            ctx = new DefaultIndexingContext( getContextId( repository.getId() ), // id
+                                              repository.getId(), // repositoryId
+                                              repoRoot, // repository
+                                              indexDirectory, // indexDirectoryFile
+                                              null, // repositoryUrl
+                                              null, // indexUpdateUrl
+                                              indexCreators, //
+                                              true // reclaimIndex
+                )
+                {
+                    @Override
+                    protected IndexWriterConfig getWriterConfig()
+                    {
+                        final IndexWriterConfig writerConfig = super.getWriterConfig();
+
+                        // NEXUS-5380 force use of compound lucene index file to postpone "Too many open files"
+
+                        final TieredMergePolicy mergePolicy = new TieredMergePolicy();
+                        mergePolicy.setUseCompoundFile( true );
+                        mergePolicy.setNoCFSRatio( 1.0 );
+
+                        writerConfig.setMergePolicy( mergePolicy );
+
+                        return writerConfig;
+                    }
+                };
+            mavenIndexer.addIndexingContext( ctx );
         }
         ctx.setSearchable( repository.isSearchable() );
 
@@ -462,13 +478,6 @@ public class DefaultIndexerManager
     public void removeRepositoryIndexContext( final Repository repository, final boolean deleteFiles )
         throws IOException
     {
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
         exclusiveSingle( repository, new Runnable()
         {
             @Override
@@ -483,7 +492,7 @@ public class DefaultIndexerManager
                 }
                 else
                 {
-                    logger.debug( "Could not remove null indexing context for repository {}", repository.getId() );
+                    logger.debug( "Could not remove <null> indexing context for repository {}", repository.getId() );
                 }
             }
         } );
@@ -496,10 +505,8 @@ public class DefaultIndexerManager
 
         // cannot do "!repository.isIndexable()" since we may be called to handle that config change (using events)!
         // the repo might be already non-indexable, but the context would still exist!
-        if ( !isIndexingSupported( repository ) )
+        if ( !SUPPORTED( repository ) )
         {
-            logSkippingRepositoryMessage( repository );
-
             return;
         }
 
@@ -525,9 +532,9 @@ public class DefaultIndexerManager
                 // remove context, if it already existed (ctx != null) and any of the following is true:
                 // is a group OR repo path changed OR we have an isIndexed transition happening
                 if ( context != null
-                    && ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
-                        || !context.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() )
-                        || !repository.isIndexable() || context.isSearchable() != repository.isSearchable() ) )
+                    && ( ISGROUP( repository ) || !INDEXABLE( repository )
+                        || !context.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) 
+                        || context.isSearchable() != repository.isSearchable() ) )
                 {
                     // remove the context
                     removeRepositoryIndexContext( repository, false );
@@ -536,7 +543,7 @@ public class DefaultIndexerManager
 
                 // add context, if it did not existed yet (ctx == null) or any of the following is true:
                 // is a group OR repo path changed OR we have an isIndexed transition happening
-                if ( repository.isIndexable() && context == null )
+                if ( INDEXABLE( repository ) && context == null )
                 {
                     // recreate the context
                     try
@@ -568,37 +575,6 @@ public class DefaultIndexerManager
     public IndexingContext getRepositoryIndexContext( Repository repository )
     {
         return mavenIndexer.getIndexingContexts().get( getContextId( repository.getId() ) );
-    }
-
-    public void setRepositoryIndexContextSearchable( final String repositoryId, final boolean searchable )
-        throws IOException, NoSuchRepositoryException
-    {
-        Repository repository = getRepository( repositoryId );
-
-        // cannot do "!repository.isIndexable()" since we may be called to handle that config change (using events)!
-        // the repo might be already non-indexable, but the context would still exist!
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        sharedSingle( repository, new Runnable()
-        {
-            @Override
-            public void run( IndexingContext context )
-                throws IOException
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "Searching on repository ID='" + repositoryId + "' is set to: "
-                                           + String.valueOf( searchable ) );
-                }
-
-                context.setSearchable( searchable );
-            }
-        } );
     }
 
     /**
@@ -647,21 +623,8 @@ public class DefaultIndexerManager
     public void addItemToIndex( final Repository repository, final StorageItem item )
         throws IOException
     {
-        // is indexing supported at all on this repository?
-        // sadly, the nexus-indexer is maven2 only, hence we check is the repo
-        // from where we get the event is a maven2 repo, is indexing supported at all
-        if ( !isIndexingSupported( repository ) )
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        // do we have to maintain index context at all?
-        if ( !repository.isIndexable() )
-        {
-            logSkippingRepositoryMessage( repository );
-
             return;
         }
 
@@ -764,29 +727,14 @@ public class DefaultIndexerManager
     public void removeItemFromIndex( final Repository repository, final StorageItem item )
         throws IOException
     {
-        // is indexing supported at all on this repository?
-        // sadly, the nexus-indexer is maven2 only, hence we check is the repo
-        // from where we get the event is a maven2 repo, is indexing supported at all
-        if ( !isIndexingSupported( repository ) || !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        // do we have to maintain index context at all?
-        if ( !repository.isIndexable() )
-        {
-            logSkippingRepositoryMessage( repository );
-
             return;
         }
 
         // index for proxy repos shouldn't change just because you deleted something locally
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        if ( ISPROXY(repository) )
         {
-            logSkippingRepositoryMessage( repository );
-
             return;
         }
 
@@ -958,7 +906,7 @@ public class DefaultIndexerManager
 
         if ( CASCADE )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
 
@@ -986,22 +934,12 @@ public class DefaultIndexerManager
     private void reindexRepository( final Repository repository, final String fromPath, final boolean fullReindex )
         throws IOException
     {
-        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
             return;
         }
 
-        if ( !isIndexingSupported( repository ) )
-        {
-            return;
-        }
-
-        if ( !repository.isIndexable() )
-        {
-            return;
-        }
-
-        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        if ( ISGROUP( repository ) )
         {
             return;
         }
@@ -1017,7 +955,7 @@ public class DefaultIndexerManager
                     public void run( final IndexingContext context )
                         throws IOException
                     {
-                        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                        if ( ISPROXY( repository ) )
                         {
                             updateRemoteIndex( repository.adaptToFacet( ProxyRepository.class ), context, fullReindex );
                         }
@@ -1105,7 +1043,7 @@ public class DefaultIndexerManager
 
         if ( CASCADE )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
 
@@ -1116,7 +1054,7 @@ public class DefaultIndexerManager
             }
         }
 
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        if ( ISPROXY( repository ) )
         {
             downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ), false );
         }
@@ -1127,19 +1065,7 @@ public class DefaultIndexerManager
     {
         TaskUtil.checkInterruption();
 
-        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
-        {
-            return;
-        }
-
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        if ( !repository.isIndexable() )
+        if ( !INDEXABLE( repository ) || !ISPROXY( repository ) )
         {
             return;
         }
@@ -1189,7 +1115,7 @@ public class DefaultIndexerManager
                                        final boolean forceFullUpdate ) throws IOException
     {
         // ensure this is a proxy repo, since download may happen with proxies only
-        if ( !repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+        if ( !INDEXABLE( repository ) || !ISPROXY( repository ) )
         {
             return;
         }
@@ -1233,7 +1159,7 @@ public class DefaultIndexerManager
                     // We need to use ProxyRepository and get it's RemoteStorage stuff to completely
                     // avoid "transparent" proxying, and even the slightest possibility to return
                     // some stale file from cache to the updater.
-                    if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                    if ( ISPROXY( repository ) )
                     {
                         ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
 
@@ -1404,7 +1330,7 @@ public class DefaultIndexerManager
 
         if ( CASCADE )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
 
@@ -1425,21 +1351,7 @@ public class DefaultIndexerManager
     protected void publishRepositoryIndex( final Repository repository )
         throws IOException
     {
-        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
-        {
-            return;
-        }
-
-        // is indexing supported at all?
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        // shadows are not capable to publish indexes
-        if ( !repository.isIndexable() )
+        if (!INDEXABLE( repository ) && !INSERVICE( repository ))
         {
             return;
         }
@@ -1655,7 +1567,7 @@ public class DefaultIndexerManager
 
         if ( CASCADE )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 GroupRepository group = repository.adaptToFacet( GroupRepository.class );
 
@@ -1676,7 +1588,7 @@ public class DefaultIndexerManager
     protected void optimizeRepositoryIndex( final Repository repository )
         throws CorruptIndexException, IOException
     {
-        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        if ( !INDEXABLE( repository ) )
         {
             return;
         }
@@ -1727,7 +1639,7 @@ public class DefaultIndexerManager
 
         bq.add( q2, BooleanClause.Occur.SHOULD );
 
-        FlatSearchRequest req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );;
+        FlatSearchRequest req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
 
         // if ( from != null )
         // {
@@ -2313,16 +2225,16 @@ public class DefaultIndexerManager
     /**
      * Executes the runnable while holding shared lock on the specified repository index. If the repository is a group,
      * also acquires shared locks on all member repositories. Repositories without indexing contexts are silently
-     * ignored. The context passed to the runnable is read-only, operations that modify index through
-     * UnsupportedOperationException. The indexing context passed to the runnable can be after return from this method,
-     * the caveat is that the context will return empty results after underlying Lucene index is closed.
+     * ignored. The context passed to the runnable is read-only, operations that modify index throw
+     * UnsupportedOperationException. The indexing context passed to the runnable can be used after return from this
+     * method, the caveat is that the context will return empty results after underlying Lucene index is closed.
      */
     public void shared( Repository repository, Runnable runnable )
         throws IOException
     {
         Lock lock = null;
         IndexingContext lockedContext = null;
-        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        if ( ISGROUP( repository ) )
         {
             Map<String, Repository> members = new HashMap<String, Repository>();
             addGroupMembers( members, (GroupRepository) repository );
@@ -2391,6 +2303,10 @@ public class DefaultIndexerManager
                 lock.unlock();
             }
         }
+        else
+        {
+            logger.warn( "Could not perform index operation on repository {}", repository.getId(), new Exception() );
+        }
     }
 
     /**
@@ -2405,7 +2321,21 @@ public class DefaultIndexerManager
         try
         {
             IndexingContext ctx = getRepositoryIndexContext( repository );
-            runnable.run( ctx );
+            if ( ctx != null )
+            {
+                runnable.run( ctx );
+            }
+            else
+            {
+                if ( logger.isDebugEnabled() )
+                {
+                    // this always happens during RepositoryRegistry.addRepository, which triggers archetype-catalog.xml
+                    // generation before the repository is added to the indexer manager.
+                    // this is not expected to happen in any other cases, so logger.warn is not a typo
+                    logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                                 new Exception() );
+                }
+            }
         }
         finally
         {
@@ -2430,24 +2360,14 @@ public class DefaultIndexerManager
             throw new IOException( "Could not create temporary directory " + location );
         }
 
-        final DefaultIndexingContext temporary;
-        try
-        {
-            temporary = new DefaultIndexingContext( indexId, //
-                repository.getId(), //
-                getRepositoryLocalStorageAsFile( repository ), // repository local storage
-                FSDirectory.open( location ), //
-                null, // repository url
-                null, // repository update url
-                indexCreators,
-                true );
-        }
-        catch ( UnsupportedExistingLuceneIndexException e )
-        {
-            // Can't really happen because we use empty new directory
-            throw new IOException( e.getMessage(), e );
-        }
-        
+        final DefaultIndexingContext temporary =
+            new DefaultIndexingContext( indexId, //
+                                        repository.getId(), //
+                                        getRepositoryLocalStorageAsFile( repository ), // repository local storage
+                                        FSDirectory.open( location ), //
+                                        null, // repository url
+                                        null, // repository update url
+                                        indexCreators, true );
         logger.debug( "Created temporary indexing context " + location + " for repository " + repository.getId() );
 
         try
@@ -2467,7 +2387,15 @@ public class DefaultIndexerManager
                     // and temporary context is populated based contains old/stale configuration
                     // need to detect when this happens based on target timestamp for example and skip replace
 
-                    target.replace( temporary.getIndexDirectory() );
+                    if (target != null)
+                    {
+                        target.replace( temporary.getIndexDirectory() );
+                    }
+                    else
+                    {
+                        logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                                     new Exception() );
+                    }
                 }
             } );
         }
@@ -2542,33 +2470,38 @@ public class DefaultIndexerManager
     private LockedIndexingContexts lockSearchTargetIndexingContexts( String repositoryId )
         throws NoSuchRepositoryException
     {
-        List<Repository> repositories;
+        List<Repository> repositories = new ArrayList<Repository>();
         if ( repositoryId != null )
         {
             Repository repository = getRepository( repositoryId );
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 Map<String, Repository> members = new HashMap<String, Repository>();
                 addGroupMembers( members, (GroupRepository) repository );
-                repositories = new ArrayList<Repository>( members.values() );
+                repositories.addAll( members.values() );
             }
             else
             {
-                repositories = Collections.singletonList( repository );
+                repositories.add( repository );
             }
         }
         else
         {
-            repositories = repositoryRegistry.getRepositories();
+            for ( Repository repository : repositoryRegistry.getRepositories() )
+            {
+                if ( INDEXABLE( repository ) && repository.isSearchable() && !ISGROUP( repository ) )
+                {
+                    repositories.add( repository );
+                }
+            }
         }
 
         return lockIndexingContexts( repositories, null );
     }
 
     /**
-     * Acquires shared locks on specified repositories. Not-searchable repositories and repositories without indexing
-     * context are silently ignored. Returns read-only contexts that are safe to use without explicit repository index
-     * locking/unlocking.
+     * Acquires shared locks on specified repositories. Repositories without indexing context are silently ignored.
+     * Returns read-only contexts that are safe to use without explicit repository index locking/unlocking.
      */
     private LockedIndexingContexts lockIndexingContexts( Collection<Repository> repositories, String force )
     {
@@ -2599,7 +2532,7 @@ public class DefaultIndexerManager
             lock.lock(); // at this point repository index cannot be added or removed, we can safely use it
             IndexingContext context = getRepositoryIndexContext( repository );
 
-            if ( !repository.getId().equals( force ) && ( context == null || !context.isSearchable() ) )
+            if ( !repository.getId().equals( force ) && context == null )
             {
                 lock.unlock();
                 continue;
@@ -2624,9 +2557,9 @@ public class DefaultIndexerManager
     {
         for ( Repository member : group.getMemberRepositories() )
         {
-            if ( !repositories.containsKey( member.getId() ) )
+            if ( INDEXABLE( member ) && !repositories.containsKey( member.getId() ) )
             {
-                if ( member.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                if ( ISGROUP( member ) )
                 {
                     addGroupMembers( repositories, (GroupRepository) member );
                 }

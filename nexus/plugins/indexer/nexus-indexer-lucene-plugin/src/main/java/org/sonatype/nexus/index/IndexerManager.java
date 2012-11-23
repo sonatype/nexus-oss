@@ -90,17 +90,6 @@ public interface IndexerManager
     void updateRepositoryIndexContext( String repositoryId )
         throws IOException, NoSuchRepositoryException;
 
-    /**
-     * Flags an indexing context should be searched in global searches or not.
-     * 
-     * @param repositoryId
-     * @param searchable
-     * @throws IOException
-     * @throws NoSuchRepositoryException
-     */
-    void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
-        throws IOException, NoSuchRepositoryException;
-
     // ----------------------------------------------------------------------------
     // adding/removing on the fly
     // ----------------------------------------------------------------------------
