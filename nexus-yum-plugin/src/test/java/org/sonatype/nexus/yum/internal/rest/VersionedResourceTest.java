@@ -193,7 +193,7 @@ public class VersionedResourceTest
     {
         final MavenRepository repo = mock( MavenRepository.class );
         when( repo.getId() ).thenReturn( id );
-        when( repo.getLocalUrl() ).thenReturn( "file:" + RPM_BASE_FILE.getAbsolutePath() );
+        when( repo.getLocalUrl() ).thenReturn( rpmsDir().toURI().toASCIIString() );
         when( repo.getProviderRole() ).thenReturn( Repository.class.getName() );
         when( repo.getProviderHint() ).thenReturn( "maven2" );
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );

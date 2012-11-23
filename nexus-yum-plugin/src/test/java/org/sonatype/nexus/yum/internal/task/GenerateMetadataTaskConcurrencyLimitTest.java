@@ -82,7 +82,7 @@ public class GenerateMetadataTaskConcurrencyLimitTest
     private void shouldCreateRepoForRpm( int index )
         throws URISyntaxException, NoSuchAlgorithmException, IOException
     {
-        final MavenRepository repo = createRepository( true, "repo" + index );
+        final MavenRepository repo = createRepository( true, "src/test/ut-resources/repo" + index );
         repositoryRegistry.register( repo );
         for ( int version = 0; version < 5; version++ )
         {

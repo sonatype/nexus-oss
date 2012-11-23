@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.yum.internal.support;
 
-import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 
 import org.junit.After;
-import org.junit.Before;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import com.google.code.tempusfugit.temporal.Condition;
@@ -55,14 +53,6 @@ public abstract class SchedulerYumNexusTestSupport
                 return running == 0;
             }
         } );
-    }
-
-    @Before
-    public void cleanUpCacheDirectory()
-        throws Exception
-    {
-        deleteDirectory( BASE_TMP_FILE );
-        BASE_CACHE_DIR.mkdirs();
     }
 
 }

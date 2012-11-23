@@ -13,18 +13,14 @@
 package org.sonatype.nexus.yum.internal.task;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.yum.internal.support.YumNexusTestSupport.UTIL;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,17 +36,17 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RpmScanner;
+import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 @SuppressWarnings( "unchecked" )
 public class GenerateMetadataTaskSettingsTest
-    extends TestSupport
+    extends YumNexusTestSupport
 {
 
     private static final String ANOTHER_REPO = "repo2";
@@ -66,8 +62,6 @@ public class GenerateMetadataTaskSettingsTest
     private static final String BASE_URL = "http://foo.bla";
 
     private static final String RPM_URL = BASE_URL + "/content/repositories/" + REPO;
-
-    private static final File RPM_DIR = UTIL.getBaseDir();
 
     @Test
     public void shouldNotExecuteIfOperateOnSameRepository()
@@ -118,12 +112,12 @@ public class GenerateMetadataTaskSettingsTest
             mock( RpmScanner.class ),
             mock( NexusScheduler.class )
         );
-        task.setRpmDir( RPM_DIR.getAbsolutePath() );
+        task.setRpmDir( rpmsDir().getAbsolutePath() );
         task.setRpmUrl( RPM_URL );
         // when
         task.setDefaults();
         // then
-        assertThat( task.getRepoDir(), is( RPM_DIR.getAbsoluteFile() ) );
+        assertThat( task.getRepoDir(), is( rpmsDir().getAbsoluteFile() ) );
         assertThat( task.getRepoUrl(), is( RPM_URL ) );
     }
 
@@ -144,9 +138,9 @@ public class GenerateMetadataTaskSettingsTest
         // when
         task.setDefaults();
         // then
-        assertThat( task.getRpmDir(), is( RPM_DIR.getAbsolutePath() ) );
+        assertThat( task.getRpmDir(), is( rpmsDir().getAbsolutePath() ) );
         assertThat( task.getRpmUrl(), is( RPM_URL ) );
-        assertThat( task.getRepoDir(), is( RPM_DIR.getAbsoluteFile() ) );
+        assertThat( task.getRepoDir(), is( rpmsDir().getAbsoluteFile() ) );
         assertThat( task.getRepoUrl(), is( RPM_URL ) );
     }
 
@@ -162,7 +156,7 @@ public class GenerateMetadataTaskSettingsTest
     {
         final Repository repo = mock( Repository.class );
         when( repo.getId() ).thenReturn( REPO );
-        when( repo.getLocalUrl() ).thenReturn( RPM_DIR.getAbsolutePath() );
+        when( repo.getLocalUrl() ).thenReturn( rpmsDir().getAbsolutePath() );
         final RepositoryRegistry repoRegistry = mock( RepositoryRegistry.class );
         when( repoRegistry.getRepository( anyString() ) ).thenReturn( repo );
         return repoRegistry;
@@ -209,9 +203,9 @@ public class GenerateMetadataTaskSettingsTest
             }
 
         };
-        task.setRpmDir( RPM_DIR.getAbsolutePath() );
+        task.setRpmDir( rpmsDir().getAbsolutePath() );
         task.setRpmUrl( RPM_URL );
-        task.setRepoDir( RPM_DIR );
+        task.setRepoDir( rpmsDir() );
         task.setRepoUrl( RPM_URL );
         task.setRepositoryId( repo );
         task.setVersion( version );

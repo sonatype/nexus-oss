@@ -53,7 +53,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.code.tempusfugit.temporal.Condition;
 
 public class GenerateMetadataTaskConcurrencyTest
-    extends GenerateMetdataTaskTestSupport
+    extends GenerateMetadataTaskTestSupport
 {
 
     private static final String RPM_NAME_2 = "hallomommy";
@@ -106,7 +106,7 @@ public class GenerateMetadataTaskConcurrencyTest
     public void shouldReuseQueuedTaskOfTheSameType()
         throws Exception
     {
-        final File tmpDir = copyToTempDir( RPM_BASE_FILE );
+        final File tmpDir = copyToTempDir( rpmsDir() );
 
         final MavenRepository repository = mock( MavenRepository.class );
         when( repository.getId() ).thenReturn( "REPO" );

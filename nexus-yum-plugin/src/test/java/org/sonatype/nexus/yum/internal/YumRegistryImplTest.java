@@ -50,9 +50,7 @@ public class YumRegistryImplTest
     {
         final MavenRepository repository = mock( MavenRepository.class );
         when( repository.getId() ).thenReturn( REPO_ID );
-        when( repository.getLocalUrl() ).thenReturn(
-            UTIL.resolveFile( "target/test-classes/repo" ).toURI().toString()
-        );
+        when( repository.getLocalUrl() ).thenReturn( rpmsDir().toURI().toASCIIString() );
         final RepositoryKind repositoryKind = mock( RepositoryKind.class );
         when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
         when( repositoryKind.isFacetAvailable( HostedRepository.class ) ).thenReturn( true );

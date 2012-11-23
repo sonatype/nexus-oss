@@ -12,16 +12,14 @@
  */
 package org.sonatype.nexus.yum.internal.task;
 
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.scheduling.SchedulerTask;
 
 public class GenerateMetadataTaskTest
-    extends GenerateMetdataTaskTestSupport
+    extends GenerateMetadataTaskTestSupport
 {
 
     private static final File PATH_NOT_EXISTS = new File( "/data/path/not/exists" );
@@ -35,25 +33,25 @@ public class GenerateMetadataTaskTest
     private static final String BASE_VERSIONED_URL = "http://localhost:8080/nexus/service/local/yum/snapshots/"
         + VERSION;
 
-    @Before
-    public void removeTestDirectories()
-        throws Exception
-    {
-        deleteDirectory( PACKAGE_CACHE_DIR );
-        deleteDirectory( REPODATA_DIR );
-    }
+    private static final String NO_REPO_URL = null;
+
+    private static final String NO_VERSION = null;
+
+    private static final String NO_ADDED_FILE = null;
+
+    private static final boolean SINGLE_RPM_PER_DIRECTORY = true;
 
     @Test
     public void shouldCreateRepo()
         throws Exception
     {
         executeJob( createTask(
-            RPM_BASE_FILE,
+            rpmsDir(),
             BASE_URL,
-            TARGET_DIR,
+            repoData(),
             SNAPSHOTS
         ) );
-        assertRepository( REPODATA_DIR, "default" );
+        assertThatYumMetadataAreTheSame( repoData(), "default" );
     }
 
     @Test
@@ -61,16 +59,16 @@ public class GenerateMetadataTaskTest
         throws Exception
     {
         executeJob( createTask(
-            RPM_BASE_FILE,
+            rpmsDir(),
             BASE_URL,
-            TARGET_DIR,
+            repoData(),
             BASE_VERSIONED_URL,
             SNAPSHOTS,
             VERSION,
-            null,
+            NO_ADDED_FILE,
             true
         ) );
-        assertRepository( REPODATA_DIR, "filtering" );
+        assertThatYumMetadataAreTheSame( repoData(), "filtering" );
     }
 
     @Test( expected = ExecutionException.class )
@@ -80,9 +78,44 @@ public class GenerateMetadataTaskTest
         executeJob( createTask(
             PATH_NOT_EXISTS,
             BASE_URL,
-            TARGET_DIR,
+            repoData(),
             SNAPSHOTS
         ) );
+    }
+
+    protected GenerateMetadataTask createTask( final File rpmDir,
+                                               final String rpmUrl,
+                                               final File repoDir,
+                                               final String repoUrl,
+                                               final String repositoryId,
+                                               final String version,
+                                               final String addedFile,
+                                               final boolean singleRpmPerDirectory )
+        throws Exception
+    {
+        GenerateMetadataTask yumTask = (GenerateMetadataTask) lookup( SchedulerTask.class, GenerateMetadataTask.ID );
+
+        yumTask.setRepositoryId( repositoryId );
+        yumTask.setRepoDir( repoDir );
+        yumTask.setRepoUrl( repoUrl );
+        yumTask.setRpmDir( rpmDir.getAbsolutePath() );
+        yumTask.setRpmUrl( rpmUrl );
+        yumTask.setVersion( version );
+        yumTask.setAddedFiles( addedFile );
+        yumTask.setSingleRpmPerDirectory( singleRpmPerDirectory );
+
+        return yumTask;
+    }
+
+    protected GenerateMetadataTask createTask( final File rpmDir,
+                                               final String rpmUrl,
+                                               final File repoDir,
+                                               final String id )
+        throws Exception
+    {
+        return createTask(
+            rpmDir, rpmUrl, repoDir, NO_REPO_URL, id, NO_VERSION, NO_ADDED_FILE, SINGLE_RPM_PER_DIRECTORY
+        );
     }
 
 }

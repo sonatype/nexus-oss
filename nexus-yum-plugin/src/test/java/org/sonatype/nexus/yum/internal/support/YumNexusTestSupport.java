@@ -41,15 +41,16 @@ import java.util.concurrent.TimeoutException;
 import java.util.zip.GZIPInputStream;
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.custommonkey.xmlunit.Diff;
 import org.freecompany.redline.Builder;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
@@ -66,6 +67,8 @@ import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
+import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
+import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
@@ -76,41 +79,57 @@ public class YumNexusTestSupport
 
     private static final Logger LOG = LoggerFactory.getLogger( YumNexusTestSupport.class );
 
-    public static final TestUtil UTIL = new TestUtil( new Marker() );
-
-    public static final File BASE_TMP_FILE = UTIL.resolveFile( "target/test-tmp" );
-
-    public static final File BASE_FILE = UTIL.resolveFile( "target/test-classes" );
-
-    public static final File RPM_BASE_FILE = new File( BASE_FILE, "repo" );
-
-    public static final File TARGET_DIR = new File( BASE_TMP_FILE, "generated-repos" );
-
-    public static final File BASE_CACHE_DIR = new File( BASE_TMP_FILE, ".cache" );
-
-    public static final File PACKAGE_CACHE_DIR = new File( BASE_CACHE_DIR, ".packageFiles" );
-
-    public static final File REPODATA_DIR = new File( TARGET_DIR, "repodata" );
-
-    public static final File TEMPLATE_DIR = new File( BASE_FILE, "templates" );
-
-    public static final String PRIMARY_XML = "primary.xml";
-
-    public static final String REPOMD_XML = "repomd.xml";
-
-    public static final String PRIMARY_XML_GZ = PRIMARY_XML + ".gz";
-
-    private static final String REPO = "foo";
+    private String javaTmpDir;
 
     public static final String TMP_DIR_KEY = "java.io.tmpdir";
 
-    private String oldTmpDir;
+    public static final String REPOMD_XML = "repomd.xml";
+
+    public static final String PRIMARY_XML = "primary.xml";
+
+    public static final String PRIMARY_XML_GZ = PRIMARY_XML + ".gz";
+
+    protected final TestUtil util = new TestUtil( this );
 
     @Rule
     public final TestTracer tracer = new TestTracer( this );
 
+    @Rule
+    public TestIndexRule testIndex = new TestIndexRule( util.resolveFile( "target/yum" ) );
+
+    @Rule
+    public TestDataRule testData = new TestDataRule( util.resolveFile( "src/test/ut-resources" ) );
+
+    @Rule
+    public final TestName testName = new TestName();
+
     @Inject
     private GlobalRestApiSettings globalRestApiSettings;
+
+    protected File rpmsDir()
+    {
+        return testData.resolveFile( "rpms" );
+    }
+
+    protected File cacheDir()
+    {
+        return testIndex.getDirectory( "cache" );
+    }
+
+    protected File repoData()
+    {
+        return testIndex.getDirectory();
+    }
+
+    protected File repositoryDir( final String repositoryId )
+    {
+        return testIndex.getDirectory( "repository/" + repositoryId );
+    }
+
+    protected File randomDir()
+    {
+        return testIndex.getDirectory( RandomStringUtils.randomAlphabetic( 20 ) );
+    }
 
     @Before
     public void setBaseUrl()
@@ -118,6 +137,65 @@ public class YumNexusTestSupport
     {
         globalRestApiSettings.setBaseUrl( "http://localhost:8080/nexus" );
         globalRestApiSettings.commitChanges();
+    }
+
+    @After
+    public void resetJavaTmpDir()
+    {
+        System.setProperty( TMP_DIR_KEY, javaTmpDir );
+    }
+
+    @After
+    public void recordSurefireAndFailsafeInfo()
+    {
+        {
+            final String name = "target/surefire-reports/" + getClass().getName();
+            testIndex.recordLink( "surefire result", util.resolveFile( name + ".txt" ) );
+            testIndex.recordLink( "surefire output", util.resolveFile( name + "-output.txt" ) );
+        }
+    }
+
+    public void assertThatYumMetadataAreTheSame( final File actualRepositoryDir,
+                                                 final String expectedRepositoryDirName )
+        throws Exception
+    {
+        LOG.debug( "Testing Repo {} ...", actualRepositoryDir );
+        final File actualRepodata = new File( actualRepositoryDir, "repodata" );
+        assertThat( actualRepodata, FileMatchers.exists() );
+        assertSameRepomdXml( actualRepodata, expectedRepositoryDirName );
+        assertSamePrimaryXml( actualRepodata, expectedRepositoryDirName );
+    }
+
+    private void assertSamePrimaryXml( final File repodataDir, final String templateName )
+        throws Exception
+    {
+        final GZIPInputStream gzipInputStream = new GZIPInputStream( new FileInputStream(
+            new File( repodataDir, PRIMARY_XML_GZ ) )
+        );
+        final Diff xmlDiff = new Diff(
+            createTemplateFileReader( templateName, PRIMARY_XML ),
+            new InputStreamReader( gzipInputStream )
+        );
+        xmlDiff.overrideDifferenceListener( new TimeStampIgnoringDifferenceListener() );
+        assertThat( xmlDiff.toString(), xmlDiff.similar(), is( true ) );
+    }
+
+    private void assertSameRepomdXml( final File repodataDir, final String templateName )
+        throws Exception
+    {
+        final Diff xmlDiff = new Diff(
+            createTemplateFileReader( templateName, REPOMD_XML ),
+            new FileReader( new File( repodataDir, REPOMD_XML ) )
+        );
+        xmlDiff.overrideDifferenceListener( new TimeStampIgnoringDifferenceListener() );
+        assertThat( xmlDiff.toString(), xmlDiff.similar(), is( true ) );
+    }
+
+    public FileReader createTemplateFileReader( String templateName, String fileName )
+        throws FileNotFoundException
+    {
+        return new FileReader( testData.resolveFile( String.format( "templates/%s/%s", templateName, fileName ) ) );
+
     }
 
     protected void waitFor( Condition condition )
@@ -137,14 +215,15 @@ public class YumNexusTestSupport
     protected void setUp()
         throws Exception
     {
-        initConfigurations();
+        javaTmpDir = System.getProperty( TMP_DIR_KEY );
+        System.setProperty( TMP_DIR_KEY, cacheDir().getAbsolutePath() );
         super.setUp();
-        initRestApiSettings();
+        lookup( NexusConfiguration.class ).loadConfiguration( true );
         injectFields();
     }
 
     private void injectFields()
-        throws Exception, IllegalAccessException
+        throws Exception
     {
         for ( Field field : getAllFields() )
         {
@@ -163,7 +242,7 @@ public class YumNexusTestSupport
     }
 
     private void lookupField( Field field, String hint )
-        throws Exception, IllegalAccessException
+        throws Exception
     {
         Object value = lookup( field.getType(), hint );
         if ( !field.isAccessible() )
@@ -172,27 +251,6 @@ public class YumNexusTestSupport
             field.set( this, value );
             field.setAccessible( false );
         }
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        System.setProperty( TMP_DIR_KEY, oldTmpDir );
-        super.tearDown();
-    }
-
-    private void initConfigurations()
-    {
-        oldTmpDir = System.getProperty( TMP_DIR_KEY );
-        System.setProperty( TMP_DIR_KEY, BASE_CACHE_DIR.getAbsolutePath() );
-    }
-
-    private void initRestApiSettings()
-        throws Exception
-    {
-        NexusConfiguration config = lookup( NexusConfiguration.class );
-        config.loadConfiguration( true );
     }
 
     private List<Field> getAllFields()
@@ -212,59 +270,6 @@ public class YumNexusTestSupport
     private List<? extends Field> getFields( Class<?> clazz )
     {
         return asList( clazz.getDeclaredFields() );
-    }
-
-    private static class Marker
-    {
-
-    }
-
-    public static void assertRepository( File repodataDir, String templateName )
-        throws Exception
-    {
-        LOG.debug( "Testing Repo {} ...", repodataDir );
-        assertThat( repodataDir, FileMatchers.exists() );
-        assertRepomdXml( repodataDir, templateName );
-        assertPrimaryXml( repodataDir, templateName );
-    }
-
-    private static void assertPrimaryXml( File repodataDir, String templateName )
-        throws Exception
-    {
-        File primaryXmlFile = new File( repodataDir, PRIMARY_XML_GZ );
-        LOG.debug( "Testing file {} ...", primaryXmlFile );
-
-        GZIPInputStream gzipInputStream = new GZIPInputStream( new FileInputStream( primaryXmlFile ) );
-        Diff xmlDiff =
-            new Diff( createTemplateFileReader( templateName, PRIMARY_XML ), new InputStreamReader( gzipInputStream ) );
-        xmlDiff.overrideDifferenceListener( new TimeStampIgnoringDifferenceListener() );
-        try
-        {
-            assertThat( xmlDiff.toString(), xmlDiff.similar(), is( true ) );
-        }
-        catch ( AssertionError e )
-        {
-            LOG.error( "Primary.xml failed test for template {} with following content : {}", templateName,
-                       IOUtils.toString( new GZIPInputStream( new FileInputStream( primaryXmlFile ) ) ) );
-            throw e;
-        }
-    }
-
-    private static void assertRepomdXml( File repodataDir, String templateName )
-        throws Exception
-    {
-        Diff xmlDiff =
-            new Diff( createTemplateFileReader( templateName, REPOMD_XML ), new FileReader( new File( repodataDir,
-                                                                                                      REPOMD_XML ) ) );
-
-        xmlDiff.overrideDifferenceListener( new TimeStampIgnoringDifferenceListener() );
-        assertThat( xmlDiff.toString(), xmlDiff.similar(), is( true ) );
-    }
-
-    public static FileReader createTemplateFileReader( String templateName, String fileName )
-        throws FileNotFoundException
-    {
-        return new FileReader( new File( TEMPLATE_DIR, templateName + File.separator + fileName ) );
     }
 
     public static File createDummyRpm( String name, String version, File outputDirectory )
@@ -293,28 +298,28 @@ public class YumNexusTestSupport
         return new File( outputDirectory, filename );
     }
 
-    public static File copyToTempDir( File srcDir )
+    public File copyToTempDir( File srcDir )
         throws IOException
     {
-        final File destDir = new File( BASE_TMP_FILE, RandomStringUtils.randomAlphabetic( 20 ) );
+        final File destDir = randomDir();
         copyDirectory( srcDir, destDir );
         return destDir;
     }
 
-    public static MavenRepository createRepository( final boolean isMavenHostedRepository )
+    public MavenRepository createRepository( final boolean isMavenHostedRepository )
     {
-        return createRepository( isMavenHostedRepository, REPO );
+        return createRepository( isMavenHostedRepository, testName.getMethodName() );
     }
 
-    public static MavenRepository createRepository( final boolean isMavenHostedRepository,
-                                                    final String repoId )
+    public MavenRepository createRepository( final boolean isMavenHostedRepository,
+                                             final String repositoryId )
     {
         final RepositoryKind kind = mock( RepositoryKind.class );
         when( kind.isFacetAvailable( MavenHostedRepository.class ) ).thenReturn( isMavenHostedRepository );
 
         final MavenHostedRepository repository = mock( MavenHostedRepository.class );
         when( repository.getRepositoryKind() ).thenReturn( kind );
-        when( repository.getId() ).thenReturn( repoId );
+        when( repository.getId() ).thenReturn( repositoryId );
         when( repository.getProviderRole() ).thenReturn( Repository.class.getName() );
         when( repository.getProviderHint() ).thenReturn( "maven2" );
 
@@ -327,19 +332,17 @@ public class YumNexusTestSupport
             when( repository.adaptToFacet( HostedRepository.class ) ).thenThrow( new ClassCastException() );
         }
 
-        final File repoDir = new File( BASE_TMP_FILE, "tmp-repos/" + repoId );
-        repoDir.mkdirs();
-        when( repository.getLocalUrl() ).thenReturn( repoDir.toURI().toString() );
+        when( repository.getLocalUrl() ).thenReturn( repositoryDir( repositoryId ).toURI().toString() );
 
         return repository;
     }
 
-    public static StorageItem createItem( String version, String filename )
+    public static StorageItem createItem( final String version, final String filename )
     {
         final StorageItem item = mock( StorageItem.class );
 
-        when( item.getPath() ).thenReturn( "blalu/" + version + "/" + filename );
-        when( item.getParentPath() ).thenReturn( "blalu/" + version );
+        when( item.getPath() ).thenReturn( "foo/" + version + "/" + filename );
+        when( item.getParentPath() ).thenReturn( "foo/" + version );
         when( item.getItemContext() ).thenReturn( new RequestContext() );
 
         return item;

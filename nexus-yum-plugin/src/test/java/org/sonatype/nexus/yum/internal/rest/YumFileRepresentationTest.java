@@ -13,13 +13,14 @@
 package org.sonatype.nexus.yum.internal.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.sonatype.nexus.yum.internal.support.YumNexusTestSupport.UTIL;
 
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class YumFileRepresentationTest
+    extends TestSupport
 {
 
     @Test
@@ -50,7 +51,7 @@ public class YumFileRepresentationTest
     {
         return new YumFileRepresentation(
             new UrlPathInterpretation( null, filename, false ),
-            new YumRepositoryImpl( UTIL.getBaseDir(), null, null )
+            new YumRepositoryImpl( util.resolveFile( "target/yum" ), null, null )
         );
     }
 }

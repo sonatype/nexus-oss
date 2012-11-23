@@ -13,23 +13,19 @@
 package org.sonatype.nexus.yum.internal;
 
 import static java.io.File.pathSeparator;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.sonatype.nexus.yum.internal.support.YumNexusTestSupport.RPM_BASE_FILE;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
 public class RpmListWriterTest
-    extends TestSupport
+    extends YumNexusTestSupport
 {
 
     private static final String REPO_ID = "repoId";
@@ -43,86 +39,86 @@ public class RpmListWriterTest
 
     private static final String NEW_RPM2 = "newAddFileRpm2.rpm";
 
+    public static final String NO_VERSION = null;
+
+    public static final String NO_ADDED_FILE = null;
+
+    public static final boolean NO_SINGLE_RPM_PER_DIRECTORY = true;
+
     @Test
     public void shouldListFileInSubDirs()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
-        assertEquals( FILE_CONTENT, IOUtils.toString( new FileInputStream( rpmListFile ) ) );
+        assertThat( writeRpmListFile( rpmsDir(), NO_VERSION ), FileMatchers.containsOnly( FILE_CONTENT ) );
     }
 
     @Test
     public void shouldListPackagesOnHighestLevel()
         throws Exception
     {
-        File rpmListFile =
-            writeRpmListFile( new File( RPM_BASE_FILE, "conflict-artifact/2.2-2" ), null, null );
-        assertEquals( "conflict-artifact-2.2-2.noarch.rpm\n", IOUtils.toString( new FileInputStream( rpmListFile ) ) );
+        assertThat(
+            writeRpmListFile( new File( rpmsDir(), "conflict-artifact/2.2-2" ), NO_VERSION ),
+            FileMatchers.containsOnly( "conflict-artifact-2.2-2.noarch.rpm\n" )
+        );
     }
 
     @Test
     public void shouldRemoveNotExistingRpmsAndAddNewlyAddedFile()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
-
-        rpmListFile = new RpmListWriter(
+        final File rpmListFile = new RpmListWriter(
             REPO_ID,
-            new File( RPM_BASE_FILE, "tomcat-mysql-jdbc/5.1.15-2" ),
+            new File( rpmsDir(), "tomcat-mysql-jdbc/5.1.15-2" ),
             "/is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm",
             null,
             true,
-            wrap( rpmListFile ),
+            listFileFactory( writeRpmListFile( rpmsDir(), NO_VERSION ) ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
 
-        assertEquals( "is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm\n",
-                      IOUtils.toString( new FileInputStream( rpmListFile ) ) );
+        assertThat( rpmListFile, FileMatchers.containsOnly( "is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm\n" ) );
     }
 
     @Test
     public void shouldReuseExistingPackageFile()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
-
-        rpmListFile = new RpmListWriter(
+        final File rpmListFile = new RpmListWriter(
             REPO_ID,
-            RPM_BASE_FILE,
+            rpmsDir(),
             null,
             null,
             true,
-            wrap( rpmListFile ),
+            listFileFactory( writeRpmListFile( rpmsDir(), NO_VERSION ) ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
-        assertEquals( FILE_CONTENT, IOUtils.toString( new FileInputStream( rpmListFile ) ) );
+        assertThat( rpmListFile, FileMatchers.containsOnly( FILE_CONTENT ) );
     }
 
     @Test
     public void shouldCreateVersionSpecificRpmListFile()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, "2.2-2", null );
-        assertEquals( "conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm\n",
-                      IOUtils.toString( new FileInputStream( rpmListFile ) ) );
+        assertThat(
+            writeRpmListFile( rpmsDir(), "2.2-2" ),
+            FileMatchers.containsOnly( "conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm\n" )
+        );
     }
 
     @Test
     public void shouldNotAddDuplicateToList()
         throws Exception
     {
-        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
-
-        rpmListFile = new RpmListWriter(
+        final File rpmListFile = new RpmListWriter(
             REPO_ID,
-            RPM_BASE_FILE,
+            rpmsDir(),
             "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm",
             null,
             true,
-            wrap( rpmListFile ),
+            listFileFactory( writeRpmListFile( rpmsDir(), NO_VERSION ) ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
-        assertEquals( FILE_CONTENT, IOUtils.toString( new FileInputStream( rpmListFile ) ) );
+        assertThat( rpmListFile, FileMatchers.containsOnly( FILE_CONTENT ) );
     }
 
     @Test
@@ -130,44 +126,39 @@ public class RpmListWriterTest
         throws Exception
     {
         // given written list file
-        File rpmListFile = writeRpmListFile( RPM_BASE_FILE, null, null );
-        // when create two files and recreate list
-        rpmListFile = new RpmListWriter(
+        final File rpmListFile = new RpmListWriter(
             REPO_ID,
-            RPM_BASE_FILE,
+            rpmsDir(),
             NEW_RPM1 + pathSeparator + NEW_RPM2,
             null,
             false,
-            wrap( rpmListFile ),
+            listFileFactory( writeRpmListFile( rpmsDir(), NO_VERSION ) ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
-        // then
-        final String content = IOUtils.toString( new FileInputStream( rpmListFile ) );
-        assertThat( content, containsString( NEW_RPM1 ) );
-        assertThat( content, containsString( NEW_RPM2 ) );
-        assertThat( content, not( containsString( pathSeparator ) ) );
+
+        assertThat( rpmListFile, FileMatchers.contains( NEW_RPM1, NEW_RPM2 ) );
+        assertThat( rpmListFile, not( FileMatchers.contains( pathSeparator ) ) );
     }
 
-    private File writeRpmListFile( File rpmBaseDir, String version, String addedFile )
+    private File writeRpmListFile( final File rpmsDir, final String version )
         throws IOException
     {
-        File rpmListFile = File.createTempFile( "package.", ".txt" );
-        rpmListFile.delete();
+        final File rpmListFile = new File( testIndex.getDirectory(), "package-list.txt" );
 
         new RpmListWriter(
-            REPO_ID,
-            rpmBaseDir,
-            addedFile,
+            testName.getMethodName(),
+            rpmsDir,
+            NO_ADDED_FILE,
             version,
-            true,
-            wrap( rpmListFile ),
+            NO_SINGLE_RPM_PER_DIRECTORY,
+            listFileFactory( rpmListFile ),
             new RpmScanner( new SerialScanner() )
         ).writeList();
 
         return rpmListFile;
     }
 
-    private ListFileFactory wrap( final File file )
+    private ListFileFactory listFileFactory( final File file )
     {
         return new ListFileFactory()
         {

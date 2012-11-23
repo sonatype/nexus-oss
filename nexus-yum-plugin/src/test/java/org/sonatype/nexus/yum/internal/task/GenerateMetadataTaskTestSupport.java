@@ -21,17 +21,9 @@ import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
-public abstract class GenerateMetdataTaskTestSupport
+public abstract class GenerateMetadataTaskTestSupport
     extends YumNexusTestSupport
 {
-
-    protected static final String NO_REPO_URL = null;
-
-    protected static final String NO_VERSION = null;
-
-    protected static final String NO_ADDED_FILE = null;
-
-    protected static final boolean SINGLE_RPM_PER_DIRECTORY = true;
 
     @Inject
     protected NexusScheduler nexusScheduler;
@@ -43,30 +35,4 @@ public abstract class GenerateMetdataTaskTestSupport
         return scheduledTask.get();
     }
 
-    protected GenerateMetadataTask createTask( File rpmDir, String rpmUrl, File repoDir, String repoUrl,
-                                               String repositoryId, String version, String addedFile,
-                                               boolean singleRpmPerDirectory )
-        throws Exception
-    {
-        GenerateMetadataTask yumTask = (GenerateMetadataTask) lookup( SchedulerTask.class, GenerateMetadataTask.ID );
-
-        yumTask.setRepositoryId( repositoryId );
-        yumTask.setRepoDir( repoDir );
-        yumTask.setRepoUrl( repoUrl );
-        yumTask.setRpmDir( rpmDir.getAbsolutePath() );
-        yumTask.setRpmUrl( rpmUrl );
-        yumTask.setVersion( version );
-        yumTask.setAddedFiles( addedFile );
-        yumTask.setSingleRpmPerDirectory( singleRpmPerDirectory );
-
-        return yumTask;
-    }
-
-    protected GenerateMetadataTask createTask( File rpmDir, String rpmUrl, File repoDir, String id )
-        throws Exception
-    {
-        return createTask(
-            rpmDir, rpmUrl, repoDir, NO_REPO_URL, id, NO_VERSION, NO_ADDED_FILE, SINGLE_RPM_PER_DIRECTORY
-        );
-    }
 }
