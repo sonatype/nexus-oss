@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -164,31 +163,34 @@ public class YumNexusTestSupport
         LOG.debug( "Testing Repo {} ...", actualRepositoryDir );
         final File actualRepodata = new File( actualRepositoryDir, "repodata" );
         assertThat( actualRepodata, FileMatchers.exists() );
-        assertSameRepomdXml( actualRepodata, expectedRepositoryDirName );
-        assertSamePrimaryXml( actualRepodata, expectedRepositoryDirName );
+
+        final File repoMdFile = new File( actualRepodata, REPOMD_XML );
+        final RepoMD repoMD = new RepoMD( repoMdFile );
+
+        assertSameRepomdXml(
+            repoMdFile,
+            getTemplateFile( expectedRepositoryDirName, REPOMD_XML )
+        );
+
+        assertSamePrimaryXml(
+            new File( actualRepodata.getParentFile(), repoMD.getPrimaryLocation() ),
+            getTemplateFile( expectedRepositoryDirName, PRIMARY_XML )
+        );
     }
 
-    private void assertSamePrimaryXml( final File repodataDir, final String templateName )
+    private void assertSamePrimaryXml( final File actual, final File expected )
         throws Exception
     {
-        final GZIPInputStream gzipInputStream = new GZIPInputStream( new FileInputStream(
-            new File( repodataDir, PRIMARY_XML_GZ ) )
-        );
-        final Diff xmlDiff = new Diff(
-            createTemplateFileReader( templateName, PRIMARY_XML ),
-            new InputStreamReader( gzipInputStream )
-        );
+        final GZIPInputStream actualIn = new GZIPInputStream( new FileInputStream( actual ) );
+        final Diff xmlDiff = new Diff( new FileReader( expected ), new InputStreamReader( actualIn ) );
         xmlDiff.overrideDifferenceListener( new TimeStampIgnoringDifferenceListener() );
         assertThat( xmlDiff.toString(), xmlDiff.similar(), is( true ) );
     }
 
-    private void assertSameRepomdXml( final File repodataDir, final String templateName )
+    private void assertSameRepomdXml( final File actual, final File expected )
         throws Exception
     {
-        final Diff xmlDiff = new Diff(
-            createTemplateFileReader( templateName, REPOMD_XML ),
-            new FileReader( new File( repodataDir, REPOMD_XML ) )
-        );
+        final Diff xmlDiff = new Diff( new FileReader( expected ), new FileReader( actual ) );
         xmlDiff.overrideDifferenceListener( new TimeStampIgnoringDifferenceListener() );
         xmlDiff.overrideElementQualifier(
             new ElementNameAndAttributeQualifier( "type" )
@@ -203,10 +205,9 @@ public class YumNexusTestSupport
         assertThat( xmlDiff.toString(), xmlDiff.similar(), is( true ) );
     }
 
-    public FileReader createTemplateFileReader( String templateName, String fileName )
-        throws FileNotFoundException
+    public File getTemplateFile( final String templateName, final String fileName )
     {
-        return new FileReader( testData.resolveFile( String.format( "templates/%s/%s", templateName, fileName ) ) );
+        return testData.resolveFile( String.format( "templates/%s/%s", templateName, fileName ) );
 
     }
 

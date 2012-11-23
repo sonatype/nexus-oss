@@ -48,6 +48,7 @@ import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RpmScanner;
+import org.sonatype.nexus.yum.internal.support.RepoMD;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.code.tempusfugit.temporal.Condition;
@@ -140,11 +141,13 @@ public class GenerateMetadataTaskConcurrencyTest
         waitFor( futures );
         // then
         assertThat( second, is( first ) );
-        assertThat( ( (GenerateMetadataTask) first.getTask() ).getAddedFiles(),
-                    is( file1 + pathSeparator + file2 ) );
-        final String content =
-            IOUtils.toString(
-                new GZIPInputStream( new FileInputStream( new File( tmpDir, "repodata/primary.xml.gz" ) ) ) );
+        assertThat( ( (GenerateMetadataTask) first.getTask() ).getAddedFiles(), is( file1 + pathSeparator + file2 ) );
+
+        final RepoMD repoMD = new RepoMD( new File( tmpDir, "repodata/repomd.xml" ) );
+
+        final String content = IOUtils.toString(
+            new GZIPInputStream( new FileInputStream( new File( tmpDir, repoMD.getPrimaryLocation() ) ) )
+        );
         assertThat( content, containsString( RPM_NAME_1 ) );
         assertThat( content, containsString( RPM_NAME_2 ) );
     }
