@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Map;
 
 import org.codehaus.plexus.util.xml.XmlStreamReader;
@@ -29,16 +30,16 @@ import com.google.common.io.Closeables;
 public class RepoMD
 {
 
-    final Map<String,String> locations;
+    private final Map<String, String> locations;
 
-    public RepoMD( final InputStream in)
+    public RepoMD( final InputStream in )
     {
         locations = parse( in );
     }
 
-    public RepoMD( final File file)
+    public RepoMD( final File file )
     {
-        BufferedInputStream in =null;
+        BufferedInputStream in = null;
         try
         {
             in = new BufferedInputStream( new FileInputStream( file ) );
@@ -48,18 +49,18 @@ public class RepoMD
         {
             throw Throwables.propagate( e );
         }
-        finally {
+        finally
+        {
             Closeables.closeQuietly( in );
         }
     }
 
-    private static Map<String,String> parse( final InputStream in )
+    private static Map<String, String> parse( final InputStream in )
     {
         try
         {
-            final Map<String,String> locations = Maps.newHashMap();
+            final Map<String, String> locations = Maps.newHashMap();
             final Xpp3Dom dom = Xpp3DomBuilder.build( new XmlStreamReader( in ) );
-
 
             for ( final Xpp3Dom data : dom.getChildren( "data" ) )
             {
@@ -75,6 +76,11 @@ public class RepoMD
         {
             throw Throwables.propagate( e );
         }
+    }
+
+    public Collection<String> getLocations()
+    {
+        return locations.values();
     }
 
     public String getLocation( final String type )
