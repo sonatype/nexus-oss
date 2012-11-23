@@ -76,9 +76,9 @@ public class MergeMetadataTask
             final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
             if ( memberReposBaseDirs.size() > 1 )
             {
-                LOG.debug( "Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName() );
+                LOG.debug( "Merging repository group '{}", groupRepository.getId() );
                 new CommandLineExecutor().exec( buildCommand( repoBaseDir, memberReposBaseDirs ) );
-                LOG.debug( "Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName() );
+                LOG.debug( "Group repository '{}' merged", groupRepository.getId() );
             }
             else
             {
