@@ -50,18 +50,25 @@ public class Hc4RawTransport
         final HttpGet get = new HttpGet( createUrlWithPath( path ) );
         get.setHeader( "Accept", ContentType.APPLICATION_XML.getMimeType() );
         final HttpResponse response = httpClient.execute( get );
-        final int statusCode = response.getStatusLine().getStatusCode();
-        if ( statusCode == 200 && response.getEntity() != null )
+        try
         {
-            return EntityUtils.toByteArray( response.getEntity() );
+            final int statusCode = response.getStatusLine().getStatusCode();
+            if ( statusCode == 200 && response.getEntity() != null )
+            {
+                return EntityUtils.toByteArray( response.getEntity() );
+            }
+            else if ( statusCode == 404 )
+            {
+                return null;
+            }
+            else
+            {
+                throw new IOException( "The response was not successful: " + response.getStatusLine() );
+            }
         }
-        else if ( statusCode == 404 )
+        finally
         {
-            return null;
-        }
-        else
-        {
-            throw new IOException( "The response was not successful: " + response.getStatusLine() );
+            EntityUtils.consume( response.getEntity() );
         }
     }
 
@@ -72,9 +79,16 @@ public class Hc4RawTransport
         final HttpPut put = new HttpPut( createUrlWithPath( path ) );
         put.setEntity( new ByteArrayEntity( bytes, ContentType.APPLICATION_XML ) );
         final HttpResponse response = httpClient.execute( put );
-        if ( response.getStatusLine().getStatusCode() > 299 )
+        try
         {
-            throw new IOException( "The response was not successful: " + response.getStatusLine() );
+            if ( response.getStatusLine().getStatusCode() > 299 )
+            {
+                throw new IOException( "The response was not successful: " + response.getStatusLine() );
+            }
+        }
+        finally
+        {
+            EntityUtils.consume( response.getEntity() );
         }
     }
 
