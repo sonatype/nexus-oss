@@ -49,7 +49,7 @@ public class TimeStampIgnoringDifferenceListener
 
         if ( isNodeName( difference, "checksum", "timestamp", "packager", "open-checksum", "time@build", "time@file",
                          "size@package", "summary", "description", "buildhost", "header-range@end", "checksum@type",
-                         "open-checksum@type" ) )
+                         "open-checksum@type", "location@href" ) )
         {
             return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
         }
