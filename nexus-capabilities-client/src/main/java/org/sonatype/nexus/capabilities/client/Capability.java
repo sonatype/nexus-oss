@@ -63,6 +63,11 @@ public interface Capability<T extends Capability>
     boolean hasProperty( String key );
 
     /**
+     * @return status of capability
+     */
+    String status();
+
+    /**
      * Sets capability notes.
      *
      * @param notes to set
@@ -103,6 +108,7 @@ public interface Capability<T extends Capability>
 
     /**
      * Removes a property.
+     *
      * @param key of property to be removed
      * @return itself
      */

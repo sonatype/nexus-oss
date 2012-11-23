@@ -206,6 +206,12 @@ public class JerseyCapability<C extends Capability<C>>
     }
 
     @Override
+    public String status()
+    {
+        return settings().getStatus();
+    }
+
+    @Override
     public C withNotes( final String notes )
     {
         settings().setNotes( notes );
