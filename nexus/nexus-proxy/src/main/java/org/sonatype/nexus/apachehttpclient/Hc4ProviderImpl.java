@@ -110,9 +110,9 @@ public class Hc4ProviderImpl
     private static final String CONNECTION_POOL_IDLE_TIME_KEY = "nexus.apacheHttpClient4x.connectionPoolIdleTime";
 
     /**
-     * Default pool idle time: 1 minute.
+     * Default pool idle time: 30 seconds.
      */
-    private static final long CONNECTION_POOL_IDLE_TIME_DEFAULT = TimeUnit.MINUTES.toMillis( 1 );
+    private static final long CONNECTION_POOL_IDLE_TIME_DEFAULT = TimeUnit.SECONDS.toMillis( 30 );
 
     /**
      * Key for customizing connection pool timeout. In other words, how long should a HTTP request execution be blocked
@@ -121,9 +121,9 @@ public class Hc4ProviderImpl
     private static final String CONNECTION_POOL_TIMEOUT_KEY = "nexus.apacheHttpClient4x.connectionPoolTimeout";
 
     /**
-     * Default pool timeout: 1 minute.
+     * Default pool timeout: 30 seconds.
      */
-    private static final long CONNECTION_POOL_TIMEOUT_DEFAULT = TimeUnit.MINUTES.toMillis( 1 );
+    private static final long CONNECTION_POOL_TIMEOUT_DEFAULT = TimeUnit.SECONDS.toMillis( 30 );
 
     /**
      * Key for customizing default (and max) keep alive duration when remote server does not state anything,
@@ -132,9 +132,9 @@ public class Hc4ProviderImpl
     private static final String KEEP_ALIVE_MAX_DURATION_KEY = "nexus.apacheHttpClient4x.keepAliveMaxDuration";
 
     /**
-     * Default keep alive max duration: 1 minute.
+     * Default keep alive max duration: 30 seconds.
      */
-    private static final long KEEP_ALIVE_MAX_DURATION_DEFAULT = TimeUnit.MINUTES.toMillis( 1 );
+    private static final long KEEP_ALIVE_MAX_DURATION_DEFAULT = TimeUnit.SECONDS.toMillis( 30 );
 
     // ==
 
