@@ -14,11 +14,13 @@ package org.sonatype.nexus.yum.internal.task;
 
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.sonatype.nexus.yum.YumRepository.PATH_OF_REPOMD_XML;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -30,15 +32,19 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.YumRepository;
+import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.nexus.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.io.Closeables;
 
 @Named( MergeMetadataTask.ID )
 public class MergeMetadataTask
@@ -106,12 +112,27 @@ public class MergeMetadataTask
         {
             try
             {
-                // TODO check if sqlite are mandatory
-                for ( final String metadataFile : YumRepository.METADATA_FILES )
+                final StorageItem repomdItem = memberRepository.retrieveItem(
+                    new ResourceStoreRequest( "/" + PATH_OF_REPOMD_XML )
+                );
+                if ( repomdItem instanceof StorageFileItem )
                 {
-                    // retrieve the item from repository
-                    // this will trigger going remote for proxy repositories
-                    memberRepository.retrieveItem( new ResourceStoreRequest( metadataFile ) );
+                    InputStream in = null;
+                    try
+                    {
+                        final RepoMD repomd = new RepoMD( in = ( (StorageFileItem) repomdItem ).getInputStream() );
+                        // do we need them all or we can skip the sqllite ?
+                        for ( final String location : repomd.getLocations() )
+                        {
+                            memberRepository.retrieveItem(
+                                new ResourceStoreRequest( "/" + location )
+                            );
+                        }
+                    }
+                    finally
+                    {
+                        Closeables.closeQuietly( in );
+                    }
                 }
                 // all metadata files are available by now so lets use it
                 baseDirs.add( RepositoryUtils.getBaseDir( memberRepository ) );
