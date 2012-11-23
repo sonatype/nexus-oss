@@ -19,29 +19,7 @@ public interface YumRepository
 
     static final String PATH_OF_REPODATA = "repodata";
 
-    static final String PATH_OF_FILELISTS_SQLLITE = PATH_OF_REPODATA + "/filelists.sqlite.bz2";
-
-    static final String PATH_OF_FILELISTS_XML = PATH_OF_REPODATA + "/filelists.xml.gz";
-
-    static final String PATH_OF_OTHER_SQLLITE = PATH_OF_REPODATA + "/other.sqlite.bz2";
-
-    static final String PATH_OF_OTHER_XML = PATH_OF_REPODATA + "/other.xml.gz";
-
-    static final String PATH_OF_PRIMARY_SQLLITE = PATH_OF_REPODATA + "/primary.sqlite.bz2";
-
-    static final String PATH_OF_PRIMARY_XML = PATH_OF_REPODATA + "/primary.xml.gz";
-
     static final String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/repomd.xml";
-
-    static final String[] METADATA_FILES = {
-        PATH_OF_FILELISTS_SQLLITE,
-        PATH_OF_FILELISTS_XML,
-        PATH_OF_OTHER_SQLLITE,
-        PATH_OF_OTHER_XML,
-        PATH_OF_PRIMARY_SQLLITE,
-        PATH_OF_PRIMARY_XML,
-        PATH_OF_REPOMD_XML
-    };
 
     File getBaseDir();
 
