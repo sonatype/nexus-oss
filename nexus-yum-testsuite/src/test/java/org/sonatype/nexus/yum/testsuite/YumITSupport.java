@@ -166,6 +166,7 @@ public class YumITSupport
         LOG.info( "Waiting for Nexus to settle down..." );
         tasks.waitForAllTasksToStop();
         events.waitForCalmPeriod();
+        Thread.sleep( 10000 );
         LOG.info( "Nexus settled down, continuing..." );
     }
 
