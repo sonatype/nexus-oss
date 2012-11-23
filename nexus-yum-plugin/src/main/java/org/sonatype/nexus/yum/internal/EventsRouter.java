@@ -25,6 +25,8 @@ import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -49,14 +51,36 @@ public class EventsRouter
 
     private final Provider<NexusScheduler> nexusScheduler;
 
+    private final Provider<SteadyLinksRequestProcessor> steadyLinksProcessor;
+
     @Inject
     public EventsRouter( final Provider<RepositoryRegistry> repositoryRegistry,
                          final Provider<YumRegistry> yumRegistryProvider,
-                         final Provider<NexusScheduler> nexusScheduler )
+                         final Provider<NexusScheduler> nexusScheduler,
+                         final Provider<SteadyLinksRequestProcessor> steadyLinksProcessor )
     {
+        this.steadyLinksProcessor = checkNotNull( steadyLinksProcessor );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.yumRegistryProvider = checkNotNull( yumRegistryProvider );
         this.nexusScheduler = checkNotNull( nexusScheduler );
+    }
+
+    @AllowConcurrentEvents
+    @Subscribe
+    public void on( final RepositoryRegistryEventAdd event )
+    {
+        event.getRepository().getRequestProcessors().put(
+            SteadyLinksRequestProcessor.class.getName(), steadyLinksProcessor.get()
+        );
+    }
+
+    @AllowConcurrentEvents
+    @Subscribe
+    public void on( final RepositoryRegistryEventRemove event )
+    {
+        event.getRepository().getRequestProcessors().remove(
+            SteadyLinksRequestProcessor.class.getName()
+        );
     }
 
     @AllowConcurrentEvents
