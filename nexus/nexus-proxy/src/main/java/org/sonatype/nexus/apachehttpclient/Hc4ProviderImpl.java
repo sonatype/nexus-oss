@@ -192,7 +192,7 @@ public class Hc4ProviderImpl
         this.eventBus.register( this );
         this.jmxInstaller.register( sharedConnectionManager );
         getLogger().info(
-            "{} started up (connectionPoolMaxSize {}, connectionPoolSize {}, connectionPoolIdleTime {} ms, connectionPoolTimeout {} ms, keepAliveMaxDuration {} ms)",
+            "{} started (connectionPoolMaxSize {}, connectionPoolSize {}, connectionPoolIdleTime {} ms, connectionPoolTimeout {} ms, keepAliveMaxDuration {} ms)",
             getClass().getSimpleName(), getConnectionPoolMaxSize(), getConnectionPoolSize(),
             getConnectionPoolIdleTime(), getConnectionPoolTimeout(), getKeepAliveMaxDuration() );
     }
@@ -292,7 +292,7 @@ public class Hc4ProviderImpl
         jmxInstaller.unregister();
         sharedConnectionManager.shutdown();
         eventBus.unregister( this );
-        getLogger().info( "{} shut down.", getClass().getSimpleName() );
+        getLogger().info( "{} stopped.", getClass().getSimpleName() );
     }
 
     @Subscribe
