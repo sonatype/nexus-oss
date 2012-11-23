@@ -239,7 +239,6 @@
           <properties>
             <year>2012</year>
           </properties>
-          <aggregate>true</aggregate>
         </configuration>
         <executions>
           <execution>
