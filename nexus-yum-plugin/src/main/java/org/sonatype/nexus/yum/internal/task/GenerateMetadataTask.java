@@ -28,10 +28,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -49,7 +49,6 @@ import org.sonatype.nexus.yum.internal.RpmListWriter;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
@@ -57,7 +56,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
  *
  * @author sherold
  */
-@Component( role = SchedulerTask.class, hint = GenerateMetadataTask.ID, instantiationStrategy = "per-lookup" )
+@Named( GenerateMetadataTask.ID )
 public class GenerateMetadataTask
     extends AbstractNexusTask<YumRepository>
     implements ListFileFactory

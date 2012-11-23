@@ -18,22 +18,22 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskState;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * This job scans a {@link Repository} for RPMs and adds each version to Yam.
  *
  * @author sherold
  */
-@Component( role = SchedulerTask.class, hint = RepositoryScanningTask.ID, instantiationStrategy = "per-lookup" )
+@Named( RepositoryScanningTask.ID )
 public class RepositoryScanningTask
     extends AbstractNexusTask<Object>
 {
@@ -47,8 +47,9 @@ public class RepositoryScanningTask
     private final RpmScanner scanner;
 
     @Inject
-    public RepositoryScanningTask( final RpmScanner scanner )
+    public RepositoryScanningTask( final RpmScanner scanner, final EventBus eventBus )
     {
+        super(eventBus, null);
         this.scanner = checkNotNull( scanner );
     }
 
@@ -59,7 +60,7 @@ public class RepositoryScanningTask
         checkNotNull( yum, "Yum must be set" );
 
         getLogger().debug(
-            "Scanning repository '{}' base dir '{}' for RPMs ", yum.getRepository().getId(), yum.getBaseDir()
+            "Scanning repository '{}' base dir '{}' for RPMs", yum.getRepository().getId(), yum.getBaseDir()
         );
 
         for ( final File rpm : scanner.scan( yum.getBaseDir() ) )

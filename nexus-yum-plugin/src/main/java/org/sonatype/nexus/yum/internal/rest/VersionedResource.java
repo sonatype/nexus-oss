@@ -17,6 +17,8 @@ import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -28,8 +30,9 @@ import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "VersionedYumRepositoryResource" )
 @Path( VersionedResource.RESOURCE_URI )
+@Named
+@Singleton
 public class VersionedResource
     extends AbstractYumRepositoryResource
     implements PlexusResource

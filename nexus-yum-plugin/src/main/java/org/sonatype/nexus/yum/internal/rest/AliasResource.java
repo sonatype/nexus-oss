@@ -21,10 +21,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
@@ -56,9 +57,10 @@ import com.google.common.collect.Maps;
  *
  * @author sherold
  */
-@Component( role = PlexusResource.class, hint = "AliasResource" )
 @Path( AliasResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json", "text/plain" } )
+@Named
+@Singleton
 public class AliasResource
     extends AbstractNexusPlexusResource
     implements PlexusResource

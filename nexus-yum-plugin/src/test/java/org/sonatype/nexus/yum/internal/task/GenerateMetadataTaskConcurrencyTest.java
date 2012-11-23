@@ -29,9 +29,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.GZIPInputStream;
+import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -67,10 +67,10 @@ public class GenerateMetadataTaskConcurrencyTest
 
     private static final int MAX_PARALLEL_SCHEDULER_THREADS = 20;
 
-    @Requirement
+    @Inject
     private NexusScheduler nexusScheduler;
 
-    @Requirement
+    @Inject
     private YumRegistry yumRegistry;
 
     private final Set<String> threadNames = new HashSet<String>();

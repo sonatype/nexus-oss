@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +37,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
 
@@ -52,8 +50,8 @@ public class VersionedResourceTest
 
     private static final String ALIAS = "myAlias";
 
-    @Requirement( hint = "VersionedYumRepositoryResource" )
-    private PlexusResource resource;
+    @Inject
+    private VersionedResource resource;
 
     @Inject
     private YumRegistry yumRegistry;
