@@ -253,7 +253,10 @@ public class GenerateMetadataTask
             }
             catch ( NoSuchRepositoryException e )
             {
-                logger.warn( "Failed to fully regenerate Yum metadata for {}", getRepositoryId(), e );
+                logger.warn(
+                    "Repository '{}' does not exist anymore. Backing out from triggering group merge for it.",
+                    getRepositoryId()
+                );
             }
         }
     }
