@@ -119,9 +119,10 @@ public class MergeMetadataTaskTest
         final GroupRepository group = mock( GroupRepository.class );
         when( group.getId() ).thenReturn( groupRepositoryId );
         when( group.getLocalUrl() ).thenReturn( groupRepoDir.getAbsolutePath() );
-        when( group.getMemberRepositories() ).thenReturn(
-            asList( createRepositoryWithYumMetadata( "repo1" ), createRepositoryWithYumMetadata( "repo2" ) )
+        final List<Repository> repositories = asList(
+            createRepositoryWithYumMetadata( "repo1" ), createRepositoryWithYumMetadata( "repo2" )
         );
+        when( group.getMemberRepositories() ).thenReturn( repositories );
 
         return group;
     }
