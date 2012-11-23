@@ -70,6 +70,11 @@ public class TimeStampIgnoringDifferenceListener
             return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
         }
 
+        if ( CHILD_NODELIST_SEQUENCE_ID == difference.getId() )
+        {
+            return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
+        }
+
         return RETURN_ACCEPT_DIFFERENCE;
     }
 
