@@ -12,11 +12,13 @@
  */
 package org.sonatype.nexus.client.internal.rest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.WebApplicationException;
@@ -74,19 +76,38 @@ public class XStreamXmlProvider
         return ( result == null ) ? DEFAULT_ENCODING : result;
     }
 
+    @Override
     public Object readFrom( Class<Object> aClass, Type genericType, Annotation[] annotations, MediaType mediaType,
-                            MultivaluedMap<String, String> map, InputStream stream )
+        MultivaluedMap<String, String> map, InputStream stream )
         throws IOException, WebApplicationException
     {
         String encoding = getCharsetAsString( mediaType );
         return xstream.fromXML( new InputStreamReader( stream, encoding ) );
     }
 
+    @Override
     public void writeTo( Object o, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType,
-                         MultivaluedMap<String, Object> map, OutputStream stream )
+        MultivaluedMap<String, Object> map, OutputStream stream )
         throws IOException, WebApplicationException
     {
         String encoding = getCharsetAsString( mediaType );
         xstream.marshal( o, new CompactWriter( new OutputStreamWriter( stream, encoding ) ) );
+    }
+
+    @Override
+    public long getSize( Object o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType )
+    {
+        try
+        {
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            String encoding = getCharsetAsString( mediaType );
+            xstream.marshal( o, new CompactWriter( new OutputStreamWriter( bos, encoding ) ) );
+            return bos.size();
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            // huh?
+            return -1;
+        }
     }
 }
