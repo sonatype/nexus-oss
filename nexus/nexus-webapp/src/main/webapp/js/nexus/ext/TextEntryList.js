@@ -23,7 +23,9 @@ Ext.namespace('Nexus.ext');
 Nexus.ext.TextEntryList = function(cfg) {
   var
         config = cfg || {},
-        defaultConfig = {};
+        defaultConfig = {
+          layout : 'form'
+        };
 
   Ext.apply(this, config, defaultConfig);
 

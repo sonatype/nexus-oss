@@ -31,7 +31,7 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 public abstract class AbstractIndexerManagerTest
     extends AbstractMavenRepoContentTests
 {
-    protected IndexerManager indexerManager;
+    protected DefaultIndexerManager indexerManager;
 
     protected NexusScheduler nexusScheduler;
 
@@ -45,7 +45,7 @@ public abstract class AbstractIndexerManagerTest
 
         nexusConfiguration.saveConfiguration();
 
-        indexerManager = lookup( IndexerManager.class );
+        indexerManager = (DefaultIndexerManager) lookup( IndexerManager.class );
 
         nexusScheduler = lookup( NexusScheduler.class );
     }

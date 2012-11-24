@@ -12,13 +12,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3615;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.integrationtests.AbstractPrivilegeTest.TEST_USER_NAME;
 import static org.sonatype.nexus.integrationtests.AbstractPrivilegeTest.TEST_USER_PASSWORD;
 
 import java.io.IOException;
 
-import org.hamcrest.MatcherAssert;
+import org.apache.maven.index.artifact.Gav;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
@@ -26,10 +28,8 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import com.thoughtworks.xstream.XStream;
 
 public class Nexus3615ArtifactInfoSecurityIT
@@ -110,6 +110,12 @@ public class Nexus3615ArtifactInfoSecurityIT
     public void checkViewAccess()
         throws Exception
     {
+        // force re-indexing to ensure that our artifact will be found by artifact info
+        final Gav gav = new Gav( "nexus3615", "artifact", "1.0" );
+        getSearchMessageUtil().reindexGAV( REPO_TEST_HARNESS_RELEASE_REPO, gav );
+        getSearchMessageUtil().reindexGAV( REPO_TEST_HARNESS_REPO2, gav );
+        getSearchMessageUtil().reindexGAV( REPO_TEST_HARNESS_REPO, gav );
+
         this.giveUserRole( TEST_USER_NAME, "ui-search", true );
         this.giveUserPrivilege( TEST_USER_NAME, "T1" ); // all m2 repo, read
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
@@ -117,17 +123,18 @@ public class Nexus3615ArtifactInfoSecurityIT
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        ArtifactInfoResource info =
-            getSearchMessageUtil().getInfo( REPO_TEST_HARNESS_REPO, "nexus3615/artifact/1.0/artifact-1.0.jar" );
+        final ArtifactInfoResource info = getSearchMessageUtil().getInfo(
+            REPO_TEST_HARNESS_REPO, "nexus3615/artifact/1.0/artifact-1.0.jar"
+        );
 
-        Assert.assertEquals( REPO_TEST_HARNESS_REPO, info.getRepositoryId() );
-        Assert.assertEquals( "/nexus3615/artifact/1.0/artifact-1.0.jar", info.getRepositoryPath() );
-        Assert.assertEquals( "b354a0022914a48daf90b5b203f90077f6852c68", info.getSha1Hash() );
+        assertThat( info.getRepositoryId(), is( REPO_TEST_HARNESS_REPO ) );
+        assertThat( info.getRepositoryPath(), is( "/nexus3615/artifact/1.0/artifact-1.0.jar" ) );
+        assertThat( info.getSha1Hash(), is( "b354a0022914a48daf90b5b203f90077f6852c68" ) );
         // view priv no longer controls search results, only read priv
-        Assert.assertEquals( 3, info.getRepositories().size() );
-        MatcherAssert.assertThat( getRepositoryId( info.getRepositories() ), hasItems( REPO_TEST_HARNESS_REPO ) );
-        Assert.assertEquals( "application/java-archive", info.getMimeType() );
-        Assert.assertEquals( 1364, info.getSize() );
+        assertThat( info.getRepositories().size(), is( 3 ) );
+        assertThat( getRepositoryId( info.getRepositories() ), hasItems( REPO_TEST_HARNESS_REPO ) );
+        assertThat( info.getMimeType(), is( "application/java-archive" ) );
+        assertThat( info.getSize(), is( 1364L ) );
     }
 
 }

@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,15 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-define('ext/form',
-      [
-        'ext/form/basicform',
-        'ext/form/displayfield',
-        'ext/form/field',
-        'ext/form/formpanel',
-        'ext/form/textarea',
-        'ext/form/TextField',
-        'ext/form/VTypes'
-      ],
-      function() {});
+package org.sonatype.nexus.rest;
+
+import javax.servlet.http.HttpServletRequest;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.mockito.Mockito;
+
+public class RemoteIPFinderTest
+{
+    @Test
+    public void testResolveIP()
+    {
+        /*
+         * Broken resolveIP method always returned first element, check it now skips non-resolvable IPs:
+         */
+        HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
+        Mockito.doReturn( "[missing],127.0.0.1,{unknown}" ).when( request ).getHeader( "X-Forwarded-For" );
+        Assert.assertEquals( "127.0.0.1", RemoteIPFinder.findIP( request ) );
+    }
+}

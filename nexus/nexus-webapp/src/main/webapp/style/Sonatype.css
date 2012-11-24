@@ -513,3 +513,10 @@ button.st-icon-refresh {
 .st-server-panel .x-panel-collapsed .x-panel-bwrap {
     display: none;
 }
+
+/*
+ * The combo box arrow is position:absolute, so afterText would overlap without the additional padding.
+ */
+.x-form-arrow-trigger + .form-label-after-field {
+    padding-left: 20px;
+}

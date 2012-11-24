@@ -51,7 +51,6 @@ Nexus.ext.FormPanel = function(cfg) {
         config = cfg || {},
         defaultConfig = {
           region : 'center',
-          buttonAlign : 'center',
           width : '100%',
           height : '100%',
           autoScroll : true,

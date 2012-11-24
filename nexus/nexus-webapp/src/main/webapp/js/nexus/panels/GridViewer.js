@@ -33,33 +33,60 @@ Ext.namespace('Sonatype.panels');
 
   /*
    * A viewer panel offering a grid on top and a details pane at the bottom.
-   * Config options: autoCreateNewRecord: if set, the "add" menu action handler
+   * Config options:
+   *
+   * autoCreateNewRecord: if set, the "add" menu action handler
    * will automatically create a new blank record and insert it into the grid,
    * before invoking the subscriber supplied handler. The record will be assigned
    * the same "autoCreateNewRecord=true" flag, which is tracked by the editor
    * component, causing it to re-create the record from the server response when
-   * the form is submitted. addMenuInitEvent: this parameter causes the panel to
+   * the form is submitted.
+   *
+   * addMenuInitEvent: this parameter causes the panel to
    * create an "Add" button on the taskbar and fire the event so the subscribers
-   * can append actions to the "add" menu. columns: a column config, combining the
+   * can append actions to the "add" menu.
+    * columns: a column config, combining the
    * properties of Ext.data.Record and Ext.grid.ColumnModel. All items are used in
    * the Record constructor. Additionally, items with a 'header' property are used
    * in the ColumnsModel config, with the Record's 'name' becoming ColumnModel's
-   * 'dataIndex'. dataAutoLoad: the 'autoLoad' property for the data store
+   * 'dataIndex'.
+   *
+   * dataAutoLoad: the 'autoLoad' property for the data store
    * (defaults to true). dataId: the id property in the record set (defaults to
-   * 'resourceURI'). dataRoot: the root property of the response (defaults to
-   * 'data'). dataSortInfo: the 'sortInfo' property for the data store.
+   * 'resourceURI').
+   * dataRoot: the root property of the response (defaults to
+   * 'data').
+   *
+   * dataSortInfo: the 'sortInfo' property for the data store.
+   *
    * deleteButton: creates a "Delete" button on the toolbar. The delete handler
    * will submit a DELETE request to requestURI of the selected record.
+   *
    * rowClickEvent: event name to fire when a row is clicked.
+   *
    * rowFocusChangedEvent: event name to fire when a row's focus changes. Called
-   * every time a row is clicked. rowClickHandler: a specific handler to be called
-   * on rowClick rowContextClickEvent: event name to fire when a row is
-   * right-clicked. rowContextClickHandler: a specific handler to be called when a
-   * row is right-clicked mouseOverEvent: event name to fire when mouse over event
-   * is fired mouseOverHandler: a specific handler to call when mouse over grid
+   * every time a row is clicked.
+   * rowClickHandler: a specific handler to be called
+   * on rowClick
+   *
+   * rowContextClickEvent: event name to fire when a row is
+   * right-clicked.
+   *
+   * rowContextClickHandler: a specific handler to be called when a
+   * row is right-clicked
+   *
+   * mouseOverEvent: event name to fire when mouse over event
+   * is fired
+   *
+   * mouseOverHandler: a specific handler to call when mouse over grid
+   *
    * singleSelect: the 'singleSelect' property for the grid's selection model
-   * (defaults to true). titleColumn: the name of the column to get a record title
-   * from (defaults to 'name'). url: the URl to load the data from.
+   * (defaults to true).
+   *
+   * titleColumn: the name of the column to get a record title
+   * from (defaults to 'name').
+   *
+   * url: the URl to load the data from.
    */
   Sonatype.panels.GridViewer = function(cfg) {
     var
@@ -146,7 +173,14 @@ Ext.namespace('Sonatype.panels');
       frame : false,
       autoScroll : true,
       selModel : new Ext.grid.RowSelectionModel({
-        singleSelect : this.singleSelect
+        singleSelect : this.singleSelect,
+        listeners : {
+          // HACK rowselect events were always fired with ExtJS2, even on store refresh/rows added,
+          // so we have to hack the same for ExtJS3 or rewrite how the refreshHandler/rowSelectHandler is working.
+          beforerowselect : function(model) {
+            model.silent = false;
+          }
+        }
       }),
 
       ds : this.dataStore,
@@ -173,7 +207,21 @@ Ext.namespace('Sonatype.panels');
       }
     });
 
-    this.gridPanel.getSelectionModel().on('rowselect', this.rowSelectHandler, this);
+    this.gridPanel.getSelectionModel().on('selectionchange', this.rowSelectHandler, this);
+    this.gridPanel.getView().on('rowsinserted', function() {
+      var idx, previousSelection = this.gridPanel.getSelectionModel().previousSelection;
+      if ( previousSelection ) {
+        idx = this.gridPanel.store.findBy(function(rec) {
+          return rec.id === previousSelection.id;
+        });
+        if ( idx !== -1 ) {
+          this.gridPanel.getSelectionModel().selectRecords([ this.gridPanel.store.getAt(idx) ]);
+        }
+      }
+    }, this);
+    this.gridPanel.getView().on('beforerefresh', function() {
+      this.gridPanel.getSelectionModel().previousSelection = this.gridPanel.getSelectionModel().getSelected();
+    }, this);
 
     this.refreshButton = new Ext.Button({
       text : 'Refresh',
@@ -574,8 +622,9 @@ Ext.namespace('Sonatype.panels');
       }
     },
 
-    rowSelectHandler : function(selectionModel, index, rec) {
-      if (this.rowClickEvent || this.rowClickHandler) {
+    rowSelectHandler : function(selectionModel) {
+      var rec = selectionModel.getSelected();
+      if (rec && (this.rowClickEvent || this.rowClickHandler) ) {
         this.createChildPanel(rec);
 
         var bookmark = rec.data[this.dataBookmark];
