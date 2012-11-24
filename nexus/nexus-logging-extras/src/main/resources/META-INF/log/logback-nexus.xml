@@ -15,7 +15,9 @@
 -->
 <included>
   <jmxConfigurator/>
-  
+
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>${appender.pattern}</pattern>
