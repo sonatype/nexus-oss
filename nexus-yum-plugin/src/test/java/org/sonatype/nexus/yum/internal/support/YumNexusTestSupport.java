@@ -95,7 +95,9 @@ public class YumNexusTestSupport
     public final TestTracer tracer = new TestTracer( this );
 
     @Rule
-    public TestIndexRule testIndex = new TestIndexRule( util.resolveFile( "target/yum" ) );
+    public TestIndexRule testIndex = new TestIndexRule(
+        util.resolveFile( "target/ut-reports" ), util.resolveFile( "target/ut-data" )
+    );
 
     @Rule
     public TestDataRule testData = new TestDataRule( util.resolveFile( "src/test/ut-resources" ) );
