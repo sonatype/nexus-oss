@@ -125,8 +125,8 @@ public abstract class NexusRunningITSupport
             {
                 logRemoteThatTestIs( "FINISHED" );
             }
-            testIndex().recordLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
-            testIndex().recordLink( "nexus.log", new File( nexus.getWorkDirectory(), "logs/nexus.log" ) );
+            testIndex().recordAndCopyLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
+            testIndex().recordAndCopyLink( "nexus.log", new File( nexus.getWorkDirectory(), "logs/nexus.log" ) );
         }
 
         if ( NexusStartAndStopStrategy.Strategy.EACH_METHOD.equals( startAndStopStrategy ) )
