@@ -137,7 +137,7 @@ public abstract class NexusITSupport
      */
     @Rule
     public TestIndexRule testIndex = new TestIndexRule(
-        util.resolveFile( "target/it-data" ), util.resolveFile( "target/it-reports" )
+        util.resolveFile( "target/it-reports" ), util.resolveFile( "target/it-data" )
     );
 
     /**
