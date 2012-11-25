@@ -12,15 +12,21 @@
  */
 package org.sonatype.nexus.capabilities.client.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Set;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capabilities.client.Capabilities;
+import org.sonatype.nexus.capabilities.client.internal.JerseyCapabilities;
+import org.sonatype.nexus.capabilities.client.spi.JerseyCapabilityFactory;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.capabilities.client.internal.JerseyCapabilities;
+import com.google.common.collect.Sets;
 
 /**
  * Jersey based Capabilities Nexus Client Subsystem factory.
@@ -32,6 +38,19 @@ import org.sonatype.nexus.capabilities.client.internal.JerseyCapabilities;
 public class JerseyCapabilitiesSubsystemFactory
     implements SubsystemFactory<Capabilities, JerseyNexusClient>
 {
+
+    private final Set<JerseyCapabilityFactory> capabilityFactories;
+
+    public JerseyCapabilitiesSubsystemFactory()
+    {
+        this.capabilityFactories = Sets.newHashSet();
+    }
+
+    @Inject
+    public JerseyCapabilitiesSubsystemFactory( final Set<JerseyCapabilityFactory> capabilityFactories )
+    {
+        this.capabilityFactories = checkNotNull( capabilityFactories );
+    }
 
     @Override
     public Condition availableWhen()
@@ -48,7 +67,7 @@ public class JerseyCapabilitiesSubsystemFactory
     @Override
     public Capabilities create( final JerseyNexusClient nexusClient )
     {
-        return new JerseyCapabilities( nexusClient );
+        return new JerseyCapabilities( nexusClient, capabilityFactories );
     }
 
 }

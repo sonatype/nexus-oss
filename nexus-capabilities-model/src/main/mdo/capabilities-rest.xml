@@ -85,6 +85,7 @@
     <class>
       <name>CapabilityResource</name>
       <version>1.0.0+</version>
+      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>The capability configuration.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "capability-resource" )</annotation>
@@ -285,6 +286,7 @@
     <class>
       <name>CapabilityListItemResource</name>
       <version>1.0.0+</version>
+      <superClass> org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource</superClass>
       <description>Capabilities list item details.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "capabilities-list-item" )</annotation>
@@ -300,33 +302,11 @@
           <description>The URL that can be used to manage the capability.</description>
         </field>
         <field>
-          <name>id</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>The id of the capability.</description>
-        </field>
-        <field>
           <name>description</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
           <description>The description of the capability (generated).</description>
-        </field>
-        <field>
-          <name>notes</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>false</required>
-          <description>Optional (user) notes about capability.</description>
-        </field>
-        <field>
-          <name>enabled</name>
-          <type>boolean</type>
-          <version>2.0.0+</version>
-          <required>true</required>
-          <defaultValue>true</defaultValue>
-          <description>The flag determining if the capability is enabled</description>
         </field>
         <field>
           <name>active</name>
@@ -335,13 +315,6 @@
           <required>true</required>
           <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is active</description>
-        </field>
-        <field>
-          <name>typeId</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>The type id of the capability.</description>
         </field>
         <field>
           <name>typeName</name>

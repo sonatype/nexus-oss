@@ -194,7 +194,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         id : 'id'
       }, this.capabilityTypeRecordConstructor);
   this.capabilityTypeDataStore = new Ext.data.Store({
-        url : CAPABILITY_TYPES_SERVICE_PATH + '?includeHidden=true',
+        url : CAPABILITY_TYPES_SERVICE_PATH,
         reader : this.capabilityTypeReader,
         sortInfo : {
           field : 'id',
@@ -224,7 +224,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         id : 'resourceURI'
       }, this.capabilityRecordConstructor);
   this.capabilitiesDataStore = new Ext.data.Store({
-        url : CAPABILITIES_SERVICE_PATH + '?includeHidden=true',
+        url : CAPABILITIES_SERVICE_PATH,
         reader : this.capabilitiesReader,
         sortInfo : {
           field : 'description',

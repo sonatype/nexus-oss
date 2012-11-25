@@ -17,8 +17,11 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityListItemResource;
 import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityStatusResponseResource;
 import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asMap;
+import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.CapabilityReferenceFilter;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -28,6 +31,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.restlet.Context;
+import org.restlet.data.Form;
+import org.restlet.data.Parameter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -39,6 +44,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
+import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -54,6 +60,16 @@ public class CapabilitiesPlexusResource
 {
 
     public static final String RESOURCE_URI = "/capabilities";
+
+    private static final String $TYPE = "$type";
+
+    private static final String $PROPERTY_PREFIX = "$p$";
+
+    private static final String $ENABLED = "$enabled";
+
+    private static final String $ACTIVE = "$active";
+
+    private static final String $INCLUDE_NOT_EXPOSED = "$includeNotExposed";
 
     private final CapabilityRegistry capabilityRegistry;
 
@@ -96,26 +112,21 @@ public class CapabilitiesPlexusResource
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
-        final boolean includeHidden = Boolean.parseBoolean(
-            request.getResourceRef().getQueryAsForm().getFirstValue( "includeHidden", true, "false" )
-        );
-        final boolean includeNotExposed = Boolean.parseBoolean(
-            request.getResourceRef().getQueryAsForm().getFirstValue( "includeNotExposed", true, "false" )
-        );
         final CapabilitiesListResponseResource result = new CapabilitiesListResponseResource();
 
-        for ( final CapabilityReference reference : capabilityRegistry.getAll() )
+        final CapabilityReferenceFilter filter = buildFilter( request.getResourceRef().getQueryAsForm() );
+
+        Collection<? extends CapabilityReference> references =
+            filter == null ? capabilityRegistry.getAll() : capabilityRegistry.get( filter );
+
+        for ( final CapabilityReference reference : references )
         {
-            if ( ( includeNotExposed || reference.context().descriptor().isExposed() ) &&
-                ( includeHidden || !reference.context().descriptor().isHidden() ) )
-            {
-                result.addData(
-                    asCapabilityListItemResource(
-                        reference,
-                        createChildReference( request, this, reference.context().id().toString() ).toString()
-                    )
-                );
-            }
+            result.addData(
+                asCapabilityListItemResource(
+                    reference,
+                    createChildReference( request, this, reference.context().id().toString() ).toString()
+                )
+            );
         }
 
         return result;
@@ -154,6 +165,77 @@ public class CapabilitiesPlexusResource
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
                                          "Could not manage capabilities configuration persistence store" );
         }
+    }
+
+    private CapabilityReferenceFilter buildFilter( final Form queryAsForm )
+    {
+        CapabilityReferenceFilter filter = null;
+        final Set<String> paramNames = queryAsForm.getNames();
+        if ( paramNames != null )
+        {
+            for ( final String paramName : paramNames )
+            {
+                final Parameter parameter = queryAsForm.getFirst( paramName );
+                if ( $TYPE.equals( paramName ) )
+                {
+                    if ( parameter != null )
+                    {
+                        filter = ensureFilter( filter ).withType( capabilityType( parameter.getValue() ) );
+                    }
+                }
+                else if ( $ENABLED.equals( paramName ) )
+                {
+                    if ( parameter != null )
+                    {
+                        filter = ensureFilter( filter ).enabled( Boolean.valueOf( parameter.getValue() ) );
+                    }
+                    else
+                    {
+                        filter = ensureFilter( filter ).enabled();
+                    }
+                }
+                else if ( $ACTIVE.equals( paramName ) )
+                {
+                    if ( parameter != null )
+                    {
+                        filter = ensureFilter( filter ).active( Boolean.valueOf( parameter.getValue() ) );
+                    }
+                    else
+                    {
+                        filter = ensureFilter( filter ).active();
+                    }
+                }
+                else if ( $INCLUDE_NOT_EXPOSED.equals( paramName ) )
+                {
+                    if ( parameter == null || Boolean.valueOf( parameter.getValue() ) )
+                    {
+                        filter = ensureFilter( filter ).includeNotExposed();
+                    }
+                }
+                else if ( paramName.startsWith( $PROPERTY_PREFIX ) && paramName.length() > $PROPERTY_PREFIX.length() )
+                {
+                    final String propertyKey = paramName.substring( $PROPERTY_PREFIX.length() );
+                    if ( parameter == null || "*".equals( parameter.getValue() ) )
+                    {
+                        filter = ensureFilter( filter ).withBoundedProperty( propertyKey );
+                    }
+                    else
+                    {
+                        filter = ensureFilter( filter ).withProperty( propertyKey, parameter.getValue() );
+                    }
+                }
+            }
+        }
+        return filter;
+    }
+
+    private CapabilityReferenceFilter ensureFilter( final CapabilityReferenceFilter filter )
+    {
+        if ( filter != null )
+        {
+            return filter;
+        }
+        return CapabilityReferenceFilterBuilder.capabilities();
     }
 
 }

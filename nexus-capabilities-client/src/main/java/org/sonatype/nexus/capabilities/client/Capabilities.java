@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.capabilities.client;
 
-import java.util.List;
+import java.util.Collection;
 
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
+import org.sonatype.nexus.capabilities.client.exceptions.CapabilityFactoryNotAvailableException;
+import org.sonatype.nexus.capabilities.client.exceptions.MultipleCapabilitiesFoundException;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 
 /**
  * Capabilities Nexus Client Subsystem.
@@ -27,80 +27,96 @@ public interface Capabilities
 {
 
     /**
-     * Retrieve all non hidden capabilities.
+     * Creates a new capability of specified type.
      *
-     * @return all non hidden capabilities
+     * @param type capability type id (cannot be null)
+     * @return created capability (never null)
      */
-    List<CapabilityListItemResource> list();
+    Capability create( String type );
 
     /**
-     * Retrieve a capability given its id.
+     * Retrieves a capability by id.
      *
-     * @param id of capability to be retrieved
-     * @return capability with given id
+     * @param id of capability to be retrieved (cannot be null)
+     * @return capability with specified id (never null)
+     * @throws NexusClientNotFoundException If a capability with specified id does not exist
      */
-    CapabilityListItemResource list( String id );
+    Capability get( String id )
+        throws NexusClientNotFoundException;
 
     /**
-     * Retrieve a capability.
+     * Retrieves all existing capabilities, except those that are not exposed.
      *
-     * @param includeHidden whether or not hidden capabilities should be included
-     * @return all capabilities
+     * @return capabilities (never null, can be empty)
      */
-    List<CapabilityListItemResource> list( boolean includeHidden );
+    Collection<Capability> get();
 
     /**
-     * Retrieve all capabilities of specified type and having specified properties.
+     * Retrieves all capabilities that matches the filter.
      *
-     * @return all capabilities of specified type and having specified properties
+     * @param filter matching filter (cannot be null)
+     * @return matching capabilities (never null, can be empty)
      */
-    List<CapabilityListItemResource> list( String type, CapabilityPropertyResource... props );
+    Collection<Capability> get( Filter filter );
 
     /**
-     * Retrieve a capability given its id.
+     * Retrieves a unique capability that matches the filter.
      *
-     * @param id of capability to be retrieved
-     * @return capability with given id
+     * @param filter matching filter (cannot be null)
+     * @return matching capability (never null)
+     * @throws MultipleCapabilitiesFoundException
+     *                                      If more then one capability is matching the filter
+     * @throws NexusClientNotFoundException If a capability with filter does not exist
      */
-    CapabilityResource get( String id );
+    Capability getUnique( Filter filter )
+        throws MultipleCapabilitiesFoundException, NexusClientNotFoundException;
 
     /**
-     * Adds a new capability.
+     * Creates a new capability of specified type.
      *
-     * @param capability to be added
-     * @return added capability
+     * @param type capability type (cannot be null)
+     * @return created capability (never null)
+     * @throws CapabilityFactoryNotAvailableException
+     *          If there is no capability factory configured for specified type
      */
-    CapabilityListItemResource add( final CapabilityResource capability );
+    <C extends Capability> C create( Class<C> type )
+        throws CapabilityFactoryNotAvailableException;
 
     /**
-     * Updates a capability.
+     * Retrieves a capability by id.
      *
-     * @param capability to be updated
-     * @return updated capability
+     * @param type expected capability type (cannot be null)
+     * @param id   of capability to be retrieved (cannot be null)
+     * @return capability with specified id (never null)
+     * @throws NexusClientNotFoundException If a capability with specified id does not exist
+     * @throws ClassCastException           If capability with specified id is of a different type then expected
      */
-    CapabilityListItemResource update( CapabilityResource capability );
+    <C extends Capability> C get( Class<C> type, String id )
+        throws NexusClientNotFoundException, ClassCastException;
 
     /**
-     * Deletes a capability.
+     * Retrieves all capabilities that matches the filter.
      *
-     * @param id of capability to be deleted
+     * @param type   expected capabilities type (cannot be null)
+     * @param filter matching filter (cannot be null)
+     * @return matching capabilities (never null, can be empty)
+     * @throws ClassCastException If any of matching capabilities is of a different type then expected
      */
-    void delete( String id );
+    <C extends Capability> Collection<C> get( Class<C> type, Filter filter )
+        throws ClassCastException;
 
     /**
-     * Enables a capability.
+     * Retrieves a unique capability that matches the filter.
      *
-     * @param id of capability to be enabled
-     * @return enabled capability
+     * @param type   expected capabilities type (cannot be null)
+     * @param filter matching filter (cannot be null)
+     * @return matching capability (never null)
+     * @throws MultipleCapabilitiesFoundException
+     *                                      If more then one capability is matching the filter
+     * @throws NexusClientNotFoundException If a capability with filter does not exist
+     * @throws ClassCastException           If found capability is of a different type then expected
      */
-    CapabilityListItemResource enable( String id );
-
-    /**
-     * Disables a capability.
-     *
-     * @param id of capability to be disabled
-     * @return disabled capability
-     */
-    CapabilityListItemResource disable( String id );
+    <C extends Capability> C getUnique( Class<C> type, Filter filter )
+        throws MultipleCapabilitiesFoundException, NexusClientNotFoundException, ClassCastException;
 
 }

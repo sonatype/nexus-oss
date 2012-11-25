@@ -14,7 +14,6 @@ package org.sonatype.nexus.plugins.capabilities.support;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
@@ -37,6 +36,8 @@ public class CapabilityReferenceFilterBuilder
         private Boolean enabled;
 
         private Boolean active;
+
+        private Boolean includeNotExposed = false;
 
         private Map<String, String> properties = new HashMap<String, String>();
 
@@ -99,10 +100,21 @@ public class CapabilityReferenceFilterBuilder
             return withProperty( key, repositoryId );
         }
 
+        public CapabilityReferenceFilter includeNotExposed()
+        {
+            includeNotExposed = true;
+            return this;
+        }
+
         @Override
-        public boolean apply( @Nullable final CapabilityReference input )
+        public boolean apply( final CapabilityReference input )
         {
             if ( input == null )
+            {
+                return false;
+            }
+            if ( input.context().descriptor() != null
+                && !input.context().descriptor().isExposed() && !includeNotExposed )
             {
                 return false;
             }
