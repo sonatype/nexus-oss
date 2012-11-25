@@ -29,7 +29,7 @@ import org.sonatype.nexus.testsuite.client.internal.JerseyUIDLocks;
  */
 @Named
 @Singleton
-public class JerseyUIDLocksFactorySubsystemFactory
+public class JerseyUIDLocksSubsystemFactory
     implements SubsystemFactory<UIDLocks, JerseyNexusClient>
 {
 
