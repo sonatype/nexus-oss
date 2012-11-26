@@ -18,17 +18,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.base.Strings;
+import com.google.common.io.Closeables;
+import eu.medsea.mimeutil.MimeType;
+import eu.medsea.mimeutil.MimeUtil2;
+import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.ContentLocator;
-
-import com.google.common.base.Strings;
-import com.google.common.io.Closeables;
-
-import eu.medsea.mimeutil.MimeType;
-import eu.medsea.mimeutil.MimeUtil2;
-import eu.medsea.mimeutil.detector.ExtensionMimeDetector;
-import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
 /**
  * Default implementation of {@link MimeSupport} component using MimeUtil2 library.
@@ -53,7 +50,7 @@ public class DefaultMimeSupport
         // uses Extension only for now (speed, no IO, but less accuracy)
         // See src/main/resources/mime-types.properties for customizations
         nonTouchingMimeUtil = new MimeUtil2();
-        nonTouchingMimeUtil.registerMimeDetector( ExtensionMimeDetector.class.getName() );
+        nonTouchingMimeUtil.registerMimeDetector( NexusExtensionMimeDetector.class.getName() );
 
         // uses magic-mime (IO and lower speed but more accuracy)
         // See src/main/resources/magic.mime for customizations
@@ -90,6 +87,10 @@ public class DefaultMimeSupport
     @Override
     public String guessMimeTypeFromPath( final String path )
     {
+        // FIXME (by replacing MimeUtil with something else?)
+        // MimeUtil2#getMostSpecificMimeType is broken in 2.1.2/2.1.3, it will (in contrast to it's javadoc) *usually* return the last
+        // mime type regardless of specificity. Which one is last depends on the impl of HashSet<String>.iterator() (which seems
+        // to have a fairly stable ordering on JVM: different order breaks unit tests.)
         return MimeUtil2.getMostSpecificMimeType( getNonTouchingMimeUtil2().getMimeTypes( path ) ).toString();
     }
 
