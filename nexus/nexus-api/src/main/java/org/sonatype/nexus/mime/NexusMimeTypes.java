@@ -14,21 +14,17 @@ package org.sonatype.nexus.mime;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import eu.medsea.mimeutil.MimeUtil2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +48,7 @@ public class NexusMimeTypes
 
     private static Logger log = LoggerFactory.getLogger( NexusMimeTypes.class );
 
+    public static final String BUILTIN_MIMETYPES_FILENAME = "nexus-builtin.mimetypes";
     public static final String MIMETYPES_FILENAME = "nexus.mimetypes";
 
     private Map<String, NexusMimeType> extensions = Maps.newHashMap();
@@ -59,7 +56,13 @@ public class NexusMimeTypes
 
     public NexusMimeTypes()
     {
-        final InputStream stream = this.getClass().getResourceAsStream( "/"  + MIMETYPES_FILENAME );
+        load( BUILTIN_MIMETYPES_FILENAME );
+        load( MIMETYPES_FILENAME );
+    }
+
+    private void load( final String filename )
+    {
+        final InputStream stream = this.getClass().getResourceAsStream( "/"  + filename );
         if ( stream != null )
         {
             final Properties properties = new Properties();
@@ -149,9 +152,18 @@ public class NexusMimeTypes
         }
     }
 
-    public NexusMimeType getMimeTypes( final String extension )
+    public NexusMimeType getMimeTypes( String extension )
     {
-        return extensions.get( extension );
+        while ( !extension.isEmpty() )
+        {
+            if ( extensions.containsKey( extension ) )
+            {
+                return extensions.get( extension );
+            }
+            extension = MimeUtil2.getExtension( extension );
+        }
+
+        return null;
     }
 
     public class NexusMimeType
