@@ -132,6 +132,8 @@ public class IndexTemplatePlexusResource
     protected VelocityRepresentation render( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
+        getLogger().debug( "Rendering index" );
+
         Map<String, Object> templatingContext = new HashMap<String, Object>();
 
         templatingContext.put( "serviceBase", "service/local" );
@@ -161,6 +163,7 @@ public class IndexTemplatePlexusResource
             pluginContext = new HashMap<String, Object>( topContext );
 
             NexusIndexHtmlCustomizer bundle = bundles.get( key );
+            getLogger().debug( "Processing customizations: {} -> {}", key, bundle );
 
             pluginContext.put( "bundle", bundle );
 
