@@ -19,17 +19,28 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>11</version>
+    <version>22-SNAPSHOT</version>
     <relativePath />
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus</artifactId>
   <packaging>pom</packaging>
-
   <version>2.3-SNAPSHOT</version>
 
+  <name>${project.artifactId}</name>
   <inceptionYear>2007</inceptionYear>
+  <url>http://nexus.sonatype.org/</url>
+  
+  <issueManagement>
+    <system>Jira</system>
+    <url>http://links.sonatype.com/products/nexus/oss/issues</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>Bamboo</system>
+    <url>https://bamboo.zion.sonatype.com/browse/NXO</url>
+  </ciManagement>
 
   <scm>
     <connection>scm:git:git://github.com/sonatype/nexus.git</connection>
@@ -50,6 +61,7 @@
       <url>http://www.eclipse.org/legal/epl-v10.html</url>
     </license>
   </licenses>
+
   <developers>
     <developer>
       <id>cstamas</id>
@@ -174,7 +186,6 @@
     <plexus-security.version>3.0-SNAPSHOT</plexus-security.version>
     <restlet.version>1.1.6-SONATYPE-5348-V7</restlet.version>
     <shiro.version>1.2.1</shiro.version>
-    <surefire.version>2.12.4</surefire.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.5-SNAPSHOT</goodies.version>
 
@@ -701,7 +712,7 @@
         <artifactId>jackson-mapper-asl</artifactId>
         <version>${jackson.version}</version>
       </dependency>
-      
+
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
@@ -926,7 +937,7 @@
         <artifactId>sisu-pr-testutil</artifactId>
         <version>1.5.2</version>
       </dependency>
-     
+
       <dependency>
         <groupId>org.codehaus.enunciate</groupId>
         <artifactId>enunciate-core</artifactId>
@@ -1232,17 +1243,6 @@
 
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>2.0</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>2.9</version>
-        </plugin>
 
         <plugin>
           <groupId>org.jboss.tattletale</groupId>
@@ -1300,15 +1300,6 @@
               <version>1.7</version>
             </dependency>
           </dependencies>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.modello</groupId>
-          <artifactId>modello-maven-plugin</artifactId>
-          <version>1.5</version>
-          <configuration>
-            <useJava5>true</useJava5>
-          </configuration>
         </plugin>
 
         <plugin>
@@ -1377,24 +1368,10 @@
         </plugin>
 
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
-          <configuration>
-            <escapeWindowsPaths>true</escapeWindowsPaths>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${surefire.version}</version>
           <configuration>
             <failIfNoTests>false</failIfNoTests>
-            <!-- force use of property -->
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <forkMode>once</forkMode>
-            <argLine>-ea</argLine>
             <!--
             FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
             https://issues.sonatype.org/browse/NEXUS-5345
@@ -1417,15 +1394,10 @@
         </plugin>
 
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${surefire.version}</version>
           <configuration>
             <failIfNoTests>false</failIfNoTests>
-            <!-- force use of property -->
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <forkMode>once</forkMode>
-            <argLine>-ea</argLine>
             <!--
             FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
             https://issues.sonatype.org/browse/NEXUS-5345
@@ -1448,46 +1420,10 @@
           <artifactId>provided-dependencies-maven-plugin</artifactId>
           <version>1.5</version>
         </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>1.1.1</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.2.1</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.5.1</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.5.1</version>
-        </plugin>
 
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>animal-sniffer-maven-plugin</artifactId>
-          <version>1.9</version>
           <configuration>
             <signature>
               <groupId>org.codehaus.mojo.signature</groupId>
@@ -1495,12 +1431,6 @@
               <version>1.0</version>
             </signature>
           </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-invoker-plugin</artifactId>
-          <version>1.7</version>
         </plugin>
 
         <!-- INTERNAL -->
@@ -1722,18 +1652,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifest>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-            </manifest>
-          </archive>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
