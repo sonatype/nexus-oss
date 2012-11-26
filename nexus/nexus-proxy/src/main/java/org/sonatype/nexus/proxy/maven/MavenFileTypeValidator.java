@@ -24,9 +24,16 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import eu.medsea.mimeutil.MimeUtil2;
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.AbstractMimeMagicFileTypeValidator;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator;
@@ -39,7 +46,8 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * 
  * @author cstamas
  */
-@Component( role = FileTypeValidator.class, hint = "maven" )
+@Named("maven")
+@Singleton
 public class MavenFileTypeValidator
     extends AbstractMimeMagicFileTypeValidator
 {
@@ -52,70 +60,13 @@ public class MavenFileTypeValidator
 
     private Map<String, List<String>> supportedTypeMap = new HashMap<String, List<String>>();
 
-    public MavenFileTypeValidator()
+    private final NexusMimeTypes mimeTypes;
+
+    @Inject
+    public MavenFileTypeValidator( final NexusMimeTypes mimeTypes, final MimeSupport mimeSupport )
     {
-        supportedTypeMap.put( "jar", Lists.newArrayList( "application/zip" ) );
-        supportedTypeMap.put( "zip", Lists.newArrayList( "application/zip" ) );
-        supportedTypeMap.put( "war", Lists.newArrayList( "application/zip" ) );
-        supportedTypeMap.put( "ear", Lists.newArrayList( "application/zip" ) );
-        supportedTypeMap.put( "pom", Lists.newArrayList( "application/x-maven-pom", "application/xml", "text/xml" ) );
-        supportedTypeMap.put( "xml", Lists.newArrayList( "application/xml", "text/xml" ) );
-        supportedTypeMap.put( "tar", Lists.newArrayList( "application/x-tar" ) );
-        // flex
-        supportedTypeMap.put( "swc", Lists.newArrayList( "application/zip" ) );
-        supportedTypeMap.put( "swf", Lists.newArrayList( "application/x-shockwave-flash" ) );
-        // tar.gz
-        supportedTypeMap.put( "gz", Lists.newArrayList( "application/x-gzip", "application/x-tgz" ) );
-        supportedTypeMap.put( "tgz", Lists.newArrayList( "application/x-tgz" ) );
-
-        // tar.bz2
-        supportedTypeMap.put( "bz2", Lists.newArrayList( "application/x-bzip2" ) );
-        supportedTypeMap.put( "tbz", Lists.newArrayList( "application/x-bzip2" ) );
-
-        addCustomMimetypes();
-    }
-
-    private void addCustomMimetypes()
-    {
-        final InputStream stream = this.getClass().getResourceAsStream( "/mimetypes.properties" );
-        if ( stream != null ) {
-            final Properties properties = new Properties();
-            try
-            {
-                properties.load( stream );
-                addCustomMimetypes( properties );
-            }
-            catch ( IOException e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().warn( "Could not load mimetypes.properties", e);
-                }
-                else
-                {
-                    getLogger().warn( "Could not load mimetypes.properties: {}", e.getMessage() );
-                }
-            }
-        }
-    }
-
-    @VisibleForTesting
-    void addCustomMimetypes( final Properties properties )
-    {
-        final Set<String> extensions = properties.stringPropertyNames();
-        for ( String extension : extensions )
-        {
-            final String csv = properties.getProperty( extension, "" );
-            final List<String> types = Lists.newArrayList( csv.split( "," ) );
-            if ( supportedTypeMap.containsKey( extension ) )
-            {
-                supportedTypeMap.get( extension ).addAll( types );
-            }
-            else
-            {
-                supportedTypeMap.put( extension, types );
-            }
-        }
+        super( mimeSupport );
+        this.mimeTypes = mimeTypes;
     }
 
     @Override
@@ -245,6 +196,13 @@ public class MavenFileTypeValidator
                     expectedMimeTypes.addAll( entry.getValue() );
                 }
             }
+
+            final NexusMimeTypes.NexusMimeType type = mimeTypes.getMimeTypes( MimeUtil2.getExtension( filePath ) );
+            if ( type != null )
+            {
+                expectedMimeTypes.addAll( type.getMimetypes() );
+            }
+
             try
             {
                 // the expectedMimeTypes will be empty, see map in constructor which extensions we check at all.

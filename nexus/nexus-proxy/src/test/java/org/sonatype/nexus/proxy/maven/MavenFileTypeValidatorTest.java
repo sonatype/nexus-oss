@@ -12,10 +12,19 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.mockito.Mockito.when;
+
 import java.util.Properties;
 
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.sonatype.nexus.mime.DefaultMimeSupport;
+import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.validator.AbstractFileTypeValidationUtilTest;
@@ -31,11 +40,18 @@ public class MavenFileTypeValidatorTest
 
     private MavenFileTypeValidator underTest;
 
+    @Spy
+    private NexusMimeTypes mimeTypes = new NexusMimeTypes();
+
+    @Mock
+    private NexusMimeTypes.NexusMimeType mimeType;
+
     @Before
     public void setup()
         throws Exception
     {
-        underTest = (MavenFileTypeValidator) lookup( FileTypeValidator.class, "maven" );
+        MockitoAnnotations.initMocks( this );
+        underTest = new MavenFileTypeValidator( mimeTypes, new DefaultMimeSupport() );
     }
 
     @Override
@@ -153,10 +169,10 @@ public class MavenFileTypeValidatorTest
         throws Exception
     {
         doTest( "something/else/library.swc", "test.tar.bz2", false );
-        doTest( "something/else/library.swc", "test.tar.gz", true );
-        final Properties properties = new Properties();
-        properties.setProperty( "swc", "application/x-bzip2" );
-        underTest.addCustomMimetypes( properties );
+
+        when( mimeTypes.getMimeTypes( "swc" ) ).thenReturn( mimeType );
+        when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "application/x-bzip2" ) );
+
         doTest( "something/else/library.swc", "test.tar.bz2", true );
     }
 
