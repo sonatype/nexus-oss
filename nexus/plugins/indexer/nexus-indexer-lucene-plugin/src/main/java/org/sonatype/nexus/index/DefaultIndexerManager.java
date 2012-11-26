@@ -35,6 +35,10 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -85,8 +89,6 @@ import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.index.updater.ResourceFetcher;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -177,7 +179,8 @@ import com.google.common.annotations.VisibleForTesting;
  * 
  * @author Tamas Cservenak
  */
-@Component( role = IndexerManager.class )
+@Named
+@Singleton
 public class DefaultIndexerManager
     implements IndexerManager
 {
@@ -234,43 +237,44 @@ public class DefaultIndexerManager
         return repository.getRepositoryKind().isFacetAvailable( GroupRepository.class );
     }
 
-    @Requirement
+    @Inject
     private NexusIndexer mavenIndexer;
 
-    @Requirement
+    @Inject
     private IndexUpdater indexUpdater;
 
-    @Requirement
+    @Inject
     private IndexPacker indexPacker;
 
-    @Requirement
+    @Inject
     private NexusConfiguration nexusConfiguration;
 
-    @Requirement
+    @Inject
     private RepositoryRegistry repositoryRegistry;
 
-    @Requirement( hint = "maven2" )
+    @Inject
+    @Named( "maven2" )
     private ContentClass maven2;
 
-    @Requirement( role = IndexCreator.class )
+    @Inject
     private List<IndexCreator> indexCreators;
 
-    @Requirement
+    @Inject
     private IndexArtifactFilter indexArtifactFilter;
 
-    @Requirement
+    @Inject
     private ArtifactContextProducer artifactContextProducer;
 
-    @Requirement
+    @Inject
     private MimeSupport mimeSupport;
 
-    @Requirement
+    @Inject
     private IndexTreeView indexTreeView;
 
-    @Requirement
+    @Inject
     private Scanner scanner;
 
-    @Requirement
+    @Inject
     private IndexerEngine indexerEngine;
 
     /**
