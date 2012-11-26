@@ -63,6 +63,13 @@ public class MavenFileTypeValidator
     private final NexusMimeTypes mimeTypes;
 
     @Inject
+    public MavenFileTypeValidator( final MimeSupport mimeSupport )
+    {
+        super( mimeSupport );
+        this.mimeTypes = new NexusMimeTypes();
+    }
+
+    @VisibleForTesting
     public MavenFileTypeValidator( final NexusMimeTypes mimeTypes, final MimeSupport mimeSupport )
     {
         super( mimeSupport );
