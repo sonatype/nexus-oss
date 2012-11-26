@@ -59,21 +59,30 @@ public class NexusExtensionMimeDetector
 
         final List<String> detected = Lists.newArrayList();
 
-        final NexusMimeTypes.NexusMimeType mimeType = mimeTypes.getMimeTypes( MimeUtil2.getExtension( fileName ) );
-        if ( mimeType != null )
+        String extension = MimeUtil2.getExtension( fileName );
+        while ( !extension.isEmpty() )
         {
-            if ( mimeType.isOverride() )
+
+            final NexusMimeTypes.NexusMimeType mimeType = mimeTypes.getMimeTypes( extension );
+            if ( mimeType != null )
             {
-                detected.addAll( mimeType.getMimetypes() );
-                return detected;
+                if ( mimeType.isOverride() )
+                {
+                    detected.addAll( mimeType.getMimetypes() );
+                    return detected;
+                }
+                else
+                {
+                    final Collection defaultTypes = super.getMimeTypesFileName( fileName );
+
+                    // HACK we have to list additional mimetypes first, because MimeUtil2#getMostSpecificMimeType
+                    // is broken and will usually choose the last mimetype in the list.
+                    detected.addAll( mimeType.getMimetypes() );
+                    detected.addAll( defaultTypes );
+                    return detected;
+                }
             }
-            else
-            {
-                final Collection types = super.getMimeTypesFileName( fileName );
-                detected.addAll( types );
-                detected.addAll( mimeType.getMimetypes() );
-                return detected;
-            }
+            extension = MimeUtil2.getExtension( extension );
         }
 
         return super.getMimeTypesFileName( fileName );

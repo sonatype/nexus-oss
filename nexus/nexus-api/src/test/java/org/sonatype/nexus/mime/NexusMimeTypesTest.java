@@ -14,6 +14,7 @@ package org.sonatype.nexus.mime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -79,7 +80,8 @@ public class NexusMimeTypesTest
         assertThat( underTest.getMimeTypes( "test" ), is( notNullValue() ) );
         assertThat( underTest.getMimeTypes( "test" ), hasProperty( "extension", is( "test" ) ) );
         assertThat( underTest.getMimeTypes( "test" ), hasProperty( "override", is( true ) ) );
-        assertThat( underTest.getMimeTypes( "test" ).getMimetypes(), contains( "application/octet-stream", "text/plain" ));
+        assertThat( underTest.getMimeTypes( "test" ).getMimetypes(), hasItems( "application/octet-stream",
+                                                                               "text/plain" ));
     }
 
 }

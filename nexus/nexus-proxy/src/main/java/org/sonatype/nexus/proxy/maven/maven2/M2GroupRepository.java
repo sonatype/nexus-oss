@@ -339,7 +339,6 @@ public class M2GroupRepository
     {
         String digestFileName = request.getRequestPath() + "." + algorithm.toLowerCase();
 
-        // see nexus-configuration mime-types.properties (defaulted to text/plain, as central reports them)
         String mimeType = getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), digestFileName );
 
         byte[] bytes = ( digest + '\n' ).getBytes( "UTF-8" );

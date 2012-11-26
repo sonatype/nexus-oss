@@ -23,6 +23,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +44,10 @@ public class DefaultMimeSupportTest
     @Before
     public void setUp() throws Exception {
         mimeSupport = new DefaultMimeSupport();
+    }
 
+    private void mock()
+    {
         final NexusExtensionMimeDetector detector =
             (NexusExtensionMimeDetector) mimeSupport.getNonTouchingMimeUtil2().getMimeDetector( NexusExtensionMimeDetector.class.getName() );
         detector.setNexusMimeTypes( mimeTypes );
@@ -120,6 +124,7 @@ public class DefaultMimeSupportTest
     @Test
     public void useNexusMimeTypes()
     {
+        mock();
         when( mimeTypes.getMimeTypes( "test" ) ).thenReturn( mimeType );
         when( mimeType.getExtension() ).thenReturn( "test" );
         when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "fake/mimetype" ) );
@@ -128,18 +133,30 @@ public class DefaultMimeSupportTest
     }
 
     @Test
+    public void retainDefaultMimeTypes()
+    {
+        // empty NexusMimeTypes
+        mock();
+
+        assertThat( mimeSupport.guessMimeTypeFromPath( "foo.doc" ), is( "application/msword" ) );
+    }
+
+    @Test
     public void preferDefaultMimeType()
     {
+        mock();
         when( mimeTypes.getMimeTypes( "zip" ) ).thenReturn( mimeType );
         when( mimeType.getExtension() ).thenReturn( "zip" );
         when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "fake/mimetype" ) );
 
+        assertThat( mimeSupport.guessMimeTypesFromPath( "foo.zip" ), hasItem( "fake/mimetype" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "foo.zip" ), is( "application/zip" ) );
     }
 
     @Test
     public void overrideDefaultMimeType()
     {
+        mock();
         when( mimeTypes.getMimeTypes( "zip" ) ).thenReturn( mimeType );
         when( mimeType.getExtension() ).thenReturn( "zip" );
         when( mimeType.isOverride() ).thenReturn( true );

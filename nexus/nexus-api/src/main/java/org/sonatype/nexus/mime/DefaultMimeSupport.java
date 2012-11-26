@@ -42,13 +42,15 @@ public class DefaultMimeSupport
 
     private final MimeUtil2 touchingMimeUtil;
 
+    /**
+     * See {@link NexusMimeTypes} for customizations
+     */
     public DefaultMimeSupport()
     {
         // MimeUtil2 by design will start (try to) read the file/stream if some "eager" detector is registered
         // so we follow the "private instance" pattern, and we handle two instances for now
 
         // uses Extension only for now (speed, no IO, but less accuracy)
-        // See src/main/resources/mime-types.properties for customizations
         nonTouchingMimeUtil = new MimeUtil2();
         nonTouchingMimeUtil.registerMimeDetector( NexusExtensionMimeDetector.class.getName() );
 
