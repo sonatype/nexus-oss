@@ -24,7 +24,7 @@
 
   <groupId>org.sonatype.plexus</groupId>
   <artifactId>plexus-restlet-bridge</artifactId>
-  <version>1.24</version>
+  <version>1.25-SNAPSHOT</version>
 
   <name>Plexus Restlet.org Bridge Component</name>
 
