@@ -31,14 +31,18 @@ import org.slf4j.LoggerFactory;
 /**
  * Parse mime type extensions and overrides from classpath.
  *
- * This class will look up /mimetypes.properties from classpath. This property file
- * must have the following format:
+ * This class will look up '/nexus-builtin.mimetypes' and '/nexus.mimetypes' from classpath.
+ * These property files must have the following format:
  * <ul>
- *     <li><em>extensions:</em>
- *     A mapping from file name extension to a comma separated list of mime types (e.g. "bz2: application/x-bzip2,application/x-bzip"). No whitespace allowed in the list of mime types.</li>
+ *     <li><em>additional mimetypes:</em>
+ *     A mapping from file name extension to a comma separated list of mime types (e.g. "bz2: application/x-bzip2,application/x-bzip").
+ *     No whitespace is allowed in the list of mime types.</li>
  *
- *     <li><em>overrides:</em>
- *     Same as extensions but prefixed with 'override.' (e.g. "override.html: text/xhtml,application/xml"). These mime type definitions will override the builtin mime type detection.</li>
+ *     <li><em>overriding mimetypes:</em>
+ *     The format is the same as adding mime types, but prefixed with 'override.' (e.g. "override.html: text/xhtml,application/xml").
+ *     These mime type definitions will override the builtin mime types.
+ *     The first listed mimetype is the 'primary' mime type and will be used by Nexus as the downstream content type.
+ *     </li>
  * </ul>
  *
  * @since 2.3

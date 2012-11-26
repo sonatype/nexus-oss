@@ -28,9 +28,8 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 
 /**
- * Default implementation of {@link MimeSupport} component using MimeUtil2 library.
+ * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the {@link NexusExtensionMimeDetector}.
  * 
- * @author cstamas
  * @since 2.0
  */
 @Component( role = MimeSupport.class )
