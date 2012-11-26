@@ -173,21 +173,22 @@ public class IndexTemplatePlexusResource
             // post HEAD
 
             String postHeadTemplate = bundle.getPostHeadContribution( pluginContext );
-
-            final Document html = Jsoup.parse( postHeadTemplate );
-            final Elements scripts = html.select( "script" );
-            for ( Element script : scripts )
+            if ( !StringUtils.isEmpty( postHeadTemplate ) )
             {
-                final String src = script.attr( "src" );
-                if ( !src.isEmpty() )
+                final Document html = Jsoup.parse( postHeadTemplate );
+                final Elements scripts = html.select( "script" );
+                for ( Element script : scripts )
                 {
-                    pluginJsFiles.add( src );
-                    script.remove();
+                    final String src = script.attr( "src" );
+                    if ( !src.isEmpty() )
+                    {
+                        pluginJsFiles.add( src );
+                        script.remove();
+                    }
                 }
+                postHeadTemplate = html.head().children().toString();
+                evaluateIfNeeded( pluginContext, postHeadTemplate, pluginPostHeadContributions );
             }
-            postHeadTemplate = html.head().children().toString();
-
-            evaluateIfNeeded( pluginContext, postHeadTemplate, pluginPostHeadContributions );
 
             // pre BODY
 
