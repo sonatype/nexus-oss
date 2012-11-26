@@ -59,30 +59,25 @@ public class NexusExtensionMimeDetector
 
         final List<String> detected = Lists.newArrayList();
 
-        String extension = MimeUtil2.getExtension( fileName );
-        while ( !extension.isEmpty() )
+        final String extension = MimeUtil2.getExtension( fileName );
+        final NexusMimeTypes.NexusMimeType mimeType = mimeTypes.getMimeTypes( extension );
+        if ( mimeType != null )
         {
-
-            final NexusMimeTypes.NexusMimeType mimeType = mimeTypes.getMimeTypes( extension );
-            if ( mimeType != null )
+            if ( mimeType.isOverride() )
             {
-                if ( mimeType.isOverride() )
-                {
-                    detected.addAll( mimeType.getMimetypes() );
-                    return detected;
-                }
-                else
-                {
-                    final Collection defaultTypes = super.getMimeTypesFileName( fileName );
-
-                    // HACK we have to list additional mimetypes first, because MimeUtil2#getMostSpecificMimeType
-                    // is broken and will usually choose the last mimetype in the list.
-                    detected.addAll( mimeType.getMimetypes() );
-                    detected.addAll( defaultTypes );
-                    return detected;
-                }
+                detected.addAll( mimeType.getMimetypes() );
+                return detected;
             }
-            extension = MimeUtil2.getExtension( extension );
+            else
+            {
+                final Collection defaultTypes = super.getMimeTypesFileName( fileName );
+
+                // HACK we have to list additional mimetypes first, because MimeUtil2#getMostSpecificMimeType
+                // is broken and will usually choose the last mimetype in the list.
+                detected.addAll( mimeType.getMimetypes() );
+                detected.addAll( defaultTypes );
+                return detected;
+            }
         }
 
         return super.getMimeTypesFileName( fileName );

@@ -13,11 +13,9 @@
 package org.sonatype.nexus.mime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
@@ -72,15 +70,4 @@ public class NexusExtensionMimeDetectorTest
         // Matchers.contains is an exact match!
         assertThat( underTest.getMimeTypesFileName( "foo.zip" ), contains( "fake/mimetype" ) );
     }
-
-    @Test
-    public void multipleExtensions()
-    {
-        when( mimeTypes.getMimeTypes( "test" ) ).thenReturn( mimeType );
-        when( mimeType.isOverride() ).thenReturn( true );
-        when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "fake/mimetype" ) );
-
-        assertThat( underTest.getMimeTypesFileName( "foo.some.more.extensions.test" ), contains( "fake/mimetype" ) );
-    }
-
 }
