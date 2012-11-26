@@ -159,7 +159,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.4</version>
+        <version>1.5.1-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
 
