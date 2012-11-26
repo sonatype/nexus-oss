@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -48,6 +49,9 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.maven.index.AndMultiArtifactInfoFilter;
 import org.apache.maven.index.ArtifactContext;
 import org.apache.maven.index.ArtifactContextProducer;
@@ -76,7 +80,6 @@ import org.apache.maven.index.context.IndexCreator;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.context.MergedIndexingContext;
 import org.apache.maven.index.context.StaticContextMemberProvider;
-import org.apache.maven.index.context.UnsupportedExistingLuceneIndexException;
 import org.apache.maven.index.expr.SearchExpression;
 import org.apache.maven.index.packer.IndexPacker;
 import org.apache.maven.index.packer.IndexPackingRequest;
@@ -278,6 +281,21 @@ public class DefaultIndexerManager
     private IndexerEngine indexerEngine;
 
     /**
+     * As of 3.6.1, Lucene provides three FSDirectory implementations, all with there pros and cons.
+     * <ul>
+     * <li>mmap -- {@link MMapDirectory}</li>
+     * <li>nio -- {@link NIOFSDirectory}</li>
+     * <li>simple -- {@link SimpleFSDirectory}</li>
+     * </ul>
+     * By default, Lucene selects FSDirectory implementation based on specifics of the operating system and JRE used,
+     * but this configuration parameter allows override.
+     */
+    @Inject
+    @Nullable
+    @Named( "${lucene.fsdirectory.type}" )
+    private String luceneFSDirectoryType;
+
+    /**
      * Locks that protect access to repository index. Item-level add/remove and search operations must acquire read
      * lock. Index-level add/remove/reindex must acquire exclusive lock.
      * <p>
@@ -434,7 +452,7 @@ public class DefaultIndexerManager
             ctx = new DefaultIndexingContext( getContextId( repository.getId() ), // id
                                               repository.getId(), // repositoryId
                                               repoRoot, // repository
-                                              indexDirectory, // indexDirectoryFile
+                                              openFSDirectory( indexDirectory ), // indexDirectory
                                               null, // repositoryUrl
                                               null, // indexUpdateUrl
                                               indexCreators, //
@@ -2368,7 +2386,7 @@ public class DefaultIndexerManager
             new DefaultIndexingContext( indexId, //
                                         repository.getId(), //
                                         getRepositoryLocalStorageAsFile( repository ), // repository local storage
-                                        FSDirectory.open( location ), //
+                                        openFSDirectory( location ), //
                                         null, // repository url
                                         null, // repository update url
                                         indexCreators, true );
@@ -2407,6 +2425,35 @@ public class DefaultIndexerManager
         {
             temporary.close( false );
             FileUtils.deleteDirectory( location );
+        }
+    }
+
+    private FSDirectory openFSDirectory( File location )
+        throws IOException
+    {
+        if ( luceneFSDirectoryType == null )
+        {
+            // let Lucene select implementation
+            return FSDirectory.open( location );
+        }
+        else if ( "mmap".equals( luceneFSDirectoryType ) )
+        {
+            return new MMapDirectory( location );
+        }
+        else if ( "nio".equals( luceneFSDirectoryType ) )
+        {
+            return new NIOFSDirectory( location );
+        }
+        else if ( "simple".equals( luceneFSDirectoryType ) )
+        {
+            return new SimpleFSDirectory( location );
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                                                "''"
+                                                    + luceneFSDirectoryType
+                                                    + "'' is not valid/supported Lucene FSDirectory type. Only ''mmap'', ''nio'' and ''simple'' are allowed" );
         }
     }
 
