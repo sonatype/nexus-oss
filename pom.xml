@@ -249,48 +249,6 @@
             </systemPropertyVariables>
           </configuration>
         </plugin>
-        <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -->
-        <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <version>1.9.0</version>
-          <configuration>
-            <header>header-eplv1.txt</header>
-            <encoding>UTF-8</encoding>
-            <strictCheck>true</strictCheck>
-            <useDefaultExcludes>false</useDefaultExcludes>
-            <includes>
-              <include>**/*.java</include>
-              <include>**/*.vm</include>
-              <include>**/*.xml</include>
-              <include>**/*.groovy</include>
-              <include>**/*.aj</include>
-              <include>**/*.css</include>
-              <include>**/*.html</include>
-              <include>**/*.js</include>
-            </includes>
-            <excludes>
-              <exclude>**/target/**</exclude>
-              <exclude>**/.*/**</exclude>
-              <!-- netbeans adds these -->
-              <exclude>**/nbactions*.xml</exclude>
-              <exclude>**/nb-configuration.xml</exclude>
-            </excludes>
-            <mapping>
-              <vm>XML_STYLE</vm>
-              <groovy>JAVADOC_STYLE</groovy>
-              <aj>JAVADOC_STYLE</aj>
-            </mapping>
-            <properties>
-              <year>2012</year>
-            </properties>
-            <!-- this is important for multi-module project -->
-            <aggregate>true</aggregate>
-          </configuration>
-          <goals>
-            <goal>check</goal>
-          </goals>
-        </plugin>
       </plugins>
     </pluginManagement>
 
