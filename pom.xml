@@ -108,9 +108,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.sisu.litmus</groupId>
-        <artifactId>litmus-testsupport</artifactId>
-        <version>1.5.1-SNAPSHOT</version>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-test-api</artifactId>
+        <version>${nexus.version}</version>
       </dependency>
 
       <dependency>

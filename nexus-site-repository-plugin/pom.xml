@@ -39,8 +39,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
