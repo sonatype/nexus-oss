@@ -207,8 +207,8 @@ public class NexusScanningListener
                             || context.getGavCalculator().gavToPath( ac.getGav() ).startsWith( contextPath ) )
                         {
                             remove( context, ac );
+                            deleted++;
                         }
-                        deleted++;
                     }
                 }
             }
@@ -223,8 +223,8 @@ public class NexusScanningListener
     // == copied from
     // https://github.com/apache/maven-indexer/blob/maven-indexer-5.1.0/indexer-core/src/main/java/org/apache/maven/index/DefaultIndexerEngine.java
     // Changes made:
-    // * none of the index/update/remove method does more that modifying index, timestamp is not set either
-    // * update does not maintains groups either (per invocation!)
+    // * none of the index/update/remove method does more that modifying index, timestamp is not set by either
+    // * update does not maintains groups either (per invocation!), it happens once at scan finish
 
     private void index( final IndexingContext context, final ArtifactContext ac )
         throws IOException
@@ -284,13 +284,10 @@ public class NexusScanningListener
         {
             return false;
         }
-
         final Map<String, String> m1 = toMap( d1 );
         final Map<String, String> m2 = toMap( d2 );
-
         m1.remove( MinimalArtifactInfoIndexCreator.FLD_LAST_MODIFIED.getKey() );
         m2.remove( MinimalArtifactInfoIndexCreator.FLD_LAST_MODIFIED.getKey() );
-
         return m1.equals( m2 );
     }
 
