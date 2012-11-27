@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Parse mime type extensions and overrides from classpath.
  *
- * This class will look up '/nexus-builtin.mimetypes' and '/nexus.mimetypes' from classpath.
+ * This class will look up '/builtin-mimetypes.properties' and '/nexus.mimetypes' from classpath.
  * These property files must have the following format:
  * <ul>
  *     <li><em>additional mimetypes:</em>
@@ -52,7 +52,7 @@ public class NexusMimeTypes
 
     private static Logger log = LoggerFactory.getLogger( NexusMimeTypes.class );
 
-    public static final String BUILTIN_MIMETYPES_FILENAME = "nexus-builtin.mimetypes";
+    public static final String BUILTIN_MIMETYPES_FILENAME = "builtin-mimetypes.properties";
     public static final String MIMETYPES_FILENAME = "nexus.mimetypes";
 
     private Map<String, NexusMimeType> extensions = Maps.newHashMap();
