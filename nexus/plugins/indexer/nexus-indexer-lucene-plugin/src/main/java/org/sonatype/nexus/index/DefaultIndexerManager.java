@@ -69,6 +69,7 @@ import org.apache.maven.index.MatchHighlightRequest;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.Scanner;
 import org.apache.maven.index.ScanningRequest;
+import org.apache.maven.index.ScanningResult;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.apache.maven.index.context.DefaultIndexingContext;
@@ -388,8 +389,7 @@ public class DefaultIndexerManager
     public void addRepositoryIndexContext( String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        final Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         addRepositoryIndexContext( repository );
     }
 
@@ -477,8 +477,7 @@ public class DefaultIndexerManager
     public void removeRepositoryIndexContext( String repositoryId, final boolean deleteFiles )
         throws IOException, NoSuchRepositoryException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         removeRepositoryIndexContext( repository, deleteFiles );
     }
 
@@ -565,12 +564,6 @@ public class DefaultIndexerManager
                 }
             }
         } );
-    }
-
-    private Repository getRepository( String repositoryId )
-        throws NoSuchRepositoryException
-    {
-        return repositoryRegistry.getRepository( repositoryId );
     }
 
     /**
@@ -896,8 +889,7 @@ public class DefaultIndexerManager
     public void reindexRepository( final String path, final String repositoryId, final boolean fullReindex )
         throws NoSuchRepositoryException, IOException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         reindexRepository( path, repository, fullReindex, new HashSet<String>() );
     }
 
@@ -969,10 +961,14 @@ public class DefaultIndexerManager
 
                         TaskUtil.checkInterruption();
 
+                        logger.info( RepositoryStringUtils.getFormattedMessage( "Scanning local storage of repository %s", repository ) );
                         // igorf, this needs be merged back to maven indexer, see MINDEXER-65
                         final NexusScanningListener scanListener =
                             new NexusScanningListener( context, fullReindex);
-                        scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
+                        final ScanningResult scanningResult = scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
+                        logger.info( "{}: totalIndexed={}, deletedFromIndex={}",
+                            RepositoryStringUtils.getFormattedMessage( "Scanned local storage of repository %s",
+                                                                       repository ), scanningResult.getTotalFiles(), scanningResult.getDeletedFiles() );
                     }
                 };
                 if ( fullReindex )
@@ -1031,8 +1027,7 @@ public class DefaultIndexerManager
     public void downloadRepositoryIndex( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         downloadRepositoryIndex( repository, new HashSet<String>() );
     }
 
@@ -1318,8 +1313,7 @@ public class DefaultIndexerManager
     public void publishRepositoryIndex( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         publishRepositoryIndex( repository, new HashSet<String>() );
     }
 
@@ -1555,8 +1549,7 @@ public class DefaultIndexerManager
     public void optimizeRepositoryIndex( final String repositoryId )
         throws NoSuchRepositoryException, IOException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         optimizeIndex( repository, new HashSet<String>() );
     }
 
@@ -2180,7 +2173,7 @@ public class DefaultIndexerManager
         throws NoSuchRepositoryException, IOException
     {
         final TreeNode[] result = new TreeNode[1];
-        shared( getRepository( repositoryId ), new Runnable()
+        shared( repositoryRegistry.getRepository( repositoryId ), new Runnable()
         {
             @Override
             public void run( IndexingContext context )
@@ -2506,7 +2499,7 @@ public class DefaultIndexerManager
         List<Repository> repositories = new ArrayList<Repository>();
         if ( repositoryId != null )
         {
-            Repository repository = getRepository( repositoryId );
+            final Repository repository = repositoryRegistry.getRepository( repositoryId );
             if ( ISGROUP( repository ) )
             {
                 Map<String, Repository> members = new HashMap<String, Repository>();

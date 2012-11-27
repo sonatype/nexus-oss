@@ -182,7 +182,7 @@ public class NexusScanningListener
                 if ( !r.isDeleted( i ) )
                 {
                     final Document d = r.document( i );
-                    String uinfo = d.get( ArtifactInfo.UINFO );
+                    final String uinfo = d.get( ArtifactInfo.UINFO );
                     if ( uinfo != null && !processedUinfos.contains( uinfo ) )
                     {
                         // file is not present in storage but is on index, delete it from index
