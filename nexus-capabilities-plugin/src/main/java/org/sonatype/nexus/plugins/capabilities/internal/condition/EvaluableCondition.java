@@ -52,7 +52,7 @@ public class EvaluableCondition
     public EvaluableCondition( final EventBus eventBus,
                                final Evaluable evaluable )
     {
-        super( eventBus, true );
+        super( eventBus, false );
         this.evaluable = checkNotNull( evaluable );
     }
 
@@ -71,6 +71,7 @@ public class EvaluableCondition
     {
         checkState( capabilityIdentity != null, "Capability identity not specified" );
         getEventBus().register( this );
+        setSatisfied( evaluable.isSatisfied() );
     }
 
     @Override
