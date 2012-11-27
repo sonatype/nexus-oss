@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -274,70 +273,77 @@ public class SearchNGIndexPlexusResource
 
         try
         {
-            List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
-
-            // we need to save this reference to later
-            SystemWideLatestVersionCollector systemWideCollector = new SystemWideLatestVersionCollector();
-            filters.add( systemWideCollector );
-
-            RepositoryWideLatestVersionCollector repositoryWideCollector = null;
-            if ( collapseResults )
+            for( int i = 0; i < 2; i++ )
             {
-                repositoryWideCollector = new RepositoryWideLatestVersionCollector();
-                filters.add( repositoryWideCollector );
-            }
+                final List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
+                // we need to save this reference to later
+                SystemWideLatestVersionCollector systemWideCollector = new SystemWideLatestVersionCollector();
+                filters.add( systemWideCollector );
 
-            try
-            {
-                IteratorSearchResponse searchResult =
-                    searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters,
-                        searchers );
-
-                if ( collapseResults && searchResult == null )
+                RepositoryWideLatestVersionCollector repositoryWideCollector = null;
+                if ( collapseResults )
                 {
-                    collapseResults = false;
-
-                    searchResult =
-                        searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults,
-                            filters, searchers );
+                    repositoryWideCollector = new RepositoryWideLatestVersionCollector();
+                    filters.add( repositoryWideCollector );
                 }
 
-                if ( searchResult != null )
+                try
                 {
-                    try
-                    {
-                        repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
-                                                      searchResult, systemWideCollector, repositoryWideCollector );
+                    IteratorSearchResponse searchResult =
+                        searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters,
+                            searchers );
 
-                        if ( !result.isTooManyResults() )
+                    if ( collapseResults && searchResult == null )
+                    {
+                        collapseResults = false;
+
+                        searchResult =
+                            searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults,
+                                filters, searchers );
+                    }
+
+                    if ( searchResult != null )
+                    {
+                        try
                         {
-                            // if we had collapseResults ON, and the totalHits are larger than actual (filtered)
-                            // results, and the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
-                            // and full result set is smaller than HIT_LIMIT
-                            // then repeat without collapse
-                            if ( collapseResults && result.getData().size() < searchResult.getTotalHitsCount()
-                                && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                                && searchResult.getTotalHitsCount() < GA_HIT_LIMIT )
+                            repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
+                                                          searchResult, systemWideCollector, repositoryWideCollector );
+
+                            if ( !result.isTooManyResults() )
                             {
-                                collapseResults = false;
+                                // if we had collapseResults ON, and the totalHits are larger than actual (filtered)
+                                // results, and the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
+                                // and full result set is smaller than HIT_LIMIT
+                                // then repeat without collapse
+                                if ( collapseResults && result.getData().size() < searchResult.getTotalHitsCount()
+                                    && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
+                                    && searchResult.getTotalHitsCount() < GA_HIT_LIMIT )
+                                {
+                                    // retry uncollapsed
+                                    collapseResults = false;
+                                    continue;
+                                }
                             }
                         }
+                        finally
+                        {
+                            searchResult.close();
+                        }
                     }
-                    finally
+                    else
                     {
-                        searchResult.close();
+                        collapseResults = false;
+                        // retry uncollapsed
+                        continue;
                     }
                 }
-                else
+                catch ( IOException e )
                 {
-                    repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
-                                                  IteratorSearchResponse.empty( null ), null, null );
-                    collapseResults = false;
+                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
                 }
-            }
-            catch ( IOException e )
-            {
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
+
+                // we have result, break from loop
+                break;
             }
         }
         catch ( NoSuchRepositoryException e )
