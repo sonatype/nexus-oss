@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>12</version>
+    <version>22</version>
     <relativePath/>
   </parent>
 
@@ -45,9 +45,6 @@
   </scm>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
     <nexus.version>2.3-SNAPSHOT</nexus.version>
 
     <nexus.plugin.name>Nexus Unpack Plugin</nexus.plugin.name>
@@ -58,10 +55,7 @@
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-
-    <arguments/>
   </properties>
 
   <repositories>
@@ -88,23 +82,6 @@
   </dependencyManagement>
 
   <build>
-    <testResources>
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-      <testResource>
-        <directory>${project.basedir}/src/test/filtered-resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-    </testResources>
-
     <pluginManagement>
       <plugins>
         <plugin>
@@ -116,11 +93,6 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-invoker-plugin</artifactId>
-          <version>1.7</version>
-        </plugin>
-        <plugin>
           <groupId>org.sonatype.nexus.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
           <version>${nexus.version}</version>
@@ -128,9 +100,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.12.4</version>
           <configuration>
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <argLine>-Xmx512m</argLine>
             <failIfNoTests>false</failIfNoTests>
             <systemProperties>
@@ -144,9 +114,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.12.4</version>
           <configuration>
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <forkMode>always</forkMode>
             <argLine>-Xmx512m</argLine>
             <junitArtifactName>none:none</junitArtifactName>
@@ -163,67 +131,6 @@
               <exclude>**/Abstract*</exclude>
             </excludes>
           </configuration>
-        </plugin>
-
-        <plugin>
-          <!-- To perform a release run mvn release:prepare release:perform -->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <useReleaseProfile>false</useReleaseProfile>
-            <goals>deploy</goals>
-            <arguments>${arguments}</arguments>
-            <releaseProfiles>release noit</releaseProfiles>
-            <tagNameFormat>nexus-unpack-plugin-@{version}</tagNameFormat>
-          </configuration>
-        </plugin>
-
-        <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -->
-        <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <version>1.9.0</version>
-          <configuration>
-            <header>header-eplv1.txt</header>
-            <encoding>UTF-8</encoding>
-            <strictCheck>true</strictCheck>
-            <useDefaultExcludes>false</useDefaultExcludes>
-            <includes>
-              <include>**/*.java</include>
-              <include>**/*.vm</include>
-              <include>**/*.xml</include>
-              <include>**/*.groovy</include>
-              <include>**/*.aj</include>
-              <include>**/*.css</include>
-              <include>**/*.html</include>
-              <include>**/*.js</include>
-            </includes>
-            <excludes>
-              <exclude>**/target/**</exclude>
-              <!-- grid makes this directory -->
-              <exclude>.maven/**</exclude>
-              <!-- eclipse makes this directory -->
-              <exclude>**/.settings/**</exclude>
-              <!-- netbeans adds these -->
-              <exclude>**/nbactions*.xml</exclude>
-              <exclude>**/nb-configuration.xml</exclude>
-              <!-- IntelliJ IDEA project directory -->
-              <exclude>**/.idea/**</exclude>
-            </excludes>
-            <mapping>
-              <vm>XML_STYLE</vm>
-              <groovy>JAVADOC_STYLE</groovy>
-              <aj>JAVADOC_STYLE</aj>
-            </mapping>
-            <properties>
-              <year>2012</year>
-            </properties>
-            <!-- this is important for multi-module project -->
-            <aggregate>true</aggregate>
-          </configuration>
-          <goals>
-            <goal>check</goal>
-          </goals>
         </plugin>
       </plugins>
     </pluginManagement>
