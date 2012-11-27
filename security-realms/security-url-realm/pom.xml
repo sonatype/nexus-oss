@@ -113,7 +113,6 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>1.0.2</version>
         <executions>
           <execution>
             <id>url-realm-config.xml</id>
@@ -133,7 +132,6 @@
         </executions>
         <configuration>
           <packageWithVersion>false</packageWithVersion>
-          <useJava5>true</useJava5>
         </configuration>
       </plugin>
 

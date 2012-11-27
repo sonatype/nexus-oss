@@ -116,7 +116,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.7-SONATYPE-1033415</version>
         <configuration>
           <argLine>-Xmx512M -Dorg.sonatype.inject.debug</argLine>
         </configuration>
