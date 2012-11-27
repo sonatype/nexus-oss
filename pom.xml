@@ -167,7 +167,6 @@
             <failIfNoTests>false</failIfNoTests>
             <!-- force use of property -->
             <forkMode>once</forkMode>
-            <argLine>-ea</argLine>
             <workingDirectory>${project.build.directory}</workingDirectory>
             <systemPropertyVariables>
               <java.awt.headless>true</java.awt.headless>
@@ -191,7 +190,6 @@
             forkMode=always will cause duplicate "T E S T S" header to be rendered :-(
             -->
             <forkMode>always</forkMode>
-            <argLine>-ea</argLine>
             <workingDirectory>${project.build.directory}</workingDirectory>
             <systemPropertyVariables>
               <java.awt.headless>true</java.awt.headless>
