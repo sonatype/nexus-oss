@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>12</version>
+    <version>22</version>
   </parent>
 
   <groupId>org.sonatype.nexus.yum</groupId>
@@ -67,9 +67,6 @@
   </modules>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
     <nexus.version>2.3-SNAPSHOT</nexus.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
 
@@ -77,10 +74,7 @@
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-
-    <arguments/>
   </properties>
 
   <dependencyManagement>
@@ -221,61 +215,13 @@
   </dependencyManagement>
 
   <build>
-    <testResources>
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-      <testResource>
-        <directory>${project.basedir}/src/test/filtered-resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-    </testResources>
-
     <pluginManagement>
       <plugins>
-        <!--
-          To perform a release run separately
-          mvn release:prepare -Darguments="-Pquick"
-          mvn release:perform
-        -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>2.2.1</version>
-          <configuration>
-            <autoVersionSubmodules>true</autoVersionSubmodules>
-            <useReleaseProfile>false</useReleaseProfile>
-            <goals>deploy</goals>
-            <!-- Use a quick build to verify the tag, and a full build with ITs for the deploy -->
-            <arguments>${arguments}</arguments>
-            <releaseProfiles>release</releaseProfiles>
-            <tagNameFormat>nexus-yum-plugin-@{version}</tagNameFormat>
-          </configuration>
-        </plugin>
-        <!-- Have to set source level to Java 6, we use annotations ;-) -->
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.3.1</version>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-          </configuration>
-        </plugin>
-
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.12</version>
           <configuration>
             <failIfNoTests>false</failIfNoTests>
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <!-- force use of property -->
             <forkMode>once</forkMode>
             <argLine>-ea</argLine>
@@ -295,10 +241,8 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.12</version>
           <configuration>
             <failIfNoTests>false</failIfNoTests>
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <!--
             For each test, so that we can use the process timeout.
             forkMode=always will cause duplicate "T E S T S" header to be rendered :-(
@@ -310,50 +254,6 @@
               <java.awt.headless>true</java.awt.headless>
             </systemPropertyVariables>
           </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <version>1.9.0</version>
-          <configuration>
-            <header>header-eplv1.txt</header>
-            <encoding>UTF-8</encoding>
-            <strictCheck>true</strictCheck>
-            <useDefaultExcludes>false</useDefaultExcludes>
-            <includes>
-              <include>**/*.java</include>
-              <include>**/*.vm</include>
-              <include>**/*.xml</include>
-              <include>**/*.groovy</include>
-              <include>**/*.aj</include>
-              <include>**/*.css</include>
-              <include>**/*.html</include>
-              <include>**/*.js</include>
-            </includes>
-            <excludes>
-              <exclude>**/target/**</exclude>
-              <exclude>**/.*/**</exclude>
-              <!-- netbeans adds these -->
-              <exclude>**/nbactions*.xml</exclude>
-              <exclude>**/nb-configuration.xml</exclude>
-              <!-- IT resources -->
-              <exclude>**/it-resources/**</exclude>
-            </excludes>
-            <mapping>
-              <vm>XML_STYLE</vm>
-              <groovy>JAVADOC_STYLE</groovy>
-              <aj>JAVADOC_STYLE</aj>
-            </mapping>
-            <properties>
-              <year>2012</year>
-            </properties>
-            <!-- this is important for multi-module project -->
-            <aggregate>true</aggregate>
-          </configuration>
-          <goals>
-            <goal>check</goal>
-          </goals>
         </plugin>
 
         <!-- Make project M2e friendly -->
