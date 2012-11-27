@@ -38,6 +38,7 @@ import org.apache.maven.index.context.IndexUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.scheduling.TaskUtil;
+import com.google.common.base.Throwables;
 
 /**
  * Nexus specific ArtifactScanningListener implementation. Looks like the MI's DefaultScannerListener, but has
@@ -55,6 +56,8 @@ public class NexusScanningListener
 
     private final IndexingContext context;
 
+    private final IndexSearcher contextIndexSearcher;
+
     private final boolean fullReindex;
 
     // the UINFO set used to track processed artifacts (grows during scanning)
@@ -68,9 +71,23 @@ public class NexusScanningListener
 
     public NexusScanningListener( final IndexingContext context,
         final boolean fullReindex )
+        throws IOException
     {
         this.context = context;
+        this.contextIndexSearcher = context.acquireIndexSearcher();
         this.fullReindex = fullReindex;
+    }
+
+    private void releaseIndexSearcher()
+    {
+        try
+        {
+            context.releaseIndexSearcher( contextIndexSearcher );
+        }
+        catch ( IOException e )
+        {
+            Throwables.propagate( e );
+        }
     }
 
     @Override
@@ -122,44 +139,52 @@ public class NexusScanningListener
         catch ( IOException ex )
         {
             artifactError( ac, ex );
+            releaseIndexSearcher();
         }
     }
 
     @Override
     public void scanningFinished( final IndexingContext ctx, final ScanningResult result )
     {
-        TaskUtil.checkInterruption();
-        result.setTotalFiles( count );
-        result.getExceptions().addAll( exceptions );
-
         try
         {
-            if ( !context.isReceivingUpdates() && !fullReindex )
-            {
-                // HOSTED-update only, remove deleted ones
-                result.setDeletedFiles( removeDeletedArtifacts( context, result.getRequest().getStartingPath() ) );
-            }
-            // rebuild groups, as methods moved out from IndexerEngine does not maintain groups anymore
-            // as it makes no sense to do it during batch invocation of update method
-            context.rebuildGroups();
-            context.commit();
-        }
-        catch ( IOException ex )
-        {
-            result.addException( ex );
-        }
+            TaskUtil.checkInterruption();
+            result.setTotalFiles( count );
+            result.getExceptions().addAll( exceptions );
 
-        if ( result.getDeletedFiles() > 0 || result.getTotalFiles() > 0 )
-        {
             try
             {
-                context.updateTimestamp( true );
-                context.optimize();
+                if ( !context.isReceivingUpdates() && !fullReindex )
+                {
+                    // HOSTED-update only, remove deleted ones
+                    result.setDeletedFiles( removeDeletedArtifacts( result.getRequest().getStartingPath() ) );
+                }
+                // rebuild groups, as methods moved out from IndexerEngine does not maintain groups anymore
+                // as it makes no sense to do it during batch invocation of update method
+                context.rebuildGroups();
+                context.commit();
             }
-            catch ( Exception ex )
+            catch ( IOException ex )
             {
                 result.addException( ex );
             }
+
+            if ( result.getDeletedFiles() > 0 || result.getTotalFiles() > 0 )
+            {
+                try
+                {
+                    context.updateTimestamp( true );
+                    context.optimize();
+                }
+                catch ( Exception ex )
+                {
+                    result.addException( ex );
+                }
+            }
+        }
+        finally
+        {
+            releaseIndexSearcher();
         }
     }
 
@@ -172,31 +197,21 @@ public class NexusScanningListener
     private boolean isOnIndex( final ArtifactContext ac )
         throws IOException
     {
-        final IndexSearcher indexSearcher = context.acquireIndexSearcher();
-        try
-        {
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 1, false );
-            indexSearcher.search( new TermQuery( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ) ),
-                                  collector );
-            return collector.getTotalHits() != 0;
-        }
-        finally
-        {
-            context.releaseIndexSearcher( indexSearcher );
-        }
-
+        final TopScoreDocCollector collector = TopScoreDocCollector.create( 1, false );
+        contextIndexSearcher.search( new TermQuery( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ) ),
+                                     collector );
+        return collector.getTotalHits() != 0;
     }
 
     /**
      * Used in {@code update} mode, deletes documents from index that are not found during scanning (means
      * they were deleted from the storage being scanned).
      *
-     * @param context
      * @param contextPath
      * @return
      * @throws IOException
      */
-    private int removeDeletedArtifacts( final IndexingContext context, final String contextPath )
+    private int removeDeletedArtifacts( final String contextPath )
         throws IOException
     {
         int deleted = 0;
@@ -333,30 +348,15 @@ public class NexusScanningListener
     }
 
     private Document getOldDocument( IndexingContext context, ArtifactContext ac )
+        throws IOException
     {
-        try
-        {
-            final IndexSearcher indexSearcher = context.acquireIndexSearcher();
-            try
-            {
-                final TopDocs result =
-                    indexSearcher.search(
-                        new TermQuery( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ) ), 2 );
+        final TopDocs result =
+            contextIndexSearcher.search(
+                new TermQuery( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ) ), 2 );
 
-                if ( result.totalHits == 1 )
-                {
-                    return indexSearcher.doc( result.scoreDocs[0].doc );
-                }
-            }
-            finally
-            {
-                context.releaseIndexSearcher( indexSearcher );
-            }
-        }
-        catch ( IOException e )
+        if ( result.totalHits == 1 )
         {
-            // huh?
-            throw new IllegalStateException( e );
+            return contextIndexSearcher.doc( result.scoreDocs[0].doc );
         }
         return null;
     }
