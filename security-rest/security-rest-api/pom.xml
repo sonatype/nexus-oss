@@ -24,7 +24,7 @@
   <description>Security CURD operations published over REST, using the plexus-restlet-bridge and PlexusResources.</description>
 
   <properties>
-    <plexus-restlet-bridge.version>1.23-SNAPSHOT</plexus-restlet-bridge.version>
+    <plexus-restlet-bridge.version>1.24</plexus-restlet-bridge.version>
   </properties>
 
   <dependencies>

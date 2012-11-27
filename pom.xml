@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
-    <version>20</version>
+    <version>22</version>
   </parent>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-parent</artifactId>
@@ -31,18 +31,10 @@
     <url>http://github.com/sonatype/security</url>
   </scm>
 
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
   <properties>
     <shiro.version>1.2.1</shiro.version>
     <sisu-ehcache.version>1.1</sisu-ehcache.version>
-    <goodies.version>1.5-SNAPSHOT</goodies.version>
+    <goodies.version>1.5</goodies.version>
     <base-configuration.version>1.0</base-configuration.version>
     <plexus-cipher.version>1.6</plexus-cipher.version>
     <plugin-host-api.version>1.0.0</plugin-host-api.version>
