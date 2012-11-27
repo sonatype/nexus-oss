@@ -29,10 +29,12 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.maven.index.ArtifactContext;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactScanningListener;
 import org.apache.maven.index.ScanningResult;
+import org.apache.maven.index.context.IndexUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.scheduling.TaskUtil;
@@ -89,6 +91,13 @@ public class NexusScanningListener
 
         try
         {
+            // if non-fullReindex, check for presence on index, act only if not found
+            if ( !fullReindex && isOnIndex( ac ) )
+            {
+                return;
+            }
+
+            // act accordingly what we do: hosted/proxy repair/update
             if ( fullReindex && !context.isReceivingUpdates() )
             {
                 // HOSTED-full only -- in this case, work is done against empty temp ctx so it fine
@@ -158,6 +167,24 @@ public class NexusScanningListener
     public void artifactError( final ArtifactContext ac, final Exception e )
     {
         exceptions.add( e );
+    }
+
+    private boolean isOnIndex( final ArtifactContext ac )
+        throws IOException
+    {
+        final IndexSearcher indexSearcher = context.acquireIndexSearcher();
+        try
+        {
+            final TopScoreDocCollector collector = TopScoreDocCollector.create( 1, false );
+            indexSearcher.search( new TermQuery( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ) ),
+                                  collector );
+            return collector.getTotalHits() != 0;
+        }
+        finally
+        {
+            context.releaseIndexSearcher( indexSearcher );
+        }
+
     }
 
     /**
