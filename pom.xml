@@ -51,9 +51,6 @@
   </modules>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
     <nexus.version>2.3-SNAPSHOT</nexus.version>
     <nexusPluginType>nexus-plugin</nexusPluginType>
 
@@ -61,7 +58,6 @@
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
 
     <arguments />
