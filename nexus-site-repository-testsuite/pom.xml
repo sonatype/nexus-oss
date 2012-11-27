@@ -54,6 +54,19 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
+            <version>3.0-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>export</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
@@ -79,6 +92,7 @@
           </plugin>
 
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
             <configuration>
               <localRepositoryPath>${project.build.directory}/apache-maven-local-repository</localRepositoryPath>
