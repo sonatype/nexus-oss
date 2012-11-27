@@ -132,6 +132,8 @@ public class IndexTemplatePlexusResource
     protected VelocityRepresentation render( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
+        getLogger().debug( "Rendering index" );
+
         Map<String, Object> templatingContext = new HashMap<String, Object>();
 
         templatingContext.put( "serviceBase", "service/local" );
@@ -161,6 +163,7 @@ public class IndexTemplatePlexusResource
             pluginContext = new HashMap<String, Object>( topContext );
 
             NexusIndexHtmlCustomizer bundle = bundles.get( key );
+            getLogger().debug( "Processing customizations: {} -> {}", key, bundle );
 
             pluginContext.put( "bundle", bundle );
 
@@ -173,21 +176,22 @@ public class IndexTemplatePlexusResource
             // post HEAD
 
             String postHeadTemplate = bundle.getPostHeadContribution( pluginContext );
-
-            final Document html = Jsoup.parse( postHeadTemplate );
-            final Elements scripts = html.select( "script" );
-            for ( Element script : scripts )
+            if ( !StringUtils.isEmpty( postHeadTemplate ) )
             {
-                final String src = script.attr( "src" );
-                if ( !src.isEmpty() )
+                final Document html = Jsoup.parse( postHeadTemplate );
+                final Elements scripts = html.select( "script" );
+                for ( Element script : scripts )
                 {
-                    pluginJsFiles.add( src );
-                    script.remove();
+                    final String src = script.attr( "src" );
+                    if ( !src.isEmpty() )
+                    {
+                        pluginJsFiles.add( src );
+                        script.remove();
+                    }
                 }
+                postHeadTemplate = html.head().children().toString();
+                evaluateIfNeeded( pluginContext, postHeadTemplate, pluginPostHeadContributions );
             }
-            postHeadTemplate = html.head().children().toString();
-
-            evaluateIfNeeded( pluginContext, postHeadTemplate, pluginPostHeadContributions );
 
             // pre BODY
 
