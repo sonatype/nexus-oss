@@ -37,10 +37,6 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.nexus.capabilities</groupId>
       <artifactId>nexus-capabilities-model</artifactId>
     </dependency>
