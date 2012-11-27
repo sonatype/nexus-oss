@@ -631,8 +631,22 @@ public class DefaultIndexerManager
         // is this hidden path?
         if ( item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
-            logger.debug( "Will not index hidden file path: " + item.getRepositoryItemUid().toString() );
+            return;
+        }
 
+        // never index generated items
+        if ( item instanceof StorageFileItem && ( (StorageFileItem) item ).isContentGenerated() )
+        {
+            return;
+        }
+
+        // by calculating GAV we check whether the request is against a repo artifact at all
+        // signatures and hashes are not considered for processing
+        // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
+        // emitted events about modifying them
+        Gav gav = ( (MavenRepository) repository ).getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
+        if ( gav == null || gav.isSignature() || gav.isHash() )
+        {
             return;
         }
 
@@ -654,20 +668,6 @@ public class DefaultIndexerManager
     private void addItemToIndex( Repository repository, StorageItem item, IndexingContext context )
         throws LocalStorageException, IOException
     {
-        // by calculating GAV we check wether the request is against a repo artifact at all
-        Gav gav = null;
-
-        gav = ( (MavenRepository) repository ).getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
-
-        // signatures and hashes are not considered for processing
-        // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
-        // emitted events about modifying them
-        if ( gav == null || gav.isSignature() || gav.isHash() )
-        {
-            // we do not index these
-            return;
-        }
-
         final RepositoryItemUidLock uidLock = item.getRepositoryItemUid().getLock();
 
         uidLock.lock( Action.read );
@@ -2324,14 +2324,8 @@ public class DefaultIndexerManager
             }
             else
             {
-                if ( logger.isDebugEnabled() )
-                {
-                    // this always happens during RepositoryRegistry.addRepository, which triggers archetype-catalog.xml
-                    // generation before the repository is added to the indexer manager.
-                    // this is not expected to happen in any other cases, so logger.warn is not a typo
-                    logger.warn( "Could not perform index operation on repository {}", repository.getId(),
-                                 new Exception() );
-                }
+                logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                             new Exception( "This is an artificial exception that provides caller backtrace." ) );
             }
         }
         finally
