@@ -163,13 +163,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
-      <version>1.4</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus.capabilities</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
       <version>${capabilities-plugin.version}</version>
