@@ -59,8 +59,6 @@
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-
-    <arguments />
   </properties>
 
   <dependencyManagement>
@@ -165,51 +163,20 @@
   </dependencyManagement>
 
   <build>
-    <testResources>
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-      <testResource>
-        <directory>${project.basedir}/src/test/filtered-resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-    </testResources>
-
     <pluginManagement>
       <plugins>
-        <!--
-          To perform a release run separately
-          mvn release:prepare -Darguments="-Pquick"
-          mvn release:perform
-        -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.2.1</version>
           <configuration>
-            <autoVersionSubmodules>true</autoVersionSubmodules>
-            <useReleaseProfile>false</useReleaseProfile>
-            <goals>deploy</goals>
-            <!-- Use a quick build to verify the tag, and a full build with ITs for the deploy -->
-            <arguments>${arguments}</arguments>
-            <releaseProfiles>release</releaseProfiles>
             <tagNameFormat>nexus-capabilities-plugin-@{version}</tagNameFormat>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.12</version>
           <configuration>
             <failIfNoTests>false</failIfNoTests>
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <!-- force use of property -->
             <forkMode>once</forkMode>
             <argLine>-ea</argLine>
@@ -229,10 +196,8 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.12</version>
           <configuration>
             <failIfNoTests>false</failIfNoTests>
-            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
             <!--
             For each test, so that we can use the process timeout.
             forkMode=always will cause duplicate "T E S T S" header to be rendered :-(
