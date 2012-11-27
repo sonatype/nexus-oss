@@ -59,7 +59,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
  * Validated against master on 9f9748aa9cdeefa9548b4487c2057223136c511b
  * this UT fails. Branch scanning-issues make it pass.
  */
-public class Nexus5393IndexEntryDuplicationTest
+public class Nexus5393IndexEntryDuplicationIT
     extends AbstractIndexerManagerTest
 {
 
