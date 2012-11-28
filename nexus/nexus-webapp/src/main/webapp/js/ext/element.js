@@ -11,12 +11,18 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/all',
-      ['extjs', 'ext/ux', 'ext/data', 'ext/dd', 'ext/form',
-        'ext/layout', 'ext/lib', 'ext/tree', 'ext/component', 
-        'ext/string', 'ext/tooltip', 'ext/util', 'ext/element'],
-      function(Ext) {
-        Ext.BLANK_IMAGE_URL = "ext-3.4.0/resources/images/default/s.gif";
-        return Ext;
+define('ext/element', ['extjs'], function(Ext) {
+  Ext.override(Ext.Element, {
+    setHeightOrig : Ext.Element.prototype.setHeight,
+    setHeight : function(height)
+    {
+      // height is NaN for IE8 because syncHeight() will call this with
+      // Math.max(0, "100%" - 27) == NaN
+      if ( Ext.isIE8 && typeof height === 'number' && isNaN(height) ) {
+        height = 0;
       }
-);
+
+      return this.setHeightOrig.call(this, height);
+    }
+  });
+});
