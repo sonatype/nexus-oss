@@ -29,6 +29,9 @@ import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSuppo
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
+/**
+ * @since 3.0
+ */
 @Singleton
 @Named( MergeMetadataCapabilityDescriptor.TYPE_ID )
 public class MergeMetadataCapabilityDescriptor

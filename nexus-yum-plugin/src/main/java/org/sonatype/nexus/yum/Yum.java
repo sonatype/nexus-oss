@@ -20,6 +20,9 @@ import java.util.Set;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
 
+/**
+ * @since 3.0
+ */
 public interface Yum
 {
 

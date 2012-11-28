@@ -19,6 +19,9 @@ import java.util.Map;
 import org.apache.shiro.util.StringUtils;
 import com.google.common.collect.Maps;
 
+/**
+ * @since 3.0
+ */
 public class AliasMappings
 {
 

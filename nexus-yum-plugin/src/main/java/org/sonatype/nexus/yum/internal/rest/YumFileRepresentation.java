@@ -16,6 +16,9 @@ import org.restlet.data.MediaType;
 import org.restlet.resource.FileRepresentation;
 import org.sonatype.nexus.yum.YumRepository;
 
+/**
+ * @since 3.0
+ */
 public class YumFileRepresentation
     extends FileRepresentation
 {

@@ -22,6 +22,9 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.yum.client.Yum;
 import org.sonatype.nexus.yum.client.internal.JerseyYum;
 
+/**
+ * @since 3.0
+ */
 @Named
 @Singleton
 public class JerseyYumSubsystemFactory

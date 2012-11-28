@@ -20,6 +20,9 @@ import static org.sonatype.nexus.yum.testsuite.client.MetadataType.PRIMARY_XML;
 import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 
+/**
+ * @since 3.0
+ */
 public class VersionedIT
     extends YumITSupport
 {

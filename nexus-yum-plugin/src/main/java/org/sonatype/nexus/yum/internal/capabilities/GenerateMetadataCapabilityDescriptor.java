@@ -33,6 +33,9 @@ import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSuppo
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 
+/**
+ * @since 3.0
+ */
 @Singleton
 @Named( GenerateMetadataCapabilityDescriptor.TYPE_ID )
 public class GenerateMetadataCapabilityDescriptor

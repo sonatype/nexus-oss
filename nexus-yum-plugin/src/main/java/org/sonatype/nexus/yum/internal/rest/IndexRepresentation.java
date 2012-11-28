@@ -18,6 +18,9 @@ import org.restlet.data.MediaType;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.yum.YumRepository;
 
+/**
+ * @since 3.0
+ */
 public class IndexRepresentation
     extends StringRepresentation
 {

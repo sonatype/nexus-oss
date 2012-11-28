@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 /**
  * Configuration adapter for {@link GenerateMetadataCapability}.
  *
- * @since 2.2
+ * @since 3.0
  */
 public class GenerateMetadataCapabilityConfiguration
     extends MetadataCapabilityConfigurationSupport

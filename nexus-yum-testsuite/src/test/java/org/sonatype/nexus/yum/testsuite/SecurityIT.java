@@ -27,6 +27,9 @@ import org.sonatype.nexus.client.core.subsystem.security.User;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
 import org.sonatype.nexus.yum.client.Yum;
 
+/**
+ * @since 3.0
+ */
 public class SecurityIT
     extends YumITSupport
 {

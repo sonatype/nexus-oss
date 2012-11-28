@@ -37,6 +37,9 @@ import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
 import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
 import org.sonatype.nexus.yum.testsuite.client.Repodata;
 
+/**
+ * @since 3.0
+ */
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )
 public class YumITSupport
     extends NexusRunningParametrizedITSupport

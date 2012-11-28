@@ -35,6 +35,9 @@ import org.sonatype.nexus.proxy.repository.RequestProcessor;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Closeables;
 
+/**
+ * @since 3.0
+ */
 @Named
 @Singleton
 public class SteadyLinksRequestProcessor

@@ -17,6 +17,9 @@ import javax.inject.Singleton;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
+/**
+ * @since 3.0
+ */
 @Singleton
 public class YumSecurityResource
     extends AbstractStaticSecurityResource

@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.yum.testsuite.client.internal;
 
+/**
+ * @since 3.0
+ */
 public enum CompressionType
 {
     NONE, GZIP, BZIP2;

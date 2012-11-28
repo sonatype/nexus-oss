@@ -17,6 +17,9 @@ import static org.sonatype.nexus.yum.testsuite.client.internal.CompressionType.G
 
 import org.sonatype.nexus.yum.testsuite.client.internal.CompressionType;
 
+/**
+ * @since 3.0
+ */
 public enum MetadataType
 {
     PRIMARY_XML( "primary", GZIP ),

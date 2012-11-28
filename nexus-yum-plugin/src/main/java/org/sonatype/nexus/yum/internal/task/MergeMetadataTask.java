@@ -46,6 +46,9 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.io.Closeables;
 
+/**
+ * @since 3.0
+ */
 @Named( MergeMetadataTask.ID )
 public class MergeMetadataTask
     extends AbstractNexusTask<YumRepository>

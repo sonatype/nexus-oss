@@ -30,6 +30,9 @@ import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepos
 import org.sonatype.nexus.yum.testsuite.support.IgnoreOn;
 import org.sonatype.nexus.yum.testsuite.support.OsTestRule;
 
+/**
+ * @since 3.0
+ */
 public class MergeMetadataIT
     extends YumITSupport
 {

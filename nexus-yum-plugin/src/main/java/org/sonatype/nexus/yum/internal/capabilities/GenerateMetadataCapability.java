@@ -24,6 +24,9 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 
+/**
+ * @since 3.0
+ */
 @Named( GenerateMetadataCapabilityDescriptor.TYPE_ID )
 public class GenerateMetadataCapability
     extends MetadataCapabilitySupport<GenerateMetadataCapabilityConfiguration>

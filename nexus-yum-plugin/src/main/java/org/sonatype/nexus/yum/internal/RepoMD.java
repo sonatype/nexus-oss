@@ -27,6 +27,9 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 
+/**
+ * @since 3.0
+ */
 public class RepoMD
 {
 

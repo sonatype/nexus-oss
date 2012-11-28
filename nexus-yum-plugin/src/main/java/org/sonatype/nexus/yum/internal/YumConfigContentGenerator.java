@@ -27,6 +27,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import com.google.common.io.Closeables;
 
+/**
+ * @since 3.0
+ */
 @Named( YumConfigContentGenerator.ID )
 public class YumConfigContentGenerator
     implements ContentGenerator

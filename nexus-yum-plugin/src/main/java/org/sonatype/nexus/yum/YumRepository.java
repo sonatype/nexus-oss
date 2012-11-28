@@ -14,6 +14,9 @@ package org.sonatype.nexus.yum;
 
 import java.io.File;
 
+/**
+ * @since 3.0
+ */
 public interface YumRepository
 {
 

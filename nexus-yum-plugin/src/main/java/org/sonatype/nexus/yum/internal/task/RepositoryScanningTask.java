@@ -31,7 +31,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 /**
  * This job scans a {@link Repository} for RPMs and adds each version to Yam.
  *
- * @author sherold
+ * @since 3.0
  */
 @Named( RepositoryScanningTask.ID )
 public class RepositoryScanningTask

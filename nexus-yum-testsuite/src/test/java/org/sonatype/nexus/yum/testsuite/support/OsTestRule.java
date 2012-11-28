@@ -16,6 +16,9 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+/**
+ * @since 3.0
+ */
 public class OsTestRule
     implements TestRule
 {

@@ -16,6 +16,9 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.scheduling.ScheduledTask;
 
+/**
+ * @since 3.0
+ */
 public class TaskAlreadyScheduledException
     extends RejectedExecutionException
 {

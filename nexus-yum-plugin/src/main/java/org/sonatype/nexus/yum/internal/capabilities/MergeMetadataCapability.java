@@ -20,6 +20,9 @@ import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.yum.YumRegistry;
 
+/**
+ * @since 3.0
+ */
 @Named( MergeMetadataCapabilityDescriptor.TYPE_ID )
 public class MergeMetadataCapability
     extends MetadataCapabilitySupport<MergeMetadataCapabilityConfiguration>

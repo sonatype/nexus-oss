@@ -16,6 +16,9 @@ import java.io.File;
 
 import org.sonatype.nexus.yum.YumRepository;
 
+/**
+ * @since 3.0
+ */
 public class YumRepositoryImpl
     implements YumRepository
 {

@@ -39,6 +39,9 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
+/**
+ * @since 3.0
+ */
 @Named
 @Singleton
 @EventBus.Managed

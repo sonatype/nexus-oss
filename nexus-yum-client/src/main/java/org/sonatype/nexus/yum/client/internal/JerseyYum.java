@@ -24,6 +24,9 @@ import org.sonatype.nexus.yum.client.Yum;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
+/**
+ * @since 3.0
+ */
 public class JerseyYum
     extends SubsystemSupport<JerseyNexusClient>
     implements Yum

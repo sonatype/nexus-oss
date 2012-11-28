@@ -47,6 +47,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 
+/**
+ * @since 3.0
+ */
 @Named
 public class YumImpl
     implements Yum

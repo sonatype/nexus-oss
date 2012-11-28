@@ -21,6 +21,9 @@ import javax.inject.Named;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 import org.sonatype.nexus.yum.YumRegistry;
 
+/**
+ * @since 3.0
+ */
 @Named( YumCapabilityDescriptor.TYPE_ID )
 public class YumCapability
     extends CapabilitySupport

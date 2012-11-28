@@ -27,6 +27,9 @@ import org.sonatype.nexus.formfields.RepoComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
+/**
+ * @since 3.0
+ */
 @Named( GenerateMetadataTask.ID )
 @Singleton
 public class GenerateMetadataTaskDescriptor

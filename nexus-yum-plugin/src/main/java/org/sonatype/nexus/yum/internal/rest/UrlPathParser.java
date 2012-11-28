@@ -24,6 +24,9 @@ import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.yum.YumRepository;
 
+/**
+ * @since 3.0
+ */
 public class UrlPathParser
 {
 

@@ -30,6 +30,9 @@ import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+/**
+ * @since 3.0
+ */
 @Path( VersionedResource.RESOURCE_URI )
 @Named
 @Singleton

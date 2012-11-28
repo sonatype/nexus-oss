@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 /**
  * Support class for Yum repository capability configurations.
  *
- * @since 2.2
+ * @since 3.0
  */
 public abstract class MetadataCapabilityConfigurationSupport
 {

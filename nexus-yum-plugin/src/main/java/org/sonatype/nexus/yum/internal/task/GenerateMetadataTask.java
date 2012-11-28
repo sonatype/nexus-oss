@@ -54,7 +54,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
  *
- * @author sherold
+ * @since 3.0
  */
 @Named( GenerateMetadataTask.ID )
 public class GenerateMetadataTask

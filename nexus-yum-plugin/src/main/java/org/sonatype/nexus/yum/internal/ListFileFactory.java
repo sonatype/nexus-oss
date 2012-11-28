@@ -14,6 +14,9 @@ package org.sonatype.nexus.yum.internal;
 
 import java.io.File;
 
+/**
+ * @since 3.0
+ */
 public interface ListFileFactory
 {
 

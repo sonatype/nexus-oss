@@ -36,6 +36,9 @@ import org.sonatype.nexus.yum.internal.YumConfigContentGenerator;
 import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
 
+/**
+ * @since 3.0
+ */
 public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConfigurationSupport>
     extends CapabilitySupport
 {

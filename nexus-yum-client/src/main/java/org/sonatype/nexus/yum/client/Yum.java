@@ -17,7 +17,7 @@ import java.io.IOException;
 /**
  * Interface to access nexus-yum-plugin functionality in tests
  *
- * @author sherold
+ * @since 3.0
  */
 public interface Yum
 {

@@ -19,6 +19,9 @@ import java.net.URL;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 
+/**
+ * @since 3.0
+ */
 public final class RepositoryUtils
 {
 

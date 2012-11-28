@@ -22,6 +22,9 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 
+/**
+ * @since 3.0
+ */
 public abstract class AbstractYumRepositoryResource
     extends AbstractPlexusResource
 {

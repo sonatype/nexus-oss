@@ -24,6 +24,9 @@ import org.sonatype.nexus.client.rest.jersey.subsystem.JerseyRepositoriesFactory
 import org.sonatype.nexus.yum.testsuite.client.Repodata;
 import org.sonatype.nexus.yum.testsuite.client.internal.JerseyRepodata;
 
+/**
+ * @since 3.0
+ */
 @Named
 @Singleton
 public class JerseyRepodataSubsystemFactory

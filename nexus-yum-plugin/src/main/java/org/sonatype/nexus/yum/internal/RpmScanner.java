@@ -25,6 +25,9 @@ import org.sonatype.sisu.resource.scanner.Scanner;
 import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
 import com.google.common.collect.Sets;
 
+/**
+ * @since 3.0
+ */
 @Named
 @Singleton
 public class RpmScanner

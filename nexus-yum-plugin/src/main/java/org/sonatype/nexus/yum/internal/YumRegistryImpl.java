@@ -34,6 +34,9 @@ import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.task.RepositoryScanningTask;
 
+/**
+ * @since 3.0
+ */
 @Named
 @Singleton
 public class YumRegistryImpl

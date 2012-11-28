@@ -55,7 +55,7 @@ import com.google.common.collect.Maps;
  * "91.0.0", "90.0.0" and "89.0.0" and can access the RPMs via
  * http://localhost:8080/nexus/service/local/yum-alias/<repo-id>/alias.rpm
  *
- * @author sherold
+ * @since 3.0
  */
 @Path( AliasResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json", "text/plain" } )

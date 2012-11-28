@@ -27,6 +27,9 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 
+/**
+ * @since 3.0
+ */
 @Singleton
 @Named( YumCapabilityDescriptor.TYPE_ID )
 public class YumCapabilityDescriptor

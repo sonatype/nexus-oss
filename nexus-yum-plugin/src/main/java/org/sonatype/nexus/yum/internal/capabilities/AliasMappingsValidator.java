@@ -20,6 +20,9 @@ import org.sonatype.nexus.plugins.capabilities.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
 
+/**
+ * @since 3.0
+ */
 public class AliasMappingsValidator
     implements Validator
 {

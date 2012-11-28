@@ -16,6 +16,9 @@ import java.io.File;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
+/**
+ * @since 3.0
+ */
 public interface YumRegistry
 {
 
