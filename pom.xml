@@ -103,6 +103,7 @@
           <configuration>
             <argLine>-Xmx512m</argLine>
             <failIfNoTests>false</failIfNoTests>
+            <testNGArtifactName>none:none</testNGArtifactName>
             <systemProperties>
               <property>
                 <name>user.home</name>
