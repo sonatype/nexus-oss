@@ -959,9 +959,8 @@ public class DefaultIndexerManager
                         try
                         {
                             final NexusScanningListener scanListener =
-                                new NexusScanningListener( context, contextIndexSearcher, fullReindex );
-                            final ScanningResult scanningResult =
-                                scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
+                                new NexusScanningListener( context, contextIndexSearcher, fullReindex, ISPROXY( repository ) );
+                            scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
                         }
                         finally
                         {

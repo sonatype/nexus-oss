@@ -62,6 +62,8 @@ public class NexusScanningListener
 
     private final boolean fullReindex;
 
+    private final boolean isProxy;
+
     // the UINFO set used to track processed artifacts (grows during scanning)
     private final Set<String> processedUinfos = new HashSet<String>();
 
@@ -81,13 +83,14 @@ public class NexusScanningListener
     private long scanningStarted;
 
     public NexusScanningListener( final IndexingContext context, final IndexSearcher contextIndexSearcher,
-        final boolean fullReindex )
+        final boolean fullReindex, final boolean isProxy )
         throws IOException
     {
         this.logger = LoggerFactory.getLogger( getClass() );
         this.context = context;
         this.contextIndexSearcher = contextIndexSearcher;
         this.fullReindex = fullReindex;
+        this.isProxy = isProxy;
         this.discovered = 0;
         this.added = 0;
         this.updated = 0;
@@ -119,7 +122,7 @@ public class NexusScanningListener
 
             // act accordingly what we do: hosted/proxy repair/update
             final IndexOp indexOp;
-            if ( fullReindex && !context.isReceivingUpdates() )
+            if ( fullReindex && !isProxy )
             {
                 // HOSTED-full only -- in this case, work is done against empty temp ctx so it fine
                 // is cheaper, does add, but
@@ -160,7 +163,7 @@ public class NexusScanningListener
         int removed = 0;
         try
         {
-            if ( !context.isReceivingUpdates() && !fullReindex )
+            if ( !fullReindex && !isProxy )
             {
                 // HOSTED-nonFull only, perform delete detection too (remove stuff from index that is removed from repository
                 removed = removeDeletedArtifacts( result.getRequest().getStartingPath() );
