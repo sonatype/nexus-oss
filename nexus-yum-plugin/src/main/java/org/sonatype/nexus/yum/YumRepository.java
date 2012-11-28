@@ -15,6 +15,8 @@ package org.sonatype.nexus.yum;
 import java.io.File;
 
 /**
+ * Provides access to Yum metadata.
+ *
  * @since 3.0
  */
 public interface YumRepository

@@ -38,6 +38,8 @@ import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
 import org.sonatype.nexus.yum.testsuite.client.Repodata;
 
 /**
+ * Support class for Yum ITs.
+ *
  * @since 3.0
  */
 @NexusStartAndStopStrategy( NexusStartAndStopStrategy.Strategy.EACH_TEST )

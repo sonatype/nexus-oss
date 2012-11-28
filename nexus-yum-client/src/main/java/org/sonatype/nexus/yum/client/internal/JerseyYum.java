@@ -25,6 +25,8 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 /**
+ * Jersey based {@link Yum}.
+ *
  * @since 3.0
  */
 public class JerseyYum

@@ -31,6 +31,8 @@ import org.sonatype.nexus.yum.testsuite.support.IgnoreOn;
 import org.sonatype.nexus.yum.testsuite.support.OsTestRule;
 
 /**
+ * ITs related to metadata merging.
+ *
  * @since 3.0
  */
 public class MergeMetadataIT

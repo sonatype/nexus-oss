@@ -22,6 +22,8 @@ import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 
 /**
+ * ITs related to generating metadata.
+ *
  * @since 3.0
  */
 public class GenerateMetadataIT

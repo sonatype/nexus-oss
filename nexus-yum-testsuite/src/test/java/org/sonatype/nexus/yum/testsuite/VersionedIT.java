@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 
 /**
+ * ITs related to versioned REST resource.
+ *
  * @since 3.0
  */
 public class VersionedIT

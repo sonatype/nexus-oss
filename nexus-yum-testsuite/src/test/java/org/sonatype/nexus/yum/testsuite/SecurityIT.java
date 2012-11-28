@@ -28,6 +28,8 @@ import org.sonatype.nexus.client.core.subsystem.security.Users;
 import org.sonatype.nexus.yum.client.Yum;
 
 /**
+ * ITs related to security.
+ *
  * @since 3.0
  */
 public class SecurityIT

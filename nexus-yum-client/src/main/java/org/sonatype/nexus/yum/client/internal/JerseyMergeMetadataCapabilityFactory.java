@@ -20,7 +20,7 @@ import org.sonatype.nexus.capabilities.client.support.JerseyReflectiveCapability
 import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
 
 /**
- * Jersey Merge Metadata factory.
+ * Jersey Merge Metadata capability factory.
  *
  * @since 3.0
  */
