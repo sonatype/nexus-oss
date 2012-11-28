@@ -12,14 +12,12 @@
  */
 package org.sonatype.nexus.yum.internal.task;
 
-import java.io.File;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 
 public abstract class GenerateMetadataTaskTestSupport
     extends YumNexusTestSupport

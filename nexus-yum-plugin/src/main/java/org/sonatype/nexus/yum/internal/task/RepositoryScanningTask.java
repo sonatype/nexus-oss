@@ -49,7 +49,7 @@ public class RepositoryScanningTask
     @Inject
     public RepositoryScanningTask( final RpmScanner scanner, final EventBus eventBus )
     {
-        super(eventBus, null);
+        super( eventBus, null );
         this.scanner = checkNotNull( scanner );
     }
 

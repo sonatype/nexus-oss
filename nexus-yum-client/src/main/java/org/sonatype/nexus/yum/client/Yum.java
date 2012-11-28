@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.yum.client;
 
-import java.io.IOException;
-
 /**
  * Interface to access nexus-yum-plugin functionality in tests
  *

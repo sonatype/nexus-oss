@@ -22,7 +22,6 @@ import java.io.IOException;
 public interface Repodata
 {
 
-
     /**
      * Retrieves the given metadata type (primary.xml, repomd.xml, etc.) from the repository
      *
