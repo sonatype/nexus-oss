@@ -4427,6 +4427,13 @@
           <required>true</required>
           <description>regex validation that will validate the field.</description>
         </field>
+        <field>
+          <name>initialValue</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Initial value of the field.</description>
+        </field>
       </fields>
     </class>
 

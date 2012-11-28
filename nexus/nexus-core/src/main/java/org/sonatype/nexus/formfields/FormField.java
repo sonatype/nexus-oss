@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.formfields;
 
-public interface FormField
+public interface FormField<T>
 {
     public static final boolean MANDATORY = true;
     public static final boolean OPTIONAL = false;
@@ -48,8 +48,14 @@ public interface FormField
     String getHelpText();
 
     /**
-     * Get the regexvalidation of this field
+     * Get the regex validation of this field
      * @return
      */
     String getRegexValidation();
+
+    /**
+     * @return initial value of this field (can be null - no initial value)
+     * @since 2.3
+     */
+    T getInitialValue();
 }

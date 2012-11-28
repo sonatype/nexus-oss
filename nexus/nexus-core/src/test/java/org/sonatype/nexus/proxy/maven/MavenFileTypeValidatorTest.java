@@ -12,8 +12,24 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.mockito.Mockito.when;
+
+import java.util.Properties;
+
+import com.google.common.collect.Lists;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.sonatype.nexus.mime.DefaultMimeSupport;
+import org.sonatype.nexus.mime.NexusMimeTypes;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.validator.AbstractFileTypeValidationUtilTest;
+import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator;
+import org.sonatype.nexus.proxy.repository.validator.FileTypeValidatorHub;
 
 /**
  * Tests for MavenFileTypeValidator specific file types.
@@ -21,6 +37,37 @@ import org.sonatype.nexus.proxy.repository.validator.AbstractFileTypeValidationU
 public class MavenFileTypeValidatorTest
     extends AbstractFileTypeValidationUtilTest
 {
+
+    private MavenFileTypeValidator underTest;
+
+    @Spy
+    private NexusMimeTypes mimeTypes = new NexusMimeTypes();
+
+    @Mock
+    private NexusMimeTypes.NexusMimeType mimeType;
+
+    @Before
+    public void setup()
+        throws Exception
+    {
+        MockitoAnnotations.initMocks( this );
+        underTest = new MavenFileTypeValidator( mimeTypes, new DefaultMimeSupport() );
+    }
+
+    @Override
+    protected FileTypeValidatorHub getValidationUtil()
+        throws Exception
+    {
+        return new FileTypeValidatorHub()
+        {
+            @Override
+            public boolean isExpectedFileType( final StorageItem item )
+            {
+                return !FileTypeValidator.FileTypeValidity.INVALID.equals( underTest.isExpectedFileType( (StorageFileItem) item ) );
+            }
+        };
+    }
+
     @Test
     public void testJar()
         throws Exception
@@ -115,6 +162,18 @@ public class MavenFileTypeValidatorTest
         doTest( "something/else/file.jar.md5", "no-doctype-pom.xml", false );
         doTest( "something/else/file.jar.md5", "test.sha1", false );
         doTest( "something/else/file.jar.md5", "test.md5", true );
+    }
+
+    @Test
+    public void overrideRules()
+        throws Exception
+    {
+        doTest( "something/else/library.swc", "test.tar.bz2", false );
+
+        when( mimeTypes.getMimeTypes( "swc" ) ).thenReturn( mimeType );
+        when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "application/x-bzip2" ) );
+
+        doTest( "something/else/library.swc", "test.tar.bz2", true );
     }
 
 }

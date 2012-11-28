@@ -19,18 +19,18 @@ import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
-import org.sonatype.nexus.testsuite.client.UIDLocks;
-import org.sonatype.nexus.testsuite.client.internal.JerseyUIDLocks;
+import org.sonatype.nexus.testsuite.client.Scheduler;
+import org.sonatype.nexus.testsuite.client.internal.JerseyScheduler;
 
 /**
- * Jersey based {@link UIDLocks} Nexus Client Subsystem factory.
+ * Jersey based {@link Scheduler} Nexus Client Subsystem factory.
  *
- * @since 2.2
+ * @since 2.3
  */
 @Named
 @Singleton
-public class JerseyUIDLocksFactorySubsystemFactory
-    implements SubsystemFactory<UIDLocks, JerseyNexusClient>
+public class JerseySchedulerSubsystemFactory
+    implements SubsystemFactory<Scheduler, JerseyNexusClient>
 {
 
     @Override
@@ -40,15 +40,15 @@ public class JerseyUIDLocksFactorySubsystemFactory
     }
 
     @Override
-    public Class<UIDLocks> getType()
+    public Class<Scheduler> getType()
     {
-        return UIDLocks.class;
+        return Scheduler.class;
     }
 
     @Override
-    public UIDLocks create( final JerseyNexusClient nexusClient )
+    public Scheduler create( final JerseyNexusClient nexusClient )
     {
-        return new JerseyUIDLocks( nexusClient );
+        return new JerseyScheduler( nexusClient );
     }
 
 }

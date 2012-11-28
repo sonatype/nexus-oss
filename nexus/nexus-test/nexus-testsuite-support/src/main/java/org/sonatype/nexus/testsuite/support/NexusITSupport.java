@@ -136,7 +136,9 @@ public abstract class NexusITSupport
      * Never null.
      */
     @Rule
-    public TestIndexRule testIndex = new TestIndexRule( util.resolveFile( "target/its" ) );
+    public TestIndexRule testIndex = new TestIndexRule(
+        util.resolveFile( "target/it-reports" ), util.resolveFile( "target/it-data" )
+    );
 
     /**
      * Test data.
@@ -255,7 +257,9 @@ public abstract class NexusITSupport
                 "TEST {} is running against a Nexus bundle resolved from injected-test.properties",
                 testName.getMethodName()
             );
-            testIndex().recordLink( "bundle", "../test-classes/injected-test.properties" );
+            testIndex().recordAndCopyLink(
+                "bundle", util.resolveFile( "target/test-classes/injected-test.properties" )
+            );
         }
     }
 
