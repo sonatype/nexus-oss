@@ -44,6 +44,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -228,14 +229,6 @@ public class DefaultIndexerManager
     private boolean ISPROXY( Repository repository )
     {
         return repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class );
-    }
-
-    /**
-     * Repository is a proxy repository, and, download of remote indexes is turned on.
-     */
-    private boolean ISPROXYANDREMOTEISEXPECTED( Repository repository )
-    {
-        return ISPROXY( repository ) && (( MavenProxyRepository ) repository).isDownloadRemoteIndexes();
     }
 
     /**
@@ -459,7 +452,7 @@ public class DefaultIndexerManager
                                               null, // indexUpdateUrl
                                               indexCreators, //
                                               true, // reclaimIndex
-                                              ISPROXYANDREMOTEISEXPECTED( repository ) );
+                                              ISPROXY( repository ) );
             mavenIndexer.addIndexingContext( ctx );
         }
         ctx.setSearchable( repository.isSearchable() );
@@ -962,9 +955,18 @@ public class DefaultIndexerManager
                         TaskUtil.checkInterruption();
 
                         // igorf, this needs be merged back to maven indexer, see MINDEXER-65
-                        final NexusScanningListener scanListener =
-                            new NexusScanningListener( context, fullReindex);
-                        final ScanningResult scanningResult = scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
+                        final IndexSearcher contextIndexSearcher = context.acquireIndexSearcher();
+                        try
+                        {
+                            final NexusScanningListener scanListener =
+                                new NexusScanningListener( context, contextIndexSearcher, fullReindex );
+                            final ScanningResult scanningResult =
+                                scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
+                        }
+                        finally
+                        {
+                            context.releaseIndexSearcher( contextIndexSearcher );
+                        }
                     }
                 };
                 if ( fullReindex )

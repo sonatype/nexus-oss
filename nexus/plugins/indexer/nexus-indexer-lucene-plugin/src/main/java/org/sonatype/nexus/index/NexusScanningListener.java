@@ -81,29 +81,17 @@ public class NexusScanningListener
     // timestamp in millis when scanning started
     private long scanningStarted;
 
-    public NexusScanningListener( final IndexingContext context,
+    public NexusScanningListener( final IndexingContext context, final IndexSearcher contextIndexSearcher,
         final boolean fullReindex )
         throws IOException
     {
         this.logger = LoggerFactory.getLogger( getClass() );
         this.context = context;
-        this.contextIndexSearcher = context.acquireIndexSearcher();
+        this.contextIndexSearcher = contextIndexSearcher;
         this.fullReindex = fullReindex;
         this.discovered = 0;
         this.added = 0;
         this.updated = 0;
-    }
-
-    private void releaseIndexSearcher()
-    {
-        try
-        {
-            context.releaseIndexSearcher( contextIndexSearcher );
-        }
-        catch ( IOException e )
-        {
-            Throwables.propagate( e );
-        }
     }
 
     @Override
@@ -128,7 +116,7 @@ public class NexusScanningListener
             // hosted-full: just blindly add, no need for uniq check, as it happens against empty ctx
             // hosted-nonFull: do update, add when document changed (see update method)
             // proxy-full: do update, as record might be present from downloaded index. Usually is, but Central does not publish ClassNames so update will happen
-            // proxy-non-full: do update, as record might be present from downloaded index.
+            // proxy-non-full: do update, as record might be present from downloaded index or already indexed (by some prev scan or by being pulled from remote).
 
             // act accordingly what we do: hosted/proxy repair/update
             final IndexOp indexOp;
@@ -163,60 +151,52 @@ public class NexusScanningListener
         catch ( IOException ex )
         {
             artifactError( ac, ex );
-            releaseIndexSearcher();
         }
     }
 
     @Override
     public void scanningFinished( final IndexingContext ctx, final ScanningResult result )
     {
+        TaskUtil.checkInterruption();
+        int removed = 0;
         try
         {
-            TaskUtil.checkInterruption();
-            int removed = 0;
+            if ( !context.isReceivingUpdates() && !fullReindex )
+            {
+                // HOSTED-nonFull only, perform delete detection too (remove stuff from index that is removed from repository
+                removed = removeDeletedArtifacts( result.getRequest().getStartingPath() );
+            }
+            // rebuild groups, as methods moved out from IndexerEngine does not maintain groups anymore
+            // as it makes no sense to do it during batch invocation of update method
+            context.rebuildGroups();
+            context.commit();
+        }
+        catch ( IOException ex )
+        {
+            result.addException( ex );
+        }
+
+        result.setTotalFiles( discovered );
+        result.setDeletedFiles( removed );
+        result.getExceptions().addAll( exceptions );
+
+        if ( result.getDeletedFiles() > 0 || result.getTotalFiles() > 0 )
+        {
             try
             {
-                if ( !context.isReceivingUpdates() && !fullReindex )
-                {
-                    // HOSTED-nonFull only, perform delete detection too (remove stuff from index that is removed from repository
-                    removed = removeDeletedArtifacts( result.getRequest().getStartingPath() );
-                }
-                // rebuild groups, as methods moved out from IndexerEngine does not maintain groups anymore
-                // as it makes no sense to do it during batch invocation of update method
-                context.rebuildGroups();
-                context.commit();
+                context.updateTimestamp( true );
+                context.optimize();
             }
-            catch ( IOException ex )
+            catch ( Exception ex )
             {
                 result.addException( ex );
             }
-
-            result.setTotalFiles( discovered );
-            result.setDeletedFiles( removed );
-            result.getExceptions().addAll( exceptions );
-
-            if ( result.getDeletedFiles() > 0 || result.getTotalFiles() > 0 )
-            {
-                try
-                {
-                    context.updateTimestamp( true );
-                    context.optimize();
-                }
-                catch ( Exception ex )
-                {
-                    result.addException( ex );
-                }
-            }
-            logger.info(
-                "Scanning of repositoryID=\"{}\" finished: scanned={}, added={}, updated={}, removed={}, scanningDuration={}",
-                ctx.getRepositoryId(), discovered, added, updated, removed,
-                DurationFormatUtils.formatDurationHMS( System.currentTimeMillis() - scanningStarted )
-            );
         }
-        finally
-        {
-            releaseIndexSearcher();
-        }
+        logger.info(
+            "Scanning of repositoryID=\"{}\" finished: scanned={}, added={}, updated={}, removed={}, scanningDuration={}",
+            ctx.getRepositoryId(), discovered, added, updated, removed,
+            DurationFormatUtils.formatDurationHMS( System.currentTimeMillis() - scanningStarted )
+        );
     }
 
     @Override
