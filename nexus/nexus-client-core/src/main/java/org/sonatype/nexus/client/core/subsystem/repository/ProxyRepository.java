@@ -78,4 +78,12 @@ public interface ProxyRepository<T extends ProxyRepository>
      */
     T withNotFoundCacheTTL( int minutes );
 
+    /**
+     * Configures number of minutes items will be cached.
+     *
+     * @param minutes to be cached
+     * @return itself, for fluent api usage
+     */
+    T withItemMaxAge( int minutes );
+
 }

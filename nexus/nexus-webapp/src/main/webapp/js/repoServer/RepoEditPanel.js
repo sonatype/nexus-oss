@@ -143,7 +143,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
 
       repoPolicySelectHandler : function(combo, rec, index) {
         var repoPolicy = rec.data.value.toLowerCase();
-        var fields = ['notFoundCacheTTL', 'artifactMaxAge', 'metadataMaxAge'];
+        var fields = ['notFoundCacheTTL', 'artifactMaxAge', 'metadataMaxAge', 'itemMaxAge'];
 
         if (this.lastPolicy != repoPolicy)
         {
@@ -1006,6 +1006,10 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
                     fieldLabel : 'Metadata Max Age',
                     helpText : ht.metadataMaxAge,
                     name : 'metadataMaxAge'
+                  }, {
+                    fieldLabel : 'Item Max Age',
+                    helpText : ht.itemMaxAge,
+                    name : 'itemMaxAge'
                   }]
             },
 
