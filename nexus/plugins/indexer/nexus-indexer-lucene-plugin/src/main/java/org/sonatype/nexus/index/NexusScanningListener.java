@@ -372,7 +372,13 @@ public class NexusScanningListener
         final Map<String, String> m2 = toMap( d2 );
         m1.remove( MinimalArtifactInfoIndexCreator.FLD_LAST_MODIFIED.getKey() );
         m2.remove( MinimalArtifactInfoIndexCreator.FLD_LAST_MODIFIED.getKey() );
-        return m1.equals( m2 );
+
+        final boolean result = m1.equals( m2 );
+        if ( !result )
+        {
+            logger.trace( "d1={}, d2={}", m1, m2 );
+        }
+        return result;
     }
 
     private Map<String, String> toMap( final Document d )
