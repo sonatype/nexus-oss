@@ -306,7 +306,7 @@ public class RepositoryListPlexusResource
 
         if ( model.getItemMaxAge() != null )
         {
-            exConf.setMetadataMaxAge( model.getItemMaxAge() );
+            exConf.setItemMaxAge( model.getItemMaxAge() );
         }
 
         // set auto block
