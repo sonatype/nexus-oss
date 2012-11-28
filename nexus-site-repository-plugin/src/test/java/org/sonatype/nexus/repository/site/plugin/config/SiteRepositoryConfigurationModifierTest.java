@@ -64,9 +64,13 @@ public class SiteRepositoryConfigurationModifierTest
             configuration
         );
         assertThat(
-            readFileToString( modified ),
-            DiffMatchers.equalToOnlyDiffs( readFileToString( util.resolveFile( "target/test-classes/expected-nexus.xml" ) ) )
+            normalizeLineEndings(readFileToString(modified)),
+            DiffMatchers.equalToOnlyDiffs( normalizeLineEndings(readFileToString(util.resolveFile("target/test-classes/expected-nexus.xml"))) )
         );
     }
 
+    private String normalizeLineEndings( final String text )
+    {
+        return text.replace("\r\n", "\n");
+    }
 }

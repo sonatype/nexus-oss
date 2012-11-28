@@ -55,10 +55,15 @@ public class SiteRepositorySecurityConfigurationModifierTest
             configuration
         );
         assertThat(
-            readFileToString( modified ),
+            normalizeLineEndings( readFileToString( modified ) ),
             DiffMatchers.equalToOnlyDiffs(
-                readFileToString( util.resolveFile( "target/test-classes/expected-security.xml" ) ) )
+                normalizeLineEndings( readFileToString( util.resolveFile( "target/test-classes/expected-security.xml" ) ) ) )
         );
+    }
+
+    private String normalizeLineEndings( final String text )
+    {
+        return text.replace("\r\n", "\n");
     }
 
 }
