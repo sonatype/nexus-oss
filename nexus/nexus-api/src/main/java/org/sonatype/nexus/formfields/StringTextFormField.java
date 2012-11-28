@@ -13,7 +13,7 @@
 package org.sonatype.nexus.formfields;
 
 public class StringTextFormField
-    extends AbstractFormField
+    extends AbstractFormField<String>
 {
     public StringTextFormField( String id, String label, String helpText, boolean required, String regexValidation )
     {
@@ -34,4 +34,11 @@ public class StringTextFormField
     {
         return "string";
     }
+
+    public StringTextFormField withInitialValue( final String initialValue )
+    {
+        setInitialValue( initialValue );
+        return this;
+    }
+
 }
