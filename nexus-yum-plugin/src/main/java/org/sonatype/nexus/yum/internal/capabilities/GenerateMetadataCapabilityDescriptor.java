@@ -66,14 +66,14 @@ public class GenerateMetadataCapabilityDescriptor
                 "Check if removing an RPM from this repository should regenerate Yum repository"
                     + " (default true)",
                 FormField.OPTIONAL
-            ),
+            ).withInitialValue( true ),
             new NumberTextFormField(
                 GenerateMetadataCapabilityConfiguration.DELETE_PROCESSING_DELAY,
                 "Delete process delay",
                 "Number of seconds to wait before regenerating Yum repository when an RPM is removed"
                     + " (default 10 seconds)",
                 FormField.OPTIONAL
-            )
+            ).withInitialValue( 10 )
         );
         this.validators = validators;
     }

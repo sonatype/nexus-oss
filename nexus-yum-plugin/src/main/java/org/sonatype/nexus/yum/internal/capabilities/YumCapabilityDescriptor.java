@@ -53,7 +53,7 @@ public class YumCapabilityDescriptor
                 "Maximum number of threads to be used for generating Yum repositories"
                     + " (default 10 threads)",
                 FormField.OPTIONAL
-            )
+            ).withInitialValue( 10 )
         );
         this.validators = validators;
     }
