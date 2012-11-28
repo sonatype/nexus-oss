@@ -46,7 +46,7 @@ public abstract class AbstractFileTypeValidationUtilTest
         return getTestFile( "target/test-classes/FileTypeValidationUtilTest" );
     }
 
-    private FileTypeValidatorHub getValidationUtil()
+    protected FileTypeValidatorHub getValidationUtil()
         throws Exception
     {
         return lookup( FileTypeValidatorHub.class );
