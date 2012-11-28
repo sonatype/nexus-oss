@@ -39,7 +39,6 @@ import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.TaskUtil;
-import com.google.common.base.Throwables;
 
 /**
  * Nexus specific ArtifactScanningListener implementation. Looks like the MI's DefaultScannerListener, but has
@@ -97,7 +96,7 @@ public class NexusScanningListener
     @Override
     public void scanningStarted( final IndexingContext ctx )
     {
-        logger.info( "Scanning of repositoryID=\"{}\" started.", ctx.getRepositoryId() );
+        logger.info( "Scanning of repositoryID=\"{}\" started.", context.getRepositoryId() );
         scanningStarted = System.currentTimeMillis();
     }
 
@@ -125,14 +124,14 @@ public class NexusScanningListener
                 // HOSTED-full only -- in this case, work is done against empty temp ctx so it fine
                 // is cheaper, does add, but
                 // does not maintain uniqueness
-                indexOp = index( context, ac );
+                indexOp = index( ac );
             }
             else
             {
                 // HOSTED-nonFull + PROXY-full/nonFull must go this path. In case of proxy, remote index was pulled, so ctx is not empty
                 // is costly, does delete+add
                 // maintains uniqueness
-                indexOp = update( context, ac );
+                indexOp = update( ac );
             }
             discovered++;
             if ( IndexOp.ADDED == indexOp )
@@ -194,7 +193,7 @@ public class NexusScanningListener
         }
         logger.info(
             "Scanning of repositoryID=\"{}\" finished: scanned={}, added={}, updated={}, removed={}, scanningDuration={}",
-            ctx.getRepositoryId(), discovered, added, updated, removed,
+            context.getRepositoryId(), discovered, added, updated, removed,
             DurationFormatUtils.formatDurationHMS( System.currentTimeMillis() - scanningStarted )
         );
     }
@@ -217,51 +216,43 @@ public class NexusScanningListener
         throws IOException
     {
         int deleted = 0;
-        final IndexSearcher indexSearcher = context.acquireIndexSearcher();
-        try
+        final IndexReader r = contextIndexSearcher.getIndexReader();
+        for ( int i = 0; i < r.maxDoc(); i++ )
         {
-            final IndexReader r = indexSearcher.getIndexReader();
-            for ( int i = 0; i < r.maxDoc(); i++ )
+            if ( !r.isDeleted( i ) )
             {
-                if ( !r.isDeleted( i ) )
+                final Document d = r.document( i );
+                final String uinfo = d.get( ArtifactInfo.UINFO );
+                if ( uinfo != null && !processedUinfos.contains( uinfo ) )
                 {
-                    final Document d = r.document( i );
-                    final String uinfo = d.get( ArtifactInfo.UINFO );
-                    if ( uinfo != null && !processedUinfos.contains( uinfo ) )
+                    // file is not present in storage but is on index, delete it from index
+                    final String[] ra = ArtifactInfo.FS_PATTERN.split( uinfo );
+                    final ArtifactInfo ai = new ArtifactInfo();
+                    ai.repository = context.getRepositoryId();
+                    ai.groupId = ra[0];
+                    ai.artifactId = ra[1];
+                    ai.version = ra[2];
+                    if ( ra.length > 3 )
                     {
-                        // file is not present in storage but is on index, delete it from index
-                        final String[] ra = ArtifactInfo.FS_PATTERN.split( uinfo );
-                        final ArtifactInfo ai = new ArtifactInfo();
-                        ai.repository = context.getRepositoryId();
-                        ai.groupId = ra[0];
-                        ai.artifactId = ra[1];
-                        ai.version = ra[2];
-                        if ( ra.length > 3 )
-                        {
-                            ai.classifier = ArtifactInfo.renvl( ra[3] );
-                        }
-                        if ( ra.length > 4 )
-                        {
-                            ai.packaging = ArtifactInfo.renvl( ra[4] );
-                        }
+                        ai.classifier = ArtifactInfo.renvl( ra[3] );
+                    }
+                    if ( ra.length > 4 )
+                    {
+                        ai.packaging = ArtifactInfo.renvl( ra[4] );
+                    }
 
-                        // minimal ArtifactContext for removal
-                        final ArtifactContext ac = new ArtifactContext( null, null, null, ai, ai.calculateGav() );
-                        if ( contextPath == null
-                            || context.getGavCalculator().gavToPath( ac.getGav() ).startsWith( contextPath ) )
+                    // minimal ArtifactContext for removal
+                    final ArtifactContext ac = new ArtifactContext( null, null, null, ai, ai.calculateGav() );
+                    if ( contextPath == null
+                        || context.getGavCalculator().gavToPath( ac.getGav() ).startsWith( contextPath ) )
+                    {
+                        if ( IndexOp.DELETED == remove( ac ) )
                         {
-                            if ( IndexOp.DELETED == remove( context, ac ) )
-                            {
-                                deleted++;
-                            }
+                            deleted++;
                         }
                     }
                 }
             }
-        }
-        finally
-        {
-            context.releaseIndexSearcher( indexSearcher );
         }
         return deleted;
     }
@@ -277,7 +268,7 @@ public class NexusScanningListener
         NOOP, ADDED, UPDATED, DELETED;
     }
 
-    private IndexOp index( final IndexingContext context, final ArtifactContext ac )
+    private IndexOp index( final ArtifactContext ac )
         throws IOException
     {
         if ( ac != null && ac.getGav() != null )
@@ -292,7 +283,7 @@ public class NexusScanningListener
         return IndexOp.NOOP;
     }
 
-    private IndexOp update( final IndexingContext context, final ArtifactContext ac )
+    private IndexOp update( final ArtifactContext ac )
         throws IOException
     {
         if ( ac != null && ac.getGav() != null )
@@ -300,7 +291,7 @@ public class NexusScanningListener
             final Document d = ac.createDocument( context );
             if ( d != null )
             {
-                final Document old = getOldDocument( context, ac );
+                final Document old = getOldDocument( ac );
                 if ( old == null )
                 {
                     context.getIndexWriter().addDocument( d );
@@ -317,7 +308,7 @@ public class NexusScanningListener
         return IndexOp.NOOP;
     }
 
-    private IndexOp remove( final IndexingContext context, final ArtifactContext ac )
+    private IndexOp remove( final ArtifactContext ac )
         throws IOException
     {
         if ( ac != null )
@@ -375,7 +366,7 @@ public class NexusScanningListener
         return result;
     }
 
-    private Document getOldDocument( IndexingContext context, ArtifactContext ac )
+    private Document getOldDocument( ArtifactContext ac )
         throws IOException
     {
         final TopDocs result =
