@@ -59,6 +59,9 @@ Nexus.util.FormFieldUtil = {
               width : width,
               regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
             };
+            if (curRec.initialValue) {
+              items[j].value = curRec.initialValue;
+            }
           }
           else if (curRec.type === 'number') {
             items[j] = {
@@ -72,6 +75,9 @@ Nexus.util.FormFieldUtil = {
               width : width,
               regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
             };
+            if (curRec.initialValue) {
+              items[j].value = Number(curRec.initialValue);
+            }
           }
           else if (curRec.type === 'text-area') {
             items[j] = {
@@ -87,6 +93,9 @@ Nexus.util.FormFieldUtil = {
               height : '138',
               regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
             };
+            if (curRec.initialValue) {
+              items[j].value = curRec.initialValue;
+            }
           }
           else if (curRec.type === 'checkbox') {
             items[j] = {
@@ -96,6 +105,9 @@ Nexus.util.FormFieldUtil = {
               name : fieldNamePrefix + curRec.id,
               disabled : true
             };
+            if (curRec.initialValue) {
+              items[j].checked = Boolean('true' === curRec.initialValue);
+            }
           }
           else if (curRec.type === 'date') {
             items[j] = {
@@ -108,6 +120,9 @@ Nexus.util.FormFieldUtil = {
               disabled : true,
               value : new Date()
             };
+            if (curRec.initialValue) {
+              items[j].value = new Date(Number(curRec.initialValue));
+            }
           }
           else if (curRec.type === 'repo') {
             items[j] = {
@@ -130,6 +145,9 @@ Nexus.util.FormFieldUtil = {
               width : width,
               minListWidth : width
             };
+            if (curRec.initialValue) {
+              items[j].value = curRec.initialValue;
+            }
           }
           else if (curRec.type === 'group') {
             items[j] = {
@@ -152,6 +170,9 @@ Nexus.util.FormFieldUtil = {
               width : width,
               minListWidth : width
             };
+            if (curRec.initialValue) {
+              items[j].value = curRec.initialValue;
+            }
           }
           else if (curRec.type === 'repo-or-group') {
             items[j] = {
@@ -174,6 +195,9 @@ Nexus.util.FormFieldUtil = {
               width : width,
               minListWidth : width
             };
+            if (curRec.initialValue) {
+              items[j].value = curRec.initialValue;
+            }
           }
           else if (customTypes && customTypes[curRec.type]) {
             items[j] = customTypes[curRec.type].createItem.call(this, curRec, fieldNamePrefix, width);

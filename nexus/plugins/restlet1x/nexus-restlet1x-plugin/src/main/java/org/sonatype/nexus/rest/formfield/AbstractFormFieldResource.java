@@ -37,7 +37,11 @@ public abstract class AbstractFormFieldResource
                 dto.setRegexValidation( field.getRegexValidation() );
                 dto.setRequired( field.isRequired() );
                 dto.setType( field.getType() );
-                
+                if ( field.getInitialValue() != null )
+                {
+                    dto.setInitialValue( field.getInitialValue().toString() );
+                }
+
                 dtoList.add( dto );
             }
             catch ( InstantiationException e )

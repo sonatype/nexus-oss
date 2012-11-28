@@ -13,7 +13,7 @@
 package org.sonatype.nexus.formfields;
 
 public class CheckboxFormField
-    extends AbstractFormField
+    extends AbstractFormField<Boolean>
 {   
     public CheckboxFormField( String id, String label, String helpText, boolean required )
     {
@@ -29,4 +29,11 @@ public class CheckboxFormField
     {
         return "checkbox";
     }
+
+    public CheckboxFormField withInitialValue( final Boolean initialValue )
+    {
+        setInitialValue( initialValue );
+        return this;
+    }
+
 }

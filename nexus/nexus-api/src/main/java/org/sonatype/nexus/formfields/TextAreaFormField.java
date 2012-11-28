@@ -18,7 +18,7 @@ package org.sonatype.nexus.formfields;
  * @since 2.0
  */
 public class TextAreaFormField
-    extends AbstractFormField
+    extends AbstractFormField<String>
 {
 
     public TextAreaFormField( String id, String label, String helpText, boolean required, String regexValidation )
@@ -39,6 +39,12 @@ public class TextAreaFormField
     public String getType()
     {
         return "text-area";
+    }
+
+    public TextAreaFormField withInitialValue( final String initialValue )
+    {
+        setInitialValue( initialValue );
+        return this;
     }
 
 }
