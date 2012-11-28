@@ -961,14 +961,10 @@ public class DefaultIndexerManager
 
                         TaskUtil.checkInterruption();
 
-                        logger.info( RepositoryStringUtils.getFormattedMessage( "Scanning local storage of repository %s", repository ) );
                         // igorf, this needs be merged back to maven indexer, see MINDEXER-65
                         final NexusScanningListener scanListener =
                             new NexusScanningListener( context, fullReindex);
                         final ScanningResult scanningResult = scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
-                        logger.info( "{}: totalIndexed={}, deletedFromIndex={}",
-                            RepositoryStringUtils.getFormattedMessage( "Scanned local storage of repository %s",
-                                                                       repository ), scanningResult.getTotalFiles(), scanningResult.getDeletedFiles() );
                     }
                 };
                 if ( fullReindex )

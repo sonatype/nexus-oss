@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
@@ -29,14 +30,14 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.maven.index.ArtifactContext;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactScanningListener;
 import org.apache.maven.index.ScanningResult;
-import org.apache.maven.index.context.IndexUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.TaskUtil;
 import com.google.common.base.Throwables;
 
@@ -54,6 +55,8 @@ public class NexusScanningListener
     implements ArtifactScanningListener
 {
 
+    private final Logger logger;
+
     private final IndexingContext context;
 
     private final IndexSearcher contextIndexSearcher;
@@ -66,16 +69,29 @@ public class NexusScanningListener
     // exceptions detected and gathered during scanning
     private final List<Exception> exceptions = new ArrayList<Exception>();
 
-    // total count of indexed artifacts (documents created/updated)
-    private int count = 0;
+    // total count of artifacts discovered
+    private int discovered;
+
+    // total count of artifacts added to index
+    private int added;
+
+    // total count of artifacts updated on index
+    private int updated;
+
+    // timestamp in millis when scanning started
+    private long scanningStarted;
 
     public NexusScanningListener( final IndexingContext context,
         final boolean fullReindex )
         throws IOException
     {
+        this.logger = LoggerFactory.getLogger( getClass() );
         this.context = context;
         this.contextIndexSearcher = context.acquireIndexSearcher();
         this.fullReindex = fullReindex;
+        this.discovered = 0;
+        this.added = 0;
+        this.updated = 0;
     }
 
     private void releaseIndexSearcher()
@@ -93,7 +109,8 @@ public class NexusScanningListener
     @Override
     public void scanningStarted( final IndexingContext ctx )
     {
-        // nop
+        logger.info( "Indexing repositoryID=\"{}\" started.", ctx.getRepositoryId() );
+        scanningStarted = System.currentTimeMillis();
     }
 
     @Override
@@ -108,33 +125,40 @@ public class NexusScanningListener
 
         try
         {
-            // if non-fullReindex, check for presence on index, act only if not found
-            if ( !fullReindex && isOnIndex( ac ) )
-            {
-                return;
-            }
+            // hosted-full: just blindly add, no need for uniq check, as it happens against empty ctx
+            // hosted-nonFull: do update, add when document changed (see update method)
+            // proxy-full: do update, as record might be present from downloaded index. Usually is, but Central does not publish ClassNames so update will happen
+            // proxy-non-full: do update, as record might be present from downloaded index.
 
             // act accordingly what we do: hosted/proxy repair/update
+            final IndexOp indexOp;
             if ( fullReindex && !context.isReceivingUpdates() )
             {
                 // HOSTED-full only -- in this case, work is done against empty temp ctx so it fine
                 // is cheaper, does add, but
                 // does not maintain uniqueness
-                index( context, ac );
+                indexOp = index( context, ac );
             }
             else
             {
                 // HOSTED-nonFull + PROXY-full/nonFull must go this path. In case of proxy, remote index was pulled, so ctx is not empty
                 // is costly, does delete+add
                 // maintains uniqueness
-                update( context, ac );
+                indexOp = update( context, ac );
             }
-
+            discovered++;
+            if ( IndexOp.ADDED == indexOp )
+            {
+                added++;
+            }
+            else if ( IndexOp.UPDATED == indexOp )
+            {
+                updated++;
+            }
             for ( Exception e : ac.getErrors() )
             {
                 artifactError( ac, e );
             }
-            count++;
         }
         catch ( IOException ex )
         {
@@ -149,15 +173,13 @@ public class NexusScanningListener
         try
         {
             TaskUtil.checkInterruption();
-            result.setTotalFiles( count );
-            result.getExceptions().addAll( exceptions );
-
+            int removed = 0;
             try
             {
                 if ( !context.isReceivingUpdates() && !fullReindex )
                 {
-                    // HOSTED-update only, remove deleted ones
-                    result.setDeletedFiles( removeDeletedArtifacts( result.getRequest().getStartingPath() ) );
+                    // HOSTED-nonFull only, perform delete detection too (remove stuff from index that is removed from repository
+                    removed = removeDeletedArtifacts( result.getRequest().getStartingPath() );
                 }
                 // rebuild groups, as methods moved out from IndexerEngine does not maintain groups anymore
                 // as it makes no sense to do it during batch invocation of update method
@@ -168,6 +190,10 @@ public class NexusScanningListener
             {
                 result.addException( ex );
             }
+
+            result.setTotalFiles( discovered );
+            result.setDeletedFiles( removed );
+            result.getExceptions().addAll( exceptions );
 
             if ( result.getDeletedFiles() > 0 || result.getTotalFiles() > 0 )
             {
@@ -181,6 +207,11 @@ public class NexusScanningListener
                     result.addException( ex );
                 }
             }
+            logger.info(
+                "Indexing repositoryID=\"{}\" finished: scanned={}, added={}, updated={}, removed={}, scanningDuration={}",
+                ctx.getRepositoryId(), discovered, added, updated, removed,
+                DurationFormatUtils.formatDurationHMS( System.currentTimeMillis() - scanningStarted )
+            );
         }
         finally
         {
@@ -192,15 +223,6 @@ public class NexusScanningListener
     public void artifactError( final ArtifactContext ac, final Exception e )
     {
         exceptions.add( e );
-    }
-
-    private boolean isOnIndex( final ArtifactContext ac )
-        throws IOException
-    {
-        final TopScoreDocCollector collector = TopScoreDocCollector.create( 1, false );
-        contextIndexSearcher.search( new TermQuery( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ) ),
-                                     collector );
-        return collector.getTotalHits() != 0;
     }
 
     /**
@@ -248,8 +270,10 @@ public class NexusScanningListener
                         if ( contextPath == null
                             || context.getGavCalculator().gavToPath( ac.getGav() ).startsWith( contextPath ) )
                         {
-                            remove( context, ac );
-                            deleted++;
+                            if ( IndexOp.DELETED == remove( context, ac ) )
+                            {
+                                deleted++;
+                            }
                         }
                     }
                 }
@@ -268,7 +292,12 @@ public class NexusScanningListener
     // * none of the index/update/remove method does more that modifying index, timestamp is not set by either
     // * update does not maintains groups either (per invocation!), it happens once at scan finish
 
-    private void index( final IndexingContext context, final ArtifactContext ac )
+    public enum IndexOp
+    {
+        NOOP, ADDED, UPDATED, DELETED;
+    }
+
+    private IndexOp index( final IndexingContext context, final ArtifactContext ac )
         throws IOException
     {
         if ( ac != null && ac.getGav() != null )
@@ -277,11 +306,13 @@ public class NexusScanningListener
             if ( d != null )
             {
                 context.getIndexWriter().addDocument( d );
+                return IndexOp.ADDED;
             }
         }
+        return IndexOp.NOOP;
     }
 
-    private void update( final IndexingContext context, final ArtifactContext ac )
+    private IndexOp update( final IndexingContext context, final ArtifactContext ac )
         throws IOException
     {
         if ( ac != null && ac.getGav() != null )
@@ -290,16 +321,23 @@ public class NexusScanningListener
             if ( d != null )
             {
                 final Document old = getOldDocument( context, ac );
-                if ( !equals( d, old ) )
+                if ( old == null )
+                {
+                    context.getIndexWriter().addDocument( d );
+                    return IndexOp.ADDED;
+                }
+                else if ( !equals( d, old ) )
                 {
                     context.getIndexWriter().updateDocument(
                         new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ), d );
+                    return IndexOp.UPDATED;
                 }
             }
         }
+        return IndexOp.NOOP;
     }
 
-    private void remove( final IndexingContext context, final ArtifactContext ac )
+    private IndexOp remove( final IndexingContext context, final ArtifactContext ac )
         throws IOException
     {
         if ( ac != null )
@@ -313,15 +351,19 @@ public class NexusScanningListener
             IndexWriter w = context.getIndexWriter();
             w.addDocument( doc );
             w.deleteDocuments( new Term( ArtifactInfo.UINFO, uinfo ) );
+            return IndexOp.DELETED;
         }
+        return IndexOp.NOOP;
     }
 
     private boolean equals( final Document d1, final Document d2 )
     {
+        // d1 is never null, check caller
         if ( d1 == null && d2 == null )
         {
             return true;
         }
+        // d2 is never null, check caller
         if ( d1 == null || d2 == null )
         {
             return false;
