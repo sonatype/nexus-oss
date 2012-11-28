@@ -109,7 +109,7 @@ public class NexusScanningListener
     @Override
     public void scanningStarted( final IndexingContext ctx )
     {
-        logger.info( "Indexing repositoryID=\"{}\" started.", ctx.getRepositoryId() );
+        logger.info( "Scanning of repositoryID=\"{}\" started.", ctx.getRepositoryId() );
         scanningStarted = System.currentTimeMillis();
     }
 
@@ -208,7 +208,7 @@ public class NexusScanningListener
                 }
             }
             logger.info(
-                "Indexing repositoryID=\"{}\" finished: scanned={}, added={}, updated={}, removed={}, scanningDuration={}",
+                "Scanning of repositoryID=\"{}\" finished: scanned={}, added={}, updated={}, removed={}, scanningDuration={}",
                 ctx.getRepositoryId(), discovered, added, updated, removed,
                 DurationFormatUtils.formatDurationHMS( System.currentTimeMillis() - scanningStarted )
             );
