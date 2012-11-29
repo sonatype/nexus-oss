@@ -22,10 +22,6 @@ import java.io.File;
 public interface YumRepository
 {
 
-    static final String PATH_OF_REPODATA = "repodata";
-
-    static final String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/repomd.xml";
-
     File getBaseDir();
 
     File getFile( String path );

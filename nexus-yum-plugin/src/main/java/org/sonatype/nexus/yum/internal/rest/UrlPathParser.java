@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.yum.YumRepository;
+import org.sonatype.nexus.yum.Yum;
 
 /**
  * @since 3.0
@@ -83,18 +83,18 @@ public class UrlPathParser
             return new UrlPathInterpretation( repoUrl, null, true );
         }
 
-        if ( YumRepository.PATH_OF_REPODATA.equals( lastSegments.get( FIRST_PARAM ) ) )
+        if ( Yum.PATH_OF_REPODATA.equals( lastSegments.get( FIRST_PARAM ) ) )
         {
             if ( lastSegments.size() == 1 )
             {
                 return new UrlPathInterpretation(
-                    repoUrl, YumRepository.PATH_OF_REPODATA, true, true, pathToIndex( segments )
+                    repoUrl, Yum.PATH_OF_REPODATA, true, true, pathToIndex( segments )
                 );
             }
 
             if ( lastSegments.get( SECOND_PARAM ).length() == 0 )
             {
-                return new UrlPathInterpretation( repoUrl, YumRepository.PATH_OF_REPODATA, true );
+                return new UrlPathInterpretation( repoUrl, Yum.PATH_OF_REPODATA, true );
             }
 
             if ( lastSegments.size() == 2 )

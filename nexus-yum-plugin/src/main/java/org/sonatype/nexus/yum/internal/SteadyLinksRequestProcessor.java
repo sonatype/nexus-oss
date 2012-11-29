@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.yum.internal;
 
-import static org.sonatype.nexus.yum.YumRepository.PATH_OF_REPODATA;
-import static org.sonatype.nexus.yum.YumRepository.PATH_OF_REPOMD_XML;
+import static org.sonatype.nexus.yum.Yum.PATH_OF_REPODATA;
+import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 
 import java.io.IOException;
 import java.io.InputStream;

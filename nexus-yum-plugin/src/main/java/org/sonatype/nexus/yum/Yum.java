@@ -29,6 +29,8 @@ public interface Yum
 {
 
     static final long DEFAULT_DELETE_PROCESSING_DELAY = 10;
+    String PATH_OF_REPODATA = "repodata";
+    String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/repomd.xml";
 
     /**
      * Configures if deletes from a Nexus repository should result in Yum metadata regeneration.

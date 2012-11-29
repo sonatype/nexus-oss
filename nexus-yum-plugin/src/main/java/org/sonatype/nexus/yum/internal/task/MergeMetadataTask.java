@@ -14,7 +14,7 @@ package org.sonatype.nexus.yum.internal.task;
 
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
-import static org.sonatype.nexus.yum.YumRepository.PATH_OF_REPOMD_XML;
+import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;

@@ -33,7 +33,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
-import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.task.MergeMetadataTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -158,7 +157,7 @@ public class EventsRouter
                 try
                 {
                     repositoryRegistry.get().getRepository( repositoryId ).retrieveItem(
-                        new ResourceStoreRequest( YumRepository.PATH_OF_REPOMD_XML )
+                        new ResourceStoreRequest( Yum.PATH_OF_REPOMD_XML )
                     );
                     return true;
                 }
