@@ -21,20 +21,18 @@ public interface Yum
 {
 
     /**
-     * Retrieves the version behind the given alias.
-     *
-     * @param repositoryId
-     * @param alias
-     * @return
+     * @param repositoryId Nexus repository (cannot be null)
+     * @param alias        alias name (cannot be null)
+     * @return the version behind the given alias
      */
     String getAlias( String repositoryId, String alias );
 
     /**
      * Creates for the given repository an alias to a specific
      *
-     * @param repositoryId
-     * @param alias
-     * @param version
+     * @param repositoryId Nexus repository (cannot be null)
+     * @param alias        alias name (cannot be null)
+     * @param version      version to be aliased
      */
     void createOrUpdateAlias( String repositoryId, String alias, String version );
 
