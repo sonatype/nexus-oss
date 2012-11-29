@@ -92,7 +92,7 @@ public interface Yum
     /**
      * @return associated Nexus repository (never null)
      */
-    Repository getRepository();
+    Repository getNexusRepository();
 
     YumRepository getYumRepository( String version, URL repoBaseUrl )
         throws Exception;

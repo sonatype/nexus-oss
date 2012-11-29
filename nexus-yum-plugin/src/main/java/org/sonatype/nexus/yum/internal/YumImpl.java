@@ -153,7 +153,7 @@ public class YumImpl
     public void addVersion( final String version )
     {
         versions.add( version );
-        LOG.debug( "Added version '{}' to repository '{}", version, getRepository().getId() );
+        LOG.debug( "Added version '{}' to repository '{}", version, getNexusRepository().getId() );
     }
 
     @Override
@@ -186,7 +186,7 @@ public class YumImpl
     }
 
     @Override
-    public Repository getRepository()
+    public Repository getNexusRepository()
     {
         return repository;
     }
@@ -397,7 +397,7 @@ public class YumImpl
             if ( isDeleted( path ) )
             {
                 LOG.debug(
-                    "Recreate yum repository {} because of removed path {}", getRepository().getId(), path
+                    "Recreate yum repository {} because of removed path {}", getNexusRepository().getId(), path
                 );
                 recreateRepository();
             }
@@ -405,7 +405,7 @@ public class YumImpl
             {
                 LOG.debug(
                     "Rescheduling creation of yum repository {} because path {} not deleted.",
-                    getRepository().getId(), path
+                    getNexusRepository().getId(), path
                 );
                 schedule( this );
             }
@@ -413,7 +413,7 @@ public class YumImpl
             {
                 LOG.warn(
                     "Deleting path {} in repository {} took too long - retried {} times.",
-                    path, getRepository().getId(), MAX_EXECUTION_COUNT
+                    path, getNexusRepository().getId(), MAX_EXECUTION_COUNT
                 );
             }
         }

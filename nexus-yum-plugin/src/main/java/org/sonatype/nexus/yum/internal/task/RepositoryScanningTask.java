@@ -60,7 +60,7 @@ public class RepositoryScanningTask
         checkNotNull( yum, "Yum must be set" );
 
         getLogger().debug(
-            "Scanning repository '{}' base dir '{}' for RPMs", yum.getRepository().getId(), yum.getBaseDir()
+            "Scanning repository '{}' base dir '{}' for RPMs", yum.getNexusRepository().getId(), yum.getBaseDir()
         );
 
         for ( final File rpm : scanner.scan( yum.getBaseDir() ) )
@@ -101,7 +101,7 @@ public class RepositoryScanningTask
     @Override
     protected String getMessage()
     {
-        return "Scanning repository '" + yum.getRepository().getId() + "'";
+        return "Scanning repository '" + yum.getNexusRepository().getId() + "'";
     }
 
     public void setYum( final Yum yum )
