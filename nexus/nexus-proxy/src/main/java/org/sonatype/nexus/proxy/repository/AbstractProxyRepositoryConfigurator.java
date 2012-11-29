@@ -147,6 +147,13 @@ public abstract class AbstractProxyRepositoryConfigurator
             {
                 RemoteStorageContext rsc = prepository.getRemoteStorageContext();
 
+                // NEXUS-5258 Do not persist storage provider hint if it's the default one
+                if ( remoteProviderHintFactory.getDefaultHttpRoleHint().equals(
+                        prepository.getRemoteStorage().getProviderId() ) )
+                {
+                    repoConfig.getRemoteStorage().setProvider( null );
+                }
+
                 if ( rsc.hasRemoteAuthenticationSettings() )
                 {
                     repoConfig.getRemoteStorage().setAuthentication(
