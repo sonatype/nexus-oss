@@ -353,7 +353,7 @@ public class DefaultFSPeer
 
         try
         {
-            final File repoTmpFolder = new File( repositoryBaseDir, REPO_TMP_FOLDER + item.getPath() );
+            final File repoTmpFolder = new File( repositoryBaseDir, REPO_TMP_FOLDER + item.getParentPath() );
             mkDirs( repository, repoTmpFolder );
 
             // NEXUS-4955 add APPENDIX to make sure prefix is bigger the 3 chars
