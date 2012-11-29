@@ -44,9 +44,9 @@ public class YumRepositoryImpl
     }
 
     @Override
-    public File getFile( String path )
+    public File resolvePath( final String path )
     {
-        return ( path == null ) ? baseDir : new File( baseDir, path );
+        return ( path == null || "/".equals( path ) ) ? baseDir : new File( baseDir, path.trim() );
     }
 
     public boolean isDirty()

@@ -25,7 +25,7 @@ public class YumFileRepresentation
 
     public YumFileRepresentation( UrlPathInterpretation interpretation, YumRepository yumRepository )
     {
-        super( yumRepository.getFile( interpretation.getPath() ), getMediaType( interpretation.getPath() ) );
+        super( yumRepository.resolvePath( interpretation.getPath() ), getMediaType( interpretation.getPath() ) );
     }
 
     private static MediaType getMediaType( String path )

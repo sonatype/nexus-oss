@@ -15,13 +15,19 @@ package org.sonatype.nexus.yum;
 import java.io.File;
 
 /**
- * Provides access to Yum metadata.
+ * Provides access to Yum FS.
  *
  * @since 3.0
  */
 public interface YumRepository
 {
 
-    File getFile( String path );
+    /**
+     * Resolves a file given its path.
+     *
+     * @param path to be resolved. A null value is considered similar to "/" (root)
+     * @return resolved file
+     */
+    File resolvePath( String path );
 
 }

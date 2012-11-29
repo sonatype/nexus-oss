@@ -37,7 +37,7 @@ public class IndexRepresentation
         StringBuilder builder = new StringBuilder();
         builder.append( "<html><head><title>File list</title></head><body><ul>" );
 
-        File directory = yumRepository.getFile( interpretation.getPath() );
+        File directory = yumRepository.resolvePath( interpretation.getPath() );
 
         appendFiles( builder, directory.listFiles() );
 
