@@ -405,6 +405,7 @@ public class TestMarshalUnmarchal
         repo.setChecksumPolicy( "IGNORE" );
         repo.setMetadataMaxAge( 42 );
         repo.setArtifactMaxAge( 41 );
+        repo.setItemMaxAge( 43 );
         repo.setContentResourceURI( "contentResourceURI" );
         repo.setDefaultLocalStorageUrl( "defaultlocalstorage" );
         repo.setExposed( true );

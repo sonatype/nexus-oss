@@ -153,6 +153,7 @@ define('repoServer/resources',['sonatype/all'], function(){
       notFoundCacheTTL : 'This controls how long to cache the fact that a file was not found in the repository.',
       artifactMaxAge : 'This controls how long to cache the artifacts in the repository before rechecking the remote repository. In a release repository, this value should be -1 (infinite) as release artifacts shouldn\'t change.',
       metadataMaxAge : 'This controls how long to cache the metadata in the repository before rechecking the remote repository. Unlike artifact max age, this value should not be infinite or Maven won\'t discover new artifact releases.',
+      itemMaxAge : 'This controls how long to cache the items in the repository before rechecking the remote repository. The value is used for repository items which are nor artifacts nor metadata.',
       provider : 'This is the content provider of the repository.',
       format : 'This is the format of the repository.  Maven1 = A Maven 1.x formatted view of the repository.  Maven2 = A Maven 2.x formatted view of the repository.',
 
