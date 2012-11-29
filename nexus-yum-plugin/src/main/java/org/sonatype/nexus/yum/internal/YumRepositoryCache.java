@@ -37,7 +37,7 @@ public class YumRepositoryCache
 
     public void cache( YumRepositoryImpl yumRepository )
     {
-        cache.put( hash( yumRepository.getId(), yumRepository.getVersion() ), yumRepository );
+        cache.put( hash( yumRepository.nexusRepositoryId(), yumRepository.version() ), yumRepository );
     }
 
     public void markDirty( String id, String version )

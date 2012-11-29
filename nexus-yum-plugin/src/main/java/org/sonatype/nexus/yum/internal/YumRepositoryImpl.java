@@ -38,7 +38,6 @@ public class YumRepositoryImpl
         this.version = version;
     }
 
-    @Override
     public File getBaseDir()
     {
         return baseDir;
@@ -50,7 +49,6 @@ public class YumRepositoryImpl
         return ( path == null ) ? baseDir : new File( baseDir, path );
     }
 
-    @Override
     public boolean isDirty()
     {
         return dirty;
@@ -61,14 +59,12 @@ public class YumRepositoryImpl
         this.dirty = true;
     }
 
-    @Override
-    public String getVersion()
+    public String version()
     {
         return version;
     }
 
-    @Override
-    public String getId()
+    public String nexusRepositoryId()
     {
         return id;
     }

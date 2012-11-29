@@ -22,14 +22,6 @@ import java.io.File;
 public interface YumRepository
 {
 
-    File getBaseDir();
-
     File getFile( String path );
-
-    boolean isDirty();
-
-    String getVersion();
-
-    String getId();
 
 }
