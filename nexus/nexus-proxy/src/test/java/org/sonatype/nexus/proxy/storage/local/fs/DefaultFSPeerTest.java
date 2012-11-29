@@ -19,6 +19,9 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 import java.io.File;
 
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 public class DefaultFSPeerTest
 {
@@ -27,11 +30,14 @@ public class DefaultFSPeerTest
     public void testGetHiddenTarget()
         throws Exception
     {
-        File base = new File( "target/a/b/c/d" );
+        File repoBase = new File( "target/a" );
+        File base = new File( repoBase, "b/c/d" );
         base.getParentFile().mkdirs();
         base.createNewFile();
 
-        File created = new DefaultFSPeer().getHiddenTarget( base, null );
+        final StorageFileItem file = Mockito.mock( StorageFileItem.class );
+        Mockito.when( file.getPath() ).thenReturn( "/b/c/d" );
+        File created = new DefaultFSPeer().getHiddenTarget( null, repoBase, base, file );
         assertThat( created, notNullValue() );
         assertThat( created, exists() );
     }

@@ -85,8 +85,8 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
 
         // Mock FSPeer to return the results created above
         FSPeer fsPeer = mock( FSPeer.class );
-        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( ResourceStoreRequest.class ), eq( validDir ) ) ).thenReturn( validFileCollection );
-        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( ResourceStoreRequest.class ), eq( new File( repoLocation, "invalid/" ) ) ) ).thenReturn( invalidFileCollection );
+        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( File.class ), Mockito.any( ResourceStoreRequest.class ), eq( validDir ) ) ).thenReturn( validFileCollection );
+        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( File.class ), Mockito.any( ResourceStoreRequest.class ), eq( new File( repoLocation, "invalid/" ) ) ) ).thenReturn( invalidFileCollection );
 
         // create Repository Mock
         Repository repository = mock( Repository.class );
