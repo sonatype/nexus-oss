@@ -1059,7 +1059,6 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
         // @todo: would be faster to pre-render the six variations of the menu for whole instance
         var menu = new Ext.menu.Menu({
-              id : 'capability-grid-ctx',
               items : [this.actions.doRefresh]
             });
 
