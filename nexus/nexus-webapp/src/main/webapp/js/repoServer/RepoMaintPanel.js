@@ -507,8 +507,6 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
           Ext.TaskMgr.stop(this.repoStatusTask);
         }
 
-        success =false;
-
         if (success)
         {
           var statusResp = Ext.decode(response.responseText);
