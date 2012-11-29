@@ -242,9 +242,9 @@ public class YumImpl
     }
 
     @Override
-    public void recreateRepository()
+    public ScheduledTask<YumRepository> regenerate()
     {
-        createYumRepository();
+        return addRpmAndRegenerate( null );
     }
 
     @Override
@@ -254,7 +254,7 @@ public class YumImpl
     }
 
     @Override
-    public ScheduledTask<YumRepository> addToYumRepository( @Nullable String filePath )
+    public ScheduledTask<YumRepository> addRpmAndRegenerate( @Nullable String filePath )
     {
         try
         {
@@ -292,11 +292,6 @@ public class YumImpl
         return (ScheduledTask<YumRepository>) existingScheduledTask;
     }
 
-    ScheduledTask<YumRepository> createYumRepository()
-    {
-        return addToYumRepository( null );
-    }
-
     private GenerateMetadataTask createTask()
     {
         final GenerateMetadataTask task = nexusScheduler.createTaskInstance( GenerateMetadataTask.class );
@@ -315,20 +310,20 @@ public class YumImpl
     }
 
     @Override
-    public void deleteRpm( String path )
+    public void regenerateWhenPathIsRemoved( String path )
     {
         if ( shouldProcessDeletes() )
         {
             if ( findDelayedParentDirectory( path ) == null )
             {
                 LOG.debug( "Delete rpm {} / {}", repository.getId(), path );
-                recreateRepository();
+                regenerate();
             }
         }
     }
 
     @Override
-    public void deleteDirectory( String path )
+    public void regenerateWhenDirectoryIsRemoved( String path )
     {
         if ( shouldProcessDeletes() )
         {
@@ -399,7 +394,7 @@ public class YumImpl
                 LOG.debug(
                     "Recreate yum repository {} because of removed path {}", getNexusRepository().getId(), path
                 );
-                recreateRepository();
+                regenerate();
             }
             else if ( executionCount < MAX_EXECUTION_COUNT )
             {

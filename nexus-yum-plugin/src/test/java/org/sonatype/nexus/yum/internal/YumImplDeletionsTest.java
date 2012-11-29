@@ -85,7 +85,7 @@ public class YumImplDeletionsTest
     public void shouldNotRegenerateRepositoryWithoutRpms()
         throws Exception
     {
-        yum.deleteDirectory( BASE_PATH );
+        yum.regenerateWhenDirectoryIsRemoved( BASE_PATH );
         sleep( TIMEOUT_IN_SEC * 2000 );
         verify( nexusScheduler, times( 0 ) ).submit(
             Mockito.anyString(), Mockito.any( GenerateMetadataTask.class )
@@ -99,8 +99,8 @@ public class YumImplDeletionsTest
         when( repository.retrieveItem( any( ResourceStoreRequest.class ) ) )
             .thenThrow( new ItemNotFoundException( new ResourceStoreRequest( "/some/fake/path" ) ) );
 
-        yum.deleteDirectory( BASE_PATH );
-        yum.deleteRpm( SUB_PATH1 );
+        yum.regenerateWhenDirectoryIsRemoved( BASE_PATH );
+        yum.regenerateWhenPathIsRemoved( SUB_PATH1 );
 
         sleep( TIMEOUT_IN_SEC * 2000 );
 
@@ -116,10 +116,10 @@ public class YumImplDeletionsTest
         when( repository.retrieveItem( any( ResourceStoreRequest.class ) ) )
             .thenThrow( new ItemNotFoundException( new ResourceStoreRequest( "/some/fake/path" ) ) );
 
-        yum.deleteDirectory( BASE_PATH );
-        yum.deleteRpm( SUB_PATH1 );
-        yum.deleteRpm( SUB_PATH2 );
-        yum.deleteRpm( SUB_PATH3 );
+        yum.regenerateWhenDirectoryIsRemoved( BASE_PATH );
+        yum.regenerateWhenPathIsRemoved( SUB_PATH1 );
+        yum.regenerateWhenPathIsRemoved( SUB_PATH2 );
+        yum.regenerateWhenPathIsRemoved( SUB_PATH3 );
 
         sleep( TIMEOUT_IN_SEC * 2000 );
 
@@ -138,8 +138,8 @@ public class YumImplDeletionsTest
             .thenReturn( null )
             .thenThrow( new ItemNotFoundException( new ResourceStoreRequest( "/some/fake/path" ) ) );
 
-        yum.deleteDirectory( BASE_PATH );
-        yum.deleteRpm( SUB_PATH1 );
+        yum.regenerateWhenDirectoryIsRemoved( BASE_PATH );
+        yum.regenerateWhenPathIsRemoved( SUB_PATH1 );
 
         sleep( TIMEOUT_IN_SEC * 1500 );
         verify( nexusScheduler, times( 0 ) ).submit(
@@ -156,7 +156,7 @@ public class YumImplDeletionsTest
     public void shouldRegenerateRepositoryAfterDeletionSingleRpm()
         throws Exception
     {
-        yum.deleteRpm( SUB_PATH1 );
+        yum.regenerateWhenPathIsRemoved( SUB_PATH1 );
         verify( nexusScheduler, times( 1 ) ).submit(
             Mockito.anyString(), Mockito.any( GenerateMetadataTask.class )
         );

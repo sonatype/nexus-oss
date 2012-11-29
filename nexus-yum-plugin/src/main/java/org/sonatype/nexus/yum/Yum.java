@@ -94,16 +94,26 @@ public interface Yum
      */
     Repository getNexusRepository();
 
+    /**
+     * Regenerates Yum metadata.
+     *
+     * @return regenerate future (never null)
+     */
+    ScheduledTask<YumRepository> regenerate();
+
+    /**
+     * Adds RPM and regenerate.
+     * @param path to be added
+     * @return regenerate future (never null)
+     */
+    ScheduledTask<YumRepository> addRpmAndRegenerate( String path );
+
     YumRepository getYumRepository( String version, URL repoBaseUrl )
         throws Exception;
 
-    ScheduledTask<YumRepository> addToYumRepository( String path );
+    void regenerateWhenPathIsRemoved( String path );
 
-    void recreateRepository();
-
-    void deleteRpm( String path );
-
-    void deleteDirectory( String path );
+    void regenerateWhenDirectoryIsRemoved( String path );
 
     File getBaseDir();
 

@@ -108,7 +108,7 @@ public class EventsRouter
             if ( yum != null )
             {
                 yum.markDirty( getItemVersion( eventStore.getItem() ) );
-                yum.addToYumRepository( eventStore.getItem().getPath() );
+                yum.addRpmAndRegenerate( eventStore.getItem().getPath() );
             }
         }
     }
@@ -122,11 +122,11 @@ public class EventsRouter
         {
             if ( isRpmItemEvent( itemEvent ) )
             {
-                yum.deleteRpm( itemEvent.getItem().getPath() );
+                yum.regenerateWhenPathIsRemoved( itemEvent.getItem().getPath() );
             }
             else if ( isCollectionItem( itemEvent ) )
             {
-                yum.deleteDirectory( itemEvent.getItem().getPath() );
+                yum.regenerateWhenDirectoryIsRemoved( itemEvent.getItem().getPath() );
             }
         }
     }

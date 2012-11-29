@@ -133,8 +133,8 @@ public class GenerateMetadataTaskConcurrencyTest
         final String file1 = "rpm1/" + rpm1.getName();
         final String file2 = "rpm2/" + rpm2.getName();
 
-        final ScheduledTask<YumRepository> first = yum.addToYumRepository( file1 );
-        final ScheduledTask<YumRepository> second = yum.addToYumRepository( file2 );
+        final ScheduledTask<YumRepository> first = yum.addRpmAndRegenerate( file1 );
+        final ScheduledTask<YumRepository> second = yum.addRpmAndRegenerate( file2 );
         futures.add( first );
         futures.add( second );
 
