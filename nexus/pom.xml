@@ -28,7 +28,6 @@
   <packaging>pom</packaging>
   <version>2.3-SNAPSHOT</version>
 
-  <name>${project.artifactId}</name>
   <inceptionYear>2007</inceptionYear>
   <url>http://nexus.sonatype.org/</url>
   
