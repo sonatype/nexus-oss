@@ -1346,7 +1346,7 @@ public class DefaultIndexerManager
     protected void publishRepositoryIndex( final Repository repository )
         throws IOException
     {
-        if (!INDEXABLE( repository ) && !INSERVICE( repository ))
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
             return;
         }
@@ -2299,7 +2299,8 @@ public class DefaultIndexerManager
         }
         else
         {
-            logger.warn( "Could not perform index operation on repository {}", repository.getId(), new Exception() );
+            logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                         new Exception( "This is an artificial exception that provides caller backtrace." ) );
         }
     }
 
