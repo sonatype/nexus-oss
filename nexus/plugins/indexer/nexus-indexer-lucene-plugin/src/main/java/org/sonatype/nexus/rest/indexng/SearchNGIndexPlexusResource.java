@@ -439,26 +439,7 @@ public class SearchNGIndexPlexusResource
 
                     if ( searchResponse != null )
                     {
-                        if ( collapseResults && searchResponse.getTotalHitsCount() < COLLAPSE_OVERRIDE_TRESHOLD )
-                        {
-                            searchResponse.close();
-
-                            // FIXME: fix this, this is ugly
-                            // We are returning null, to hint that we need UNCOLLAPSED search!
-                            // Needed, to be able to "signal" the fact that we are overriding collapsed switch
-                            // since we have to send it back in DTOs to REST client
-                            return null;
-
-                            // old code was a recursive call:
-                            // this was a "collapsed" search (probably initiated by UI), and we have less then treshold hits
-                            // override collapse
-                            // return searchByTerms( terms, repositoryId, from, count, exact, expandVersion, false, filters
-                            // );
-                        }
-                        else
-                        {
-                            return searchResponse;
-                        }
+                        return searchResponse;
                     }
                 }
             }
