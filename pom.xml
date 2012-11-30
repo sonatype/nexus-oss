@@ -147,18 +147,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
   </build>
-
-  <profiles>
-    <profile>
-      <id>nexus-maven-plugins</id>
-      <!-- HACK we leave out nexus-maven-plugins by default because when we release with it as part of aggregator -->
-      <!-- maven-release-plugin borks. It will be removed out after 2.1 anyways, then this profile no longer needed -->
-      <modules>
-        <module>nexus-maven-plugins</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>
