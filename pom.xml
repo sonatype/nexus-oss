@@ -413,7 +413,7 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <version>1.5.5</version>
+          <version>${plexus.version}</version>
           <executions>
             <execution>
               <id>process-classes</id>
