@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>22</version>
+    <version>23-SNAPSHOT</version>
     <relativePath />
   </parent>
 
@@ -30,7 +30,7 @@
 
   <inceptionYear>2007</inceptionYear>
   <url>http://nexus.sonatype.org/</url>
-  
+
   <issueManagement>
     <system>Jira</system>
     <url>http://links.sonatype.com/products/nexus/oss/issues</url>
@@ -193,7 +193,7 @@
 
     <nexus.plugin.name>CHANGEME-PLUGIN-NAME-NOT-CONFIGURED</nexus.plugin.name>
     <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
-    
+
     <!-- used in enunciate.xml -->
     <copyright.year>2012</copyright.year>
   </properties>
@@ -1319,9 +1319,6 @@
           NOTE: (2.3 which is the latest available, is better, but still has problems with directorySet outputDirectory permissions)
           -->
           <version>2.2-beta-3</version>
-          <configuration>
-            <tarLongFileMode>gnu</tarLongFileMode>
-          </configuration>
         </plugin>
 
         <plugin>
@@ -1904,26 +1901,6 @@
             </plugin>
           </plugins>
         </pluginManagement>
-      </build>
-    </profile>
-
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.mycila.maven-license-plugin</groupId>
-            <artifactId>maven-license-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
       </build>
     </profile>
 
