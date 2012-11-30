@@ -41,6 +41,20 @@
     <url>http://github.com/sonatype/nexus-p2-repository-plugin</url>
   </scm>
 
+  <repositories>
+    <repository>
+      <id>rso-public-grid</id>
+      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>rso-public-grid</id>
+      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <properties>
     <nexus.version>2.3-SNAPSHOT</nexus.version>
     <capabilities-plugin.version>2.2-SNAPSHOT</capabilities-plugin.version>
@@ -313,6 +327,26 @@
                 </plugin>
               </nexusPluginsArtifacts>
             </configuration>
+          </plugin>
+          <!-- HACK: This plugin is here just to force download of plugins used in poms built via Verifier -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+                <configuration>
+                  <extraArtifacts>
+                    <extraArtifact>org.sonatype.maven.plugins:maven-p2-bridge-plugin:1.0.8</extraArtifact>
+                    <extraArtifact>org.apache.maven.plugins:maven-clean-plugin:2.4.1</extraArtifact>
+                  </extraArtifacts>
+                  <localRepositoryPath>${project.build.directory}/maven-local-repository</localRepositoryPath>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

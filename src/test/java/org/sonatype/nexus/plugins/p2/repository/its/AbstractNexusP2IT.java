@@ -62,6 +62,8 @@ public abstract class AbstractNexusP2IT
 
         final Verifier verifier = new Verifier( basedir.getAbsolutePath() );
 
+        verifier.setLocalRepo( new File( getBasedir(), "target/maven-local-repository" ).getAbsolutePath() );
+
         verifier.setSystemProperty( "org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000" );
         verifier.setSystemProperty( "p2.installIU", installIU );
         verifier.setSystemProperty( "p2.destination", destination );
