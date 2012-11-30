@@ -207,14 +207,13 @@ public class MergeMetadataTask
     @Override
     protected String getAction()
     {
-        return "GENERATE_YUM_GROUP_REPOSITORY";
+        return "MERGE_YUM_METADATA";
     }
 
     @Override
     protected String getMessage()
     {
-        return format( "Generate yum metadata for group repository %s='%s'", groupRepository.getId(),
-                       groupRepository.getName() );
+        return format( "Merging Yum metadata in repository '%s'", groupRepository.getId() );
     }
 
     public GroupRepository getGroupRepository()

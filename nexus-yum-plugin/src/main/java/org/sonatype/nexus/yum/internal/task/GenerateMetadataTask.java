@@ -180,13 +180,13 @@ public class GenerateMetadataTask
     @Override
     protected String getAction()
     {
-        return "Yum metadata generation";
+        return "GENERATE_YUM_METADATA";
     }
 
     @Override
     protected String getMessage()
     {
-        return "Yum metadata generation";
+        return format( "Generate Yum metadata of repository '%s'", getRepositoryId() );
     }
 
     @Override
