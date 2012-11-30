@@ -375,7 +375,7 @@
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-restlet-bridge</artifactId>
-        <version>1.23-SNAPSHOT</version>
+        <version>1.24</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
