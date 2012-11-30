@@ -11,10 +11,6 @@
 @REM Eclipse Foundation. All other trademarks are the property of their respective owners.
 @REM
 
-@rem .
-@rem Copyright (c) 2009-2010 Sonatype, Inc. All rights reserved.
-@rem .
-
 @if "%WRAPPER_DEBUG%" == "" @echo off
 
 if "%OS%"=="Windows_NT" goto begin
