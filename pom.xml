@@ -63,16 +63,6 @@
           <groupId>com.mycila.maven-license-plugin</groupId>
           <artifactId>maven-license-plugin</artifactId>
           <configuration>
-            <includes>
-              <include>**/*.java</include>
-              <include>**/*.vm</include>
-              <include>**/*.xml</include>
-              <include>**/*.groovy</include>
-              <include>**/*.aj</include>
-              <include>**/*.css</include>
-              <include>**/*.html</include>
-              <include>**/*.js</include>
-            </includes>
             <excludes>
               <exclude>**/.*/**</exclude>
               <!-- we have target pattern in this format because of target package in nexus-api and nexus-proxy modules -->
@@ -105,9 +95,6 @@
               <exclude>zwork/**</exclude>
             </excludes>
           </configuration>
-          <goals>
-            <goal>check</goal>
-          </goals>
         </plugin>
 
         <plugin>
