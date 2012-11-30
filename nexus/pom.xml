@@ -162,10 +162,6 @@
     <tattletale.failOnWarn>false</tattletale.failOnWarn>
     <tattletale.failOnError>true</tattletale.failOnError>
 
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-
     <nexus.version>${project.version}</nexus.version>
 
     <!-- logging configuration used in logback config files to control test logging -->
@@ -197,7 +193,8 @@
 
     <nexus.plugin.name>CHANGEME-PLUGIN-NAME-NOT-CONFIGURED</nexus.plugin.name>
     <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
-
+    
+    <!-- used in enunciate.xml -->
     <copyright.year>2012</copyright.year>
   </properties>
 
