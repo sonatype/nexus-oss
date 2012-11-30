@@ -20,6 +20,7 @@ import static org.sonatype.nexus.yum.testsuite.client.MetadataType.PRIMARY_XML;
 
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -154,6 +155,7 @@ public class MergeMetadataIT
     }
 
     @Test
+    @Ignore
     @IgnoreOn( "mac" )
     public void shouldReFetchProxyMetadata()
         throws Exception
@@ -191,6 +193,12 @@ public class MergeMetadataIT
         content().upload(
             repositoryLocation( repo1.id(), "a_group3/an_artifact3/3.0/an_artifact3-3.0.rpm" ),
             testData().resolveFile( "/rpms/foo-bar-5.1.2-1.noarch.rpm" )
+        );
+
+        // deploy something again to repo 2 to trigger metadata re-merge which in turn will re-download from proxy
+        content().upload(
+            repositoryLocation( repo2.id(), "a_group2/an_artifact2/2.1/an_artifact2-2.1.rpm" ),
+            testData.resolveFile( "/rpms/test-rpm-5.6.7-1.noarch.rpm" )
         );
 
         waitForNexusToSettleDown();
