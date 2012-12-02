@@ -72,8 +72,7 @@ public class SearchNGIndexPlexusResourceTest
 
         try
         {
-            resource.searchByTerms( terms, "rid", 1, 1, false, false, true,
-                                    Collections.<ArtifactInfoFilter> emptyList(), Arrays.asList( searcher ) );
+            resource.searchByTerms( terms, "rid", 1, 1, false, Arrays.asList( searcher ) );
 
             Assert.fail( "Expected PlexusResourceException" );
         }
