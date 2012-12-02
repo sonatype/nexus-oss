@@ -13,7 +13,7 @@
 
 -->
 <model xsd.namespace="http://www.sonatype.com/xsd/security-model-2.0.3"
-    xsd.target-namespace="http://www.sonatype.com/xsd/security-model-2.0.3">
+    xsd.targetNamespace="http://www.sonatype.com/xsd/security-model-2.0.3">
 
     <id>security</id>
 
@@ -76,7 +76,7 @@
                     <name>privileges</name>
                     <version>2.0.0+</version>
                     <description>
-                        List of privileges that can be put in a role. 
+                        List of privileges that can be put in a role.
                     </description>
                     <association>
                         <type>CPrivilege</type>
@@ -84,13 +84,13 @@
                     </association>
                     <required>false</required>
                 </field>
-                
+
                 <!--  ALSO NEW STUFF, TODO, upgrade -->
                 <field>
                     <name>userRoleMappings</name>
                     <version>2.0.2+</version>
                     <description>
-                        List of User. 
+                        List of User.
                     </description>
                     <association>
                         <type>CUserRoleMapping</type>
@@ -98,7 +98,7 @@
                     </association>
                     <required>false</required>
                 </field>
-                
+
             </fields>
             <codeSegments>
                 <codeSegment>
@@ -139,7 +139,7 @@
                 </codeSegment>
             </codeSegments>
         </class>
-        
+
         <!-- Users -->
         <class java.clone="deep">
             <name>CUser</name>
@@ -199,7 +199,7 @@
                     <name>roles</name>
                     <version>2.0.0/2.0.1</version>
                     <description>
-                        List of role ids that will define this user. 
+                        List of role ids that will define this user.
                     </description>
                     <association>
                         <type>String</type>
@@ -213,18 +213,18 @@
                     <version>2.0.0+</version>
                     <code><![CDATA[
     public static final String STATUS_DISABLED = "disabled";
-    
+
     public static final String STATUS_ACTIVE = "active";
-    
+
     //Not currently supported
     //public static final String STATUS_LOCKED = "locked";
-    
+
     //public static final String STATUS_EXPIRED = "expired";
 ]]></code>
                 </codeSegment>
             </codeSegments>
         </class>
-        
+
         <!-- Roles -->
         <class java.clone="deep">
             <name>CRole</name>
@@ -263,7 +263,7 @@
                     <name>privileges</name>
                     <version>2.0.0+</version>
                     <description>
-                        List of privilege ids that will define this role. 
+                        List of privilege ids that will define this role.
                     </description>
                     <association>
                         <type>String</type>
@@ -275,7 +275,7 @@
                     <name>roles</name>
                     <version>2.0.0+</version>
                     <description>
-                        List of role ids, whose contents, will also define this role. 
+                        List of role ids, whose contents, will also define this role.
                     </description>
                     <association>
                         <type>String</type>
@@ -346,7 +346,7 @@
                 </field>
             </fields>
         </class>
-        
+
         <!-- Properties -->
         <class java.clone="deep">
             <name>CProperty</name>
@@ -369,9 +369,9 @@
                 </field>
             </fields>
         </class>
-        
-        
-        
+
+
+
         <!-- MY NEW STUFF TODO: talk to max, about upgrade -->
 
 		<class java.clone="deep">

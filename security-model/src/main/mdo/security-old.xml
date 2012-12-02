@@ -13,7 +13,7 @@
 
 -->
 <model xsd.namespace="http://www.sonatype.com/xsd/nexus-security-configuration-1.0.1"
-    xsd.target-namespace="http://www.sonatype.com/xsd/nexus-security-configuration-1.0.1">
+    xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-security-configuration-1.0.1">
 
     <id>nexus-security</id>
 
@@ -44,7 +44,7 @@
                     <name>version</name>
                     <version>1.0.0+</version>
                     <description>
-                        The version of the security persisted model. Should be equal to the version in Nexus that consumes 
+                        The version of the security persisted model. Should be equal to the version in Nexus that consumes
                         this configuration.
                     </description>
                     <type>String</type>
@@ -76,7 +76,7 @@
                     <description>
                         List of repository target privileges that can be put in a role.  These privileges allow you to assign a Repository
                         Target.  You can then add this privilege to a role, and all user's with that role will gain access (as defined in method
-                        parameter below) to the targeted section of the repository. 
+                        parameter below) to the targeted section of the repository.
                     </description>
                     <association>
                         <type>CRepoTargetPrivilege</type>
@@ -88,7 +88,7 @@
                     <name>applicationPrivileges</name>
                     <version>1.0.0+</version>
                     <description>
-                        List of application privileges that can be put in a role.  These items are not dynamic and should not be modified. 
+                        List of application privileges that can be put in a role.  These items are not dynamic and should not be modified.
                     </description>
                     <association>
                         <type>CApplicationPrivilege</type>
@@ -106,7 +106,7 @@
                 </codeSegment>
             </codeSegments>
         </class>
-        
+
         <!-- Users -->
         <class>
             <name>CUser</name>
@@ -152,7 +152,7 @@
                     <name>roles</name>
                     <version>1.0.0+</version>
                     <description>
-                        List of role ids that will define this user. 
+                        List of role ids that will define this user.
                     </description>
                     <association>
                         <type>String</type>
@@ -166,18 +166,18 @@
                     <version>1.0.0+</version>
                     <code><![CDATA[
     public static final String STATUS_DISABLED = "disabled";
-    
+
     public static final String STATUS_ACTIVE = "active";
-    
+
     //Not currently supported
     //public static final String STATUS_LOCKED = "locked";
-    
+
     //public static final String STATUS_EXPIRED = "expired";
 ]]></code>
                 </codeSegment>
             </codeSegments>
         </class>
-        
+
         <!-- Roles -->
         <class>
             <name>CRole</name>
@@ -216,7 +216,7 @@
                     <name>privileges</name>
                     <version>1.0.0+</version>
                     <description>
-                        List of privilege ids that will define this role. 
+                        List of privilege ids that will define this role.
                     </description>
                     <association>
                         <type>String</type>
@@ -228,7 +228,7 @@
                     <name>roles</name>
                     <version>1.0.0+</version>
                     <description>
-                        List of role ids, whose contents, will also define this role. 
+                        List of role ids, whose contents, will also define this role.
                     </description>
                     <association>
                         <type>String</type>
@@ -281,9 +281,9 @@
     public static final String METHOD_READ = "read";
 
     public static final String METHOD_CREATE = "create";
-    
+
     public static final String METHOD_UPDATE = "update";
-    
+
     public static final String METHOD_DELETE = "delete";
 ]]></code>
                 </codeSegment>
@@ -307,7 +307,7 @@
                 </field>
             </fields>
         </class>
-        
+
         <class>
             <name>CRepoTargetPrivilege</name>
             <superClass>CPrivilege</superClass>

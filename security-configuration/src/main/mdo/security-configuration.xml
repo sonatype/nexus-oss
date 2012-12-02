@@ -13,7 +13,7 @@
 
 -->
 <model xsd.namespace="http://www.sonatype.com/xsd/security-configuration-2.0.3"
-    xsd.target-namespace="http://www.sonatype.com/xsd/security-configuration-2.0.3">
+    xsd.targetNamespace="http://www.sonatype.com/xsd/security-configuration-2.0.3">
 
   <id>security</id>
 
