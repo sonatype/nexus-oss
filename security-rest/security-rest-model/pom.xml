@@ -19,8 +19,8 @@
     <groupId>org.sonatype.security</groupId>
     <version>3.0-SNAPSHOT</version>
   </parent>
+  
   <artifactId>security-rest-model</artifactId>
-  <name>Security: REST Model</name>
   <description>Security REST Model.  The modello model used by the REST API.</description>
 
 
