@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.configuration.ConfigurationException;
@@ -45,6 +46,25 @@ public abstract class AbstractProxyRepositoryConfigurator
 
     @Requirement
     private RemoteProviderHintFactory remoteProviderHintFactory;
+
+    /**
+     * For plexus injection.
+     */
+    protected AbstractProxyRepositoryConfigurator()
+    {
+    }
+
+    @VisibleForTesting
+    AbstractProxyRepositoryConfigurator( final AuthenticationInfoConverter authenticationInfoConverter,
+                                                   final GlobalHttpProxySettings globalHttpProxySettings,
+                                                   final GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
+                                                   final RemoteProviderHintFactory remoteProviderHintFactory )
+    {
+        this.authenticationInfoConverter = authenticationInfoConverter;
+        this.globalHttpProxySettings = globalHttpProxySettings;
+        this.globalRemoteConnectionSettings = globalRemoteConnectionSettings;
+        this.remoteProviderHintFactory = remoteProviderHintFactory;
+    }
 
     @Override
     public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
