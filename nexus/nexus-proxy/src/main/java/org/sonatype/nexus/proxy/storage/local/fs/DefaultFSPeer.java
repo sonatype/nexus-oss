@@ -344,7 +344,7 @@ public class DefaultFSPeer
     protected File getHiddenTarget( final Repository repository, final File repositoryBaseDir, final File target, final StorageItem item )
         throws LocalStorageException
     {
-        // NEXUS-5400: instead of putting "hidden" target in same dir as original file would reside (and appending it
+        // NEXUS-5400: instead of putting "hidden" target in same dir structure as original file would reside (and appending it
         // with some extra cruft), we place the file into repo-level tmp directory (/.nexus/tmp, REPO_TMP_FOLDER)
         // As since Nexus 2.0, due to attributes, it is required that whole repository from it's root must be kept on same
         // volume (no subtree of it should reside on some other volume), meaning, rename would still happen
@@ -353,7 +353,7 @@ public class DefaultFSPeer
 
         try
         {
-            final File repoTmpFolder = new File( repositoryBaseDir, REPO_TMP_FOLDER + item.getParentPath() );
+            final File repoTmpFolder = new File( repositoryBaseDir, REPO_TMP_FOLDER );
             mkDirs( repository, repoTmpFolder );
 
             // NEXUS-4955 add APPENDIX to make sure prefix is bigger the 3 chars
