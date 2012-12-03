@@ -57,7 +57,7 @@ public class DefaultFSPeerTest
         // startsWith, as garbage is appeneded to it's end
         assertThat( hiddenTarget.getName(), startsWith( "foo-1.0.txt" ) );
         // contains, as OS path from root is prefixing this, and garbage at the end suffixing it
-        assertThat( hiddenTarget.getPath(), containsString( "target/repoId/.nexus/tmp/foo/1.0/foo-1.0.txt" ) );
+        assertThat( hiddenTarget.getPath(), containsString( "target/repoId/.nexus/tmp/foo-1.0.txt" ) );
 
         // writing to hidden target is handled elsewhere, so we simulate content being written out
         final String PAYLOAD = "dummy payload";
