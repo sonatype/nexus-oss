@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>23-SNAPSHOT</version>
+    <version>24</version>
     <relativePath />
   </parent>
 
@@ -178,7 +178,7 @@
     <enunciate.version>1.26.1</enunciate.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <plexus-security.version>3.0-SNAPSHOT</plexus-security.version>
+    <plexus-security.version>3.0</plexus-security.version>
     <restlet.version>1.1.6-SONATYPE-5348-V8</restlet.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
@@ -440,7 +440,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.6-SNAPSHOT</version>
+        <version>1.6</version>
         <exclusions>
           <exclusion>
             <groupId>javax.activation</groupId>
@@ -452,7 +452,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-velocity</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
       </dependency>
 
       <dependency>
@@ -864,13 +864,13 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>junit-runner</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
       </dependency>
 
       <dependency>
