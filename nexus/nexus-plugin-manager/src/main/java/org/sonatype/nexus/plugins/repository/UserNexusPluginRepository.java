@@ -51,7 +51,7 @@ final class UserNexusPluginRepository
 
     public int getPriority()
     {
-        return 50;
+        return 100;
     }
 
     // ----------------------------------------------------------------------

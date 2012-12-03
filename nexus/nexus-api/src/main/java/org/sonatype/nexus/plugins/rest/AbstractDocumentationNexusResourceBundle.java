@@ -22,25 +22,28 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.mime.MimeSupport;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public abstract class AbstractDocumentationNexusResourceBundle
     implements NexusDocumentationBundle
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private MimeSupport mimeSupport;
 
-    protected AbstractDocumentationNexusResourceBundle() {
+    protected AbstractDocumentationNexusResourceBundle()
+    {
     }
 
     @VisibleForTesting
-    protected AbstractDocumentationNexusResourceBundle(final MimeSupport mimeSupport) {
+    protected AbstractDocumentationNexusResourceBundle( final MimeSupport mimeSupport )
+    {
         this.mimeSupport = mimeSupport;
     }
 
@@ -52,39 +55,48 @@ public abstract class AbstractDocumentationNexusResourceBundle
         try
         {
             zip = getZipFile();
-            Enumeration<? extends ZipEntry> entries = zip.entries();
-            while ( entries.hasMoreElements() )
+
+            if ( zip != null )
             {
-                ZipEntry entry = entries.nextElement();
-
-                if ( entry.isDirectory() )
+                Enumeration<? extends ZipEntry> entries = zip.entries();
+                while ( entries.hasMoreElements() )
                 {
-                    continue;
+                    ZipEntry entry = entries.nextElement();
+
+                    if ( entry.isDirectory() )
+                    {
+                        continue;
+                    }
+                    String name = entry.getName();
+                    if ( !name.startsWith( "docs" ) )
+                    {
+                        continue;
+                    }
+
+                    name = "/" + name;
+
+                    URL url = new URL( "jar:file:" + zip.getName() + "!" + name );
+
+                    // to lessen clash possibilities, this way only within single plugin may be clashes, but one
+                    // plugin is usually developed by one team or one user so this is okay
+                    // system-wide clashes are much harder to resolve
+                    String path = "/" + getPluginId() + "/" + getUrlSnippet() + name;
+
+                    resources.add( new DefaultStaticResource( url, path, mimeSupport.guessMimeTypeFromPath( name ) ) );
                 }
-                String name = entry.getName();
-                if ( !name.startsWith( "docs" ) )
+
+                if ( logger.isTraceEnabled() )
                 {
-                    continue;
+                    logger.trace( "Discovered documentation for: {}", getPluginId() );
+                    for ( StaticResource resource : resources )
+                    {
+                        logger.trace( "  {}", resource );
+                    }
                 }
-
-                name = "/" + name;
-
-                URL url = new URL( "jar:file:" + zip.getName() + "!" + name );
-
-                // to lessen clash possibilities, this way only within single plugin may be clashes, but one
-                // plugin is usually developed by one team or one user so this is okay
-                // system-wide clashes are much harder to resolve
-                String path = "/" + getPluginId() + "/" + getUrlSnippet() + name;
-
-                resources.add( new DefaultStaticResource( url, path, mimeSupport.guessMimeTypeFromPath( name ) ) );
             }
-
-            if ( logger.isTraceEnabled() )
+            else
             {
-                logger.trace("Discovered documentation for: {}", getPluginId());
-                for (StaticResource resource: resources) {
-                    logger.trace("  {}", resource);
-                }
+                logger.debug( "No documentation discovered for: {}", getPluginId() );
             }
         }
         catch ( IOException e )
@@ -120,7 +132,7 @@ public abstract class AbstractDocumentationNexusResourceBundle
 
     /**
      * Deprecated, but left in place because old plugins still rely on this.
-     *
+     * 
      * @deprecated use getPathPrefix() method.
      */
     @Deprecated
@@ -139,6 +151,13 @@ public abstract class AbstractDocumentationNexusResourceBundle
         throws IOException, UnsupportedEncodingException
     {
         URL baseClass = clazz.getClassLoader().getResource( clazz.getName().replace( '.', '/' ) + ".class" );
+
+        if ( "file".equals( baseClass.getProtocol() ) )
+        {
+            // for now, assume that unpacked directory-based plugins do not contain documentation
+            return null;
+        }
+
         assert baseClass.getProtocol().equals( "jar" );
 
         String jarPath = baseClass.getPath().substring( 5, baseClass.getPath().indexOf( "!" ) );

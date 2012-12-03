@@ -1346,7 +1346,7 @@ public class DefaultIndexerManager
     protected void publishRepositoryIndex( final Repository repository )
         throws IOException
     {
-        if (!INDEXABLE( repository ) && !INSERVICE( repository ))
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
             return;
         }
@@ -2169,8 +2169,15 @@ public class DefaultIndexerManager
                                final ArtifactInfoFilter artifactInfoFilter, final String repositoryId )
         throws NoSuchRepositoryException, IOException
     {
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
+        {
+            return null;
+        }
+
         final TreeNode[] result = new TreeNode[1];
-        shared( repositoryRegistry.getRepository( repositoryId ), new Runnable()
+        shared( repository, new Runnable()
         {
             @Override
             public void run( IndexingContext context )
@@ -2228,6 +2235,12 @@ public class DefaultIndexerManager
     {
         Lock lock = null;
         IndexingContext lockedContext = null;
+
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
+        {
+            return;
+        }
+
         if ( ISGROUP( repository ) )
         {
             Map<String, Repository> members = new HashMap<String, Repository>();
@@ -2241,7 +2254,7 @@ public class DefaultIndexerManager
                 List<IndexingContext> memberContexts = new ArrayList<IndexingContext>();
                 for ( IndexingContext context : lockedContexts.contexts.values() )
                 {
-                    if ( !repository.getId().equals( context.getRepositoryId() ) )
+                    if ( context != null && !repository.getId().equals( context.getRepositoryId() ) )
                     {
                         memberContexts.add( context );
                     }
@@ -2299,7 +2312,8 @@ public class DefaultIndexerManager
         }
         else
         {
-            logger.warn( "Could not perform index operation on repository {}", repository.getId(), new Exception() );
+            logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                         new Exception( "This is an artificial exception that provides caller backtrace." ) );
         }
     }
 
