@@ -50,12 +50,6 @@
   </modules>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-      </plugin>
-    </plugins>
     <pluginManagement>
       <plugins>
         <!-- Manually run with: mvn license:format -N -->
