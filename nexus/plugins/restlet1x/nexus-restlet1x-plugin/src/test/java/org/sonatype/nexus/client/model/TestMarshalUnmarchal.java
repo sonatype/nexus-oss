@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -405,6 +405,7 @@ public class TestMarshalUnmarchal
         repo.setChecksumPolicy( "IGNORE" );
         repo.setMetadataMaxAge( 42 );
         repo.setArtifactMaxAge( 41 );
+        repo.setItemMaxAge( 43 );
         repo.setContentResourceURI( "contentResourceURI" );
         repo.setDefaultLocalStorageUrl( "defaultlocalstorage" );
         repo.setExposed( true );

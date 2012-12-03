@@ -17,10 +17,16 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>25</version>
+    <relativePath />
+  </parent>
+
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-aggregator</artifactId>
   <version>2.3-SNAPSHOT</version>
-
   <packaging>pom</packaging>
 
   <scm>
@@ -30,8 +36,6 @@
   </scm>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <arguments>-Dtest=VOID -Dit.test=VOID</arguments>
   </properties>
 
@@ -46,34 +50,13 @@
   </modules>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-      </plugin>
-    </plugins>
     <pluginManagement>
       <plugins>
         <!-- Manually run with: mvn license:format -N -->
         <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
           <artifactId>maven-license-plugin</artifactId>
-          <version>1.9.0</version>
           <configuration>
-            <header>header-eplv1.txt</header>
-            <encoding>UTF-8</encoding>
-            <strictCheck>true</strictCheck>
-            <useDefaultExcludes>false</useDefaultExcludes>
-            <includes>
-              <include>**/*.java</include>
-              <include>**/*.vm</include>
-              <include>**/*.xml</include>
-              <include>**/*.groovy</include>
-              <include>**/*.aj</include>
-              <include>**/*.css</include>
-              <include>**/*.html</include>
-              <include>**/*.js</include>
-            </includes>
             <excludes>
               <exclude>**/.*/**</exclude>
               <!-- we have target pattern in this format because of target package in nexus-api and nexus-proxy modules -->
@@ -105,38 +88,20 @@
               <!-- Exclude zion work directory -->
               <exclude>zwork/**</exclude>
             </excludes>
-            <mapping>
-              <vm>SHARPSTAR_STYLE</vm>
-              <groovy>JAVADOC_STYLE</groovy>
-              <aj>JAVADOC_STYLE</aj>
-            </mapping>
-            <properties>
-              <year>2012</year>
-            </properties>
-            <!-- this is important for multi-module project -->
-            <aggregate>true</aggregate>
           </configuration>
-          <goals>
-            <goal>check</goal>
-          </goals>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.2.1</version>
           <configuration>
-            <autoVersionSubmodules>true</autoVersionSubmodules>
-            <!-- forge-parent settings -->
-            <useReleaseProfile>false</useReleaseProfile>
-            <goals>deploy</goals>
-            <!--<arguments>-Prelease</arguments>-->
             <arguments>${arguments}</arguments>
-            <preparationGoals /> 
+            <preparationGoals />
             <releaseProfiles>release,tattletale,optimize-js</releaseProfiles>
             <tagNameFormat>nexus-@{version}</tagNameFormat>
           </configuration>
         </plugin>
+
         <!-- do not deploy aggregator POM -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -145,20 +110,15 @@
             <skip>true</skip>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <configuration>
+            <skipRemoteStaging>true</skipRemoteStaging>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
-
   </build>
-
-  <profiles>
-    <profile>
-      <id>nexus-maven-plugins</id>
-      <!-- HACK we leave out nexus-maven-plugins by default because when we release with it as part of aggregator -->
-      <!-- maven-release-plugin borks. It will be removed out after 2.1 anyways, then this profile no longer needed -->
-      <modules>
-        <module>nexus-maven-plugins</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>

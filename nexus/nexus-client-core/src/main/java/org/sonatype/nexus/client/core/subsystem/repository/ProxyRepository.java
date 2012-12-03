@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -77,5 +77,13 @@ public interface ProxyRepository<T extends ProxyRepository>
      * @return itself, for fluent api usage
      */
     T withNotFoundCacheTTL( int minutes );
+
+    /**
+     * Configures number of minutes items will be cached.
+     *
+     * @param minutes to be cached
+     * @return itself, for fluent api usage
+     */
+    T withItemMaxAge( int minutes );
 
 }

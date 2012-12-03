@@ -12,7 +12,7 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<model xsd.namespace="http://www.sonatype.org/xsd/nexus-lvo-plugin-1.0.0" xsd.target-namespace="http://www.sonatype.org/xsd/nexus-lvo-plugin-1.0.0">
+<model xsd.namespace="http://www.sonatype.org/xsd/nexus-lvo-plugin-1.0.0" xsd.targetNamespace="http://www.sonatype.org/xsd/nexus-lvo-plugin-1.0.0">
 
   <id>lvo</id>
 

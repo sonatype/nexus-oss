@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>22-SNAPSHOT</version>
+    <version>24</version>
     <relativePath />
   </parent>
 
@@ -28,10 +28,9 @@
   <packaging>pom</packaging>
   <version>2.3-SNAPSHOT</version>
 
-  <name>${project.artifactId}</name>
   <inceptionYear>2007</inceptionYear>
   <url>http://nexus.sonatype.org/</url>
-  
+
   <issueManagement>
     <system>Jira</system>
     <url>http://links.sonatype.com/products/nexus/oss/issues</url>
@@ -163,10 +162,6 @@
     <tattletale.failOnWarn>false</tattletale.failOnWarn>
     <tattletale.failOnError>true</tattletale.failOnError>
 
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-
     <nexus.version>${project.version}</nexus.version>
 
     <!-- logging configuration used in logback config files to control test logging -->
@@ -183,8 +178,8 @@
     <enunciate.version>1.26.1</enunciate.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <plexus-security.version>3.0-SNAPSHOT</plexus-security.version>
-    <restlet.version>1.1.6-SONATYPE-5348-V7</restlet.version>
+    <plexus-security.version>3.0</plexus-security.version>
+    <restlet.version>1.1.6-SONATYPE-5348-V8</restlet.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.5</goodies.version>
@@ -199,6 +194,7 @@
     <nexus.plugin.name>CHANGEME-PLUGIN-NAME-NOT-CONFIGURED</nexus.plugin.name>
     <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
 
+    <!-- used in enunciate.xml -->
     <copyright.year>2012</copyright.year>
   </properties>
 
@@ -379,7 +375,7 @@
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-restlet-bridge</artifactId>
-        <version>1.23-SNAPSHOT</version>
+        <version>1.24</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -444,7 +440,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.6-SNAPSHOT</version>
+        <version>1.6</version>
         <exclusions>
           <exclusion>
             <groupId>javax.activation</groupId>
@@ -456,7 +452,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-velocity</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
       </dependency>
 
       <dependency>
@@ -868,13 +864,13 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>junit-runner</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
       </dependency>
 
       <dependency>
@@ -1207,39 +1203,6 @@
   </dependencyManagement>
 
   <build>
-    <resources>
-      <resource>
-        <directory>${project.basedir}/src/main/resources</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>${project.basedir}/src/main/filtered-resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </resource>
-    </resources>
-
-    <testResources>
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-      <testResource>
-        <directory>${project.basedir}/src/test/filtered-resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-    </testResources>
 
     <pluginManagement>
       <plugins>
@@ -1253,12 +1216,6 @@
             <failOnWarn>${tattletale.failOnWarn}</failOnWarn>
             <failOnError>${tattletale.failOnError}</failOnError>
           </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>sisu-maven-plugin</artifactId>
-          <version>1.1</version>
         </plugin>
 
         <plugin>
@@ -1362,9 +1319,6 @@
           NOTE: (2.3 which is the latest available, is better, but still has problems with directorySet outputDirectory permissions)
           -->
           <version>2.2-beta-3</version>
-          <configuration>
-            <tarLongFileMode>gnu</tarLongFileMode>
-          </configuration>
         </plugin>
 
         <plugin>
@@ -1642,19 +1596,6 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <source>1.6</source>
@@ -1785,7 +1726,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.0</version>
             <executions>
               <execution>
                 <goals>
@@ -1960,26 +1901,6 @@
             </plugin>
           </plugins>
         </pluginManagement>
-      </build>
-    </profile>
-
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.mycila.maven-license-plugin</groupId>
-            <artifactId>maven-license-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
       </build>
     </profile>
 
