@@ -29,7 +29,7 @@ public class NoSuchRepositoryException
      */
     public NoSuchRepositoryException( final String repoId )
     {
-        super( "Repository with ID=\"" + repoId + "\" not found!" );
+        super( "Repository with ID=\"" + repoId + "\" not found" );
     }
 
     /**
