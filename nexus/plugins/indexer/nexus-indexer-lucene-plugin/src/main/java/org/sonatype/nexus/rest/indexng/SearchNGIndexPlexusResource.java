@@ -346,7 +346,10 @@ public class SearchNGIndexPlexusResource
         float lastDocumentScore = -1f;
 
         int gavcount = 0;
-        boolean tooManyResults = false; // true when iteration was aborted due to one of limiters
+
+        // tooManyResults true when iteration was aborted due to one of limiters
+        // response will contain partial info and may have incorrect latest version and classifiers/extensions.
+        boolean tooManyResults = iterator.getTotalHitsCount() + 1 >= LUCENE_HIT_LIMIT;
 
         for ( ArtifactInfo ai : iterator )
         {
