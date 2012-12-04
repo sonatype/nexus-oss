@@ -75,7 +75,20 @@ public abstract class CapabilityBooterSupport
     protected CapabilityReference findCapability( final CapabilityRegistry capabilityRegistry,
                                                   final CapabilityType type )
     {
+        return findCapability( capabilityRegistry, type, true );
+    }
+
+    protected CapabilityReference findCapability( final CapabilityRegistry capabilityRegistry,
+                                                  final CapabilityType type,
+                                                  final boolean includeNotExposed )
+    {
         CapabilityReferenceFilterBuilder.CapabilityReferenceFilter filter = capabilities().withType( type );
+
+        if ( includeNotExposed )
+        {
+            filter.includeNotExposed();
+        }
+
         Collection<? extends CapabilityReference> capabilities = capabilityRegistry.get( filter );
         if ( capabilities != null && !capabilities.isEmpty() )
         {
