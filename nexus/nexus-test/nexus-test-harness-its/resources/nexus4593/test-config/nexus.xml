@@ -38,7 +38,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>${proxy-repo-base-url}release-proxy-repo-1</url>
       </remoteStorage>
       <externalConfiguration>

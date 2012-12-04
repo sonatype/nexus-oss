@@ -53,7 +53,6 @@
 			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
 			<repositoryPolicy>release</repositoryPolicy>
 			<remoteStorage>
-				<provider>apacheHttpClient3x</provider>
 				<url>http://repo1.maven.org/maven2/</url>
 			</remoteStorage>
 		</repository>
@@ -74,7 +73,6 @@
 			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
 			<repositoryPolicy>snapshot</repositoryPolicy>
 			<remoteStorage>
-				<provider>apacheHttpClient3x</provider>
 				<url>http://people.apache.org/repo/m2-snapshot-repository</url>
 			</remoteStorage>
 		</repository>
@@ -92,7 +90,6 @@
 			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
 			<repositoryPolicy>snapshot</repositoryPolicy>
 			<remoteStorage>
-				<provider>apacheHttpClient3x</provider>
 				<url>http://snapshots.repository.codehaus.org/</url>
 			</remoteStorage>
 		</repository>

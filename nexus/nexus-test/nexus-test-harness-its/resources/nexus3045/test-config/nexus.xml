@@ -34,7 +34,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repo1.maven.org/maven2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -65,7 +64,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repository.apache.org/snapshots</url>
       </remoteStorage>
       <externalConfiguration>
@@ -96,7 +94,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://snapshots.repository.codehaus.org/</url>
       </remoteStorage>
       <externalConfiguration>

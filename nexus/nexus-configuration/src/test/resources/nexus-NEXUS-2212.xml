@@ -33,7 +33,6 @@
         <url>file:/Users/demers/dev/source/nexus/trunk/nexus/nexus-webapp/target/foo/nexus-webapp-1.4.0-SNAPSHOT/bin/jsw/macosx-universal-32/../../../../sonatype-work/nexus/storage/central</url>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repo1.maven.org/maven2/</url>
         <mirrors>
           <mirror>
@@ -69,7 +68,6 @@
         <url>file:/Users/demers/dev/source/nexus/trunk/nexus/nexus-webapp/target/foo/nexus-webapp-1.4.0-SNAPSHOT/bin/jsw/macosx-universal-32/../../../../sonatype-work/nexus/storage/apache-snapshots</url>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repository.apache.org/snapshots</url>
       </remoteStorage>
       <externalConfiguration>
@@ -99,7 +97,6 @@
         <url>file:/Users/demers/dev/source/nexus/trunk/nexus/nexus-webapp/target/foo/nexus-webapp-1.4.0-SNAPSHOT/bin/jsw/macosx-universal-32/../../../../sonatype-work/nexus/storage/codehaus-snapshots</url>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://snapshots.repository.codehaus.org/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -281,7 +278,6 @@
         <url>file:/Users/demers/dev/source/nexus/trunk/nexus/nexus-webapp/target/foo/nexus-webapp-1.4.0-SNAPSHOT/bin/jsw/macosx-universal-32/../../../../sonatype-work/nexus/storage/test</url>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repository.apache.org/content/groups/Snapshots</url>
       </remoteStorage>
       <externalConfiguration>
@@ -308,7 +304,6 @@
         <url>file:/Users/demers/dev/source/nexus/trunk/nexus/nexus-webapp/target/foo/nexus-webapp-1.4.0-SNAPSHOT/bin/jsw/macosx-universal-32/../../../../sonatype-work/nexus/storage/javanet</url>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>https://maven-repository.dev.java.net/</url>
       </remoteStorage>
       <externalConfiguration>
