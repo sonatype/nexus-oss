@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>22</version>
+    <version>27</version>
   </parent>
 
   <groupId>org.sonatype.nexus.capabilities</groupId>
@@ -51,7 +51,7 @@
   </modules>
 
   <properties>
-    <nexus.version>2.3</nexus.version>
+    <nexus.version>2.3-SNAPSHOT</nexus.version>
     <nexusPluginType>nexus-plugin</nexusPluginType>
 
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
