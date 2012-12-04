@@ -25,13 +25,11 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.SearchType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,11 +41,9 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.Searcher;
-import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
-import org.sonatype.nexus.rest.model.XStreamConfigurator;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
@@ -78,9 +74,7 @@ public class SearchNGIndexPlexusResourceTest
 
         try
         {
-            resource.searchByTerms( terms, "rid", 1, 1, false, false, true,
-                                    Collections.<ArtifactInfoFilter>emptyList(), Arrays.asList( searcher ) );
-
+            resource.searchByTerms( terms, "rid", 1, 1, false, Arrays.asList( searcher ) );
             Assert.fail( "Expected PlexusResourceException" );
         }
         catch ( PlexusResourceException e )
