@@ -19,6 +19,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
@@ -46,7 +48,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 /**
  * The default FSPeer implementation, directly implementating it. There might be alternate implementations, like doing
  * 2nd level caching and so on.
- * 
+ *
  * @author cstamas
  */
 @Named
@@ -55,29 +57,36 @@ public class DefaultFSPeer
     extends AbstractLoggingComponent
     implements FSPeer
 {
+
     private static final String HIDDEN_TARGET_SUFFIX = ".nx-upload";
 
     private static final String APPENDIX = "nx-tmp";
 
-    public boolean isReachable( Repository repository, ResourceStoreRequest request, File target )
+    private static final String REPO_TMP_FOLDER = ".nexus/tmp";
+
+    @Override
+    public boolean isReachable( final Repository repository, final File repositoryBaseDir, final ResourceStoreRequest request, final File target )
         throws LocalStorageException
     {
         return target.exists() && target.canWrite();
     }
 
-    public boolean containsItem( Repository repository, ResourceStoreRequest request, File target )
+    @Override
+    public boolean containsItem( final Repository repository, final File repositoryBaseDir, final ResourceStoreRequest request, final File target )
         throws LocalStorageException
     {
         return target.exists();
     }
 
-    public File retrieveItem( Repository repository, ResourceStoreRequest request, File target )
+    @Override
+    public File retrieveItem( final Repository repository, final File repositoryBaseDir, final ResourceStoreRequest request, final File target )
         throws ItemNotFoundException, LocalStorageException
     {
         return target;
     }
 
-    public void storeItem( Repository repository, StorageItem item, File target, ContentLocator cl )
+    @Override
+    public void storeItem( final Repository repository, final File repositoryBaseDir, final StorageItem item, final File target, final ContentLocator cl )
         throws UnsupportedStorageOperationException, LocalStorageException
     {
         // create parents down to the file itself (this will make those if needed, otherwise return silently)
@@ -86,7 +95,7 @@ public class DefaultFSPeer
         if ( cl != null )
         {
             // we have _content_ (content or link), hence we store a file
-            final File hiddenTarget = getHiddenTarget( target, item );
+            final File hiddenTarget = getHiddenTarget( repository, repositoryBaseDir, target, item );
 
             // NEXUS-4550: Part One, saving to "hidden" (temp) file
             // In case of error cleaning up only what needed
@@ -145,14 +154,14 @@ public class DefaultFSPeer
                     !item.getRepositoryItemUid().getBooleanAttributeValue( IsItemAttributeMetacontentAttribute.class );
 
                 if ( target != null && ( isCleanupNeeded ||
-                // NEXUS-4871 prevent zero length/corrupt files
+                    // NEXUS-4871 prevent zero length/corrupt files
                     target.length() == 0 ) )
                 {
                     target.delete();
                 }
 
                 if ( hiddenTarget != null && ( isCleanupNeeded ||
-                // NEXUS-4871 prevent zero length/corrupt files
+                    // NEXUS-4871 prevent zero length/corrupt files
                     hiddenTarget.length() == 0 ) )
                 {
                     hiddenTarget.delete();
@@ -183,7 +192,8 @@ public class DefaultFSPeer
         }
     }
 
-    public void shredItem( Repository repository, ResourceStoreRequest request, File target )
+    @Override
+    public void shredItem( final Repository repository, final File repositoryBaseDir, final ResourceStoreRequest request, final File target )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
         if ( getLogger().isDebugEnabled() )
@@ -222,8 +232,9 @@ public class DefaultFSPeer
         }
     }
 
-    public void moveItem( Repository repository, ResourceStoreRequest from, File fromTarget, ResourceStoreRequest to,
-                          File toTarget )
+    @Override
+    public void moveItem( final Repository repository, final File repositoryBaseDir, final ResourceStoreRequest from, final File fromTarget, final ResourceStoreRequest to,
+        final File toTarget )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
         if ( fromTarget.exists() )
@@ -238,7 +249,7 @@ public class DefaultFSPeer
             catch ( IOException e )
             {
                 getLogger().warn( "Unable to move item, falling back to copy+delete: " + toTarget.getPath(),
-                    getLogger().isDebugEnabled() ? e : null );
+                                  getLogger().isDebugEnabled() ? e : null );
 
                 if ( fromTarget.isDirectory() )
                 {
@@ -267,7 +278,7 @@ public class DefaultFSPeer
                     // TODO throw exception?
                     getLogger().error( "Unexpected item kind: " + toTarget.getClass() );
                 }
-                shredItem( repository, from, fromTarget );
+                shredItem( repository, repositoryBaseDir, from, fromTarget );
             }
         }
         else
@@ -276,7 +287,8 @@ public class DefaultFSPeer
         }
     }
 
-    public Collection<File> listItems( Repository repository, ResourceStoreRequest request, File target )
+    @Override
+    public Collection<File> listItems( final Repository repository, final File repositoryBaseDir, final ResourceStoreRequest request, final File target )
         throws ItemNotFoundException, LocalStorageException
     {
         if ( target.isDirectory() )
@@ -302,7 +314,7 @@ public class DefaultFSPeer
 
                         request.pushRequestPath( newPath );
 
-                        result.add( retrieveItem( repository, request, files[i] ) );
+                        result.add( retrieveItem( repository, repositoryBaseDir, request, files[i] ) );
 
                         request.popRequestPath();
                     }
@@ -311,7 +323,8 @@ public class DefaultFSPeer
             else
             {
                 getLogger().warn( "Cannot list directory in repository {}, path \"{}\"",
-                    RepositoryStringUtils.getHumanizedNameString( repository ), target.getAbsolutePath() );
+                                  RepositoryStringUtils.getHumanizedNameString( repository ),
+                                  target.getAbsolutePath() );
             }
 
             return result;
@@ -328,15 +341,23 @@ public class DefaultFSPeer
 
     // ==
 
-    protected File getHiddenTarget( final File target, final StorageItem item )
+    protected File getHiddenTarget( final Repository repository, final File repositoryBaseDir, final File target, final StorageItem item )
         throws LocalStorageException
     {
+        // NEXUS-5400: instead of putting "hidden" target in same dir structure as original file would reside (and appending it
+        // with some extra cruft), we place the file into repo-level tmp directory (/.nexus/tmp, REPO_TMP_FOLDER)
+        // As since Nexus 2.0, due to attributes, it is required that whole repository from it's root must be kept on same
+        // volume (no subtree of it should reside on some other volume), meaning, rename would still happen
+        // on same volume, hence is fast (is not copy+del on OS level).
         checkNotNull( target );
 
         try
         {
+            final File repoTmpFolder = new File( repositoryBaseDir, REPO_TMP_FOLDER );
+            mkDirs( repository, repoTmpFolder );
+
             // NEXUS-4955 add APPENDIX to make sure prefix is bigger the 3 chars
-            return File.createTempFile( target.getName() + APPENDIX, HIDDEN_TARGET_SUFFIX, target.getParentFile() );
+            return File.createTempFile( target.getName() + APPENDIX, HIDDEN_TARGET_SUFFIX, repoTmpFolder );
         }
         catch ( IOException e )
         {
@@ -347,10 +368,16 @@ public class DefaultFSPeer
     protected void mkParentDirs( Repository repository, File target )
         throws LocalStorageException
     {
-        if ( !target.getParentFile().exists() && !target.getParentFile().mkdirs() )
+        mkDirs( repository, target.getParentFile() );
+    }
+
+    protected void mkDirs( final Repository repository, final File target )
+        throws LocalStorageException
+    {
+        if ( !target.exists() && !target.mkdirs() )
         {
             // re-check is it really a "good" parent?
-            if ( !target.getParentFile().isDirectory() )
+            if ( !target.isDirectory() )
             {
                 throw new LocalStorageException( String.format(
                     "Could not create the directory hiearchy in repository %s to write \"%s\"",
@@ -421,7 +448,8 @@ public class DefaultFSPeer
         for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
         {
             getLogger().debug( "Rename operation attempt {} failed on {} --> {}, will wait {} ms and try again",
-                new Object[] { i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), getRenameRetryDelay() } );
+                               new Object[]{ i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath(),
+                                   getRenameRetryDelay() } );
 
             try
             {
@@ -443,7 +471,7 @@ public class DefaultFSPeer
             if ( success )
             {
                 getLogger().info( "Rename operation succeeded after {} retries on {} --> {}",
-                    new Object[] { i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath() } );
+                                  new Object[]{ i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath() } );
             }
         }
 
@@ -457,11 +485,12 @@ public class DefaultFSPeer
             {
                 getLogger().error(
                     "Rename operation failed after {} retries in {} ms intervals {} --> {}",
-                    new Object[] { getRenameRetryCount(), getRenameRetryDelay(), hiddenTarget.getAbsolutePath(),
+                    new Object[]{ getRenameRetryCount(), getRenameRetryDelay(), hiddenTarget.getAbsolutePath(),
                         target.getAbsolutePath() } );
 
                 throw new IOException( String.format( "Cannot rename file \"%s\" to \"%s\"! Message: %s",
-                    hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), e.getMessage() ), e );
+                                                      hiddenTarget.getAbsolutePath(), target.getAbsolutePath(),
+                                                      e.getMessage() ), e );
             }
         }
     }

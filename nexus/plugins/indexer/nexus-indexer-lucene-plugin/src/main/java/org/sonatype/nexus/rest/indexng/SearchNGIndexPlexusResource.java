@@ -87,7 +87,7 @@ public class SearchNGIndexPlexusResource
      * DEFAULT_GA_HIT_LIMIT.
      */
     private static final int GA_HIT_LIMIT = SystemPropertiesHelper.getInteger( "plexus.search.ga.hit.limit",
-        DEFAULT_GA_HIT_LIMIT );
+                                                                               DEFAULT_GA_HIT_LIMIT );
 
     /**
      * Time to spend in 1st processing loop before bail out. It defaults to 30sec (UI timeout is 60secs).
@@ -165,7 +165,7 @@ public class SearchNGIndexPlexusResource
      * a, v, p or c' query parameters, a maven coordinate search will be performed. If you provide the 'cn' query
      * parameter, a classname search will be performed. If you provide the 'sha1' query parameter, a checksum search
      * will be performed.
-     * 
+     *
      * @param q provide this param for a keyword search (g, a, v, p, c, cn, sha1 params will be ignored).
      * @param sha1 provide this param for a checksum search (g, a, v, p, c, cn params will be ignored).
      * @param cn provide this param for a classname search (g, a, v, p, c params will be ignored).
@@ -277,7 +277,7 @@ public class SearchNGIndexPlexusResource
         catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository to be searched does not exists!",
-                e );
+                                         e );
         }
     }
 
@@ -287,8 +287,8 @@ public class SearchNGIndexPlexusResource
     }
 
     /* UT */IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
-                                                  final Integer from, final int count, final Boolean exact,
-                                                  final List<Searcher> searchers )
+        final Integer from, final int count, final Boolean exact,
+        final List<Searcher> searchers )
         throws NoSuchRepositoryException, ResourceException, IOException
     {
         try
@@ -326,7 +326,7 @@ public class SearchNGIndexPlexusResource
             {
                 // NEXUS-4372: illegal query -> 400 response
                 throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getCause(),
-                    getNexusErrorResponse( "search", e.getCause().getMessage() ) );
+                                                   getNexusErrorResponse( "search", e.getCause().getMessage() ) );
             }
             else
             {
@@ -336,7 +336,7 @@ public class SearchNGIndexPlexusResource
     }
 
     protected SearchNGResponse packSearchNGResponse( Request request, Map<String, String> terms,
-                                                     IteratorSearchResponse iterator, boolean forceExpand )
+        IteratorSearchResponse iterator, boolean forceExpand )
     {
         // GA -> [version] -> [repository] -> [classified, extension]
         Map<String, GAHolder> gahits = new LinkedHashMap<String, GAHolder>();
@@ -444,12 +444,12 @@ public class SearchNGIndexPlexusResource
                 if ( !"pom".equals( ai.packaging ) )
                 {
                     repositoryHit.addArtifactLink( createNexusNGArtifactLink( request, ai.repository, ai.groupId,
-                        ai.artifactId, ai.version, "pom", null ) );
+                                                                              ai.artifactId, ai.version, "pom", null ) );
                 }
             }
 
             repositoryHit.addArtifactLink( createNexusNGArtifactLink( request, ai.repository, ai.groupId,
-                ai.artifactId, ai.version, ai.fextension, ai.classifier ) );
+                                                                      ai.artifactId, ai.version, ai.fextension, ai.classifier ) );
 
             tooManyResults = false;
         }
@@ -583,9 +583,9 @@ public class SearchNGIndexPlexusResource
     }
 
     protected NexusNGArtifactLink createNexusNGArtifactLink( final Request request, final String repositoryId,
-                                                             final String groupId, final String artifactId,
-                                                             final String version, final String extension,
-                                                             final String classifier )
+        final String groupId, final String artifactId,
+        final String version, final String extension,
+        final String classifier )
     {
         NexusNGArtifactLink link = new NexusNGArtifactLink();
 

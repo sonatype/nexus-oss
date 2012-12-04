@@ -496,8 +496,15 @@ public abstract class AbstractGroupRepository
             }
             catch ( NoSuchRepositoryException e )
             {
-                this.getLogger().warn( "Could not find repository: " + repoId, e );
-                // XXX throw new StorageException( e );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    this.getLogger().warn( "Could not find repository '{}' while iterating members", repoId, e );
+                }
+                else
+                {
+                    this.getLogger().warn( "Could not find repository '{}' while iterating members", repoId );
+                }
+                // XXX throw new StorageException( e )  ;
             }
         }
 

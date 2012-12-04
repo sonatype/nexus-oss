@@ -13,27 +13,115 @@
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isFile;
 
 import java.io.File;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 public class DefaultFSPeerTest
 {
 
     @Test
-    public void testGetHiddenTarget()
+    public void hiddenTargetHandling()
         throws Exception
     {
-        File base = new File( "target/a/b/c/d" );
-        base.getParentFile().mkdirs();
-        base.createNewFile();
+        // test subject
+        final DefaultFSPeer subject = new DefaultFSPeer();
 
-        File created = new DefaultFSPeer().getHiddenTarget( base, null );
-        assertThat( created, notNullValue() );
-        assertThat( created, exists() );
+        // repo base
+        File repoBase = new File( "target/repoId" );
+
+        // the file we want to store
+        File target = new File( repoBase, "foo/1.0/foo-1.0.txt" );
+        target.getParentFile().mkdirs();
+
+        final StorageFileItem file = Mockito.mock( StorageFileItem.class );
+        Mockito.when( file.getPath() ).thenReturn( "/foo/1.0/foo-1.0.txt" );
+        Mockito.when( file.getParentPath() ).thenReturn( "/foo/1.0" );
+
+        // getting hidden target for target
+        File hiddenTarget = subject.getHiddenTarget( null, repoBase, target, file );
+        assertThat( hiddenTarget, notNullValue() );
+        assertThat( hiddenTarget, isFile() );
+        // startsWith, as garbage is appeneded to it's end
+        assertThat( hiddenTarget.getName(), startsWith( "foo-1.0.txt" ) );
+        // contains, as OS path from root is prefixing this, and garbage at the end suffixing it
+        assertThat( hiddenTarget.getPath(), containsString( "target/repoId/.nexus/tmp/foo-1.0.txt" ) );
+
+        // writing to hidden target is handled elsewhere, so we simulate content being written out
+        final String PAYLOAD = "dummy payload";
+        FileUtils.fileWrite( hiddenTarget, PAYLOAD );
+
+        // handle the rename
+        subject.handleRenameOperation( hiddenTarget, target );
+
+        // hidden should cease to exist
+        assertThat( hiddenTarget, not( exists() ) );
+        // target should exists
+        assertThat( target, exists() );
+        // name should be not garbaged anymore
+        assertThat( target.getName(), equalTo( "foo-1.0.txt" ) );
+        // path prefixed by OS from root, no garbage at tail
+        assertThat( target.getPath(), endsWith( "target/repoId/foo/1.0/foo-1.0.txt" ) );
+        // content is fine too
+        assertThat( FileUtils.fileRead( target ), equalTo( PAYLOAD ) );
+    }
+
+    @Test
+    public void hiddenTargetHandlingAtRoot()
+        throws Exception
+    {
+        // test subject
+        final DefaultFSPeer subject = new DefaultFSPeer();
+
+        // repo base
+        File repoBase = new File( "target/repoId" );
+
+        // the file we want to store
+        File target = new File( repoBase, "archetype-catalog.xml" );
+        target.getParentFile().mkdirs();
+
+        final StorageFileItem file = Mockito.mock( StorageFileItem.class );
+        Mockito.when( file.getPath() ).thenReturn( "/archetype-catalog.xml" );
+        Mockito.when( file.getParentPath() ).thenReturn( "/" );
+
+        // getting hidden target for target
+        File hiddenTarget = subject.getHiddenTarget( null, repoBase, target, file );
+        assertThat( hiddenTarget, notNullValue() );
+        assertThat( hiddenTarget, isFile() );
+        // startsWith, as garbage is appeneded to it's end
+        assertThat( hiddenTarget.getName(), startsWith( "archetype-catalog.xml" ) );
+        // contains, as OS path from root is prefixing this, and garbage at the end suffixing it
+        assertThat( hiddenTarget.getPath(), containsString( "target/repoId/.nexus/tmp/archetype-catalog.xml" ) );
+
+        // writing to hidden target is handled elsewhere, so we simulate content being written out
+        final String PAYLOAD = "dummy payload";
+        FileUtils.fileWrite( hiddenTarget, PAYLOAD );
+
+        // handle the rename
+        subject.handleRenameOperation( hiddenTarget, target );
+
+        // hidden should cease to exist
+        assertThat( hiddenTarget, not( exists() ) );
+        // target should exists
+        assertThat( target, exists() );
+        // name should be not garbaged anymore
+        assertThat( target.getName(), equalTo( "archetype-catalog.xml" ) );
+        // path prefixed by OS from root, no garbage at tail
+        assertThat( target.getPath(), endsWith( "target/repoId/archetype-catalog.xml" ) );
+        // content is fine too
+        assertThat( FileUtils.fileRead( target ), equalTo( PAYLOAD ) );
     }
 
 }

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,8 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -46,6 +50,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
@@ -64,25 +69,33 @@ import org.sonatype.scheduling.TaskUtil;
  * minCountOfSnapshotsToKeep (but maybe more) snapshots per one snapshot collection by removing all older from
  * removeSnapshotsOlderThanDays. If should remove snaps if their release counterpart exists, the whole GAV will be
  * removed.
- * 
+ *
  * @author cstamas
  */
-@Component( role = SnapshotRemover.class )
+@Named
+@Singleton
 public class DefaultSnapshotRemover
     extends AbstractLoggingComponent
     implements SnapshotRemover
 {
 
-    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    @Requirement
     private Walker walker;
 
-    @Requirement( hint = "maven2" )
-    private ContentClass contentClass;
+    private ContentClass maven2ContentClass;
 
     private VersionParser versionScheme = new GenericVersionParser();
+
+    @Inject
+    public DefaultSnapshotRemover( final RepositoryRegistry repositoryRegistry,
+                                   final Walker walker,
+                                   final @Named( "maven2" ) ContentClass maven2ContentClass )
+    {
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
+        this.walker = checkNotNull( walker );
+        this.maven2ContentClass = checkNotNull( maven2ContentClass );
+    }
 
     protected RepositoryRegistry getRepositoryRegistry()
     {
@@ -128,7 +141,7 @@ public class DefaultSnapshotRemover
     private boolean process( SnapshotRemovalRequest request, SnapshotRemovalResult result, Repository repository )
     {
         // only from maven repositories, stay silent for others and simply skip
-        if ( !repository.getRepositoryContentClass().isCompatible( contentClass ) )
+        if ( !repository.getRepositoryContentClass().isCompatible( maven2ContentClass ) )
         {
             getLogger().debug( "Skipping '" + repository.getId() + "' is not a maven 2 repository" );
             return false;
@@ -137,6 +150,12 @@ public class DefaultSnapshotRemover
         if ( !repository.getLocalStatus().shouldServiceRequest() )
         {
             getLogger().debug( "Skipping '" + repository.getId() + "' the repository is out of service" );
+            return false;
+        }
+
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            getLogger().debug( "Skipping '" + repository.getId() + "' is a proxy repository" );
             return false;
         }
 
@@ -155,7 +174,7 @@ public class DefaultSnapshotRemover
 
     /**
      * Removes the snapshots from maven repository.
-     * 
+     *
      * @param repository the repository
      * @throws Exception the exception
      */

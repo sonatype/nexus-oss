@@ -87,9 +87,8 @@ public class RepoConversionTest
         assertEquals( "This should match, since they should be the same!", remoteRepositoryStorage.getProviderId(),
                       afterTreatment.getRemoteStorage().getProviderId() );
 
-        assertEquals( "Config should state the same as object is", afterTreatment.getRemoteStorage().getProviderId(),
-                      ( ( (CRepositoryCoreConfiguration) afterTreatment.getCurrentCoreConfiguration() )
-                          .getConfiguration( false ) ).getRemoteStorage().getProvider() );
+        // before NEXUS-5258, this test used to check that the provider was set. Nexus does not set the provider anymore
+        // if it is the default provider, to let repos pick up the system default.
 
         assertEquals( "Config should state the same as object is", afterTreatment.getRemoteUrl(),
                       ( ( (CRepositoryCoreConfiguration) afterTreatment.getCurrentCoreConfiguration() )
