@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -72,8 +71,9 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 public class SearchNGIndexPlexusResource
     extends AbstractIndexerNexusPlexusResource
 {
+
     public static final String ROLE_HINT = "SearchNGIndexPlexusResource";
-    
+
     /**
      * Capping the number of Lucene Documents to process, to avoid potention problems and DOS-like attacks. If someone
      * needs more results, download the index instead and process it in-situ.
@@ -92,7 +92,7 @@ public class SearchNGIndexPlexusResource
      * DEFAULT_GA_HIT_LIMIT.
      */
     private static final int GA_HIT_LIMIT = SystemPropertiesHelper.getInteger( "plexus.search.ga.hit.limit",
-        DEFAULT_GA_HIT_LIMIT );
+                                                                               DEFAULT_GA_HIT_LIMIT );
 
     /**
      * Time to spend in 1st processing loop before bail out. It defaults to 30sec (UI timeout is 60secs).
@@ -170,19 +170,19 @@ public class SearchNGIndexPlexusResource
      * a, v, p or c' query parameters, a maven coordinate search will be performed. If you provide the 'cn' query
      * parameter, a classname search will be performed. If you provide the 'sha1' query parameter, a checksum search
      * will be performed.
-     * 
-     * @param q provide this param for a keyword search (g, a, v, p, c, cn, sha1 params will be ignored).
-     * @param sha1 provide this param for a checksum search (g, a, v, p, c, cn params will be ignored).
-     * @param cn provide this param for a classname search (g, a, v, p, c params will be ignored).
-     * @param g group id to perform a maven search against (can be combined with a, v, p & c params as well).
-     * @param a artifact id to perform a maven search against (can be combined with g, v, p & c params as well).
-     * @param v version to perform a maven search against (can be combined with g, a, p & c params as well).
-     * @param p packaging type to perform a maven search against (can be combined with g, a, v & c params as well).
-     * @param c classifier to perform a maven search against (can be combined with g, a, v & p params as well).
-     * @param from result index to start retrieving results from.
-     * @param count number of results to have returned to you.
+     *
+     * @param q            provide this param for a keyword search (g, a, v, p, c, cn, sha1 params will be ignored).
+     * @param sha1         provide this param for a checksum search (g, a, v, p, c, cn params will be ignored).
+     * @param cn           provide this param for a classname search (g, a, v, p, c params will be ignored).
+     * @param g            group id to perform a maven search against (can be combined with a, v, p & c params as well).
+     * @param a            artifact id to perform a maven search against (can be combined with g, v, p & c params as well).
+     * @param v            version to perform a maven search against (can be combined with g, a, p & c params as well).
+     * @param p            packaging type to perform a maven search against (can be combined with g, a, v & c params as well).
+     * @param c            classifier to perform a maven search against (can be combined with g, a, v & p params as well).
+     * @param from         result index to start retrieving results from.
+     * @param count        number of results to have returned to you.
      * @param repositoryId The repositoryId to which repository search should be narrowed. Omit if search should be
-     *            global.
+     *                     global.
      */
     @Override
     @GET
@@ -274,70 +274,9 @@ public class SearchNGIndexPlexusResource
 
         try
         {
-            List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
-
-            // we need to save this reference to later
-            SystemWideLatestVersionCollector systemWideCollector = new SystemWideLatestVersionCollector();
-            filters.add( systemWideCollector );
-
-            RepositoryWideLatestVersionCollector repositoryWideCollector = null;
-            if ( collapseResults )
+            if ( doSearch( request, terms, repositoryId, from, count, exact, expandVersion, collapseResults, result ) )
             {
-                repositoryWideCollector = new RepositoryWideLatestVersionCollector();
-                filters.add( repositoryWideCollector );
-            }
-
-            try
-            {
-                IteratorSearchResponse searchResult =
-                    searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters,
-                        searchers );
-
-                if ( collapseResults && searchResult == null )
-                {
-                    collapseResults = false;
-
-                    searchResult =
-                        searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults,
-                            filters, searchers );
-                }
-
-                if ( searchResult != null )
-                {
-                    try
-                    {
-                        repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
-                                                      searchResult, systemWideCollector, repositoryWideCollector );
-
-                        if ( !result.isTooManyResults() )
-                        {
-                            // if we had collapseResults ON, and the totalHits are larger than actual (filtered)
-                            // results, and the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
-                            // and full result set is smaller than HIT_LIMIT
-                            // then repeat without collapse
-                            if ( collapseResults && result.getData().size() < searchResult.getTotalHitsCount()
-                                && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                                && searchResult.getTotalHitsCount() < GA_HIT_LIMIT )
-                            {
-                                collapseResults = false;
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        searchResult.close();
-                    }
-                }
-                else
-                {
-                    repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
-                                                  IteratorSearchResponse.empty( null ), null, null );
-                    collapseResults = false;
-                }
-            }
-            catch ( IOException e )
-            {
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
+                doSearch( request, terms, repositoryId, from, count, exact, expandVersion, false, result );
             }
         }
         catch ( NoSuchRepositoryException e )
@@ -345,8 +284,93 @@ public class SearchNGIndexPlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository to be searched does not exists!",
                                          e );
         }
-        
+
         return result;
+    }
+
+    /**
+     * Performs the search, and tells is retry needed without collapsing turned on.
+     * @param request
+     * @param terms
+     * @param repositoryId
+     * @param from
+     * @param count
+     * @param exact
+     * @param expandVersion
+     * @param collapseResults
+     * @param result
+     * @return true if retry needed with collapseResults false. If false, result is prepped to send back to client.
+     * @throws NoSuchRepositoryException
+     * @throws ResourceException
+     */
+    protected boolean doSearch( final Request request, final Map<String, String> terms, final String repositoryId,
+        final Integer from, final Integer count, final Boolean exact, final Boolean expandVersion,
+        final Boolean collapseResults, final SearchNGResponse result )
+        throws NoSuchRepositoryException, ResourceException
+    {
+        final List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
+        // we need to save this reference to later
+        SystemWideLatestVersionCollector systemWideCollector = new SystemWideLatestVersionCollector();
+        filters.add( systemWideCollector );
+
+        RepositoryWideLatestVersionCollector repositoryWideCollector = null;
+        if ( collapseResults )
+        {
+            repositoryWideCollector = new RepositoryWideLatestVersionCollector();
+            filters.add( repositoryWideCollector );
+        }
+
+        try
+        {
+            IteratorSearchResponse searchResult =
+                searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters,
+                               searchers );
+
+            if ( collapseResults && searchResult == null )
+            {
+                return true;
+            }
+
+            if ( searchResult != null )
+            {
+                try
+                {
+                    repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
+                                                  searchResult, systemWideCollector, repositoryWideCollector );
+
+                    if ( !result.isTooManyResults() )
+                    {
+                        // if we had collapseResults ON, and the totalHits are larger than actual (filtered)
+                        // results, and the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
+                        // and full result set is smaller than HIT_LIMIT
+                        // then repeat without collapse
+                        if ( collapseResults && result.getData().size() < searchResult.getTotalHitsCount()
+                            && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
+                            && searchResult.getTotalHitsCount() < GA_HIT_LIMIT )
+                        {
+                            // retry uncollapsed
+                            return true;
+                        }
+                    }
+
+                    // we have it, do not retry
+                    return false;
+                }
+                finally
+                {
+                    searchResult.close();
+                }
+            }
+            else
+            {
+                // retry uncollapsed
+                return true;
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
+        }
     }
 
     protected Logger getSearchDiagnosticLogger()
@@ -355,9 +379,9 @@ public class SearchNGIndexPlexusResource
     }
 
     /* UT */ IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
-                                                  final Integer from, final int count, final Boolean exact,
-                                                  final Boolean expandVersion, final Boolean collapseResults,
-                                                  final List<ArtifactInfoFilter> filters, final List<Searcher> searchers )
+        final Integer from, final int count, final Boolean exact,
+        final Boolean expandVersion, final Boolean collapseResults,
+        final List<ArtifactInfoFilter> filters, final List<Searcher> searchers )
         throws NoSuchRepositoryException, ResourceException, IOException
     {
         try
@@ -415,26 +439,7 @@ public class SearchNGIndexPlexusResource
 
                     if ( searchResponse != null )
                     {
-                        if ( collapseResults && searchResponse.getTotalHitsCount() < COLLAPSE_OVERRIDE_TRESHOLD )
-                        {
-                            searchResponse.close();
-
-                            // FIXME: fix this, this is ugly
-                            // We are returning null, to hint that we need UNCOLLAPSED search!
-                            // Needed, to be able to "signal" the fact that we are overriding collapsed switch
-                            // since we have to send it back in DTOs to REST client
-                            return null;
-
-                            // old code was a recursive call:
-                            // this was a "collapsed" search (probably initiated by UI), and we have less then treshold hits
-                            // override collapse
-                            // return searchByTerms( terms, repositoryId, from, count, exact, expandVersion, false, filters
-                            // );
-                        }
-                        else
-                        {
-                            return searchResponse;
-                        }
+                        return searchResponse;
                     }
                 }
             }
@@ -457,10 +462,10 @@ public class SearchNGIndexPlexusResource
     }
 
     protected void repackIteratorSearchResponse( Request request, Map<String, String> terms, SearchNGResponse response,
-                                                 boolean collapsed, Integer from, int count,
-                                                 IteratorSearchResponse iterator,
-                                                 SystemWideLatestVersionCollector systemWideCollector,
-                                                 RepositoryWideLatestVersionCollector repositoryWideCollector )
+        boolean collapsed, Integer from, int count,
+        IteratorSearchResponse iterator,
+        SystemWideLatestVersionCollector systemWideCollector,
+        RepositoryWideLatestVersionCollector repositoryWideCollector )
         throws NoSuchRepositoryException, IOException
     {
         response.setCollapsed( collapsed );
@@ -594,7 +599,7 @@ public class SearchNGIndexPlexusResource
                         {
                             NexusNGArtifactLink link =
                                 createNexusNGArtifactLink( request, ai.repository, ai.groupId, ai.artifactId,
-                                    ai.version, "pom", null );
+                                                           ai.version, "pom", null );
 
                             // add the POM link
                             hit.addArtifactLink( link );
@@ -624,7 +629,7 @@ public class SearchNGIndexPlexusResource
                     {
                         NexusNGArtifactLink link =
                             createNexusNGArtifactLink( request, ai.repository, ai.groupId, ai.artifactId,
-                                ai.version, ai.fextension, ai.classifier );
+                                                       ai.version, ai.fextension, ai.classifier );
 
                         hit.addArtifactLink( link );
                     }
@@ -690,7 +695,7 @@ public class SearchNGIndexPlexusResource
                     {
                         final String repositoryWideCollectorKey =
                             repositoryWideCollector.getKey( hit.getRepositoryId(), artifactNg.getGroupId(),
-                                artifactNg.getArtifactId() );
+                                                            artifactNg.getArtifactId() );
 
                         LatestECVersionHolder repositoryWideHolder =
                             repositoryWideCollector.getLVHForKey( repositoryWideCollectorKey );
@@ -712,7 +717,7 @@ public class SearchNGIndexPlexusResource
                             // add POM link
                             NexusNGArtifactLink pomLink =
                                 createNexusNGArtifactLink( request, hit.getRepositoryId(), artifactNg.getGroupId(),
-                                    artifactNg.getArtifactId(), versionToSet, "pom", null );
+                                                           artifactNg.getArtifactId(), versionToSet, "pom", null );
 
                             hit.addArtifactLink( pomLink );
 
@@ -736,8 +741,9 @@ public class SearchNGIndexPlexusResource
                                 {
                                     NexusNGArtifactLink link =
                                         createNexusNGArtifactLink( request, hit.getRepositoryId(),
-                                            artifactNg.getGroupId(), artifactNg.getArtifactId(), versionToSet,
-                                            holder.getExtension(), holder.getClassifier() );
+                                                                   artifactNg.getGroupId(), artifactNg.getArtifactId(),
+                                                                   versionToSet,
+                                                                   holder.getExtension(), holder.getClassifier() );
 
                                     hit.addArtifactLink( link );
                                 }
@@ -774,7 +780,8 @@ public class SearchNGIndexPlexusResource
 
             repoDetail.setRepositoryName( repository.getName() );
 
-            repoDetail.setRepositoryURL( createRepositoryReference( request, repository.getId() ).getTargetRef().toString() );
+            repoDetail.setRepositoryURL(
+                createRepositoryReference( request, repository.getId() ).getTargetRef().toString() );
 
             repoDetail.setRepositoryContentClass( repository.getRepositoryContentClass().getId() );
 
@@ -792,9 +799,9 @@ public class SearchNGIndexPlexusResource
     }
 
     protected NexusNGArtifactLink createNexusNGArtifactLink( final Request request, final String repositoryId,
-                                                             final String groupId, final String artifactId,
-                                                             final String version, final String extension,
-                                                             final String classifier )
+        final String groupId, final String artifactId,
+        final String version, final String extension,
+        final String classifier )
     {
         NexusNGArtifactLink link = new NexusNGArtifactLink();
 

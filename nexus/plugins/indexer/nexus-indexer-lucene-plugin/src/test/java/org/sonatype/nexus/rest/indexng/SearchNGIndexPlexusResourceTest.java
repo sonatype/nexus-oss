@@ -43,9 +43,11 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.Searcher;
+import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
+import org.sonatype.nexus.rest.model.XStreamConfigurator;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
@@ -146,6 +148,13 @@ public class SearchNGIndexPlexusResourceTest
         throws Exception
     {
         fillInRepo();
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final IndexerManager indexerManager = lookup( IndexerManager.class );
+        indexerManager.reindexAllRepositories( "/", true );
 
         SearchNGIndexPlexusResource subject =
             (SearchNGIndexPlexusResource) lookup( PlexusResource.class, SearchNGIndexPlexusResource.ROLE_HINT );
@@ -160,6 +169,27 @@ public class SearchNGIndexPlexusResourceTest
         Response response = new Response( request );
         SearchNGResponse result = subject.get( context, request, response, null );
 
-        Assert.assertEquals( 1, result.getTotalCount() );
+        // explanation:
+        // we test here, does this resource "expand" the result set even if the request told to collaps
+        // (like UI does). This happens when result set (the grid count in search UI) would contain less
+        // rows than COLLAPSE_OVERRIDE_TRESHOLD = 35 lines. If yes, it will repeat the search but uncollapsed
+        // kinda overriding the "hint" that was in original request (see request query parameters above).
+        //
+        // Found items uncollapsed (without any specific order, is unstable):
+        // org.sonatype.nexus:nexus:1.3.0-SNAPSHOT
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-5-SNAPSHOT
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-3-SNAPSHOT
+        // org.sonatype.nexus:nexus:1.2.2-SNAPSHOT
+        // org.sonatype:nexus-3148:1.0.SNAPSHOT
+        //
+        // Found items collapsed (G:A:maxVersion):
+        // org.sonatype.nexus:nexus:1.3.0-SNAPSHOT
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4 (rel preferred over snap)
+        // org.sonatype:nexus-3148:1.0.SNAPSHOT
+
+        // we assert that the grid would contain 7, not 3 hits (corresponds to grid lines in Search UI)
+        Assert.assertEquals( 7, result.getData().size() );
     }
 }
