@@ -464,7 +464,7 @@ public class SearchNGIndexPlexusResource
                 + " ms." );
 
         // expand if explicitly requested or if number of unique GAV matches is less than threshold
-        boolean expand = forceExpand || ( gahits.size() <= COLLAPSE_OVERRIDE_TRESHOLD );
+        boolean expand = forceExpand || gavcount <= COLLAPSE_OVERRIDE_TRESHOLD;
 
         SearchNGResponse response = new SearchNGResponse();
         response.setTooManyResults( tooManyResults );
