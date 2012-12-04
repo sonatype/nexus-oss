@@ -274,10 +274,14 @@ public class AbstractEvictTaskIt
         {
             if ( itemPath.split( Pattern.quote( File.separator ) ).length != 1 )
             {
-                File directory = new File( this.getStorageWorkDir(), itemPath );
-                if ( directory.list().length == 0 )
+                // introduced with NEXUS-5400: maybe ignore all paths starting with ".nexus"?
+                if ( !itemPath.endsWith( ".nexus/tmp" ) )
                 {
-                    emptyDirectories.add( itemPath );
+                    File directory = new File( this.getStorageWorkDir(), itemPath );
+                    if ( directory.list().length == 0 )
+                    {
+                        emptyDirectories.add( itemPath );
+                    }
                 }
             }
         }
