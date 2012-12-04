@@ -289,35 +289,6 @@ public class DefaultSnapshotRemoverIT
     }
 
     /**
-     * Never touch maven metadata files in proxy repo
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testProxyRepo()
-        throws Exception
-    {
-        fillInRepo();
-
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), 2, -1, false );
-
-        SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
-
-        assertTrue( result.isSuccessful() );
-
-        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
-        expecting.put( "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090209.062729-356.pom", Boolean.TRUE );
-        expecting.put( "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090209.062729-356.pom.md5", Boolean.FALSE );
-        expecting.put( "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090210.090218-375.pom", Boolean.TRUE );
-        expecting.put( "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090202.142204-272.pom", Boolean.FALSE );
-        expecting.put( "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090123.170636-198.pom", Boolean.FALSE );
-        expecting.put( "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090123.160704-197.pom", Boolean.FALSE );
-        expecting.put( "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/maven-metadata.xml", Boolean.FALSE );
-
-        validateResults( apacheSnapshots, expecting );
-    }
-
-    /**
      * When there are snapshot files and the metadata file is correct
      *
      * @throws Exception
