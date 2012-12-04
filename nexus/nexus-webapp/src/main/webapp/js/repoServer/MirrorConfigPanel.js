@@ -267,8 +267,8 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
         }
         else
         {
+          // don't add icons, no need to bother the user with this
           Ext.TaskMgr.stop(this.mirrorStatusTask);
-          Sonatype.MessageBox.alert('Status retrieval failed');
         }
       },
 

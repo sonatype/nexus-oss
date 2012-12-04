@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -12,12 +12,20 @@
  */
 package org.sonatype.nexus.mime;
 
+import com.google.common.collect.Lists;
+import eu.medsea.mimeutil.detector.MimeDetector;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link DefaultMimeSupport}.
@@ -25,11 +33,24 @@ import static org.hamcrest.Matchers.equalTo;
 public class DefaultMimeSupportTest
     extends TestSupport
 {
-    private MimeSupport mimeSupport;
+    private DefaultMimeSupport mimeSupport;
+
+    @Mock
+    private NexusMimeTypes mimeTypes;
+
+    @Mock
+    private NexusMimeTypes.NexusMimeType mimeType;
 
     @Before
     public void setUp() throws Exception {
         mimeSupport = new DefaultMimeSupport();
+    }
+
+    private void mock()
+    {
+        final NexusExtensionMimeDetector detector =
+            (NexusExtensionMimeDetector) mimeSupport.getNonTouchingMimeUtil2().getMimeDetector( NexusExtensionMimeDetector.class.getName() );
+        detector.setNexusMimeTypes( mimeTypes );
     }
 
     /**
@@ -98,5 +119,50 @@ public class DefaultMimeSupportTest
     public void testGuessNullMimeRulesSourceMimeTypeFromPath()
     {
         assertThat( mimeSupport.guessMimeTypeFromPath( null, "/some/path/artifact.pom" ), equalTo( "application/xml" ) );
+    }
+
+    @Test
+    public void useNexusMimeTypes()
+    {
+        mock();
+        when( mimeTypes.getMimeTypes( "test" ) ).thenReturn( mimeType );
+        when( mimeType.getExtension() ).thenReturn( "test" );
+        when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "fake/mimetype" ) );
+
+        assertThat( mimeSupport.guessMimeTypeFromPath( "foo.test" ), is( "fake/mimetype" ) );
+    }
+
+    @Test
+    public void retainDefaultMimeTypes()
+    {
+        // empty NexusMimeTypes
+        mock();
+
+        assertThat( mimeSupport.guessMimeTypeFromPath( "foo.doc" ), is( "application/msword" ) );
+    }
+
+    @Test
+    public void preferDefaultMimeType()
+    {
+        mock();
+        when( mimeTypes.getMimeTypes( "zip" ) ).thenReturn( mimeType );
+        when( mimeType.getExtension() ).thenReturn( "zip" );
+        when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "fake/mimetype" ) );
+
+        assertThat( mimeSupport.guessMimeTypesFromPath( "foo.zip" ), hasItem( "fake/mimetype" ) );
+        assertThat( mimeSupport.guessMimeTypeFromPath( "foo.zip" ), is( "application/zip" ) );
+    }
+
+    @Test
+    public void overrideDefaultMimeType()
+    {
+        mock();
+        when( mimeTypes.getMimeTypes( "zip" ) ).thenReturn( mimeType );
+        when( mimeType.getExtension() ).thenReturn( "zip" );
+        when( mimeType.isOverride() ).thenReturn( true );
+        when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "fake/mimetype" ) );
+
+        assertThat( mimeSupport.guessMimeTypeFromPath( "foo.zip" ), is( "fake/mimetype" ) );
+
     }
 }

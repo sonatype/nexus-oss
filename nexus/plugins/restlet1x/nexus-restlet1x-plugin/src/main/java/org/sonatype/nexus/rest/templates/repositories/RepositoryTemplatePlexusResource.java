@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -186,6 +186,7 @@ public class RepositoryTemplatePlexusResource
         repoRes.setDownloadRemoteIndexes( repoCfg.isDownloadRemoteIndex() );
         repoRes.setArtifactMaxAge( repoCfg.getArtifactMaxAge() );
         repoRes.setMetadataMaxAge( repoCfg.getMetadataMaxAge() );
+        repoRes.setItemMaxAge( repoCfg.getItemMaxAge() );
         repoRes.setFileTypeValidation( repoCfg.isFileTypeValidation() );
 
         return repoRes;

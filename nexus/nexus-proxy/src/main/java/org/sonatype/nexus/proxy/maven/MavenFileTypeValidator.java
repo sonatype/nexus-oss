@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -13,15 +13,27 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import eu.medsea.mimeutil.MimeUtil2;
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.AbstractMimeMagicFileTypeValidator;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator;
@@ -34,7 +46,8 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * 
  * @author cstamas
  */
-@Component( role = FileTypeValidator.class, hint = "maven" )
+@Named("maven")
+@Singleton
 public class MavenFileTypeValidator
     extends AbstractMimeMagicFileTypeValidator
 {
@@ -47,25 +60,20 @@ public class MavenFileTypeValidator
 
     private Map<String, List<String>> supportedTypeMap = new HashMap<String, List<String>>();
 
-    public MavenFileTypeValidator()
-    {
-        supportedTypeMap.put( "jar", Arrays.asList( "application/zip" ) );
-        supportedTypeMap.put( "zip", Arrays.asList( "application/zip" ) );
-        supportedTypeMap.put( "war", Arrays.asList( "application/zip" ) );
-        supportedTypeMap.put( "ear", Arrays.asList( "application/zip" ) );
-        supportedTypeMap.put( "pom", Arrays.asList( "application/x-maven-pom", "application/xml", "text/xml" ) );
-        supportedTypeMap.put( "xml", Arrays.asList( "application/xml", "text/xml" ) );
-        supportedTypeMap.put( "tar", Arrays.asList( "application/x-tar" ) );
-        // flex
-        supportedTypeMap.put( "swc", Arrays.asList( "application/zip" ) );
-        supportedTypeMap.put( "swf", Arrays.asList( "application/x-shockwave-flash" ) );
-        // tar.gz
-        supportedTypeMap.put( "gz", Arrays.asList( "application/x-gzip", "application/x-tgz" ) );
-        supportedTypeMap.put( "tgz", Arrays.asList( "application/x-tgz" ) );
+    private final NexusMimeTypes mimeTypes;
 
-        // tar.bz2
-        supportedTypeMap.put( "bz2", Arrays.asList( "application/x-bzip2" ) );
-        supportedTypeMap.put( "tbz", Arrays.asList( "application/x-bzip2" ) );
+    @Inject
+    public MavenFileTypeValidator( final MimeSupport mimeSupport )
+    {
+        super( mimeSupport );
+        this.mimeTypes = new NexusMimeTypes();
+    }
+
+    @VisibleForTesting
+    public MavenFileTypeValidator( final NexusMimeTypes mimeTypes, final MimeSupport mimeSupport )
+    {
+        super( mimeSupport );
+        this.mimeTypes = mimeTypes;
     }
 
     @Override
@@ -195,6 +203,13 @@ public class MavenFileTypeValidator
                     expectedMimeTypes.addAll( entry.getValue() );
                 }
             }
+
+            final NexusMimeTypes.NexusMimeType type = mimeTypes.getMimeTypes( MimeUtil2.getExtension( filePath ) );
+            if ( type != null )
+            {
+                expectedMimeTypes.addAll( type.getMimetypes() );
+            }
+
             try
             {
                 // the expectedMimeTypes will be empty, see map in constructor which extensions we check at all.

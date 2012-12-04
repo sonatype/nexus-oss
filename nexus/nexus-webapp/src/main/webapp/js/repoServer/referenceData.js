@@ -108,6 +108,7 @@ define('repoServer/referenceData',['sonatype/all'], function(){
         notFoundCacheTTL : 0,
         artifactMaxAge : 0,
         metadataMaxAge : 0,
+        itemMaxAge : 0,
         repoPolicy : "",
         provider : "",
         providerRole : "",

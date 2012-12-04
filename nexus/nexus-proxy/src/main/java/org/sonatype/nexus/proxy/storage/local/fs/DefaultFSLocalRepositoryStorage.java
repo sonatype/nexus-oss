@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -306,13 +306,13 @@ public class DefaultFSLocalRepositoryStorage
     {
         File target = getBaseDir( repository, request );
 
-        return getFSPeer().isReachable( repository, request, target );
+        return getFSPeer().isReachable( repository, target, request, target );
     }
 
     public boolean containsItem( Repository repository, ResourceStoreRequest request )
         throws LocalStorageException
     {
-        return getFSPeer().containsItem( repository, request, getFileFromBase( repository, request ) );
+        return getFSPeer().containsItem( repository, getBaseDir( repository, request ), request, getFileFromBase( repository, request ) );
     }
 
     public AbstractStorageItem retrieveItem( Repository repository, ResourceStoreRequest request )
@@ -359,7 +359,7 @@ public class DefaultFSLocalRepositoryStorage
             cl = new ByteArrayContentLocator( bos.toByteArray(), "text/xml" );
         }
 
-        getFSPeer().storeItem( repository, item, target, cl );
+        getFSPeer().storeItem( repository, getBaseDir( repository, item.getResourceStoreRequest() ), item, target, cl );
 
         if ( item instanceof StorageFileItem )
         {
@@ -401,7 +401,7 @@ public class DefaultFSLocalRepositoryStorage
 
         File target = getFileFromBase( repository, request );
 
-        getFSPeer().shredItem( repository, request, target );
+        getFSPeer().shredItem( repository, getBaseDir( repository, request ), request, target );
     }
 
     public void moveItem( Repository repository, ResourceStoreRequest from, ResourceStoreRequest to )
@@ -426,7 +426,7 @@ public class DefaultFSLocalRepositoryStorage
 
             File toTarget = getFileFromBase( repository, to );
 
-            getFSPeer().moveItem( repository, from, fromTarget, to, toTarget );
+            getFSPeer().moveItem( repository, getBaseDir( repository, from ), from, fromTarget, to, toTarget );
 
             repository.getAttributesHandler().getAttributeStorage().deleteAttributes( fromUid );
         }
@@ -449,7 +449,7 @@ public class DefaultFSLocalRepositoryStorage
 
         File target = getFileFromBase( repository, request );
 
-        Collection<File> files = getFSPeer().listItems( repository, request, target );
+        Collection<File> files = getFSPeer().listItems( repository, getBaseDir( repository, request ), request, target );
 
         if ( files != null )
         {

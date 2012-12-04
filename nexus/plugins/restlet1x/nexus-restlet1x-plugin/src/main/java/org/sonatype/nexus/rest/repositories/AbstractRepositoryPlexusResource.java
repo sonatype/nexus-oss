@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -384,6 +384,8 @@ public abstract class AbstractRepositoryPlexusResource
             resource.setArtifactMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getArtifactMaxAge() );
 
             resource.setMetadataMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getMetadataMaxAge() );
+
+            resource.setItemMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getItemMaxAge() );
         }
         else
         {
@@ -392,6 +394,7 @@ public abstract class AbstractRepositoryPlexusResource
             {
                 Method artifactMethod = repository.getClass().getMethod( "getArtifactMaxAge", new Class<?>[0] );
                 Method metadataMethod = repository.getClass().getMethod( "getMetadataMaxAge", new Class<?>[0] );
+                Method itemMethod = repository.getClass().getMethod( "getItemMaxAge", new Class<?>[0] );
 
                 if ( artifactMethod != null )
                 {
@@ -400,6 +403,10 @@ public abstract class AbstractRepositoryPlexusResource
                 if ( metadataMethod != null )
                 {
                     resource.setMetadataMaxAge( (Integer) metadataMethod.invoke( repository, new Object[0] ) );
+                }
+                if ( itemMethod != null )
+                {
+                    resource.setItemMaxAge( (Integer) itemMethod.invoke( repository, new Object[0] ) );
                 }
             }
             catch ( Exception e )

@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -18,7 +18,7 @@ package org.sonatype.nexus.formfields;
  * @since 2.0
  */
 public class TextAreaFormField
-    extends AbstractFormField
+    extends AbstractFormField<String>
 {
 
     public TextAreaFormField( String id, String label, String helpText, boolean required, String regexValidation )
@@ -39,6 +39,12 @@ public class TextAreaFormField
     public String getType()
     {
         return "text-area";
+    }
+
+    public TextAreaFormField withInitialValue( final String initialValue )
+    {
+        setInitialValue( initialValue );
+        return this;
     }
 
 }

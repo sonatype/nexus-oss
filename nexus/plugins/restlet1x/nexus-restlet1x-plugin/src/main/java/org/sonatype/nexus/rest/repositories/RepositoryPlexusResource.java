@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -291,6 +291,11 @@ public class RepositoryPlexusResource
                                 pRepository.setArtifactMaxAge( proxyModel.getArtifactMaxAge() );
 
                                 pRepository.setMetadataMaxAge( proxyModel.getMetadataMaxAge() );
+
+                                if ( proxyModel.getItemMaxAge() != null )
+                                {
+                                    pRepository.setItemMaxAge( proxyModel.getItemMaxAge() );
+                                }
                             }
                         }
                         else
@@ -302,6 +307,8 @@ public class RepositoryPlexusResource
                                     repository.getClass().getMethod( "setArtifactMaxAge", int.class );
                                 Method metadataMethod =
                                     repository.getClass().getMethod( "setMetadataMaxAge", int.class );
+                                Method itemMethod =
+                                    repository.getClass().getMethod( "setItemMaxAge", int.class );
 
                                 RepositoryProxyResource proxyModel = (RepositoryProxyResource) model;
 
@@ -312,6 +319,10 @@ public class RepositoryPlexusResource
                                 if ( metadataMethod != null )
                                 {
                                     metadataMethod.invoke( repository, proxyModel.getMetadataMaxAge() );
+                                }
+                                if ( itemMethod != null && proxyModel.getItemMaxAge() != null)
+                                {
+                                    itemMethod.invoke( repository, proxyModel.getItemMaxAge() );
                                 }
                             }
                             catch ( Exception e )

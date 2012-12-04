@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -501,8 +501,17 @@ public class DefaultNexusPluginManager
     private String getPublishedPath( final URL resourceURL )
     {
         final String path = resourceURL.toExternalForm();
-        final int index = path.indexOf( "jar!/" );
-        return index > 0 ? path.substring( index + 4 ) : null;
+        int index = path.indexOf( "jar!/" );
+        if ( index > 0 )
+        {
+            return path.substring( index + 4 );
+        }
+        index = path.indexOf( "/static/" );
+        if ( index > 0 )
+        {
+            return path.substring( index );
+        }
+        return null;
     }
 
     private void reportMissingPlugin( final PluginManagerResponse response,

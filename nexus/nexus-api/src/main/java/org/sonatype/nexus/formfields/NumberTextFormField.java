@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -13,7 +13,7 @@
 package org.sonatype.nexus.formfields;
 
 public class NumberTextFormField
-    extends AbstractFormField
+    extends AbstractFormField<Number>
 {
     public NumberTextFormField( String id, String label, String helpText, boolean required, String regexValidation )
     {
@@ -34,4 +34,11 @@ public class NumberTextFormField
     {
         return "number";
     }
+
+    public NumberTextFormField withInitialValue( final Number initialValue )
+    {
+        setInitialValue( initialValue );
+        return this;
+    }
+
 }

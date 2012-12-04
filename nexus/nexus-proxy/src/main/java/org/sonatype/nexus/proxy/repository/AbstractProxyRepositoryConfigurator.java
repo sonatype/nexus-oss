@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.configuration.ConfigurationException;
@@ -45,6 +46,25 @@ public abstract class AbstractProxyRepositoryConfigurator
 
     @Requirement
     private RemoteProviderHintFactory remoteProviderHintFactory;
+
+    /**
+     * For plexus injection.
+     */
+    protected AbstractProxyRepositoryConfigurator()
+    {
+    }
+
+    @VisibleForTesting
+    AbstractProxyRepositoryConfigurator( final AuthenticationInfoConverter authenticationInfoConverter,
+                                                   final GlobalHttpProxySettings globalHttpProxySettings,
+                                                   final GlobalRemoteConnectionSettings globalRemoteConnectionSettings,
+                                                   final RemoteProviderHintFactory remoteProviderHintFactory )
+    {
+        this.authenticationInfoConverter = authenticationInfoConverter;
+        this.globalHttpProxySettings = globalHttpProxySettings;
+        this.globalRemoteConnectionSettings = globalRemoteConnectionSettings;
+        this.remoteProviderHintFactory = remoteProviderHintFactory;
+    }
 
     @Override
     public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
@@ -146,6 +166,13 @@ public abstract class AbstractProxyRepositoryConfigurator
             if ( repoConfig.getRemoteStorage() != null )
             {
                 RemoteStorageContext rsc = prepository.getRemoteStorageContext();
+
+                // NEXUS-5258 Do not persist storage provider hint if it's the default one
+                if ( remoteProviderHintFactory.getDefaultHttpRoleHint().equals(
+                        prepository.getRemoteStorage().getProviderId() ) )
+                {
+                    repoConfig.getRemoteStorage().setProvider( null );
+                }
 
                 if ( rsc.hasRemoteAuthenticationSettings() )
                 {

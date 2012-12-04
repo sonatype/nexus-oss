@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -85,8 +85,8 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
 
         // Mock FSPeer to return the results created above
         FSPeer fsPeer = mock( FSPeer.class );
-        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( ResourceStoreRequest.class ), eq( validDir ) ) ).thenReturn( validFileCollection );
-        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( ResourceStoreRequest.class ), eq( new File( repoLocation, "invalid/" ) ) ) ).thenReturn( invalidFileCollection );
+        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( File.class ), Mockito.any( ResourceStoreRequest.class ), eq( validDir ) ) ).thenReturn( validFileCollection );
+        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( File.class ), Mockito.any( ResourceStoreRequest.class ), eq( new File( repoLocation, "invalid/" ) ) ) ).thenReturn( invalidFileCollection );
 
         // create Repository Mock
         Repository repository = mock( Repository.class );

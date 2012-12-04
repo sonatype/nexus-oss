@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -23,6 +23,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,6 +44,8 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.XStreamConfigurator;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -68,15 +71,15 @@ public class SearchNGIndexPlexusResourceTest
         when( searcher.canHandle( Mockito.any( Map.class ) ) ).thenReturn( true );
 
         when(
-              searcher.flatIteratorSearch( Mockito.any( Map.class ), anyString(), anyInt(), anyInt(), anyInt(),
-                                           anyBoolean(), Mockito.any( SearchType.class ), Mockito.any( List.class ) ) )
-        // emulate current indexer search behavior, illegal query results in IllegalArgEx with the ParseEx as cause
-        .thenThrow( new IllegalArgumentException( new ParseException( "mock" ) ) );
+            searcher.flatIteratorSearch( Mockito.any( Map.class ), anyString(), anyInt(), anyInt(), anyInt(),
+                                         anyBoolean(), Mockito.any( SearchType.class ), Mockito.any( List.class ) ) )
+            // emulate current indexer search behavior, illegal query results in IllegalArgEx with the ParseEx as cause
+            .thenThrow( new IllegalArgumentException( new ParseException( "mock" ) ) );
 
         try
         {
             resource.searchByTerms( terms, "rid", 1, 1, false, false, true,
-                                    Collections.<ArtifactInfoFilter> emptyList(), Arrays.asList( searcher ) );
+                                    Collections.<ArtifactInfoFilter>emptyList(), Arrays.asList( searcher ) );
 
             Assert.fail( "Expected PlexusResourceException" );
         }
@@ -92,6 +95,52 @@ public class SearchNGIndexPlexusResourceTest
             assertThat( errorMessage.getId(), equalTo( "search" ) );
             assertThat( errorMessage.getMsg(), containsString( "mock" ) );
         }
+    }
+
+    @Test
+    public void NEXUS5412Uncollapse()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        // we deploy 50 fluke artifacts, to have them end up on index
+        // same GA but version goes 1..50
+        final IndexerManager indexerManager = lookup( IndexerManager.class );
+        final Repository releases = repositoryRegistry.getRepository( "releases" );
+        for ( int i = 1; i <= 50; i++ )
+        {
+            final String path = String.format( "/org/nexus5412/%s/nexus5412-%s.jar", i, i );
+            final ResourceStoreRequest request = new ResourceStoreRequest( path );
+            releases.storeItem( request, new ByteArrayInputStream( "Junk JAR".getBytes() ), null );
+        }
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final SearchNGIndexPlexusResource subject =
+            (SearchNGIndexPlexusResource) lookup( PlexusResource.class, SearchNGIndexPlexusResource.ROLE_HINT );
+        Context context = new Context();
+        Request request = new Request();
+        Reference ref = new Reference( "http://localhost:12345/" );
+        request.setRootRef( ref );
+        request.setResourceRef( new Reference( ref, SearchNGIndexPlexusResource.RESOURCE_URI
+            + "?q=nexus5412&collapseresults=true" ) );
+        Response response = new Response( request );
+
+        // perform a search
+        SearchNGResponse result = subject.get( context, request, response, null );
+
+        // NEXUS-5412 causes this assertion below to fail
+        // Reason: by mistake, there are two comparisons against DEFAULT_COLLAPSE_OVERRIDE_TRESHOLD, a constant
+        // that defines the "lower threshold" when to un-collapse, but one of those checks compares apples to oranges.
+        // The "unit" of this constant is "rows in UI", while the 1st comparison is done against matched ArtifactInfos
+        // Clearly, as we above created 50 (50 > 35), the check will pass. Then, "repackage" happens, where collapse
+        // is applied too, and result ends up with having 1 line (versions collapsed, GA gives 1 line, they are all same)
+        // Second check will detect this, and set collapseResults=false, but search is not redone anymore.
+        Assert.assertEquals( 50, result.getData().size() );
     }
 
     @Test

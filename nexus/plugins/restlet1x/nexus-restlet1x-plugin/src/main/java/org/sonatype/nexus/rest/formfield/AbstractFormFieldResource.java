@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -37,7 +37,11 @@ public abstract class AbstractFormFieldResource
                 dto.setRegexValidation( field.getRegexValidation() );
                 dto.setRequired( field.isRequired() );
                 dto.setType( field.getType() );
-                
+                if ( field.getInitialValue() != null )
+                {
+                    dto.setInitialValue( field.getInitialValue().toString() );
+                }
+
                 dtoList.add( dto );
             }
             catch ( InstantiationException e )

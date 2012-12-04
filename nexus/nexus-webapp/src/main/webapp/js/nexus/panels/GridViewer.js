@@ -660,7 +660,6 @@ Ext.namespace('Sonatype.panels');
               item,
               rec = grid.store.getAt(index),
               menu = new Sonatype.menu.Menu({
-                id : 'grid-context-menu',
                 payload : rec,
                 scope : this,
                 items : []

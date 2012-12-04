@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -339,7 +339,6 @@ public class M2GroupRepository
     {
         String digestFileName = request.getRequestPath() + "." + algorithm.toLowerCase();
 
-        // see nexus-configuration mime-types.properties (defaulted to text/plain, as central reports them)
         String mimeType = getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), digestFileName );
 
         byte[] bytes = ( digest + '\n' ).getBytes( "UTF-8" );

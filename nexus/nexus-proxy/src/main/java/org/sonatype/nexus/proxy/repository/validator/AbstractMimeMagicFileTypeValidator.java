@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository.validator;
 import java.io.IOException;
 import java.util.Set;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -34,6 +35,18 @@ public abstract class AbstractMimeMagicFileTypeValidator
 {
     @Requirement
     private MimeSupport mimeSupport;
+
+    /**
+     * Only use with plexus injection.
+     */
+    protected AbstractMimeMagicFileTypeValidator()
+    {
+    }
+
+    protected AbstractMimeMagicFileTypeValidator( final MimeSupport mimeSupport )
+    {
+        this.mimeSupport = mimeSupport;
+    }
 
     /**
      * This method accepts the file item which content needs MIME magic detection, and the set of "expectations" to

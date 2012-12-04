@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -13,7 +13,7 @@
 package org.sonatype.nexus.formfields;
 
 public class RepoOrGroupComboFormField
-    extends AbstractFormField
+    extends AbstractFormField<String>
 {
     public static final String DEFAULT_HELP_TEXT = "Select the repository or repository group";
     public static final String DEFAULT_LABEL = "Repository/Group"; 
@@ -41,4 +41,11 @@ public class RepoOrGroupComboFormField
     {
         return "repo-or-group";
     }
+
+    public RepoOrGroupComboFormField withInitialValue( final String initialValue )
+    {
+        setInitialValue( initialValue );
+        return this;
+    }
+
 }

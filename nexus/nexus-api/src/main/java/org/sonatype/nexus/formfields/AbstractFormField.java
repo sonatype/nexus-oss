@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -12,15 +12,23 @@
  */
 package org.sonatype.nexus.formfields;
 
-public abstract class AbstractFormField
-    implements FormField
+public abstract class AbstractFormField<T>
+    implements FormField<T>
 {
     private String helpText;
     private String id;
     private String regexValidation;
     private boolean required;
     private String label;
+    private T initialValue;
     
+    public AbstractFormField( final String id, final String label, final String helpText, final boolean required,
+                              final String regexValidation, final T initialValue )
+    {
+        this( id, label, helpText, required, regexValidation );
+        this.initialValue = initialValue;
+    }
+
     public AbstractFormField( String id, String label, String helpText, boolean required, String regexValidation )
     {
         this( id, label, helpText, required );
@@ -60,6 +68,10 @@ public abstract class AbstractFormField
     {
         return this.required;
     }
+    public T getInitialValue()
+    {
+        return initialValue;
+    }
     public void setHelpText( String helpText )
     {
         this.helpText = helpText;
@@ -79,5 +91,9 @@ public abstract class AbstractFormField
     public void setLabel( String label )
     {
         this.label = label;
+    }
+    public void setInitialValue( T value )
+    {
+        this.initialValue=value;
     }
 }

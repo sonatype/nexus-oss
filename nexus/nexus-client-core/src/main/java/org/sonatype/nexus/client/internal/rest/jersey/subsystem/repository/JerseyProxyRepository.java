@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -61,6 +61,7 @@ public class JerseyProxyRepository<T extends ProxyRepository>
         settings.setFileTypeValidation( true );
         settings.setArtifactMaxAge( -1 );
         settings.setMetadataMaxAge( 1440 );
+        settings.setItemMaxAge( 1440 );
         settings.setAutoBlockActive( true );
 
         return settings;
@@ -121,6 +122,13 @@ public class JerseyProxyRepository<T extends ProxyRepository>
     public T withNotFoundCacheTTL( final int minutes )
     {
         settings().setNotFoundCacheTTL( minutes );
+        return me();
+    }
+
+    @Override
+    public T withItemMaxAge( final int minutes )
+    {
+        settings().setItemMaxAge( minutes );
         return me();
     }
 
