@@ -1386,6 +1386,7 @@
               <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
               <!-- FIXME is this really a good idea excluding all test resources? -->
               <exclude>**/src/test/resources/**</exclude>
+              <exclude>**/src/test/filtered-resources/**</exclude>
               <exclude>**/nexus-test-harness-its/resources/**</exclude>
               <exclude>**/gwt/ext/ui/**/*.js</exclude>
               <exclude>**/gwt/ext/ui/**/*.css</exclude>
