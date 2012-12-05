@@ -17,7 +17,7 @@
   <parent>
     <artifactId>security-rest</artifactId>
     <groupId>org.sonatype.security</groupId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
   </parent>
   
   <artifactId>security-rest-model</artifactId>
