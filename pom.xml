@@ -1387,13 +1387,60 @@
           </configuration>
         </plugin>
 
-        <!-- INTERNAL -->
+        <plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <configuration>
+            <!-- caution do not append children excludes since we have 'target' package -->
+            <excludes>
+              <exclude>**/.*/**</exclude>
+              <!-- we have target pattern in this format because of target package in nexus-api and nexus-proxy modules -->
+              <exclude>**/nexus*/target/**</exclude>
+              <exclude>**/ldap-common/target/**</exclude>
+              <exclude>**/ext-2.3/**</exclude>
+              <exclude>**/ext-3.4.0/**</exclude>
+              <exclude>**/js/filetree/**</exclude>
+              <exclude>**/editarea_0_8_2/**</exclude>
+              <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
+              <!-- FIXME is this really a good idea excluding all test resources? -->
+              <exclude>**/src/test/resources/**</exclude>
+              <exclude>**/nexus-test-harness-its/resources/**</exclude>
+              <exclude>**/gwt/ext/ui/**/*.js</exclude>
+              <exclude>**/gwt/ext/ui/**/*.css</exclude>
+              <!-- already has a lgpl license -->
+              <exclude>**/Ext.ux.form.LovCombo.css</exclude>
+              <!-- temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check -->
+              <exclude>**/dependency-reduced-pom.xml</exclude>
+              <!-- netbeans adds these -->
+              <exclude>**/nbactions*.xml</exclude>
+              <exclude>**/nb-configuration.xml</exclude>
+              <!-- IntelliJ IDEA files-->
+              <exclude>**/atlassian-ide-plugin.xml</exclude>
+              <exclude>nexus-plugin-archetype/src/main/resources/archetype-resources/**</exclude>
+              <exclude>nexus/nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
+              <exclude>nexus/nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
+              <!-- Exclude zion work directory -->
+              <exclude>zwork/**</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
 
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <releaseProfiles>release,tattletale,optimize-js</releaseProfiles>
+            <tagNameFormat>nexus-@{version}</tagNameFormat>
+          </configuration>
+        </plugin>
+
+        <!-- INTERNAL -->
         <plugin>
           <groupId>org.sonatype.nexus.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
           <version>${project.version}</version>
         </plugin>
+
       </plugins>
     </pluginManagement>
 
