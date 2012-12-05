@@ -1610,30 +1610,32 @@
   </build>
 
   <modules>
-    <module>nexus-bootstrap</module>
-    <module>nexus-plugin-api</module>
-    <module>nexus-plugin-manager</module>
-    <module>nexus-plugin-test-api</module>
-    <module>nexus-utils</module>
-    <module>nexus-web-utils</module>
-    <module>nexus-logging-extras</module>
-    <module>nexus-logging-extras-appender</module>
-    <module>nexus-compat</module>
-    <module>nexus-api</module>
-    <module>nexus-oss-edition</module>
-    <module>nexus-configuration-model</module>
-    <module>nexus-configuration</module>
-    <module>nexus-proxy</module>
-    <module>nexus-app</module>
-    <module>plugins</module>
-    <module>nexus-webapp</module>
-    <module>nexus-launcher</module>
-    <module>nexus-client-core</module>
-    <module>nexus-clients</module>
-    <module>nexus-oss-webapp</module>
-    <module>nexus-stories</module>
-    <module>nexus-test</module>
-    <module>nexus-client-core-testsuite</module>
+    <module>nexus-plugin-archetype</module>
+    <module>nexus-runtime-platform</module>
+    <module>nexus/nexus-bootstrap</module>
+    <module>nexus/nexus-plugin-api</module>
+    <module>nexus/nexus-plugin-manager</module>
+    <module>nexus/nexus-plugin-test-api</module>
+    <module>nexus/nexus-utils</module>
+    <module>nexus/nexus-web-utils</module>
+    <module>nexus/nexus-logging-extras</module>
+    <module>nexus/nexus-logging-extras-appender</module>
+    <module>nexus/nexus-compat</module>
+    <module>nexus/nexus-api</module>
+    <module>nexus/nexus-oss-edition</module>
+    <module>nexus/nexus-configuration-model</module>
+    <module>nexus/nexus-configuration</module>
+    <module>nexus/nexus-proxy</module>
+    <module>nexus/nexus-app</module>
+    <module>nexus/plugins</module>
+    <module>nexus/nexus-webapp</module>
+    <module>nexus/nexus-launcher</module>
+    <module>nexus/nexus-client-core</module>
+    <module>nexus/nexus-clients</module>
+    <module>nexus/nexus-oss-webapp</module>
+    <module>nexus/nexus-stories</module>
+    <module>nexus/nexus-test</module>
+    <module>nexus/nexus-client-core-testsuite</module>
   </modules>
 
   <profiles>
