@@ -43,6 +43,7 @@ import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
+import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SystemNotificationSettings;
 
 /**
@@ -428,10 +429,4 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         return result;
     }
 
-    @Override
-    public void configureXStream( final XStream xstream )
-    {
-        xstream.registerLocalConverter( SmtpSettings.class, "username", new HtmlUnescapeStringConverter( true ) );
-        xstream.registerLocalConverter( SmtpSettings.class, "password", new HtmlUnescapeStringConverter( true ) );
-    }
 }
