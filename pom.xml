@@ -1208,14 +1208,6 @@
       <plugins>
 
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <skipIfEmpty>false</skipIfEmpty>
-          </configuration>
-        </plugin>
-
-        <plugin>
           <groupId>org.jboss.tattletale</groupId>
           <artifactId>tattletale-maven</artifactId>
           <version>1.1.2.Final</version>
