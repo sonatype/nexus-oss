@@ -20,6 +20,7 @@
     <artifactId>nexus</artifactId>
     <groupId>org.sonatype.nexus</groupId>
     <version>2.3-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
