@@ -31,7 +31,7 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <pluginName>Nexus : Plugins : Yum</pluginName>
+    <pluginName>Nexus Yum Plugin</pluginName>
     <pluginDescription>Allows Nexus to create yum repositories for uploaded RPM packages</pluginDescription>
     <pluginSiteUrl>https://github.com/sonatype/nexus-yum-plugin</pluginSiteUrl>
   </properties>
