@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -42,6 +42,7 @@ public class Nexus3162SnapshotProxyRepoTemplateIT
         Assert.assertTrue( result instanceof RepositoryProxyResource );
         Assert.assertEquals( 1440, ( (RepositoryProxyResource) result ).getArtifactMaxAge() );
         Assert.assertEquals( 1440, ( (RepositoryProxyResource) result ).getMetadataMaxAge() );
+        Assert.assertEquals( Integer.valueOf( 1440 ), ( (RepositoryProxyResource) result ).getItemMaxAge() );
     }
 
     @Test
@@ -53,5 +54,6 @@ public class Nexus3162SnapshotProxyRepoTemplateIT
         Assert.assertTrue( result instanceof RepositoryProxyResource );
         Assert.assertEquals( -1, ( (RepositoryProxyResource) result ).getArtifactMaxAge() );
         Assert.assertEquals( 1440, ( (RepositoryProxyResource) result ).getMetadataMaxAge() );
+        Assert.assertEquals( Integer.valueOf( 1440 ), ( (RepositoryProxyResource) result ).getItemMaxAge() );
     }
 }

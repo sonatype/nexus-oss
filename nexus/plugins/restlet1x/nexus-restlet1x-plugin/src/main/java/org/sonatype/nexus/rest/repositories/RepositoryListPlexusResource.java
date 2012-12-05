@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -303,6 +303,11 @@ public class RepositoryListPlexusResource
         exConf.setArtifactMaxAge( model.getArtifactMaxAge() );
 
         exConf.setMetadataMaxAge( model.getMetadataMaxAge() );
+
+        if ( model.getItemMaxAge() != null )
+        {
+            exConf.setItemMaxAge( model.getItemMaxAge() );
+        }
 
         // set auto block
         exConf.setAutoBlockActive( model.isAutoBlockActive() );

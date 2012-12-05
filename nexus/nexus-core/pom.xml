@@ -19,6 +19,7 @@
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
     <version>2.3-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>nexus-core</artifactId>
@@ -270,16 +271,6 @@
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet</groupId>
-      <artifactId>org.restlet</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.noelios.restlet</groupId>
-      <artifactId>com.noelios.restlet</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

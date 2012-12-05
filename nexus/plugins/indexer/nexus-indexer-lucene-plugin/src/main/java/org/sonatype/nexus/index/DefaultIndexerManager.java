@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -60,7 +61,6 @@ import org.apache.maven.index.ArtifactInfoPostprocessor;
 import org.apache.maven.index.Field;
 import org.apache.maven.index.FlatSearchRequest;
 import org.apache.maven.index.FlatSearchResponse;
-import org.apache.maven.index.IndexerEngine;
 import org.apache.maven.index.IteratorResultSet;
 import org.apache.maven.index.IteratorSearchRequest;
 import org.apache.maven.index.IteratorSearchResponse;
@@ -70,7 +70,6 @@ import org.apache.maven.index.MatchHighlightRequest;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.Scanner;
 import org.apache.maven.index.ScanningRequest;
-import org.apache.maven.index.ScanningResult;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.apache.maven.index.context.DefaultIndexingContext;
@@ -186,6 +185,8 @@ import com.google.common.annotations.VisibleForTesting;
 public class DefaultIndexerManager
     implements IndexerManager
 {
+    private static final String ARTIFICIAL_EXCEPTION = "This is an artificial exception that provides caller backtrace.";
+
     /** The key used in working directory. */
     public static final String INDEXER_WORKING_DIRECTORY_KEY = "indexer";
 
@@ -290,6 +291,14 @@ public class DefaultIndexerManager
     @Nullable
     @Named( "${lucene.fsdirectory.type}" )
     private String luceneFSDirectoryType;
+
+    /**
+     * Timeout, in seconds, acquiring index locks. This is a safety net meant to prevent complete system lockup in case
+     * of index lock leaks.
+     */
+    @Inject
+    @Named( "${nexus.indexer.locktimeout:-60}" )
+    private int lockTimeoutSeconds;
 
     /**
      * Locks that protect access to repository index. Item-level add/remove and search operations must acquire read
@@ -1346,7 +1355,7 @@ public class DefaultIndexerManager
     protected void publishRepositoryIndex( final Repository repository )
         throws IOException
     {
-        if (!INDEXABLE( repository ) && !INSERVICE( repository ))
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
             return;
         }
@@ -2169,8 +2178,15 @@ public class DefaultIndexerManager
                                final ArtifactInfoFilter artifactInfoFilter, final String repositoryId )
         throws NoSuchRepositoryException, IOException
     {
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
+        {
+            return null;
+        }
+
         final TreeNode[] result = new TreeNode[1];
-        shared( repositoryRegistry.getRepository( repositoryId ), new Runnable()
+        shared( repository, new Runnable()
         {
             @Override
             public void run( IndexingContext context )
@@ -2228,6 +2244,12 @@ public class DefaultIndexerManager
     {
         Lock lock = null;
         IndexingContext lockedContext = null;
+
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
+        {
+            return;
+        }
+
         if ( ISGROUP( repository ) )
         {
             Map<String, Repository> members = new HashMap<String, Repository>();
@@ -2241,7 +2263,7 @@ public class DefaultIndexerManager
                 List<IndexingContext> memberContexts = new ArrayList<IndexingContext>();
                 for ( IndexingContext context : lockedContexts.contexts.values() )
                 {
-                    if ( !repository.getId().equals( context.getRepositoryId() ) )
+                    if ( context != null && !repository.getId().equals( context.getRepositoryId() ) )
                     {
                         memberContexts.add( context );
                     }
@@ -2272,21 +2294,23 @@ public class DefaultIndexerManager
         }
         else
         {
-            lock = getRepositoryLock( repository ).readLock();
-            lock.lock();
-            IndexingContext context = getRepositoryIndexContext( repository );
-            if ( context != null )
+            lock = getRepositoryLock( repository, false /* shared */);
+            if ( lock != null )
             {
-                lockedContext = new LockingIndexingContext( context, lock );
-            }
-            else
-            {
-                lock.unlock();
-                lock = null;
+                IndexingContext context = getRepositoryIndexContext( repository );
+                if ( context != null )
+                {
+                    lockedContext = new LockingIndexingContext( context, lock );
+                }
+                else
+                {
+                    lock.unlock();
+                    lock = null;
+                }
             }
         }
 
-        if ( lockedContext != null )
+        if ( lockedContext != null && lock != null )
         {
             try
             {
@@ -2299,7 +2323,8 @@ public class DefaultIndexerManager
         }
         else
         {
-            logger.warn( "Could not perform index operation on repository {}", repository.getId(), new Exception() );
+            logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                         new Exception( ARTIFICIAL_EXCEPTION ) );
         }
     }
 
@@ -2310,24 +2335,26 @@ public class DefaultIndexerManager
     private void sharedSingle( Repository repository, Runnable runnable )
         throws IOException
     {
-        Lock lock = getRepositoryLock( repository ).readLock();
-        lock.lock();
-        try
+        Lock lock = getRepositoryLock( repository, false /* shared */);
+        if ( lock != null )
         {
-            IndexingContext ctx = getRepositoryIndexContext( repository );
-            if ( ctx != null )
+            try
             {
-                runnable.run( ctx );
+                IndexingContext ctx = getRepositoryIndexContext( repository );
+                if ( ctx != null )
+                {
+                    runnable.run( ctx );
+                }
+                else
+                {
+                    logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                                 new Exception( ARTIFICIAL_EXCEPTION ) );
+                }
             }
-            else
+            finally
             {
-                logger.warn( "Could not perform index operation on repository {}", repository.getId(),
-                             new Exception( "This is an artificial exception that provides caller backtrace." ) );
+                lock.unlock();
             }
-        }
-        finally
-        {
-            lock.unlock();
         }
     }
 
@@ -2430,35 +2457,52 @@ public class DefaultIndexerManager
     private void exclusiveSingle( Repository repository, Runnable runnable )
         throws IOException
     {
-        Lock lock = getRepositoryLock( repository ).writeLock();
-        lock.lock();
-        try
+        Lock lock = getRepositoryLock( repository, true /* exclusive */);
+        if ( lock != null )
         {
-            IndexingContext ctx = getRepositoryIndexContext( repository );
-            runnable.run( ctx );
-        }
-        finally
-        {
-            lock.unlock();
+            try
+            {
+                IndexingContext ctx = getRepositoryIndexContext( repository );
+                runnable.run( ctx );
+            }
+            finally
+            {
+                lock.unlock();
+            }
         }
     }
 
     /**
-     * Returns "repository" read-write lock that corresponds to the repository. The lock is used to protect access to
-     * the repository Lucene index.
+     * Acquires either shared or exclusive "repository" lock. The lock is used to protect access to the repository
+     * Lucene index. Returns null if requested lock cannot be acquired due to timeout or interruption.
      */
-    private ReadWriteLock getRepositoryLock( Repository repository )
+    private Lock getRepositoryLock( Repository repository, boolean exclusive )
     {
+        ReadWriteLock rwlock;
         synchronized ( repositoryLocks )
         {
-            ReadWriteLock lock = repositoryLocks.get( repository.getId() );
-            if ( lock == null )
+            rwlock = repositoryLocks.get( repository.getId() );
+            if ( rwlock == null )
             {
-                lock = NamedReadWriteLock.decorate( new ReentrantReadWriteLock(), repository.getId() );
-                repositoryLocks.put( repository.getId(), lock );
+                rwlock = NamedReadWriteLock.decorate( new ReentrantReadWriteLock(), repository.getId() );
+                repositoryLocks.put( repository.getId(), rwlock );
             }
-            return lock;
         }
+        try
+        {
+            Lock lock = exclusive ? rwlock.writeLock() : rwlock.readLock();
+            if ( lock.tryLock( lockTimeoutSeconds, TimeUnit.SECONDS ) )
+            {
+                return lock;
+            }
+        }
+        catch ( InterruptedException e )
+        {
+            // TODO consider throwing IOException instead
+        }
+        logger.error( "Could not acquire {} lock on repository {}", exclusive ? "exclusive" : "shared",
+                      repository.getId(), new Exception( ARTIFICIAL_EXCEPTION ) );
+        return null;
     }
 
     /**
@@ -2544,19 +2588,21 @@ public class DefaultIndexerManager
         Map<String, IndexingContext> contexts = new LinkedHashMap<String, IndexingContext>();
         for ( Repository repository : sorted )
         {
-            Lock lock = getRepositoryLock( repository ).readLock();
-
-            lock.lock(); // at this point repository index cannot be added or removed, we can safely use it
-            IndexingContext context = getRepositoryIndexContext( repository );
-
-            if ( !repository.getId().equals( force ) && context == null )
+            Lock lock = getRepositoryLock( repository, false /* shared */);
+            if ( lock != null )
             {
-                lock.unlock();
-                continue;
-            }
+                // at this point repository index cannot be added or removed, we can safely use it
+                IndexingContext context = getRepositoryIndexContext( repository );
 
-            locks.add( lock );
-            contexts.put( repository.getId(), new LockingIndexingContext( context, lock ) );
+                if ( !repository.getId().equals( force ) && context == null )
+                {
+                    lock.unlock();
+                    continue;
+                }
+
+                locks.add( lock );
+                contexts.put( repository.getId(), new LockingIndexingContext( context, lock ) );
+            }
         }
 
         if ( contexts.isEmpty() )

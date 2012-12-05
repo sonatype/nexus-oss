@@ -36,7 +36,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://test/nexus/content/groups/public/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -68,7 +67,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://test/nexus/content/groups/thirdparty/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -99,7 +97,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://test/nexus/content/groups/enterprise/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -158,7 +155,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://test/nexus/content/groups/enterprise-snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -189,7 +185,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://test/nexus/content/groups/internal/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -220,7 +215,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://test:8200/nexus/content/repositories/test/</url>
       </remoteStorage>
       <externalConfiguration>

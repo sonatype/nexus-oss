@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -23,14 +23,13 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.SearchType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,7 +39,10 @@ import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.Searcher;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -72,9 +74,7 @@ public class SearchNGIndexPlexusResourceTest
 
         try
         {
-            resource.searchByTerms( terms, "rid", 1, 1, false, false, true,
-                                    Collections.<ArtifactInfoFilter> emptyList(), Arrays.asList( searcher ) );
-
+            resource.searchByTerms( terms, "rid", 1, 1, false, Arrays.asList( searcher ) );
             Assert.fail( "Expected PlexusResourceException" );
         }
         catch ( PlexusResourceException e )
@@ -92,10 +92,74 @@ public class SearchNGIndexPlexusResourceTest
     }
 
     @Test
+    public void uncollapse()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        int artifactCount = 30; // this is bellow collapse threshold
+        SearchNGResponse result = deployAndSearch( artifactCount );
+        Assert.assertEquals( artifactCount, result.getData().size() );
+    }
+
+    @Test
+    public void collapse()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        int artifactCount = 60; // this is above collapse threshold
+        SearchNGResponse result = deployAndSearch( artifactCount );
+        Assert.assertEquals( 1, result.getData().size() );
+    }
+
+    private SearchNGResponse deployAndSearch( int artifactCount )
+        throws Exception
+    {
+        final Repository releases = repositoryRegistry.getRepository( "releases" );
+        for ( int i = 1; i <= artifactCount; i++ )
+        {
+            final String path = String.format( "/org/nexus5412/%s/nexus5412-%s.jar", i, i );
+            final ResourceStoreRequest request = new ResourceStoreRequest( path );
+            releases.storeItem( request, new ByteArrayInputStream( "Junk JAR".getBytes() ), null );
+        }
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final SearchNGIndexPlexusResource subject =
+            (SearchNGIndexPlexusResource) lookup( PlexusResource.class, SearchNGIndexPlexusResource.ROLE_HINT );
+        Context context = new Context();
+        Request request = new Request();
+        Reference ref = new Reference( "http://localhost:12345/" );
+        request.setRootRef( ref );
+        request.setResourceRef( new Reference( ref, SearchNGIndexPlexusResource.RESOURCE_URI
+            + "?q=nexus5412&collapseresults=true" ) );
+        Response response = new Response( request );
+
+        // perform a search
+        return subject.get( context, request, response, null );
+    }
+
+    @Test
     public void testUncollapseResults()
         throws Exception
     {
         fillInRepo();
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final IndexerManager indexerManager = lookup( IndexerManager.class );
+        indexerManager.reindexAllRepositories( "/", true );
 
         SearchNGIndexPlexusResource subject =
             (SearchNGIndexPlexusResource) lookup( PlexusResource.class, SearchNGIndexPlexusResource.ROLE_HINT );
@@ -110,6 +174,27 @@ public class SearchNGIndexPlexusResourceTest
         Response response = new Response( request );
         SearchNGResponse result = subject.get( context, request, response, null );
 
-        Assert.assertEquals( 1, result.getTotalCount() );
+        // explanation:
+        // we test here, does this resource "expand" the result set even if the request told to collaps
+        // (like UI does). This happens when result set (the grid count in search UI) would contain less
+        // rows than COLLAPSE_OVERRIDE_TRESHOLD = 35 lines. If yes, it will repeat the search but uncollapsed
+        // kinda overriding the "hint" that was in original request (see request query parameters above).
+        //
+        // Found items uncollapsed (without any specific order, is unstable):
+        // org.sonatype.nexus:nexus:1.3.0-SNAPSHOT
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-5-SNAPSHOT
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-3-SNAPSHOT
+        // org.sonatype.nexus:nexus:1.2.2-SNAPSHOT
+        // org.sonatype:nexus-3148:1.0.SNAPSHOT
+        //
+        // Found items collapsed (G:A:maxVersion):
+        // org.sonatype.nexus:nexus:1.3.0-SNAPSHOT
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4 (rel preferred over snap)
+        // org.sonatype:nexus-3148:1.0.SNAPSHOT
+
+        // we assert that the grid would contain 7, not 3 hits (corresponds to grid lines in Search UI)
+        Assert.assertEquals( 7, result.getData().size() );
     }
 }

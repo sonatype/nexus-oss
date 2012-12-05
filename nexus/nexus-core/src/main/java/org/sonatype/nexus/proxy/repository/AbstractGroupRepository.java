@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -496,8 +496,15 @@ public abstract class AbstractGroupRepository
             }
             catch ( NoSuchRepositoryException e )
             {
-                this.getLogger().warn( "Could not find repository: " + repoId, e );
-                // XXX throw new StorageException( e );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    this.getLogger().warn( "Could not find repository '{}' while iterating members", repoId, e );
+                }
+                else
+                {
+                    this.getLogger().warn( "Could not find repository '{}' while iterating members", repoId );
+                }
+                // XXX throw new StorageException( e )  ;
             }
         }
 

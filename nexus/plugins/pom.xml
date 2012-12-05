@@ -13,12 +13,14 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>nexus</artifactId>
     <groupId>org.sonatype.nexus</groupId>
     <version>2.3-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -36,18 +38,6 @@
     </dependency>
   </dependencies>
 
-  <modules>
-    <module>restlet1x</module>
-    <module>indexer</module>
-    <module>ldap</module>
-    <module>nexus-timeline-plugin</module>
-    <module>nexus-lvo-plugin</module>
-    <module>nexus-plugin-console-plugin</module>
-    <module>nexus-rrb-plugin</module>
-    <module>nexus-archetype-plugin</module>
-    <module>nexus-maven-bridge-plugin</module>
-  </modules>
-
   <build>
     <plugins>
       <plugin>
@@ -57,5 +47,29 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>plugins</id>
+
+      <activation>
+        <property>
+          <name>!skip-plugins</name>
+        </property>
+      </activation>
+
+      <modules>
+        <module>restlet1x</module>
+        <module>indexer</module>
+        <module>ldap</module>
+        <module>nexus-timeline-plugin</module>
+        <module>nexus-lvo-plugin</module>
+        <module>nexus-plugin-console-plugin</module>
+        <module>nexus-rrb-plugin</module>
+        <module>nexus-archetype-plugin</module>
+        <module>nexus-maven-bridge-plugin</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

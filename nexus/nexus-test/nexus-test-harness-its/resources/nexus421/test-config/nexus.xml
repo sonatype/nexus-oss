@@ -31,7 +31,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repo1.maven.org/maven2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -59,7 +58,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://google-maven-repository.googlecode.com/svn/repository/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -87,7 +85,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://download.java.net/maven/2/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -116,7 +113,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://download.java.net/maven/1/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -142,7 +138,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://repository.apache.org/snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
@@ -170,7 +165,6 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>http://nexus.codehaus.org/snapshots/</url>
       </remoteStorage>
       <externalConfiguration>

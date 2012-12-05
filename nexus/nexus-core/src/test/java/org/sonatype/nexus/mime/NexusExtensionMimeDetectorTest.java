@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -17,6 +17,8 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.mockito.Mockito.when;
+
+import java.util.Collection;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -48,7 +50,8 @@ public class NexusExtensionMimeDetectorTest
     @Test
     public void fallbackToDefaults()
     {
-        assertThat( underTest.getMimeTypesFileName( "foo.zip" ), hasItem( "application/zip" ) );
+        Collection<String> fileNames = underTest.getMimeTypesFileName( "foo.zip" );
+        assertThat( fileNames, hasItem( "application/zip" ) );
     }
 
     @Test
@@ -57,7 +60,8 @@ public class NexusExtensionMimeDetectorTest
         when( mimeTypes.getMimeTypes( "zip" ) ).thenReturn( mimeType );
         when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "fake/mimetype" ) );
 
-        assertThat( underTest.getMimeTypesFileName( "foo.zip" ), hasItems( "application/zip", "fake/mimetype" ) );
+        Collection<String> fileNames = underTest.getMimeTypesFileName( "foo.zip" );
+        assertThat( fileNames, hasItems( "application/zip", "fake/mimetype" ) );
     }
 
     @Test
@@ -68,6 +72,7 @@ public class NexusExtensionMimeDetectorTest
         when( mimeType.getMimetypes() ).thenReturn( Lists.newArrayList( "fake/mimetype" ) );
 
         // Matchers.contains is an exact match!
-        assertThat( underTest.getMimeTypesFileName( "foo.zip" ), contains( "fake/mimetype" ) );
+        Collection<String> fileNames = underTest.getMimeTypesFileName( "foo.zip" );
+        assertThat( fileNames, contains( "fake/mimetype" ) );
     }
 }

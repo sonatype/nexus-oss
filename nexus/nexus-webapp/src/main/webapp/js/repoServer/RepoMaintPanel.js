@@ -526,16 +526,22 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
                 rec.endEdit();
               }
             }
-            if (data.length)
-            {
-              this.gridPanel.getView().refresh();
-            }
           }
         }
         else
         {
-          Sonatype.MessageBox.alert('Status retrieval failed');
+          this.dataStore.each(function(rec) {
+            if ( rec.get('repoType') !== 'group' ) {
+              rec.beginEdit();
+              rec.set('status', {localStatus : 'IN_SERVICE' , proxyMode : 'ALLOW', remoteStatus:'UNKNOWN'});
+              rec.set('displayStatus', '<i>Status retrieval failed</i>');
+              rec.commit(true);
+              rec.endEdit();
+            }
+          });
         }
+
+        this.gridPanel.getView().refresh();
       },
 
       statusStart : function() {

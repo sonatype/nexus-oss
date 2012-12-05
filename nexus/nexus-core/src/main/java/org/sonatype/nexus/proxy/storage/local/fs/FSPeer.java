@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -30,25 +30,25 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  */
 public interface FSPeer
 {
-    public boolean isReachable( Repository repository, ResourceStoreRequest request, File target )
+    public boolean isReachable( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
         throws LocalStorageException;
 
-    public boolean containsItem( Repository repository, ResourceStoreRequest request, File target )
+    public boolean containsItem( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
         throws LocalStorageException;
 
-    public File retrieveItem( Repository repository, ResourceStoreRequest request, File target )
+    public File retrieveItem( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, LocalStorageException;
 
-    public void storeItem( Repository repository, StorageItem item, File target, ContentLocator cl )
+    public void storeItem( Repository repository, File repositoryBaseDir, StorageItem item, File target, ContentLocator cl )
         throws UnsupportedStorageOperationException, LocalStorageException;
 
-    public void shredItem( Repository repository, ResourceStoreRequest request, File target )
+    public void shredItem( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
 
-    public void moveItem( Repository repository, ResourceStoreRequest request1, File target1,
+    public void moveItem( Repository repository, File repositoryBaseDir, ResourceStoreRequest request1, File target1,
                          ResourceStoreRequest request2, File target2 )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
 
-    public Collection<File> listItems( Repository repository, ResourceStoreRequest request, File target )
+    public Collection<File> listItems( Repository repository, File repositoryBaseDir, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, LocalStorageException;
 }

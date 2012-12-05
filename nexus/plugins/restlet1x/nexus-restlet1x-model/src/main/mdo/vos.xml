@@ -956,6 +956,13 @@
           <description>The max age of metadata before we will check remote again for updated (in milliseconds, -1 for never).</description>
         </field>
         <field>
+          <name>itemMaxAge</name>
+          <version>1.0.0+</version>
+          <type>Integer</type>
+          <required>false</required>
+          <description>The max age of items (not artifact not metadata) before we will check remote again for updated (in minutes, -1 for never).</description>
+        </field>
+        <field>
           <name>autoBlockActive</name>
           <version>1.0.0+</version>
           <type>boolean</type>
