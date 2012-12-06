@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -98,10 +99,12 @@ public abstract class AbstractGroupRepository
         }
     }
 
-    @Subscribe
     @Override
-    public void onEvent( final ConfigurationPrepareForSaveEvent evt )
+    protected void prepareForSave()
+        throws ConfigurationException
     {
+        super.prepareForSave();
+
         boolean membersChanged = false;
         List<String> currentMemberIds = Collections.emptyList();
         List<String> newMemberIds = Collections.emptyList();
@@ -127,8 +130,6 @@ public abstract class AbstractGroupRepository
                 newMemberIds = getExternalConfiguration( true ).getMemberRepositoryIds();
             }
         }
-
-        super.onEvent( evt );
 
         if ( membersChanged )
         {

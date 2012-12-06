@@ -90,7 +90,7 @@ public abstract class AbstractConfigurable
     }
 
     @Subscribe
-    public void onEvent( final ConfigurationPrepareForLoadEvent evt )
+    public final void onEvent( final ConfigurationPrepareForLoadEvent evt )
     {
         try
         {
@@ -105,7 +105,7 @@ public abstract class AbstractConfigurable
     }
 
     @Subscribe
-    public void onEvent( final ConfigurationPrepareForSaveEvent evt )
+    public final void onEvent( final ConfigurationPrepareForSaveEvent evt )
     {
         if ( isDirty() )
         {
@@ -126,7 +126,7 @@ public abstract class AbstractConfigurable
     }
 
     @Subscribe
-    public void onEvent( final ConfigurationValidateEvent evt )
+    public final void onEvent( final ConfigurationValidateEvent evt )
     {
         try
         {
@@ -141,7 +141,7 @@ public abstract class AbstractConfigurable
     }
 
     @Subscribe
-    public void onEvent( final ConfigurationCommitEvent evt )
+    public final void onEvent( final ConfigurationCommitEvent evt )
     {
         try
         {
@@ -155,7 +155,7 @@ public abstract class AbstractConfigurable
     }
 
     @Subscribe
-    public void onEvent( final ConfigurationRollbackEvent evt )
+    public final void onEvent( final ConfigurationRollbackEvent evt )
     {
         rollbackChanges();
     }
