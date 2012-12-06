@@ -40,7 +40,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.aether.version.Version;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -419,7 +418,7 @@ public class SearchNGIndexPlexusResource
 
             }
 
-            Version version = ai.getArtifactVersion();
+            StringVersion version = new StringVersion( ai.version, ai.getArtifactVersion() );
 
             NexusNGArtifact versionHit = gaholder.getVersionHit( version );
             if ( versionHit == null )

@@ -17,27 +17,26 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.maven.index.artifact.VersionUtils;
-import org.sonatype.aether.version.Version;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 
 class GAHolder
 {
-    private final SortedMap<Version, NexusNGArtifact> versionHits = new TreeMap<Version, NexusNGArtifact>();
+    private final SortedMap<StringVersion, NexusNGArtifact> versionHits = new TreeMap<StringVersion, NexusNGArtifact>();
 
     private NexusNGArtifact latestSnapshot = null;
 
-    private Version latestSnapshotVersion = null;
+    private StringVersion latestSnapshotVersion = null;
 
     private NexusNGArtifact latestRelease = null;
 
-    private Version latestReleaseVersion = null;
+    private StringVersion latestReleaseVersion = null;
 
-    public NexusNGArtifact getVersionHit( Version version )
+    public NexusNGArtifact getVersionHit( StringVersion version )
     {
         return versionHits.get( version );
     }
 
-    public void putVersionHit( Version version, NexusNGArtifact versionHit )
+    public void putVersionHit( StringVersion version, NexusNGArtifact versionHit )
     {
         versionHits.put( version, versionHit );
 
