@@ -348,7 +348,7 @@ public class SearchNGIndexPlexusResource
 
         // tooManyResults true when iteration was aborted due to one of limiters
         // response will contain partial info and may have incorrect latest version and classifiers/extensions.
-        boolean tooManyResults = iterator.getTotalHitsCount() + 1 >= LUCENE_HIT_LIMIT;
+        boolean tooManyResults = false;
 
         for ( ArtifactInfo ai : iterator )
         {
@@ -469,7 +469,7 @@ public class SearchNGIndexPlexusResource
         boolean expand = forceExpand || gavcount <= COLLAPSE_OVERRIDE_TRESHOLD;
 
         SearchNGResponse response = new SearchNGResponse();
-        response.setTooManyResults( tooManyResults );
+        response.setTooManyResults( tooManyResults || iterator.getTotalHitsCount() + 1 >= LUCENE_HIT_LIMIT);
         response.setCollapsed( !expand );
 
         LinkedHashSet<String> repositoryIds = new LinkedHashSet<String>();
