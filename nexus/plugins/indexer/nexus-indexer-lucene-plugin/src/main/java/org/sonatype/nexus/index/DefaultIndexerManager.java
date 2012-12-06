@@ -2515,6 +2515,7 @@ public class DefaultIndexerManager
                 repositoryLocks.put( repository.getId(), rwlock );
             }
         }
+        final String lockName = exclusive ? "exclusive" : "shared";
         try
         {
             Lock lock = exclusive ? rwlock.writeLock() : rwlock.readLock();
@@ -2522,13 +2523,27 @@ public class DefaultIndexerManager
             {
                 return lock;
             }
+            if ( logger.isDebugEnabled() )
+            {
+                logger.warn( "Could not acquire {} lock on repository {} in {} seconds. " //
+                    + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
+                    + "The operation has been aborted.", //
+                             lockName, repository.getId(), lockTimeoutSeconds, new Exception( ARTIFICIAL_EXCEPTION ) );
+            }
+            else
+            {
+                logger.warn( "Could not acquire {} lock on repository {} in {} seconds. " //
+                    + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
+                    + "Enable debug log to recieve more information.", //
+                             lockName, repository.getId(), lockTimeoutSeconds );
+            }
         }
         catch ( InterruptedException e )
         {
             // TODO consider throwing IOException instead
+            logger.debug( "Interrupted {} lock request on repository {}", lockName, repository.getId(),
+                          new Exception( ARTIFICIAL_EXCEPTION ) );
         }
-        logger.error( "Could not acquire {} lock on repository {}", exclusive ? "exclusive" : "shared",
-                      repository.getId(), new Exception( ARTIFICIAL_EXCEPTION ) );
         return null;
     }
 
