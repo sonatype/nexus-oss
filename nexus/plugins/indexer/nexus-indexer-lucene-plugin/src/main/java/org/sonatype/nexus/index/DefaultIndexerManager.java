@@ -428,6 +428,8 @@ public class DefaultIndexerManager
     private void addRepositoryIndexContext( final Repository repository, IndexingContext oldContext )
         throws IOException
     {
+        logger.debug( "Adding indexing context for repository {}", repository.getId() );
+
         if ( oldContext != null )
         {
             // this is really an error, the oldContext is expected to be null here
@@ -494,6 +496,9 @@ public class DefaultIndexerManager
             {
                 if ( context != null )
                 {
+                    logger.debug( "Removing indexing context for repository {} deleteFiles={}", repository.getId(),
+                                  deleteFiles );
+
                     mavenIndexer.removeIndexingContext( context, deleteFiles );
 
                     logger.debug( "Removed indexing context {} for repository {}", context.getId(), repository.getId() );
@@ -535,6 +540,8 @@ public class DefaultIndexerManager
             public void run( IndexingContext context )
                 throws IOException
             {
+                logger.debug( "Updating indexing context for repository {}", repository.getId() );
+
                 File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
                 // remove context, if it already existed (ctx != null) and any of the following is true:
@@ -564,6 +571,8 @@ public class DefaultIndexerManager
                         logger.debug( "Could not add indexing context for repository {}", repositoryId, e );
                     }
                 }
+
+                logger.debug( "Updated indexing context for repository {}", repository.getId() );
             }
         } );
     }
@@ -846,9 +855,11 @@ public class DefaultIndexerManager
     // Reindexing related
     // ----------------------------------------------------------------------------
 
-    public void reindexAllRepositories( final String path, final boolean fullReindex )
+    public void reindexAllRepositories( final String fromPath, final boolean fullReindex )
         throws IOException
     {
+        logger.debug( "Reindexing all repositories fromPath={} fullReindex={}", fromPath, fullReindex );
+
         final List<Repository> reposes = repositoryRegistry.getRepositories();
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( Repository repository : reposes )
@@ -856,7 +867,7 @@ public class DefaultIndexerManager
             try
             {
                 // going directly to single-shot, we are iterating over all reposes anyway
-                reindexRepository( repository, path, fullReindex );
+                reindexRepository( repository, fromPath, fullReindex );
             }
             catch ( IOException e )
             {
@@ -950,6 +961,9 @@ public class DefaultIndexerManager
         {
             try
             {
+                logger.debug( "Reindexing repository {} fromPath={} fullReindex={}", repository.getId(), fromPath,
+                              fullReindex );
+
                 Runnable runnable = new Runnable()
                 {
                     @Override
@@ -989,6 +1003,7 @@ public class DefaultIndexerManager
                     // scans directly into "real" ctx
                     sharedSingle( repository, runnable );
                 }
+
                 logger.debug( "Reindexed repository {}", repository.getId() );
             }
             finally
@@ -1010,6 +1025,8 @@ public class DefaultIndexerManager
     public void downloadAllIndex()
         throws IOException
     {
+        logger.debug( "Downloading remote indexes for all repositories" );
+
         final List<ProxyRepository> reposes = repositoryRegistry.getRepositoriesWithFacet( ProxyRepository.class );
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( ProxyRepository repository : reposes )
@@ -1295,6 +1312,8 @@ public class DefaultIndexerManager
     public void publishAllIndex()
         throws IOException
     {
+        logger.debug( "Publishing indexes for all repositories" );
+
         final List<Repository> reposes = repositoryRegistry.getRepositories();
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         // just publish all, since we use merged context, no need for double pass
@@ -1390,6 +1409,8 @@ public class DefaultIndexerManager
     private void publishRepositoryIndex( final Repository repository, IndexingContext context )
         throws IOException
     {
+        logger.debug( "Publishing index for repository {}", repository.getId() );
+
         File targetDir = null;
 
         try
@@ -1423,6 +1444,8 @@ public class DefaultIndexerManager
                     storeIndexItem( repository, file, context );
                 }
             }
+
+            logger.debug( "Published index for repository {}", repository.getId() );
         }
         finally
         {
@@ -1531,6 +1554,8 @@ public class DefaultIndexerManager
     public void optimizeAllRepositoriesIndex()
         throws IOException
     {
+        logger.debug( "Optimizing indexes for all repositories" );
+
         final List<Repository> repos = repositoryRegistry.getRepositories();
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( Repository repository : repos )
@@ -1606,9 +1631,11 @@ public class DefaultIndexerManager
             {
                 TaskUtil.checkInterruption();
 
-                logger.debug( "Optimizing local index context for repository: " + repository.getId() );
+                logger.debug( "Optimizing index for repository {} ", repository.getId() );
 
                 context.optimize();
+
+                logger.debug( "Optimized index for repository {} ", repository.getId() );
             }
         } );
     }
