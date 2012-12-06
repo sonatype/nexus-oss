@@ -40,10 +40,14 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -191,6 +195,52 @@ public class SearchNGIndexPlexusResourceTest
         SearchNGResponse result = search( key );
 
         Assert.assertEquals( 5, result.getData().size() );
+    }
+
+    @Test
+    public void multipleRepositories()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final Repository releases = repositoryRegistry.getRepository( "releases" );
+
+        final M2Repository releases2 = (M2Repository) this.lookup( Repository.class, M2Repository.ID );
+        final CRepository repoConfig = new DefaultCRepository();
+        repoConfig.setId( "releases2" );
+        repoConfig.setExposed( true );
+        repoConfig.setProviderRole( Repository.class.getName() );
+        repoConfig.setProviderHint( "maven2" );
+        releases2.configure( repoConfig );
+        repositoryRegistry.addRepository( releases2 );
+
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final String key = "dummy";
+
+        deployDummyArtifact( releases, key, "1" );
+        deployDummyArtifact( releases2, key, "1" );
+        deployDummyArtifact( releases, key, "2" );
+        deployDummyArtifact( releases2, key, "2" );
+
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        SearchNGResponse result = search( key );
+
+        Assert.assertEquals( 2, result.getData().size() );
+        for ( int i = 0; i < 2; i++ )
+        {
+            NexusNGArtifact nexusNGArtifact = result.getData().get( 0 );
+            Assert.assertEquals( 2, nexusNGArtifact.getArtifactHits().size() );
+            Assert.assertEquals( releases.getId(), nexusNGArtifact.getArtifactHits().get( 0 ).getRepositoryId() );
+            Assert.assertEquals( releases2.getId(), nexusNGArtifact.getArtifactHits().get( 1 ).getRepositoryId() );
+        }
     }
 
     @Test
