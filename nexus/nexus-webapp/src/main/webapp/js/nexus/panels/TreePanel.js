@@ -253,7 +253,6 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
     {
 
       var menu = new Sonatype.menu.Menu({
-        id : 'tree-context-menu',
         payload : node,
         scope : this,
         items : []
