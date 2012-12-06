@@ -45,7 +45,8 @@ Sonatype.repoServer.UserEditPanel = function(config) {
         cls : 'x-btn-text-icon',
         value : 'allConfigured',
         menu : {
-          id : 'user-realm-selector-menu',
+          // no context menu,
+          itemId : 'user-realm-selector-menu',
           items : [{
                 text : 'All Users',
                 checked : false,
@@ -565,7 +566,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
       },
 
       loadSources : function(store, records, options) {
-        var menu = Ext.menu.MenuMgr.get('user-realm-selector-menu');
+        var menu = this.displaySelector.menu;
 
         for (var i = 0; i < records.length; i++)
         {

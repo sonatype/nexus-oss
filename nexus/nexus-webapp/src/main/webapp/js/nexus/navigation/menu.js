@@ -11,20 +11,11 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('nexus/navigation/menu',['extjs', 'sonatype'], function(Ext, Sonatype){
+define('nexus/navigation/menu', ['extjs', 'sonatype', 'ext/menu'], function(Ext, Sonatype, Menu){
 
 Ext.namespace('Sonatype.menu');
 
-Sonatype.menu.Menu = function(cfg) {
-  var
-        config = cfg || {},
-        defaultConfig = {};
-  Ext.apply(this, config, defaultConfig);
-
-  Sonatype.menu.Menu.superclass.constructor.call(this);
-};
-
-Ext.extend(Sonatype.menu.Menu, Ext.menu.Menu, {
+Sonatype.menu.Menu = Ext.extend(Menu, {
   add : function(c) {
     if (!c) {
       return null;
