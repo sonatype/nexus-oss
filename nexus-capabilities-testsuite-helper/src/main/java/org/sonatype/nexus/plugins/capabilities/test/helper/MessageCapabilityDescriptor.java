@@ -19,6 +19,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.formfields.TextAreaFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
@@ -36,13 +38,19 @@ public class MessageCapabilityDescriptor
 
     static final String REPOSITORY = "repository";
 
+    static final String MESSAGE = "message";
+
     static final RepoOrGroupComboFormField REPOSITORY_FIELD = new RepoOrGroupComboFormField(
         REPOSITORY, FormField.MANDATORY
     );
 
+    static final StringTextFormField MESSAGE_FIELD = new StringTextFormField(
+        MESSAGE, "Message", "Enter a message starting with XYZ", FormField.OPTIONAL, "XYZ.*"
+    );
+
     protected MessageCapabilityDescriptor()
     {
-        super( TYPE, "Message Capability", "What about me?", REPOSITORY_FIELD );
+        super( TYPE, "Message Capability", "What about me?", REPOSITORY_FIELD, MESSAGE_FIELD );
     }
 
 }

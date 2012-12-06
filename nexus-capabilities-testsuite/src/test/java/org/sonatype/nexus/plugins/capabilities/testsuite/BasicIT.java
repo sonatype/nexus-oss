@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonatype.nexus.capabilities.client.Capability;
+import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.testsuite.client.CapabilityA;
 import org.sonatype.nexus.plugins.capabilities.testsuite.client.CapabilityB;
@@ -335,6 +336,44 @@ public class BasicIT
             assertThat( capability, instanceOf( CapabilityA.class ) );
             assertThat( capability.property( "a1" ), is( "bar" ) );
         }
+    }
+
+    /**
+     * Verify that create will fail if a mandatory property is not set.
+     */
+    @Test
+    public void failIfMandatoryPropertyNotPresent()
+    {
+        thrown.expect( NexusClientErrorResponseException.class );
+        thrown.expectMessage( "[repository] Repository/Group is required" );
+        capabilities().create( "[message]" )
+            .save();
+    }
+
+    /**
+     * Verify that create will fail if a property validated via regexp (in this case XYZ.*) does not match.
+     */
+    @Test
+    public void failIfNotMatchingRegexp()
+    {
+        thrown.expect( NexusClientErrorResponseException.class );
+        thrown.expectMessage( "[message] Message does not match 'XYZ.*'" );
+        capabilities().create( "[message]" )
+            .withProperty( "repository", "releases" )
+            .withProperty( "message", "Blah" )
+            .save();
+    }
+
+    /**
+     * Verify that create will fail if a property validated via regexp (in this case XYZ.*) does not match.
+     */
+    @Test
+    public void doNotFailIfMatchingRegexp()
+    {
+        capabilities().create( "[message]" )
+            .withProperty( "repository", "releases" )
+            .withProperty( "message", "XYZ Blah" )
+            .save();
     }
 
 }
