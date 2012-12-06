@@ -34,6 +34,7 @@ import org.apache.maven.index.SearchType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.powermock.reflect.Whitebox;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -241,6 +242,23 @@ public class SearchNGIndexPlexusResourceTest
             Assert.assertEquals( releases.getId(), nexusNGArtifact.getArtifactHits().get( 0 ).getRepositoryId() );
             Assert.assertEquals( releases2.getId(), nexusNGArtifact.getArtifactHits().get( 1 ).getRepositoryId() );
         }
+    }
+
+    @Test
+    public void emptyResult()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        SearchNGResponse result = search( "notfound" );
+
+        // have to bypass getXXX methods because they are not used by JSON renderer
+        Assert.assertNotNull( Whitebox.getInternalState( result, "repoDetails" ) );
+        Assert.assertNotNull( Whitebox.getInternalState( result, "data" ) );
     }
 
     @Test
