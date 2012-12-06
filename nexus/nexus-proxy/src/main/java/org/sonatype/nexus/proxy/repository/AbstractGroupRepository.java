@@ -100,7 +100,7 @@ public abstract class AbstractGroupRepository
     }
 
     @Override
-    public void prepareForSave()
+    protected void prepareForSave()
         throws ConfigurationException
     {
         super.prepareForSave();
