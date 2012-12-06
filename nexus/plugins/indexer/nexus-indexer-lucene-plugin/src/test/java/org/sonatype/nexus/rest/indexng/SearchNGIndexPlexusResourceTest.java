@@ -38,6 +38,7 @@ import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.Searcher;
@@ -124,28 +125,72 @@ public class SearchNGIndexPlexusResourceTest
     private SearchNGResponse deployAndSearch( int artifactCount )
         throws Exception
     {
+        final String key = "nexus5412";
         final Repository releases = repositoryRegistry.getRepository( "releases" );
         for ( int i = 1; i <= artifactCount; i++ )
         {
-            final String path = String.format( "/org/nexus5412/%s/nexus5412-%s.jar", i, i );
-            final ResourceStoreRequest request = new ResourceStoreRequest( path );
-            releases.storeItem( request, new ByteArrayInputStream( "Junk JAR".getBytes() ), null );
+            deployDummyArtifact( releases, key, Integer.toString( i ) );
         }
         wairForAsyncEventsToCalmDown();
         waitForTasksToStop();
 
+        return search( key );
+    }
+
+    private SearchNGResponse search( final String key )
+        throws Exception, ResourceException
+    {
         final SearchNGIndexPlexusResource subject =
             (SearchNGIndexPlexusResource) lookup( PlexusResource.class, SearchNGIndexPlexusResource.ROLE_HINT );
         Context context = new Context();
         Request request = new Request();
         Reference ref = new Reference( "http://localhost:12345/" );
         request.setRootRef( ref );
-        request.setResourceRef( new Reference( ref, SearchNGIndexPlexusResource.RESOURCE_URI
-            + "?q=nexus5412&collapseresults=true" ) );
+        request.setResourceRef( new Reference( ref, SearchNGIndexPlexusResource.RESOURCE_URI + "?q=" + key
+            + "&collapseresults=true" ) );
         Response response = new Response( request );
 
         // perform a search
         return subject.get( context, request, response, null );
+    }
+
+    private void deployDummyArtifact( final Repository releases, String key, String version )
+        throws Exception
+    {
+        StringBuilder path = new StringBuilder();
+        path.append( "/org/" ).append( key );
+        path.append( '/' ).append( version );
+        path.append( '/' ).append( key ).append( '-' ).append( version ).append( ".jar" );
+        final ResourceStoreRequest request = new ResourceStoreRequest( path.toString() );
+        releases.storeItem( request, new ByteArrayInputStream( "Junk JAR".getBytes() ), null );
+    }
+
+    @Test
+    public void versionCollation()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final Repository releases = repositoryRegistry.getRepository( "releases" );
+
+        final String key = "nexus5422";
+
+        deployDummyArtifact( releases, key, "2" );
+        deployDummyArtifact( releases, key, "2.0" );
+        deployDummyArtifact( releases, key, "2.0.0" );
+        deployDummyArtifact( releases, key, "2.0.0.0" );
+        deployDummyArtifact( releases, key, "2.0.0.0.0" );
+
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        SearchNGResponse result = search( key );
+
+        Assert.assertEquals( 5, result.getData().size() );
     }
 
     @Test
