@@ -31,7 +31,7 @@ import org.eclipse.jetty.util.log.Logger;
 public class RedirectToHttpsRule
     extends Rule
 {
-    private static final Logger logger = Log.getLogger( RedirectToHttpsRule.class.getName() );
+    private static final Logger LOG = Log.getLogger( RedirectToHttpsRule.class.getName() );
 
     private Integer httpsPort;
 
@@ -47,7 +47,7 @@ public class RedirectToHttpsRule
 
     public void setHttpsPort( int httpsPort )
     {
-        logger.info( "HTTPS port set to: {}", httpsPort, null );
+        LOG.debug( "HTTPS port set to: {}", httpsPort, null );
 
         this.httpsPort = httpsPort;
     }
@@ -57,7 +57,7 @@ public class RedirectToHttpsRule
         throws IOException
     {
         StringBuffer requestURL = request.getRequestURL();
-        logger.info( "Original URL: {}", requestURL, null );
+        LOG.debug( "Original URL: {}", requestURL, null );
 
         if ( !requestURL.toString().startsWith( "https" ) )
         {
@@ -83,17 +83,17 @@ public class RedirectToHttpsRule
             String queryString = request.getQueryString();
             if ( queryString != null )
             {
-                logger.info( "Adding query string to redirect: {}", queryString, null );
+                LOG.debug( "Adding query string to redirect: {}", queryString, null );
                 result.append( '?' ).append( queryString );
             }
 
-            logger.info( "Redirecting to URL: {}", result, null );
+            LOG.debug( "Redirecting to URL: {}", result, null );
             response.sendRedirect( result.toString() );
             return target;
         }
         else
         {
-            logger.info( "NOT redirecting. Already HTTPS: {}", requestURL, null );
+            LOG.debug( "NOT redirecting. Already HTTPS: {}", requestURL, null );
             return null;
         }
     }
