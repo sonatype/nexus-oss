@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.spice</groupId>
-    <artifactId>spice-parent</artifactId>
-    <version>19</version>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>27</version>
   </parent>
 
   <groupId>org.sonatype.sisu</groupId>
@@ -14,11 +14,24 @@
 
   <name>SISU Jetty8 Component</name>
 
+  <url>https://github.com/sonatype/sisu-jetty8</url>
+  <inceptionYear>2012</inceptionYear>
+
   <scm>
     <url>https://github.com/sonatype/sisu-jetty8</url>
     <connection>scm:git:git://github.com/sonatype/sisu-jetty8.git</connection>
     <developerConnection>scm:git:git@github.com:sonatype/sisu-jetty8.git</developerConnection>
   </scm>
+
+  <ciManagement>
+      <system>Hudson</system>
+      <url>https://builds.sonatype.org/job/sisu-jetty8</url>
+  </ciManagement>
+
+  <issueManagement>
+      <system>Github</system>
+      <url>https://github.com/sonatype/sisu-jetty8/issues</url>
+  </issueManagement>
 
   <properties>
     <jetty.version>8.1.7.v20120910</jetty.version>
@@ -95,12 +108,6 @@
   </dependencies>
 
   <build>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
 
     <pluginManagement>
       <plugins>
@@ -126,7 +133,7 @@
             </systemProperties>
           </configuration>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build 
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build
           itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
@@ -157,6 +164,7 @@
 
     <plugins>
       <plugin>
+        <!-- FIXME tests should allocate ports themselves directly -->
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>port-allocator-maven-plugin</artifactId>
         <version>1.0</version>
