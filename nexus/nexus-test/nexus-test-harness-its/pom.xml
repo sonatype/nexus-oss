@@ -222,6 +222,7 @@
           <!--
           NOTE: Using patched version of surefire, which supports includes/excludes from files.
           https://jira.codehaus.org/browse/SUREFIRE-925
+          TODO: Update to surefire 2.13 when its released, which has this feature.
           -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
