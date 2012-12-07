@@ -886,7 +886,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             {
                 // not that it makes much sense, as client will not receive response anyway
                 // it dropped connection on us!
-                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof IllegalArgumentException )
             {
