@@ -305,7 +305,7 @@ define('repoServer/FileUploadPanel', ['extjs', 'sonatype/all'], function(Ext, So
                 var
                       filename = b.uploadPanel.fileInput.getValue(),
                       endStr = '.pom';
-                if (filename === "pom.xml" || (filename.match(endStr + "$") === endStr)) {
+                if (filename === "pom.xml" || (filename.indexOf(endStr) === filename.length - endStr.length )) {
                   Ext.Msg.show({
                     title : 'Error',
                     msg : "Select the POM file as part of the GAV Definition.",
