@@ -65,13 +65,11 @@ Sonatype.repoServer.LogEditPanel = function(cfg) {
                   }],
 
         buttons : [{
-              id : 'savebutton',
               text : 'Save',
               handler : this.saveBtnHandler,
               disabled : true,
               scope : this
             }, {
-              id : 'cancelbutton',
               text : 'Cancel',
               handler : this.cancelBtnHandler,
               scope : this
