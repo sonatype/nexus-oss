@@ -114,10 +114,9 @@ public class CapabilitiesPlexusResource
     {
         final CapabilitiesListResponseResource result = new CapabilitiesListResponseResource();
 
-        final CapabilityReferenceFilter filter = buildFilter( request.getResourceRef().getQueryAsForm() );
-
-        Collection<? extends CapabilityReference> references =
-            filter == null ? capabilityRegistry.getAll() : capabilityRegistry.get( filter );
+        final Collection<? extends CapabilityReference> references = capabilityRegistry.get(
+            buildFilter( request.getResourceRef().getQueryAsForm() )
+        );
 
         for ( final CapabilityReference reference : references )
         {
@@ -169,7 +168,7 @@ public class CapabilitiesPlexusResource
 
     private CapabilityReferenceFilter buildFilter( final Form queryAsForm )
     {
-        CapabilityReferenceFilter filter = null;
+        CapabilityReferenceFilter filter = CapabilityReferenceFilterBuilder.capabilities();
         final Set<String> paramNames = queryAsForm.getNames();
         if ( paramNames != null )
         {
@@ -180,36 +179,36 @@ public class CapabilitiesPlexusResource
                 {
                     if ( parameter != null )
                     {
-                        filter = ensureFilter( filter ).withType( capabilityType( parameter.getValue() ) );
+                        filter = filter.withType( capabilityType( parameter.getValue() ) );
                     }
                 }
                 else if ( $ENABLED.equals( paramName ) )
                 {
                     if ( parameter != null )
                     {
-                        filter = ensureFilter( filter ).enabled( Boolean.valueOf( parameter.getValue() ) );
+                        filter = filter.enabled( Boolean.valueOf( parameter.getValue() ) );
                     }
                     else
                     {
-                        filter = ensureFilter( filter ).enabled();
+                        filter = filter.enabled();
                     }
                 }
                 else if ( $ACTIVE.equals( paramName ) )
                 {
                     if ( parameter != null )
                     {
-                        filter = ensureFilter( filter ).active( Boolean.valueOf( parameter.getValue() ) );
+                        filter = filter.active( Boolean.valueOf( parameter.getValue() ) );
                     }
                     else
                     {
-                        filter = ensureFilter( filter ).active();
+                        filter = filter.active();
                     }
                 }
                 else if ( $INCLUDE_NOT_EXPOSED.equals( paramName ) )
                 {
                     if ( parameter == null || Boolean.valueOf( parameter.getValue() ) )
                     {
-                        filter = ensureFilter( filter ).includeNotExposed();
+                        filter = filter.includeNotExposed();
                     }
                 }
                 else if ( paramName.startsWith( $PROPERTY_PREFIX ) && paramName.length() > $PROPERTY_PREFIX.length() )
@@ -217,25 +216,16 @@ public class CapabilitiesPlexusResource
                     final String propertyKey = paramName.substring( $PROPERTY_PREFIX.length() );
                     if ( parameter == null || "*".equals( parameter.getValue() ) )
                     {
-                        filter = ensureFilter( filter ).withBoundedProperty( propertyKey );
+                        filter = filter.withBoundedProperty( propertyKey );
                     }
                     else
                     {
-                        filter = ensureFilter( filter ).withProperty( propertyKey, parameter.getValue() );
+                        filter = filter.withProperty( propertyKey, parameter.getValue() );
                     }
                 }
             }
         }
         return filter;
-    }
-
-    private CapabilityReferenceFilter ensureFilter( final CapabilityReferenceFilter filter )
-    {
-        if ( filter != null )
-        {
-            return filter;
-        }
-        return CapabilityReferenceFilterBuilder.capabilities();
     }
 
 }
