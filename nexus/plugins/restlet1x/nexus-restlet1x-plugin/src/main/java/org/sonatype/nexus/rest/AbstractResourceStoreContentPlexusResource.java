@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageEofException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
@@ -880,6 +881,12 @@ public abstract class AbstractResourceStoreContentPlexusResource
             if ( t instanceof ResourceException )
             {
                 throw (ResourceException) t;
+            }
+            else if ( t instanceof LocalStorageEofException )
+            {
+                // not that it makes much sense, as client will not receive response anyway
+                // it dropped connection on us!
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_BAD_REQUEST, t ), t );
             }
             else if ( t instanceof IllegalArgumentException )
             {
