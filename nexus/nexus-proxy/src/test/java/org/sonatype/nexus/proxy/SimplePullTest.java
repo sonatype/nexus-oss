@@ -14,8 +14,12 @@ package org.sonatype.nexus.proxy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyIterableOf;
 import static org.hamcrest.Matchers.equalTo;
 
+import java.io.ByteArrayInputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -41,6 +45,7 @@ import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.util.WrappingInputStream;
 
 import com.google.common.base.Strings;
 
@@ -441,6 +446,44 @@ public class SimplePullTest
             assertThat( countOccurence( dumpStr, " " + ItemNotFoundException.class.getSimpleName() ), equalTo( 4 ));
         }
     }
+
+    /**
+     * NXCM-4582: When Local storage is about to store something, but during "store" operation source stream EOFs,
+     * the new LocalStorage exception should be thrown, to differentiate from other "fatal" (like disk full or what not)
+     * error.
+     */
+    @Test( expected = LocalStorageEofException.class )
+    public void testNXCM4852()
+        throws Exception
+    {
+        ResourceStoreRequest request =
+            new ResourceStoreRequest( "/repositories/inhouse/activemq/activemq-core/1.2/activemq-core-1.2.jar", true );
+
+        getRootRouter().storeItem( request, new WrappingInputStream( new ByteArrayInputStream( "123456789012345678901234567890".getBytes() ))
+        {
+            @Override
+            public int read()
+                throws IOException
+            {
+                throw new EOFException("Eof!");
+            }
+
+            @Override
+            public int read( final byte[] b )
+                throws IOException
+            {
+                throw new EOFException("Eof!");
+            }
+
+            @Override
+            public int read( final byte[] b, final int off, final int len )
+                throws IOException
+            {
+                throw new EOFException("Eof!");
+            }
+        }, null);
+    }
+
 
     //
 
