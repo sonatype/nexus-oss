@@ -179,11 +179,9 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
           required : true
         }],
     buttons : [{
-          id : 'savebutton',
           text : 'Save',
           disabled : true
         }, {
-          id : 'cancelbutton',
           text : 'Cancel'
         }]
   };
