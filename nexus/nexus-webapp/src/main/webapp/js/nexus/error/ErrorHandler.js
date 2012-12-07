@@ -28,6 +28,8 @@ define('nexus/error/ErrorHandler', ['extjs', 'nexus', 'nexus/log'], function(Ext
           lines[lines.length] = "Message: (" + err.name + ") " + err.message;
           lines[lines.length] = "Error number: " + (err.number & 0xFFFF); //Apply binary arithmetic for IE number, firefox returns message string in element array element 0
           lines[lines.length] = "Description: " + err.description;
+          lines[lines.length] = "Stacktrace: ";
+          lines[lines.length] = err.stack;
         } else if ((args.length === 3) && (typeof(args[2]) === "number")) { // Check the signature for a match with an unhandled exception
           lines[lines.length] = "Message: " + args[0];
           lines[lines.length] = "URL: " + args[1];
