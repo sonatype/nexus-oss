@@ -520,3 +520,25 @@ button.st-icon-refresh {
 body.x-body-masked .x-window-plain .x-window-mc {
     background-color: #F2F1F0 !important;
 }
+
+/* Nexus.messages */
+
+.nx-msg .x-box-mc {
+    font-size: 14px;
+}
+
+#nx-msg-div {
+    position: absolute;
+    left: 35%;
+    top: 10px;
+    width: 250px;
+    z-index: 20000;
+}
+
+/* Ext.LinkButton */
+
+.x-linkbtn-wrap {}
+.x-linkbtn-left {}
+.x-linkbtn-center {}
+.x-linkbtn-text {}
+.x-linkbtn-wright {}

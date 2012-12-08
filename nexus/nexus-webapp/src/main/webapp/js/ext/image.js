@@ -10,22 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-/*global define*/
-
-define('nexus', ['extjs'], function(Ext){
-
-    Ext.namespace('Nexus');
+define('ext/image', ['ext/define'], function(){
 
     /**
-     * Return the current user.
+     * A simple component to display an image.
      *
-     * @return {*}
-     * @static
+     * @class Ext.Image
+     * @extends Ext.BoxComponent
+     * @namespace Ext
      */
-    Nexus.currentUser = function () {
-        return Sonatype.user.curr;
-    };
+    Ext.define('Ext.Image', {
+        extend: 'Ext.BoxComponent',
 
-    return window.Nexus;
+        /**
+         * @cfg {String} src Image source
+         */
+        constructor: function (config) {
+            var self = this;
+
+            Ext.apply(self, {
+                autoEl: {
+                    tag: 'img',
+                    src: config.src
+                }
+            });
+
+            // Call super constructor
+            self.constructor.superclass.constructor.apply(self, arguments);
+        }
+    },
+
+    function () {
+        var type = this;
+        Ext.ComponentMgr.registerType('image', type);
+    });
+
 });
