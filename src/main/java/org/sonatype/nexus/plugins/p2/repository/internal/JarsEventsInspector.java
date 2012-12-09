@@ -16,7 +16,6 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retri
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.getP2Type;
 
 import java.io.File;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -53,7 +52,8 @@ public class JarsEventsInspector
     {
         if ( evt == null
             || !( evt instanceof RepositoryItemEvent )
-            || !( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache || evt instanceof RepositoryItemEventDelete ) )
+            || !( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache
+            || evt instanceof RepositoryItemEventDelete ) )
         {
             return false;
         }
@@ -103,7 +103,7 @@ public class JarsEventsInspector
         try
         {
             final File file = retrieveFile( repositories.getRepository( item.getRepositoryId() ), item.getPath() );
-            return getP2Type(file) != null;
+            return getP2Type( file ) != null;
         }
         catch ( final Exception e )
         {

@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -116,7 +115,7 @@ public class DefaultP2MetadataGenerator
         {
             return;
         }
-        logger.debug("Generate P2 metadata for [{}:{}]", item.getRepositoryId(), item.getPath());
+        logger.debug( "Generate P2 metadata for [{}:{}]", item.getRepositoryId(), item.getPath() );
 
         // TODO only regenerate if jar is newer
 
@@ -124,9 +123,11 @@ public class DefaultP2MetadataGenerator
         {
             final Repository repository = repositories.getRepository( item.getRepositoryId() );
             final File file = retrieveFile( repository, item.getPath() );
-            final GenericP2Artifact desc = parseP2Artifact(file);
-            if ( desc == null ) {
-                logger.debug("[{}:{}] is neither an OSGi bundle nor an feature. Bailing out.", item.getRepositoryId(), item.getPath());
+            final GenericP2Artifact desc = parseP2Artifact( file );
+            if ( desc == null )
+            {
+                logger.debug( "[{}:{}] is neither an OSGi bundle nor an feature. Bailing out.", item.getRepositoryId(),
+                              item.getPath() );
                 return;
             }
 
@@ -136,41 +137,42 @@ public class DefaultP2MetadataGenerator
             artifact.setVersion( desc.getVersion() );
             artifact.setPath( file.getAbsolutePath() );
             artifact.setRepositoryPath( item.getPath() );
-            
+
             final Collection<InstallableUnit> ius;
-            switch (desc.getType()) {
-            case BUNDLE:
-                ius = publisher.generateIUs(true /* generateCapabilities */, true /* generateManifest */,
-                        true /* generateTouchpointData */, file);
-                break;
-            case FEATURE:
-                ius = publisher.generateFeatureIUs(true /* generateCapabilities */,
-                        true /* generateRequirements */, file);
-                break;
-            default:
-                throw new IllegalStateException("Unsupported artifact type " + desc.getType().name());
+            switch ( desc.getType() )
+            {
+                case BUNDLE:
+                    ius = publisher.generateIUs( true /* generateCapabilities */, true /* generateManifest */,
+                                                 true /* generateTouchpointData */, file );
+                    break;
+                case FEATURE:
+                    ius = publisher.generateFeatureIUs( true /* generateCapabilities */,
+                                                        true /* generateRequirements */, file );
+                    break;
+                default:
+                    throw new IllegalStateException( "Unsupported artifact type " + desc.getType().name() );
             }
 
             attachArtifact( artifact, ius );
             storeP2Data( artifact, ius, repository );
-        } catch (final Exception e) {
+        }
+        catch ( final Exception e )
+        {
             logger.warn(
-                    String.format("Could not generate p2 metadata of [%s:%s] due to %s. Bailing out.",
-                            item.getRepositoryId(), item.getPath(), e.getMessage()), e);
+                String.format( "Could not generate p2 metadata of [%s:%s] due to %s. Bailing out.",
+                               item.getRepositoryId(), item.getPath(), e.getMessage() ), e );
             return;
         }
     }
 
-
     /**
      * Attaches the given artifact to the passed installable units.
-     * 
-     * @param artifact
-     *            The artifact to attach
-     * @param ius
-     *            The {@link InstallableUnit}s were to attach the artifact
+     *
+     * @param artifact The artifact to attach
+     * @param ius      The {@link InstallableUnit}s were to attach the artifact
      */
-    private void attachArtifact(InstallableArtifact artifact, Collection<InstallableUnit> ius) {
+    private void attachArtifact( InstallableArtifact artifact, Collection<InstallableUnit> ius )
+    {
         for ( final InstallableUnit iu : ius )
         {
             final InstallableUnitArtifact iuArtifact = new InstallableUnitArtifact();
@@ -190,18 +192,15 @@ public class DefaultP2MetadataGenerator
 
     /**
      * Stores the P2 data for the passed artifact.
-     * 
-     * @param artifact
-     *            The artifact for which to create the entries
-     * @param ius
-     *            The installable units for the passed artifact
-     * @param repository
-     *            The repository were to store the data
-     * @throws Exception
-     *             If an error occurred while
+     *
+     * @param artifact   The artifact for which to create the entries
+     * @param ius        The installable units for the passed artifact
+     * @param repository The repository were to store the data
+     * @throws Exception If an error occurred while
      */
-    private void storeP2Data(InstallableArtifact artifact, Collection<InstallableUnit> ius, Repository repository)
-            throws Exception {
+    private void storeP2Data( InstallableArtifact artifact, Collection<InstallableUnit> ius, Repository repository )
+        throws Exception
+    {
         File tempP2Repository = null;
         try
         {
@@ -209,26 +208,31 @@ public class DefaultP2MetadataGenerator
 
             tempP2Repository = createTemporaryP2Repository();
 
-            artifactRepository.write( tempP2Repository.toURI(), Collections.singleton(artifact), artifact.getId(), null /** repository properties */
-                    , new String[][] { { "(classifier=" + artifact.getClassifier() + ")", "${repoUrl}" + artifact.getRepositoryPath() } } );
+            artifactRepository.write( tempP2Repository.toURI(), Collections.singleton( artifact ), artifact.getId(),
+                                      null /** repository properties */
+                , new String[][]{
+                { "(classifier=" + artifact.getClassifier() + ")", "${repoUrl}" + artifact.getRepositoryPath() } } );
 
             final String p2ArtifactsPath =
-                artifact.getRepositoryPath().substring(0, artifact.getRepositoryPath().length() - extension.length() - 1)
+                artifact.getRepositoryPath().substring( 0,
+                                                        artifact.getRepositoryPath().length() - extension.length() - 1 )
                     + "-p2Artifacts.xml";
 
-            storeItemFromFile(p2ArtifactsPath, new File(tempP2Repository, "artifacts.xml"), repository);
+            storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
 
-            metadataRepository.write(tempP2Repository.toURI(), ius, artifact.getId(), null /** repository properties */
+            metadataRepository.write( tempP2Repository.toURI(), ius, artifact.getId(), null /** repository properties */
             );
 
             final String p2ContentPath =
-                artifact.getRepositoryPath().substring(0, artifact.getRepositoryPath().length() - extension.length() - 1 ) + "-p2Content.xml";
+                artifact.getRepositoryPath().substring( 0,
+                                                        artifact.getRepositoryPath().length() - extension.length() - 1 )
+                    + "-p2Content.xml";
 
-            storeItemFromFile(p2ContentPath, new File(tempP2Repository, "content.xml"), repository);
+            storeItemFromFile( p2ContentPath, new File( tempP2Repository, "content.xml" ), repository );
         }
         finally
         {
-            FileUtils.deleteDirectory(tempP2Repository);
+            FileUtils.deleteDirectory( tempP2Repository );
         }
     }
 

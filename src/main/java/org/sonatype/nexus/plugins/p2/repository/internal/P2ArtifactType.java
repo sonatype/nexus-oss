@@ -14,34 +14,42 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 
 /**
  * P2 artifact types.
- * 
+ *
  * @author msoftch
  */
-public enum P2ArtifactType {
-    /** OSGi Bundle. */
-    BUNDLE("osgi.bundle"),
-    /** Eclipse feature. */
-    FEATURE("org.eclipse.update.feature");
+public enum P2ArtifactType
+{
+    /**
+     * OSGi Bundle.
+     */
+    BUNDLE( "osgi.bundle" ),
+    /**
+     * Eclipse feature.
+     */
+    FEATURE( "org.eclipse.update.feature" );
 
     /**
      * Default constructor.
-     * 
-     * @param classifier
-     *            The classifier
+     *
+     * @param classifier The classifier
      */
-    private P2ArtifactType(String classifier) {
+    private P2ArtifactType( String classifier )
+    {
         this.classifier = classifier;
     }
 
-    /** The classifier. */
+    /**
+     * The classifier.
+     */
     private final String classifier;
 
     /**
      * Returns the artifacts classifier.
-     * 
+     *
      * @return The classifier
      */
-    public String getClassifier() {
+    public String getClassifier()
+    {
         return classifier;
     }
 }

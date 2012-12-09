@@ -14,18 +14,25 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 
 /**
  * Generic attributes describing an P2 artifact.
- * 
+ *
  * @author msoftch
  */
 public class GenericP2Artifact
 {
-    /** The artifact id. */
+
+    /**
+     * The artifact id.
+     */
     private String id;
 
-    /** The artifact version. */
+    /**
+     * The artifact version.
+     */
     private String version;
 
-    /** The artifact type. */
+    /**
+     * The artifact type.
+     */
     private P2ArtifactType type;
 
     /**
@@ -37,10 +44,10 @@ public class GenericP2Artifact
 
     /**
      * Initializing constructor.
-     * 
-     * @param id The artifact id
+     *
+     * @param id      The artifact id
      * @param version The artifact version
-     * @param type The artifact type
+     * @param type    The artifact type
      */
     public GenericP2Artifact( String id, String version, P2ArtifactType type )
     {

@@ -21,26 +21,30 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
 import org.eclipse.tycho.model.Feature;
-
 import de.pdark.decentxml.XMLIOSource;
 import de.pdark.decentxml.XMLParser;
 
 /**
  * Helper class to analyze (possible) P2 artifacts.
- * 
+ *
  * @author msoftch
  */
 public class P2ArtifactAnalyzer
 {
-    /** Manifest entry for bundle symbolic name. */
+
+    /**
+     * Manifest entry for bundle symbolic name.
+     */
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
-    /** File name of a feature description. */
+    /**
+     * File name of a feature description.
+     */
     private static final String FEATURE_XML = "feature.xml";
 
     /**
      * Return the p2 artifact type of the given file.
-     * 
+     *
      * @param file A jar file
      * @return The p2 artifact type or null if not a known p2 artifact
      */
@@ -88,9 +92,9 @@ public class P2ArtifactAnalyzer
 
     /**
      * Returns the specified main attribute of the given manifest.
-     * 
+     *
      * @param manifest The manifest or null
-     * @param attr The main attribute name
+     * @param attr     The main attribute name
      * @return The attribute name or null if a null manifest was passed or if no such attribute exists
      */
     private static String getMainAttribute( Manifest manifest, String attr )
@@ -104,7 +108,7 @@ public class P2ArtifactAnalyzer
 
     /**
      * Extracts the generic information out of the given P2 artifact.
-     * 
+     *
      * @param file The artifact file
      * @return The generic artifact information or null
      * @throws IOException If an parsing error occurred
@@ -142,7 +146,7 @@ public class P2ArtifactAnalyzer
 
     /**
      * Parses the generic artifact information of a feature.
-     * 
+     *
      * @param in The input stream of the feature.xml
      * @return The generic description
      * @throws IOException If a parser error occurred
@@ -158,7 +162,7 @@ public class P2ArtifactAnalyzer
 
     /**
      * Parses the generic artifact information of a bundle.
-     * 
+     *
      * @param manifest The manifest of the bundle
      * @return The generic description or null if not a bundle
      */
