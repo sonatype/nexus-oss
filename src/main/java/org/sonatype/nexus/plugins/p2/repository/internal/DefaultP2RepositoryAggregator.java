@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createLink;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
