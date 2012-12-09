@@ -12,85 +12,72 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.getP2Type;
 
 import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
-import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
+@EventBus.Managed
 public class JarsEventsInspector
-    implements EventInspector
 {
 
-    private final P2MetadataGenerator p2MetadataGenerator;
+    private final Provider<P2MetadataGenerator> p2MetadataGenerator;
 
-    private final RepositoryRegistry repositories;
+    private final Provider<RepositoryRegistry> repositories;
 
     @Inject
-    public JarsEventsInspector( final P2MetadataGenerator p2MetadataGenerator, final RepositoryRegistry repositories )
+    public JarsEventsInspector( final Provider<P2MetadataGenerator> p2MetadataGenerator,
+                                final Provider<RepositoryRegistry> repositories )
     {
-        this.p2MetadataGenerator = p2MetadataGenerator;
-        this.repositories = repositories;
+        this.p2MetadataGenerator = checkNotNull( p2MetadataGenerator );
+        this.repositories = checkNotNull( repositories );
     }
 
-    @Override
-    public boolean accepts( final Event<?> evt )
+    @Subscribe
+    @AllowConcurrentEvents
+    private void onItemStored( final RepositoryItemEventStore event )
     {
-        if ( evt == null
-            || !( evt instanceof RepositoryItemEvent )
-            || !( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache
-            || evt instanceof RepositoryItemEventDelete ) )
+        if ( isP2Artifact( event.getItem() ) )
         {
-            return false;
-        }
-
-        final RepositoryItemEvent event = (RepositoryItemEvent) evt;
-
-        return isP2Artifact( event.getItem() );
-    }
-
-    @Override
-    public void inspect( final Event<?> evt )
-    {
-        if ( !accepts( evt ) )
-        {
-            return;
-        }
-
-        final RepositoryItemEvent event = (RepositoryItemEvent) evt;
-
-        if ( event instanceof RepositoryItemEventStore || event instanceof RepositoryItemEventCache )
-        {
-            onItemAdded( event );
-        }
-        else if ( event instanceof RepositoryItemEventDelete )
-        {
-            onItemRemoved( event );
+            p2MetadataGenerator.get().generateP2Metadata( event.getItem() );
         }
     }
 
-    private void onItemAdded( final RepositoryItemEvent event )
+    @Subscribe
+    @AllowConcurrentEvents
+    private void onItemCached( final RepositoryItemEventCache event )
     {
-        p2MetadataGenerator.generateP2Metadata( event.getItem() );
+        if ( isP2Artifact( event.getItem() ) )
+        {
+            p2MetadataGenerator.get().generateP2Metadata( event.getItem() );
+        }
     }
 
-    private void onItemRemoved( final RepositoryItemEvent event )
+    @Subscribe
+    @AllowConcurrentEvents
+    private void onItemRemoved( final RepositoryItemEventDelete event )
     {
-        p2MetadataGenerator.removeP2Metadata( event.getItem() );
+        if ( isP2Artifact( event.getItem() ) )
+        {
+            p2MetadataGenerator.get().removeP2Metadata( event.getItem() );
+        }
     }
 
     // TODO optimize by saving the fact that is a bundle/feature as item attribute and check that one first
@@ -102,7 +89,9 @@ public class JarsEventsInspector
         }
         try
         {
-            final File file = retrieveFile( repositories.getRepository( item.getRepositoryId() ), item.getPath() );
+            final File file = retrieveFile(
+                repositories.get().getRepository( item.getRepositoryId() ), item.getPath()
+            );
             return getP2Type( file ) != null;
         }
         catch ( final Exception e )
