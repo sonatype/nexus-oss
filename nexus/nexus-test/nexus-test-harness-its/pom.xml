@@ -312,6 +312,7 @@
                       <type>war</type>
                       <outputDirectory>${project.build.directory}/nexus/webapp</outputDirectory>
                     </artifactItem>
+                    <!--
                     Versions here must be kept in sync with nexus3860/* (cargo) tests.
                     Including/excluding only the bits needed for the container tests to function, keep out all other ancillary crud.
 
@@ -434,7 +435,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemPropertyVariables>
+              <systemPropertyVariables combine.children="append">
                 <nexus.default.http.provider>async-http-client</nexus.default.http.provider>
                 <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>
@@ -458,7 +459,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemPropertyVariables>
+              <systemPropertyVariables combine.children="append">
                 <nexus.default.http.provider>apacheHttpClient4x</nexus.default.http.provider>
                 <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>
@@ -482,7 +483,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemPropertyVariables>
+              <systemPropertyVariables combine.children="append">
                 <nexus.default.http.provider>apacheHttpClient3x</nexus.default.http.provider>
                 <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>

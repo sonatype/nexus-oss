@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>27</version>
+    <version>28</version>
     <relativePath />
   </parent>
 
@@ -882,7 +882,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
       </dependency>
 
       <!--
@@ -1324,15 +1324,12 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <failIfNoTests>false</failIfNoTests>
-            <forkMode>once</forkMode>
             <!--
             FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
             https://issues.sonatype.org/browse/NEXUS-5345
             -->
             <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
-            <systemPropertyVariables>
-              <java.awt.headless>true</java.awt.headless>
+            <systemPropertyVariables combine.children="append">
               <!-- start junit benchmarks config -->
               <jub.consumers>H2,CONSOLE</jub.consumers>
               <jub.db.file>.benchmarks</jub.db.file>
@@ -1350,7 +1347,6 @@
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-            <failIfNoTests>false</failIfNoTests>
             <forkMode>once</forkMode>
             <!--
             FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
@@ -1360,8 +1356,7 @@
             <excludes combine.children="append">
               <exclude>**/Abstract*</exclude>
             </excludes>
-            <systemPropertyVariables>
-              <java.awt.headless>true</java.awt.headless>
+            <systemPropertyVariables combine.children="append">
               <!-- logging configuration properties, see logback*.xml files -->
               <test.log.level>${test.log.level}</test.log.level>
               <it.test.log.level>${it.test.log.level}</it.test.log.level>
