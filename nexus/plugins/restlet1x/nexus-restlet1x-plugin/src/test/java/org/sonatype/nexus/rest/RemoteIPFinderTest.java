@@ -56,6 +56,8 @@ public class RemoteIPFinderTest
         Mockito.doReturn( "127.0.0.1" ).when( http ).getHeader( RemoteIPFinder.FORWARD_HEADER );
         Assert.assertEquals( "127.0.0.1", RemoteIPFinder.findIP( http ) );
 
+        // Note that if you use a DNS provider, such as OpenDNS, or internet cafe which buckets non-resolvable IPs
+        // to a landing page host, these tests will fail when the name 'missing' actually resolves to an IP
         Mockito.doReturn( "missing, 127.0.0.2, unknown, 127.0.0.1" ).when( http ).getHeader( RemoteIPFinder.FORWARD_HEADER );
         Assert.assertEquals( "127.0.0.2", RemoteIPFinder.findIP( http ) );
 
