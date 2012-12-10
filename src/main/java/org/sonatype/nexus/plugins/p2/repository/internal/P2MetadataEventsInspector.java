@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -65,7 +66,7 @@ public class P2MetadataEventsInspector
 
     @Subscribe
     @AllowConcurrentEvents
-    public void onItemRemoved( final RepositoryItemEvent event )
+    public void onItemRemoved( final RepositoryItemEventDelete event )
     {
         if ( isP2ContentXML( event.getItem() ) )
         {
