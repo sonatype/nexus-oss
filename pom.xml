@@ -51,7 +51,7 @@
   </modules>
 
   <properties>
-    <nexus.version>2.3-SNAPSHOT</nexus.version>
+    <nexus.version>2.3.0</nexus.version>
     <nexusPluginType>nexus-plugin</nexusPluginType>
 
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
