@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>22</version>
+    <version>29</version>
     <relativePath/>
   </parent>
 
@@ -29,7 +29,8 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <description>Automatically unpack deployed bundles</description>
+  <inceptionYear>2009</inceptionYear>
+  <url>http://github.com/sonatype/nexus-unpack-plugin</url>
 
   <licenses>
     <license>
@@ -43,6 +44,11 @@
     <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-unpack-plugin.git</developerConnection>
     <url>http://github.com/sonatype/nexus-unpack-plugin</url>
   </scm>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>http://github.com/sonatype/nexus-unpack-plugin/issues</url>
+  </issueManagement>
 
   <properties>
     <nexus.version>2.3-SNAPSHOT</nexus.version>
@@ -102,7 +108,6 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <argLine>-Xmx512m</argLine>
-            <failIfNoTests>false</failIfNoTests>
             <testNGArtifactName>none:none</testNGArtifactName>
             <systemProperties>
               <property>
@@ -116,17 +121,12 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-            <forkMode>always</forkMode>
             <argLine>-Xmx512m</argLine>
             <junitArtifactName>none:none</junitArtifactName>
             <testNGArtifactName>org.testng:testng</testNGArtifactName>
-            <failIfNoTests>false</failIfNoTests>
             <junitArtifactName>none:none</junitArtifactName>
             <testNGArtifactName>org.testng:testng</testNGArtifactName>
             <workingDirectory>${project.build.directory}</workingDirectory>
-            <systemPropertyVariables>
-              <java.awt.headless>true</java.awt.headless>
-            </systemPropertyVariables>
             <excludes>
               <exclude>**/*$*</exclude>
               <exclude>**/Abstract*</exclude>
