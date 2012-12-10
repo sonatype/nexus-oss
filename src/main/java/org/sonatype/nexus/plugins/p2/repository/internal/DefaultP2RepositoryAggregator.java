@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createLink;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
@@ -65,6 +65,11 @@ import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 public class DefaultP2RepositoryAggregator
     implements P2RepositoryAggregator
 {
+
+    /**
+     * Classifier for features.
+     */
+    private static final String FEATURE_CLASSIFIER = P2ArtifactType.FEATURE.getClassifier();
 
     @Inject
     private Logger logger;
@@ -465,9 +470,7 @@ public class DefaultP2RepositoryAggregator
                 artifactRepository.getInstallableArtifacts( sourceP2Repository.toURI() );
             for ( final InstallableArtifact installableArtifact : installableArtifacts )
             {
-                final String linkPath =
-                    P2_REPOSITORY_ROOT_PATH + "/plugins/" + installableArtifact.getId() + "_"
-                        + installableArtifact.getVersion() + ".jar";
+                final String linkPath = createP2Path( installableArtifact );
                 if ( installableArtifact.getRepositoryPath() != null )
                 {
                     final StorageItem bundle = retrieveItem( repository, installableArtifact.getRepositoryPath() );
@@ -479,6 +482,21 @@ public class DefaultP2RepositoryAggregator
         {
             deleteDirectory( sourceP2Repository );
         }
+    }
+
+    /**
+     * Creates the p2 path for the given artifact.
+     *
+     * @param art The artifact
+     * @return The path
+     */
+    private String createP2Path( InstallableArtifact art )
+    {
+        if ( FEATURE_CLASSIFIER.equals( art.getClassifier() ) )
+        {
+            return P2_REPOSITORY_ROOT_PATH + "/features/" + art.getId() + "_" + art.getVersion() + ".jar";
+        }
+        return P2_REPOSITORY_ROOT_PATH + "/plugins/" + art.getId() + "_" + art.getVersion() + ".jar";
     }
 
     private void updateP2Metadata( final Repository repository, final File sourceContent,

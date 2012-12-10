@@ -12,78 +12,66 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
+@EventBus.Managed
 public class P2MetadataEventsInspector
-    implements EventInspector
 {
 
-    private final P2RepositoryAggregator p2RepositoryAggregator;
+    private final Provider<P2RepositoryAggregator> p2RepositoryAggregator;
 
     @Inject
-    public P2MetadataEventsInspector( final P2RepositoryAggregator p2RepositoryAggregator )
+    public P2MetadataEventsInspector( final Provider<P2RepositoryAggregator> p2RepositoryAggregator )
     {
-        this.p2RepositoryAggregator = p2RepositoryAggregator;
+        this.p2RepositoryAggregator = checkNotNull( p2RepositoryAggregator );
     }
 
-    @Override
-    public boolean accepts( final Event<?> evt )
+    @Subscribe
+    @AllowConcurrentEvents
+    public void onItemStored( final RepositoryItemEventStore event )
     {
-        if ( evt == null
-            || !( evt instanceof RepositoryItemEvent )
-            || !( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache || evt instanceof RepositoryItemEventDelete ) )
+        if ( isP2ContentXML( event.getItem() ) )
         {
-            return false;
-        }
-
-        final RepositoryItemEvent event = (RepositoryItemEvent) evt;
-
-        return isP2ContentXML( event.getItem() );
-    }
-
-    @Override
-    public void inspect( final Event<?> evt )
-    {
-        if ( !accepts( evt ) )
-        {
-            return;
-        }
-
-        final RepositoryItemEvent event = (RepositoryItemEvent) evt;
-
-        if ( event instanceof RepositoryItemEventStore || event instanceof RepositoryItemEventCache )
-        {
-            onItemAdded( event );
-        }
-        else if ( event instanceof RepositoryItemEventDelete )
-        {
-            onItemRemoved( event );
+            p2RepositoryAggregator.get().updateP2Metadata( event.getItem() );
         }
     }
 
-    private void onItemAdded( final RepositoryItemEvent event )
+    @Subscribe
+    @AllowConcurrentEvents
+    public void onItemCached( final RepositoryItemEventCache event )
     {
-        p2RepositoryAggregator.updateP2Metadata( event.getItem() );
+        if ( isP2ContentXML( event.getItem() ) )
+        {
+            p2RepositoryAggregator.get().updateP2Metadata( event.getItem() );
+        }
     }
 
-    private void onItemRemoved( final RepositoryItemEvent event )
+    @Subscribe
+    @AllowConcurrentEvents
+    public void onItemRemoved( final RepositoryItemEventDelete event )
     {
-        p2RepositoryAggregator.removeP2Metadata( event.getItem() );
+        if ( isP2ContentXML( event.getItem() ) )
+        {
+            p2RepositoryAggregator.get().removeP2Metadata( event.getItem() );
+        }
     }
 
     private static boolean isP2ContentXML( final StorageItem item )

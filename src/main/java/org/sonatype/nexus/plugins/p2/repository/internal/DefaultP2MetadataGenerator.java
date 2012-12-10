@@ -13,24 +13,22 @@
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
 import static org.sonatype.nexus.plugins.p2.repository.internal.DefaultP2RepositoryAggregator.createTemporaryP2Repository;
-import static org.sonatype.nexus.plugins.p2.repository.internal.JarsEventsInspector.isABundle;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveItem;
+import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.getP2Type;
+import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactAnalyzer.parseP2Artifact;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -121,83 +119,42 @@ public class DefaultP2MetadataGenerator
 
         // TODO only regenerate if jar is newer
 
-        JarFile jarFile = null;
         try
         {
             final Repository repository = repositories.getRepository( item.getRepositoryId() );
-            final File bundle = retrieveFile( repository, item.getPath() );
-            jarFile = new JarFile( bundle );
-            final Manifest manifest = jarFile.getManifest();
-            final Attributes mainAttributes = manifest.getMainAttributes();
-
-            // get part before first semicolon
-            // bug fix NEXUS-4552 & NEXUS-4567
-            final String bsn = mainAttributes.getValue( "Bundle-SymbolicName" ).split( ";" )[0].trim();
-            if ( bsn == null )
+            final File file = retrieveFile( repository, item.getPath() );
+            final GenericP2Artifact desc = parseP2Artifact( file );
+            if ( desc == null )
             {
-                logger.debug( "[{}:{}] is not an OSGi bundle. Bailing out.", item.getRepositoryId(), item.getPath() );
+                logger.debug( "[{}:{}] is neither an OSGi bundle nor an feature. Bailing out.", item.getRepositoryId(),
+                              item.getPath() );
                 return;
             }
-            final String version = mainAttributes.getValue( "Bundle-Version" );
 
             final InstallableArtifact artifact = new InstallableArtifact();
-            artifact.setId( bsn );
-            artifact.setClassifier( "osgi.bundle" );
-            artifact.setVersion( version );
-            artifact.setPath( bundle.getAbsolutePath() );
+            artifact.setId( desc.getId() );
+            artifact.setClassifier( desc.getType().getClassifier() );
+            artifact.setVersion( desc.getVersion() );
+            artifact.setPath( file.getAbsolutePath() );
             artifact.setRepositoryPath( item.getPath() );
 
-            final Collection<InstallableArtifact> artifacts = new ArrayList<InstallableArtifact>();
-            artifacts.add( artifact );
-
-            final Collection<InstallableUnit> ius =
-                publisher.generateIUs( true /* generateCapabilities */, true /* generateRequirements */,
-                                       true /* generateManifest */, bundle );
-
-            for ( final InstallableUnit iu : ius )
+            final Collection<InstallableUnit> ius;
+            switch ( desc.getType() )
             {
-                final InstallableUnitArtifact iuArtifact = new InstallableUnitArtifact();
-                iuArtifact.setId( artifact.getId() );
-                iuArtifact.setClassifier( artifact.getClassifier() );
-                iuArtifact.setVersion( artifact.getVersion() );
-
-                iu.addArtifact( iuArtifact );
-
-                final TouchpointType touchpointType = new TouchpointType();
-                touchpointType.setId( "org.eclipse.equinox.p2.osgi" );
-                touchpointType.setVersion( "1.0.0" );
-
-                iu.setTouchpointType( touchpointType );
+                case BUNDLE:
+                    ius = publisher.generateIUs( true /* generateCapabilities */, true /* generateManifest */,
+                                                 true /* generateTouchpointData */, file );
+                    break;
+                case FEATURE:
+                    ius = publisher.generateFeatureIUs( true /* generateCapabilities */,
+                                                        true /* generateRequirements */, file );
+                    break;
+                default:
+                    throw new IllegalStateException( "Unsupported artifact type " + desc.getType().name() );
             }
 
-            File tempP2Repository = null;
-            try
-            {
-                final String extension = FileUtils.getExtension( bundle.getPath() );
-
-                tempP2Repository = createTemporaryP2Repository();
-
-                artifactRepository.write( tempP2Repository.toURI(), artifacts, bsn, null /** repository properties */
-                    , new String[][]{ { "(classifier=osgi.bundle)", "${repoUrl}" + item.getPath() } } );
-
-                final String p2ArtifactsPath =
-                    item.getPath().substring( 0, item.getPath().length() - extension.length() - 1 )
-                        + "-p2Artifacts.xml";
-
-                storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
-
-                metadataRepository.write( tempP2Repository.toURI(), ius, bsn, null /** repository properties */
-                );
-
-                final String p2ContentPath =
-                    item.getPath().substring( 0, item.getPath().length() - extension.length() - 1 ) + "-p2Content.xml";
-
-                storeItemFromFile( p2ContentPath, new File( tempP2Repository, "content.xml" ), repository );
-            }
-            finally
-            {
-                FileUtils.deleteDirectory( tempP2Repository );
-            }
+            attachArtifact( artifact, ius );
+            storeP2Data( artifact, ius, repository );
         }
         catch ( final Exception e )
         {
@@ -206,19 +163,76 @@ public class DefaultP2MetadataGenerator
                                item.getRepositoryId(), item.getPath(), e.getMessage() ), e );
             return;
         }
+    }
+
+    /**
+     * Attaches the given artifact to the passed installable units.
+     *
+     * @param artifact The artifact to attach
+     * @param ius      The {@link InstallableUnit}s were to attach the artifact
+     */
+    private void attachArtifact( InstallableArtifact artifact, Collection<InstallableUnit> ius )
+    {
+        for ( final InstallableUnit iu : ius )
+        {
+            final InstallableUnitArtifact iuArtifact = new InstallableUnitArtifact();
+            iuArtifact.setId( artifact.getId() );
+            iuArtifact.setClassifier( artifact.getClassifier() );
+            iuArtifact.setVersion( artifact.getVersion() );
+
+            iu.addArtifact( iuArtifact );
+
+            final TouchpointType touchpointType = new TouchpointType();
+            touchpointType.setId( "org.eclipse.equinox.p2.osgi" );
+            touchpointType.setVersion( "1.0.0" );
+
+            iu.setTouchpointType( touchpointType );
+        }
+    }
+
+    /**
+     * Stores the P2 data for the passed artifact.
+     *
+     * @param artifact   The artifact for which to create the entries
+     * @param ius        The installable units for the passed artifact
+     * @param repository The repository were to store the data
+     * @throws Exception If an error occurred while
+     */
+    private void storeP2Data( InstallableArtifact artifact, Collection<InstallableUnit> ius, Repository repository )
+        throws Exception
+    {
+        File tempP2Repository = null;
+        try
+        {
+            final String extension = FileUtils.getExtension( artifact.getRepositoryPath() );
+
+            tempP2Repository = createTemporaryP2Repository();
+
+            artifactRepository.write( tempP2Repository.toURI(), Collections.singleton( artifact ), artifact.getId(),
+                                      null /** repository properties */
+                , new String[][]{
+                { "(classifier=" + artifact.getClassifier() + ")", "${repoUrl}" + artifact.getRepositoryPath() } } );
+
+            final String p2ArtifactsPath =
+                artifact.getRepositoryPath().substring( 0,
+                                                        artifact.getRepositoryPath().length() - extension.length() - 1 )
+                    + "-p2Artifacts.xml";
+
+            storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
+
+            metadataRepository.write( tempP2Repository.toURI(), ius, artifact.getId(), null /** repository properties */
+            );
+
+            final String p2ContentPath =
+                artifact.getRepositoryPath().substring( 0,
+                                                        artifact.getRepositoryPath().length() - extension.length() - 1 )
+                    + "-p2Content.xml";
+
+            storeItemFromFile( p2ContentPath, new File( tempP2Repository, "content.xml" ), repository );
+        }
         finally
         {
-            if ( jarFile != null )
-            {
-                try
-                {
-                    jarFile.close();
-                }
-                catch ( final Exception ignored )
-                {
-                    // safe to ignore...
-                }
-            }
+            FileUtils.deleteDirectory( tempP2Repository );
         }
     }
 
@@ -265,7 +279,7 @@ public class DefaultP2MetadataGenerator
                 public void onFile( final File file )
                 {
                     final String path = getRelativePath( localStorage, file );
-                    if ( !isHidden( path ) && isABundle( file ) )
+                    if ( !isHidden( path ) && getP2Type( file ) != null )
                     {
                         try
                         {
