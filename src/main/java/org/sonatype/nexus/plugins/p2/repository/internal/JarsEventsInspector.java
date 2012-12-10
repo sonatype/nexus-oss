@@ -22,6 +22,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -37,6 +39,8 @@ import com.google.common.eventbus.Subscribe;
 @EventBus.Managed
 public class JarsEventsInspector
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( JarsEventsInspector.class );
 
     private final Provider<P2MetadataGenerator> p2MetadataGenerator;
 
@@ -96,6 +100,10 @@ public class JarsEventsInspector
         }
         catch ( final Exception e )
         {
+            LOG.debug(
+                "Could not determine if p2 metadata should be generated for '{}'. No metadata will be generated",
+                item.getPath(), e
+            );
             return false;
         }
     }
