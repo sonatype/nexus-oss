@@ -390,11 +390,9 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
           }]
         }],
     buttons : [{
-          id : 'savebutton',
           text : 'Save',
           disabled : true
         }, {
-          id : 'cancelbutton',
           text : 'Cancel'
         }]
   };
