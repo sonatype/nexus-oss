@@ -43,7 +43,7 @@
 
   <properties>
     <nexus.version>2.3-SNAPSHOT</nexus.version>
-    <p2-bridge.version>1.1.5-SNAPSHOT</p2-bridge.version>
+    <p2-bridge.version>1.1.5</p2-bridge.version>
 
     <nexus.plugin.name>Nexus P2 Bridge Plugin</nexus.plugin.name>
     <nexus.plugin.description>Bridge between Nexus and P2 Eclipse Runtime</nexus.plugin.description>
