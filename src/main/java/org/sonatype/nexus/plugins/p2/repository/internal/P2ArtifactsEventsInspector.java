@@ -45,7 +45,7 @@ public class P2ArtifactsEventsInspector
 
     @Subscribe
     @AllowConcurrentEvents
-    private void onItemStored( final RepositoryItemEventStore event )
+    public void onItemStored( final RepositoryItemEventStore event )
     {
         if ( isP2ArtifactsXML( event.getItem() ) )
         {
@@ -55,7 +55,7 @@ public class P2ArtifactsEventsInspector
 
     @Subscribe
     @AllowConcurrentEvents
-    private void onItemCached( final RepositoryItemEventCache event )
+    public void onItemCached( final RepositoryItemEventCache event )
     {
         if ( isP2ArtifactsXML( event.getItem() ) )
         {
@@ -65,7 +65,7 @@ public class P2ArtifactsEventsInspector
 
     @Subscribe
     @AllowConcurrentEvents
-    private void onItemRemoved( final RepositoryItemEventDelete event )
+    public void onItemRemoved( final RepositoryItemEventDelete event )
     {
         if ( isP2ArtifactsXML( event.getItem() ) )
         {

@@ -45,7 +45,7 @@ public class P2MetadataEventsInspector
 
     @Subscribe
     @AllowConcurrentEvents
-    private void onItemStored( final RepositoryItemEventStore event )
+    public void onItemStored( final RepositoryItemEventStore event )
     {
         if ( isP2ContentXML( event.getItem() ) )
         {
@@ -55,7 +55,7 @@ public class P2MetadataEventsInspector
 
     @Subscribe
     @AllowConcurrentEvents
-    private void onItemCached( final RepositoryItemEventCache event )
+    public void onItemCached( final RepositoryItemEventCache event )
     {
         if ( isP2ContentXML( event.getItem() ) )
         {
@@ -65,7 +65,7 @@ public class P2MetadataEventsInspector
 
     @Subscribe
     @AllowConcurrentEvents
-    private void onItemRemoved( final RepositoryItemEvent event )
+    public void onItemRemoved( final RepositoryItemEvent event )
     {
         if ( isP2ContentXML( event.getItem() ) )
         {
