@@ -14,6 +14,7 @@ package org.sonatype.nexus.proxy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyIterableOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -486,7 +487,7 @@ public class SimplePullTest
                     throws IOException
                 {
                     int result = super.read( b, off, len );
-                    if ( result != len )
+                    if ( result == -1 )
                     {
                         throw new EOFException( "Foo" );
                     }
@@ -502,8 +503,10 @@ public class SimplePullTest
         }
         finally
         {
-            // now we have to ensure no remmant files exists
-            assertThat( getLocalRepositoryStorage().containsItem( repository, request ), is( false ) );
+            // now we have to ensure no remnant files exists
+            assertThat( repository.getLocalStorage().containsItem( repository, request ), is( false ) );
+            // no tmp files should exists either
+            assertThat( repository.getLocalStorage().listItems( repository, new ResourceStoreRequest( "/.nexus/tmp" ) ), is( empty() ) );
         }
     }
 
