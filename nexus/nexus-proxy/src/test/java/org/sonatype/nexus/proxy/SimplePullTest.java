@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyIterableOf;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
@@ -452,36 +453,58 @@ public class SimplePullTest
      * the new LocalStorage exception should be thrown, to differentiate from other "fatal" (like disk full or what not)
      * error.
      */
-    @Test( expected = LocalStorageEofException.class )
+    @Test
     public void testNXCM4852()
         throws Exception
     {
+        final Repository repository = getRepositoryRegistry().getRepository( "inhouse" );
         ResourceStoreRequest request =
-            new ResourceStoreRequest( "/repositories/inhouse/activemq/activemq-core/1.2/activemq-core-1.2.jar", true );
+            new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar", true );
 
-        getRootRouter().storeItem( request, new WrappingInputStream( new ByteArrayInputStream( "123456789012345678901234567890".getBytes() ))
+        try
         {
-            @Override
-            public int read()
-                throws IOException
+            repository.storeItem( request, new WrappingInputStream(
+                new ByteArrayInputStream( "123456789012345678901234567890".getBytes() ) )
             {
-                throw new EOFException("Eof!");
-            }
+                @Override
+                public int read()
+                    throws IOException
+                {
+                    int result = super.read();
+                    if ( result == -1 )
+                    {
+                        throw new EOFException( "Foo" );
+                    }
+                    else
+                    {
+                        return result;
+                    }
+                }
 
-            @Override
-            public int read( final byte[] b )
-                throws IOException
-            {
-                throw new EOFException("Eof!");
-            }
+                @Override
+                public int read( final byte[] b, final int off, final int len )
+                    throws IOException
+                {
+                    int result = super.read( b, off, len );
+                    if ( result != len )
+                    {
+                        throw new EOFException( "Foo" );
+                    }
+                    return result;
+                }
+            }, null );
 
-            @Override
-            public int read( final byte[] b, final int off, final int len )
-                throws IOException
-            {
-                throw new EOFException("Eof!");
-            }
-        }, null);
+            Assert.fail( "We expected a LocalStorageEofException to be thrown" );
+        }
+        catch ( LocalStorageEofException e )
+        {
+            // good, we expected this
+        }
+        finally
+        {
+            // now we have to ensure no remmant files exists
+            assertThat( getLocalRepositoryStorage().containsItem( repository, request ), is( false ) );
+        }
     }
 
 
