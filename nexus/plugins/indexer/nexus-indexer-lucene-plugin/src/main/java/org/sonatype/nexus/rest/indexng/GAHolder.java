@@ -42,7 +42,7 @@ class GAHolder
 
         if ( VersionUtils.isSnapshot( versionHit.getVersion() ) )
         {
-            if ( latestSnapshotVersion == null || latestSnapshotVersion.compareTo( version ) > 0 )
+            if ( latestSnapshotVersion == null || latestSnapshotVersion.compareTo( version ) < 0 )
             {
                 latestSnapshot = versionHit;
                 latestSnapshotVersion = version;
@@ -50,7 +50,7 @@ class GAHolder
         }
         else
         {
-            if ( latestReleaseVersion == null || latestReleaseVersion.compareTo( version ) > 0 )
+            if ( latestReleaseVersion == null || latestReleaseVersion.compareTo( version ) < 0 )
             {
                 latestRelease = versionHit;
                 latestReleaseVersion = version;
