@@ -25,7 +25,7 @@
 
   <groupId>org.sonatype.nexus.unpack</groupId>
   <artifactId>nexus-unpack</artifactId>
-  <version>1.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <inceptionYear>2009</inceptionYear>
