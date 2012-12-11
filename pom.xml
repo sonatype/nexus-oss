@@ -51,7 +51,7 @@
   </issueManagement>
 
   <properties>
-    <nexus.version>2.3-SNAPSHOT</nexus.version>
+    <nexus.version>2.3.0</nexus.version>
 
     <nexus.plugin.name>Nexus Unpack Plugin</nexus.plugin.name>
     <nexus.plugin.description>Automatically unpack deployed bundles.</nexus.plugin.description>
