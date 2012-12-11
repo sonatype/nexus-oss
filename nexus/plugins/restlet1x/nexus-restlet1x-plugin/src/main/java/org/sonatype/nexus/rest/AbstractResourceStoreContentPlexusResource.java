@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageEofException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
@@ -880,6 +881,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
             if ( t instanceof ResourceException )
             {
                 throw (ResourceException) t;
+            }
+            else if ( t instanceof LocalStorageEofException )
+            {
+                // in case client drops connection, this makes not much sense, as he will not
+                // receive this response, but we have to end it somehow.
+                // but, in case when remote proxy peer drops connection on us regularly
+                // this makes sense
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof IllegalArgumentException )
             {

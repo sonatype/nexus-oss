@@ -14,8 +14,14 @@ package org.sonatype.nexus.proxy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyIterableOf;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
+import java.io.ByteArrayInputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -41,6 +47,7 @@ import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.util.WrappingInputStream;
 
 import com.google.common.base.Strings;
 
@@ -441,6 +448,68 @@ public class SimplePullTest
             assertThat( countOccurence( dumpStr, " " + ItemNotFoundException.class.getSimpleName() ), equalTo( 4 ));
         }
     }
+
+    /**
+     * NXCM-4582: When Local storage is about to store something, but during "store" operation source stream EOFs,
+     * the new LocalStorage exception should be thrown, to differentiate from other "fatal" (like disk full or what not)
+     * error.
+     */
+    @Test
+    public void testNXCM4852()
+        throws Exception
+    {
+        final Repository repository = getRepositoryRegistry().getRepository( "inhouse" );
+        ResourceStoreRequest request =
+            new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar", true );
+
+        try
+        {
+            repository.storeItem( request, new WrappingInputStream(
+                new ByteArrayInputStream( "123456789012345678901234567890".getBytes() ) )
+            {
+                @Override
+                public int read()
+                    throws IOException
+                {
+                    int result = super.read();
+                    if ( result == -1 )
+                    {
+                        throw new EOFException( "Foo" );
+                    }
+                    else
+                    {
+                        return result;
+                    }
+                }
+
+                @Override
+                public int read( final byte[] b, final int off, final int len )
+                    throws IOException
+                {
+                    int result = super.read( b, off, len );
+                    if ( result == -1 )
+                    {
+                        throw new EOFException( "Foo" );
+                    }
+                    return result;
+                }
+            }, null );
+
+            Assert.fail( "We expected a LocalStorageEofException to be thrown" );
+        }
+        catch ( LocalStorageEofException e )
+        {
+            // good, we expected this
+        }
+        finally
+        {
+            // now we have to ensure no remnant files exists
+            assertThat( repository.getLocalStorage().containsItem( repository, request ), is( false ) );
+            // no tmp files should exists either
+            assertThat( repository.getLocalStorage().listItems( repository, new ResourceStoreRequest( "/.nexus/tmp" ) ), is( empty() ) );
+        }
+    }
+
 
     //
 
