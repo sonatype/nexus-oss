@@ -884,8 +884,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
             else if ( t instanceof LocalStorageEofException )
             {
-                // not that it makes much sense, as client will not receive response anyway
-                // it dropped connection on us!
+                // in case client drops connection, this makes not much sense, as he will not
+                // receive this response, but we have to end it somehow.
+                // but, in case when remote proxy peer drops connection on us regularly
+                // this makes sense
                 throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof IllegalArgumentException )
