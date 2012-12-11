@@ -31,7 +31,7 @@
   <artifactId>nexus-runtime-platform</artifactId>
   <packaging>pom</packaging>
 
-  <version>2.3-SNAPSHOT</version>
+  <version>2.3.0</version>
 
   <properties>
     <sisu-inject.version>2.3.1</sisu-inject.version>
