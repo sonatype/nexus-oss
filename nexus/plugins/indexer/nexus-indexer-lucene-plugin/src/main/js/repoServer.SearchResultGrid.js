@@ -55,21 +55,25 @@ Sonatype.SearchStore = function(config) {
             },
             scope : this
           },
+          // FIXME loadexception event is deprecated, should use general DataProxy#exception event
           'loadexception' : {
-        	fn : function (obj, options, response, error) {
-        	  try {
-              // The response is already HTML escaped as it's coming through the REST layer, and can be directly used as
-              // a warning
-	        	  var errorResponse = Ext.decode(response.responseText);
-	        	  if ( errorResponse.errors && errorResponse.errors[0] && errorResponse.errors[0].id == "search" ) {
-		              this.grid.setWarningLabel(errorResponse.errors[0].msg);
-	        	  } else {
-		              this.grid.setWarningLabel(response.responseText);
-	        	  }
-        	  } catch (e) {
-        		  Sonatype.MessageBox.alert('Problem parsing error response:\n' + response.responseText);
-        	  }
-	        },
+            fn : function(obj, options, response) {
+              try {
+                // The response is already HTML escaped as it's coming through the REST layer, and can be directly used as
+                // a warning
+                var errorResponse = Ext.decode(response.responseText);
+                if (errorResponse.errors && errorResponse.errors[0] && errorResponse.errors[0].id === "search") {
+                  this.grid.setWarningLabel(errorResponse.errors[0].msg);
+                } else if (typeof response.responseText !== 'undefined') {
+                  this.grid.setWarningLabel(response.responseText);
+                } else {
+                  this.grid.setWarningLabel('Could not retrieve search results.');
+                }
+              }
+              catch (e) {
+                Sonatype.MessageBox.alert('Problem parsing error response:\n' + e.toString() + '\n' + response.responseText);
+              }
+            },
             scope : this
           }
         }
