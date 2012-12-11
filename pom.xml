@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>22</version>
+    <version>30</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -56,8 +56,8 @@
   </pluginRepositories>
 
   <properties>
-    <nexus.version>2.3-SNAPSHOT</nexus.version>
-    <capabilities-plugin.version>2.2-SNAPSHOT</capabilities-plugin.version>
+    <nexus.version>2.3.0</nexus.version>
+    <capabilities-plugin.version>2.2</capabilities-plugin.version>
 
     <nexus.plugin.name>Nexus P2 Repository Plugin</nexus.plugin.name>
     <nexus.plugin.description>Adds P2 repository support.</nexus.plugin.description>
@@ -235,15 +235,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
-          <forkMode>always</forkMode>
-          <argLine>-ea -XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
-          <failIfNoTests>false</failIfNoTests>
+          <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
           <junitArtifactName>none:none</junitArtifactName>
           <testNGArtifactName>org.testng:testng</testNGArtifactName>
           <workingDirectory>${project.build.directory}</workingDirectory>
-          <systemPropertyVariables>
-            <java.awt.headless>true</java.awt.headless>
-          </systemPropertyVariables>
           <excludes>
             <exclude>**/*$*</exclude>
             <exclude>**/Abstract*</exclude>
@@ -267,7 +262,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.0</version>
             <executions>
               <execution>
                 <goals>
