@@ -14,12 +14,12 @@ package org.sonatype.nexus.proxy.storage.local.fs;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,11 +31,11 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageEofException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
@@ -112,6 +112,17 @@ public class DefaultFSPeer
                 IOUtil.copy( is, os, getCopyStreamBufferSize() );
 
                 os.flush();
+            }
+            catch ( EOFException e )
+            {
+                if ( hiddenTarget != null )
+                {
+                    hiddenTarget.delete();
+                }
+
+                throw new LocalStorageEofException( String.format(
+                    "EOF during storing on path \"%s\" (while writing to hiddenTarget: \"%s\")",
+                    item.getRepositoryItemUid().toString(), hiddenTarget.getAbsolutePath() ), e );
             }
             catch ( IOException e )
             {
