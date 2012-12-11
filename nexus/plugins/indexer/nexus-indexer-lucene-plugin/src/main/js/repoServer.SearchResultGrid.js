@@ -266,8 +266,8 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
           latest = record.get('latestSnapshot');
         }
 
-        return 'Latest: ' + latest + ' <a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
-            + '~~~~kw,versionexpand " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">(Show All Versions)</a>';
+        return '<a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
+            + '~~~~kw,versionexpand " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Show All Versions</a>';
       },
       formatDownloadLinks : function(value, p, record, rowIndex, colIndex, store) {
         var hitIndex = 0;
