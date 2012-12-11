@@ -554,7 +554,7 @@
       </dependency>
 
       <!--
-      Use our custom build of commons-util 1.8.3 which excludes the commons-collections classes.
+      Use our custom build of commons-beanutils 1.8.3 which excludes the commons-collections classes.
       For more details see:
       https://issues.sonatype.org/browse/NEXUS-5336
       -->
