@@ -235,11 +235,9 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
           name : 'id'
         }],
     buttons : [{
-          id : 'savebutton',
           text : 'Save',
           disabled : true
         }, {
-          id : 'cancelbutton',
           text : 'Cancel'
         }]
   };

@@ -12,10 +12,15 @@
  */
 package org.sonatype.nexus.rest.global;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.rest.global.SmtpSettingsValidationPlexusResource.validateEmail;
 
+import com.thoughtworks.xstream.XStream;
 import org.junit.Test;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.rest.model.SmtpSettings;
+import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class SmtpSettingsValidationPlexusResourceTest
@@ -57,4 +62,25 @@ public class SmtpSettingsValidationPlexusResourceTest
         validateEmail( "me@foo.CoM" );
     }
 
+    @Test
+    public void unescapeHTMLInSMTPPassword()
+    {
+        final SmtpSettingsValidationPlexusResource testSubject =
+            new SmtpSettingsValidationPlexusResource();
+
+        // settings object as it would come in via REST, with escaped HTML
+        SmtpSettingsResource settings = new SmtpSettingsResource();
+        settings.setPassword( "asdf&amp;qwer" );
+        settings.setUsername( "asdf&amp;qwer" );
+
+        // make sure the configuration resource configures xstream to unescape
+        final XStream xStream = new XStream();
+        testSubject.configureXStream( xStream );
+
+        final String xml = xStream.toXML( settings );
+        settings = (SmtpSettingsResource) xStream.fromXML( xml );
+
+        assertThat( settings.getUsername(), is( "asdf&qwer" ) );
+        assertThat( settings.getPassword(), is( "asdf&qwer" ) );
+    }
 }

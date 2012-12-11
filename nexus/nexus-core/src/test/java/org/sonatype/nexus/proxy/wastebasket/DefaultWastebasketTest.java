@@ -47,9 +47,25 @@ public class DefaultWastebasketTest
     extends AbstractNexusTestEnvironment
 {
 
+    private File getRepoRoot( final String id )
+        throws Exception
+    {
+        final ApplicationConfiguration applicationConfiguration = lookup( ApplicationConfiguration.class );
+        final File repoRoot = applicationConfiguration.getWorkingDirectory( "storage/" + id );
+        return repoRoot;
+    }
+
     private File addRepository( String id )
         throws Exception
     {
+        final ApplicationConfiguration applicationConfiguration = lookup( ApplicationConfiguration.class );
+        final File repoRoot = getRepoRoot( id );
+        final File repoContent = new File( "src/test/resources/" + id );
+        if ( repoContent.isDirectory() )
+        {
+            FileUtils.copyDirectoryStructure( repoContent, repoRoot );
+        }
+
         // ading one hosted only
         M2Repository repo = (M2Repository) lookup( Repository.class, "maven2" );
 
@@ -62,8 +78,7 @@ public class DefaultWastebasketTest
         repoConf.setLocalStorage( new CLocalStorage() );
         repoConf.getLocalStorage().setProvider( "file" );
 
-        final File repoLocation = new File( getBasedir(), "target/test-classes/" + id );
-        repoConf.getLocalStorage().setUrl( repoLocation.toURI().toURL().toString() );
+        repoConf.getLocalStorage().setUrl( repoRoot.toURI().toURL().toString() );
 
         Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
         repoConf.setExternalConfiguration( exRepo );
@@ -73,17 +88,17 @@ public class DefaultWastebasketTest
 
         repo.configure( repoConf );
 
-        lookup( ApplicationConfiguration.class ).getConfigurationModel().addRepository( repoConf );
+        applicationConfiguration.getConfigurationModel().addRepository( repoConf );
 
         lookup( RepositoryRegistry.class ).addRepository( repo );
 
-        return repoLocation;
+        return repoRoot;
     }
 
     /**
      * Tests that that empting the trash does NOT fail for an out-of-service repository.<BR>
      * Verifies fix for: NEXUS-4554 - Out of service proxy repo appears to cause Empty Trash task to abort as BROKEN
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -117,15 +132,15 @@ public class DefaultWastebasketTest
     {
 
         this.addRepository( "out-of-service-repo" );
-        this.addRepository( "active-repo" );
+        final File activeRepoRoot = this.addRepository( "active-repo" );
 
         ApplicationConfiguration applicationConfiguration = lookup( ApplicationConfiguration.class );
         File basketDir =
             applicationConfiguration.getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
 
-        // fill legacy trash
+        // fill legacy trash from activeRepo trash
         basketDir.mkdirs();
-        File trashContent = new File( "src/test/resources/active-repo/.nexus/trash" );
+        File trashContent = new File( activeRepoRoot, ".nexus/trash" );
         FileUtils.copyDirectoryStructure( trashContent, basketDir );
 
         M2Repository outOfServiceRepo =
@@ -143,7 +158,7 @@ public class DefaultWastebasketTest
     /**
      * NXCM-4474 Check that if a directory is removed by some other means while it has being emptied the walker will not
      * fail.
-     *
+     * <p/>
      * The test will add a walker processor in front of wastebasket processor that will delete the first
      * collection (directory) it finds. In that way by the time that wastebasket processor wants to remove it, it is
      * already removed. Yet, this should not end up in an error but just silently skip it.
@@ -153,9 +168,6 @@ public class DefaultWastebasketTest
         throws Exception
     {
         final File repoLocation = this.addRepository( "active-repo" );
-        final File repoTrashLocation = new File( repoLocation, ".nexus/trash" );
-        final File trashContent = new File( "src/test/resources/active-repo/.nexus/trash" );
-        FileUtils.copyDirectoryStructure( trashContent, repoTrashLocation );
 
         final DefaultWastebasket wastebasket = (DefaultWastebasket) this.lookup( Wastebasket.class );
         final Walker walker = wastebasket.getWalker();

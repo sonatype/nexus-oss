@@ -513,3 +513,17 @@ button.st-icon-refresh {
 .x-form-arrow-trigger + .form-label-after-field {
     padding-left: 20px;
 }
+
+/*
+ * xtheme-gray.css background color for windows is too much in contrast with borders.
+ */
+body.x-body-masked .x-window-plain .x-window-mc {
+    background-color: #F2F1F0 !important;
+}
+
+/*
+ * Text in linkbutton should be centered.
+ */
+.x-linkbtn-mc {
+    text-align: center;
+}

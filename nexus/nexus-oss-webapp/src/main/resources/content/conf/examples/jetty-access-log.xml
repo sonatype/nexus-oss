@@ -17,9 +17,6 @@
 
 <!-- ============================================================ -->
 <!--                                                              -->
-<!--  NOTE: Copy this file to ../jetty.xml to use it.             -->
-<!--                                                              -->
-<!--                                                              -->
 <!-- For help using this configuration, see:                      -->
 <!--                                                              -->
 <!--   http://links.sonatype.com/products/nexus/oss/docs-jetty    -->
@@ -31,30 +28,24 @@
     </Set>
     <Call name="addConnector">
         <Arg>
-            <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
-                <Set name="host">${application-host}</Set>
-                <Set name="port">${application-port}</Set>
-                <Set name="keystore">/etc/ssl/keystore</Set>
-                <Set name="truststore">/etc/ssl/keystore</Set>
-                <Set name="password">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
-                <Set name="keyPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
-                <Set name="trustPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+            <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+              <Set name="host">${application-host}</Set>
+              <Set name="port">${application-port}</Set>
             </New>
         </Arg>
     </Call>
-    
-    <Set name="handler">
-      <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-          <!-- The following configuration disables JSP taglib support, the validation of which
-               slows down Jetty's startup significantly. -->
-          <Call name="addLifeCycleListener">
-              <Arg>
-                <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
-              </Arg>
-          </Call>
-      </New>
-    </Set>
-    
+
+    <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+        <!-- The following configuration disables JSP taglib support, the validation of which
+             slows down Jetty's startup significantly. -->
+        <Call name="addLifeCycleListener">
+            <Arg>
+              <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
+            </Arg>
+        </Call>
+    </New>
+
+
     <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
       <Arg><Ref id="Contexts"/></Arg>
       <Arg>${nexus-webapp}</Arg>
@@ -62,7 +53,30 @@
       <Set name="extractWAR">false</Set>
       <Set name="throwUnavailableOnStartupException">true</Set>
     </New>
-    
+
+    <Set name="handler"> <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+            <Set name="handlers">
+                <Array type="org.eclipse.jetty.server.Handler">
+                    <Item><Ref id="Contexts"/></Item>
+                    <Item><New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/></Item>
+                    <Item> <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/></Item>
+                </Array>
+            </Set>
+        </New>
+    </Set>
+
+    <Ref id="RequestLog">
+        <Set name="requestLog">
+            <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
+                <Arg>${nexus-work}/logs/yyyy_mm_dd.access.log</Arg>
+                <Set name="retainDays">90</Set>
+                <Set name="append">true</Set>
+                <Set name="extended">false</Set>
+                <Set name="LogTimeZone">GMT</Set>
+            </New>
+        </Set>
+    </Ref>
+
     <Set name="stopAtShutdown">true</Set>
     <Set name="sendServerVersion">true</Set>
     <Set name="sendDateHeader">true</Set>

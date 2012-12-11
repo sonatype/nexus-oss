@@ -422,6 +422,7 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
         p.fetchMoreBar.items.items[0].destroy();
         p.fetchMoreBar.items.removeAt(0);
         p.fetchMoreBar.insertButton(0, new Ext.Toolbar.TextItem('Displaying Top ' + count + ' records'));
+        p.fetchMoreBar.doLayout();
       },
 
       setWarningLabel : function(s) {

@@ -682,7 +682,6 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
           node.data = node.attributes;
 
           var menu = new Sonatype.menu.Menu({
-                id : 'repo-context-menu',
                 payload : node,
                 scope : this,
                 items : []

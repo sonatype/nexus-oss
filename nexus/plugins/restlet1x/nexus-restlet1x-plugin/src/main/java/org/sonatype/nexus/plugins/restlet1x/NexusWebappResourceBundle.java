@@ -49,6 +49,8 @@ public class NexusWebappResourceBundle
                                                "/js/" + prefix + "/sonatype-all.js", "text/javascript" ));
         result.add( new DefaultStaticResource( this.getClass().getResource( "/style/sonatype-all.css" ),
                                                "/style/" + prefix + "/sonatype-all.css", "text/css" ));
+        result.add( new DefaultStaticResource( this.getClass().getResource( "/style/sonatype-all.css" ),
+                                               "/style/sonatype-all.css", "text/css" ));
 
         return result;
     }

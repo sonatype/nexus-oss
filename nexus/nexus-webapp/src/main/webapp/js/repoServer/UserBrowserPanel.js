@@ -83,6 +83,10 @@ Ext.extend(Sonatype.repoServer.UserBrowsePanel, Ext.tree.TreePanel, {
         this.roleTreeDataStore.reload();
       },
       roleTreeLoadHandler : function(store, records, options) {
+        if (!this.getRootNode()) {
+          // not rendered yet
+          return;
+        }
         this.idCounter = 0;
         while (this.getRootNode().lastChild)
         {

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.rest.indexng;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -40,7 +41,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.aether.version.Version;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -349,7 +349,7 @@ public class SearchNGIndexPlexusResource
 
         // tooManyResults true when iteration was aborted due to one of limiters
         // response will contain partial info and may have incorrect latest version and classifiers/extensions.
-        boolean tooManyResults = iterator.getTotalHitsCount() + 1 >= LUCENE_HIT_LIMIT;
+        boolean tooManyResults = false;
 
         for ( ArtifactInfo ai : iterator )
         {
@@ -419,7 +419,7 @@ public class SearchNGIndexPlexusResource
 
             }
 
-            Version version = ai.getArtifactVersion();
+            StringVersion version = new StringVersion( ai.version, ai.getArtifactVersion() );
 
             NexusNGArtifact versionHit = gaholder.getVersionHit( version );
             if ( versionHit == null )
@@ -470,8 +470,10 @@ public class SearchNGIndexPlexusResource
         boolean expand = forceExpand || gavcount <= COLLAPSE_OVERRIDE_TRESHOLD;
 
         SearchNGResponse response = new SearchNGResponse();
-        response.setTooManyResults( tooManyResults );
+        response.setTooManyResults( tooManyResults || iterator.getTotalHitsCount() + 1 >= LUCENE_HIT_LIMIT );
         response.setCollapsed( !expand );
+
+        List<NexusNGArtifact> responseData = new ArrayList<NexusNGArtifact>();
 
         LinkedHashSet<String> repositoryIds = new LinkedHashSet<String>();
 
@@ -482,7 +484,7 @@ public class SearchNGIndexPlexusResource
                 // expand, i.e. include all versions
                 for ( NexusNGArtifact artifact : gahit.getOrderedVersionHits() )
                 {
-                    response.addData( artifact );
+                    responseData.add( artifact );
                     addRepositoryIds( repositoryIds, artifact );
                 }
             }
@@ -491,10 +493,14 @@ public class SearchNGIndexPlexusResource
                 // collapse, i.e. only include latest version in each GA
                 NexusNGArtifact artifact = gahit.getLatestVersionHit();
                 setLatest( artifact, gahit.getLatestRelease(), gahit.getLatestSnapshot() );
-                response.addData( artifact );
+                responseData.add( artifact );
                 addRepositoryIds( repositoryIds, artifact );
             }
         }
+
+        response.setData( responseData );
+
+        List<NexusNGRepositoryDetail> repoDetails = new ArrayList<NexusNGRepositoryDetail>();
 
         for ( String repositoryId : repositoryIds )
         {
@@ -502,13 +508,15 @@ public class SearchNGIndexPlexusResource
             try
             {
                 repository = getUnprotectedRepositoryRegistry().getRepository( repositoryId );
-                addRepositoryDetails( request, response, repository );
+                addRepositoryDetails( repoDetails, request, repository );
             }
             catch ( NoSuchRepositoryException e )
             {
                 // XXX can't happen, can it?
             }
         }
+
+        response.setRepoDetails( repoDetails );
 
         return response;
     }
@@ -547,11 +555,11 @@ public class SearchNGIndexPlexusResource
         }
     }
 
-    protected void addRepositoryDetails( Request request, SearchNGResponse response, Repository repository )
+    private void addRepositoryDetails( List<NexusNGRepositoryDetail> repoDetails, Request request, Repository repository )
     {
         boolean add = true;
 
-        for ( NexusNGRepositoryDetail repoDetail : response.getRepoDetails() )
+        for ( NexusNGRepositoryDetail repoDetail : repoDetails )
         {
             if ( repoDetail.getRepositoryId().equals( repository.getId() ) )
             {
@@ -581,7 +589,7 @@ public class SearchNGIndexPlexusResource
                 repoDetail.setRepositoryPolicy( mavenRepo.getRepositoryPolicy().name() );
             }
 
-            response.addRepoDetail( repoDetail );
+            repoDetails.add( repoDetail );
         }
     }
 

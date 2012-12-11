@@ -17,84 +17,48 @@
 
 <!-- ============================================================ -->
 <!--                                                              -->
-<!--  NOTE: Copy this file to ../jetty.xml to use it.             -->
-<!--                                                              -->
 <!-- For help using this configuration, see:                      -->
 <!--                                                              -->
 <!--   http://links.sonatype.com/products/nexus/oss/docs-jetty    -->
 <!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
+    <Set name="threadPool">
+        <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    </Set>
     <Call name="addConnector">
         <Arg>
             <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
-                <Set name="host">${application-host}</Set>
-                <Set name="port">${application-port}</Set>
+              <Set name="host">${application-host}</Set>
+              <Set name="port">${application-port}</Set>
             </New>
         </Arg>
     </Call>
-
+    
     <Set name="handler">
-        <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-            <!-- The following configuration disables JSP taglib support, the validation of which
-                 slows down Jetty's startup significantly. -->
-            <Call name="addLifeCycleListener">
-                <Arg>
-                    <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener"/>
-                </Arg>
-            </Call>
-        </New>
+      <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+          <!-- The following configuration disables JSP taglib support, the validation of which
+               slows down Jetty's startup significantly. -->
+          <Call name="addLifeCycleListener">
+              <Arg>
+                <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
+              </Arg>
+          </Call>
+      </New>
     </Set>
-
+    
     <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
-        <Arg>
-            <Ref id="Contexts"/>
-        </Arg>
-        <Arg>${nexus-webapp}</Arg>
-        <Arg>${nexus-webapp-context-path}</Arg>
-        <Set name="extractWAR">false</Set>
-        <Set name="throwUnavailableOnStartupException">true</Set>
+      <Arg><Ref id="Contexts"/></Arg>
+      <Arg>${nexus-webapp}</Arg>
+      <Arg>${nexus-webapp-context-path}</Arg>
+      <Set name="extractWAR">false</Set>
+      <Set name="throwUnavailableOnStartupException">true</Set>
     </New>
-
+    
     <Set name="stopAtShutdown">true</Set>
     <Set name="sendServerVersion">true</Set>
     <Set name="sendDateHeader">true</Set>
     <Set name="gracefulShutdown">1000</Set>
-
-    <!-- ================= -->
-    <!-- JMX Configuration -->
-    <!-- ================= -->
-
-    <Call id="MBeanServer" class="java.lang.management.ManagementFactory" name="getPlatformMBeanServer"/>
-
-    <New id="MBeanContainer" class="org.eclipse.jetty.jmx.MBeanContainer">
-        <Arg>
-            <Ref id="MBeanServer"/>
-        </Arg>
-    </New>
-
-    <Get id="Container" name="container">
-        <Call name="addEventListener">
-            <Arg>
-                <Ref id="MBeanContainer"/>
-            </Arg>
-        </Call>
-    </Get>
-
-    <Call name="addBean">
-        <Arg>
-            <Ref id="MBeanContainer"/>
-        </Arg>
-    </Call>
-
-    <Get id="Logger" class="org.eclipse.jetty.util.log.Log" name="log"/>
-    <Ref id="MBeanContainer">
-        <Call name="addBean">
-            <Arg>
-                <Ref id="Logger"/>
-            </Arg>
-        </Call>
-    </Ref>
 
     <!-- In order to connect to the JMX server remotely from a different
         process, possibly running on a different host, Jetty JMX module

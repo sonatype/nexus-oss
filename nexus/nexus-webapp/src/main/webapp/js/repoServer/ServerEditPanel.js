@@ -655,14 +655,12 @@ define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all'], function(Ext, So
       ],
       buttons : [
         {
-          id : 'savebutton',
           text : 'Save',
           handler : this.saveBtnHandler,
           disabled : true,
           scope : this
         },
         {
-          id : 'cancelbutton',
           text : 'Cancel',
           handler : this.cancelBtnHandler,
           scope : this

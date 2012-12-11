@@ -27,43 +27,30 @@
             </New>
         </Arg>
     </Call>
-    <Call name="addConnector">
-        <Arg>
-            <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
-                <Set name="host">${application-host}</Set>
-                <Set name="port">${application-port-ssl}</Set>
-                <Set name="maxIdleTime">30000</Set>
-                <Set name="keystore">/etc/ssl/keystore</Set>
-                <Set name="truststore">/etc/ssl/keystore/keystore</Set>
-                <Set name="password">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
-                <Set name="keyPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
-                <Set name="trustPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
-            </New>
-        </Arg>
-    </Call>
 
+    <New id="MovedHandler" class="org.eclipse.jetty.server.handler.MovedContextHandler">
+        <Set name="contextPath">/nexus/content/all</Set>
+        <Set name="newContextURL">/nexus/content/public</Set>
+      <Set name="permanent">false</Set>
+      <Set name="discardPathInfo">false</Set>
+      <Set name="discardQuery">false</Set>
 
-     <New id="RewriteHandler" class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
-       <Set name="rules">
-         <Array type="org.eclipse.jetty.rewrite.handler.Rule">
-
-           <Item>
-              <New id="redirecedHttps"
-                   class="org.sonatype.sisu.jetty.custom.RedirectToHttpsRule">
-                 <Set name="httpsPort">${application-port-ssl}</Set>
-              </New>
-           </Item>
-
-         </Array>
-       </Set>
-     </New>
+    </New>
 
     <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+        <!-- The following configuration is REQUIRED, and MUST BE FIRST.·
+             It makes the Plexus container available for use in the Nexus webapp. -->
+        <Call name="addLifeCycleListener">
+            <Arg>
+              <New class="org.sonatype.plexus.jetty.custom.InjectExistingPlexusListener" />
+            </Arg>
+        </Call>
+
         <!-- The following configuration disables JSP taglib support, the validation of which
              slows down Jetty's startup significantly. -->
         <Call name="addLifeCycleListener">
             <Arg>
-              <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
+              <New class="org.sonatype.plexus.jetty.custom.DisableTagLibsListener" />
             </Arg>
         </Call>
     </New>
@@ -74,16 +61,14 @@
       <Arg>${nexus-webapp}</Arg>
       <Arg>${nexus-webapp-context-path}</Arg>
       <Set name="extractWAR">false</Set>
-      <Set name="throwUnavailableOnStartupException">true</Set>
     </New>
 
     <Set name="handler"> <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
             <Set name="handlers">
                 <Array type="org.eclipse.jetty.server.Handler">
-                    <Item><Ref id="RewriteHandler"/></Item>
+                    <Item><Ref id="MovedHandler"/></Item>
                     <Item><Ref id="Contexts"/></Item>
                     <Item><New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/></Item>
-                    <Item><New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/></Item>
                 </Array>
             </Set>
         </New>

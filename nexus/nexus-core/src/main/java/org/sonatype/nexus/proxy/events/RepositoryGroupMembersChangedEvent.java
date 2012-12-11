@@ -23,16 +23,17 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 
 /**
  * Fired when a group repository members changed and change is commited to configuration (is not rolled back).
- * 
+ *
  * @author cstamas
  */
 public class RepositoryGroupMembersChangedEvent
     extends RepositoryEvent
 {
+
     /**
      * Enum describing the changes that might happen against a group members list. Every enum describes one of the
      * possible type of the change, but they might happen all together too.
-     * 
+     *
      * @author cstamas
      * @since 2.0
      */
@@ -83,7 +84,7 @@ public class RepositoryGroupMembersChangedEvent
     private final Set<MemberChange> memberChangeSet;
 
     public RepositoryGroupMembersChangedEvent( final GroupRepository repository, final List<String> currentMemberIds,
-                                               final List<String> newMemberIds )
+        final List<String> newMemberIds )
     {
         super( repository );
         // we need to copy these to "detach" them for sure from config
@@ -138,7 +139,7 @@ public class RepositoryGroupMembersChangedEvent
 
     /**
      * Returns the group repository instance being reconfigured.
-     * 
+     *
      * @return
      */
     public GroupRepository getGroupRepository()
@@ -148,7 +149,7 @@ public class RepositoryGroupMembersChangedEvent
 
     /**
      * Returns the set of enums describing the changes happened against group repository.
-     * 
+     *
      * @return
      * @since 2.0
      */
@@ -159,7 +160,7 @@ public class RepositoryGroupMembersChangedEvent
 
     /**
      * Returns the list of member repository IDs as it was set before the configuration change.
-     * 
+     *
      * @return
      * @since 2.0
      */
@@ -170,7 +171,7 @@ public class RepositoryGroupMembersChangedEvent
 
     /**
      * Returns the list of member repository IDs as it was set after the configuration change.
-     * 
+     *
      * @return
      * @since 2.0
      */
@@ -181,7 +182,7 @@ public class RepositoryGroupMembersChangedEvent
 
     /**
      * Returns the list of repository IDs that were removed from the group by the configuration change.
-     * 
+     *
      * @return
      * @since 2.0
      */
@@ -192,7 +193,7 @@ public class RepositoryGroupMembersChangedEvent
 
     /**
      * Returns the list of repository IDs that were added to the group by the configuration change.
-     * 
+     *
      * @return
      * @since 2.0
      */
@@ -203,12 +204,23 @@ public class RepositoryGroupMembersChangedEvent
 
     /**
      * Returns the list of repository IDs that were reordered within the group by the configuration change.
-     * 
+     *
      * @return
      * @since 2.0
      */
     public List<String> getReorderedRepositoryIds()
     {
         return Collections.unmodifiableList( reorderedRepositoryIds );
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + "{" +
+            "repositoryId=" + getRepository().getId() +
+            ", addedMembers=" + getAddedRepositoryIds() +
+            ", removedMembers=" + getRemovedRepositoryIds() +
+            ", reorderedMembers=" + getReorderedRepositoryIds() +
+            '}';
     }
 }

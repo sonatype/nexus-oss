@@ -176,7 +176,6 @@ Sonatype.repoServer.LogsViewPanel = function(cfg) {
               },
               // handler: this.movePreview.createDelegate(this, []),
               menu : {
-                id : 'log-menu',
                 width : 200,
                 items : [
 
@@ -226,7 +225,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
           var
                 i, name, size, text, uri, existingItem,
                 resp = Ext.decode(response.responseText),
-                myMenu = Ext.menu.MenuMgr.get('log-menu'),
+                myMenu = Ext.getCmp('log-btn').menu,
                 list = resp.data,
                 sameUri = function(o) {
                   return o.logUri === uri;
@@ -296,7 +295,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
           var
                 i, name, uri, existingItem,
                 resp = Ext.decode(response.responseText),
-                myMenu = Ext.menu.MenuMgr.get('log-menu'),
+                myMenu = Ext.getCmp('log-btn').menu,
                 list = resp.data,
                 sameUri = function(o) {
                   return o.logUri === uri;
@@ -362,7 +361,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         // check to make sure the menubar is rendered
         if (this.logListLoaded)
         {
-          var ii, logsAndConfMenu = Ext.menu.MenuMgr.get('log-menu'), tmpMenuItem;
+          var ii, logsAndConfMenu = Ext.getCmp('log-btn').menu, tmpMenuItem;
           for (ii = 0; ii < logsAndConfMenu.items.length; ii+=1)
           {
             tmpMenuItem = logsAndConfMenu.items.itemAt(ii);

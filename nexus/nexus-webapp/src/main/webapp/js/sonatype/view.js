@@ -126,7 +126,6 @@ Sonatype.view = {
                     minTabWidth : 140,
                     autoScroll : false, // default
                     defaults : {
-                      autoScroll : false,
                       closable : true
                     },
                     activeTab : 0,

@@ -34,15 +34,21 @@ import org.apache.maven.index.SearchType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.powermock.reflect.Whitebox;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -124,28 +130,135 @@ public class SearchNGIndexPlexusResourceTest
     private SearchNGResponse deployAndSearch( int artifactCount )
         throws Exception
     {
+        final String key = "nexus5412";
         final Repository releases = repositoryRegistry.getRepository( "releases" );
         for ( int i = 1; i <= artifactCount; i++ )
         {
-            final String path = String.format( "/org/nexus5412/%s/nexus5412-%s.jar", i, i );
-            final ResourceStoreRequest request = new ResourceStoreRequest( path );
-            releases.storeItem( request, new ByteArrayInputStream( "Junk JAR".getBytes() ), null );
+            deployDummyArtifact( releases, key, Integer.toString( i ) );
         }
         wairForAsyncEventsToCalmDown();
         waitForTasksToStop();
 
+        return search( key );
+    }
+
+    private SearchNGResponse search( final String key )
+        throws Exception, ResourceException
+    {
         final SearchNGIndexPlexusResource subject =
             (SearchNGIndexPlexusResource) lookup( PlexusResource.class, SearchNGIndexPlexusResource.ROLE_HINT );
         Context context = new Context();
         Request request = new Request();
         Reference ref = new Reference( "http://localhost:12345/" );
         request.setRootRef( ref );
-        request.setResourceRef( new Reference( ref, SearchNGIndexPlexusResource.RESOURCE_URI
-            + "?q=nexus5412&collapseresults=true" ) );
+        request.setResourceRef( new Reference( ref, SearchNGIndexPlexusResource.RESOURCE_URI + "?q=" + key
+            + "&collapseresults=true" ) );
         Response response = new Response( request );
 
         // perform a search
         return subject.get( context, request, response, null );
+    }
+
+    private void deployDummyArtifact( final Repository releases, String key, String version )
+        throws Exception
+    {
+        StringBuilder path = new StringBuilder();
+        path.append( "/org/" ).append( key );
+        path.append( '/' ).append( version );
+        path.append( '/' ).append( key ).append( '-' ).append( version ).append( ".jar" );
+        final ResourceStoreRequest request = new ResourceStoreRequest( path.toString() );
+        releases.storeItem( request, new ByteArrayInputStream( "Junk JAR".getBytes() ), null );
+    }
+
+    @Test
+    public void versionCollation()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final Repository releases = repositoryRegistry.getRepository( "releases" );
+
+        final String key = "nexus5422";
+
+        deployDummyArtifact( releases, key, "2" );
+        deployDummyArtifact( releases, key, "2.0" );
+        deployDummyArtifact( releases, key, "2.0.0" );
+        deployDummyArtifact( releases, key, "2.0.0.0" );
+        deployDummyArtifact( releases, key, "2.0.0.0.0" );
+
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        SearchNGResponse result = search( key );
+
+        Assert.assertEquals( 5, result.getData().size() );
+    }
+
+    @Test
+    public void multipleRepositories()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final Repository releases = repositoryRegistry.getRepository( "releases" );
+
+        final M2Repository releases2 = (M2Repository) this.lookup( Repository.class, M2Repository.ID );
+        final CRepository repoConfig = new DefaultCRepository();
+        repoConfig.setId( "releases2" );
+        repoConfig.setExposed( true );
+        repoConfig.setProviderRole( Repository.class.getName() );
+        repoConfig.setProviderHint( "maven2" );
+        releases2.configure( repoConfig );
+        repositoryRegistry.addRepository( releases2 );
+
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        final String key = "dummy";
+
+        deployDummyArtifact( releases, key, "1" );
+        deployDummyArtifact( releases2, key, "1" );
+        deployDummyArtifact( releases, key, "2" );
+        deployDummyArtifact( releases2, key, "2" );
+
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        SearchNGResponse result = search( key );
+
+        Assert.assertEquals( 2, result.getData().size() );
+        for ( int i = 0; i < 2; i++ )
+        {
+            NexusNGArtifact nexusNGArtifact = result.getData().get( 0 );
+            Assert.assertEquals( 2, nexusNGArtifact.getArtifactHits().size() );
+            Assert.assertEquals( releases.getId(), nexusNGArtifact.getArtifactHits().get( 0 ).getRepositoryId() );
+            Assert.assertEquals( releases2.getId(), nexusNGArtifact.getArtifactHits().get( 1 ).getRepositoryId() );
+        }
+    }
+
+    @Test
+    public void emptyResult()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        SearchNGResponse result = search( "notfound" );
+
+        // have to bypass getXXX methods because they are not used by JSON renderer
+        Assert.assertNotNull( Whitebox.getInternalState( result, "repoDetails" ) );
+        Assert.assertNotNull( Whitebox.getInternalState( result, "data" ) );
     }
 
     @Test

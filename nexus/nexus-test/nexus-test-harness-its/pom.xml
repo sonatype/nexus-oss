@@ -12,15 +12,14 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-test</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-test-harness-its</artifactId>
@@ -196,7 +195,7 @@
           <plugin>
             <groupId>org.codehaus.gmaven</groupId>
             <artifactId>gmaven-plugin</artifactId>
-            <version>1.5-SNAPSHOT</version>
+            <version>1.5</version>
             <executions>
               <execution>
                 <phase>test-compile</phase>
@@ -227,11 +226,12 @@
           <!--
           NOTE: Using patched version of surefire, which supports includes/excludes from files.
           https://jira.codehaus.org/browse/SUREFIRE-925
+          TODO: Update to surefire 2.13 when its released, which has this feature.
           -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.13-SONATYPE-SNAPSHOT</version>
+            <version>2.13-SONATYPE</version>
             <configuration>
               <includesFile>${settings.localRepository}/org/sonatype/nexus/${project.artifactId}/shards/shard-${testsuite.shardId}.txt</includesFile>
             </configuration>
@@ -316,6 +316,7 @@
                       <type>war</type>
                       <outputDirectory>${project.build.directory}/nexus/webapp</outputDirectory>
                     </artifactItem>
+                    <!--
                     Versions here must be kept in sync with nexus3860/* (cargo) tests.
                     Including/excluding only the bits needed for the container tests to function, keep out all other ancillary crud.
 
@@ -438,7 +439,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemPropertyVariables>
+              <systemPropertyVariables combine.children="append">
                 <nexus.default.http.provider>async-http-client</nexus.default.http.provider>
                 <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>
@@ -462,7 +463,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemPropertyVariables>
+              <systemPropertyVariables combine.children="append">
                 <nexus.default.http.provider>apacheHttpClient4x</nexus.default.http.provider>
                 <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>
@@ -486,7 +487,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemPropertyVariables>
+              <systemPropertyVariables combine.children="append">
                 <nexus.default.http.provider>apacheHttpClient3x</nexus.default.http.provider>
                 <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>
