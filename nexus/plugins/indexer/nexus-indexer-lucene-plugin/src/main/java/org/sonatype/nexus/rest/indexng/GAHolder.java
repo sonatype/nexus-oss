@@ -13,6 +13,7 @@
 package org.sonatype.nexus.rest.indexng;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -21,7 +22,7 @@ import org.sonatype.nexus.rest.model.NexusNGArtifact;
 
 class GAHolder
 {
-    private final SortedMap<StringVersion, NexusNGArtifact> versionHits = new TreeMap<StringVersion, NexusNGArtifact>();
+    private final SortedMap<StringVersion, NexusNGArtifact> versionHits = new TreeMap<StringVersion, NexusNGArtifact>( Collections.reverseOrder() );
 
     private NexusNGArtifact latestSnapshot = null;
 
@@ -42,7 +43,7 @@ class GAHolder
 
         if ( VersionUtils.isSnapshot( versionHit.getVersion() ) )
         {
-            if ( latestSnapshotVersion == null || latestSnapshotVersion.compareTo( version ) > 0 )
+            if ( latestSnapshotVersion == null || latestSnapshotVersion.compareTo( version ) < 0 )
             {
                 latestSnapshot = versionHit;
                 latestSnapshotVersion = version;
@@ -50,7 +51,7 @@ class GAHolder
         }
         else
         {
-            if ( latestReleaseVersion == null || latestReleaseVersion.compareTo( version ) > 0 )
+            if ( latestReleaseVersion == null || latestReleaseVersion.compareTo( version ) < 0 )
             {
                 latestRelease = versionHit;
                 latestReleaseVersion = version;
