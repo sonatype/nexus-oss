@@ -432,10 +432,10 @@ public class DefaultIndexerManager
 
         if ( oldContext != null )
         {
-            // this is really an error, the oldContext is expected to be null here
-            mavenIndexer.removeIndexingContext( oldContext, true );
-            logger.warn( "Removed old/stale indexing context {} for repository {}", oldContext.getId(),
-                         repository.getId() );
+            // this is an error, oldContext can have filesystem locks or long-running threads
+            logger.error( "Old/stale indexing context {} for repository {}. Operation cancaled.", oldContext.getId(),
+                          repository.getId() );
+            return;
         }
 
         IndexingContext ctx = null;
