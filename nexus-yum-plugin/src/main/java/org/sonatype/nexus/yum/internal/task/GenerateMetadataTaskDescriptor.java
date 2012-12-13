@@ -36,10 +36,10 @@ public class GenerateMetadataTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
 
-    public static final String NAME = "Yum: Generate Metadate";
+    public static final String NAME = "Yum: Generate Metadata";
 
     private final RepoComboFormField repoField = new RepoComboFormField(
-        PARAM_REPO_ID, "Repostiory for createrepo",
+        PARAM_REPO_ID, "Repository for createrepo",
         "Maven Repository for which the yum metadata is generated via createrepo.",
         MANDATORY
     );
