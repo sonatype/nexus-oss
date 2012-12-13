@@ -92,7 +92,7 @@ public class DefaultRemoteProviderHintFactory
             throw new IllegalArgumentException( "RemoteRepositoryStorage hint cannot be null!" );
         }
 
-        logger.info( "Returning supplied \"{}\" hint for remote URL {}.", new Object[] { remoteUrl, hint } );
+        logger.debug( "Returning supplied \"{}\" hint for remote URL {}.", remoteUrl, hint );
 
         return hint;
     }
