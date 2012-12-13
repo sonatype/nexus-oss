@@ -517,7 +517,8 @@ public class DefaultIndexerManager
                         public void run( final IndexingContext context )
                             throws IOException
                         {
-                            removed[0] = removeRepositoryIndexingContext( repository, deleteFiles, context );
+                            removeRepositoryIndexingContext( repository, deleteFiles, context );
+                            removed[0] = true;
                         }
                     } );
                 }
@@ -537,7 +538,7 @@ public class DefaultIndexerManager
         }
     }
 
-    private boolean removeRepositoryIndexingContext( final Repository repository, final boolean deleteFiles,
+    private void removeRepositoryIndexingContext( final Repository repository, final boolean deleteFiles,
                                                      final IndexingContext context )
         throws IOException
     {
@@ -548,14 +549,10 @@ public class DefaultIndexerManager
             mavenIndexer.removeIndexingContext( context, deleteFiles );
 
             logger.debug( "Removed indexing context {} for repository {}", context.getId(), repository.getId() );
-
-            return true;
         }
         else
         {
             logger.debug( "Could not remove <null> indexing context for repository {}", repository.getId() );
-
-            return false;
         }
     }
 
