@@ -100,9 +100,6 @@ public class MockRemoteStorage
     {
         requests.add( new MockRequestRecord( repository, request, baseUrl ) );
 
-        System.out.println( "request: " + request.getRequestPath() );
-        System.out.println( "baseUrl: " + baseUrl );
-
         final String requestUrl = baseUrl.substring( 0, baseUrl.length() - 1 ) + request.getRequestPath();
 
         if ( downUrls.contains( baseUrl ) )

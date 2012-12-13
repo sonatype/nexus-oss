@@ -233,7 +233,6 @@ public class ArtifactsMerge
             if ( mergedMappingsMap.containsKey( filter ) )
             {
                 // Known rule
-                System.out.println( "mergeMappings found existing rule: filter=" + filter + ", output=" + output );
                 if ( !output.equals( mergedMappingsMap.get( filter ) ) )
                 {
                     throw new P2MetadataMergeException( "Incompatible artifact repository mapping rules: filter="
@@ -243,7 +242,6 @@ public class ArtifactsMerge
             else
             {
                 // New rule
-                System.out.println( "mergeMappings found new rule: filter=" + filter + ", output=" + output );
                 mergedMappingsMap.put( filter, output );
             }
         }
