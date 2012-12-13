@@ -45,8 +45,7 @@ class InterruptableInputStream
     private void abortIfInterrupted()
         throws IOException
     {
-        final Thread thread = Thread.currentThread();
-        if ( thread.isInterrupted() )
+        if ( Thread.interrupted() )
         {
             if ( request != null )
             {
