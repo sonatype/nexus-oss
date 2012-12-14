@@ -2555,7 +2555,7 @@ public class DefaultIndexerManager
         Thread deleteThread = deleteThreads.get( repository.getId() );
         if ( deleteThread != null && deleteThread != Thread.currentThread() )
         {
-            logger.debug( "Could not acquire {} lock on repository {}. The repository {} is being deleted by thread {}.",
+            logger.debug( "Could not acquire {} lock on repository {}. The repository is being deleted by thread {}.",
                           lockName, repository.getId(), deleteThread.getName() );
             return null;
         }
