@@ -680,14 +680,21 @@ public abstract class AbstractNexusIntegrationTest
         File pom = new File( project, "pom.xml" );
 
         // FIXME, this needs to be fluffed up a little, should add the classifier, etc.
-        String artifactFileName = model.getArtifactId() + "." + model.getPackaging();
+        String extension = model.getPackaging();
+        // for now, only due to Nexus570IndexArchetypeIT
+        // no other IT specifies other packaging where extension != packaging
+        if ( "maven-archetype".equals( extension ) )
+        {
+            extension = "jar";
+        }
+        String artifactFileName = model.getArtifactId() + "." + extension;
         File artifactFile = new File( project, artifactFileName );
 
         log.debug( "wow, this is working: " + artifactFile.getName() );
 
         final Gav gav =
             new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null,
-                FileUtils.getExtension( artifactFile.getName() ), null, null, artifactFile.getName(), false, null,
+                extension, null, null, artifactFile.getName(), false, null,
                 false, null );
 
         // the Restlet Client does not support multipart forms:
