@@ -444,15 +444,22 @@ public abstract class NexusITSupport
      */
     protected void logRemoteThatTestIs( final Logger remoteLogger, final String doingWhat )
     {
-        final String message = "TEST " + testName.getMethodName() + " " + doingWhat;
+        try
+        {
+            final String message = "TEST " + testName.getMethodName() + " " + doingWhat;
 
-        final StringBuilder fullMessage = new StringBuilder()
-            .append( "\n" )
-            .append( StringUtils.repeat( "*", message.length() ) ).append( "\n" )
-            .append( message ).append( "\n" )
-            .append( StringUtils.repeat( "*", message.length() ) );
+            final StringBuilder fullMessage = new StringBuilder()
+                .append( "\n" )
+                .append( StringUtils.repeat( "*", message.length() ) ).append( "\n" )
+                .append( message ).append( "\n" )
+                .append( StringUtils.repeat( "*", message.length() ) );
 
-        remoteLogger.info( fullMessage.toString() );
+            remoteLogger.info( fullMessage.toString() );
+        }
+        catch ( final Exception e )
+        {
+            logger.warn( "Failed to log remote that test was '{}' ({})", doingWhat, e.getMessage() );
+        }
     }
 
     /**
