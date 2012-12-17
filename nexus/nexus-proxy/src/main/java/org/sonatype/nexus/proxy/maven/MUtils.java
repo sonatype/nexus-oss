@@ -93,7 +93,7 @@ public class MUtils
             digest = compress( raw );
         }
 
-        if ( !isDigest( digest ) && digest.contains( " " ) )
+        if ( !isDigest( digest ) && raw.contains( " " ) )
         {
             // check if the raw string is an uncompressed checksum with file name suffix, e.g.
             // 'DCAB 88FC 2A04 3C24 79A6 DE67 6A2F 8179 E9EA 2167 pom.xml'
