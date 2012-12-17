@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.nexus.proxy.maven.MUtils.readDigest;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -81,6 +82,19 @@ public class MUtilsTest
         final File sha1 = util.resolveFile( "target/test-classes/nexus-4984/zero-bytes-length.sha1" );
         final String digest = MUtils.readDigestFromStream( new FileInputStream( sha1 ) );
         assertThat( "Zero bites checksum file", digest, is( equalTo( "" ) ) );
+    }
+
+    /**
+     * Invalid digest, so MUtil should return it as is.
+     */
+    @Test
+    public void invalidShortDigest()
+    {
+        assertThat( readDigest( "123456" ), is( "123456" ) );
+        assertThat( readDigest( "" ), is( "" ) );
+
+        // special case, because space is a delimiter that will be munched
+        assertThat( readDigest( " " ), is( "" ) );
     }
 
 }
