@@ -198,9 +198,10 @@ public class URLUserManager
     private User toUser( String userId, boolean addDefaultRole )
     {
         String defaultRole = urlRealmConfiguration.getConfiguration().getDefaultRole();
+        String emailDomain = urlRealmConfiguration.getConfiguration().getEmailDomain();
 
         DefaultUser user = new DefaultUser();
-        user.setEmailAddress( userId + "@" + defaultRole );
+        user.setEmailAddress( userId + "@" + emailDomain );
         user.setName( userId );
         user.setSource( SOURCE );
         user.setUserId( userId );
