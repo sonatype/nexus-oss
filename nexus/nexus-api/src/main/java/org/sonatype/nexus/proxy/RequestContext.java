@@ -30,13 +30,13 @@ public class RequestContext
     /** Context URL of the original resource requested on the incoming connector. */
     public static final String CTX_REQUEST_URL = "request.url";
 
-    /** Context flag to mark a request local only. */
+    /** Context flag to mark a request local only (proxy: do not attempt remote access at all, else: no effect). */
     public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
-    /** Context flag to mark a request local only. */
+    /** Context flag to mark a request local only (proxy: force remote access -- might still serve local if up2date, else: no effect). */
     public static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
 
-    /** Context flag to mark a request local only. */
+    /** Context flag to mark a request local only (group: do not "dive" into members, else: no effect). */
     public static final String CTX_GROUP_LOCAL_ONLY_FLAG = "request.groupLocalOnly";
 
     /** Context key for condition "if-modified-since" */
@@ -55,15 +55,11 @@ public class RequestContext
 
     public RequestContext()
     {
-        super();
-
-        this.parent = null;
+        setParentContext( null );
     }
 
     public RequestContext( RequestContext parent )
     {
-        this();
-
         setParentContext( parent );
     }
 
@@ -180,7 +176,7 @@ public class RequestContext
     /**
      * Sets the request remote only.
      * 
-     * @param requestremoteOnly the new request remote only
+     * @param requestRemoteOnly the new request remote only
      */
     public void setRequestRemoteOnly( boolean requestRemoteOnly )
     {
@@ -207,7 +203,7 @@ public class RequestContext
     /**
      * Sets the request group local only.
      * 
-     * @param requestremoteOnly the new request group local only
+     * @param requestGroupLocal the new request group local only
      */
     public void setRequestGroupLocalOnly( boolean requestGroupLocal )
     {
@@ -347,26 +343,30 @@ public class RequestContext
      */
     public Map<String, Object> flatten()
     {
-        HashMap<String, Object> result = new HashMap<String, Object>();
-
+        final HashMap<String, Object> result = new HashMap<String, Object>();
         RequestContext ctx = this;
-
-        Stack<RequestContext> stack = new Stack<RequestContext>();
-
+        final Stack<RequestContext> stack = new Stack<RequestContext>();
         while ( ctx != null )
         {
             stack.push( ctx );
-
             ctx = ctx.getParentContext();
         }
-
         while ( !stack.isEmpty() )
         {
             ctx = stack.pop();
-
             result.putAll( ctx );
         }
-
         return result;
+    }
+
+    // ==
+
+    @Override
+    public String toString()
+    {
+        return "RequestContext{" +
+            "this=" + super.toString() +
+            ", parent=" + parent +
+            '}';
     }
 }
