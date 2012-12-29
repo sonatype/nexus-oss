@@ -283,6 +283,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
           {
             sOut += status.proxyMode === 'BLOCKED_AUTO' ? ' - Remote Automatically Blocked' : ' - Remote Manually Blocked';
             sOut += remoteStatus === 'available' ? ' and Available' : ' and Unavailable';
+            if (remoteStatus.search(/unavailable:/) === 0)
+            {
+              sOut += ' (' + status.remoteStatus.substr(12) + ')';
+            }
           }
           else
           { // allow
@@ -296,6 +300,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
             else
             { // Out of service
               sOut += remoteStatus === 'available' ? ' - Remote Available' : ' - Remote Unavailable';
+              if (remoteStatus.search(/unavailable:/) === 0)
+              {
+                sOut += ' (' + status.remoteStatus.substr(12) + ')';
+              }
             }
           }
         }
