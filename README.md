@@ -8,6 +8,7 @@ Yum metadata, so that RedHat-compatible system can use Nexus as software reposit
 1. [Audience](#audience)
 1. [History](#history)
 1. [Features](#features)
+1. [Requirements](#requirements)
 1. [Help & Issues](#help--issues)
 1. [Installation](#installation)
 1. [Configuration](#configuration)
