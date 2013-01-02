@@ -46,6 +46,13 @@ wanted to have a repository manager for their application RPMs. Why don't extend
 - Multiple createrepo tasks on the same repository get merged.
 - Use Yum group repositories as target of staging repositories (Nexus Pro)
 
+
+## Requirements
+
+The Nexus Yum Plugin uses the command line "createrepo" utility to build yum repository metadata.  This utility must be on the path of the system that is running Nexus.
+
+If your Centos/Redhat/Fedora system does not have this command you can install it by running "yum install createrepo" as root.
+
 ## Help & Issues
 
 Ask for help at our [Google Group][7] or [create a new issue][8].
