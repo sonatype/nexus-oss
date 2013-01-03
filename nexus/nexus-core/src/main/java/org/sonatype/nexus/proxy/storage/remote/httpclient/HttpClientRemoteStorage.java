@@ -70,7 +70,7 @@ import com.google.common.base.Stopwatch;
 
 /**
  * Apache HTTP client (4) {@link RemoteRepositoryStorage} implementation.
- * 
+ *
  * @since 2.0
  */
 @Named( HttpClientRemoteStorage.PROVIDER_STRING )
@@ -431,7 +431,7 @@ public class HttpClientRemoteStorage
      * <p/>
      * In case of any exception thrown by HttpClient, it will release the connection. In other cases it is the duty of
      * caller to do it, or process the input stream.
-     * 
+     *
      * @param repository to execute the HTTP method fpr
      * @param request resource store request that triggered the HTTP request
      * @param httpRequest HTTP request to be executed
@@ -455,8 +455,8 @@ public class HttpClientRemoteStorage
                 stopwatch.stop();
                 if ( timingLog.isDebugEnabled() )
                 {
-                    timingLog.debug( "[{}] {} {} took {}", new Object[] { repository.getId(), httpRequest.getMethod(),
-                        httpRequest.getURI(), stopwatch } );
+                    timingLog.debug( "[{}] {} {} took {}", repository.getId(), httpRequest.getMethod(),
+                        httpRequest.getURI(), stopwatch );
                 }
             }
         }
@@ -546,7 +546,7 @@ public class HttpClientRemoteStorage
 
     /**
      * Executes the HTTP request and automatically releases any related resources.
-     * 
+     *
      * @param repository to execute the HTTP method fpr
      * @param request resource store request that triggered the HTTP request
      * @param httpRequest HTTP request to be executed
@@ -564,7 +564,7 @@ public class HttpClientRemoteStorage
 
     /**
      * Make date from header.
-     * 
+     *
      * @param date the date
      * @return the long
      */
@@ -592,7 +592,7 @@ public class HttpClientRemoteStorage
 
     /**
      * Appends repository configured additional query string to provided URL.
-     * 
+     *
      * @param url to append to
      * @param repository that may contain additional query string
      * @return URL with appended query string or original URL if repository does not have an configured query string
@@ -629,7 +629,7 @@ public class HttpClientRemoteStorage
 
     /**
      * Releases connection resources (back to pool). If an exception appears during releasing, exception is just logged.
-     * 
+     *
      * @param httpResponse to be released
      */
     private void release( final HttpResponse httpResponse )
