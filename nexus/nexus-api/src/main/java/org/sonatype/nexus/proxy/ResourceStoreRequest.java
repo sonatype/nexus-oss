@@ -48,9 +48,9 @@ public class ResourceStoreRequest
     /**
      * Constructor.
      *
-     * @param requestPath
-     * @param localOnly
-     * @param remoteOnly
+     * @param requestPath the request path.
+     * @param localOnly See {@link RequestContext#CTX_LOCAL_ONLY_FLAG}.
+     * @param remoteOnly See {@link RequestContext#CTX_REMOTE_ONLY_FLAG}.
      */
     public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly )
     {

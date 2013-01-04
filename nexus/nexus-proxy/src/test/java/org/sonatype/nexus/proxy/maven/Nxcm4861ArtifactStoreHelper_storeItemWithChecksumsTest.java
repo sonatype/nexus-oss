@@ -46,11 +46,19 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.sisu.litmus.testsupport.mock.MockitoRule;
 
-public class Nxcm4861Test
+/**
+ * UT for NXCM-4861: {@link ArtifactStoreHelper#storeItemWithChecksums(boolean, org.sonatype.nexus.proxy.item.AbstractStorageItem)}
+ * was in some cases causing proxying to kick in (after store item was retrieved from remote -- only in case of procurement reposes
+ * but still wrong). 
+ * 
+ * Despite extending {@link AbstractProxyTestEnvironment} it actually uses
+ * a hosted repo only, and using spy determines actually happened invocations. 
+ */
+public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
     extends AbstractProxyTestEnvironment
 {
 
-    private Logger log = LoggerFactory.getLogger( Nxcm4861Test.class );
+    private Logger log = LoggerFactory.getLogger( Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest.class );
 
     private static final String REPO_ID = "inhouse";
 

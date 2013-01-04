@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 public class RequestContext
     extends HashMap<String, Object>
@@ -30,13 +32,13 @@ public class RequestContext
     /** Context URL of the original resource requested on the incoming connector. */
     public static final String CTX_REQUEST_URL = "request.url";
 
-    /** Context flag to mark a request local only (proxy: do not attempt remote access at all, else: no effect). */
+    /** Context flag to mark a request local only. For {@link ProxyRepository} instances: do not attempt remote access at all, else: no effect. */
     public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
-    /** Context flag to mark a request local only (proxy: force remote access -- might still serve local if up2date, else: no effect). */
+    /** Context flag to mark a request local only. For {@link ProxyRepository} instances: force remote access -- might still serve local if cache is fresh, else: no effect. */
     public static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
 
-    /** Context flag to mark a request local only (group: do not "dive" into members, else: no effect). */
+    /** Context flag to mark a request local only. For {@link GroupRepository} instances: do not "dive" into members, else: no effect. */
     public static final String CTX_GROUP_LOCAL_ONLY_FLAG = "request.groupLocalOnly";
 
     /** Context key for condition "if-modified-since" */
