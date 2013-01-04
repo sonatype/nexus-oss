@@ -11,15 +11,17 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 define('nexus/all',
-      ['nexus/config',
+      [ 'nexus/callbackref',
+        'nexus/config',
         'nexus/error',
         'nexus/ext',
         'nexus/form',
         'nexus/log',
+        'nexus/messages',
         'nexus/messagebox',
         'nexus/navigation',
         'nexus/panels',
         'nexus/grid',
         'nexus/profile',
-        'nexus/util'],
+        'nexus/util' ],
       function() {});
