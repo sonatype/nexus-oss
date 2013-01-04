@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -88,17 +88,6 @@ public interface IndexerManager
      * @throws NoSuchRepositoryException
      */
     void updateRepositoryIndexContext( String repositoryId )
-        throws IOException, NoSuchRepositoryException;
-
-    /**
-     * Flags an indexing context should be searched in global searches or not.
-     * 
-     * @param repositoryId
-     * @param searchable
-     * @throws IOException
-     * @throws NoSuchRepositoryException
-     */
-    void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
         throws IOException, NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------

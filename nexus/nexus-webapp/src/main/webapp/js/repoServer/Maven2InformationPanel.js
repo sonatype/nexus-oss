@@ -10,13 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define('repoServer/Maven2InformationPanel',['sonatype/all'], function(){
+/*global define*/
+define('repoServer/Maven2InformationPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.Maven2InformationPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {
+  Ext.apply(this, config || {}, {
     halfSize : false
-  };
-  Ext.apply(this, config, defaultConfig);
+  });
 
   this.sp = Sonatype.lib.Permissions;
 
@@ -81,7 +80,44 @@ Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
 
       showArtifact : function(data, artifactContainer) {
         this.data = data;
-        if (data == null)
+        if (data) {
+          Ext.Ajax.request({
+            url : this.data.resourceURI + '?describe=maven2&isLocal=true',
+            callback : function(options, isSuccess, response) {
+              if (isSuccess)
+              {
+                var infoResp = Ext.decode(response.responseText);
+
+                // hide classifier if empty
+                if (this.data.classifier)
+                {
+                  this.find('name', 'classifier')[0].show();
+                }
+                else
+                {
+                  this.find('name', 'classifier')[0].hide();
+                }
+                this.form.setValues(infoResp.data);
+                artifactContainer.showTab(this);
+              }
+              else
+              {
+                if (response.status === 404)
+                {
+                  artifactContainer.hideTab(this);
+                }
+                else
+                {
+                  Sonatype.utils.connectionError(response, 'Unable to retrieve Maven information.');
+                }
+              }
+            },
+            scope : this,
+            method : 'GET',
+            suppressStatus : '404'
+          });
+        }
+        else
         {
           this.find('name', 'groupId')[0].setRawValue(null);
           this.find('name', 'artifactId')[0].setRawValue(null);
@@ -89,44 +125,6 @@ Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
           this.find('name', 'classifier')[0].setRawValue(null);
           this.find('name', 'extension')[0].setRawValue(null);
           this.find('name', 'dependencyXmlChunk')[0].setRawValue(null);
-        }
-        else
-        {
-          Ext.Ajax.request({
-                url : this.data.resourceURI + '?describe=maven2&isLocal=true',
-                callback : function(options, isSuccess, response) {
-                  if (isSuccess)
-                  {
-                    var infoResp = Ext.decode(response.responseText);
-
-                    // hide classifier if empty
-                    if (this.data.classifier)
-                    {
-                      this.find('name', 'classifier')[0].show();
-                    }
-                    else
-                    {
-                      this.find('name', 'classifier')[0].hide();
-                    }
-                    this.form.setValues(infoResp.data);
-                    artifactContainer.showTab(this);
-                  }
-                  else
-                  {
-                    if (response.status = 404)
-                    {
-                      artifactContainer.hideTab(this);
-                    }
-                    else
-                    {
-                      Sonatype.utils.connectionError(response, 'Unable to retrieve Maven information.');
-                    }
-                  }
-                },
-                scope : this,
-                method : 'GET',
-                suppressStatus : '404'
-              });
         }
       }
     });
@@ -142,13 +140,13 @@ Sonatype.Events.addListener('fileContainerInit', function(items) {
 Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, data) {
       var panel = artifactContainer.find('name', 'maven2InformationPanel')[0];
 
-      if (data == null || !data.leaf)
+      if ( data && data.leaf)
       {
-        panel.showArtifact(null, artifactContainer);
+        panel.showArtifact(data, artifactContainer);
       }
       else
       {
-        panel.showArtifact(data, artifactContainer);
+        panel.showArtifact(null, artifactContainer);
       }
     });
 
@@ -163,13 +161,13 @@ Sonatype.Events.addListener('artifactContainerInit', function(items) {
 Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContainer, payload) {
       var panel = artifactContainer.find('name', 'maven2InformationPanel')[0];
 
-      if (payload == null || !payload.leaf)
+      if (payload && payload.leaf)
       {
-        panel.showArtifact(null, artifactContainer);
+        panel.showArtifact(payload, artifactContainer);
       }
       else
       {
-        panel.showArtifact(payload, artifactContainer);
+        panel.showArtifact(null, artifactContainer);
       }
 
     });

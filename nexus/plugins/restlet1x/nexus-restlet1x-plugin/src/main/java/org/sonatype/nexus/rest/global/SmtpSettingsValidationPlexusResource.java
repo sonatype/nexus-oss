@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -18,6 +18,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
+import com.thoughtworks.xstream.XStream;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -30,6 +31,7 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.email.EmailerException;
 import org.sonatype.nexus.email.SmtpSettingsValidator;
+import org.sonatype.nexus.rest.model.HtmlUnescapeStringConverter;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -142,4 +144,10 @@ public class SmtpSettingsValidationPlexusResource
         }
     }
 
+    @Override
+    public void configureXStream( final XStream xstream )
+    {
+        xstream.registerLocalConverter( SmtpSettingsResource.class, "username", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( SmtpSettingsResource.class, "password", new HtmlUnescapeStringConverter( true ) );
+    }
 }

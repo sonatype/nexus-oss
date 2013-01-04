@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -136,7 +136,9 @@ public abstract class NexusITSupport
      * Never null.
      */
     @Rule
-    public TestIndexRule testIndex = new TestIndexRule( util.resolveFile( "target/its" ) );
+    public TestIndexRule testIndex = new TestIndexRule(
+        util.resolveFile( "target/it-reports" ), util.resolveFile( "target/it-data" )
+    );
 
     /**
      * Test data.
@@ -255,7 +257,9 @@ public abstract class NexusITSupport
                 "TEST {} is running against a Nexus bundle resolved from injected-test.properties",
                 testName.getMethodName()
             );
-            testIndex().recordLink( "bundle", "../test-classes/injected-test.properties" );
+            testIndex().recordAndCopyLink(
+                "bundle", util.resolveFile( "target/test-classes/injected-test.properties" )
+            );
         }
     }
 
@@ -440,15 +444,22 @@ public abstract class NexusITSupport
      */
     protected void logRemoteThatTestIs( final Logger remoteLogger, final String doingWhat )
     {
-        final String message = "TEST " + testName.getMethodName() + " " + doingWhat;
+        try
+        {
+            final String message = "TEST " + testName.getMethodName() + " " + doingWhat;
 
-        final StringBuilder fullMessage = new StringBuilder()
-            .append( "\n" )
-            .append( StringUtils.repeat( "*", message.length() ) ).append( "\n" )
-            .append( message ).append( "\n" )
-            .append( StringUtils.repeat( "*", message.length() ) );
+            final StringBuilder fullMessage = new StringBuilder()
+                .append( "\n" )
+                .append( StringUtils.repeat( "*", message.length() ) ).append( "\n" )
+                .append( message ).append( "\n" )
+                .append( StringUtils.repeat( "*", message.length() ) );
 
-        remoteLogger.info( fullMessage.toString() );
+            remoteLogger.info( fullMessage.toString() );
+        }
+        catch ( final Exception e )
+        {
+            logger.warn( "Failed to log remote that test was '{}' ({})", doingWhat, e.getMessage() );
+        }
     }
 
     /**

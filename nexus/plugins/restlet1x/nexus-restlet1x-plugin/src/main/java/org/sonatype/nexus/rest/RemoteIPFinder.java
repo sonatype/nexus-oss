@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -16,7 +16,6 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +26,7 @@ import org.restlet.data.Request;
 
 public class RemoteIPFinder
 {
-    protected static final String FORWARD_HEADER = "X-Forwarded-For";
+    static final String FORWARD_HEADER = "X-Forwarded-For";
 
     public static String findIP( HttpServletRequest request )
     {
@@ -38,14 +37,7 @@ public class RemoteIPFinder
             return forwardedIP;
         }
 
-        String remoteIP = request.getRemoteAddr();
-
-        if ( remoteIP != null )
-        {
-            return remoteIP;
-        }
-
-        return null;
+        return request.getRemoteAddr();
     }
 
     public static String findIP( Request request )
@@ -59,67 +51,65 @@ public class RemoteIPFinder
             return forwardedIP;
         }
 
-        List<String> ipAddresses = request.getClientInfo().getAddresses();
+        List<String> clientAddresses = request.getClientInfo().getAddresses();
 
-        return resolveIp( ipAddresses );
+        if ( clientAddresses.size() > 1 )
+        {
+            // restlet1x ClientInfo.getAddresses has *reverse* order to XFF
+            // (this has been fixed in restlet2x, along with a clearer API)
+
+            String[] ipAddresses = new String[clientAddresses.size()];
+            for ( int i = 0, j = ipAddresses.length - 1; j >= 0; i++, j-- )
+            {
+                ipAddresses[i] = clientAddresses.get( j );
+            }
+
+            forwardedIP = resolveIp( ipAddresses );
+
+            if ( forwardedIP != null )
+            {
+                return forwardedIP;
+            }
+        }
+
+        return request.getClientInfo().getAddress();
     }
 
-    protected static String getFirstForwardedIp( String forwardedFor )
+    /**
+     * Returns the *left-most* resolvable IP from the given XFF string; otherwise null.
+     */
+    private static String getFirstForwardedIp( String forwardedFor )
     {
         if ( !StringUtils.isEmpty( forwardedFor ) )
         {
-            String[] forwardedIps = forwardedFor.split( "," );
-
-            return resolveIp( Arrays.asList( forwardedIps ) );
+            return resolveIp( forwardedFor.split( "\\s*,\\s*" ) );
         }
 
         return null;
     }
 
-    private static String resolveIp( List<String> ipAddresses )
+    /**
+     * Returns the *left-most* resolvable IP from the given sequence.
+     */
+    private static String resolveIp( String[] ipAddresses )
     {
-        String ip0 = null;
-        String ip4 = null;
-        String ip6 = null;
-
-        if ( ipAddresses.size() > 0 )
+        for ( String ip : ipAddresses )
         {
-            ip0 = ipAddresses.get( 0 );
-
-            for ( String ip : ipAddresses )
+            InetAddress ipAdd;
+            try
             {
-
-                InetAddress ipAdd;
-                try
-                {
-                    ipAdd = InetAddress.getByAddress( ip.getBytes() );
-                }
-                catch ( UnknownHostException e )
-                {
-                    continue;
-                }
-                if ( ipAdd instanceof Inet4Address )
-                {
-                    ip4 = ip;
-                    continue;
-                }
-                if ( ipAdd instanceof Inet6Address )
-                {
-                    ip6 = ip;
-                    continue;
-                }
+                ipAdd = InetAddress.getByName( ip );
+            }
+            catch ( UnknownHostException e )
+            {
+                continue;
+            }
+            if ( ipAdd instanceof Inet4Address || ipAdd instanceof Inet6Address )
+            {
+                return ip;
             }
         }
 
-        if ( ip4 != null )
-        {
-            return ip4;
-        }
-        if ( ip6 != null )
-        {
-            return ip6;
-        }
-
-        return ip0;
+        return null;
     }
 }

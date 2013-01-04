@@ -12,15 +12,14 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.indexer-lucene</groupId>
     <artifactId>nexus-indexer-lucene</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -28,7 +27,7 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <maven.indexer.version>5.0.0</maven.indexer.version>
+    <maven.indexer.version>5.1.1-d928049c927da992071a6c6bba892568dbcf27a3</maven.indexer.version>
 
     <nexus.plugin.name>Nexus Indexer Lucene Plugin</nexus.plugin.name>
     <nexus.plugin.description>Adds search capabilities for repository content.</nexus.plugin.description>

@@ -15,7 +15,17 @@
 
 define('nexus', ['extjs'], function(Ext){
 
-  Ext.namespace('Nexus');
+    Ext.namespace('Nexus');
 
-  return window.Nexus;
+    /**
+     * Return the current user.
+     *
+     * @return {*}
+     * @static
+     */
+    Nexus.currentUser = function () {
+        return Sonatype.user.curr;
+    };
+
+    return window.Nexus;
 });

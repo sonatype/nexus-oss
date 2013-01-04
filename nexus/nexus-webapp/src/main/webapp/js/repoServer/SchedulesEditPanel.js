@@ -855,11 +855,9 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               }]
         }],
     buttons : [{
-          id : 'savebutton',
           text : 'Save',
           disabled : true
         }, {
-          id : 'cancelbutton',
           text : 'Cancel'
         }]
   };

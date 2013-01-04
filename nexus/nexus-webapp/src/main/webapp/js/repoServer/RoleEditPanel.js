@@ -64,16 +64,7 @@ Sonatype.repoServer.RoleEditPanel = function(config) {
                 }
               }
 
-              /* ext-3.4.0
-              if (this.sp.checkPermission('security:roles', this.sp.CREATE) && store.getCount() > 0 && this.toolbarAddButton.menu.items.length == 1)
-              {
-                this.toolbarAddButton.menu.add({
-                      text : 'External Role Mapping',
-                      handler : this.mapExternalRoles,
-                      scope : this
-                    });
-              }
-              */
+              this.userLocatorsLoaded = true;
             },
             scope : this
           }
@@ -168,13 +159,29 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Sonatype.panels.GridViewer, {
                 scope : this
               });
         }
-        /* ext 3.4.0 */
-        if (this.sp.checkPermission('security:roles', this.sp.CREATE) && this.sourceStore.getCount() > 0 ) {
-          this.toolbarAddButton.menu.add({
-            text : 'External Role Mapping',
-            handler : this.mapExternalRoles,
-            scope : this
-          });
+
+        var
+              self = this,
+              addExternalMappingMenuItem = function() {
+                if (self.sp.checkPermission('security:roles', self.sp.CREATE) && self.sourceStore.getCount() > 0 ) {
+                  self.toolbarAddButton.menu.add({
+                    text : 'External Role Mapping',
+                    handler : self.mapExternalRoles,
+                    scope : self
+                  });
+
+                  self.externalMappingMenuItemAdded = true;
+                }
+              };
+
+        if (self.externalMappingMenuItemAdded) {
+          return;
+        }
+
+        if (self.userLocatorsLoaded) {
+          addExternalMappingMenuItem();
+        } else {
+          this.sourceStore.on('load', addExternalMappingMenuItem, this, {single : true});
         }
       },
 

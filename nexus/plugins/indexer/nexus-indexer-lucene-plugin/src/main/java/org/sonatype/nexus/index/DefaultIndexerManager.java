@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -30,18 +30,29 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.maven.index.AndMultiArtifactInfoFilter;
 import org.apache.maven.index.ArtifactContext;
 import org.apache.maven.index.ArtifactContextProducer;
@@ -51,7 +62,6 @@ import org.apache.maven.index.ArtifactInfoPostprocessor;
 import org.apache.maven.index.Field;
 import org.apache.maven.index.FlatSearchRequest;
 import org.apache.maven.index.FlatSearchResponse;
-import org.apache.maven.index.IndexerEngine;
 import org.apache.maven.index.IteratorResultSet;
 import org.apache.maven.index.IteratorSearchRequest;
 import org.apache.maven.index.IteratorSearchResponse;
@@ -69,7 +79,6 @@ import org.apache.maven.index.context.IndexCreator;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.context.MergedIndexingContext;
 import org.apache.maven.index.context.StaticContextMemberProvider;
-import org.apache.maven.index.context.UnsupportedExistingLuceneIndexException;
 import org.apache.maven.index.expr.SearchExpression;
 import org.apache.maven.index.packer.IndexPacker;
 import org.apache.maven.index.packer.IndexPackingRequest;
@@ -82,8 +91,6 @@ import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.index.updater.ResourceFetcher;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -123,8 +130,6 @@ import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
 import com.google.common.annotations.VisibleForTesting;
-
-import copied.org.apache.maven.index.DefaultScannerListener;
 
 /**
  * <p>
@@ -173,13 +178,16 @@ import copied.org.apache.maven.index.DefaultScannerListener;
  * Access to gz index download and publishing areas and to repository local storage is protected by
  * <code>reindexLocks</code> reentrant locks.
  * </p>
- * 
+ *
  * @author Tamas Cservenak
  */
-@Component( role = IndexerManager.class )
+@Named
+@Singleton
 public class DefaultIndexerManager
     implements IndexerManager
 {
+    private static final String ARTIFICIAL_EXCEPTION = "This is an artificial exception that provides caller backtrace.";
+
     /** The key used in working directory. */
     public static final String INDEXER_WORKING_DIRECTORY_KEY = "indexer";
 
@@ -191,44 +199,107 @@ public class DefaultIndexerManager
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Requirement
+    /**
+     * Indexing is supported for this repository.
+     */
+    private boolean SUPPORTED( Repository repository )
+    {
+        return !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
+            && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
+            && repository.getRepositoryContentClass().isCompatible( maven2 );
+    }
+
+    /**
+     * Index is maintained for the repository. Implies SUPPORTED.
+     */
+    private boolean INDEXABLE( Repository repository )
+    {
+        return SUPPORTED( repository ) && repository.isIndexable();
+    }
+
+    /**
+     * The repository is in service for indexing purposes
+     */
+    private boolean INSERVICE( Repository repository )
+    {
+        return LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() );
+    }
+
+    /**
+     * Repository is a proxy repository.
+     */
+    private boolean ISPROXY( Repository repository )
+    {
+        return repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class );
+    }
+
+    /**
+     * Repository is a group repository.
+     */
+    private boolean ISGROUP(Repository repository)
+    {
+        return repository.getRepositoryKind().isFacetAvailable( GroupRepository.class );
+    }
+
+    @Inject
     private NexusIndexer mavenIndexer;
 
-    @Requirement
+    @Inject
     private IndexUpdater indexUpdater;
 
-    @Requirement
+    @Inject
     private IndexPacker indexPacker;
 
-    @Requirement
+    @Inject
     private NexusConfiguration nexusConfiguration;
 
-    @Requirement
+    @Inject
     private RepositoryRegistry repositoryRegistry;
 
-    @Requirement( hint = "maven2" )
+    @Inject
+    @Named( "maven2" )
     private ContentClass maven2;
 
-    @Requirement( role = IndexCreator.class )
+    @Inject
     private List<IndexCreator> indexCreators;
 
-    @Requirement
+    @Inject
     private IndexArtifactFilter indexArtifactFilter;
 
-    @Requirement
+    @Inject
     private ArtifactContextProducer artifactContextProducer;
 
-    @Requirement
+    @Inject
     private MimeSupport mimeSupport;
 
-    @Requirement
+    @Inject
     private IndexTreeView indexTreeView;
 
-    @Requirement
+    @Inject
     private Scanner scanner;
 
-    @Requirement
-    private IndexerEngine indexerEngine;
+    /**
+     * As of 3.6.1, Lucene provides three FSDirectory implementations, all with there pros and cons.
+     * <ul>
+     * <li>mmap -- {@link MMapDirectory}</li>
+     * <li>nio -- {@link NIOFSDirectory}</li>
+     * <li>simple -- {@link SimpleFSDirectory}</li>
+     * </ul>
+     * By default, Lucene selects FSDirectory implementation based on specifics of the operating system and JRE used,
+     * but this configuration parameter allows override.
+     */
+    @Inject
+    @Nullable
+    @Named( "${lucene.fsdirectory.type}" )
+    private String luceneFSDirectoryType;
+
+    /**
+     * Timeout, in seconds, acquiring index locks. This is a safety net meant to prevent complete system lockup in case
+     * of index lock leaks.
+     */
+    @Inject
+    @Named( "${nexus.indexer.locktimeout:-60}" )
+    private int lockTimeoutSeconds;
 
     /**
      * Locks that protect access to repository index. Item-level add/remove and search operations must acquire read
@@ -246,7 +317,13 @@ public class DefaultIndexerManager
      * Note that locks are only added to the map, never removed. This introduces a minor memory leak for each deleted
      * repository id, but makes synchronization logic much easier.
      */
-    private final Map<String, ReentrantLock> reindexLocks = new HashMap<String, ReentrantLock>();
+    private final Map<String, ForceableReentrantLock> reindexLocks = new HashMap<String, ForceableReentrantLock>();
+
+    /**
+     * Threads attempting to delete repository indexing contexts. Used as a marker to index requests for repositories
+     * that are being deleted.
+     */
+    private final ConcurrentMap<String, Thread> deleteThreads = new ConcurrentHashMap<String, Thread>();
 
     private File workingDirectory;
 
@@ -318,66 +395,21 @@ public class DefaultIndexerManager
     // Context management et al
     // ----------------------------------------------------------------------------
 
-    protected boolean isIndexingSupported( Repository repository )
-    {
-        // indexing is supported if:
-        // repo has NO Shadow facet available (is not a shadow)
-        // repo has facet MavenRepository available (is implementation tied)
-        // repo had contentClass compatible with Maven2 contentClass
-        return !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
-            && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
-            && repository.getRepositoryContentClass().isCompatible( maven2 );
-    }
-
-    protected void logSkippingRepositoryMessage( Repository repository )
-    {
-        boolean isSupported = isIndexingSupported( repository );
-        boolean isIndexed = repository.isIndexable();
-
-        if ( logger.isDebugEnabled() )
-        {
-            StringBuilder sb = new StringBuilder( "Indexing is " );
-
-            if ( !isSupported )
-            {
-                sb.append( "not " );
-            }
-
-            sb.append( "supported on repository \"" + repository.getName() + "\" (ID=\"" + repository.getId() + "\")" );
-
-            if ( isSupported )
-            {
-                sb.append( " and is set as " );
-
-                if ( !isIndexed )
-                {
-                    sb.append( "not " );
-                }
-
-                sb.append( "indexed. " );
-            }
-            else
-            {
-                sb.append( ". " );
-            }
-
-            sb.append( "Skipping it." );
-
-            logger.debug( sb.toString() );
-        }
-    }
-
     public void addRepositoryIndexContext( String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        final Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         addRepositoryIndexContext( repository );
     }
 
     public void addRepositoryIndexContext( final Repository repository )
         throws IOException, NoSuchRepositoryException
     {
+        if (!INDEXABLE( repository ))
+        {
+            return;
+        }
+
         if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
             // group repository
@@ -403,18 +435,13 @@ public class DefaultIndexerManager
     private void addRepositoryIndexContext( final Repository repository, IndexingContext oldContext )
         throws IOException
     {
+        logger.debug( "Adding indexing context for repository {}", repository.getId() );
+
         if ( oldContext != null )
         {
-            // this is really an error, the oldContext is expected to be null here
-            mavenIndexer.removeIndexingContext( oldContext, true );
-            logger.warn( "Removed old/stale indexing context {} for repository {}", oldContext.getId(),
-                         repository.getId() );
-        }
-
-        if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
-        {
-            logSkippingRepositoryMessage( repository );
-
+            // this is an error, oldContext can have filesystem locks or long-running threads
+            logger.error( "Old/stale indexing context {} for repository {}. Operation cancaled.", oldContext.getId(),
+                          repository.getId() );
             return;
         }
 
@@ -435,9 +462,16 @@ public class DefaultIndexerManager
         else
         {
             // add context for repository
-            ctx =
-                mavenIndexer.addIndexingContextForced( getContextId( repository.getId() ), repository.getId(),
-                                                       repoRoot, indexDirectory, null, null, indexCreators );
+            ctx = new NexusIndexingContext( getContextId( repository.getId() ), // id
+                                              repository.getId(), // repositoryId
+                                              repoRoot, // repository
+                                              openFSDirectory( indexDirectory ), // indexDirectory
+                                              null, // repositoryUrl
+                                              null, // indexUpdateUrl
+                                              indexCreators, //
+                                              true, // reclaimIndex
+                                              ISPROXY( repository ) );
+            mavenIndexer.addIndexingContext( ctx );
         }
         ctx.setSearchable( repository.isSearchable() );
 
@@ -454,39 +488,72 @@ public class DefaultIndexerManager
     public void removeRepositoryIndexContext( String repositoryId, final boolean deleteFiles )
         throws IOException, NoSuchRepositoryException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         removeRepositoryIndexContext( repository, deleteFiles );
     }
 
     public void removeRepositoryIndexContext( final Repository repository, final boolean deleteFiles )
         throws IOException
     {
-        if ( !isIndexingSupported( repository ) )
+        Thread otherThread = deleteThreads.putIfAbsent( repository.getId(), Thread.currentThread() );
+        if ( otherThread != null )
         {
-            logSkippingRepositoryMessage( repository );
-
+            logger.debug( "Indexing context for repository {} is being deleted by thread {}", repository.getId(),
+                          otherThread.getName() );
             return;
         }
 
-        exclusiveSingle( repository, new Runnable()
+        try
         {
-            @Override
-            public void run( final IndexingContext context )
-                throws IOException
+            final boolean[] removed = new boolean[1];
+            final ForceableReentrantLock lock = getReindexLock( repository );
+            if ( lock.tryForceLock( lockTimeoutSeconds, TimeUnit.SECONDS ) )
             {
-                if ( context != null )
+                try
                 {
-                    mavenIndexer.removeIndexingContext( context, deleteFiles );
-
-                    logger.debug( "Removed indexing context {} for repository {}", context.getId(), repository.getId() );
+                    exclusiveSingle( repository, new Runnable()
+                    {
+                        @Override
+                        public void run( final IndexingContext context )
+                            throws IOException
+                        {
+                            removeRepositoryIndexingContext( repository, deleteFiles, context );
+                            removed[0] = true;
+                        }
+                    } );
                 }
-                else
+                finally
                 {
-                    logger.debug( "Could not remove null indexing context for repository {}", repository.getId() );
+                    lock.unlock();
                 }
             }
-        } );
+            if ( !removed[0] )
+            {
+                throw new IOException( "Could not remove indexing context for repository " + repository.getId() );
+            }
+        }
+        finally
+        {
+            deleteThreads.remove( repository.getId() );
+        }
+    }
+
+    private void removeRepositoryIndexingContext( final Repository repository, final boolean deleteFiles,
+                                                     final IndexingContext context )
+        throws IOException
+    {
+        if ( context != null )
+        {
+            logger.debug( "Removing indexing context for repository {} deleteFiles={}", repository.getId(), deleteFiles );
+
+            mavenIndexer.removeIndexingContext( context, deleteFiles );
+
+            logger.debug( "Removed indexing context {} for repository {}", context.getId(), repository.getId() );
+        }
+        else
+        {
+            logger.debug( "Could not remove <null> indexing context for repository {}", repository.getId() );
+        }
     }
 
     public void updateRepositoryIndexContext( final String repositoryId )
@@ -496,10 +563,8 @@ public class DefaultIndexerManager
 
         // cannot do "!repository.isIndexable()" since we may be called to handle that config change (using events)!
         // the repo might be already non-indexable, but the context would still exist!
-        if ( !isIndexingSupported( repository ) )
+        if ( !SUPPORTED( repository ) )
         {
-            logSkippingRepositoryMessage( repository );
-
             return;
         }
 
@@ -520,14 +585,16 @@ public class DefaultIndexerManager
             public void run( IndexingContext context )
                 throws IOException
             {
+                logger.debug( "Updating indexing context for repository {}", repository.getId() );
+
                 File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
                 // remove context, if it already existed (ctx != null) and any of the following is true:
                 // is a group OR repo path changed OR we have an isIndexed transition happening
                 if ( context != null
-                    && ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
+                    && ( ISGROUP( repository ) || !INDEXABLE( repository )
                         || !context.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() )
-                        || !repository.isIndexable() || context.isSearchable() != repository.isSearchable() ) )
+                        || context.isSearchable() != repository.isSearchable() ) )
                 {
                     // remove the context
                     removeRepositoryIndexContext( repository, false );
@@ -536,7 +603,7 @@ public class DefaultIndexerManager
 
                 // add context, if it did not existed yet (ctx == null) or any of the following is true:
                 // is a group OR repo path changed OR we have an isIndexed transition happening
-                if ( repository.isIndexable() && context == null )
+                if ( INDEXABLE( repository ) && context == null )
                 {
                     // recreate the context
                     try
@@ -549,20 +616,16 @@ public class DefaultIndexerManager
                         logger.debug( "Could not add indexing context for repository {}", repositoryId, e );
                     }
                 }
+
+                logger.debug( "Updated indexing context for repository {}", repository.getId() );
             }
         } );
-    }
-
-    private Repository getRepository( String repositoryId )
-        throws NoSuchRepositoryException
-    {
-        return repositoryRegistry.getRepository( repositoryId );
     }
 
     /**
      * Returns "raw" unprotected repository IndexingContext. Most clients should use shared() or exclusive() methods to
      * manipulate repository indexes.
-     * 
+     *
      * @noreference this method is public for test purposes only
      */
     public IndexingContext getRepositoryIndexContext( Repository repository )
@@ -570,40 +633,9 @@ public class DefaultIndexerManager
         return mavenIndexer.getIndexingContexts().get( getContextId( repository.getId() ) );
     }
 
-    public void setRepositoryIndexContextSearchable( final String repositoryId, final boolean searchable )
-        throws IOException, NoSuchRepositoryException
-    {
-        Repository repository = getRepository( repositoryId );
-
-        // cannot do "!repository.isIndexable()" since we may be called to handle that config change (using events)!
-        // the repo might be already non-indexable, but the context would still exist!
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        sharedSingle( repository, new Runnable()
-        {
-            @Override
-            public void run( IndexingContext context )
-                throws IOException
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "Searching on repository ID='" + repositoryId + "' is set to: "
-                                           + String.valueOf( searchable ) );
-                }
-
-                context.setSearchable( searchable );
-            }
-        } );
-    }
-
     /**
      * Extracts the repo root on local FS as File. It may return null!
-     * 
+     *
      * @param repository
      * @return
      * @throws MalformedURLException
@@ -647,29 +679,30 @@ public class DefaultIndexerManager
     public void addItemToIndex( final Repository repository, final StorageItem item )
         throws IOException
     {
-        // is indexing supported at all on this repository?
-        // sadly, the nexus-indexer is maven2 only, hence we check is the repo
-        // from where we get the event is a maven2 repo, is indexing supported at all
-        if ( !isIndexingSupported( repository ) )
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        // do we have to maintain index context at all?
-        if ( !repository.isIndexable() )
-        {
-            logSkippingRepositoryMessage( repository );
-
             return;
         }
 
         // is this hidden path?
         if ( item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
-            logger.debug( "Will not index hidden file path: " + item.getRepositoryItemUid().toString() );
+            return;
+        }
 
+        // never index generated items
+        if ( item instanceof StorageFileItem && ( (StorageFileItem) item ).isContentGenerated() )
+        {
+            return;
+        }
+
+        // by calculating GAV we check whether the request is against a repo artifact at all
+        // signatures and hashes are not considered for processing
+        // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
+        // emitted events about modifying them
+        Gav gav = ( (MavenRepository) repository ).getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
+        if ( gav == null || gav.isSignature() || gav.isHash() )
+        {
             return;
         }
 
@@ -691,20 +724,6 @@ public class DefaultIndexerManager
     private void addItemToIndex( Repository repository, StorageItem item, IndexingContext context )
         throws LocalStorageException, IOException
     {
-        // by calculating GAV we check wether the request is against a repo artifact at all
-        Gav gav = null;
-
-        gav = ( (MavenRepository) repository ).getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
-
-        // signatures and hashes are not considered for processing
-        // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
-        // emitted events about modifying them
-        if ( gav == null || gav.isSignature() || gav.isHash() )
-        {
-            // we do not index these
-            return;
-        }
-
         final RepositoryItemUidLock uidLock = item.getRepositoryItemUid().getLock();
 
         uidLock.lock( Action.read );
@@ -764,29 +783,14 @@ public class DefaultIndexerManager
     public void removeItemFromIndex( final Repository repository, final StorageItem item )
         throws IOException
     {
-        // is indexing supported at all on this repository?
-        // sadly, the nexus-indexer is maven2 only, hence we check is the repo
-        // from where we get the event is a maven2 repo, is indexing supported at all
-        if ( !isIndexingSupported( repository ) || !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        // do we have to maintain index context at all?
-        if ( !repository.isIndexable() )
-        {
-            logSkippingRepositoryMessage( repository );
-
             return;
         }
 
         // index for proxy repos shouldn't change just because you deleted something locally
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        if ( ISPROXY(repository) )
         {
-            logSkippingRepositoryMessage( repository );
-
             return;
         }
 
@@ -896,9 +900,11 @@ public class DefaultIndexerManager
     // Reindexing related
     // ----------------------------------------------------------------------------
 
-    public void reindexAllRepositories( final String path, final boolean fullReindex )
+    public void reindexAllRepositories( final String fromPath, final boolean fullReindex )
         throws IOException
     {
+        logger.debug( "Reindexing all repositories fromPath={} fullReindex={}", fromPath, fullReindex );
+
         final List<Repository> reposes = repositoryRegistry.getRepositories();
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( Repository repository : reposes )
@@ -906,7 +912,7 @@ public class DefaultIndexerManager
             try
             {
                 // going directly to single-shot, we are iterating over all reposes anyway
-                reindexRepository( repository, path, fullReindex );
+                reindexRepository( repository, fromPath, fullReindex );
             }
             catch ( IOException e )
             {
@@ -941,8 +947,7 @@ public class DefaultIndexerManager
     public void reindexRepository( final String path, final String repositoryId, final boolean fullReindex )
         throws NoSuchRepositoryException, IOException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         reindexRepository( path, repository, fullReindex, new HashSet<String>() );
     }
 
@@ -958,7 +963,7 @@ public class DefaultIndexerManager
 
         if ( CASCADE )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
 
@@ -986,65 +991,64 @@ public class DefaultIndexerManager
     private void reindexRepository( final Repository repository, final String fromPath, final boolean fullReindex )
         throws IOException
     {
-        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
             return;
         }
 
-        if ( !isIndexingSupported( repository ) )
+        if ( ISGROUP( repository ) )
         {
             return;
         }
 
-        if ( !repository.isIndexable() )
-        {
-            return;
-        }
-
-        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-        {
-            return;
-        }
-
-        Lock reindexLock = getReindexLock( repository );
+        ForceableReentrantLock reindexLock = getReindexLock( repository );
         if ( reindexLock.tryLock() )
         {
             try
             {
+                logger.debug( "Reindexing repository {} fromPath={} fullReindex={}", repository.getId(), fromPath,
+                              fullReindex );
+
                 Runnable runnable = new Runnable()
                 {
                     @Override
                     public void run( final IndexingContext context )
                         throws IOException
                     {
-                        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                        if ( ISPROXY( repository ) )
                         {
                             updateRemoteIndex( repository.adaptToFacet( ProxyRepository.class ), context, fullReindex );
                         }
 
                         TaskUtil.checkInterruption();
 
-                        // igorf: always do scan in incremental mode. for repositories with remote index, the scan must
-                        // be incremental to properly merge remote index and local scan. for repositories without remote
-                        // index full rescan is forced by starting with new/empty temporary context.
-
                         // igorf, this needs be merged back to maven indexer, see MINDEXER-65
-                        DefaultScannerListener scanListener = //
-                            new DefaultScannerListener( context, //
-                                                        indexerEngine, //
-                                                        true /* incremental update, see note above */, //
-                                                        null /* listener */);
-                        scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
+                        final IndexSearcher contextIndexSearcher = context.acquireIndexSearcher();
+                        try
+                        {
+                            final NexusScanningListener scanListener =
+                                new NexusScanningListener( context, contextIndexSearcher, fullReindex, ISPROXY( repository ) );
+                            scanner.scan( new ScanningRequest( context, scanListener, fromPath ) );
+                        }
+                        finally
+                        {
+                            context.releaseIndexSearcher( contextIndexSearcher );
+                        }
                     }
                 };
                 if ( fullReindex )
                 {
+                    // delete published stuff too, as we are breaking incremental downstream chain
+                    deleteIndexItems( repository );
+                    // creates a temp ctx and finally replaces the "real" with temp
                     temporary( repository, runnable );
                 }
                 else
                 {
+                    // scans directly into "real" ctx
                     sharedSingle( repository, runnable );
                 }
+
                 logger.debug( "Reindexed repository {}", repository.getId() );
             }
             finally
@@ -1066,6 +1070,8 @@ public class DefaultIndexerManager
     public void downloadAllIndex()
         throws IOException
     {
+        logger.debug( "Downloading remote indexes for all repositories" );
+
         final List<ProxyRepository> reposes = repositoryRegistry.getRepositoriesWithFacet( ProxyRepository.class );
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( ProxyRepository repository : reposes )
@@ -1089,8 +1095,7 @@ public class DefaultIndexerManager
     public void downloadRepositoryIndex( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         downloadRepositoryIndex( repository, new HashSet<String>() );
     }
 
@@ -1105,7 +1110,7 @@ public class DefaultIndexerManager
 
         if ( CASCADE )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
 
@@ -1116,7 +1121,7 @@ public class DefaultIndexerManager
             }
         }
 
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        if ( ISPROXY( repository ) )
         {
             downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ), false );
         }
@@ -1127,24 +1132,12 @@ public class DefaultIndexerManager
     {
         TaskUtil.checkInterruption();
 
-        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        if ( !INDEXABLE( repository ) || !ISPROXY( repository ) )
         {
             return;
         }
 
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        if ( !repository.isIndexable() )
-        {
-            return;
-        }
-
-        Lock reindexLock = getReindexLock( repository );
+        ForceableReentrantLock reindexLock = getReindexLock( repository );
         if ( reindexLock.tryLock() )
         {
             try
@@ -1182,14 +1175,14 @@ public class DefaultIndexerManager
     /**
      * Downloads full or incremental remote index and applies it to the provided indexing context. Callers are expected
      * to acquire all required repository and download area locks.
-     * 
+     *
      * @return true if index was updated, false otherwise.
      */
     private void updateRemoteIndex( final ProxyRepository repository, final IndexingContext context,
                                        final boolean forceFullUpdate ) throws IOException
     {
         // ensure this is a proxy repo, since download may happen with proxies only
-        if ( !repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+        if ( !INDEXABLE( repository ) || !ISPROXY( repository ) )
         {
             return;
         }
@@ -1233,7 +1226,7 @@ public class DefaultIndexerManager
                     // We need to use ProxyRepository and get it's RemoteStorage stuff to completely
                     // avoid "transparent" proxying, and even the slightest possibility to return
                     // some stale file from cache to the updater.
-                    if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                    if ( ISPROXY( repository ) )
                     {
                         ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
 
@@ -1364,6 +1357,8 @@ public class DefaultIndexerManager
     public void publishAllIndex()
         throws IOException
     {
+        logger.debug( "Publishing indexes for all repositories" );
+
         final List<Repository> reposes = repositoryRegistry.getRepositories();
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         // just publish all, since we use merged context, no need for double pass
@@ -1388,8 +1383,7 @@ public class DefaultIndexerManager
     public void publishRepositoryIndex( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         publishRepositoryIndex( repository, new HashSet<String>() );
     }
 
@@ -1404,7 +1398,7 @@ public class DefaultIndexerManager
 
         if ( CASCADE )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
 
@@ -1425,26 +1419,12 @@ public class DefaultIndexerManager
     protected void publishRepositoryIndex( final Repository repository )
         throws IOException
     {
-        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
         {
             return;
         }
 
-        // is indexing supported at all?
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        // shadows are not capable to publish indexes
-        if ( !repository.isIndexable() )
-        {
-            return;
-        }
-
-        Lock reindexLock = getReindexLock( repository );
+        ForceableReentrantLock reindexLock = getReindexLock( repository );
         if ( reindexLock.tryLock() )
         {
             try
@@ -1474,6 +1454,8 @@ public class DefaultIndexerManager
     private void publishRepositoryIndex( final Repository repository, IndexingContext context )
         throws IOException
     {
+        logger.debug( "Publishing index for repository {}", repository.getId() );
+
         File targetDir = null;
 
         try
@@ -1507,6 +1489,8 @@ public class DefaultIndexerManager
                     storeIndexItem( repository, file, context );
                 }
             }
+
+            logger.debug( "Published index for repository {}", repository.getId() );
         }
         finally
         {
@@ -1615,6 +1599,8 @@ public class DefaultIndexerManager
     public void optimizeAllRepositoriesIndex()
         throws IOException
     {
+        logger.debug( "Optimizing indexes for all repositories" );
+
         final List<Repository> repos = repositoryRegistry.getRepositories();
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( Repository repository : repos )
@@ -1639,8 +1625,7 @@ public class DefaultIndexerManager
     public void optimizeRepositoryIndex( final String repositoryId )
         throws NoSuchRepositoryException, IOException
     {
-        Repository repository = getRepository( repositoryId );
-
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
         optimizeIndex( repository, new HashSet<String>() );
     }
 
@@ -1655,7 +1640,7 @@ public class DefaultIndexerManager
 
         if ( CASCADE )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            if ( ISGROUP( repository ) )
             {
                 GroupRepository group = repository.adaptToFacet( GroupRepository.class );
 
@@ -1676,7 +1661,7 @@ public class DefaultIndexerManager
     protected void optimizeRepositoryIndex( final Repository repository )
         throws CorruptIndexException, IOException
     {
-        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        if ( !INDEXABLE( repository ) )
         {
             return;
         }
@@ -1691,9 +1676,11 @@ public class DefaultIndexerManager
             {
                 TaskUtil.checkInterruption();
 
-                logger.debug( "Optimizing local index context for repository: " + repository.getId() );
+                logger.debug( "Optimizing index for repository {} ", repository.getId() );
 
                 context.optimize();
+
+                logger.debug( "Optimized index for repository {} ", repository.getId() );
             }
         } );
     }
@@ -1727,7 +1714,7 @@ public class DefaultIndexerManager
 
         bq.add( q2, BooleanClause.Occur.SHOULD );
 
-        FlatSearchRequest req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );;
+        FlatSearchRequest req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
 
         // if ( from != null )
         // {
@@ -2179,7 +2166,7 @@ public class DefaultIndexerManager
             lockedContexts.lock.unlock();
         }
     }
-    
+
     private IteratorSearchResponse searchIterator( String repositoryId, IteratorSearchRequest req )
         throws NoSuchRepositoryException
     {
@@ -2263,8 +2250,15 @@ public class DefaultIndexerManager
                                final ArtifactInfoFilter artifactInfoFilter, final String repositoryId )
         throws NoSuchRepositoryException, IOException
     {
+        final Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
+        {
+            return null;
+        }
+
         final TreeNode[] result = new TreeNode[1];
-        shared( getRepository( repositoryId ), new Runnable()
+        shared( repository, new Runnable()
         {
             @Override
             public void run( IndexingContext context )
@@ -2287,7 +2281,7 @@ public class DefaultIndexerManager
     // ----------------------------------------------------------------------------
     // Locking
     // ----------------------------------------------------------------------------
-    
+
     public static interface Runnable
     {
         public void run( IndexingContext context )
@@ -2295,7 +2289,7 @@ public class DefaultIndexerManager
     }
 
     /**
-     * Simple value object meant to carry a number of indexing contexts and a lock that protects access to them. 
+     * Simple value object meant to carry a number of indexing contexts and a lock that protects access to them.
      */
     private static class LockedIndexingContexts
     {
@@ -2313,16 +2307,22 @@ public class DefaultIndexerManager
     /**
      * Executes the runnable while holding shared lock on the specified repository index. If the repository is a group,
      * also acquires shared locks on all member repositories. Repositories without indexing contexts are silently
-     * ignored. The context passed to the runnable is read-only, operations that modify index through
-     * UnsupportedOperationException. The indexing context passed to the runnable can be after return from this method,
-     * the caveat is that the context will return empty results after underlying Lucene index is closed.
+     * ignored. The context passed to the runnable is read-only, operations that modify index throw
+     * UnsupportedOperationException. The indexing context passed to the runnable can be used after return from this
+     * method, the caveat is that the context will return empty results after underlying Lucene index is closed.
      */
     public void shared( Repository repository, Runnable runnable )
         throws IOException
     {
         Lock lock = null;
         IndexingContext lockedContext = null;
-        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+
+        if ( !INDEXABLE( repository ) || !INSERVICE( repository ) )
+        {
+            return;
+        }
+
+        if ( ISGROUP( repository ) )
         {
             Map<String, Repository> members = new HashMap<String, Repository>();
             addGroupMembers( members, (GroupRepository) repository );
@@ -2335,7 +2335,7 @@ public class DefaultIndexerManager
                 List<IndexingContext> memberContexts = new ArrayList<IndexingContext>();
                 for ( IndexingContext context : lockedContexts.contexts.values() )
                 {
-                    if ( !repository.getId().equals( context.getRepositoryId() ) )
+                    if ( context != null && !repository.getId().equals( context.getRepositoryId() ) )
                     {
                         memberContexts.add( context );
                     }
@@ -2366,21 +2366,23 @@ public class DefaultIndexerManager
         }
         else
         {
-            lock = getRepositoryLock( repository ).readLock();
-            lock.lock();
-            IndexingContext context = getRepositoryIndexContext( repository );
-            if ( context != null )
+            lock = getRepositoryLock( repository, false /* shared */);
+            if ( lock != null )
             {
-                lockedContext = new LockingIndexingContext( context, lock );
-            }
-            else
-            {
-                lock.unlock();
-                lock = null;
+                IndexingContext context = getRepositoryIndexContext( repository );
+                if ( context != null )
+                {
+                    lockedContext = new LockingIndexingContext( context, lock );
+                }
+                else
+                {
+                    lock.unlock();
+                    lock = null;
+                }
             }
         }
 
-        if ( lockedContext != null )
+        if ( lockedContext != null && lock != null )
         {
             try
             {
@@ -2391,31 +2393,46 @@ public class DefaultIndexerManager
                 lock.unlock();
             }
         }
+        else
+        {
+            logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                         new Exception( ARTIFICIAL_EXCEPTION ) );
+        }
     }
 
     /**
      * Executes the runnable while holding shared lock on the specified repository index. Indexing context passed to the
-     * runnable must not be used after return from this methos.
+     * runnable must not be used after return from this method.
      */
     private void sharedSingle( Repository repository, Runnable runnable )
         throws IOException
     {
-        Lock lock = getRepositoryLock( repository ).readLock();
-        lock.lock();
-        try
+        Lock lock = getRepositoryLock( repository, false /* shared */);
+        if ( lock != null )
         {
-            IndexingContext ctx = getRepositoryIndexContext( repository );
-            runnable.run( ctx );
-        }
-        finally
-        {
-            lock.unlock();
+            try
+            {
+                IndexingContext ctx = getRepositoryIndexContext( repository );
+                if ( ctx != null )
+                {
+                    runnable.run( ctx );
+                }
+                else
+                {
+                    logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                                 new Exception( ARTIFICIAL_EXCEPTION ) );
+                }
+            }
+            finally
+            {
+                lock.unlock();
+            }
         }
     }
 
     /**
      * Executes the runnable with new empty temporary indexing context. The repository index is the replaced with the
-     * contents of the temporary context. 
+     * contents of the temporary context.
      */
     // XXX igorf, better name
     private void temporary( final Repository repository, final Runnable runnable )
@@ -2430,24 +2447,14 @@ public class DefaultIndexerManager
             throw new IOException( "Could not create temporary directory " + location );
         }
 
-        final DefaultIndexingContext temporary;
-        try
-        {
-            temporary = new DefaultIndexingContext( indexId, //
-                repository.getId(), //
-                getRepositoryLocalStorageAsFile( repository ), // repository local storage
-                FSDirectory.open( location ), //
-                null, // repository url
-                null, // repository update url
-                indexCreators,
-                true );
-        }
-        catch ( UnsupportedExistingLuceneIndexException e )
-        {
-            // Can't really happen because we use empty new directory
-            throw new IOException( e.getMessage(), e );
-        }
-        
+        final DefaultIndexingContext temporary =
+            new DefaultIndexingContext( indexId, //
+                                        repository.getId(), //
+                                        getRepositoryLocalStorageAsFile( repository ), // repository local storage
+                                        openFSDirectory( location ), //
+                                        null, // repository url
+                                        null, // repository update url
+                                        indexCreators, true );
         logger.debug( "Created temporary indexing context " + location + " for repository " + repository.getId() );
 
         try
@@ -2467,7 +2474,15 @@ public class DefaultIndexerManager
                     // and temporary context is populated based contains old/stale configuration
                     // need to detect when this happens based on target timestamp for example and skip replace
 
-                    target.replace( temporary.getIndexDirectory() );
+                    if (target != null)
+                    {
+                        target.replace( temporary.getIndexDirectory() );
+                    }
+                    else
+                    {
+                        logger.warn( "Could not perform index operation on repository {}", repository.getId(),
+                                     new Exception() );
+                    }
                 }
             } );
         }
@@ -2478,6 +2493,35 @@ public class DefaultIndexerManager
         }
     }
 
+    private FSDirectory openFSDirectory( File location )
+        throws IOException
+    {
+        if ( luceneFSDirectoryType == null )
+        {
+            // let Lucene select implementation
+            return FSDirectory.open( location );
+        }
+        else if ( "mmap".equals( luceneFSDirectoryType ) )
+        {
+            return new MMapDirectory( location );
+        }
+        else if ( "nio".equals( luceneFSDirectoryType ) )
+        {
+            return new NIOFSDirectory( location );
+        }
+        else if ( "simple".equals( luceneFSDirectoryType ) )
+        {
+            return new SimpleFSDirectory( location );
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                                                "''"
+                                                    + luceneFSDirectoryType
+                                                    + "'' is not valid/supported Lucene FSDirectory type. Only ''mmap'', ''nio'' and ''simple'' are allowed" );
+        }
+    }
+
     /**
      * Executes the runnable while holding exclusive lock on the specified repository index. Indexing context passed to
      * the runnable must not be used after return from this methos.
@@ -2485,49 +2529,91 @@ public class DefaultIndexerManager
     private void exclusiveSingle( Repository repository, Runnable runnable )
         throws IOException
     {
-        Lock lock = getRepositoryLock( repository ).writeLock();
-        lock.lock();
-        try
+        Lock lock = getRepositoryLock( repository, true /* exclusive */);
+        if ( lock != null )
         {
-            IndexingContext ctx = getRepositoryIndexContext( repository );
-            runnable.run( ctx );
-        }
-        finally
-        {
-            lock.unlock();
+            try
+            {
+                IndexingContext ctx = getRepositoryIndexContext( repository );
+                runnable.run( ctx );
+            }
+            finally
+            {
+                lock.unlock();
+            }
         }
     }
 
     /**
-     * Returns "repository" read-write lock that corresponds to the repository. The lock is used to protect access to
-     * the repository Lucene index.
+     * Acquires either shared or exclusive "repository" lock. The lock is used to protect access to the repository
+     * Lucene index. Returns null if requested lock cannot be acquired due to timeout or interruption.
      */
-    private ReadWriteLock getRepositoryLock( Repository repository )
+    private Lock getRepositoryLock( Repository repository, boolean exclusive )
     {
+        final String lockName = exclusive ? "exclusive" : "shared";
+
+        Thread deleteThread = deleteThreads.get( repository.getId() );
+        if ( deleteThread != null && deleteThread != Thread.currentThread() )
+        {
+            logger.debug( "Could not acquire {} lock on repository {}. The repository is being deleted by thread {}.",
+                          lockName, repository.getId(), deleteThread.getName() );
+            return null;
+        }
+
+        ReadWriteLock rwlock;
         synchronized ( repositoryLocks )
         {
-            ReadWriteLock lock = repositoryLocks.get( repository.getId() );
-            if ( lock == null )
+            rwlock = repositoryLocks.get( repository.getId() );
+            if ( rwlock == null )
             {
-                lock = NamedReadWriteLock.decorate( new ReentrantReadWriteLock(), repository.getId() );
-                repositoryLocks.put( repository.getId(), lock );
+                rwlock = NamedReadWriteLock.decorate( new ReentrantReadWriteLock(), repository.getId() );
+                repositoryLocks.put( repository.getId(), rwlock );
             }
-            return lock;
         }
+
+        try
+        {
+            Lock lock = exclusive ? rwlock.writeLock() : rwlock.readLock();
+            if ( lock.tryLock( lockTimeoutSeconds, TimeUnit.SECONDS ) )
+            {
+                return lock;
+            }
+            if ( logger.isDebugEnabled() )
+            {
+                logger.warn( "Could not acquire {} lock on repository {} in {} seconds. " //
+                    + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
+                    + "The operation has been aborted.", //
+                             lockName, repository.getId(), lockTimeoutSeconds, new Exception( ARTIFICIAL_EXCEPTION ) );
+            }
+            else
+            {
+                logger.warn( "Could not acquire {} lock on repository {} in {} seconds. " //
+                    + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
+                    + "Enable debug log to recieve more information.", //
+                             lockName, repository.getId(), lockTimeoutSeconds );
+            }
+        }
+        catch ( InterruptedException e )
+        {
+            // TODO consider throwing IOException instead
+            logger.debug( "Interrupted {} lock request on repository {}", lockName, repository.getId(),
+                          new Exception( ARTIFICIAL_EXCEPTION ) );
+        }
+        return null;
     }
 
     /**
      * Returns "reindex" reentrant lock that corresponds to the repository. The lock is used to protect access to
      * repository gz index download and publishing areas and to the repository local storage.
      */
-    private ReentrantLock getReindexLock( final Repository repository )
+    private ForceableReentrantLock getReindexLock( final Repository repository )
     {
         synchronized ( reindexLocks )
         {
-            ReentrantLock lock = reindexLocks.get( repository.getId() );
+            ForceableReentrantLock lock = reindexLocks.get( repository.getId() );
             if ( lock == null )
             {
-                lock = new ReentrantLock();
+                lock = new ForceableReentrantLock();
                 reindexLocks.put( repository.getId(), lock );
             }
             return lock;
@@ -2542,33 +2628,38 @@ public class DefaultIndexerManager
     private LockedIndexingContexts lockSearchTargetIndexingContexts( String repositoryId )
         throws NoSuchRepositoryException
     {
-        List<Repository> repositories;
+        List<Repository> repositories = new ArrayList<Repository>();
         if ( repositoryId != null )
         {
-            Repository repository = getRepository( repositoryId );
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            final Repository repository = repositoryRegistry.getRepository( repositoryId );
+            if ( ISGROUP( repository ) )
             {
                 Map<String, Repository> members = new HashMap<String, Repository>();
                 addGroupMembers( members, (GroupRepository) repository );
-                repositories = new ArrayList<Repository>( members.values() );
+                repositories.addAll( members.values() );
             }
             else
             {
-                repositories = Collections.singletonList( repository );
+                repositories.add( repository );
             }
         }
         else
         {
-            repositories = repositoryRegistry.getRepositories();
+            for ( Repository repository : repositoryRegistry.getRepositories() )
+            {
+                if ( INDEXABLE( repository ) && repository.isSearchable() && !ISGROUP( repository ) )
+                {
+                    repositories.add( repository );
+                }
+            }
         }
 
         return lockIndexingContexts( repositories, null );
     }
 
     /**
-     * Acquires shared locks on specified repositories. Not-searchable repositories and repositories without indexing
-     * context are silently ignored. Returns read-only contexts that are safe to use without explicit repository index
-     * locking/unlocking.
+     * Acquires shared locks on specified repositories. Repositories without indexing context are silently ignored.
+     * Returns read-only contexts that are safe to use without explicit repository index locking/unlocking.
      */
     private LockedIndexingContexts lockIndexingContexts( Collection<Repository> repositories, String force )
     {
@@ -2594,19 +2685,21 @@ public class DefaultIndexerManager
         Map<String, IndexingContext> contexts = new LinkedHashMap<String, IndexingContext>();
         for ( Repository repository : sorted )
         {
-            Lock lock = getRepositoryLock( repository ).readLock();
-
-            lock.lock(); // at this point repository index cannot be added or removed, we can safely use it
-            IndexingContext context = getRepositoryIndexContext( repository );
-
-            if ( !repository.getId().equals( force ) && ( context == null || !context.isSearchable() ) )
+            Lock lock = getRepositoryLock( repository, false /* shared */);
+            if ( lock != null )
             {
-                lock.unlock();
-                continue;
-            }
+                // at this point repository index cannot be added or removed, we can safely use it
+                IndexingContext context = getRepositoryIndexContext( repository );
 
-            locks.add( lock );
-            contexts.put( repository.getId(), new LockingIndexingContext( context, lock ) );
+                if ( !repository.getId().equals( force ) && context == null )
+                {
+                    lock.unlock();
+                    continue;
+                }
+
+                locks.add( lock );
+                contexts.put( repository.getId(), new LockingIndexingContext( context, lock ) );
+            }
         }
 
         if ( contexts.isEmpty() )
@@ -2624,9 +2717,9 @@ public class DefaultIndexerManager
     {
         for ( Repository member : group.getMemberRepositories() )
         {
-            if ( !repositories.containsKey( member.getId() ) )
+            if ( INDEXABLE( member ) && !repositories.containsKey( member.getId() ) )
             {
-                if ( member.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                if ( ISGROUP( member ) )
                 {
                     addGroupMembers( repositories, (GroupRepository) member );
                 }

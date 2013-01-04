@@ -18,11 +18,9 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>2.3-SNAPSHOT</version>
-    <!-- FIXME: Move this to the proper location, this is crazy-sauce -->
-    <relativePath>../nexus</relativePath>
+    <version>2.4-SNAPSHOT</version>
   </parent>
-  
+
   <groupId>org.sonatype.nexus.archetypes</groupId>
   <artifactId>nexus-plugin-archetype</artifactId>
   <packaging>maven-archetype</packaging>

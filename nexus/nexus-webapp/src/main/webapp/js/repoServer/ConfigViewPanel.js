@@ -10,15 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+/*global define*/
+
 /*
  * View Nexus serer XML configuration file
  */
-
-define('repoServer/ConfigViewPanel',['sonatype/all'], function(){
-Sonatype.repoServer.ConfigViewPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
-  Ext.apply(this, config, defaultConfig);
+define('repoServer/ConfigViewPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
+Sonatype.repoServer.ConfigViewPanel = function(cfg) {
+  Ext.apply(this, cfg || {});
 
   this.listeners = {
     // note: this isn't pre-render dependent, we just need an early event to

@@ -10,13 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
 
-define('repoServer/LogsViewPanel',['sonatype/all'], function(){
-/*global Ext,Sonatype,Nexus*/
+define('repoServer/LogsViewPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.LogsViewPanel = function(cfg) {
-  var config = cfg || {}, defaultConfig = {};
-
-  Ext.apply(this, config, defaultConfig);
+  Ext.apply(this, cfg || {});
 
   this.currentLogUrl = null;
   this.currentContentType = null;
@@ -178,7 +176,6 @@ Sonatype.repoServer.LogsViewPanel = function(cfg) {
               },
               // handler: this.movePreview.createDelegate(this, []),
               menu : {
-                id : 'log-menu',
                 width : 200,
                 items : [
 
@@ -219,30 +216,37 @@ Sonatype.repoServer.LogsViewPanel = function(cfg) {
 
 Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       renderLogList : function(options, success, response) {
-        if (success)
+        if (!success)
         {
-          var resp = Ext.decode(response.responseText);
-          var myMenu = Ext.menu.MenuMgr.get('log-menu');
+          Sonatype.MessageBox.alert('Failed to get file list from server.');
+        }
+        else
+        {
+          var
+                i, name, size, text, uri, existingItem,
+                resp = Ext.decode(response.responseText),
+                myMenu = Ext.getCmp('log-btn').menu,
+                list = resp.data,
+                sameUri = function(o) {
+                  return o.logUri === uri;
+                };
 
-          var list = resp.data;
           this.sortFileListByName(list);
 
-          for (var i = 0; i < list.length; i++)
+          for (i = 0; i < list.length; i+=1)
           {
-            var name = list[i].name;
-            var size = list[i].size;
-            var text = name + ' (' + this.printKb(size) + ')';
-            var uri = list[i].resourceURI;
+            name = list[i].name;
+            size = list[i].size;
+            text = name + ' (' + this.printKb(size) + ')';
+            uri = list[i].resourceURI;
 
-            var existingItem = myMenu.items.find(function(o) {
-                  return o.logUri == uri;
-                });
+            existingItem = myMenu.items.find(sameUri);
 
             if (existingItem)
             {
               existingItem.setText(text);
               existingItem.value = size;
-              if (this.currentLogUrl == uri)
+              if (this.currentLogUrl === uri)
               {
                 this.totalSize = size;
                 this.getTopToolbar().items.get(2).setText(text);
@@ -279,59 +283,60 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
             this.logToShowWhenLoaded = null;
           }
         }
-        else
-        {
-          Sonatype.MessageBox.alert('Failed to get file list from server.');
-        }
       },
 
       renderConfigList : function(options, success, response) {
-        if (success)
+        if (!success)
         {
-          var resp = Ext.decode(response.responseText);
-          var myMenu = Ext.menu.MenuMgr.get('log-menu');
+          Sonatype.MessageBox.alert('Failed to get config file list from server.');
+        }
+        else
+        {
+          var
+                i, name, uri, existingItem,
+                resp = Ext.decode(response.responseText),
+                myMenu = Ext.getCmp('log-btn').menu,
+                list = resp.data,
+                sameUri = function(o) {
+                  return o.logUri === uri;
+                };
 
-          if (resp.data.length > 0)
+
+          this.sortFileListByName(list);
+
+          if (list.length > 0)
           {
             myMenu.add('-');
           }
 
-          var list = resp.data;
-          this.sortFileListByName(list);
-
-          for (var i = 0; i < list.length; i++)
+          for (i = 0; i < list.length; i+=1)
           {
-            var name = list[i].name;
-            var uri = list[i].resourceURI;
+            name = list[i].name;
+            uri = list[i].resourceURI;
 
-            var existingItem = myMenu.items.find(function(o) {
-                  return o.logUri === uri;
-                });
+            existingItem = myMenu.items.find(sameUri);
 
             if (!existingItem)
             {
               myMenu.addMenuItem({
-                    id : name,
-                    logUri : uri,
-                    text : name,
-                    value : 0,
-                    checked : false,
-                    group : 'rp-group',
-                    checkHandler : this.showItem.createDelegate(this, [name, 'application/xml'], 0),
-                    scope : this
-                  });
+                id : name,
+                logUri : uri,
+                text : name,
+                value : 0,
+                checked : false,
+                group : 'rp-group',
+                checkHandler : this.showItem.createDelegate(this, [name, 'application/xml'], 0),
+                scope : this
+              });
             }
           }
-        }
-        else
-        {
-          Sonatype.MessageBox.alert('Failed to get config file list from server.');
         }
       },
 
       showItem : function(shortLogName, contentType, mItem, pressed) {
-        if (!pressed)
+        if (!pressed) {
           return;
+        }
         this.logTextArea.setRawValue('');
         this.currentSize = 0;
         this.currentOffset = 0;
@@ -356,11 +361,11 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         // check to make sure the menubar is rendered
         if (this.logListLoaded)
         {
-          var logsAndConfMenu = Ext.menu.MenuMgr.get('log-menu');
-          for (var ii = 0; ii < logsAndConfMenu.items.length; ii++)
+          var ii, logsAndConfMenu = Ext.getCmp('log-btn').menu, tmpMenuItem;
+          for (ii = 0; ii < logsAndConfMenu.items.length; ii+=1)
           {
-            var tmpMenuItem = logsAndConfMenu.items.itemAt(ii);
-            if (tmpMenuItem != null && tmpMenuItem.id == logName)
+            tmpMenuItem = logsAndConfMenu.items.itemAt(ii);
+            if (tmpMenuItem && tmpMenuItem.id === logName)
             {
               this.showItem(tmpMenuItem.logUri, 'text/plain', tmpMenuItem, true);
               break;
@@ -399,9 +404,9 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
           {
             toFetch = Number(this.fetchMoreButton.value) * 1024;
           }
-          if (toFetch == 0)
+          if (toFetch === 0)
           {
-            if (this.tailed && this.currentOffset == 0 && this.totalSize > 102400)
+            if (this.tailed && this.currentOffset === 0 && this.totalSize > 102400)
             { // 100Kb
               this.currentOffset = this.totalSize - 102400;
             }
@@ -416,7 +421,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
                   count : toFetch
                 },
                 headers : {
-                  'accept' : this.currentContentType ? this.currentContentType : 'text/plain'
+                  'accept' : this.currentContentType || 'text/plain'
                 },
                 url : this.currentLogUrl
               });
@@ -426,15 +431,15 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       renderLog : function(options, success, response) {
         if (success)
         {
-          var text = response.responseText;
-          var newValue = this.currentSize == 0 ? text : this.logTextArea.getRawValue() + text;
-
-          var logDom = this.logTextArea.getEl().dom;
-          var scrollTop = logDom.scrollTop;
-          var scrollHeight = logDom.scrollHeight;
-          var clientHeight = logDom.clientHeight;
+          var
+                text = response.responseText,
+                newValue = this.currentSize === 0 ? text : this.logTextArea.getRawValue() + text,
+                logDom = this.logTextArea.getEl().dom,
+                scrollTop = logDom.scrollTop,
+                scrollHeight = logDom.scrollHeight,
+                clientHeight = logDom.clientHeight;
           this.logTextArea.setRawValue(newValue);
-          if (this.tailEnabled && (scrollTop == 0 || scrollTop + clientHeight >= scrollHeight - 20))
+          if (this.tailEnabled && (scrollTop === 0 || scrollTop + clientHeight >= scrollHeight - 20))
           {
             scrollTop = logDom.scrollHeight - clientHeight;
           }
@@ -447,12 +452,12 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         }
         else
         {
-          Sonatype.utils.connectionError(response, 'The file failed to load from the server.')
+          Sonatype.utils.connectionError(response, 'The file failed to load from the server.');
         }
       },
 
       fetchMore : function(button, event) {
-        if (button.value != this.fetchMoreButton.value)
+        if (button.value !== this.fetchMoreButton.value)
         {
           this.fetchMoreButton.value = button.value;
           this.fetchMoreButton.setText(button.text);
@@ -470,7 +475,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         this.fetchMoreBar.items.removeAt(0);
         this.fetchMoreBar.insertButton(0, new Ext.Toolbar.TextItem('Displaying ' + (this.tailed ? 'last ' : '') + this.printKb(this.currentSize) + ' of ' + this.printKb(this.totalSize)));
 
-        this.tailUpdateButton.setDisabled(this.currentLogUrl == Sonatype.config.repos.urls.configCurrent);
+        this.tailUpdateButton.setDisabled(this.currentLogUrl === Sonatype.config.repos.urls.configCurrent);
         this.fetchMoreButton.setDisabled(this.currentOffset >= this.totalSize);
       },
 
@@ -509,13 +514,13 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       },
 
       loadTailButtonHandler : function(button, event) {
-        if (button.value != this.tailUpdateButton.value)
+        if (button.value !== this.tailUpdateButton.value)
         {
           this.tailUpdateButton.value = button.value;
           this.tailUpdateButton.setText(button.text);
           this.fixUpdateTask();
         }
-        else if (button.value == 0)
+        else if (button.value === 0)
         {
           this.loadTail();
         }
@@ -560,19 +565,21 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
 
       sortFileListByName : function(list) {
         list.sort(function(a, b) {
-              var valueA = a.name.toLowerCase();
-              var valueB = b.name.toLowerCase();
+              var
+                    valueA = a.name.toLowerCase(),
+                    valueB = b.name.toLowerCase();
+
               if (valueA < valueB)
               {
                 return -1;
               }
-              else if (valueA == valueB)
+              else if (valueA > valueB)
               {
-                return 0;
+                return 1;
               }
               else
               {
-                return 1;
+                return 0;
               }
             });
       }

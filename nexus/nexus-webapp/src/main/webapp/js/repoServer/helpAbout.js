@@ -10,11 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define('repoServer/helpAbout',['sonatype/all'], function(){
+/*global define*/
+define('repoServer/helpAbout',['extjs', 'sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.HelpAboutPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {};
-  Ext.apply(this, config, defaultConfig);
+  Ext.apply(this, config || {});
   
   var helpItems = [{
       //add this one by default, so existing usage will be preserved

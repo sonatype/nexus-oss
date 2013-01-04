@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
@@ -35,8 +36,8 @@ public class IndexerManagerEventInspector
     extends AbstractEventInspector
     implements AsynchronousEventInspector
 {
-    private final boolean enabled = SystemPropertiesHelper.getBoolean(
-        "org.sonatype.nexus.events.IndexerManagerEventInspector.enabled", true );
+    private final boolean enabled =
+        SystemPropertiesHelper.getBoolean( "org.sonatype.nexus.events.IndexerManagerEventInspector.enabled", true );
 
     @Requirement
     private IndexerManager indexerManager;
@@ -63,26 +64,28 @@ public class IndexerManagerEventInspector
 
     private void inspectForIndexerManager( Event<?> evt )
     {
-        try
-        {
-            RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
+        RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
-            // should we sync at all
-            if ( ievt.getRepository().isIndexable() )
+        Repository repository = ievt.getRepository();
+
+        // should we sync at all
+        if ( repository != null && repository.isIndexable() )
+        {
+            try
             {
                 if ( ievt instanceof RepositoryItemEventCache || ievt instanceof RepositoryItemEventStore )
                 {
-                    getIndexerManager().addItemToIndex( ievt.getRepository(), ievt.getItem() );
+                    getIndexerManager().addItemToIndex( repository, ievt.getItem() );
                 }
                 else if ( ievt instanceof RepositoryItemEventDelete )
                 {
-                    getIndexerManager().removeItemFromIndex( ievt.getRepository(), ievt.getItem() );
+                    getIndexerManager().removeItemFromIndex( repository, ievt.getItem() );
                 }
             }
-        }
-        catch ( Exception e ) // TODO be more specific
-        {
-            getLogger().error( "Could not maintain index!", e );
+            catch ( Exception e ) // TODO be more specific
+            {
+                getLogger().error( "Could not maintain index for repository {}!", repository.getId(), e );
+            }
         }
     }
 

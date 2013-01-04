@@ -16,6 +16,7 @@ define('ext/form',
         'ext/form/basicform',
         'ext/form/displayfield',
         'ext/form/field',
+        'ext/form/formpanel',
         'ext/form/textarea',
         'ext/form/TextField',
         'ext/form/VTypes'

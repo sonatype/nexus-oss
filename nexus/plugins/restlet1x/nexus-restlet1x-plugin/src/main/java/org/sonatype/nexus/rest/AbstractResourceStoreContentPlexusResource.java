@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageEofException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
@@ -195,10 +196,12 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     private void addNoCacheHeaders( final Response response )
     {
-        // NXCM-5155 Force browsers to not cache this page
+        // NEXUS-5155 Force browsers to not cache this page
         final Series<Parameter> headers = ( (HttpResponse) response ).getHttpCall().getResponseHeaders();
-        headers.add( "Pragma", "no-cache" );
-        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" );
+        headers.add( "Pragma", "no-cache" ); // HTTP/1.0
+        headers.add( "Cache-Control", "no-cache, no-store, max-age=0, must-revalidate" ); // HTTP/1.1
+        headers.add( "Cache-Control", "post-check=0, pre-check=0" ); // MS IE
+        headers.add( "Expires", "0" ); // No caching on Proxies in between client and Nexus
     }
 
     @Override
@@ -878,6 +881,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
             if ( t instanceof ResourceException )
             {
                 throw (ResourceException) t;
+            }
+            else if ( t instanceof LocalStorageEofException )
+            {
+                // in case client drops connection, this makes not much sense, as he will not
+                // receive this response, but we have to end it somehow.
+                // but, in case when remote proxy peer drops connection on us regularly
+                // this makes sense
+                throw new ResourceException( getStatus( Status.CLIENT_ERROR_NOT_FOUND, t ), t );
             }
             else if ( t instanceof IllegalArgumentException )
             {

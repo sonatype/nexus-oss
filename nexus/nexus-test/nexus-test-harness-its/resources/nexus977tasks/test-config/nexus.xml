@@ -116,7 +116,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>${proxy-repo-base-url}nexus977tasks/1</url>
       </remoteStorage>
       <externalConfiguration>
@@ -147,7 +146,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>${proxy-repo-base-url}nexus977tasks/2</url>
       </remoteStorage>
       <externalConfiguration>

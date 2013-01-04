@@ -26,6 +26,9 @@
 <!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
+    <Set name="threadPool">
+        <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    </Set>
     <Call name="addConnector">
         <Arg>
             <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
@@ -33,11 +36,11 @@
               <Set name="port">${application-port}</Set>
               
               <!-- Documentation for this fix can be found at:
-                    http://docs.codehaus.org/display/JETTY/Configuring+Connectors#ConfiguringConnectors-headerBufferSize
+                    http://wiki.eclipse.org/Jetty/Howto/Configure_Connectors
                     
                    This setting doubles the documented default value, from 4K to 8K.
               -->
-              <Set name="headerBufferSize">8192</Set>
+              <Set name="requestHeaderSize">8192</Set>
             </New>
         </Arg>
     </Call>

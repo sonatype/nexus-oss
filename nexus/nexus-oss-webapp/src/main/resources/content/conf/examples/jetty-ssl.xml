@@ -26,9 +26,12 @@
 <!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
+    <Set name="threadPool">
+        <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    </Set>
     <Call name="addConnector">
         <Arg>
-            <New class="org.eclipse.jetty.security.SslSelectChannelConnector">
+            <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
                 <Set name="host">${application-host}</Set>
                 <Set name="port">${application-port}</Set>
                 <Set name="keystore">/etc/ssl/keystore</Set>

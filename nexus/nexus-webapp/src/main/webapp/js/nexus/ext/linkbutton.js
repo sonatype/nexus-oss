@@ -52,13 +52,16 @@ define('nexus/ext/linkbutton', ['extjs', 'nexus'], function(Ext, Nexus) {
 
     buttonSelector : 'a:first',
 
+    // FIXME: Consider removing the href/target muck exposed here, as this class is intended to behave just like a normal button, just look like a link.
+    // FIXME: If the button handler really wants to change the location, it can/should do so programmatically.
+
     /**
      * @cfg String href
      * The URL to create a link for.
      */
     /**
      * @cfg String target
-     * The target for the &lt;a> element.
+     * The target for the 'a' element.
      */
     /**
      * @cfg Object
@@ -76,15 +79,16 @@ define('nexus/ext/linkbutton', ['extjs', 'nexus'], function(Ext, Nexus) {
       if (e.button !== 0) {
         return;
       }
+      // if disabled, stop the event
       if (this.disabled) {
-        this.stopEvent(e);
-      } else {
-        if (this.fireEvent("click", this, e) !== false) {
-          if (this.handler) {
-            this.handler.call(this.scope || this, this, e);
-          }
-        }
+        e.stopEvent();
       }
+      // else if there is a handler, stop the event and call the handler
+      else if (this.handler) {
+        e.stopEvent();
+        this.handler.call(this.scope || this, this, e);
+      }
+      // else let the event propagate
     },
 
     // private
@@ -101,7 +105,7 @@ define('nexus/ext/linkbutton', ['extjs', 'nexus'], function(Ext, Nexus) {
 
     /**
      * Sets the href of the link dynamically according to the params passed, and any {@link #baseParams} configured.
-     * @param {Object} Parameters to use in the href URL.
+     * @param {Object} p Parameters to use in the href URL.
      */
     setParams : function(p) {
       this.params = p;

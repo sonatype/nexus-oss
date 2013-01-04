@@ -31,12 +31,9 @@
 
   <link rel="stylesheet" href="ext-3.4.0/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="ext-3.4.0/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="style/sonatype-all.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
+  <link rel="stylesheet" href="style/$buildQualifier/sonatype-all.css" type="text/css" media="screen" title="no title" charset="utf-8">
 
 ##  <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
-    <script src="ext-3.4.0/adapter/ext/ext-base$!{debug}.js" type="text/javascript" charset="utf-8"></script>
-    <script src="ext-3.4.0/ext-all$!{debug}.js" type="text/javascript" charset="utf-8"></script>
-
     <script type="text/javascript">
         var require = {
             baseUrl : 'js',
@@ -46,38 +43,63 @@
 
     <script src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
 
-  #if ($!debug != "-debug")
-      ## load aggregated module definitions
-      <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  #if ($debug)
+      <script src="ext-3.4.0/adapter/ext/ext-base-debug.js" type="text/javascript" charset="utf-8"></script>
+      <script src="ext-3.4.0/ext-all-debug.js" type="text/javascript" charset="utf-8"></script>
+      ## omit sonatype-all.js to pick up single file modules
+  #else
+      ## load aggregated/minified files
+      <script src="ext-3.4.0/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
+      <script src="ext-3.4.0/ext-all.js" type="text/javascript" charset="utf-8"></script>
+      <script src="js/$buildQualifier/sonatype-all.js" type="text/javascript" charset="utf-8"></script>
   #end
 
     <script type="text/javascript" charset="utf-8">
-        requirejs(['require', 'extjs', 'nexus/ui', 'sonatype/all'], function(require) {
-            // repeating nexus/sonatype dependencies to have them as local variables
-            require([ 'extjs', 'nexus/ui', 'sonatype/all',
-            #foreach( $js in $pluginJsFiles )
-                '$nexusRoot/$js' ,
-            #end
-            ], function(Ext, Nexus, Sonatype) {
+
+        requirejs(['require', 'extjs', 'nexus/ui', 'sonatype/all'], function(require, Ext, Nexus, Sonatype) {
+            var
+                    all = ${pluginJsFiles.size()},
+                    loaded = 0;
+
+            function init() {
+                loaded += 1;
+
+                if (loaded < all) {
+                    return;
+                }
+
                 var alreadyDone = false;
+
                 function init() {
                     if (!Ext.isReady || alreadyDone) {
                         return;
                     }
                     alreadyDone = true;
-                    requirejs(['extjs', 'sonatype/init', 'nexus/ui', 'sonatype/utils'], function(Ext, Sonatype, Nexus) {
-                        Nexus.Log.debug('Initializing UI...');
-                        Sonatype.init();
-                        Sonatype.view.init();
-                        Nexus.Log.debug('Loading Nexus Status...');
-                        Sonatype.utils.loadNexusStatus();
-                    });
-                }
+
+                    Nexus.Log.debug('Initializing UI...');
+                    Sonatype.init();
+                    Sonatype.view.init();
+                    Nexus.Log.debug('Loading Nexus Status...');
+                    Sonatype.utils.loadNexusStatus();
+                };
 
                 Nexus.Log.debug('Loaded plugins');
                 Ext.onReady(init);
                 init();
-            });
+            }
+
+            function errorCallback(error) {
+                if (Nexus.error !== undefined) {
+                    Nexus.error.handle([errorCallback]);
+                } else if (console !== undefined) {
+                    console.log(errorCallback);
+                }
+                init();
+            }
+
+        #foreach( $js in $pluginJsFiles )
+            require([ '$js' ], init, errorCallback);
+        #end
         });
     </script>
 
@@ -112,8 +134,10 @@
   </div>
 
 <div id="welcome-tab" class="little-padding">
-  <p>Welcome to the <a href="http://nexus.sonatype.org" target="new">$appName</a>.</p>
-  <br/>
+    ## "manual" loadmask; will be replaced entirely on UI init
+    <div id="loadmask" class="ext-el-mask-msg x-mask-loading" style="margin-left: auto; margin-right: auto; margin-top: 200px; width: 150px; position: relative;">
+        <div>Loading Nexus UI...</div>
+    </div>
 </div>
 
 ## Plugin post BODY contributions start here

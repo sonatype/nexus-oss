@@ -956,6 +956,13 @@
           <description>The max age of metadata before we will check remote again for updated (in milliseconds, -1 for never).</description>
         </field>
         <field>
+          <name>itemMaxAge</name>
+          <version>1.0.0+</version>
+          <type>Integer</type>
+          <required>false</required>
+          <description>The max age of items (not artifact not metadata) before we will check remote again for updated (in minutes, -1 for never).</description>
+        </field>
+        <field>
           <name>autoBlockActive</name>
           <version>1.0.0+</version>
           <type>boolean</type>
@@ -4426,6 +4433,13 @@
           <type>String</type>
           <required>true</required>
           <description>regex validation that will validate the field.</description>
+        </field>
+        <field>
+          <name>initialValue</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Initial value of the field.</description>
         </field>
       </fields>
     </class>

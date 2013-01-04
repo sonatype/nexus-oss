@@ -44,7 +44,7 @@
     <!--
       <repository> <id>central</id> <name>Maven Central</name> <localStatus>inService</localStatus> <proxyMode>allow</proxyMode> <allowWrite>false</allowWrite> <browseable>true</browseable> <indexable>true</indexable>
       <notFoundCacheTTL>1440</notFoundCacheTTL> <artifactMaxAge>-1</artifactMaxAge> <metadataMaxAge>1440</metadataMaxAge> <maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata> <repositoryPolicy>release</repositoryPolicy>
-      <remoteStorage> <provider>apacheHttpClient3x</provider> <url>http://repo1.maven.org/maven2/</url> </remoteStorage> </repository>
+      <remoteStorage>  <url>http://repo1.maven.org/maven2/</url> </remoteStorage> </repository>
     -->
 
 

@@ -19,7 +19,8 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>nexus-launcher</artifactId>
@@ -28,7 +29,7 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-bundle-launcher</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.5</version>
     </dependency>
 
     <dependency>

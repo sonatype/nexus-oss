@@ -235,11 +235,9 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config) {
           name : 'id'
         }],
     buttons : [{
-          id : 'savebutton',
           text : 'Save',
           disabled : true
         }, {
-          id : 'cancelbutton',
           text : 'Cancel'
         }]
   };
@@ -739,7 +737,6 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
         // @todo: would be faster to pre-render the six variations of the menu
         // for whole instance
         var menu = new Ext.menu.Menu({
-              id : 'repoTarget-grid-ctx',
               items : [this.actions.refresh]
             });
 

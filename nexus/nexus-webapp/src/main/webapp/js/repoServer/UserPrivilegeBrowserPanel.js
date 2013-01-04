@@ -166,6 +166,10 @@ Ext.extend(Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
       },
       loadPrivilegeList : function() {
         var privilegeList = this.find('name', 'privilege-list')[0];
+        if (!privilegeList) {
+          // not displayed yet
+          return;
+        }
         while (privilegeList.root.lastChild)
         {
           privilegeList.root.removeChild(privilegeList.root.lastChild);

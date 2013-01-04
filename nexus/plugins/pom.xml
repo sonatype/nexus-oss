@@ -18,7 +18,8 @@
   <parent>
     <artifactId>nexus</artifactId>
     <groupId>org.sonatype.nexus</groupId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -36,19 +37,6 @@
     </dependency>
   </dependencies>
 
-  <modules>
-    <module>siesta</module>
-    <module>restlet1x</module>
-    <module>indexer</module>
-    <module>ldap</module>
-    <module>nexus-timeline-plugin</module>
-    <module>nexus-lvo-plugin</module>
-    <module>nexus-plugin-console-plugin</module>
-    <module>nexus-rrb-plugin</module>
-    <module>nexus-archetype-plugin</module>
-    <module>nexus-maven-bridge-plugin</module>
-  </modules>
-
   <build>
     <plugins>
       <plugin>
@@ -58,5 +46,30 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>plugins</id>
+
+      <activation>
+        <property>
+          <name>!skip-plugins</name>
+        </property>
+      </activation>
+
+      <modules>
+        <module>siesta</module>
+        <module>restlet1x</module>
+        <module>indexer</module>
+        <module>ldap</module>
+        <module>nexus-timeline-plugin</module>
+        <module>nexus-lvo-plugin</module>
+        <module>nexus-plugin-console-plugin</module>
+        <module>nexus-rrb-plugin</module>
+        <module>nexus-archetype-plugin</module>
+        <module>nexus-maven-bridge-plugin</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

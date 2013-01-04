@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -169,12 +169,31 @@ public class Nexus3578IndexerManagerIT
         creators.add( mavenArchetype );
         creators.add( jar );
 
-        Field indexCreatorsField = context.getClass().getDeclaredField( "indexCreators" );
+        Field indexCreatorsField = getIndexCreatorsField( context );
 
         if ( indexCreatorsField != null )
         {
             indexCreatorsField.setAccessible( true );
             indexCreatorsField.set( context, creators );
         }
+    }
+
+    private Field getIndexCreatorsField( DefaultIndexingContext context )
+        throws NoSuchFieldException
+    {
+        Class<?> type = context.getClass();
+        do
+        {
+            try
+            {
+                return type.getDeclaredField( "indexCreators" );
+            }
+            catch ( NoSuchFieldException e )
+            {
+                type = type.getSuperclass();
+            }
+        }
+        while ( type != null );
+        throw new NoSuchFieldException();
     }
 }

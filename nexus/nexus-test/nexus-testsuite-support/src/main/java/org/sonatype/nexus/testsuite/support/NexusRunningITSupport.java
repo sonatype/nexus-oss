@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -125,8 +125,8 @@ public abstract class NexusRunningITSupport
             {
                 logRemoteThatTestIs( "FINISHED" );
             }
-            testIndex().recordLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
-            testIndex().recordLink( "nexus.log", new File( nexus.getWorkDirectory(), "logs/nexus.log" ) );
+            testIndex().recordAndCopyLink( "wrapper.log", new File( nexus.getNexusDirectory(), "logs/wrapper.log" ) );
+            testIndex().recordAndCopyLink( "nexus.log", new File( nexus.getWorkDirectory(), "logs/nexus.log" ) );
         }
 
         if ( NexusStartAndStopStrategy.Strategy.EACH_METHOD.equals( startAndStopStrategy ) )
@@ -236,14 +236,7 @@ public abstract class NexusRunningITSupport
      */
     private void logRemoteThatTestIs( final String doingWhat )
     {
-        try
-        {
-            logRemoteThatTestIs( remoteLogger(), doingWhat );
-        }
-        catch ( final Exception e )
-        {
-            logger.warn( "Failed to log remote that test was '{}' ({})", doingWhat, e.getMessage() );
-        }
+        logRemoteThatTestIs( remoteLogger(), doingWhat );
     }
 
     private void startNexus( final NexusBundle nexusBundle )

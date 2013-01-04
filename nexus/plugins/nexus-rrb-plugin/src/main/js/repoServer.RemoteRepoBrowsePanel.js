@@ -182,7 +182,6 @@ Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 	      node.data = node.attributes;
 	  
 	      var menu = new Sonatype.menu.Menu( {
-	      	id: 'repo-context-menu',
 	        payload: node,
 	        scope: this,
 	        items: []

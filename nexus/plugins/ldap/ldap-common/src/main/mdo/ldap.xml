@@ -13,7 +13,7 @@
 
 -->
 <model xsd.namespace="http://www.sonatype.com/xsd/ldap-configuration-1.0.1"
-    xsd.target-namespace="http://www.sonatype.com/xsd/ldap-configuration-1.0.1">
+    xsd.targetNamespace="http://www.sonatype.com/xsd/ldap-configuration-1.0.1">
 
     <id>ldap</id>
 

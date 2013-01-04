@@ -49,57 +49,55 @@ Sonatype.SearchStore = function(config) {
                   name : 'latestSnapshotRepositoryId'
                 }])),
         listeners : {
-          'beforeload' : {
-            fn : function(store, options) {
-              store.proxy.getConnection().on('requestcomplete', function(conn, response, options) {
-                    if (response.responseText)
-                    {
-                      var statusResp = Ext.decode(response.responseText);
-                      if (statusResp)
-                      {
-                        this.grid.totalRecords = statusResp.totalCount;
-                        if (statusResp.tooManyResults)
-                        {
-                          this.grid.setWarningLabel('Too many results, please refine the search condition.');
-                        }
-                        else
-                        {
-                          this.grid.clearWarningLabel();
-                        }
-                      }
-                    }
-                  }, this, {
-                    single : true
-                  });
-              return true;
-            },
-            scope : this
-          },
           'load' : {
             fn : function(store, records, options) {
               this.grid.updateRowTotals(this.grid);
             },
             scope : this
           },
+          // FIXME loadexception event is deprecated, should use general DataProxy#exception event
           'loadexception' : {
-        	fn : function (obj, options, response, error) {
-        	  try {
-              // The response is already HTML escaped as it's coming through the REST layer, and can be directly used as
-              // a warning
-	        	  var errorResponse = Ext.decode(response.responseText);
-	        	  if ( errorResponse.errors && errorResponse.errors[0] && errorResponse.errors[0].id == "search" ) {
-		              this.grid.setWarningLabel(errorResponse.errors[0].msg);
-	        	  } else {
-		              this.grid.setWarningLabel(response.responseText);
-	        	  }
-        	  } catch (e) {
-        		  Sonatype.MessageBox.alert('Problem parsing error response:\n' + response.responseText);
-        	  }
-	        },
+            fn : function(obj, options, response) {
+              try {
+                // The response is already HTML escaped as it's coming through the REST layer, and can be directly used as
+                // a warning
+                var errorResponse = Ext.decode(response.responseText);
+                if (errorResponse.errors && errorResponse.errors[0] && errorResponse.errors[0].id === "search") {
+                  this.grid.setWarningLabel(errorResponse.errors[0].msg);
+                } else if (typeof response.responseText !== 'undefined') {
+                  this.grid.setWarningLabel(response.responseText);
+                } else {
+                  this.grid.setWarningLabel('Could not retrieve search results.');
+                }
+              }
+              catch (e) {
+                Sonatype.MessageBox.alert('Problem parsing error response:\n' + e.toString() + '\n' + response.responseText);
+              }
+            },
             scope : this
           }
         }
       });
+
+  // FIXME it's stupid to do it this way, because getConnection usually returns Ext.Ajax and this ends up firing for all calls.
+  this.proxy.getConnection().on('requestcomplete', function(conn, response, options) {
+    if (response.responseText && options.url.indexOf(this.searchUrl) !== -1)
+    {
+      var statusResp = Ext.decode(response.responseText);
+      if (statusResp)
+      {
+        this.grid.totalRecords = statusResp.totalCount;
+        if (statusResp.tooManyResults)
+        {
+          this.grid.setWarningLabel('Too many results, please refine the search condition.');
+        }
+        else
+        {
+          this.grid.clearWarningLabel();
+        }
+      }
+    }
+  }, this);
 };
 
 Ext.extend(Sonatype.SearchStore, Ext.data.Store, {});
@@ -268,8 +266,16 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
           latest = record.get('latestSnapshot');
         }
 
-        return 'Latest: ' + latest + ' <a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
-            + '~~~~kw,versionexpand " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">(Show All Versions)</a>';
+        var linkMarkup = '<a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
+                + '~~~~kw,versionexpand " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">';
+
+        if (store.reader.jsonData.tooManyResults) {
+          return linkMarkup + 'Show All Versions</a>';
+        } else {
+          return 'Latest: ' + latest + ' ' + linkMarkup + '(Show All Versions)</a>';
+
+        }
+
       },
       formatDownloadLinks : function(value, p, record, rowIndex, colIndex, store) {
         var hitIndex = 0;
@@ -428,6 +434,7 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
         p.fetchMoreBar.items.items[0].destroy();
         p.fetchMoreBar.items.removeAt(0);
         p.fetchMoreBar.insertButton(0, new Ext.Toolbar.TextItem('Displaying Top ' + count + ' records'));
+        p.fetchMoreBar.doLayout();
       },
 
       setWarningLabel : function(s) {

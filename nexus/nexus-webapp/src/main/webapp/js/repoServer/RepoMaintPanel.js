@@ -205,7 +205,9 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
     header : 'Repository Path',
     autoExpand : true,
     renderer : function(s) {
-      if (/^http(s)?:/.test(s)) {
+      if ( typeof s !== 'string' ) {
+        return '';
+      } else if (/^http(s)?:/.test(s)) {
         return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') + '" target="_blank">' + s + '</a>';
       } else {
         return '' + s;
@@ -304,7 +306,8 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
 
       applyBookmark : function(bookmark) {
         this.updatingBookmark = true;
-        if (this.groupStore.lastOptions == null)
+
+        if (typeof this.groupStore.lastOptions !== 'object')
         {
           this.groupStore.on('load', function(store, recs, options) {
                 this.selectBookmarkedItem(bookmark);
@@ -523,16 +526,22 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
                 rec.endEdit();
               }
             }
-            if (data.length)
-            {
-              this.gridPanel.getView().refresh();
-            }
           }
         }
         else
         {
-          Sonatype.MessageBox.alert('Status retrieval failed');
+          this.dataStore.each(function(rec) {
+            if ( rec.get('repoType') !== 'group' ) {
+              rec.beginEdit();
+              rec.set('status', {localStatus : 'IN_SERVICE' , proxyMode : 'ALLOW', remoteStatus:'UNKNOWN'});
+              rec.set('displayStatus', '<i>Status retrieval failed</i>');
+              rec.commit(true);
+              rec.endEdit();
+            }
+          });
         }
+
+        this.gridPanel.getView().refresh();
       },
 
       statusStart : function() {
@@ -673,7 +682,6 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
           node.data = node.attributes;
 
           var menu = new Sonatype.menu.Menu({
-                id : 'repo-context-menu',
                 payload : node,
                 scope : this,
                 items : []

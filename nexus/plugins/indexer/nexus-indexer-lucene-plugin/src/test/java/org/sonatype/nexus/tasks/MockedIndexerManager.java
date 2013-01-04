@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -69,14 +69,6 @@ public class MockedIndexerManager
 
     @Override
     public void updateRepositoryIndexContext( String repositoryId )
-        throws IOException, NoSuchRepositoryException
-    {
-        throw new UnsupportedOperationException();
-
-    }
-
-    @Override
-    public void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
         throws IOException, NoSuchRepositoryException
     {
         throw new UnsupportedOperationException();

@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -31,7 +31,7 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 public abstract class AbstractIndexerManagerTest
     extends AbstractMavenRepoContentTests
 {
-    protected IndexerManager indexerManager;
+    protected DefaultIndexerManager indexerManager;
 
     protected NexusScheduler nexusScheduler;
 
@@ -45,7 +45,7 @@ public abstract class AbstractIndexerManagerTest
 
         nexusConfiguration.saveConfiguration();
 
-        indexerManager = lookup( IndexerManager.class );
+        indexerManager = (DefaultIndexerManager) lookup( IndexerManager.class );
 
         nexusScheduler = lookup( NexusScheduler.class );
     }

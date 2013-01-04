@@ -10,17 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
+
 /*
  * Privilege Edit/Create panel layout and controller
  */
-
-define('repoServer/PrivilegeEditPanel',['sonatype/all'], function(){
+define('repoServer/PrivilegeEditPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.PrivilegeEditPanel = function(config) {
-  var config = config || {};
-  var defaultConfig = {
+  Ext.apply(this, config || {}, {
     title : 'Privileges'
-  };
-  Ext.apply(this, config, defaultConfig);
+  });
 
   this.sp = Sonatype.lib.Permissions;
 
@@ -174,18 +173,18 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config) {
 
 Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
       convertRepository : function(value, parent) {
-        var targetPriv = false;
-        for (var i = 0; i < parent.properties.length; i++)
+        var i, targetPriv = false;
+        for (i = 0; i < parent.properties.length; i+=1)
         {
-          if (parent.properties[i].key == 'repositoryId' && !Ext.isEmpty(parent.properties[i].value))
+          if (parent.properties[i].key === 'repositoryId' && !Ext.isEmpty(parent.properties[i].value))
           {
             return this.convertDataValue(parent.properties[i].value, this.repoStore, 'id', 'name');
           }
-          else if (parent.properties[i].key == 'repositoryGroupId' && !Ext.isEmpty(parent.properties[i].value))
+          else if (parent.properties[i].key === 'repositoryGroupId' && !Ext.isEmpty(parent.properties[i].value))
           {
             return this.convertDataValue(parent.properties[i].value, this.groupStore, 'id', 'name');
           }
-          else if (parent.properties[i].key == 'repositoryTargetId')
+          else if (parent.properties[i].key === 'repositoryTargetId')
           {
             targetPriv = true;
           }
@@ -202,9 +201,10 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
       },
 
       convertTarget : function(value, parent) {
-        for (var i = 0; i < parent.properties.length; i++)
+        var i;
+        for (i = 0; i < parent.properties.length; i+=1)
         {
-          if (parent.properties[i].key == 'repositoryTargetId' && !Ext.isEmpty(parent.properties[i].value))
+          if (parent.properties[i].key === 'repositoryTargetId' && !Ext.isEmpty(parent.properties[i].value))
           {
             return this.convertDataValue(parent.properties[i].value, this.targetStore, 'id', 'name');
           }
@@ -217,9 +217,10 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
       },
 
       convertMethod : function(value, parent) {
-        for (var i = 0; i < parent.properties.length; i++)
+        var i;
+        for (i = 0; i < parent.properties.length; i+=1)
         {
-          if (parent.properties[i].key == 'method' && !Ext.isEmpty(parent.properties[i].value))
+          if (parent.properties[i].key === 'method' && !Ext.isEmpty(parent.properties[i].value))
           {
             return parent.properties[i].value;
           }
@@ -232,11 +233,12 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
       },
 
       convertRepositoryProperty : function(value, parent) {
+        var i;
         if (Ext.isEmpty(value))
         {
-          for (var i = 0; i < parent.length; i++)
+          for (i = 0; i < parent.length; i+=1)
           {
-            if (parent[i].key == 'repositoryGroupId' && !Ext.isEmpty(parent[i].value))
+            if (parent[i].key === 'repositoryGroupId' && !Ext.isEmpty(parent[i].value))
             {
               return '';
             }
@@ -308,11 +310,12 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
       },
 
       submitHandler : function(form, action, receivedData) {
+        var i, r;
         if (Ext.isArray(receivedData))
         {
-          for (var i = 0; i < receivedData.length; i++)
+          for (i = 0; i < receivedData.length; i+=1)
           {
-            var r = receivedData[i];
+            r = receivedData[i];
             r.sTarget = this.convertTarget(r.repositoryTargetId, r);
             r.sType = this.convertType(r.type, r);
             r.sRepository = this.convertRepository(r.repositoryId, r);
@@ -324,13 +327,14 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
     });
 
 Sonatype.repoServer.PrivilegeEditor = function(config) {
-  var config = config || {};
-  var defaultConfig = {
+  var i, items, targetStore2, typeRec,
+        ht = Sonatype.repoServer.resources.help.privileges,
+        defaultConfig = {
     uri : Sonatype.config.repos.urls.privileges + '_target',
     dataModifiers : {
       load : {
         properties : function(value, parent, fpanel) {
-          for (var i = 0; i < value.length; i++)
+          for (i = 0; i < value.length; i+=1)
           {
             var field = fpanel.form.findField(value[i].key);
             field.setValue(fpanel.propertyTypeStore.getAt(fpanel.propertyTypeStore.find('type', field.fieldConverterType)).data.converter(value[i].value, value));
@@ -346,11 +350,11 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
         },
         repositoryId : function(val, fpanel) {
           var v = fpanel.form.findField('repositoryOrGroup').getValue();
-          return v.indexOf('repo_') == 0 ? v.substring('repo_'.length) : '';
+          return v.indexOf('repo_') === 0 ? v.substring('repo_'.length) : '';
         },
         repositoryGroupId : function(val, fpanel) {
           var v = fpanel.form.findField('repositoryOrGroup').getValue();
-          return v.indexOf('group_') == 0 ? v.substring('group_'.length) : '';
+          return v.indexOf('group_') === 0 ? v.substring('group_'.length) : '';
         },
         type : function(val, fpanel) {
           return 'target';
@@ -363,9 +367,8 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
     },
     referenceData : Sonatype.repoServer.referenceData.privileges.target
   };
-  Ext.apply(this, config, defaultConfig);
+  Ext.apply(this, config || {}, defaultConfig);
 
-  var ht = Sonatype.repoServer.resources.help.privileges;
   this.COMBO_WIDTH = 300;
   this.sp = Sonatype.lib.Permissions;
 
@@ -390,7 +393,7 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
     this.readOnly = true;
   }
 
-  var items = [{
+  items = [{
         xtype : 'hidden',
         name : 'id'
       }, {
@@ -416,7 +419,7 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
   if (this.isNew)
   {
     // clone the target store
-    var targetStore2 = new Ext.data.JsonStore({
+    targetStore2 = new Ext.data.JsonStore({
           root : 'data',
           id : 'id',
           fields : [{
@@ -487,11 +490,11 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
           disabled : true
         });
 
-    var typeRec = this.privilegeTypeStore.getById(this.payload.data.type);
+    typeRec = this.privilegeTypeStore.getById(this.payload.data.type);
 
     if (!Ext.isEmpty(typeRec))
     {
-      for (var i = 0; i < typeRec.data.properties.length; i++)
+      for (i = 0; i < typeRec.data.properties.length; i+=1)
       {
         items.push({
               xtype : 'textfield',
@@ -514,7 +517,7 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
 
 Ext.extend(Sonatype.repoServer.PrivilegeEditor, Sonatype.ext.FormPanel, {
       initCombinedRecord : function(rec) {
-        var isGroup = rec.data.repoType == null;
+        var isGroup = rec.data.repoType === null || rec.data.repoType === undefined;
         return {
           id : (isGroup ? 'group_' : 'repo_') + rec.data.id,
           name : rec.data.name + (isGroup ? ' (Group)' : ' (Repo)'),
@@ -541,12 +544,14 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditor, Sonatype.ext.FormPanel, {
       },
 
       repositorySelectHandler : function(combo, rec, index) {
-        var targetCombo = this.form.findField('repositoryTargetId');
-        var previousValue = targetCombo.getValue();
+        var
+              targetCombo = this.form.findField('repositoryTargetId'),
+              previousValue = targetCombo.getValue(),
+
+        filterValue = rec.data.format;
         targetCombo.setValue(null);
         targetCombo.store.clearFilter();
 
-        var filterValue = rec.data.format;
         if (filterValue)
         {
           targetCombo.store.filter('contentClass', filterValue);

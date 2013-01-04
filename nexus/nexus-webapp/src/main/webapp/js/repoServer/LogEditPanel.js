@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global define*/
 
-define('repoServer/LogEditPanel',['sonatype/all'], function(){
-/*global Ext, Sonatype*/
+define('repoServer/LogEditPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.LogEditPanel = function(cfg) {
   var
         config = cfg || {},
@@ -65,13 +65,11 @@ Sonatype.repoServer.LogEditPanel = function(cfg) {
                   }],
 
         buttons : [{
-              id : 'savebutton',
               text : 'Save',
               handler : this.saveBtnHandler,
               disabled : true,
               scope : this
             }, {
-              id : 'cancelbutton',
               text : 'Cancel',
               handler : this.cancelBtnHandler,
               scope : this

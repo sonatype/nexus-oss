@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -12,10 +12,9 @@
  */
 package org.sonatype.nexus.plugins.tasks.api;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.getTaskByName;
+import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.isTaskCompleted;
+import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.sleep;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -31,14 +30,12 @@ import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
-import org.sonatype.scheduling.schedules.ManualRunSchedule;
-import org.sonatype.scheduling.schedules.RunNowSchedule;
 
 @Component( role = PlexusResource.class, hint = "TaskHelperResource" )
 public class TaskHelperPlexusResource
     extends AbstractPlexusResource
 {
+
     @Requirement
     private NexusScheduler nexusScheduler;
 
@@ -82,58 +79,23 @@ public class TaskHelperPlexusResource
             }
         }
 
-        ScheduledTask<?> namedTask = null;
+        final ScheduledTask<?> namedTask = getTaskByName( nexusScheduler, name );
 
-        if ( name != null )
+        if ( name != null && namedTask == null )
         {
-            namedTask = getTaskByName( name );
-
-            if ( namedTask == null )
-            {
-                // task wasn't found, so bounce on outta here
-                response.setStatus( Status.SUCCESS_OK );
-                return "OK";
-            }
+            // task wasn't found, so bounce on outta here
+            response.setStatus( Status.SUCCESS_OK );
+            return "OK";
         }
 
         for ( int i = 0; i < attempts; i++ )
         {
-            try
-            {
-                Thread.sleep( 500 );
-            }
-            catch ( InterruptedException e )
-            {
-            }
+            sleep();
 
-            if ( namedTask != null )
+            if ( isTaskCompleted( nexusScheduler, taskType, namedTask ) )
             {
-                if ( isTaskCompleted( namedTask ) )
-                {
-                    response.setStatus( Status.SUCCESS_OK );
-                    return "OK";
-                }
-            }
-            else
-            {
-                Set<ScheduledTask<?>> tasks = getTasks( taskType );
-
-                boolean running = false;
-
-                for ( ScheduledTask<?> task : tasks )
-                {
-                    if ( !isTaskCompleted( task ) )
-                    {
-                        running = true;
-                        break;
-                    }
-                }
-
-                if ( !running )
-                {
-                    response.setStatus( Status.SUCCESS_OK );
-                    return "OK";
-                }
+                response.setStatus( Status.SUCCESS_OK );
+                return "OK";
             }
         }
 
@@ -141,72 +103,4 @@ public class TaskHelperPlexusResource
         return "Tasks Not Finished";
     }
 
-    private boolean isTaskCompleted( ScheduledTask<?> task )
-    {
-        if ( task.getSchedule() instanceof RunNowSchedule )
-        {
-            // runNow scheduled tasks will _dissapear_ when done. So, the fact they are PRESENT simply
-            // means they are not YET complete
-            return false;
-        }
-        else
-        {
-            final TaskState state = task.getTaskState();
-
-            if ( task.getSchedule() instanceof ManualRunSchedule )
-            {
-                // MnuallRunSchedule stuff goes back to SUBMITTED state and sit there for next "kick"
-                // but we _know_ it ran once at least if lastRun date != null AND is in some of the following
-                // states
-                // Note: I _think_ ManualRunScheduled task never go into WAITING state! (unverified claim)
-                return task.getLastRun() != null
-                    && ( TaskState.SUBMITTED.equals( state ) || TaskState.WAITING.equals( state )
-                        || TaskState.FINISHED.equals( state ) || TaskState.BROKEN.equals( state ) || TaskState.CANCELLED.equals( state ) );
-            }
-            else
-            {
-                // the rest of tasks are completed if in any of these statuses
-                return TaskState.WAITING.equals( state ) || TaskState.FINISHED.equals( state )
-                    || TaskState.BROKEN.equals( state ) || TaskState.CANCELLED.equals( state );
-            }
-        }
-    }
-
-    private ScheduledTask<?> getTaskByName( String name )
-    {
-        Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getAllTasks();
-
-        for ( List<ScheduledTask<?>> taskList : taskMap.values() )
-        {
-            for ( ScheduledTask<?> task : taskList )
-            {
-                if ( task.getName().equals( name ) )
-                {
-                    return task;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private Set<ScheduledTask<?>> getTasks( String taskType )
-    {
-        Set<ScheduledTask<?>> tasks = new HashSet<ScheduledTask<?>>();
-
-        Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getAllTasks();
-
-        for ( List<ScheduledTask<?>> taskList : taskMap.values() )
-        {
-            for ( ScheduledTask<?> task : taskList )
-            {
-                if ( taskType == null || task.getType().equals( taskType ) )
-                {
-                    tasks.add( task );
-                }
-            }
-        }
-
-        return tasks;
-    }
 }
