@@ -989,8 +989,14 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-utils</artifactId>
+        <artifactId>nexus-core</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-core</artifactId>
+        <version>${project.version}</version>
+        <classifier>tests</classifier>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1014,11 +1020,6 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1026,33 +1027,6 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration-model</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-configuration</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-proxy</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-proxy</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-app</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-app</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
@@ -1397,6 +1371,7 @@
               <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
               <!-- FIXME is this really a good idea excluding all test resources? -->
               <exclude>**/src/test/resources/**</exclude>
+              <exclude>**/src/test/filtered-resources/**</exclude>
               <exclude>**/nexus-test-harness-its/resources/**</exclude>
               <exclude>**/gwt/ext/ui/**/*.js</exclude>
               <exclude>**/gwt/ext/ui/**/*.css</exclude>
@@ -1654,19 +1629,14 @@
     <module>nexus-runtime-platform</module>
     <module>nexus/nexus-bootstrap</module>
     <module>nexus/nexus-plugin-api</module>
-    <module>nexus/nexus-plugin-manager</module>
     <module>nexus/nexus-plugin-test-api</module>
-    <module>nexus/nexus-utils</module>
+    <module>nexus/nexus-core</module>
     <module>nexus/nexus-web-utils</module>
     <module>nexus/nexus-logging-extras</module>
     <module>nexus/nexus-logging-extras-appender</module>
     <module>nexus/nexus-compat</module>
-    <module>nexus/nexus-api</module>
     <module>nexus/nexus-oss-edition</module>
     <module>nexus/nexus-configuration-model</module>
-    <module>nexus/nexus-configuration</module>
-    <module>nexus/nexus-proxy</module>
-    <module>nexus/nexus-app</module>
     <module>nexus/plugins</module>
     <module>nexus/nexus-webapp</module>
     <module>nexus/nexus-launcher</module>

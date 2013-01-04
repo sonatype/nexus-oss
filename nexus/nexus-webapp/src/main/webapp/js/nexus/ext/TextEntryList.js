@@ -138,7 +138,7 @@ Nexus.ext.TextEntryList = function(cfg) {
 
 };
 
-Ext.extend(Nexus.ext.TextEntryList, Ext.Panel, {
+Ext.extend(Nexus.ext.TextEntryList, Ext.FormPanel, {
 
       addEntryNode : function(treePanel, entry) {
         var id = Ext.id();
