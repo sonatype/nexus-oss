@@ -16,10 +16,11 @@ Ext.namespace('Sonatype.panels');
 
 (function() {
   function removeDanglingSeparators(menu) {
+    var item, i, seenSeparator;
     if (!menu.items) {
       return menu;
     }
-    var item = menu.items.first();
+    item = menu.items.first();
     while (item && !item.text) {
       menu.remove(item); // clean up if the first element is a separator
       item = menu.items.first();
@@ -29,6 +30,18 @@ Ext.namespace('Sonatype.panels');
       menu.remove(item); // clean up if the last element is a separator
       item = menu.items.last();
     }
+
+    menu.items.each(function(item) {
+      if (!item.text) {
+        if (seenSeparator) {
+          menu.remove(item);
+        } else {
+          seenSeparator = true;
+        }
+      } else {
+        seenSeparator = false;
+      }
+    });
   }
 
   /*

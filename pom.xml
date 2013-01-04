@@ -19,14 +19,14 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>27</version>
+    <version>30</version>
     <relativePath />
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus</artifactId>
   <packaging>pom</packaging>
-  <version>2.3-SNAPSHOT</version>
+  <version>2.4-SNAPSHOT</version>
 
   <inceptionYear>2007</inceptionYear>
   <url>http://nexus.sonatype.org/</url>
@@ -174,7 +174,6 @@
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
     <aether.version>1.13.1</aether.version>
-    <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.26.1</enunciate.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
@@ -554,22 +553,21 @@
         </exclusions>
       </dependency>
 
+      <!--
+      Use our custom build of commons-beanutils 1.8.3 which excludes the commons-collections classes.
+      For more details see:
+      https://issues.sonatype.org/browse/NEXUS-5336
+      -->
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils-core</artifactId>
-        <version>${commons-beanutils.version}</version>
+        <version>1.8.3-SONATYPE</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils-bean-collections</artifactId>
-        <version>${commons-beanutils.version}</version>
       </dependency>
 
       <dependency>
@@ -882,7 +880,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
       </dependency>
 
       <!--
@@ -991,8 +989,14 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-utils</artifactId>
+        <artifactId>nexus-core</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-core</artifactId>
+        <version>${project.version}</version>
+        <classifier>tests</classifier>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1016,11 +1020,6 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1028,33 +1027,6 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration-model</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-configuration</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-proxy</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-proxy</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-app</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-app</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
@@ -1324,15 +1296,12 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <failIfNoTests>false</failIfNoTests>
-            <forkMode>once</forkMode>
             <!--
             FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
             https://issues.sonatype.org/browse/NEXUS-5345
             -->
             <!--<workingDirectory>${project.build.directory}</workingDirectory>-->
-            <systemPropertyVariables>
-              <java.awt.headless>true</java.awt.headless>
+            <systemPropertyVariables combine.children="append">
               <!-- start junit benchmarks config -->
               <jub.consumers>H2,CONSOLE</jub.consumers>
               <jub.db.file>.benchmarks</jub.db.file>
@@ -1350,7 +1319,6 @@
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-            <failIfNoTests>false</failIfNoTests>
             <forkMode>once</forkMode>
             <!--
             FIXME: Some tests do not root properly, should be update to use TestSupport util.resolve* helpers; leave default for now
@@ -1360,8 +1328,7 @@
             <excludes combine.children="append">
               <exclude>**/Abstract*</exclude>
             </excludes>
-            <systemPropertyVariables>
-              <java.awt.headless>true</java.awt.headless>
+            <systemPropertyVariables combine.children="append">
               <!-- logging configuration properties, see logback*.xml files -->
               <test.log.level>${test.log.level}</test.log.level>
               <it.test.log.level>${it.test.log.level}</it.test.log.level>
@@ -1394,7 +1361,7 @@
             <!-- caution do not append children excludes since we have 'target' package -->
             <excludes>
               <exclude>**/.*/**</exclude>
-              <!-- we have target pattern in this format because of target package in nexus-api and nexus-proxy modules -->
+              <!-- we have target pattern in this format because of target package in nexus-core modules -->
               <exclude>**/nexus*/target/**</exclude>
               <exclude>**/ldap-common/target/**</exclude>
               <exclude>**/ext-2.3/**</exclude>
@@ -1404,6 +1371,7 @@
               <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
               <!-- FIXME is this really a good idea excluding all test resources? -->
               <exclude>**/src/test/resources/**</exclude>
+              <exclude>**/src/test/filtered-resources/**</exclude>
               <exclude>**/nexus-test-harness-its/resources/**</exclude>
               <exclude>**/gwt/ext/ui/**/*.js</exclude>
               <exclude>**/gwt/ext/ui/**/*.css</exclude>
@@ -1661,19 +1629,14 @@
     <module>nexus-runtime-platform</module>
     <module>nexus/nexus-bootstrap</module>
     <module>nexus/nexus-plugin-api</module>
-    <module>nexus/nexus-plugin-manager</module>
     <module>nexus/nexus-plugin-test-api</module>
-    <module>nexus/nexus-utils</module>
+    <module>nexus/nexus-core</module>
     <module>nexus/nexus-web-utils</module>
     <module>nexus/nexus-logging-extras</module>
     <module>nexus/nexus-logging-extras-appender</module>
     <module>nexus/nexus-compat</module>
-    <module>nexus/nexus-api</module>
     <module>nexus/nexus-oss-edition</module>
     <module>nexus/nexus-configuration-model</module>
-    <module>nexus/nexus-configuration</module>
-    <module>nexus/nexus-proxy</module>
-    <module>nexus/nexus-app</module>
     <module>nexus/plugins</module>
     <module>nexus/nexus-webapp</module>
     <module>nexus/nexus-launcher</module>

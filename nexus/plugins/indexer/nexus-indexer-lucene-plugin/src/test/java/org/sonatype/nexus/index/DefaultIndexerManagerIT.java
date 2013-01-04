@@ -14,12 +14,16 @@ package org.sonatype.nexus.index;
 
 import java.util.Collection;
 
+import junit.framework.Assert;
+
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
+import org.apache.maven.index.context.IndexingContext;
 import org.junit.Test;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.RemoteStorageException;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 
@@ -85,7 +89,8 @@ public class DefaultIndexerManagerIT
         // org.sonatype.nexus : nexus-indexer : 1.0-beta-4
         // sha1: 86e12071021fa0be4ec809d4d2e08f07b80d4877
 
-        Collection<ArtifactInfo> ais = indexerManager.identifyArtifact( MAVEN.SHA1, "86e12071021fa0be4ec809d4d2e08f07b80d4877" );
+        Collection<ArtifactInfo> ais =
+            indexerManager.identifyArtifact( MAVEN.SHA1, "86e12071021fa0be4ec809d4d2e08f07b80d4877" );
 
         assertTrue( "The artifact has to be found!", ais.size() == 1 );
 
@@ -94,7 +99,7 @@ public class DefaultIndexerManagerIT
         // this will be EXACT search, since we gave full SHA1 checksum of 40 chars
         response =
             indexerManager.searchArtifactSha1ChecksumIterator( "86e12071021fa0be4ec809d4d2e08f07b80d4877", null, null,
-                null, null, null );
+                                                               null, null, null );
 
         assertEquals( "There should be one hit!", 1, response.getTotalHits() );
 
@@ -121,5 +126,22 @@ public class DefaultIndexerManagerIT
         nexusConfiguration.saveConfiguration();
 
         indexerManager.reindexRepository( "/", r.getId(), true );
+    }
+
+    @Test
+    public void testDuplicateAddRepositoryRequest()
+        throws Exception
+    {
+        MavenProxyRepository repo = central;
+
+        IndexingContext repoCtx = indexerManager.getRepositoryIndexContext( repo );
+
+        Assert.assertNotNull( repoCtx );
+
+        indexerManager.addRepositoryIndexContext( repo );
+
+        IndexingContext repoCtx2 = indexerManager.getRepositoryIndexContext( repo );
+
+        Assert.assertSame( repoCtx, repoCtx2 );
     }
 }

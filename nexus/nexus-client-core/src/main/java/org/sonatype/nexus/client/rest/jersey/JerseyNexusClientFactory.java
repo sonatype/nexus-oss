@@ -24,6 +24,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.CoreProtocolPNames;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;

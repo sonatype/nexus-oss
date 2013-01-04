@@ -25,7 +25,7 @@ Example Maven settings XML:
       <!-- This sends everything to Forge -->
       <id>sonatype-forge</id>
       <mirrorOf>external:*</mirrorOf>
-      <url>https://repository.sonatype.org/content/groups/forge</url>
+      <url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
     </mirror>
   </mirrors>
   <profiles>

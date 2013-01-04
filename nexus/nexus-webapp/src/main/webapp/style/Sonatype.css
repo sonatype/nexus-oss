@@ -542,3 +542,10 @@ body.x-body-masked .x-window-plain .x-window-mc {
 .x-linkbtn-center {}
 .x-linkbtn-text {}
 .x-linkbtn-wright {}
+
+/*
+ * Text in linkbutton should be centered.
+ */
+.x-linkbtn-mc {
+    text-align: center;
+}

@@ -815,6 +815,10 @@ Sonatype.repoServer.UserMappingEditor = function(config) {
       load : {
         roles : function(arr, srcObj, fpanel) {
           var roleManager = fpanel.find('name', 'roleManager')[0];
+          if ( !roleManager ) {
+            // guard against rec.commit() without fpanel set - no need to translate then
+            return arr;
+          }
           if (this.lastLoadedId)
           {
             roleManager.setUserId(this.lastLoadedId);
@@ -984,13 +988,13 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
         }
       },
 
-      // update roles if the user record with the same id is displayed in the
-      // grid
-      // (auto-update doesn't work since the mapping resource does not return
-      // anything)
+      // update roles if the user record with the same id is displayed in the grid
+      // (auto-update doesn't work since the mapping resource does not return anything)
       submitHandler : function(form, action, receivedData) {
-        var store;
-        if (this.payload.id == 'new_mapping' && this.payload.hostPanel)
+        var s = '', roles = [], store, rec, resourceURI,
+              roleManager = this.find('name', 'roleManager')[0];
+
+        if (this.payload.id === 'new_mapping' && this.payload.hostPanel)
         {
           store = this.payload.hostPanel.dataStore;
         }
@@ -1001,40 +1005,10 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
 
         if (store)
         {
-          var s = '';
-          var roles = [];
-          var sentRoles = action.output.data.roles;
-          for (var i = 0; i < sentRoles.length; i++)
-          {
-            var roleName = sentRoles[i];
-            var roleManager = this.find('name', 'roleManager')[0];
-            var newRole = {
-              id : sentRoles[i],
-              name : roleManager.getRoleNameFromId(sentRoles[i]),
-              source : 'default'
-            }
-            roles.push(newRole);
-
-            if (s)
-            {
-              s += ', ';
-            }
-            s += newRole.name;
-          }
-
-          var rec = store.getById(action.output.data.userId);
-          if (rec)
-          {
-            rec.beginEdit();
-            rec.set('roles', roles);
-            rec.set('displayRoles', s);
-            rec.commit();
-            rec.endEdit();
-          }
-          else if (this.payload.hostPanel && this.loadedUserData)
-          {
-            var resourceURI = Sonatype.config.host + Sonatype.config.repos.urls.plexusUser + '/' + this.loadedUserData.userId;
-            var rec = new store.reader.recordType({
+          rec = store.getById(action.output.data.userId);
+          if (!rec && this.payload.hostPanel && this.loadedUserData) {
+            resourceURI = Sonatype.config.host + Sonatype.config.repos.urls.plexusUser + '/' + this.loadedUserData.userId;
+            rec = new store.reader.recordType({
                   //                  name : this.loadedUserData.name,
                   email : this.loadedUserData.email,
                   source : this.loadedUserData.source,
@@ -1045,6 +1019,39 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
                 }, resourceURI);
             rec.autoCreateNewRecord = true;
             store.addSorted(rec);
+          }
+
+          if ( rec ) {
+            rec.beginEdit();
+            rec.set('displayRoles', '<i>Updating...</i>');
+            rec.commit();
+            rec.endEdit();
+            Ext.Ajax.request({
+              url : Sonatype.config.host + Sonatype.config.repos.urls.plexusUser + '/' + this.loadedUserData.userId,
+              success : function(response, options) {
+                var i, s = '', receivedData = Ext.decode(response.responseText).data;
+
+                for (i = 0; i < receivedData.roles.length; i+=1) {
+                  if (s)
+                  {
+                    s += ', ';
+                  }
+                  s += receivedData.roles[i].name;
+                }
+
+                rec.beginEdit();
+                rec.set('roles', receivedData.roles);
+                rec.set('displayRoles', s);
+                rec.commit();
+                rec.endEdit();
+              },
+              failure : function(response, options) {
+                rec.beginEdit();
+                rec.set('displayRoles', 'Update failed');
+                rec.commit();
+                rec.endEdit();
+              }
+            });
           }
         }
       },
