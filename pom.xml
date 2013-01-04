@@ -1361,7 +1361,7 @@
             <!-- caution do not append children excludes since we have 'target' package -->
             <excludes>
               <exclude>**/.*/**</exclude>
-              <!-- we have target pattern in this format because of target package in nexus-api and nexus-proxy modules -->
+              <!-- we have target pattern in this format because of target package in nexus-core modules -->
               <exclude>**/nexus*/target/**</exclude>
               <exclude>**/ldap-common/target/**</exclude>
               <exclude>**/ext-2.3/**</exclude>
