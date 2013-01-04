@@ -543,7 +543,7 @@ public abstract class AbstractProxyRepository
                     // this one should be fired _always_
                     eventBus().post( new RepositoryEventProxyModeSet( this, oldProxyMode, proxyMode, cause ) );
 
-                    if ( !proxyMode.equals( oldProxyMode ) )
+                    if ( proxyMode != null && !proxyMode.equals( oldProxyMode ) )
                     {
                         // this one should be fired on _transition_ only
                         eventBus().post( new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );

@@ -65,6 +65,7 @@ public class RemoteErrorPageWith200Test
 
         String expectedContent = "my cool expected content";
         ErrorServlet.CONTENT = expectedContent;
+        ErrorServlet.clearHeaders();
 
         // remote request
         ResourceStoreRequest storeRequest = new ResourceStoreRequest( "random/file.txt" );

@@ -174,7 +174,6 @@
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
     <aether.version>1.13.1</aether.version>
-    <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.26.1</enunciate.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
@@ -554,22 +553,21 @@
         </exclusions>
       </dependency>
 
+      <!--
+      Use our custom build of commons-beanutils 1.8.3 which excludes the commons-collections classes.
+      For more details see:
+      https://issues.sonatype.org/browse/NEXUS-5336
+      -->
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils-core</artifactId>
-        <version>${commons-beanutils.version}</version>
+        <version>1.8.3-SONATYPE</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils-bean-collections</artifactId>
-        <version>${commons-beanutils.version}</version>
       </dependency>
 
       <dependency>

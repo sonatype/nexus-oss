@@ -54,10 +54,11 @@ public class DefaultFSPeerTest
         File hiddenTarget = subject.getHiddenTarget( null, repoBase, target, file );
         assertThat( hiddenTarget, notNullValue() );
         assertThat( hiddenTarget, isFile() );
-        // startsWith, as garbage is appeneded to it's end
+        // startsWith, as garbage is appended to it's end
         assertThat( hiddenTarget.getName(), startsWith( "foo-1.0.txt" ) );
         // contains, as OS path from root is prefixing this, and garbage at the end suffixing it
-        assertThat( hiddenTarget.getPath(), containsString( "target/repoId/.nexus/tmp/foo-1.0.txt" ) );
+        
+        assertThat( hiddenTarget.getPath(), containsString( "target/repoId/.nexus/tmp/foo-1.0.txt".replace("/", File.separator) ) );
 
         // writing to hidden target is handled elsewhere, so we simulate content being written out
         final String PAYLOAD = "dummy payload";
@@ -73,7 +74,7 @@ public class DefaultFSPeerTest
         // name should be not garbaged anymore
         assertThat( target.getName(), equalTo( "foo-1.0.txt" ) );
         // path prefixed by OS from root, no garbage at tail
-        assertThat( target.getPath(), endsWith( "target/repoId/foo/1.0/foo-1.0.txt" ) );
+        assertThat( target.getPath(), endsWith( "target/repoId/foo/1.0/foo-1.0.txt".replace("/", File.separator) ) );
         // content is fine too
         assertThat( FileUtils.fileRead( target ), equalTo( PAYLOAD ) );
     }
@@ -100,10 +101,10 @@ public class DefaultFSPeerTest
         File hiddenTarget = subject.getHiddenTarget( null, repoBase, target, file );
         assertThat( hiddenTarget, notNullValue() );
         assertThat( hiddenTarget, isFile() );
-        // startsWith, as garbage is appeneded to it's end
+        // startsWith, as garbage is appended to it's end
         assertThat( hiddenTarget.getName(), startsWith( "archetype-catalog.xml" ) );
         // contains, as OS path from root is prefixing this, and garbage at the end suffixing it
-        assertThat( hiddenTarget.getPath(), containsString( "target/repoId/.nexus/tmp/archetype-catalog.xml" ) );
+        assertThat( hiddenTarget.getPath(), containsString( "target/repoId/.nexus/tmp/archetype-catalog.xml".replace("/", File.separator) ) );
 
         // writing to hidden target is handled elsewhere, so we simulate content being written out
         final String PAYLOAD = "dummy payload";
@@ -119,7 +120,7 @@ public class DefaultFSPeerTest
         // name should be not garbaged anymore
         assertThat( target.getName(), equalTo( "archetype-catalog.xml" ) );
         // path prefixed by OS from root, no garbage at tail
-        assertThat( target.getPath(), endsWith( "target/repoId/archetype-catalog.xml" ) );
+        assertThat( target.getPath(), endsWith( "target/repoId/archetype-catalog.xml".replace("/", File.separator) ) );
         // content is fine too
         assertThat( FileUtils.fileRead( target ), equalTo( PAYLOAD ) );
     }
