@@ -34,20 +34,26 @@ public class ResourceStoreRequest
     private String requestPath;
 
     /** Extra data associated with this request. */
-    private RequestContext requestContext;
+    private final RequestContext requestContext;
 
     /** Used internally by Routers. */
-    private Stack<String> pathStack;
+    private final Stack<String> pathStack;
 
     /** Used internally to track reposes where this request was */
-    private List<String> processedRepositories;
+    private final List<String> processedRepositories;
 
     /** Used internally to track applied mappins */
-    private Map<String, List<String>> appliedMappings;
+    private final Map<String, List<String>> appliedMappings;
 
+    /**
+     * Constructor.
+     *
+     * @param requestPath the request path.
+     * @param localOnly See {@link RequestContext#CTX_LOCAL_ONLY_FLAG}.
+     * @param remoteOnly See {@link RequestContext#CTX_REMOTE_ONLY_FLAG}.
+     */
     public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly )
     {
-        super();
         this.requestPath = requestPath;
         this.pathStack = new Stack<String>();
         this.processedRepositories = new ArrayList<String>();
@@ -57,11 +63,23 @@ public class ResourceStoreRequest
         this.requestContext.setRequestRemoteOnly( remoteOnly );
     }
 
+    /**
+     * Shortcut constructor.
+     *
+     * @param requestPath
+     * @param localOnly
+     * @deprecated use {@link #ResourceStoreRequest(String, boolean, boolean)} instead.
+     */
     public ResourceStoreRequest( String requestPath, boolean localOnly )
     {
         this( requestPath, localOnly, false );
     }
 
+    /**
+     * Shortcut constructor.
+     *
+     * @param requestPath
+     */
     public ResourceStoreRequest( String requestPath )
     {
         this( requestPath, false, false );
@@ -71,7 +89,7 @@ public class ResourceStoreRequest
      * Creates a request aimed at given path denoted by RepositoryItemUid.
      * 
      * @param uid the uid
-     * @deprecated use ResourceStoreRequest(String path)
+     * @deprecated use {@link #ResourceStoreRequest(String, boolean, boolean)} instead.
      */
     public ResourceStoreRequest( RepositoryItemUid uid, boolean localOnly )
     {
@@ -79,28 +97,28 @@ public class ResourceStoreRequest
     }
 
     /**
-     * Creates a request for a given item.
+     * Creates a request for a given item that is expected to be already present (locally).
      * 
      * @param item
      */
-    public ResourceStoreRequest( StorageItem item )
+    public ResourceStoreRequest( final StorageItem item )
     {
         this( item.getRepositoryItemUid().getPath(), true, false );
-
-        this.requestContext = item.getItemContext();
+        getRequestContext().setParentContext( item.getItemContext() );
     }
 
     /**
-     * Creates a new request off from a given one.
+     * Creates a new request off from a given one, item is expected to be already present (locally).
      * 
-     * @param item
+     * @param request
      */
-    public ResourceStoreRequest( ResourceStoreRequest request )
+    public ResourceStoreRequest( final ResourceStoreRequest request )
     {
         this( request.getRequestPath(), true, false );
-
         getRequestContext().setParentContext( request.getRequestContext() );
     }
+
+    // ==
 
     /**
      * Gets the request context.
@@ -127,9 +145,10 @@ public class ResourceStoreRequest
      * 
      * @param requestPath the new request path
      */
-    public void setRequestPath( String requestPath )
+    public ResourceStoreRequest setRequestPath( String requestPath )
     {
         this.requestPath = requestPath;
+        return this;
     }
 
     /**
@@ -171,9 +190,10 @@ public class ResourceStoreRequest
      * 
      * @param requestLocalOnly the new request local only
      */
-    public void setRequestLocalOnly( boolean requestLocalOnly )
+    public ResourceStoreRequest setRequestLocalOnly( boolean requestLocalOnly )
     {
         getRequestContext().setRequestLocalOnly( requestLocalOnly );
+        return this;
     }
 
     /**
@@ -189,11 +209,12 @@ public class ResourceStoreRequest
     /**
      * Sets the request remote only.
      * 
-     * @param requestremoteOnly the new request remote only
+     * @param requestRemoteOnly the new request remote only
      */
-    public void setRequestRemoteOnly( boolean requestRemoteOnly )
+    public ResourceStoreRequest setRequestRemoteOnly( boolean requestRemoteOnly )
     {
         getRequestContext().setRequestRemoteOnly( requestRemoteOnly );
+        return this;
     }
 
     /**
@@ -209,11 +230,12 @@ public class ResourceStoreRequest
     /**
      * Sets the request group local only.
      * 
-     * @param requestremoteOnly the new request group local only
+     * @param requestGroupLocal the new request group local only
      */
-    public void setRequestGroupLocalOnly( boolean requestGroupLocal )
+    public ResourceStoreRequest setRequestGroupLocalOnly( boolean requestGroupLocal )
     {
         getRequestContext().setRequestGroupLocalOnly( requestGroupLocal );
+        return this;
     }
 
     /**
@@ -261,9 +283,10 @@ public class ResourceStoreRequest
      * 
      * @param ifModifiedSince
      */
-    public void setIfModifiedSince( long ifModifiedSince )
+    public ResourceStoreRequest setIfModifiedSince( long ifModifiedSince )
     {
         getRequestContext().setIfModifiedSince( ifModifiedSince );
+        return this;
     }
 
     /**
@@ -281,9 +304,10 @@ public class ResourceStoreRequest
      * 
      * @param tag
      */
-    public void setIfNoneMatch( String tag )
+    public ResourceStoreRequest setIfNoneMatch( String tag )
     {
         getRequestContext().setIfNoneMatch( tag );
+        return this;
     }
 
     /**
@@ -301,9 +325,10 @@ public class ResourceStoreRequest
      * 
      * @param url
      */
-    public void setRequestUrl( String url )
+    public ResourceStoreRequest setRequestUrl( String url )
     {
         getRequestContext().setRequestUrl( url );
+        return this;
     }
 
     /**
@@ -321,9 +346,10 @@ public class ResourceStoreRequest
      * 
      * @param url
      */
-    public void setRequestAppRootUrl( String url )
+    public ResourceStoreRequest setRequestAppRootUrl( String url )
     {
         getRequestContext().setRequestAppRootUrl( url );
+        return this;
     }
 
     /**
@@ -349,10 +375,12 @@ public class ResourceStoreRequest
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder( getClass().getSimpleName() );
-        sb.append( "(requestPath=\"" );
-        sb.append( getRequestPath() );
-        sb.append( "\")" );
-        return sb.toString();
+        return "ResourceStoreRequest{" +
+            "requestPath='" + requestPath + '\'' +
+            ", requestContext=" + requestContext +
+            ", pathStack=" + pathStack +
+            ", processedRepositories=" + processedRepositories +
+            ", appliedMappings=" + appliedMappings +
+            '}';
     }
 }
