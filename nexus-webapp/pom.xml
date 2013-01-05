@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -72,6 +73,15 @@
     There are problems with the Maven reactor that would require these modules.
     However if we include as a test scope the reactor will be happy and the dependency pom will be correct.
     -->
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-h2-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -170,6 +180,13 @@
             <configuration>
               <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/plugin-repository</outputDirectory>
               <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-h2-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-restlet1x-plugin</artifactId>
@@ -273,7 +290,7 @@
                   </excludes>
                   <includes>
                     <include>**/*.js</include>
-                  </includes> 
+                  </includes>
                 </aggregation>
                 <aggregation>
                   <output>${project.build.outputDirectory}/style/sonatype-all.css</output>
