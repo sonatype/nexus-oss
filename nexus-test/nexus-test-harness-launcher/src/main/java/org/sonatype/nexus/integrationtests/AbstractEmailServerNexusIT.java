@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.integrationtests;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
@@ -27,12 +27,12 @@ public abstract class AbstractEmailServerNexusIT
 
     private static final Logger LOG = LoggerFactory.getLogger( AbstractEmailServerNexusIT.class );
 
-    private int emailServerPort;
+    private static int emailServerPort;
 
-    protected GreenMail server;
+    protected static GreenMail server;
 
     @BeforeClass
-    public void startEmailServer()
+    public static void startEmailServer()
     {
         String port = TestProperties.getString( "email.server.port" );
         emailServerPort = new Integer( port );
@@ -45,8 +45,8 @@ public abstract class AbstractEmailServerNexusIT
         server.start();
     }
 
-    @AfterClass( alwaysRun = true )
-    public void stopEmailServer()
+    @AfterClass
+    public static void stopEmailServer()
     {
         if ( server != null )
         {

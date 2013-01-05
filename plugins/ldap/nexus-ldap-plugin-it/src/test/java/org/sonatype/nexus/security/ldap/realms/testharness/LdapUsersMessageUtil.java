@@ -15,6 +15,7 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -29,7 +30,6 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -110,7 +110,7 @@ public class LdapUsersMessageUtil extends ITUtil
     public void validateResourceResponse( UserToRoleResource expected, CUserRoleMapping actual )
         throws Exception
     {
-        Assert.assertEquals( expected.getUserId(), actual.getUserId() );
+        Assert.assertEquals( actual.getUserId(), expected.getUserId() );
         Assert.assertEquals( expected.getRoles(), actual.getRoles() );
 
         // also validate the file config

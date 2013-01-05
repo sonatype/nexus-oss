@@ -16,10 +16,10 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1329UnavailableIT
     extends AbstractMirrorIT
@@ -51,15 +51,15 @@ public class Nexus1329UnavailableIT
             // expected
         }
 
-        Assert.assertFalse( repoUrls.isEmpty(), "Nexus should try repository canonical url " + repoUrls );
-        Assert.assertFalse( mirror1Urls.isEmpty(), "Nexus should try mirror 1 " + mirror1Urls );
+        Assert.assertFalse( "Nexus should try repository canonical url " + repoUrls, repoUrls.isEmpty() );
+        Assert.assertFalse( "Nexus should try mirror 1 " + mirror1Urls, mirror1Urls.isEmpty() );
 
         MirrorStatusResourceListResponse response = this.messageUtil.getMirrorsStatus( REPO );
 
         MirrorStatusResource one = (MirrorStatusResource) response.getData().get( 0 );
 
-        Assert.assertEquals( "http://localhost:" + webProxyPort + "/mirror1", one.getUrl() );
-        Assert.assertEquals( "Available", one.getStatus() );
+        Assert.assertEquals( one.getUrl(), "http://localhost:" + webProxyPort + "/mirror1" );
+        Assert.assertEquals( one.getStatus(), "Available" );
     }
 
 }

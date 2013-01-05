@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import static org.testng.Assert.fail;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.HashMap;

@@ -19,6 +19,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +40,6 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -92,7 +92,7 @@ public abstract class AbstractPrivilegeTest
         }
     }
 
-    @BeforeClass( alwaysRun = true )
+    @BeforeClass
     public static void enableSecurity()
     {
         // turn on security for the test
@@ -114,7 +114,7 @@ public abstract class AbstractPrivilegeTest
         this.groupUtil = new GroupMessageUtil( this, xstream, MediaType.APPLICATION_XML );
     }
 
-    @BeforeMethod( alwaysRun = true )
+    @Before
     public void resetTestUserPrivs()
         throws Exception
     {
@@ -372,7 +372,7 @@ public abstract class AbstractPrivilegeTest
     }
 
     @Override
-    @AfterMethod( alwaysRun = true )
+    @After
     public void afterTest()
         throws Exception
     {

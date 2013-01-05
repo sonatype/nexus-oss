@@ -17,10 +17,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 
 /**
@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 public class Nexus166SampleIT extends AbstractNexusIntegrationTest
 {
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

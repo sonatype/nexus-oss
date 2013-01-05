@@ -14,6 +14,10 @@ package org.sonatype.nexus.integrationtests.nexus156;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -21,23 +25,26 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Extra CRUD validation tests.
  */
-public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
+public class Nexus156RolesValidationIT
+    extends AbstractNexusIntegrationTest
 {
 
     protected RoleMessageUtil messageUtil;
 
     @BeforeClass
-    public void setSecureTest(){
-    	this.messageUtil =
-            new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    public static void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+
+    @Before
+    public void setUp()
+    {
+        this.messageUtil = new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -50,7 +57,7 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
         resource.setDescription( "roleWithNoPrivsTest" );
         resource.setName( "roleWithNoPrivsTest" );
         resource.setSessionTimeout( 30 );
-//        resource.addPrivilege( "priv1" );
+        // resource.addPrivilege( "priv1" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
@@ -69,7 +76,7 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
         RoleResource resource = new RoleResource();
 
         resource.setDescription( "roleWithNoName" );
-//        resource.setName( "roleWithNoName" );
+        // resource.setName( "roleWithNoName" );
         resource.setSessionTimeout( 30 );
         resource.addPrivilege( "1" );
 
@@ -98,11 +105,12 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Response: "+ response.getEntity().getText() +"Role should have been created: " + response.getStatus() );
+            Assert.fail( "Response: " + response.getEntity().getText() + "Role should have been created: "
+                + response.getStatus() );
         }
-        
+
         // make sure the get works too
-        Assert.assertEquals( "role With Space In Id", this.messageUtil.getRole( resource.getId() ).getId());
+        Assert.assertEquals( this.messageUtil.getRole( resource.getId() ).getId(), "role With Space In Id" );
     }
 
     @Test
@@ -120,14 +128,15 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
 
         // create
         resource = this.messageUtil.createRole( resource );
-        Assert.assertEquals( "duplicateIdTest", resource.getId() );
+        Assert.assertEquals( resource.getId(), "duplicateIdTest" );
 
         // update
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         if ( response.getStatus().isSuccess() )
         {
-            Assert.fail( "Role should not have been updated: " + response.getStatus() +"New Id: "+ this.messageUtil.getResourceFromResponse( response ).getId() );
+            Assert.fail( "Role should not have been updated: " + response.getStatus() + "New Id: "
+                + this.messageUtil.getResourceFromResponse( response ).getId() );
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
@@ -198,7 +207,8 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
     }
 
     @Test
-    public void updateValidationTests() throws IOException
+    public void updateValidationTests()
+        throws IOException
     {
         RoleResource resource = new RoleResource();
 
@@ -223,14 +233,13 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
 
         resource.setId( responseResource.getId() );
 
-        Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getDescription(), resource.getDescription() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getSessionTimeout(), responseResource.getSessionTimeout() );
         Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
 
         getSecurityConfigUtil().verifyRole( resource );
-
 
         /*
          * NO Name
@@ -241,7 +250,6 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
         resource.addPrivilege( "5" );
         resource.addPrivilege( "4" );
 
-
         response = this.messageUtil.sendMessage( Method.PUT, resource );
 
         if ( response.getStatus().isSuccess() )
@@ -250,8 +258,6 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
 
-
-
         /*
          * NO Privs
          */
@@ -259,7 +265,6 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
         resource.setName( "updateValidationTests" );
         resource.setSessionTimeout( 99999 );
         resource.getPrivileges().clear();
-
 
         response = this.messageUtil.sendMessage( Method.PUT, resource );
 
@@ -305,8 +310,6 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
         // expect a 404
         Assert.assertEquals( 404, response.getStatus().getCode() );
 
-
     }
-
 
 }

@@ -15,22 +15,14 @@ package org.sonatype.nexus.integrationtests.nexus3427;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.isSuccessful;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.isSuccessfulCode;
 import static org.sonatype.nexus.test.utils.SettingsMessageUtil.getCurrentSettings;
 import static org.sonatype.nexus.test.utils.SettingsMessageUtil.save;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
-import org.sonatype.nexus.test.utils.ResponseMatchers;
-import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus3427GlobalSettingsIT
 extends AbstractNexusIntegrationTest

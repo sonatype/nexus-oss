@@ -12,15 +12,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2641;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus2641RestApiConfigIT
     extends AbstractNexusIntegrationTest
@@ -45,7 +45,7 @@ public class Nexus2641RestApiConfigIT
 
         Assert.assertNotNull( settings.getGlobalRestApiSettings() );
         Assert.assertTrue( StringUtils.isNotEmpty( settings.getGlobalRestApiSettings().getBaseUrl() ) );
-        Assert.assertEquals( false, settings.getGlobalRestApiSettings().isForceBaseUrl() );
+        Assert.assertEquals( settings.getGlobalRestApiSettings().isForceBaseUrl(), false );
 
         // now edit it
         restApiSettings.setBaseUrl( "http://myhost/nexus" );
@@ -55,8 +55,8 @@ public class Nexus2641RestApiConfigIT
         settings = SettingsMessageUtil.getCurrentSettings();
 
         Assert.assertNotNull( settings.getGlobalRestApiSettings() );
-        Assert.assertEquals( "http://myhost/nexus", settings.getGlobalRestApiSettings().getBaseUrl() );
-        Assert.assertEquals( true, settings.getGlobalRestApiSettings().isForceBaseUrl() );
+        Assert.assertEquals( settings.getGlobalRestApiSettings().getBaseUrl(), "http://myhost/nexus" );
+        Assert.assertEquals( settings.getGlobalRestApiSettings().isForceBaseUrl(), true );
 
         //now unset it
         settings.setGlobalRestApiSettings( null );

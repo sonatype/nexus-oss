@@ -15,6 +15,8 @@ package org.sonatype.nexus.integrationtests.nexus1961;
 import java.util.List;
 
 import org.apache.maven.index.treeview.TreeNode;
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -23,8 +25,6 @@ import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -64,7 +64,7 @@ public class Nexus1961IndexContentIT
         List<TreeNode> children = content.getChildren();
         for ( TreeNode child : children )
         {
-            Assert.assertEquals( "nexus1961", child.getNodeName() );
+            Assert.assertEquals( child.getNodeName(), "nexus1961" );
         }
 
     }

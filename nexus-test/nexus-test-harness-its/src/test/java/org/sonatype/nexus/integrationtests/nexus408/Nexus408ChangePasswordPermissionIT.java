@@ -12,15 +12,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus408;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
-
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Test the privilege for changing a users password..
@@ -28,12 +28,12 @@ import org.testng.annotations.Test;
 public class Nexus408ChangePasswordPermissionIT
     extends AbstractPrivilegeTest
 {
-    @BeforeClass(alwaysRun = true)
-    public void setSecureTest(){
+    @BeforeClass
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
-    @Test(groups = SECURITY)
+    @Test @Category(SECURITY.class)
     public void withPermission()
         throws Exception
     {
@@ -63,7 +63,7 @@ public class Nexus408ChangePasswordPermissionIT
         // should NOT be able to change another users password
     }
 
-    @Test(groups = SECURITY)
+    @Test @Category(SECURITY.class)
     public void withoutPermission()
         throws Exception
     {

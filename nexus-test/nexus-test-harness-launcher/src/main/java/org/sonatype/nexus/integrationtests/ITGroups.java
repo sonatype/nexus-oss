@@ -14,9 +14,8 @@ package org.sonatype.nexus.integrationtests;
 
 public final class ITGroups
 {
-    public static final String PROXY = "proxy";
-    public static final String INDEX = "index";
-    public static final String SECURITY = "security";
-    public static final String CHECKIN = "checkin";
-
+    public static final class PROXY {}
+    public static final class INDEX {};
+    public static final class SECURITY {};
+    public static final class CHECKIN {};
 }

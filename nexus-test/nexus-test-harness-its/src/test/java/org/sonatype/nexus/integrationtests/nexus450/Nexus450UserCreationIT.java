@@ -14,6 +14,11 @@ package org.sonatype.nexus.integrationtests.nexus450;
 
 import javax.mail.internet.MimeMessage;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
@@ -23,11 +28,6 @@ import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 
@@ -49,7 +49,7 @@ public class Nexus450UserCreationIT
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @BeforeMethod
+    @Before
     public void init()
     {
         userUtil =
@@ -82,7 +82,7 @@ public class Nexus450UserCreationIT
         StringBuilder emailsContent = new StringBuilder();
         
         /// make sure we have at least 1 message
-        Assert.assertTrue( msgs.length > 0, "No emails recieved." );
+        Assert.assertTrue( "No emails recieved.", msgs.length > 0 );
         
         for ( MimeMessage mimeMessage : msgs )
         {
@@ -102,7 +102,7 @@ public class Nexus450UserCreationIT
             }
         }
 
-        Assert.assertNotNull("Didn't recieve a password.  Got the following messages:\n" + emailsContent, password );
+        Assert.assertNotNull(password, "Didn't recieve a password.  Got the following messages:\n" + emailsContent );
 
         // login with generated password
         testContext.setUsername( USER_ID );
@@ -118,7 +118,7 @@ public class Nexus450UserCreationIT
         // check if the user is 'active'
         testContext.useAdminForRequests();
         UserResource user = userUtil.getUser( USER_ID );
-        Assert.assertEquals( "active", user.getStatus() );
+        Assert.assertEquals( user.getStatus(), "active" );
 
         // login with new password
         testContext.setUsername( USER_ID );
@@ -127,7 +127,7 @@ public class Nexus450UserCreationIT
         Assert.assertTrue( status.isSuccess() );
     }
 
-    @AfterMethod
+    @After
     public void removeUser()
         throws Exception
     {

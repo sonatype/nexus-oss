@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -24,9 +28,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Extra CRUD validation tests.
@@ -38,10 +39,14 @@ public class Nexus133TargetValidationIT
     protected TargetMessageUtil messageUtil;
 
     @BeforeClass
-    public void setSecureTest(){
-    	this.messageUtil =
-            new TargetMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
+    @Before
+    public void setUp()
+    {
+        this.messageUtil = new TargetMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -67,8 +72,8 @@ public class Nexus133TargetValidationIT
         {
             Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ),
-                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
+        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
+                           responseText.startsWith( "{\"errors\":" ) );
     }
 
     @Test
@@ -93,8 +98,8 @@ public class Nexus133TargetValidationIT
         {
             Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ),
-                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
+        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
+                           responseText.startsWith( "{\"errors\":" ) );
     }
 
     @Test
@@ -119,8 +124,8 @@ public class Nexus133TargetValidationIT
         {
             Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ),
-                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
+        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
+                           responseText.startsWith( "{\"errors\":" ) );
     }
 
     @Test
@@ -145,8 +150,8 @@ public class Nexus133TargetValidationIT
         {
             Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ),
-                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
+        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
+                           responseText.startsWith( "{\"errors\":" ) );
     }
 
     @Test
@@ -222,8 +227,8 @@ public class Nexus133TargetValidationIT
         // make sure the id != null
         Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
 
-        Assert.assertEquals( resource.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
 
         // verify config
@@ -247,7 +252,7 @@ public class Nexus133TargetValidationIT
             Assert.fail( "Target should not have been created: " + response.getStatus() );
         }
         String responseText = response.getEntity().getText();
-        Assert.assertTrue(responseText.startsWith( "{\"errors\":" ), "responseText does not contain an error message:\n"+ responseText );
+        Assert.assertTrue("responseText does not contain an error message:\n"+ responseText, responseText.startsWith( "{\"errors\":" ) );
 
         /*
          * Invalid RegEx
@@ -327,8 +332,8 @@ public class Nexus133TargetValidationIT
         // make sure the id != null
         Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
 
-        Assert.assertEquals( resource.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
 
         this.messageUtil.verifyTargetsConfig( responseResource );
@@ -362,8 +367,8 @@ public class Nexus133TargetValidationIT
         // make sure the id != null
         Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
 
-        Assert.assertEquals( resource.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
 
         this.messageUtil.verifyTargetsConfig( responseResource );
@@ -398,8 +403,8 @@ public class Nexus133TargetValidationIT
         // make sure the id != null
         Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
 
-        Assert.assertEquals( resource.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
 
         this.messageUtil.verifyTargetsConfig( responseResource );
@@ -434,8 +439,8 @@ public class Nexus133TargetValidationIT
         // make sure the id != null
         Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
 
-        Assert.assertEquals( resource.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
 
         this.messageUtil.verifyTargetsConfig( responseResource );
@@ -473,8 +478,8 @@ public class Nexus133TargetValidationIT
 
         // FIXME: This should be allowed
         // Assert.assertEquals( resource.getId(), responseResource.getId() );
-        Assert.assertEquals( resource.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getContentClass(), resource.getContentClass() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
 
         this.messageUtil.verifyTargetsConfig( responseResource );

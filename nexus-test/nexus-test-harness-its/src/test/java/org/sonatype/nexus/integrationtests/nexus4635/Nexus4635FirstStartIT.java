@@ -12,18 +12,18 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4635;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResource;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * 1st start of "virgin" Nexus<BR>
@@ -39,7 +39,7 @@ public class Nexus4635FirstStartIT
     extends AbstractNexusIntegrationTest
 {
     @BeforeClass
-    protected void disableSecurity()
+    public static void disableSecurity()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( false );
     }

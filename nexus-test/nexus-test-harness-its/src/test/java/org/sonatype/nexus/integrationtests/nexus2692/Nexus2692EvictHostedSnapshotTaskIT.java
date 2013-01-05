@@ -15,8 +15,8 @@ package org.sonatype.nexus.integrationtests.nexus2692;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class Nexus2692EvictHostedSnapshotTaskIT
     extends AbstractEvictTaskIt
@@ -36,8 +36,8 @@ public class Nexus2692EvictHostedSnapshotTaskIT
         SortedSet<String> storageDiff = new TreeSet<String>( getPathMap().keySet() );
         storageDiff.removeAll( resultStorageFiles );
 
-        Assert.assertTrue( storageDiff.isEmpty(), "Files deleted that should not have been: "
-            + prettyList( storageDiff ) );
+        Assert.assertTrue( "Files deleted that should not have been: "
+            + prettyList( storageDiff ), storageDiff.isEmpty() );
     }
 
 }

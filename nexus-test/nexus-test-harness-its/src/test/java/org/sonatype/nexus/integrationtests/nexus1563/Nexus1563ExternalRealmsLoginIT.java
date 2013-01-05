@@ -12,16 +12,16 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1563;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.security.rest.model.RoleResource;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus1563ExternalRealmsLoginIT
     extends AbstractPrivilegeTest

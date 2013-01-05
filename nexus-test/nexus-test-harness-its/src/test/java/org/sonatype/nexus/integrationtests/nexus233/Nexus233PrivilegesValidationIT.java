@@ -16,6 +16,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -25,9 +29,6 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Extra CRUD validation tests.
@@ -39,9 +40,15 @@ public class Nexus233PrivilegesValidationIT
     protected PrivilegesMessageUtil messageUtil;
 
     @BeforeClass
-    public void setSecureTest(){
-    	this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    public static void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+
+    @Before
+    public void setUp()
+    {
+        this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @SuppressWarnings( "unchecked" )

@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.integrationtests.nexus782;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,12 +20,12 @@ import java.util.Date;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.maven.index.artifact.Gav;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus782UploadWithClassifierIT
     extends AbstractNexusIntegrationTest
@@ -42,7 +42,7 @@ public class Nexus782UploadWithClassifierIT
     {
     }
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -58,7 +58,7 @@ public class Nexus782UploadWithClassifierIT
         // upload jar artifact
         int result =
             getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null, null );
-        assertTrue( Status.isSuccess( result ), "Got error from server: " + result );
+        assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
         // make sure everything is cool so far
         this.checkUpload( this.artifactGav, artifactFile );
@@ -67,7 +67,7 @@ public class Nexus782UploadWithClassifierIT
         result =
             getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile,
                                                      this.artifactClassifierGav.getClassifier(), null );
-        assertTrue( Status.isSuccess( result ), "Got error from server: " + result );
+        assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
         // now check files again
         this.checkUpload( this.artifactGav, artifactFile );
@@ -88,7 +88,7 @@ public class Nexus782UploadWithClassifierIT
         int result =
             getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null,
                                                      this.artifactGav.getExtension() );
-        assertTrue( Status.isSuccess( result ), "Got error from server: " + result );
+        assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
         getEventInspectorsUtil().waitForCalmPeriod();
 
         // make sure everything is cool so far
@@ -99,7 +99,7 @@ public class Nexus782UploadWithClassifierIT
             getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile,
                                                      this.artifactClassifierGav.getClassifier(),
                                                      this.artifactClassifierGav.getExtension() );
-        assertTrue( Status.isSuccess( result ), "Got error from server: " + result );
+        assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
         // now check files again
         this.checkUpload( this.artifactGav, artifactFile );

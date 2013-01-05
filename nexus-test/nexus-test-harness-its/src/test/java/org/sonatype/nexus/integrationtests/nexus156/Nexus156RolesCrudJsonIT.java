@@ -15,6 +15,10 @@ package org.sonatype.nexus.integrationtests.nexus156;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -22,9 +26,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * CRUD tests for JSON request/response.
@@ -36,10 +37,15 @@ public class Nexus156RolesCrudJsonIT
     protected RoleMessageUtil messageUtil;
 
     @BeforeClass
-    public void setSecureTest(){
-    	this.messageUtil =
-            new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    public static void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+
+    @Before
+    public void setUp()
+    {
+        this.messageUtil = new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -114,9 +120,9 @@ public class Nexus156RolesCrudJsonIT
         // get the Resource object
         RoleResource responseResource = this.messageUtil.getRole( resource.getId() );
 
-        Assert.assertEquals( resource.getId(), responseResource.getId() );
-        Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getId(), resource.getId() );
+        Assert.assertEquals( responseResource.getDescription(), resource.getDescription() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
     }
@@ -155,9 +161,9 @@ public class Nexus156RolesCrudJsonIT
         // get the Resource object
         responseResource = this.messageUtil.getResourceFromResponse( response );
 
-        Assert.assertEquals( resource.getId(), responseResource.getId() );
-        Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getId(), resource.getId() );
+        Assert.assertEquals( responseResource.getDescription(), resource.getDescription() );
+        Assert.assertEquals( responseResource.getName(), resource.getName() );
         Assert.assertEquals( resource.getSessionTimeout(), responseResource.getSessionTimeout() );
         Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );

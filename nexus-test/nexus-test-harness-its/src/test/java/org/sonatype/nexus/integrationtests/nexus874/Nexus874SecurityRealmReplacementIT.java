@@ -12,12 +12,16 @@
  */
 package org.sonatype.nexus.integrationtests.nexus874;
 
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
 
 import java.io.IOException;
 import java.net.ConnectException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -28,9 +32,6 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Validate the MemoryRealm that replaces default nexus security
@@ -45,12 +46,17 @@ public class Nexus874SecurityRealmReplacementIT
     private RoleMessageUtil roleUtil;
 
     private UserMessageUtil userUtil;
-
+    
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
         throws ComponentLookupException
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+
+    @Before
+    public void setUp()
+    {
         groupUtil = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         repoUtil = new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         // targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );

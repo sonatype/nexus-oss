@@ -15,6 +15,9 @@ package org.sonatype.nexus.integrationtests.nexus642;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -24,16 +27,13 @@ import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus642SynchShadowTaskIT
     extends AbstractNexusIntegrationTest
 {
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }

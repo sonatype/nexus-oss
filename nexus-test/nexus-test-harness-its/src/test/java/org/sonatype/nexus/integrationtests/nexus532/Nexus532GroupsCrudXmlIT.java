@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus532;
 
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isNotFound;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -29,9 +32,6 @@ import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * CRUD tests for XML request/response.
@@ -44,11 +44,11 @@ public class Nexus532GroupsCrudXmlIT
 
     public Nexus532GroupsCrudXmlIT()
     {
+        this.messageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     @BeforeClass
-    public void setSecureTest(){
-    	this.messageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -188,7 +188,7 @@ public class Nexus532GroupsCrudXmlIT
             RepositoryGroupListResource group = iter.next();
             M2GroupRepositoryConfiguration cGroup = getNexusConfigUtil().getGroup( group.getId() );
 
-            Assert.assertNotNull( cGroup, "CRepositoryGroup" );
+            Assert.assertNotNull( "CRepositoryGroup", cGroup );
         }
     }
 }

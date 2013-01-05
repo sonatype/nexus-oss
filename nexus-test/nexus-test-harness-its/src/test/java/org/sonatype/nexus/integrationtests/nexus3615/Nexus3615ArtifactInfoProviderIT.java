@@ -17,9 +17,9 @@ import static org.hamcrest.Matchers.hasItems;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus3615ArtifactInfoProviderIT
     extends AbstractArtifactInfoIT
@@ -32,7 +32,7 @@ public class Nexus3615ArtifactInfoProviderIT
         ArtifactInfoResource info =
             getSearchMessageUtil().getInfo( REPO_TEST_HARNESS_REPO, "nexus3615/artifact/1.0/artifact-1.0.jar" );
 
-        Assert.assertEquals( REPO_TEST_HARNESS_REPO, info.getRepositoryId() );
+        Assert.assertEquals( info.getRepositoryId(), REPO_TEST_HARNESS_REPO );
 
         validate( info );
     }
@@ -53,14 +53,14 @@ public class Nexus3615ArtifactInfoProviderIT
 
     private void validate( ArtifactInfoResource info )
     {
-        Assert.assertEquals( "/nexus3615/artifact/1.0/artifact-1.0.jar", info.getRepositoryPath() );
-        Assert.assertEquals( "b354a0022914a48daf90b5b203f90077f6852c68", info.getSha1Hash() );
+        Assert.assertEquals( info.getRepositoryPath(), "/nexus3615/artifact/1.0/artifact-1.0.jar" );
+        Assert.assertEquals( info.getSha1Hash(), "b354a0022914a48daf90b5b203f90077f6852c68" );
         Assert.assertEquals( 3, info.getRepositories().size() );
         MatcherAssert.assertThat( getRepositoryId( info.getRepositories() ),
                            hasItems( REPO_TEST_HARNESS_REPO, REPO_TEST_HARNESS_REPO2,
                                                             REPO_TEST_HARNESS_RELEASE_REPO ) );
-        Assert.assertEquals( "application/java-archive", info.getMimeType() );
-        Assert.assertEquals( 1364, info.getSize() );
+        Assert.assertEquals( info.getMimeType(), "application/java-archive" );
+        Assert.assertEquals( info.getSize(), 1364 );
     }
 
 }

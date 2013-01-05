@@ -12,16 +12,18 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3233;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -31,13 +33,11 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus3233IndexPomSha1IT
     extends AbstractNexusIntegrationTest
 {
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void wagonDeploy()
         throws Exception
     {
@@ -53,7 +53,7 @@ public class Nexus3233IndexPomSha1IT
         searchFor( pom );
     }
 
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void mavenDeploy()
         throws Exception
     {
@@ -63,18 +63,18 @@ public class Nexus3233IndexPomSha1IT
         searchFor( pom );
     }
 
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void restDeploy()
         throws Exception
     {
         final File pom = getTestFile( "rest.pom" );
         HttpMethod r = getDeployUtils().deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
-        Assert.assertTrue( Status.isSuccess( r.getStatusCode() ),
-        "Unable to deploy artifact " + r.getStatusCode() + ": " + r.getStatusText() );
+        Assert.assertTrue( "Unable to deploy artifact " + r.getStatusCode() + ": " + r.getStatusText(),
+        Status.isSuccess( r.getStatusCode() ) );
         searchFor( pom );
     }
 
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void manualStorage()
         throws Exception
     {
@@ -121,6 +121,6 @@ public class Nexus3233IndexPomSha1IT
         getEventInspectorsUtil().waitForCalmPeriod();
 
         NexusArtifact result = getSearchMessageUtil().identify( sha1 );
-        Assert.assertNotNull( result, "Pom with " + sha1 + " not found " + msg );
+        Assert.assertNotNull( "Pom with " + sha1 + " not found " + msg, result );
     }
 }

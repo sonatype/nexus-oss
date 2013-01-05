@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.integrationtests.nexus977tasks;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsDownloadIndexesTaskIT
     extends AbstractNexusProxyIntegrationTest

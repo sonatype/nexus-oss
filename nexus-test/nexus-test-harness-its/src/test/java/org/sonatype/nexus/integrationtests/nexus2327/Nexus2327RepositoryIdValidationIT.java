@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2327;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -22,8 +24,6 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus2327RepositoryIdValidationIT
     extends AbstractNexusIntegrationTest

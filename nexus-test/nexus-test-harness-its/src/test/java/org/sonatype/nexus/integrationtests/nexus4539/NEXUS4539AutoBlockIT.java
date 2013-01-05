@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4539;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 /**
  * Make sure normal case works, that is, a proxy whose remote is timing out blocks, and then unblocks when the remote is

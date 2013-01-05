@@ -13,18 +13,19 @@
 package org.sonatype.nexus.integrationtests.nexus1197;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.FileNotFoundException;
 
-import static org.hamcrest.Matchers.*;
 import org.eclipse.jetty.server.Server;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus1197CheckUserAgentIT
     extends AbstractNexusIntegrationTest

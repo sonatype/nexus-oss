@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class Nexus2692EvictGroupTaskIT
     extends AbstractEvictTaskIt
@@ -42,14 +42,14 @@ public class Nexus2692EvictGroupTaskIT
 
         // calc the diff ( files that were deleted and should not have been )
         expectedResults.removeAll( resultStorageFiles );
-        Assert.assertTrue( expectedResults.isEmpty(), "The following files were deleted and should not have been: "
-            + prettyList( expectedResults ) );
+        Assert.assertTrue( "The following files were deleted and should not have been: "
+            + prettyList( expectedResults ), expectedResults.isEmpty() );
 
         // now the other way
         expectedResults = buildListOfExpectedFiles( days, nonPublicGroupMembers );
         resultStorageFiles.removeAll( expectedResults );
-        Assert.assertTrue( resultStorageFiles.isEmpty(), "The following files should have been deleted: "
-            + prettyList( resultStorageFiles ) );
+        Assert.assertTrue( "The following files should have been deleted: "
+            + prettyList( resultStorageFiles ), resultStorageFiles.isEmpty() );
 
         // make sure we don't have any empty directories
         checkForEmptyDirectories();

@@ -15,6 +15,8 @@ package org.sonatype.nexus.integrationtests.nexus643;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -22,8 +24,6 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Tests empty trash task.
@@ -39,7 +39,7 @@ public class Nexus643EmptyTrashTaskIT
         delete( "nexus643" );
 
         File trashContent = new File( nexusWorkDir, "storage/nexus-test-harness-repo/.nexus/trash/nexus643" );
-        Assert.assertTrue( trashContent.exists(), "Something should be at trash!" );
+        Assert.assertTrue( "Something should be at trash!", trashContent.exists() );
 
         // Empty trash content older than 1 days
         File oldTrashFile =
@@ -50,8 +50,8 @@ public class Nexus643EmptyTrashTaskIT
                 "storage/nexus-test-harness-repo/.nexus/trash/nexus643/artifact-1/1.0.0/artifact-1-1.0.0.jar" );
         oldTrashFile.setLastModified( System.currentTimeMillis() - 24L * 60L * 60L * 1000L * 2 );
 
-        Assert.assertTrue( newTrashFile.exists(), "New trash content should be kept! " );
-        Assert.assertTrue( oldTrashFile.exists(), "Old trash content should be kept!" );
+        Assert.assertTrue( "New trash content should be kept! ", newTrashFile.exists() );
+        Assert.assertTrue( "Old trash content should be kept!", oldTrashFile.exists() );
 
         // this is unsupported, disabled for now (UI is not using it either)
         ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();
@@ -60,13 +60,13 @@ public class Nexus643EmptyTrashTaskIT
 
         TaskScheduleUtil.runTask( "Empty Trash Older Than", EmptyTrashTaskDescriptor.ID, age );
 
-        Assert.assertTrue( newTrashFile.exists(), "New trash content should be kept! " );
-        Assert.assertFalse( oldTrashFile.exists(), "Old trash content should be removed!" );
+        Assert.assertTrue( "New trash content should be kept! ", newTrashFile.exists() );
+        Assert.assertFalse( "Old trash content should be removed!", oldTrashFile.exists() );
 
         // Empty the whole trash
         TaskScheduleUtil.runTask( "Empty Whole Trash", EmptyTrashTaskDescriptor.ID );
 
-        Assert.assertFalse( trashContent.exists(), "Trash should be empty!" );
+        Assert.assertFalse( "Trash should be empty!", trashContent.exists() );
     }
 
     private void delete( String groupId )
@@ -74,7 +74,7 @@ public class Nexus643EmptyTrashTaskIT
     {
         String serviceURI = "service/local/repositories/nexus-test-harness-repo/content/" + groupId + "/";
         Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Unable to delete nexus643 artifacts" );
+        Assert.assertTrue( "Unable to delete nexus643 artifacts", response.getStatus().isSuccess() );
     }
 
 }

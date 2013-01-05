@@ -15,13 +15,12 @@ package org.sonatype.nexus.integrationtests.nexus1022;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.scheduling.TaskUtils;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1022RebuildRepositoryMavenMetadataTaskIT
     extends AbstractNexusIntegrationTest
@@ -49,10 +48,10 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskIT
 
         File artifactDirMd =
             new File( nexusWorkDir, repoPrefix + "nexus1022/foo/bar/artifact/maven-metadata.xml" );
-        Assert.assertTrue( artifactDirMd.exists(), "Maven metadata file should be generated after rebuild" );
+        Assert.assertTrue( "Maven metadata file should be generated after rebuild", artifactDirMd.exists() );
 
         File groupPluginMd = new File( nexusWorkDir, repoPrefix + "nexus1022/foo/bar/plugins/maven-metadata.xml" );
-        Assert.assertTrue( groupPluginMd.exists(), "Maven metadata file should be generated after rebuild" );
+        Assert.assertTrue( "Maven metadata file should be generated after rebuild", groupPluginMd.exists() );
 
         // just downloading it into dummy, since we are just checking is download possible
         // if not, downloadFile() will fail anyway. The content is not we are interested in.

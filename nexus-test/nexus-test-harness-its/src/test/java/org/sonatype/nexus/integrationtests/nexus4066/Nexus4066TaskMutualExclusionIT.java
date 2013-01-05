@@ -16,18 +16,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.sonatype.nexus.test.utils.TaskScheduleUtil.newProperty;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.scheduling.TaskState;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import com.google.common.collect.Lists;
 
@@ -67,7 +65,7 @@ public class Nexus4066TaskMutualExclusionIT
 
     private List<ScheduledServiceListResource> tasks;
 
-    @BeforeMethod
+    @Before
     public void w8()
         throws Exception
     {
@@ -76,7 +74,7 @@ public class Nexus4066TaskMutualExclusionIT
         TaskScheduleUtil.waitForAllTasksToStop();
     }
 
-    @AfterMethod
+    @After
     public void killTasks()
         throws Exception
     {

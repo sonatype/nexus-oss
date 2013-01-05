@@ -14,18 +14,17 @@ package org.sonatype.nexus.integrationtests.nexus4341;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isClientError;
 
 import java.io.IOException;
 
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.sisu.goodies.common.Time;
-import org.testng.annotations.Test;
 
 public class Nexus4341RunningTaskNotEditableIT
     extends AbstractNexusIntegrationTest

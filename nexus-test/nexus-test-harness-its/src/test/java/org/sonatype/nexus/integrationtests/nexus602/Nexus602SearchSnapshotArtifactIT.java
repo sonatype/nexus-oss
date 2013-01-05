@@ -26,11 +26,11 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.testng.annotations.Test;
 
 /**
  * Test snapshot search results can be downloaded.

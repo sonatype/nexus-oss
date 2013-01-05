@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -33,8 +35,6 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Test the privilege for CRUD operations.
@@ -56,13 +56,13 @@ public class NXCM1985UmbrellaContentClassIT
         Gav gav = GavUtil.newGav( "nxcm1985", "artifact", "1.0" );
         int status =
             getDeployUtils().deployUsingGavWithRest( getTestRepositoryId(), gav, getTestFile( "artifact.jar" ) );
-        Assert.assertEquals( status, 403, "Status" );
+        Assert.assertEquals( "Status", status, 403 );
 
         resetTestUserPrivs( true );
 
         // create success
         status = getDeployUtils().deployUsingGavWithRest( getTestRepositoryId(), gav, getTestFile( "artifact.jar" ) );
-        Assert.assertEquals( status, 201, "Status" );
+        Assert.assertEquals( "Status", status, 201 );
 
         resetTestUserPrivs( false );
 
@@ -70,26 +70,26 @@ public class NXCM1985UmbrellaContentClassIT
         String serviceURI =
             "content/repositories/" + this.getTestRepositoryId() + "/" + this.getRelitiveArtifactPath( gav );
         Response response = RequestFacade.sendMessage( serviceURI, Method.GET );
-        Assert.assertEquals( response.getStatus().getCode(), 403, "Status" );
+        Assert.assertEquals( "Status", response.getStatus().getCode(), 403 );
 
         resetTestUserPrivs( true );
 
         // read success
         response = RequestFacade.sendMessage( serviceURI, Method.GET );
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Status" );
+        Assert.assertEquals( "Status", response.getStatus().getCode(), 200 );
 
         resetTestUserPrivs( false );
 
         // delete failure
         serviceURI = "content/repositories/" + this.getTestRepositoryId() + "/nxcm1985";
         response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-        Assert.assertEquals( response.getStatus().getCode(), 403, "Status" );
+        Assert.assertEquals( "Status", response.getStatus().getCode(), 403 );
 
         resetTestUserPrivs( true );
 
         // delete success
         response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-        Assert.assertEquals( response.getStatus().getCode(), 204, "Status" );
+        Assert.assertEquals( "Status", response.getStatus().getCode(), 204 );
     }
 
     private void resetTestUserPrivs( boolean addPrivs )

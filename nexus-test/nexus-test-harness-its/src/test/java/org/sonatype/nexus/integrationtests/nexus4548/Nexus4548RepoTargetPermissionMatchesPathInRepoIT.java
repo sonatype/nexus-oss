@@ -23,14 +23,14 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * IT testing the pattern matching of repository targets for security permissions.
@@ -49,7 +49,7 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
         super( "releases" );
     }
 
-    @BeforeMethod( alwaysRun = true )
+    @Before
     public void setSecureTest()
         throws IOException
     {

@@ -12,14 +12,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus586;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 
 /**
@@ -30,7 +30,7 @@ public class Nexus586ValidateConfigurationIT
 {
 
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -44,7 +44,7 @@ public class Nexus586ValidateConfigurationIT
         globalConfig.setSecurityAnonymousUsername( "zigfrid" );
 
         Status status = SettingsMessageUtil.save( globalConfig );
-        Assert.assertEquals( status.getCode(), 400, "Can't set an invalid user as anonymous" );
+        Assert.assertEquals( "Can't set an invalid user as anonymous", status.getCode(), 400 );
     }
 
 }

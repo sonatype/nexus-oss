@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
@@ -23,9 +26,6 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Test filtering search results based upon security
@@ -35,7 +35,7 @@ public class Nexus779RssFeedFilteringIT
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -75,11 +75,11 @@ public class Nexus779RssFeedFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to see only test1 artifacts
-        Assert.assertTrue( feedListContainsArtifact( "nexus779", "test1", "1.0.0" ),
-                           "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: " + this.entriesToString() );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
-        Assert.assertFalse( feedListContainsArtifact( "nexus779", "test2", "1.0.0" ), "Feed should not contain entry for nexus779:test2:1.0.0\nEntries: "
-                + this.entriesToString() );
+        Assert.assertFalse( "Feed should not contain entry for nexus779:test2:1.0.0\nEntries: "
+                + this.entriesToString(), feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
         // Now update the test user so that the user can only access test2
         updateUserRole( TEST_USER_NAME, Collections.singletonList( role2.getId() ) );
@@ -88,11 +88,11 @@ public class Nexus779RssFeedFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to see only test2 artifacts
-        Assert.assertFalse( feedListContainsArtifact( "nexus779", "test1", "1.0.0" ), "Feed should not contain entry for nexus779:test1:1.0.0.\nEntries: "
-                + this.entriesToString() );
+        Assert.assertFalse( "Feed should not contain entry for nexus779:test1:1.0.0.\nEntries: "
+                + this.entriesToString(), feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
-        Assert.assertTrue( feedListContainsArtifact( "nexus779", "test2", "1.0.0" ),
-                           "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString() );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
         // Now update the test user to find both
         updateUserRole( TEST_USER_NAME, Collections.singletonList( role3.getId() ) );
@@ -101,11 +101,11 @@ public class Nexus779RssFeedFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to see both test1 & test2 artifacts
-        Assert.assertTrue( feedListContainsArtifact( "nexus779", "test1", "1.0.0" ),
-                           "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: " + this.entriesToString() );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
-        Assert.assertTrue( feedListContainsArtifact( "nexus779", "test2", "1.0.0" ),
-                           "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString() );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
     }
 
     private RepositoryTargetResource createTarget( String name, List<String> patterns )

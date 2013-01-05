@@ -19,8 +19,8 @@ import java.io.File;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.testng.annotations.Test;
 
 public class Nexus4970InvalidMetadataMergeOnGroupsIT
     extends AbstractNexusIntegrationTest

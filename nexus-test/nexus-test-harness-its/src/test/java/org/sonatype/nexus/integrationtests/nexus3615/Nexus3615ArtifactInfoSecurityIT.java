@@ -21,6 +21,9 @@ import static org.sonatype.nexus.integrationtests.AbstractPrivilegeTest.TEST_USE
 import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
@@ -28,8 +31,7 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+
 import com.thoughtworks.xstream.XStream;
 
 public class Nexus3615ArtifactInfoSecurityIT
@@ -41,14 +43,19 @@ public class Nexus3615ArtifactInfoSecurityIT
     protected RoleMessageUtil roleUtil;
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+
+    @Before
+    public void setUp()
+    {
         XStream xstream = this.getXMLXStream();
         this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );
         this.roleUtil = new RoleMessageUtil( this, xstream, MediaType.APPLICATION_XML );
     }
-
+    
     protected void giveUserRole( String userId, String roleId, boolean overwrite )
         throws IOException
     {

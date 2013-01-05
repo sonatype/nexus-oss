@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -25,8 +27,6 @@ import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.usermanagement.PasswordGenerator;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * CRUD tests for JSON request/response.
@@ -79,7 +79,7 @@ public class Nexus142UserCrudJsonIT
         PasswordGenerator pwGenerator = lookup( PasswordGenerator.class );
         String hashedPassword = pwGenerator.hashPassword( password );
         CUser cUser = getSecurityConfigUtil().getCUser( "createTestWithPassword" );
-        Assert.assertEquals( cUser.getPassword(), hashedPassword, "Expected hashed passwords to be the same." );
+        Assert.assertEquals( "Expected hashed passwords to be the same.", cUser.getPassword(), hashedPassword );
 
     }
 
@@ -131,10 +131,10 @@ public class Nexus142UserCrudJsonIT
         // get the Resource object
         UserResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
-        Assert.assertEquals( resource.getFirstName(), responseResource.getFirstName() );
-        Assert.assertEquals( resource.getUserId(), responseResource.getUserId() );
-        Assert.assertEquals( "active", responseResource.getStatus() );
-        Assert.assertEquals( resource.getEmail(), responseResource.getEmail() );
+        Assert.assertEquals( responseResource.getFirstName(), resource.getFirstName() );
+        Assert.assertEquals( responseResource.getUserId(), resource.getUserId() );
+        Assert.assertEquals( responseResource.getStatus(), "active" );
+        Assert.assertEquals( responseResource.getEmail(), resource.getEmail() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
     }
 

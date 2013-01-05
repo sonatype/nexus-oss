@@ -13,6 +13,7 @@
 package org.sonatype.nexus.integrationtests.nxcm897;
 
 import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.UserAccount;
@@ -20,7 +21,6 @@ import org.sonatype.nexus.test.utils.UserAccountMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.annotations.Test;
 
 /**
  * Copied from the nexus-user-account-plugin to test the migrated UserAccountManager.

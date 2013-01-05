@@ -12,15 +12,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2797;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Calendar;
 import java.util.Date;
 
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 public class Nexus2797Validate140TaskUpgradeIT
     extends AbstractNexusIntegrationTest
@@ -44,14 +44,14 @@ public class Nexus2797Validate140TaskUpgradeIT
         // setLastRun in DefaultScheduledTask
         Date lastRunTime = new Date( 1111111111131l );
         
-        assertEquals( lastRunTime.toString(), TaskScheduleUtil.getTask( "task1" ).getLastRunTime() );
-        assertEquals( lastRunTime.toString(), TaskScheduleUtil.getTask( "task2" ).getLastRunTime() );
-        assertEquals( lastRunTime.toString(), TaskScheduleUtil.getTask( "task3" ).getLastRunTime() );
-        assertEquals( "n/a", TaskScheduleUtil.getTask( "task4" ).getLastRunTime() );
+        assertEquals( TaskScheduleUtil.getTask( "task1" ).getLastRunTime(), lastRunTime.toString() );
+        assertEquals( TaskScheduleUtil.getTask( "task2" ).getLastRunTime(), lastRunTime.toString() );
+        assertEquals( TaskScheduleUtil.getTask( "task3" ).getLastRunTime(), lastRunTime.toString() );
+        assertEquals( TaskScheduleUtil.getTask( "task4" ).getLastRunTime(), "n/a" );
 
-        assertEquals( (Long) lastRunTime.getTime(), TaskScheduleUtil.getTask( "task1" ).getLastRunTimeInMillis() );
-        assertEquals( (Long) lastRunTime.getTime(), TaskScheduleUtil.getTask( "task2" ).getLastRunTimeInMillis() );
-        assertEquals( (Long) lastRunTime.getTime(), TaskScheduleUtil.getTask( "task3" ).getLastRunTimeInMillis() );
+        assertEquals( TaskScheduleUtil.getTask( "task1" ).getLastRunTimeInMillis(), (Long) lastRunTime.getTime() );
+        assertEquals( TaskScheduleUtil.getTask( "task2" ).getLastRunTimeInMillis(), (Long) lastRunTime.getTime() );
+        assertEquals( TaskScheduleUtil.getTask( "task3" ).getLastRunTimeInMillis(), (Long) lastRunTime.getTime() );
         assertNull( TaskScheduleUtil.getTask( "task4" ).getLastRunTimeInMillis() );
 
         //problem was simply that next run time was invalidly calculated, and never set
@@ -59,15 +59,15 @@ public class Nexus2797Validate140TaskUpgradeIT
         //we need to fix the next run time, as it will change depending on current date
         Date nextRunTime = fixNextRunTime( new Date( 1230777000000l ) );
         
-        assertEquals( nextRunTime.toString(), TaskScheduleUtil.getTask( "task1" ).getNextRunTime() );
-        assertEquals( nextRunTime.toString(), TaskScheduleUtil.getTask( "task2" ).getNextRunTime() );
-        assertEquals( nextRunTime.toString(), TaskScheduleUtil.getTask( "task3" ).getNextRunTime() );
-        assertEquals( nextRunTime.toString(), TaskScheduleUtil.getTask( "task4" ).getNextRunTime() );
+        assertEquals( TaskScheduleUtil.getTask( "task1" ).getNextRunTime(), nextRunTime.toString() );
+        assertEquals( TaskScheduleUtil.getTask( "task2" ).getNextRunTime(), nextRunTime.toString() );
+        assertEquals( TaskScheduleUtil.getTask( "task3" ).getNextRunTime(), nextRunTime.toString() );
+        assertEquals( TaskScheduleUtil.getTask( "task4" ).getNextRunTime(), nextRunTime.toString() );
 
-        assertEquals( (Long) nextRunTime.getTime(), TaskScheduleUtil.getTask( "task1" ).getNextRunTimeInMillis() );
-        assertEquals( (Long) nextRunTime.getTime(), TaskScheduleUtil.getTask( "task2" ).getNextRunTimeInMillis() );
-        assertEquals( (Long) nextRunTime.getTime(), TaskScheduleUtil.getTask( "task3" ).getNextRunTimeInMillis() );
-        assertEquals( (Long) nextRunTime.getTime(), TaskScheduleUtil.getTask( "task4" ).getNextRunTimeInMillis() );
+        assertEquals( TaskScheduleUtil.getTask( "task1" ).getNextRunTimeInMillis(), (Long) nextRunTime.getTime() );
+        assertEquals( TaskScheduleUtil.getTask( "task2" ).getNextRunTimeInMillis(), (Long) nextRunTime.getTime() );
+        assertEquals( TaskScheduleUtil.getTask( "task3" ).getNextRunTimeInMillis(), (Long) nextRunTime.getTime() );
+        assertEquals( TaskScheduleUtil.getTask( "task4" ).getNextRunTimeInMillis(), (Long) nextRunTime.getTime() );
     }
     
     private Date fixNextRunTime( Date nextRunTime )

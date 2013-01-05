@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus969;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
@@ -19,8 +21,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus969CacheEvictInteractionIT
     extends AbstractNexusIntegrationTest
@@ -42,8 +42,8 @@ public class Nexus969CacheEvictInteractionIT
         Assert.assertFalse( id1.equals( id2 ) );
         restartNexus();
         String id3 = createEvictTask( CACHE_EVICT + "3" ).getId();
-        Assert.assertFalse( id1.equals( id3 ), "The new task ID should be different both are : " + id3 );
-        Assert.assertFalse( id2.equals( id3 ), "The new task ID should be different both are: " + id3 );
+        Assert.assertFalse( "The new task ID should be different both are : " + id3, id1.equals( id3 ) );
+        Assert.assertFalse( "The new task ID should be different both are: " + id3, id2.equals( id3 ) );
     }
 
     private ScheduledServiceListResource createEvictTask( String taskName )
@@ -65,7 +65,7 @@ public class Nexus969CacheEvictInteractionIT
         scheduledTask.addProperty( repo );
 
         Status status = TaskScheduleUtil.create( scheduledTask );
-        Assert.assertTrue( status.isSuccess(), "Unable to create task: " + status.getDescription() );
+        Assert.assertTrue( "Unable to create task: " + status.getDescription(), status.isSuccess() );
 
         return TaskScheduleUtil.getTask( taskName );
     }

@@ -17,12 +17,12 @@ import static org.hamcrest.Matchers.equalTo;
 import java.io.IOException;
 
 import org.hamcrest.MatcherAssert;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.annotations.Test;
 
 /**
  * Case1 of NXCM-3600: anon access disabled.

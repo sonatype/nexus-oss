@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4257;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+
 import java.io.IOException;
 
 import org.apache.commons.httpclient.Cookie;
@@ -22,20 +27,14 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.security.StatelessAndStatefulWebSessionManager;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 
 public class Nexus4257CookieVerificationIT
@@ -43,7 +42,7 @@ public class Nexus4257CookieVerificationIT
 {
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }

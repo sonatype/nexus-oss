@@ -16,22 +16,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus1239PlexusUserResourceIT
     extends AbstractNexusIntegrationTest
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -43,18 +43,18 @@ public class Nexus1239PlexusUserResourceIT
 
         UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         PlexusUserResource user = userUtil.getPlexusUser( "default", "admin" );
-        Assert.assertEquals( "admin", user.getUserId() );
-        Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
-        Assert.assertEquals( "Administrator", user.getFirstName() );
-        Assert.assertEquals( "default", user.getSource() );
+        Assert.assertEquals( user.getUserId(), "admin" );
+        Assert.assertEquals( user.getEmail(), "changeme@yourcompany.com" );
+        Assert.assertEquals( user.getFirstName(), "Administrator" );
+        Assert.assertEquals( user.getSource(), "default" );
 
         List<PlexusRoleResource> roles = user.getRoles();
         Assert.assertEquals( 1, roles.size() );
 
         PlexusRoleResource role = roles.get( 0 );
-        Assert.assertEquals( "Nexus Administrator Role", role.getName() );
-        Assert.assertEquals( "nx-admin", role.getRoleId() );
-        Assert.assertEquals( "default", role.getSource() );
+        Assert.assertEquals( role.getName(), "Nexus Administrator Role" );
+        Assert.assertEquals( role.getRoleId(), "nx-admin" );
+        Assert.assertEquals( role.getSource(), "default" );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -65,18 +65,18 @@ public class Nexus1239PlexusUserResourceIT
 
         UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         PlexusUserResource user = userUtil.getPlexusUser( null, "admin" );
-        Assert.assertEquals( "admin", user.getUserId() );
-        Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
-        Assert.assertEquals( "Administrator", user.getFirstName() );
-        Assert.assertEquals( "default", user.getSource() );
+        Assert.assertEquals( user.getUserId(), "admin" );
+        Assert.assertEquals( user.getEmail(), "changeme@yourcompany.com" );
+        Assert.assertEquals( user.getFirstName(), "Administrator" );
+        Assert.assertEquals( user.getSource(), "default" );
 
         List<PlexusRoleResource> roles = user.getRoles();
         Assert.assertEquals( 1, roles.size() );
 
         PlexusRoleResource role = roles.get( 0 );
-        Assert.assertEquals( "Nexus Administrator Role", role.getName() );
-        Assert.assertEquals( "nx-admin", role.getRoleId() );
-        Assert.assertEquals( "default", role.getSource() );
+        Assert.assertEquals( role.getName(), "Nexus Administrator Role" );
+        Assert.assertEquals( role.getRoleId(), "nx-admin" );
+        Assert.assertEquals( role.getSource(), "default" );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -87,18 +87,18 @@ public class Nexus1239PlexusUserResourceIT
 
         UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         PlexusUserResource user = userUtil.getPlexusUser( "all", "admin" );
-        Assert.assertEquals( "admin", user.getUserId() );
-        Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
-        Assert.assertEquals( "Administrator", user.getFirstName() );
-        Assert.assertEquals( "default", user.getSource() );
+        Assert.assertEquals( user.getUserId(), "admin" );
+        Assert.assertEquals( user.getEmail(), "changeme@yourcompany.com" );
+        Assert.assertEquals( user.getFirstName(), "Administrator" );
+        Assert.assertEquals( user.getSource(), "default" );
 
         List<PlexusRoleResource> roles = user.getRoles();
         Assert.assertEquals( 1, roles.size() );
 
         PlexusRoleResource role = roles.get( 0 );
-        Assert.assertEquals( "Nexus Administrator Role", role.getName() );
-        Assert.assertEquals( "nx-admin", role.getRoleId() );
-        Assert.assertEquals( "default", role.getSource() );
+        Assert.assertEquals( role.getName(), "Nexus Administrator Role" );
+        Assert.assertEquals( role.getRoleId(), "nx-admin" );
+        Assert.assertEquals( role.getSource(), "default" );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -120,7 +120,7 @@ public class Nexus1239PlexusUserResourceIT
         Assert.assertTrue( userIds.contains( "anonymous" ) );
         Assert.assertTrue( userIds.contains( "deployment" ) );
         Assert.assertTrue( userIds.contains( "test-user" ) );
-        Assert.assertEquals( users.size(), 4, "Users: " + userIds );
+        Assert.assertEquals( "Users: " + userIds, users.size(), 4 );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -146,7 +146,7 @@ public class Nexus1239PlexusUserResourceIT
 
         // NOTE: this needs to be at least the number of users expected in the default realm, the In-Memory realm add
         // another user locator, and there is no way to disable it.
-        Assert.assertTrue( users.size() >= 4, "Users: " + userIds );
+        Assert.assertTrue( "Users: " + userIds, users.size() >= 4 );
     }
 
     @SuppressWarnings( "unchecked" )

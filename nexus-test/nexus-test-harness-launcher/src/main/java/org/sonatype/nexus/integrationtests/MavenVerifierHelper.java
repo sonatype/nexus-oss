@@ -20,7 +20,7 @@ import java.util.List;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.util.FileUtils;
-import org.testng.Assert;
+import org.junit.Assert;
 
 /**
  * Helper class to create Maven Verifier.

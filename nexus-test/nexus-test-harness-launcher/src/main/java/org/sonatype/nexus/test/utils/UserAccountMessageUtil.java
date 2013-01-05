@@ -14,7 +14,6 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.XStream;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -24,6 +23,8 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.UserAccount;
 import org.sonatype.nexus.rest.model.UserAccountRequestResponseWrapper;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+
+import com.thoughtworks.xstream.XStream;
 
 public class UserAccountMessageUtil
 {

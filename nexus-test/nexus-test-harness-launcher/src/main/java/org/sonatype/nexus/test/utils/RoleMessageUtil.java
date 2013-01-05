@@ -12,12 +12,13 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -35,7 +36,6 @@ import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -71,15 +71,15 @@ public class RoleMessageUtil
         RoleResource responseResource = this.getResourceFromResponse( entityText );
 
         // make sure the id != null
-        Assert.assertNotNull( responseResource.getId(), "Result:\n" + this.xStream.toXML( responseResource ) );
+        Assert.assertNotNull( "Result:\n" + this.xStream.toXML( responseResource ), responseResource.getId() );
 
         if ( role.getId() != null )
         {
-            Assert.assertEquals( role.getId(), responseResource.getId() );
+            Assert.assertEquals( responseResource.getId(), role.getId() );
         }
 
-        Assert.assertEquals( role.getDescription(), responseResource.getDescription() );
-        Assert.assertEquals( role.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getDescription(), role.getDescription() );
+        Assert.assertEquals( responseResource.getName(), role.getName() );
         Assert.assertEquals( role.getSessionTimeout(), responseResource.getSessionTimeout() );
         Assert.assertEquals( role.getPrivileges(), responseResource.getPrivileges() );
         Assert.assertEquals( role.getRoles(), responseResource.getRoles() );

@@ -24,6 +24,9 @@ import java.util.Properties;
 import org.apache.maven.index.context.IndexingContext;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -38,12 +41,9 @@ import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
-import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 
 public abstract class AbstractNexus1923
     extends AbstractNexusIntegrationTest
@@ -85,7 +85,7 @@ public abstract class AbstractNexus1923
         super();
     }
 
-    @BeforeClass( alwaysRun = true )
+    @Before
     public void init()
         throws ComponentLookupException
     {
@@ -517,8 +517,8 @@ public abstract class AbstractNexus1923
         }
         else
         {
-            Assert.assertEquals( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ),
-                Integer.toString( current ) );
+            Assert.assertEquals( Integer.toString( current ),
+                properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
         }
     }
 
@@ -580,7 +580,7 @@ public abstract class AbstractNexus1923
 
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( args, repositoryId );
 
-        Assert.assertEquals( artifacts.size() > 0, shouldFind );
+        Assert.assertEquals( shouldFind, artifacts.size() > 0 );
     }
 
     protected void searchForArtifactInHostedIndex( String artifact, boolean shouldFind )
@@ -628,7 +628,7 @@ public abstract class AbstractNexus1923
         }
     }
 
-    @BeforeClass( alwaysRun = true )
+    @BeforeClass
     public static void clean()
         throws Exception
     {

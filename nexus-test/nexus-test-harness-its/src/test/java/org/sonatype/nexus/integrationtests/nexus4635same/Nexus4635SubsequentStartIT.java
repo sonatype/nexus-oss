@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4635same;
 
-import static org.testng.Assert.assertFalse;
+import static org.junit.Assert.assertFalse;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResource;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * subsequent start of same instance<br>
@@ -34,7 +34,7 @@ public class Nexus4635SubsequentStartIT
     extends AbstractNexusIntegrationTest
 {
     @BeforeClass
-    protected void disableSecurity()
+    public static void disableSecurity()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( false );
     }
