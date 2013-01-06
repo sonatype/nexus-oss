@@ -232,10 +232,13 @@ public abstract class AbstractCargoIT
 
     protected PluginConsoleMessageUtil pluginConsoleMsgUtil = new PluginConsoleMessageUtil();
 
-    @Test( dependsOnMethods = { "checkStatus", "checkLogs" } )
+    @Test
     public void checkPlugins()
         throws Exception
     {
+        checkStatus();
+        checkLogs();
+
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
@@ -249,10 +252,12 @@ public abstract class AbstractCargoIT
         }
     }
 
-    @Test( dependsOnMethods = { "checkStatus" } )
+    @Test
     public void checkLogs()
         throws Exception
     {
+        checkStatus();
+
         Response response = RequestFacade.sendMessage( "service/local/logs", Method.GET );
         String responseText = response.getEntity().getText();
 

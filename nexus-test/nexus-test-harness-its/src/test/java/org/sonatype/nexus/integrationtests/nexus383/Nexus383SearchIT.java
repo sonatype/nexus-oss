@@ -221,8 +221,8 @@ public class Nexus383SearchIT
         getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
     }
 
-    @Test( dependsOnMethods = { "searchFor", "searchForSHA1", "disableSearching", "disableEnableSearching",
-        "disableBrowsing", "disableEnableBrowsing", "disableDeploying" } )
+    @Test //( dependsOnMethods = { "searchFor", "searchForSHA1", "disableSearching", "disableEnableSearching",
+        //"disableBrowsing", "disableEnableBrowsing", "disableDeploying" } )
     // 4. deploy same artifact to multiple repos, and search
     public void crossRepositorySearch()
         throws Exception

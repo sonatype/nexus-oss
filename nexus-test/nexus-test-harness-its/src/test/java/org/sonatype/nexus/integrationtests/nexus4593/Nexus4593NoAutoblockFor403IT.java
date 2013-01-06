@@ -104,7 +104,7 @@ public class Nexus4593NoAutoblockFor403IT
      * <p/>
      * This test will change repo status to auto blocked.
      */
-    @Test( dependsOnMethods = "testNoAutoblockOn403" )
+    @Test //( dependsOnMethods = "testNoAutoblockOn403" )
     public void testAutoblockOn401()
         throws Exception
     {
@@ -127,7 +127,7 @@ public class Nexus4593NoAutoblockFor403IT
     /**
      * Verify that un-autoblocking a repo works when 'HEAD /' is giving 403.
      */
-    @Test( dependsOnMethods = "testAutoblockOn401" )
+    @Test //( dependsOnMethods = "testAutoblockOn401" )
     public void testUnAutoblockFor403()
         throws Exception
     {

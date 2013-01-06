@@ -44,7 +44,7 @@ public class Nexus538SystemFeedsIT
         Assert.assertTrue( findFeedEntry( feed, "Booting", null ) );
     }
 
-    @Test( dependsOnMethods = { "bootEventTest" } )
+    @Test //( dependsOnMethods = { "bootEventTest" } )
     public void updateRepoTest()
         throws Exception
     {
@@ -67,7 +67,7 @@ public class Nexus538SystemFeedsIT
             findFeedEntry( feed, "Configuration change", new String[] { newName, oldName } ) );
     }
 
-    @Test( dependsOnMethods = { "updateRepoTest" } )
+    @Test //( dependsOnMethods = { "updateRepoTest" } )
     public void changeProxyStatusTest()
         throws Exception
     {

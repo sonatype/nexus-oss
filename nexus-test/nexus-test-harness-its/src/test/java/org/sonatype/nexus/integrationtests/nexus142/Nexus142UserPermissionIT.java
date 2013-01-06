@@ -79,7 +79,7 @@ public class Nexus142UserPermissionIT
 
     }
 
-    @Test( dependsOnMethods = "testCreatePermission" )
+    @Test
     public void testUpdatePermission()
         throws IOException
     {
@@ -136,7 +136,7 @@ public class Nexus142UserPermissionIT
 
     }
 
-    @Test( dependsOnMethods = "testUpdatePermission" )
+    @Test
     public void testReadPermission()
         throws IOException
     {
@@ -192,7 +192,7 @@ public class Nexus142UserPermissionIT
 
     }
 
-    @Test( dependsOnMethods = { "testReadPermission" } )
+    @Test
     public void testDeletePermission()
         throws IOException
     {

@@ -65,7 +65,7 @@ public class Nexus502MavenExecutionIT
         }
     }
 
-    @Test( dependsOnMethods = { "dependencyDownload" } )
+    @Test //( dependsOnMethods = { "dependencyDownload" } )
     public void dependencyDownloadPrivateServer()
         throws Exception
     {
@@ -92,7 +92,7 @@ public class Nexus502MavenExecutionIT
     }
 
     // Depends on nexus-508
-    @Test( dependsOnMethods = { "dependencyDownloadPrivateServer" } )
+    @Test //( dependsOnMethods = { "dependencyDownloadPrivateServer" } )
     public void dependencyDownloadProtectedServer()
         throws Exception
     {
