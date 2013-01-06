@@ -97,11 +97,14 @@ public abstract class AbstractCargoIT
     
             WAR war = new WAR( getWarFile().getAbsolutePath() );
             war.setContext( "nexus" );
+            
+            File configHome = new File( "target/conatiner-configs", getContainer() ).getAbsoluteFile();
     
             ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
             LocalConfiguration configuration =
                 (LocalConfiguration) configurationFactory.createConfiguration( getContainer(), ContainerType.INSTALLED,
-                                                                               ConfigurationType.STANDALONE );
+                                                                               ConfigurationType.STANDALONE,
+                                                                               configHome.getAbsolutePath() );
             configuration.addDeployable( war );
             configuration.setProperty( ServletPropertySet.PORT, TestProperties.getString( "nexus.application.port" ) );
             container =
