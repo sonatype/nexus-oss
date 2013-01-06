@@ -16,12 +16,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.sonatype.nexus.test.utils.TaskScheduleUtil.newProperty;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -33,6 +37,7 @@ import com.google.common.collect.Lists;
  * Check for tasks mutual exclusion (like two reindex tasks for same repository will run serialized, one will "win" and
  * run, one will "loose" and wait for winner to finish).
  */
+@RunWith( Parameterized.class )
 public class Nexus4066TaskMutualExclusionIT
     extends AbstractNexusIntegrationTest
 {
@@ -40,11 +45,11 @@ public class Nexus4066TaskMutualExclusionIT
     /*
      * When last argument is false mean task should run in parallel. When it is true task should run serialized.
      */
-    @DataProvider( name = "data", parallel = false )
-    public Object[][] createData()
+    @Parameters
+    public static List<Object[]> createData()
     {
         // GofG == group of groups
-        return new Object[][] {//
+        return Arrays.asList(new Object[][] {//
         { "repo", "group", true },//
             { "repo", "repo2", false },//
             { "repo", "group2", false },//
@@ -60,9 +65,22 @@ public class Nexus4066TaskMutualExclusionIT
             { "group2", "GofG2", true },//
             { "repo", "GofG2", false },//
             { "group", "GofG2", false },//
-        };
+        });
     }
 
+    private final String repo1;
+
+    private final String repo2;
+
+    private final boolean shouldWait;
+
+    public Nexus4066TaskMutualExclusionIT( String repo1, String repo2, boolean shouldWait )
+    {
+        this.repo1 = repo1;
+        this.repo2 = repo2;
+        this.shouldWait = shouldWait;
+    }
+    
     private List<ScheduledServiceListResource> tasks;
 
     @Before
@@ -89,8 +107,8 @@ public class Nexus4066TaskMutualExclusionIT
         TaskScheduleUtil.deleteAllTasks();
     }
 
-    @Test( dataProvider = "data" )
-    public void run( String repo1, String repo2, boolean shouldWait )
+    @Test
+    public void run()
         throws Exception
     {
 
