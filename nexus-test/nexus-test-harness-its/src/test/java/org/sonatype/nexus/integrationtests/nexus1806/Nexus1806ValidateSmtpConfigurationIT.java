@@ -149,8 +149,8 @@ public class Nexus1806ValidateSmtpConfigurationIT
     {
         if ( originalServer != null )
         {
-            originalServer.stop();
-            
+            EmailUtil.stopEmailServer();
+
             originalServer = null;
         }
         if ( changedServer != null )
