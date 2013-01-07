@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
@@ -42,10 +43,24 @@ public class MavenVerifierHelper
         throws VerificationException, IOException
     {
         System.setProperty( "maven.home", mavenDeployment.getMavenHomeFile().getAbsolutePath() );
-        Verifier verifier = new Verifier( mavenDeployment.getMavenProjectFile().getAbsolutePath(), false );
+        Verifier verifier = new Verifier( mavenDeployment.getMavenProjectFile().getAbsolutePath() )
+        {
+            @Override
+            public void executeGoals(List<String> goals, Map envVars) throws VerificationException {
+                try {
+                    super.executeGoals(goals, envVars);
+                }
+                catch (VerificationException e) {
+                    // HACK: Strip out the entire log which is included in the message by default! :-(
+                    File logFile = new File( getBasedir(), getLogFileName() );
+                    throw new VerificationException("Goals execution failed: " + goals + "; see log for more details: " + logFile.getAbsolutePath(), e.getCause());
+                }
+            }
+        };
         verifier.setLogFileName( mavenDeployment.getLogFileName() );
         verifier.setLocalRepo( mavenDeployment.getLocalRepositoryFile().getAbsolutePath() );
         verifier.resetStreams();
+
         List<String> options = new ArrayList<String>();
         options.add( "-X" );
         options.add( "-Dmaven.repo.local=" + mavenDeployment.getLocalRepositoryFile().getAbsolutePath() );
