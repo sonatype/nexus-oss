@@ -90,7 +90,10 @@ public class MavenVerifierHelper
      * 
      * @param verifier
      * @throws IOException
+     *
+     * @deprecated This method will make huge/confusing output on build execution, and should not be used.
      */
+    @Deprecated
     public void failTest( final Verifier verifier )
         throws IOException
     {
