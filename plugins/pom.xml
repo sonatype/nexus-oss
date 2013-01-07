@@ -59,6 +59,7 @@
       <modules>
         <module>restlet1x</module>
         <module>indexer</module>
+        <module>bouncycastle</module>
         <module>ldap</module>
         <module>nexus-timeline-plugin</module>
         <module>nexus-lvo-plugin</module>
