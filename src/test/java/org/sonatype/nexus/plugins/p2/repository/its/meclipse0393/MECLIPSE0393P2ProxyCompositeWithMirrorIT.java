@@ -21,9 +21,9 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readabl
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.Test;
 
 public class MECLIPSE0393P2ProxyCompositeWithMirrorIT
     extends AbstractNexusProxyP2IT

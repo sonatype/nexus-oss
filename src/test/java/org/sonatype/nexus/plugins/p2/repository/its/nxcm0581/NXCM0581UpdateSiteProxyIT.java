@@ -20,9 +20,9 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readabl
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 public class NXCM0581UpdateSiteProxyIT
     extends AbstractNexusProxyP2IT

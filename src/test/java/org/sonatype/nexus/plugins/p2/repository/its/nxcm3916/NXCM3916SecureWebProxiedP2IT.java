@@ -15,16 +15,15 @@ package org.sonatype.nexus.plugins.p2.repository.its.nxcm3916;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
-import static org.testng.Assert.fail;
 
 import java.net.URL;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class NXCM3916SecureWebProxiedP2IT
     extends AbstractNexusProxyP2IT
@@ -44,7 +43,7 @@ public class NXCM3916SecureWebProxiedP2IT
         super( "nxcm3916" );
     }
 
-    @BeforeMethod( alwaysRun = true )
+    @Before
     public void startWebProxy()
         throws Exception
     {
@@ -57,7 +56,7 @@ public class NXCM3916SecureWebProxiedP2IT
         }
         catch ( Exception e )
         {
-            fail( "Current properties:\n" + TestProperties.getAll(), e );
+            throw new Exception( "Current properties:\n" + TestProperties.getAll(), e );
         }
 
         // ensuring the proxy is working!!!
@@ -70,7 +69,7 @@ public class NXCM3916SecureWebProxiedP2IT
         );
     }
 
-    @AfterMethod( alwaysRun = true )
+    @After
     public void stopWebProxy()
         throws Exception
     {

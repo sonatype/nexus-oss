@@ -15,12 +15,13 @@ package org.sonatype.nexus.plugins.p2.repository.its.nxcm1898;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public abstract class NXCM1898P2ProxyTimeoutIT
     extends AbstractNexusProxyP2IT
@@ -33,7 +34,7 @@ public abstract class NXCM1898P2ProxyTimeoutIT
     }
 
     @Override
-    @BeforeClass( alwaysRun = true )
+    @Before
     public void startProxy()
         throws Exception
     {
@@ -41,7 +42,7 @@ public abstract class NXCM1898P2ProxyTimeoutIT
         proxyServer.start();
     }
 
-    @Test( enabled = false )
+    @Test @Ignore
     protected void test( final int timeout )
         throws IOException, Exception
     {

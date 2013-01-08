@@ -24,8 +24,8 @@ import java.io.File;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
-import org.testng.annotations.Test;
 
 public class NEXUS5057EnsureEclipseBundleShapeIsSupportedIT
     extends

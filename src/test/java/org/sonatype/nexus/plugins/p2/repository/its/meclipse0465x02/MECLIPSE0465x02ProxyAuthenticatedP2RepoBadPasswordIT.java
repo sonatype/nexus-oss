@@ -19,9 +19,9 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readabl
 
 import java.io.File;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2SecureIT;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT
     extends AbstractNexusProxyP2SecureIT

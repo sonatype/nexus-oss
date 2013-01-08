@@ -22,8 +22,8 @@ import java.io.File;
 import java.net.URL;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
-import org.testng.annotations.Test;
 
 public class NXCM2838MergedMetadataP2GroupIT
     extends AbstractNexusProxyP2IT

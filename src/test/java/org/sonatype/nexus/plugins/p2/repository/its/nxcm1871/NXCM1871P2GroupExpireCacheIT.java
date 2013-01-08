@@ -22,12 +22,12 @@ import java.io.File;
 import java.net.URL;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 public class NXCM1871P2GroupExpireCacheIT
     extends AbstractNexusProxyP2IT

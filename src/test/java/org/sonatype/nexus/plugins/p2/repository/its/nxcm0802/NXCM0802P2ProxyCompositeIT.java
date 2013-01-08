@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm0802;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
-import org.testng.annotations.Test;
 
 public class NXCM0802P2ProxyCompositeIT
     extends AbstractNexusProxyP2IT
