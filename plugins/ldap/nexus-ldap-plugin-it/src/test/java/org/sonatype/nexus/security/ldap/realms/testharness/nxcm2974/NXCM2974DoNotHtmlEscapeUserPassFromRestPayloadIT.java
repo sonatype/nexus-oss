@@ -12,14 +12,16 @@
  */
 package org.sonatype.nexus.security.ldap.realms.testharness.nxcm2974;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.isSuccessful;
 
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.ldaptestsuite.LdapServer;
@@ -31,7 +33,6 @@ import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConf
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapConnMessageUtil;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUserGroupMessageUtil;
-import org.testng.annotations.Test;
 
 public class NXCM2974DoNotHtmlEscapeUserPassFromRestPayloadIT
     extends AbstractLdapIntegrationIT

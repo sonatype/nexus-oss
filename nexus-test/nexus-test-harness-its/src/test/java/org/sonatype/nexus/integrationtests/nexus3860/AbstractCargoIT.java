@@ -14,14 +14,14 @@ package org.sonatype.nexus.integrationtests.nexus3860;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -44,11 +44,13 @@ import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -62,11 +64,6 @@ import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import static org.hamcrest.Matchers.*;
 
 public abstract class AbstractCargoIT
     extends TestSupport
@@ -83,31 +80,42 @@ public abstract class AbstractCargoIT
     }
 
     @BeforeClass
-    public void startContainer()
-        throws Exception
+    public static void startContainer()
     {
-        fixPlexusProperties();
-        changeStartupLoggingToDebug();
-
-        WAR war = new WAR( getWarFile().getAbsolutePath() );
-        war.setContext( "nexus" );
-
-        ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
-        LocalConfiguration configuration =
-            (LocalConfiguration) configurationFactory.createConfiguration( getContainer(), ContainerType.INSTALLED,
-                ConfigurationType.STANDALONE );
-        configuration.addDeployable( war );
-        configuration.setProperty( ServletPropertySet.PORT, TestProperties.getString( "nexus.application.port" ) );
-        container =
-            (InstalledLocalContainer) new DefaultContainerFactory().createContainer( getContainer(),
-                ContainerType.INSTALLED, configuration );
-        container.setHome( getContainerLocation().getAbsolutePath() );
-
-        container.setTimeout( 5 * 60 * 1000 );// 5 minutes
-        container.start();
-
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+    }
+
+    @Before
+    public void setUp()
+        throws Exception
+    {
+        if (container == null)
+        {
+            fixPlexusProperties();
+            changeStartupLoggingToDebug();
+    
+            WAR war = new WAR( getWarFile().getAbsolutePath() );
+            war.setContext( "nexus" );
+            
+            File configHome = new File( "target/conatiner-configs", getContainer() ).getAbsoluteFile();
+    
+            ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
+            LocalConfiguration configuration =
+                (LocalConfiguration) configurationFactory.createConfiguration( getContainer(), ContainerType.INSTALLED,
+                                                                               ConfigurationType.STANDALONE,
+                                                                               configHome.getAbsolutePath() );
+            configuration.addDeployable( war );
+            configuration.setProperty( ServletPropertySet.PORT, TestProperties.getString( "nexus.application.port" ) );
+            container =
+                (InstalledLocalContainer) new DefaultContainerFactory().createContainer( getContainer(),
+                                                                                         ContainerType.INSTALLED,
+                                                                                         configuration );
+            container.setHome( getContainerLocation().getAbsolutePath() );
+    
+            container.setTimeout( 5 * 60 * 1000 );// 5 minutes
+            container.start();
+        }
     }
 
     /**
@@ -200,7 +208,7 @@ public abstract class AbstractCargoIT
         return TestProperties.getString( "nexus-work-dir" ) + "-" + getClass().getSimpleName();
     }
 
-    @AfterClass( alwaysRun = true )
+    @After
     public void stopContainer()
     {
         if ( container != null )
@@ -221,16 +229,19 @@ public abstract class AbstractCargoIT
         throws Exception
     {
         assertEquals(
-            new NexusStatusUtil( AbstractNexusIntegrationTest.nexusApplicationPort ).getNexusStatus().getData().getState(),
-            "STARTED" );
+            "STARTED",
+            new NexusStatusUtil( AbstractNexusIntegrationTest.nexusApplicationPort ).getNexusStatus().getData().getState() );
     }
 
     protected PluginConsoleMessageUtil pluginConsoleMsgUtil = new PluginConsoleMessageUtil();
 
-    @Test( dependsOnMethods = { "checkStatus", "checkLogs" } )
+    @Test
     public void checkPlugins()
         throws Exception
     {
+        checkStatus();
+        checkLogs();
+
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
@@ -240,23 +251,25 @@ public abstract class AbstractCargoIT
 
         for ( PluginInfoDTO info : pluginInfos )
         {
-            assertEquals( info.getStatus(), "ACTIVATED" );
+            assertEquals( "ACTIVATED", info.getStatus() );
         }
     }
 
-    @Test( dependsOnMethods = { "checkStatus" } )
+    @Test
     public void checkLogs()
         throws Exception
     {
+        checkStatus();
+
         Response response = RequestFacade.sendMessage( "service/local/logs", Method.GET );
         String responseText = response.getEntity().getText();
 
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Status: \n" + responseText );
+        Assert.assertEquals( "Status: \n" + responseText, response.getStatus().getCode(), 200 );
 
         LogsListResourceResponse logListResponse =
             (LogsListResourceResponse) XStreamFactory.getXmlXStream().fromXML( responseText );
         List<LogsListResource> logList = logListResponse.getData();
-        Assert.assertTrue( logList.size() > 0, "Log List should contain at least 1 log." );
+        Assert.assertTrue( "Log List should contain at least 1 log.", logList.size() > 0 );
 
         for ( Iterator<LogsListResource> iter = logList.iterator(); iter.hasNext(); )
         {

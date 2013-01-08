@@ -12,21 +12,21 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1286;
 
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.rest.model.PlexusRoleResource;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1286RoleListIT
     extends AbstractNexusIntegrationTest

@@ -15,8 +15,8 @@ package org.sonatype.nexus.integrationtests.nexus634;
 import java.io.File;
 import java.util.Collection;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test SnapshotRemoverTask to remove all artifacts

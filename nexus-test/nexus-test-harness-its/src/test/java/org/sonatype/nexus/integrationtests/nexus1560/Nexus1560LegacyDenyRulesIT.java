@@ -12,16 +12,16 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1560;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus1560LegacyDenyRulesIT
     extends AbstractLegacyRulesIT
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

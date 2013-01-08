@@ -12,20 +12,20 @@
  */
 package org.sonatype.nexus.integrationtests.nexus980;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
-
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Reindex a virtual repo should fail
@@ -34,7 +34,7 @@ public class Nexus980ReindexVirtualReposIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void manualReindex()
         throws IOException
     {
@@ -45,10 +45,10 @@ public class Nexus980ReindexVirtualReposIT
         }
         String serviceURI = "service/local/data_index/repositories/nexus-test-harness-shadow/content";
         Status status = RequestFacade.sendMessage( serviceURI, Method.DELETE ).getStatus();
-        Assert.assertFalse( status.isSuccess(), "Should not being able to reindex a shadow repo" );
+        Assert.assertFalse( "Should not being able to reindex a shadow repo", status.isSuccess() );
     }
 
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void taskReindex()
         throws Exception
     {
@@ -69,7 +69,7 @@ public class Nexus980ReindexVirtualReposIT
         scheduledTask.setSchedule( "manual" );
         scheduledTask.addProperty( prop );
         Status status = TaskScheduleUtil.create( scheduledTask );
-        Assert.assertFalse( status.isSuccess(), "Should not be able to create a reindex task to a virtual repo" );
+        Assert.assertFalse( "Should not be able to create a reindex task to a virtual repo", status.isSuccess() );
     }
 
 }

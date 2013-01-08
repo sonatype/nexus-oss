@@ -16,8 +16,8 @@ import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.testng.annotations.Test;
 
 /**
  * See NEXUS-4423: in short, Nexus suffers from same problem as Maven2 did: snapshots with classifiers not deployed with

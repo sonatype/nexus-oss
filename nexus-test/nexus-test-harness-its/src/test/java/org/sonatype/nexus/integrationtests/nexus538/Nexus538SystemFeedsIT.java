@@ -14,17 +14,16 @@ package org.sonatype.nexus.integrationtests.nexus538;
 
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
-import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -45,7 +44,7 @@ public class Nexus538SystemFeedsIT
         Assert.assertTrue( findFeedEntry( feed, "Booting", null ) );
     }
 
-    @Test( dependsOnMethods = { "bootEventTest" } )
+    @Test //( dependsOnMethods = { "bootEventTest" } )
     public void updateRepoTest()
         throws Exception
     {
@@ -64,11 +63,11 @@ public class Nexus538SystemFeedsIT
 
         final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( feed );
-        Assert.assertTrue( findFeedEntry( feed, "Configuration change", new String[] { newName, oldName } ),
-            "Update repo feed not found\r\n\r\n" + feed );
+        Assert.assertTrue( "Update repo feed not found\r\n\r\n" + feed,
+            findFeedEntry( feed, "Configuration change", new String[] { newName, oldName } ) );
     }
 
-    @Test( dependsOnMethods = { "updateRepoTest" } )
+    @Test //( dependsOnMethods = { "updateRepoTest" } )
     public void changeProxyStatusTest()
         throws Exception
     {
@@ -136,15 +135,15 @@ public class Nexus538SystemFeedsIT
     @SuppressWarnings( "unchecked" )
     private void validateLinksInFeeds( SyndFeed feed )
     {
-        Assert.assertTrue( feed.getLink().startsWith( this.getBaseNexusUrl() ), "Feed link is wrong" );
+        Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ) );
 
         List<SyndEntry> entries = feed.getEntries();
 
         for ( SyndEntry syndEntry : entries )
         {
-            Assert.assertNotNull( "Feed item link is empty.", syndEntry.getLink() );
-            Assert.assertTrue( syndEntry.getLink().startsWith( this.getBaseNexusUrl() ),
-                "Feed item link is wrong, is: " + syndEntry.getLink() );
+            Assert.assertNotNull( syndEntry.getLink(), "Feed item link is empty." );
+            Assert.assertTrue( "Feed item link is wrong, is: " + syndEntry.getLink(),
+                syndEntry.getLink().startsWith( this.getBaseNexusUrl() ) );
         }
     }
 }

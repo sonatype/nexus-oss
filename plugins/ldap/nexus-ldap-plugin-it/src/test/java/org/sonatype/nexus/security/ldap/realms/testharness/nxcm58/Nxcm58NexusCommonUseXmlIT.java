@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.security.ldap.realms.testharness.nxcm58;
 
+import org.junit.Before;
 import org.restlet.data.MediaType;
-import org.testng.annotations.BeforeClass;
 
 public class Nxcm58NexusCommonUseXmlIT
     extends Nxcm58NexusCommonUseJsonIT
@@ -24,7 +24,7 @@ public class Nxcm58NexusCommonUseXmlIT
         super();
     }
 
-    @BeforeClass
+    @Before
     public void init()
     {
         this.xstream = this.getXMLXStream();

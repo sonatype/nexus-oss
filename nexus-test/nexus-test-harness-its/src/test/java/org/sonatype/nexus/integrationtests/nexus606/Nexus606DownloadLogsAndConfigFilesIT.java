@@ -22,6 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -33,9 +36,6 @@ import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Tests downloading of log and config files.
@@ -45,7 +45,7 @@ public class Nexus606DownloadLogsAndConfigFilesIT
 {
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -58,12 +58,12 @@ public class Nexus606DownloadLogsAndConfigFilesIT
         Response response = RequestFacade.sendMessage( "service/local/logs", Method.GET );
         String responseText = response.getEntity().getText();
 
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Status: \n" + responseText );
+        Assert.assertEquals( "Status: \n" + responseText, response.getStatus().getCode(), 200 );
 
         LogsListResourceResponse logListResponse =
             (LogsListResourceResponse) this.getXMLXStream().fromXML( responseText );
         List<LogsListResource> logList = logListResponse.getData();
-        Assert.assertTrue( logList.size() > 0, "Log List should contain at least 1 log." );
+        Assert.assertTrue( "Log List should contain at least 1 log.", logList.size() > 0 );
 
         for ( Iterator<LogsListResource> iter = logList.iterator(); iter.hasNext(); )
         {
@@ -83,34 +83,34 @@ public class Nexus606DownloadLogsAndConfigFilesIT
         Response response = RequestFacade.sendMessage( "service/local/configs", Method.GET );
         String responseText = response.getEntity().getText();
 
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Status: \n" + responseText );
+        Assert.assertEquals( "Status: \n" + responseText, response.getStatus().getCode(), 200 );
 
         ConfigurationsListResourceResponse logListResponse =
             (ConfigurationsListResourceResponse) this.getXMLXStream().fromXML( responseText );
         List<ConfigurationsListResource> configList = logListResponse.getData();
-        Assert.assertTrue( configList.size() >= 2, "Config List should contain at least 2 config file: " + configList );
+        Assert.assertTrue( "Config List should contain at least 2 config file: " + configList, configList.size() >= 2 );
 
         ConfigurationsListResource nexusXmlConfigResource = getConfigFromList( configList, "nexus.xml" );
-        Assert.assertNotNull( nexusXmlConfigResource, "nexus.xml" );
+        Assert.assertNotNull( "nexus.xml", nexusXmlConfigResource );
 
         ConfigurationsListResource securityXmlConfigResource = this.getConfigFromList( configList, "security.xml" );
-        Assert.assertNotNull( securityXmlConfigResource, "security.xml" );
+        Assert.assertNotNull( "security.xml", securityXmlConfigResource );
 
         // check the config now...
         response = RequestFacade.sendMessage( new URL( nexusXmlConfigResource.getResourceURI() ), Method.GET, null );
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Status: " );
+        Assert.assertEquals( "Status: ", response.getStatus().getCode(), 200 );
 
         String sha1Expected = FileTestingUtils.createSHA1FromStream( response.getEntity().getStream() );
         String sha1Actual = FileTestingUtils.createSHA1FromFile( NexusConfigUtil.getNexusFile() );
 
-        Assert.assertEquals( sha1Actual, sha1Expected, "SHA1 of config files do not match: " );
+        Assert.assertEquals( "SHA1 of config files do not match: ", sha1Actual, sha1Expected );
     }
 
     private void downloadAndConfirmLog( String logURI, String name )
         throws Exception
     {
         Response response = RequestFacade.sendMessage( new URL( logURI ), Method.GET, null );
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Request URI: " + logURI + " Status: " );
+        Assert.assertEquals( "Request URI: " + logURI + " Status: ", response.getStatus().getCode(), 200 );
         InputStream stream = response.getEntity().getStream();
         if ( stream == null )
         {
@@ -137,9 +137,9 @@ public class Nexus606DownloadLogsAndConfigFilesIT
         {
             String logOnDisk = FileUtils.fileRead( nexusLog );
             Assert.assertTrue(
-                logOnDisk.contains( downloadedLog ),
                 "Downloaded log should be similar to log file from disk.\nNOTE: its possible the file could have rolled over.\nTrying to match:\n"
-                    + downloadedLog );
+                    + downloadedLog,
+                logOnDisk.contains( downloadedLog ) );
         }
     }
 

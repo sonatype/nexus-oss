@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetup;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 
 public class EmailUtil
 {

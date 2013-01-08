@@ -23,22 +23,17 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
-import org.sonatype.nexus.proxy.attributes.Marshaller;
 import org.sonatype.nexus.proxy.attributes.JacksonJSONMarshaller;
-import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
+import org.sonatype.nexus.proxy.attributes.Marshaller;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Tests evict task.
@@ -56,7 +51,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         super( REPO_RELEASE_PROXY_REPO1 );
     }
 
-    @BeforeMethod
+    @Before
     public void deployOldArtifacts()
         throws Exception
     {
@@ -105,7 +100,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
                 isAllDotFiles = isAllDotFiles && file.getName().startsWith( "." );
             }
 
-            Assert.assertTrue( isAllDotFiles, "The only files left should be \"dotted\" files! We have: " + paths );
+            Assert.assertTrue( "The only files left should be \"dotted\" files! We have: " + paths, isAllDotFiles );
         }
     }
 
@@ -116,7 +111,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         executeTask( "keepTestDeployedFiles", "release-proxy-repo-1", 2 );
 
         File artifact = new File( repositoryPath, "nexus636/artifact-new/1.0/artifact-new-1.0.jar" );
-        Assert.assertTrue( artifact.exists(), "The files deployed by this test should be young enough to be kept" );
+        Assert.assertTrue( "The files deployed by this test should be young enough to be kept", artifact.exists() );
 
     }
 
@@ -129,7 +124,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         // expect 3 files in repo
         File groupDirectory = new File( repositoryPath, this.getTestId() );
         File[] files = groupDirectory.listFiles();
-        Assert.assertEquals( files.length, 3, "Expected 3 artifacts in repo:\n" + Arrays.asList( files ) );
+        Assert.assertEquals( "Expected 3 artifacts in repo:\n" + Arrays.asList( files ), files.length, 3 );
 
         // edit dates on files
         File oldJar = new File( this.attributesPath, "nexus636/artifact-old/2.1/artifact-old-2.1.jar" );
@@ -144,7 +139,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
 
         // check file list
         files = groupDirectory.listFiles();
-        Assert.assertEquals( files.length, 2, "Expected 2 artifacts in repo:\n" + Arrays.asList( files ) );
+        Assert.assertEquals( "Expected 2 artifacts in repo:\n" + Arrays.asList( files ), files.length, 2 );
     }
 
     private void executeTask( String taskName, String repository, int cacheAge )

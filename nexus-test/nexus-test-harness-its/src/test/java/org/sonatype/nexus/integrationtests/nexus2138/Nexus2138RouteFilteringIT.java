@@ -12,11 +12,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2138;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.isSuccessful;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
 
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -27,8 +30,6 @@ import org.sonatype.nexus.rest.model.RepositoryRouteListResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus2138RouteFilteringIT
     extends AbstractPrivilegeTest
@@ -69,7 +70,7 @@ public class Nexus2138RouteFilteringIT
 
         List<RepositoryRouteListResource> routes = RoutesMessageUtil.getList();
         Assert.assertEquals( 1, routes.size() );
-        Assert.assertEquals( "public", routes.get( 0 ).getGroupId() );
+        Assert.assertEquals( routes.get( 0 ).getGroupId(), "public" );
     }
     
     @Test

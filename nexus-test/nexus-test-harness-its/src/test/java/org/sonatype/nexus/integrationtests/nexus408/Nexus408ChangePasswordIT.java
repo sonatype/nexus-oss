@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.integrationtests.nexus408;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Test change password service. 

@@ -17,6 +17,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -24,16 +27,13 @@ import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus810PackageNamesInNexusConfIT
     extends AbstractNexusIntegrationTest
 {
 
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
@@ -60,15 +60,15 @@ public class Nexus810PackageNamesInNexusConfIT
         prop.setValue( "all_repo" );
         scheduledTask.addProperty( prop );
 
-        Assert.assertTrue( TaskScheduleUtil.create( scheduledTask ).isSuccess(), "Expected task to be created: " );
+        Assert.assertTrue( "Expected task to be created: ", TaskScheduleUtil.create( scheduledTask ).isSuccess() );
         
         // now check the conf
         List<CScheduledTask> tasks = getNexusConfigUtil().getNexusConfig().getTasks();
-        Assert.assertTrue( tasks.size() > 0, "Expected at least 1 task in nexus.xml" );
+        Assert.assertTrue( "Expected at least 1 task in nexus.xml", tasks.size() > 0 );
         
         for ( CScheduledTask task : tasks )
         {
-            Assert.assertFalse( task.getType().contains( "org.sonatype." ), "Found package name in nexus.xml for task type: "+ task.getType());
+            Assert.assertFalse( "Found package name in nexus.xml for task type: "+ task.getType(), task.getType().contains( "org.sonatype." ));
         }
 
     }

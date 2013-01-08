@@ -15,6 +15,7 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 import java.io.IOException;
 
 import org.hamcrest.Matcher;
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -27,7 +28,6 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoRespons
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -156,13 +156,13 @@ public class LdapConnMessageUtil
         throws Exception
     {
         CConnectionInfo fileConfig = LdapConfigurationUtil.getConfiguration().getConnectionInfo();
-        Assert.assertEquals( connInfo.getAuthScheme(), fileConfig.getAuthScheme() );
-        Assert.assertEquals( connInfo.getHost(), fileConfig.getHost() );
+        Assert.assertEquals( fileConfig.getAuthScheme(), connInfo.getAuthScheme() );
+        Assert.assertEquals( fileConfig.getHost(), connInfo.getHost() );
         Assert.assertEquals( connInfo.getPort(), fileConfig.getPort() );
-        Assert.assertEquals( connInfo.getProtocol(), fileConfig.getProtocol() );
-        Assert.assertEquals( connInfo.getRealm(), fileConfig.getRealm() );
-        Assert.assertEquals( connInfo.getSearchBase(), fileConfig.getSearchBase() );
-        Assert.assertEquals( connInfo.getSystemUsername(), fileConfig.getSystemUsername() );
+        Assert.assertEquals( fileConfig.getProtocol(), connInfo.getProtocol() );
+        Assert.assertEquals( fileConfig.getRealm(), connInfo.getRealm() );
+        Assert.assertEquals( fileConfig.getSearchBase(), connInfo.getSearchBase() );
+        Assert.assertEquals( fileConfig.getSystemUsername(), connInfo.getSystemUsername() );
 
         // if the expectedPassword == null then the actual should be null
         if ( connInfo.getSystemPassword() == null )
@@ -180,13 +180,13 @@ public class LdapConnMessageUtil
     public void validateResourceResponse( LdapConnectionInfoDTO expected, LdapConnectionInfoDTO actual )
         throws Exception
     {
-        Assert.assertEquals( expected.getAuthScheme(), actual.getAuthScheme() );
-        Assert.assertEquals( expected.getHost(), actual.getHost() );
+        Assert.assertEquals( actual.getAuthScheme(), expected.getAuthScheme() );
+        Assert.assertEquals( actual.getHost(), expected.getHost() );
         Assert.assertEquals( expected.getPort(), actual.getPort() );
-        Assert.assertEquals( expected.getProtocol(), actual.getProtocol() );
-        Assert.assertEquals( expected.getRealm(), actual.getRealm() );
-        Assert.assertEquals( expected.getSearchBase(), actual.getSearchBase() );
-        Assert.assertEquals( expected.getSystemUsername(), actual.getSystemUsername() );
+        Assert.assertEquals( actual.getProtocol(), expected.getProtocol() );
+        Assert.assertEquals( actual.getRealm(), expected.getRealm() );
+        Assert.assertEquals( actual.getSearchBase(), expected.getSearchBase() );
+        Assert.assertEquals( actual.getSystemUsername(), expected.getSystemUsername() );
 
         // if the expectedPassword == null then the actual should be null
         // if its anything else the actual password should be "--FAKE-PASSWORD--"
@@ -196,7 +196,7 @@ public class LdapConnMessageUtil
         }
         else
         {
-            Assert.assertEquals( LdapRealmPlexusResourceConst.FAKE_PASSWORD, actual.getSystemPassword() );
+            Assert.assertEquals( actual.getSystemPassword(), LdapRealmPlexusResourceConst.FAKE_PASSWORD );
         }
 
         // also validate the file config

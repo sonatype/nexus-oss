@@ -12,15 +12,16 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4635nexusVersion;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResource;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * tampering the nexusVersion to 1.9.3<BR>
@@ -43,12 +44,12 @@ public class Nexus4635OldNexusVersionIT
     extends AbstractNexusIntegrationTest
 {
     @BeforeClass
-    protected void disableSecurity()
+    public static void disableSecurity()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( false );
     }
 
-    @Test( enabled = false )
+    @Test @Ignore
     public void checkState()
         throws Exception
     {

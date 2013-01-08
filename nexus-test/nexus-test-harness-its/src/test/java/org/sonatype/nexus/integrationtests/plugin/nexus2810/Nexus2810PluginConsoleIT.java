@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.plugin.nexus2810;
 
+import static org.hamcrest.Matchers.hasItems;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -19,10 +21,9 @@ import java.util.List;
 import org.apache.maven.it.util.StringUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
-import static org.hamcrest.Matchers.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus2810PluginConsoleIT
     extends AbstractPluginConsoleIT
@@ -70,8 +71,8 @@ public class Nexus2810PluginConsoleIT
         assertPropertyValid( "Version", pgpPlugin.getVersion() );
         assertPropertyValid( "Status", pgpPlugin.getStatus(), "BROKEN" );
         Assert.assertNull( pgpPlugin.getDescription() );
-        Assert.assertEquals( "N/A", pgpPlugin.getScmVersion() );
-        Assert.assertEquals( "N/A", pgpPlugin.getScmTimestamp() );
+        Assert.assertEquals( pgpPlugin.getScmVersion(), "N/A" );
+        Assert.assertEquals( pgpPlugin.getScmTimestamp(), "N/A" );
         assertPropertyValid( "Site", pgpPlugin.getSite() );
         Assert.assertFalse( StringUtils.isEmpty( pgpPlugin.getFailureReason() ) );
     }

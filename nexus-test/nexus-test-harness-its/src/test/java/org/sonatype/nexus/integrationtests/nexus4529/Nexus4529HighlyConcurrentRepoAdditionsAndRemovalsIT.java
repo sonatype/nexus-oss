@@ -19,15 +19,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * See NEXUS-4529: This IT bombards Nexus with rest requests to create and drop repositories.
@@ -37,14 +35,7 @@ import org.testng.annotations.Test;
 public class Nexus4529HighlyConcurrentRepoAdditionsAndRemovalsIT
     extends AbstractNexusIntegrationTest
 {
-    protected RepositoryMessageUtil repoUtil;
-
-    @BeforeClass
-    public void prepare()
-        throws ComponentLookupException
-    {
-        repoUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
-    }
+    protected RepositoryMessageUtil repoUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
 
     @Test
     public void doTheTest()

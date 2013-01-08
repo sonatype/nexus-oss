@@ -12,9 +12,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus504;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.StatusMatchers.hasStatusCode;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -24,9 +28,6 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -46,12 +47,12 @@ public class Nexus504ChangeRoleIT
     private RoleMessageUtil roleUtil;
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @BeforeMethod
+    @Before
     public void init()
     {
         XStream xstream = this.getXMLXStream();

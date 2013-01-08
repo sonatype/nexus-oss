@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus537;
 
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isNotFound;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,10 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -35,10 +39,6 @@ import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * Creates a few repo targets and make sure the privileges work correctly.
@@ -94,36 +94,41 @@ public class Nexus537RepoTargetsIT
     private static final String GROUP_ID = "test-group";
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
-        repo1BarArtifact =
-            new Gav( this.getTestId(), "repo1-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "repo1-bar-artifact", false, null, false, null );
-        repo1FooArtifact =
-            new Gav( this.getTestId(), "repo1-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "repo1-foo-artifact", false, null, false, null );
-        repo2BarArtifact =
-            new Gav( this.getTestId(), "repo2-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "repo2-bar-artifact", false, null, false, null );
-        repo2FooArtifact =
-            new Gav( this.getTestId(), "repo2-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "repo2-foo-artifact", false, null, false, null );
-
-        repo1BarArtifactDelete =
-            new Gav( this.getTestId(), "repo1-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "repo1-bar-artifact-delete", false, null, false, null );
-        repo1FooArtifactDelete =
-            new Gav( this.getTestId(), "repo1-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "repo1-foo-artifact-delete", false, null, false, null );
-        repo2BarArtifactDelete =
-            new Gav( this.getTestId(), "repo2-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "repo2-bar-artifact-delete", false, null, false, null );
-        repo2FooArtifactDelete =
-            new Gav( this.getTestId(), "repo2-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "repo2-foo-artifact-delete", false, null, false, null );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
+    @Before
+    public void setUp()
+    {
+        repo1BarArtifact =
+            new Gav( this.getTestId(), "repo1-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo1-bar-artifact", false, null, false, null );
+        repo1FooArtifact =
+            new Gav( this.getTestId(), "repo1-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo1-foo-artifact", false, null, false, null );
+        repo2BarArtifact =
+            new Gav( this.getTestId(), "repo2-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo2-bar-artifact", false, null, false, null );
+        repo2FooArtifact =
+            new Gav( this.getTestId(), "repo2-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo2-foo-artifact", false, null, false, null );
+
+        repo1BarArtifactDelete =
+            new Gav( this.getTestId(), "repo1-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo1-bar-artifact-delete", false, null, false, null );
+        repo1FooArtifactDelete =
+            new Gav( this.getTestId(), "repo1-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo1-foo-artifact-delete", false, null, false, null );
+        repo2BarArtifactDelete =
+            new Gav( this.getTestId(), "repo2-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo2-bar-artifact-delete", false, null, false, null );
+        repo2FooArtifactDelete =
+            new Gav( this.getTestId(), "repo2-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo2-foo-artifact-delete", false, null, false, null );
+    }
+    
     @Override
     public void runOnce()
         throws Exception
@@ -133,7 +138,7 @@ public class Nexus537RepoTargetsIT
     }
 
     @Override
-    @BeforeMethod
+    @Before
     public void resetTestUserPrivs()
         throws Exception
     {
@@ -387,11 +392,11 @@ public class Nexus537RepoTargetsIT
         try
         {
             result = this.downloadArtifactFromRepository( repoId, gav, "target/nexus537jars/" );
-            Assert.assertTrue( shouldDownload, "Artifact download should have thrown exception" );
+            Assert.assertTrue( "Artifact download should have thrown exception", shouldDownload );
         }
         catch ( IOException e )
         {
-            Assert.assertFalse( shouldDownload, "Artifact should have downloaded: \n" + e.getMessage() );
+            Assert.assertFalse( "Artifact should have downloaded: \n" + e.getMessage(), shouldDownload );
         }
 
         return result;
@@ -409,11 +414,11 @@ public class Nexus537RepoTargetsIT
                 MavenDeployer.deployAndGetVerifier( gav, this.getRepositoryUrl( repoId ), fileToDeploy,
                     this.getOverridableFile( "settings.xml" ) );
 
-            Assert.assertTrue( shouldUpload, "Artifact upload should have thrown exception" );
+            Assert.assertTrue( "Artifact upload should have thrown exception", shouldUpload );
         }
         catch ( VerificationException e )
         {
-            Assert.assertFalse( shouldUpload, "Artifact should have uploaded: \n" + e.getMessage() );
+            Assert.assertFalse( "Artifact should have uploaded: \n" + e.getMessage(), shouldUpload );
         }
 
         // if we made it this far we should also test download, because upload implies download
@@ -426,8 +431,8 @@ public class Nexus537RepoTargetsIT
     {
         int status = getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy );
 
-        Assert.assertTrue( ( 201 == status && shouldUpload ) || !shouldUpload, "Artifact upload returned: " + status
-            + ( shouldUpload ? " expected sucess" : " expected failure" ) );
+        Assert.assertTrue( "Artifact upload returned: " + status
+            + ( shouldUpload ? " expected sucess" : " expected failure" ), ( 201 == status && shouldUpload ) || !shouldUpload );
         // if we made it this far we should also test download, because upload implies download
         this.download( repoId, gav, shouldUpload );
     }
@@ -455,18 +460,18 @@ public class Nexus537RepoTargetsIT
         try
         {
             result = this.downloadArtifactFromGroup( GROUP_ID, gav, "target/nexus537jars/" );
-            Assert.assertTrue( shouldDownload, "Artifact download should have thrown exception" );
+            Assert.assertTrue( "Artifact download should have thrown exception", shouldDownload );
         }
         catch ( IOException e )
         {
-            Assert.assertFalse( shouldDownload, "Artifact should have downloaded: \n" + e.getMessage() );
+            Assert.assertFalse( "Artifact should have downloaded: \n" + e.getMessage(), shouldDownload );
         }
 
         return result;
     }
 
     @Override
-    @BeforeMethod
+    @Before
     public void oncePerClassSetUp()
         throws Exception
     {

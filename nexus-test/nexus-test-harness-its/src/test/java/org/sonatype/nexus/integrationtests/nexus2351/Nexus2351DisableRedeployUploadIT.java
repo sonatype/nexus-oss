@@ -24,6 +24,9 @@ import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
@@ -31,9 +34,6 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus2351DisableRedeployUploadIT
     extends AbstractMavenNexusIT
@@ -47,7 +47,7 @@ public class Nexus2351DisableRedeployUploadIT
 
     }
 
-    @BeforeClass
+    @Before
     public void init()
         throws ComponentLookupException
     {
@@ -78,15 +78,15 @@ public class Nexus2351DisableRedeployUploadIT
         this.deployWithMavenExpectSuccess( mavenProject1, repoId );
         metadata = this.downloadMetadataFromRepository( gav1, repoId );
         Date secondDeployDate = this.getLastDeployTimeStamp( metadata );
-        Assert.assertTrue( firstDeployDate.before( secondDeployDate ),
-            "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: " + secondDeployDate );
+        Assert.assertTrue( "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: " + secondDeployDate,
+            firstDeployDate.before( secondDeployDate ) );
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
         this.deployWithMavenExpectSuccess( mavenProject1, repoId );
         metadata = this.downloadMetadataFromRepository( gav1, repoId );
         Date thirdDeployDate = this.getLastDeployTimeStamp( metadata );
-        Assert.assertTrue( secondDeployDate.before( thirdDeployDate ),
-            "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: " + secondDeployDate );
+        Assert.assertTrue( "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: " + secondDeployDate,
+            secondDeployDate.before( thirdDeployDate ) );
         this.deployWithMavenExpectSuccess( mavenProject2, repoId );
         metadata = this.downloadMetadataFromRepository( gav2, repoId );
         // now check the metadata for both versions
@@ -119,16 +119,16 @@ public class Nexus2351DisableRedeployUploadIT
         Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         metadata = this.downloadMetadataFromRepository( gav, repoId );
         Date secondDeployDate = this.getLastDeployTimeStamp( metadata );
-        Assert.assertTrue( firstDeployDate.before( secondDeployDate ),
-            "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: " + secondDeployDate );
+        Assert.assertTrue( "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: " + secondDeployDate,
+            firstDeployDate.before( secondDeployDate ) );
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
 
         Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         metadata = this.downloadMetadataFromRepository( gav, repoId );
         Date thirdDeployDate = this.getLastDeployTimeStamp( metadata );
-        Assert.assertTrue( secondDeployDate.before( thirdDeployDate ),
-            "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: " + secondDeployDate );
+        Assert.assertTrue( "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: " + secondDeployDate,
+            secondDeployDate.before( thirdDeployDate ) );
     }
 
     @Test
@@ -213,7 +213,7 @@ public class Nexus2351DisableRedeployUploadIT
         // deploy again (should fail)
         this.deployWithMavenExpectFailure( mavenProject1, repoId );
         metadata = this.downloadMetadataFromRepository( gav1, repoId );
-        Assert.assertEquals( firstDeployDate, this.getLastDeployTimeStamp( metadata ) );
+        Assert.assertEquals( this.getLastDeployTimeStamp( metadata ), firstDeployDate );
 
         // deploy a new version
         this.deployWithMavenExpectSuccess( mavenProject2, repoId );

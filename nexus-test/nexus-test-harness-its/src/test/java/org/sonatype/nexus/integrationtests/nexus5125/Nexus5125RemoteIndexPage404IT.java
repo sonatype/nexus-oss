@@ -16,11 +16,10 @@ import static org.sonatype.nexus.integrationtests.RequestFacade.doGet;
 
 import java.io.IOException;
 
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
-import org.testng.annotations.Test;
 
 /**
  * Verifies that index pages of a remote repository is not delivered from a proxy repository.

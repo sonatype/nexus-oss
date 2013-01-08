@@ -22,13 +22,13 @@ import java.util.TimeZone;
 
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.context.IndexingContext;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public abstract class AbstractDeleteArtifactsIT
     extends AbstractNexusIntegrationTest
@@ -62,7 +62,7 @@ public abstract class AbstractDeleteArtifactsIT
     }
 
     //@BeforeClass
-    @BeforeMethod
+    @Before
     public void init()
     {
         artifact = getTestFile( "artifact.jar" );

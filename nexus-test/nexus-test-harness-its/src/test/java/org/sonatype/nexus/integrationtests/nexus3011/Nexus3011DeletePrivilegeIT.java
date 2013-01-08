@@ -12,19 +12,20 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3011;
 
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.hasItems;
-import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+import static org.hamcrest.Matchers.not;
 
 import org.hamcrest.MatcherAssert;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.rest.model.RoleResource;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus3011DeletePrivilegeIT
     extends AbstractNexusIntegrationTest
@@ -48,7 +49,7 @@ public class Nexus3011DeletePrivilegeIT
 
     private static final String[] PRIVS = new String[] { READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID };
 
-    @Test(groups = SECURITY)
+    @Test @Category(SECURITY.class)
     public void deletePriv()
         throws Exception
     {

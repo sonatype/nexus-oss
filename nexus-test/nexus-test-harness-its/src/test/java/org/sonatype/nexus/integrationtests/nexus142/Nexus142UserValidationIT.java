@@ -14,6 +14,10 @@ package org.sonatype.nexus.integrationtests.nexus142;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -21,9 +25,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Extra CRUD validation tests.
@@ -35,9 +36,15 @@ public class Nexus142UserValidationIT
     protected UserMessageUtil messageUtil;
 
     @BeforeClass
-    public void setSecureTest(){
-    	this.messageUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    public static void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+
+    @Before
+    public void setUp()
+    {
+        this.messageUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -61,7 +68,7 @@ public class Nexus142UserValidationIT
             Assert.fail( "User should not have been created: " + response.getStatus() );
         }
         String responseText = response.getEntity().getText();
-        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ), "Error message: " + responseText );
+        Assert.assertTrue( "Error message: " + responseText, responseText.startsWith( "{\"errors\":" ) );
 
     }
 
@@ -84,9 +91,9 @@ public class Nexus142UserValidationIT
         Response response = this.messageUtil.sendMessage( Method.PUT, resource );
 
         String responseText = response.getEntity().getText();
-        Assert.assertFalse( response.getStatus().isSuccess(),
-            "Expected failure: Satus: " + response.getStatus() + "\n Response Text:" + responseText );
-        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ), "Error message: " + responseText );
+        Assert.assertFalse( "Expected failure: Satus: " + response.getStatus() + "\n Response Text:" + responseText,
+            response.getStatus().isSuccess() );
+        Assert.assertTrue( "Error message: " + responseText, responseText.startsWith( "{\"errors\":" ) );
 
     }
 
@@ -251,10 +258,10 @@ public class Nexus142UserValidationIT
         // get the Resource object
         UserResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
-        Assert.assertEquals( resource.getFirstName(), responseResource.getFirstName() );
-        Assert.assertEquals( resource.getUserId(), responseResource.getUserId() );
-        Assert.assertEquals( resource.getStatus(), responseResource.getStatus() );
-        Assert.assertEquals( resource.getEmail(), responseResource.getEmail() );
+        Assert.assertEquals( responseResource.getFirstName(), resource.getFirstName() );
+        Assert.assertEquals( responseResource.getUserId(), resource.getUserId() );
+        Assert.assertEquals( responseResource.getStatus(), resource.getStatus() );
+        Assert.assertEquals( responseResource.getEmail(), resource.getEmail() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
 
         getSecurityConfigUtil().verifyUser( resource );
@@ -293,7 +300,7 @@ public class Nexus142UserValidationIT
 
         String errorText = response.getEntity().getText();
 
-        Assert.assertTrue( errorText.startsWith( "{\"errors\":" ), "expected error, but was: " + errorText );
+        Assert.assertTrue( "expected error, but was: " + errorText, errorText.startsWith( "{\"errors\":" ) );
 
         // FIXME: should we keep supporting this?
         // /**

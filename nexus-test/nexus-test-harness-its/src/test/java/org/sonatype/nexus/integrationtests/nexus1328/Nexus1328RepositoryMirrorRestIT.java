@@ -14,6 +14,8 @@ package org.sonatype.nexus.integrationtests.nexus1328;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.MirrorResource;
@@ -22,8 +24,6 @@ import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1328RepositoryMirrorRestIT
     extends AbstractNexusIntegrationTest
@@ -84,9 +84,9 @@ public class Nexus1328RepositoryMirrorRestIT
         MirrorResource two = response.getData().get( 1 );
         MirrorResource three = response.getData().get( 2 );
 
-        Assert.assertEquals( "http://updateMirrorTest4", one.getUrl() );
-        Assert.assertEquals( "http://updateMirrorTest2", two.getUrl() );
-        Assert.assertEquals( "http://updateMirrorTest3", three.getUrl() );
+        Assert.assertEquals( one.getUrl(), "http://updateMirrorTest4" );
+        Assert.assertEquals( two.getUrl(), "http://updateMirrorTest2" );
+        Assert.assertEquals( three.getUrl(), "http://updateMirrorTest3" );
     }
 
     @Test
@@ -110,8 +110,8 @@ public class Nexus1328RepositoryMirrorRestIT
         MirrorResource one = response.getData().get( 0 );
         MirrorResource two = response.getData().get( 1 );
 
-        Assert.assertEquals( "http://getMirrorTest1", one.getUrl() );
-        Assert.assertEquals( "http://getMirrorTest2", two.getUrl() );
+        Assert.assertEquals( one.getUrl(), "http://getMirrorTest1" );
+        Assert.assertEquals( two.getUrl(), "http://getMirrorTest2" );
     }
 
     @Test
@@ -135,10 +135,10 @@ public class Nexus1328RepositoryMirrorRestIT
         MirrorStatusResource one = response.getData().get( 0 );
         MirrorStatusResource two = response.getData().get( 1 );
 
-        Assert.assertEquals( "http://mirrorStatusTest1", one.getUrl() );
-        Assert.assertEquals( "http://mirrorStatusTest2", two.getUrl() );
-        Assert.assertEquals( "Available", one.getStatus() );
-        Assert.assertEquals( "Available", two.getStatus() );
+        Assert.assertEquals( one.getUrl(), "http://mirrorStatusTest1" );
+        Assert.assertEquals( two.getUrl(), "http://mirrorStatusTest2" );
+        Assert.assertEquals( one.getStatus(), "Available" );
+        Assert.assertEquals( two.getStatus(), "Available" );
     }
 
     @Test

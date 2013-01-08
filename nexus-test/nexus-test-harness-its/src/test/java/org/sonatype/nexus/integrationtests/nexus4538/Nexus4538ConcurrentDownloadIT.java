@@ -27,12 +27,12 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * Test which makes sure that simultaneous requests for the same artifact are not serialized.
@@ -43,7 +43,7 @@ public class Nexus4538ConcurrentDownloadIT
 
     private Gav gav;
 
-    @BeforeMethod
+    @Before
     public void createFiles()
         throws Exception
     {

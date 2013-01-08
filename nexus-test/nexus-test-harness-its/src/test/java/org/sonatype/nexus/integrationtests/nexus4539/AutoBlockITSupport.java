@@ -30,8 +30,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.hamcrest.Matchers;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.jettytestsuite.ControlledServer;
@@ -41,10 +45,6 @@ import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 
 import com.google.common.collect.Lists;
 
@@ -71,7 +71,7 @@ public abstract class AutoBlockITSupport
     }
 
     @SuppressWarnings( "serial" )
-    @BeforeMethod
+    @Before
     public void setup()
         throws Exception
     {
@@ -103,7 +103,7 @@ public abstract class AutoBlockITSupport
         this.repoUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
-    @AfterMethod
+    @After
     public void shutdown()
         throws StoppingException
     {

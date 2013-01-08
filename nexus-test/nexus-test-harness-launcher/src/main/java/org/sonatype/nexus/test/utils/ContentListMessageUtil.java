@@ -15,6 +15,7 @@ package org.sonatype.nexus.test.utils;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -22,7 +23,6 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -55,8 +55,8 @@ public class ContentListMessageUtil
 
         String responeText = response.getEntity().getText();
         Assert.assertTrue(
-            response.getStatus().isSuccess(),
-            "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText );
+            "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText,
+            response.getStatus().isSuccess() );
 
         XStreamRepresentation representation = new XStreamRepresentation( this.xstream, responeText, this.mediaType );
         ContentListResourceResponse listRepsonse = (ContentListResourceResponse) representation

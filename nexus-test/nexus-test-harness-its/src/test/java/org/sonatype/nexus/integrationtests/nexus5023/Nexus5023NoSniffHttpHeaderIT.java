@@ -19,13 +19,13 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import java.net.URL;
 
+import org.junit.Test;
 import org.restlet.data.Form;
 import org.restlet.data.Method;
 import org.restlet.data.Parameter;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.testng.annotations.Test;
 
 /**
  * Tests that Nexus will set an "X-Content-Type-Options: nosniff" response header.

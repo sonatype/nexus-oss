@@ -26,17 +26,16 @@ import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * IT testing move to trash/delete immediately behavior of the SnapshotRemovalTask.
@@ -64,7 +63,7 @@ public class Nexus4579OptionalTrashForSnapshotsIT
         super( "nexus-test-harness-snapshot-repo" );
     }
 
-    @BeforeMethod( alwaysRun = true )
+    @Before
     public void deploySnapshotArtifacts()
         throws Exception
     {
@@ -98,7 +97,7 @@ public class Nexus4579OptionalTrashForSnapshotsIT
         getEventInspectorsUtil().waitForCalmPeriod();
     }
 
-    @AfterMethod( alwaysRun = true )
+    @After
     public void cleanTrash()
         throws IOException
     {

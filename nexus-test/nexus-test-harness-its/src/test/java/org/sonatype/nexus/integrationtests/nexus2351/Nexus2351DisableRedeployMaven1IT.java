@@ -17,16 +17,15 @@ import java.io.IOException;
 
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus2351DisableRedeployMaven1IT
     extends AbstractNexusIntegrationTest
@@ -43,14 +42,14 @@ public class Nexus2351DisableRedeployMaven1IT
 
     }
 
-    @BeforeClass
+    @Before
     public void init()
         throws ComponentLookupException
     {
         this.repoUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
-    @BeforeMethod
+    @Before
     public void create()
     {
         artifact = this.getTestFile( "artifact.jar" );

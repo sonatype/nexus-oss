@@ -16,22 +16,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus1239UserSearchIT
     extends AbstractNexusIntegrationTest
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -45,18 +45,18 @@ public class Nexus1239UserSearchIT
 
         Assert.assertEquals( 1, users.size() );
         PlexusUserResource user = users.get( 0 );
-        Assert.assertEquals( "admin", user.getUserId() );
-        Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
-        Assert.assertEquals( "Administrator", user.getFirstName() );
-        Assert.assertEquals( "default", user.getSource() );
+        Assert.assertEquals( user.getUserId(), "admin" );
+        Assert.assertEquals( user.getEmail(), "changeme@yourcompany.com" );
+        Assert.assertEquals( user.getFirstName(), "Administrator" );
+        Assert.assertEquals( user.getSource(), "default" );
 
         List<PlexusRoleResource> roles = user.getRoles();
         Assert.assertEquals( 1, roles.size() );
 
         PlexusRoleResource role = roles.get( 0 );
-        Assert.assertEquals( "Nexus Administrator Role", role.getName() );
-        Assert.assertEquals( "nx-admin", role.getRoleId() );
-        Assert.assertEquals( "default", role.getSource() );
+        Assert.assertEquals( role.getName(), "Nexus Administrator Role" );
+        Assert.assertEquals( role.getRoleId(), "nx-admin" );
+        Assert.assertEquals( role.getSource(), "default" );
     }
 
     @Test

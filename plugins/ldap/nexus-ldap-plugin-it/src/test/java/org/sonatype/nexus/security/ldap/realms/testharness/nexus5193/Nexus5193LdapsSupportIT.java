@@ -12,7 +12,17 @@
  */
 package org.sonatype.nexus.security.ldap.realms.testharness.nexus5193;
 
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
+
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -20,15 +30,6 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapConnMessageUtil;
 import org.sonatype.sisu.litmus.testsupport.net.TrustingX509TrustManager;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class Nexus5193LdapsSupportIT
     extends AbstractLdapIntegrationIT

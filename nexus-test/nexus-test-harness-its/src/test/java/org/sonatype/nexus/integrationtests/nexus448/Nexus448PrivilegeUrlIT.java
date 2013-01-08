@@ -14,6 +14,9 @@ package org.sonatype.nexus.integrationtests.nexus448;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -21,9 +24,6 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * GETS for application privileges where returning an error, so this is a really simple test to make sure the GET will
@@ -37,11 +37,11 @@ public class Nexus448PrivilegeUrlIT
 
     public Nexus448PrivilegeUrlIT()
     {
+        this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     @BeforeClass
-    public void setSecureTest(){ 
-    	this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    public static void setSecureTest(){ 
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -51,10 +51,10 @@ public class Nexus448PrivilegeUrlIT
     {
 
         PrivilegeStatusResource resource = this.messageUtil.getPrivilegeResource( "T2" );
-        Assert.assertEquals( resource.getType(), TargetPrivilegeDescriptor.TYPE, "Type" );
+        Assert.assertEquals( "Type", resource.getType(), TargetPrivilegeDescriptor.TYPE );
 
         resource = this.messageUtil.getPrivilegeResource( "1" );
-        Assert.assertEquals( resource.getType(), ApplicationPrivilegeDescriptor.TYPE, "Type" );
+        Assert.assertEquals( "Type", resource.getType(), ApplicationPrivilegeDescriptor.TYPE );
 
     }
 

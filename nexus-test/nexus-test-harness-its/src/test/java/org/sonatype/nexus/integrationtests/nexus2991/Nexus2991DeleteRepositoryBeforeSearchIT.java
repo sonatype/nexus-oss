@@ -14,6 +14,8 @@ package org.sonatype.nexus.integrationtests.nexus2991;
 
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -25,8 +27,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * @author juven
@@ -57,7 +57,7 @@ public class Nexus2991DeleteRepositoryBeforeSearchIT
         searchParam.setPackaging( "jar" );
         searchParam.setClassifier( null );
         List<NexusArtifact> results = client.searchByGAV( searchParam );
-        Assert.assertEquals( results.size(), 1, "Search result size" );
+        Assert.assertEquals( "Search result size", results.size(), 1 );
         client.disconnect();
 
         // create a repo
@@ -77,9 +77,9 @@ public class Nexus2991DeleteRepositoryBeforeSearchIT
         RepositoryBaseResource repoResult = client.createRepository( repoResoruce );
         Assert.assertNotNull( repoResult );
         RepositoryBaseResource repoExpected = client.getRepository( "testCreate" );
-        Assert.assertEquals( repoResult.getId(), repoExpected.getId() );
-        Assert.assertEquals( repoResult.getName(), repoExpected.getName() );
-        Assert.assertEquals( repoResult.getFormat(), repoExpected.getFormat() );
+        Assert.assertEquals( repoExpected.getId(), repoResult.getId() );
+        Assert.assertEquals( repoExpected.getName(), repoResult.getName() );
+        Assert.assertEquals( repoExpected.getFormat(), repoResult.getFormat() );
         // delete it
         client.deleteRepository( "testCreate" );
         client.disconnect();
@@ -90,7 +90,7 @@ public class Nexus2991DeleteRepositoryBeforeSearchIT
         // search again
         client = this.getConnectedNexusClient();
         results = client.searchByGAV( searchParam );
-        Assert.assertEquals( results.size(), 1, "Search result size" );
+        Assert.assertEquals( "Search result size", results.size(), 1 );
         client.disconnect();
     }
 }

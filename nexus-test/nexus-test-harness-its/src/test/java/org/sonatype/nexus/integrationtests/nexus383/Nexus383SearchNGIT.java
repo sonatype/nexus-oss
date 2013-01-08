@@ -20,16 +20,16 @@ import org.apache.maven.index.SearchType;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import com.google.common.io.Closeables;
 
@@ -53,7 +53,7 @@ public class Nexus383SearchNGIT
 
     }
 
-    @BeforeClass
+    @Before
     public void prepare()
     {
         this.groupMessageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
@@ -71,7 +71,7 @@ public class Nexus383SearchNGIT
         super.deployArtifacts();
     }
 
-    @AfterMethod
+    @After
     public void resetRepo()
         throws Exception
     {
@@ -133,15 +133,15 @@ public class Nexus383SearchNGIT
     {
         // know-artifact-1
         SearchNGResponse result = getSearchMessageUtil().searchSha1NGFor( "4ce1d96bd11b8959b32a75c1fa5b738d7b87d408" );
-        Assert.assertEquals( result.getData().size(), 1, "know-artifact-1 should be found" );
+        Assert.assertEquals( "know-artifact-1 should be found", result.getData().size(), 1 );
 
         // know-artifact-2
         result = getSearchMessageUtil().searchSha1NGFor( "230377663ac3b19ad83c99b0afdb056dd580c5c8" );
-        Assert.assertEquals( result.getData().size(), 1, "know-artifact-2 should be found" );
+        Assert.assertEquals( "know-artifact-2 should be found", result.getData().size(), 1 );
 
         // velo's picture
         result = getSearchMessageUtil().searchSha1NGFor( "612c17de73fdc8b9e3f6a063154d89946eb7c6f2" );
-        Assert.assertEquals( result.getData().size(), 0, "velo's picture should not be found" );
+        Assert.assertEquals( "velo's picture should not be found", result.getData().size(), 0 );
     }
 
     @Test
@@ -231,8 +231,8 @@ public class Nexus383SearchNGIT
         getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
     }
 
-    @Test( dependsOnMethods = { "searchFor", "searchForSHA1", "disableSearching", "disableEnableSearching",
-        "disableBrowsing", "disableEnableBrowsing", "disableDeploying" } )
+    @Test //( dependsOnMethods = { "searchFor", "searchForSHA1", "disableSearching", "disableEnableSearching",
+        //"disableBrowsing", "disableEnableBrowsing", "disableDeploying" } )
     // 4. deploy same artifact to multiple repos, and search
     public void crossRepositorySearch()
         throws Exception
@@ -299,11 +299,11 @@ public class Nexus383SearchNGIT
         // Keyword search does collapse results, so we need _1_
         // Since the top level is GAV now only
         SearchNGResponse results = getSearchMessageUtil().searchNGFor( "crossArtifact" );
-        Assert.assertEquals( results.getData().size(), 1, "We need 1 cross artifacts with Quick search!" );
+        Assert.assertEquals( "We need 1 cross artifacts with Quick search!", results.getData().size(), 1 );
 
         // GAV search does not
         results = getSearchMessageUtil().searchNGForGav( gav );
-        Assert.assertEquals( results.getData().size(), 1, "We need 1 cross artifacts with GAV search!" );
+        Assert.assertEquals( "We need 1 cross artifacts with GAV search!", results.getData().size(), 1 );
     }
 
 }

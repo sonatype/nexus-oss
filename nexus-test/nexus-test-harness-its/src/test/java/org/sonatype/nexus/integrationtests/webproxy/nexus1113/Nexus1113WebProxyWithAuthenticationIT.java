@@ -12,23 +12,23 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1113;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
-
 import java.io.File;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus1113WebProxyWithAuthenticationIT
     extends AbstractNexusWebProxyIntegrationTest
 {
 
     @Override
-    @BeforeMethod(alwaysRun = true)
+    @Before
     public void startWebProxy()
         throws Exception
     {
@@ -37,7 +37,8 @@ public class Nexus1113WebProxyWithAuthenticationIT
         server.getProxyServlet().getAuthentications().put( "admin", "123" );
     }
 
-    @Test(groups = PROXY)
+    @Test
+    @Category( PROXY.class )
     public void downloadArtifactOverWebProxy()
         throws Exception
     {
@@ -52,11 +53,11 @@ public class Nexus1113WebProxyWithAuthenticationIT
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( jarArtifact, jarFile ) );
 
         String artifactUrl = baseProxyURL + "release-proxy-repo-1/nexus1113/artifact/1.0/artifact-1.0.jar";
-        Assert.assertTrue( server.getAccessedUris().contains( artifactUrl ), "Proxy was not accessed" );
+        Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
     }
 
     @Override
-    @AfterMethod(alwaysRun = true)
+    @After
     public void stopWebProxy()
         throws Exception
     {

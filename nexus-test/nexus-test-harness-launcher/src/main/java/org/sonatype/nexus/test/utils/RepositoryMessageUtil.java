@@ -20,6 +20,7 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -38,7 +39,7 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
+
 import com.thoughtworks.xstream.XStream;
 
 public class RepositoryMessageUtil
@@ -91,14 +92,14 @@ public class RepositoryMessageUtil
     public void validateResourceResponse( RepositoryBaseResource repo, RepositoryBaseResource responseResource )
         throws IOException
     {
-        Assert.assertEquals( repo.getId(), responseResource.getId() );
-        Assert.assertEquals( repo.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getId(), repo.getId() );
+        Assert.assertEquals( responseResource.getName(), repo.getName() );
         // Assert.assertEquals( repo.getDefaultLocalStorageUrl(), responseResource.getDefaultLocalStorageUrl() ); //
         // TODO: add check for this
 
         // format is not used anymore, removing the check
         // Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
-        Assert.assertEquals( repo.getRepoType(), responseResource.getRepoType() );
+        Assert.assertEquals( responseResource.getRepoType(), repo.getRepoType() );
 
         if ( repo.getRepoType().equals( "virtual" ) )
         {
@@ -106,7 +107,7 @@ public class RepositoryMessageUtil
             RepositoryShadowResource expected = (RepositoryShadowResource) repo;
             RepositoryShadowResource actual = (RepositoryShadowResource) responseResource;
 
-            Assert.assertEquals( expected.getShadowOf(), actual.getShadowOf() );
+            Assert.assertEquals( actual.getShadowOf(), expected.getShadowOf() );
         }
         else
         {
@@ -118,18 +119,18 @@ public class RepositoryMessageUtil
             // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
             if ( actual.getDefaultLocalStorageUrl().endsWith( "/" ) )
             {
-                Assert.assertTrue( actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ),
-                                   "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                                       + repo.getId()
-                                       + "/  <actual>" + actual.getDefaultLocalStorageUrl() );
+                Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
+                       + repo.getId()
+                       + "/  <actual>" + actual.getDefaultLocalStorageUrl(),
+                                   actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ) );
             }
             // NOTE one of these blocks should be removed
             else
             {
-                Assert.assertTrue( actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ),
-                                   "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                                       + repo.getId()
-                                       + "  <actual>" + actual.getDefaultLocalStorageUrl() );
+                Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
+                       + repo.getId()
+                       + "  <actual>" + actual.getDefaultLocalStorageUrl(),
+                                   actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ) );
             }
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), actual.getNotFoundCacheTTL() );
@@ -141,11 +142,11 @@ public class RepositoryMessageUtil
             }
             else
             {
-                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(),
-                                     actual.getRemoteStorage().getRemoteStorageUrl() );
+                Assert.assertEquals( actual.getRemoteStorage().getRemoteStorageUrl(),
+                                     expected.getRemoteStorage().getRemoteStorageUrl() );
             }
 
-            Assert.assertEquals( expected.getRepoPolicy(), actual.getRepoPolicy() );
+            Assert.assertEquals( actual.getRepoPolicy(), expected.getRepoPolicy() );
         }
 
         // check nexus.xml
@@ -260,9 +261,9 @@ public class RepositoryMessageUtil
             M2LayoutedM1ShadowRepositoryConfiguration cShadowRepo =
                 getTest().getNexusConfigUtil().getRepoShadow( repo.getId() );
 
-            Assert.assertEquals( expected.getShadowOf(), cShadowRepo.getMasterRepositoryId() );
-            Assert.assertEquals( expected.getId(), cRepo.getId() );
-            Assert.assertEquals( expected.getName(), cRepo.getName() );
+            Assert.assertEquals( cShadowRepo.getMasterRepositoryId(), expected.getShadowOf() );
+            Assert.assertEquals( cRepo.getId(), expected.getId() );
+            Assert.assertEquals( cRepo.getName(), expected.getName() );
 
             // cstamas: This is nonsense, this starts in-process (HERE) of nexus internals while IT runs a nexus too,
             // and they start/try to use same FS resources!
@@ -278,9 +279,9 @@ public class RepositoryMessageUtil
             RepositoryResource expected = (RepositoryResource) repo;
             CRepository cRepo = getTest().getNexusConfigUtil().getRepo( repo.getId() );
 
-            Assert.assertEquals( cRepo.getId(), expected.getId() );
+            Assert.assertEquals( expected.getId(), cRepo.getId() );
 
-            Assert.assertEquals( cRepo.getName(), expected.getName() );
+            Assert.assertEquals( expected.getName(), cRepo.getName() );
 
             // cstamas: This is nonsense, this starts in-process (HERE) of nexus internals while IT runs a nexus too,
             // and they start/try to use same FS resources!
@@ -295,8 +296,8 @@ public class RepositoryMessageUtil
 
             if ( expected.getOverrideLocalStorageUrl() == null )
             {
-                Assert.assertNull( cRepo.getLocalStorage().getUrl(),
-                                   "Expected CRepo localstorage url not be set, because it is the default." );
+                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.",
+                                   cRepo.getLocalStorage().getUrl() );
             }
             else
             {
@@ -306,7 +307,7 @@ public class RepositoryMessageUtil
                 String overridLocalStorage =
                     expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl()
                         : expected.getOverrideLocalStorageUrl() + "/";
-                Assert.assertEquals( overridLocalStorage, actualLocalStorage );
+                Assert.assertEquals( actualLocalStorage, overridLocalStorage );
             }
 
             if ( expected.getRemoteStorage() == null )
@@ -315,8 +316,8 @@ public class RepositoryMessageUtil
             }
             else
             {
-                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(),
-                                     cRepo.getRemoteStorage().getUrl() );
+                Assert.assertEquals( cRepo.getRemoteStorage().getUrl(),
+                                     expected.getRemoteStorage().getRemoteStorageUrl() );
             }
 
             // check maven repo props (for not just check everything that is a Repository
@@ -326,10 +327,10 @@ public class RepositoryMessageUtil
 
                 if ( expected.getChecksumPolicy() != null )
                 {
-                    Assert.assertEquals( expected.getChecksumPolicy(), cM2Repo.getChecksumPolicy().name() );
+                    Assert.assertEquals( cM2Repo.getChecksumPolicy().name(), expected.getChecksumPolicy() );
                 }
 
-                Assert.assertEquals( expected.getRepoPolicy(), cM2Repo.getRepositoryPolicy().name() );
+                Assert.assertEquals( cM2Repo.getRepositoryPolicy().name(), expected.getRepoPolicy() );
             }
         }
 

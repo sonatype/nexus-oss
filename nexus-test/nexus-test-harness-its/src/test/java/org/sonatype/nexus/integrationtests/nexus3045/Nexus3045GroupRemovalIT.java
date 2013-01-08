@@ -21,6 +21,8 @@ import java.util.List;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -34,8 +36,6 @@ import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus3045GroupRemovalIT
     extends AbstractNexusIntegrationTest

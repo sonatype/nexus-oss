@@ -14,12 +14,12 @@ package org.sonatype.nexus.security.ldap.realms.testharness.nxcm58;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 
 public class Nxcm58NexusStatusIT
@@ -32,7 +32,7 @@ public class Nxcm58NexusStatusIT
     {
         Response response = RequestFacade.doGetRequest( "service/local/status" );
         Status status = response.getStatus();
-        Assert.assertTrue( status.isSuccess(), "Unable to get nexus status" + status );
+        Assert.assertTrue( "Unable to get nexus status" + status, status.isSuccess() );
     }
 
     @Test
@@ -41,8 +41,8 @@ public class Nxcm58NexusStatusIT
     {
         Response response = RequestFacade.doGetRequest( "service/local/ldap/conn_info" );
         Status status = response.getStatus();
-        Assert.assertTrue( status.isSuccess(), "Unable to reach ldap services\n" + status + "\n"
-                + response.getEntity().getText() );
+        Assert.assertTrue( "Unable to reach ldap services\n" + status + "\n"
+                + response.getEntity().getText(), status.isSuccess() );
     }
 
 }

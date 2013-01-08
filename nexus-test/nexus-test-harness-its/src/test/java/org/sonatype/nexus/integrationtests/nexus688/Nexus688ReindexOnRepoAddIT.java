@@ -18,6 +18,9 @@ import java.net.URL;
 import java.util.Arrays;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -28,14 +31,11 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus688ReindexOnRepoAddIT
     extends AbstractNexusIntegrationTest
 {
-    private RepositoryMessageUtil messageUtil;
+    private RepositoryMessageUtil messageUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
 
     // Indexer stopped publishing "old" index for good
     // private static final String OLD_INDEX_FILE = ".index/nexus-maven-repository-index.zip";
@@ -44,10 +44,9 @@ public class Nexus688ReindexOnRepoAddIT
     private static final String INDEX_PROPERTIES = ".index/nexus-maven-repository-index.properties";
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
         throws ComponentLookupException
     {
-        messageUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
