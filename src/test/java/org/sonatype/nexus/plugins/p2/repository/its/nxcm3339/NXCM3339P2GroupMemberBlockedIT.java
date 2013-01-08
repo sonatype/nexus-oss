@@ -18,10 +18,10 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirec
 
 import java.io.File;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.annotations.Test;
 
 public class NXCM3339P2GroupMemberBlockedIT
     extends AbstractNexusProxyP2IT

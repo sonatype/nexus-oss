@@ -17,9 +17,9 @@ import static org.hamcrest.Matchers.startsWith;
 
 import java.io.IOException;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.Test;
 
 public class NXCM1941P2ProxyWithFTPMirrorIT
     extends AbstractNexusProxyP2IT

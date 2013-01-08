@@ -20,8 +20,8 @@ import java.io.File;
 import java.net.URL;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
-import org.testng.annotations.Test;
 
 public class P2R0304P2RepositoryRecreateIT
     extends AbstractNexusP2GeneratorIT

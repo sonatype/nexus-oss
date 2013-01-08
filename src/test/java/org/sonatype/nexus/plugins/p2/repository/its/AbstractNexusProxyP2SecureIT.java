@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its;
 
+import org.junit.Before;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.testng.annotations.BeforeClass;
 
 public abstract class AbstractNexusProxyP2SecureIT
     extends AbstractNexusProxyP2IT
@@ -24,7 +24,7 @@ public abstract class AbstractNexusProxyP2SecureIT
         super( testRepositoryId );
     }
 
-    @BeforeClass( alwaysRun = true )
+    @Before
     public void startProxy()
         throws Exception
     {

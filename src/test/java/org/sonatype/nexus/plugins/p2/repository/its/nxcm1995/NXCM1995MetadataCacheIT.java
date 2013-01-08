@@ -22,9 +22,10 @@ import java.io.File;
 import java.net.URL;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.annotations.Test;
 
 public class NXCM1995MetadataCacheIT
     extends AbstractNexusProxyP2IT
@@ -35,7 +36,7 @@ public class NXCM1995MetadataCacheIT
         super( "nxcm1995" );
     }
 
-    @Test( enabled = false )
+    @Test @Ignore
     public void test()
         throws Exception
     {

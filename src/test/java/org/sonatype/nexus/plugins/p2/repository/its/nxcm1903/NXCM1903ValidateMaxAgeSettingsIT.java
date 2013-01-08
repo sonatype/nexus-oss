@@ -15,12 +15,12 @@ package org.sonatype.nexus.plugins.p2.repository.its.nxcm1903;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.annotations.Test;
 
 public class NXCM1903ValidateMaxAgeSettingsIT
     extends AbstractNexusIntegrationTest

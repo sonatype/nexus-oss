@@ -20,8 +20,8 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
-import org.testng.annotations.Test;
 
 public class MECLIPSE1299P2CompositeRepoMergeRulesIT
     extends AbstractNexusProxyP2IT

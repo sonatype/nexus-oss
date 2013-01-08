@@ -56,7 +56,7 @@
   </pluginRepositories>
 
   <properties>
-    <nexus.version>2.3.0</nexus.version>
+    <nexus.version>2.4-SNAPSHOT</nexus.version>
     <capabilities-plugin.version>2.2</capabilities-plugin.version>
 
     <nexus.plugin.name>Nexus P2 Repository Plugin</nexus.plugin.name>
@@ -103,20 +103,6 @@
       <artifactId>org.sonatype.p2.bridge.api</artifactId>
       <version>1.1.5</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>5.11</version>
-      <classifier>jdk15</classifier>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -220,8 +206,6 @@
         <configuration>
           <testNGArtifactName>none:none</testNGArtifactName>
           <argLine>-Xmx512m</argLine>
-          <junitArtifactName>junit:junit-dep</junitArtifactName>
-          <failIfNoTests>false</failIfNoTests>
           <systemProperties>
             <property>
               <name>user.home</name>
@@ -236,8 +220,6 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
-          <junitArtifactName>none:none</junitArtifactName>
-          <testNGArtifactName>org.testng:testng</testNGArtifactName>
           <workingDirectory>${project.build.directory}</workingDirectory>
           <excludes>
             <exclude>**/*$*</exclude>

@@ -21,12 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
-import org.testng.annotations.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 

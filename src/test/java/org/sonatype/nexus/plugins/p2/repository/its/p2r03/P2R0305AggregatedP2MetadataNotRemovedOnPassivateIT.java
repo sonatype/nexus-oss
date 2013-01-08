@@ -17,8 +17,8 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
-import org.testng.annotations.Test;
 
 public class P2R0305AggregatedP2MetadataNotRemovedOnPassivateIT
     extends AbstractNexusP2GeneratorIT

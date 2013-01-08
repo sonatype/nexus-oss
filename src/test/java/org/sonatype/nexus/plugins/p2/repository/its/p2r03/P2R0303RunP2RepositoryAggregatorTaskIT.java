@@ -19,11 +19,11 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readabl
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2RepositoryAggregatorTaskDescriptor;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 public class P2R0303RunP2RepositoryAggregatorTaskIT
     extends AbstractNexusP2GeneratorIT

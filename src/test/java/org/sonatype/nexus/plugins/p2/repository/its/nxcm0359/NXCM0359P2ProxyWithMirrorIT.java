@@ -21,10 +21,10 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readabl
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class NXCM0359P2ProxyWithMirrorIT
     extends AbstractNexusProxyP2IT

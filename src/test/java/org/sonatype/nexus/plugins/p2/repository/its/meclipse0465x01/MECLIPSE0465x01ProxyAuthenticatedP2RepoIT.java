@@ -17,8 +17,8 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2SecureIT;
-import org.testng.annotations.Test;
 
 public class MECLIPSE0465x01ProxyAuthenticatedP2RepoIT
     extends AbstractNexusProxyP2SecureIT

@@ -13,9 +13,9 @@
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm2947;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
-import org.testng.annotations.Test;
 
 public class NXCM2947P2SecureProxyIT
     extends AbstractNexusProxyP2IT

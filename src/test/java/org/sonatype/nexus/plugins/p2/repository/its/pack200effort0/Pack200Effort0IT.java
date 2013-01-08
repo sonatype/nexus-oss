@@ -16,8 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
-import org.testng.annotations.Test;
 
 public class Pack200Effort0IT
     extends AbstractNexusProxyP2IT

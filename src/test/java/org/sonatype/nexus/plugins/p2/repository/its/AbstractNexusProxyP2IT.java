@@ -19,16 +19,16 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 
 public abstract class AbstractNexusProxyP2IT
     extends AbstractNexusP2IT
 {
 
-    protected static ServletServer proxyServer;
+    protected ServletServer proxyServer;
 
     protected static final String localStorageDir;
 
@@ -48,7 +48,7 @@ public abstract class AbstractNexusProxyP2IT
     }
 
     @SuppressWarnings( "deprecation" )
-    @BeforeClass( alwaysRun = true )
+    @Before
     public void startProxy()
         throws Exception
     {
@@ -56,7 +56,7 @@ public abstract class AbstractNexusProxyP2IT
         proxyServer.start();
     }
 
-    @AfterClass( alwaysRun = true )
+    @After
     public void stopProxy()
         throws Exception
     {

@@ -18,8 +18,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
-import org.testng.annotations.Test;
 
 public class P2R0103DeployFeatureIT
     extends AbstractNexusP2GeneratorIT

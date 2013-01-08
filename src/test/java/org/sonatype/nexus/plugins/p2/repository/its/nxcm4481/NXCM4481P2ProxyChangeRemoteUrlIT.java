@@ -20,13 +20,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class NXCM4481P2ProxyChangeRemoteUrlIT
     extends AbstractNexusProxyP2IT
