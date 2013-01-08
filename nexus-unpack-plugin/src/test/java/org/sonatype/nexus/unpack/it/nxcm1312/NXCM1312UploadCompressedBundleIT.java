@@ -19,6 +19,8 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
 import java.io.File;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -28,16 +30,25 @@ import org.restlet.resource.Representation;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import org.sonatype.nexus.unpack.it.AbstractUnpackIT;
 
 public class NXCM1312UploadCompressedBundleIT
     extends AbstractUnpackIT
 {
+    // HACK: Deal with lack of test dependencies, by running them all together under one-test method
+
     @Test
-    public void upload()
+    public void testCombined()
+        throws Exception
+    {
+        do_upload();
+        do_uploadWithPath();
+        do_uploadWithDelete();
+    }
+
+    //@Test
+    public void do_upload()
         throws Exception
     {
         // this one test DOES depend on indexing, so we must enable it
@@ -60,8 +71,8 @@ public class NXCM1312UploadCompressedBundleIT
         Assert.assertEquals(getSearchMessageUtil().searchForGav("org.nxcm1312", "maven-deploy-released", "1.0").size(), 1);
     }
 
-    @Test( dependsOnMethods = "upload" )
-    public void uploadWithPath()
+    //@Test( dependsOnMethods = "upload" )
+    public void do_uploadWithPath()
         throws Exception
     {
         getDeployUtils().deployWithWagon(
@@ -75,8 +86,8 @@ public class NXCM1312UploadCompressedBundleIT
         assertThat( root, FileMatchers.isDirectory() );
     }
 
-    @Test( dependsOnMethods = "uploadWithPath" )
-    public void uploadWithDelete()
+    //@Test( dependsOnMethods = "uploadWithPath" )
+    public void do_uploadWithDelete()
         throws Exception
     {
         // what we do here:
