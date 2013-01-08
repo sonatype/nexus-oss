@@ -29,6 +29,9 @@
   <properties>
     <nexus.plugin.name>Nexus BouncyCastle Provider Plugin</nexus.plugin.name>
     <nexus.plugin.description>Provides Bouncy Castle JARs and registers it as a JCE provider.</nexus.plugin.description>
+    
+    <bouncycastle.version>1.47</bouncycastle.version>
+    <sisu-goodies.version>1.5.1</sisu-goodies.version>
   </properties>
 
   <dependencies>
@@ -40,8 +43,23 @@
 
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk16</artifactId>
-      <version>1.46</version>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>${bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk15on</artifactId>
+      <version>${bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <version>${bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-crypto</artifactId>
+      <version>${sisu-goodies.version}</version>
     </dependency>
 
     <dependency>
@@ -58,7 +76,10 @@
         <artifactId>app-lifecycle-maven-plugin</artifactId>
         <configuration>
           <sharedDependencies>
-            <sharedDependency>org.bouncycastle:bcprov-jdk16</sharedDependency>
+            <sharedDependency>org.bouncycastle:bcprov-jdk15on</sharedDependency>
+            <sharedDependency>org.bouncycastle:bcpg-jdk15on</sharedDependency>
+            <sharedDependency>org.bouncycastle:bcpkix-jdk15on</sharedDependency>
+            <sharedDependency>org.sonatype.sisu.goodies:goodies-crypto</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>
