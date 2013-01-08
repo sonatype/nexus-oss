@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.it.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;

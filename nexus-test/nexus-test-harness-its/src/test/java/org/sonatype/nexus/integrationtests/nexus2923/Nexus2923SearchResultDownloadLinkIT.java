@@ -17,7 +17,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.it.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Method;
@@ -66,7 +66,7 @@ public class Nexus2923SearchResultDownloadLinkIT
 
         for ( NexusArtifact artifact : artifacts )
         {
-            if ( StringUtils.isNotEmpty( artifact.getPomLink() ) )
+            if ( StringUtils.isNotEmpty(artifact.getPomLink()) )
             {
                 assertLinkAvailable( artifact.getPomLink() );
             }
