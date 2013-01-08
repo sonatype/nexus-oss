@@ -50,7 +50,7 @@
   </issueManagement>
 
   <properties>
-    <nexus.version>2.3.0</nexus.version>
+    <nexus.version>2.4-SNAPSHOT</nexus.version>
 
     <nexus.plugin.name>Nexus Unpack Plugin</nexus.plugin.name>
     <nexus.plugin.description>Automatically unpack deployed bundles.</nexus.plugin.description>
@@ -97,11 +97,13 @@
             <target>1.6</target>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.sonatype.nexus.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
           <version>${nexus.version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -116,15 +118,12 @@
             </systemProperties>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <argLine>-Xmx512m</argLine>
-            <junitArtifactName>none:none</junitArtifactName>
-            <testNGArtifactName>org.testng:testng</testNGArtifactName>
-            <junitArtifactName>none:none</junitArtifactName>
-            <testNGArtifactName>org.testng:testng</testNGArtifactName>
             <workingDirectory>${project.build.directory}</workingDirectory>
             <excludes>
               <exclude>**/*$*</exclude>

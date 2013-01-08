@@ -14,6 +14,9 @@ package org.sonatype.nexus.unpack.it.nxcm1326;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
@@ -21,10 +24,6 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.sonatype.nexus.unpack.it.AbstractUnpackIT;
 import com.thoughtworks.xstream.XStream;
@@ -32,8 +31,9 @@ import com.thoughtworks.xstream.XStream;
 public class NXCM1326AuthenticationIT
     extends AbstractUnpackIT
 {
-    @BeforeClass
-    public void setSecurity()
+    @Before
+    public void setUp()
+        throws Exception
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         XStream xstream = this.getXMLXStream();
@@ -41,20 +41,25 @@ public class NXCM1326AuthenticationIT
         this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );
         this.roleUtil = new RoleMessageUtil( this, xstream, MediaType.APPLICATION_XML );
         this.privUtil = new PrivilegesMessageUtil( this, xstream, MediaType.APPLICATION_XML );
-    }
 
-    @BeforeMethod
-    public void setupUserPrivs()
-        throws IOException
-    {
         UserResource user = this.userUtil.getUser( "test-user" );
         user.addRole( "repo-all-full" );
         this.userUtil.updateUser( user );
-
     }
 
+    // HACK: Deal with lack of test dependencies, by running them all together under one-test method
+
     @Test
-    public void invalidUser()
+    public void testCombined()
+        throws Exception
+    {
+        do_invalidUser();
+        do_withoutPrivsUser();
+        do_okUser();
+    }
+
+    //@Test
+    public void do_invalidUser()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().setUsername( "dummy" );
@@ -65,7 +70,7 @@ public class NXCM1326AuthenticationIT
             getDeployUtils().deployWithWagon( "http",
                                               nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
                                                   + "/content-compressed", getTestFile( "bundle.zip" ), "" );
-            Assert.fail( "Authentication should fail!!!" );
+            Assert.fail("Authentication should fail!!!");
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
         {
@@ -73,8 +78,8 @@ public class NXCM1326AuthenticationIT
         }
     }
 
-    @Test( dependsOnMethods = "invalidUser" )
-    public void withoutPrivsUser()
+    //@Test( dependsOnMethods = "invalidUser" )
+    public void do_withoutPrivsUser()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -92,8 +97,8 @@ public class NXCM1326AuthenticationIT
         }
     }
 
-    @Test( dependsOnMethods = { "withoutPrivsUser" } )
-    public void okUser()
+    //@Test( dependsOnMethods = { "withoutPrivsUser" } )
+    public void do_okUser()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );

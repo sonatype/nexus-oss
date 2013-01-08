@@ -14,18 +14,18 @@ package org.sonatype.nexus.unpack.it;
 
 import java.io.IOException;
 
+import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.annotations.BeforeMethod;
 
 public abstract class AbstractUnpackIT
     extends AbstractNexusIntegrationTest
 {
     @Override
-    @BeforeMethod( alwaysRun = true )
+    @Before
     public void oncePerClassSetUp()
         throws Exception
     {

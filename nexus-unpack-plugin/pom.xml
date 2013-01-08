@@ -29,8 +29,6 @@
   <description>Automatically unpack deployed bundles</description>
 
   <dependencies>
-
-    <!-- This is a plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
@@ -46,6 +44,7 @@
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.codehaus.enunciate</groupId>
       <artifactId>enunciate-core</artifactId>

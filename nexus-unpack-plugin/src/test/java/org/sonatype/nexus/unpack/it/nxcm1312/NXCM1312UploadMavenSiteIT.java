@@ -15,9 +15,9 @@ package org.sonatype.nexus.unpack.it.nxcm1312;
 import java.io.File;
 
 import org.apache.maven.it.Verifier;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import org.sonatype.nexus.unpack.it.AbstractUnpackIT;
 
@@ -45,7 +45,7 @@ public class NXCM1312UploadMavenSiteIT
         verifier.executeGoal( "install" );
 
         File root = new File( nexusWorkDir, "storage/nexus-test-harness-repo2/some/path" );
-        Assert.assertTrue( root.exists() );
+        Assert.assertTrue(root.exists());
         Assert.assertTrue( new File( root, "b.bin" ).exists() );
         Assert.assertTrue( new File( root, "x/a.txt" ).exists() );
         Assert.assertTrue( new File( root, "META-INF/MANIFEST.MF" ).exists() );
