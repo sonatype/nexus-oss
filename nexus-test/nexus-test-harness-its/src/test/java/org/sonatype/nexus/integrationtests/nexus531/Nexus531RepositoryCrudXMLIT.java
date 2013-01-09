@@ -13,24 +13,23 @@
 package org.sonatype.nexus.integrationtests.nexus531;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.annotations.BeforeClass;
 
 public class Nexus531RepositoryCrudXMLIT
     extends Nexus531RepositoryCrudJsonIT
 {
     public Nexus531RepositoryCrudXMLIT()
     {
-
+        this.messageUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @BeforeClass
-    public void init()
+    public static void init()
         throws ComponentLookupException
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        this.messageUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 }

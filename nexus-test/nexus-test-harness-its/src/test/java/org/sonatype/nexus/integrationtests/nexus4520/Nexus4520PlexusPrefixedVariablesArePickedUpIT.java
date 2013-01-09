@@ -19,10 +19,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * IT for issue NEXUS-4520, covering the "System properties" case. In short, before Nexus is booted, it sets a
@@ -41,37 +43,24 @@ public class Nexus4520PlexusPrefixedVariablesArePickedUpIT
 
     public static final String CUSTOM_SYSPROP_VALUE = "customValue";
 
-    @BeforeClass( alwaysRun = true )
-    public void setSystemProperty()
+    private static PrintStream actualOut;
+
+    private static ByteArrayOutputStream fakeOut;
+
+    @BeforeClass
+    public static void setUp()
         throws Exception
     {
         System.setProperty( SYSPROP_PREFIX + CUSTOM_SYSPROP_KEY, CUSTOM_SYSPROP_VALUE );
-    }
-
-    @AfterClass( alwaysRun = true )
-    public void removeSystemProperty()
-        throws Exception
-    {
-        System.getProperties().remove( SYSPROP_PREFIX + CUSTOM_SYSPROP_KEY );
-    }
-
-    private PrintStream actualOut;
-
-    private ByteArrayOutputStream fakeOut;
-
-    @BeforeClass( alwaysRun = true )
-    public void grabOut()
-        throws Exception
-    {
         actualOut = System.out;
-
         System.setOut( new PrintStream( fakeOut = new ByteArrayOutputStream() ) );
     }
 
-    @AfterClass( alwaysRun = true )
-    public void restoreOut()
+    @AfterClass
+    public static void tearDown()
         throws Exception
     {
+        System.getProperties().remove( SYSPROP_PREFIX + CUSTOM_SYSPROP_KEY );
         if ( actualOut != null )
         {
             // if null mean @Before did not ran for some reason

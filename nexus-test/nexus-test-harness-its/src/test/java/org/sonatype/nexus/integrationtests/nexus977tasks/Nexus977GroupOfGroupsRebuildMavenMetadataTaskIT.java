@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus977tasks;
 
+import static org.hamcrest.Matchers.hasItems;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -20,13 +22,12 @@ import java.util.List;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.MatcherAssert;
-import static org.hamcrest.Matchers.hasItems;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsRebuildMavenMetadataTaskIT
     extends AbstractNexusProxyIntegrationTest

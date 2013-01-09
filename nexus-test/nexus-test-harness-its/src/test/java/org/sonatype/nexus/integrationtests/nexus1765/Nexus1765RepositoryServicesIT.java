@@ -12,9 +12,12 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1765;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -25,14 +28,12 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus1765RepositoryServicesIT
     extends AbstractPrivilegeTest
 {
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

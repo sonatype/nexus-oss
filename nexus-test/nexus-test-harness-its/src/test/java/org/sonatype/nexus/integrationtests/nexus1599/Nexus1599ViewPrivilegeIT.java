@@ -14,15 +14,15 @@ package org.sonatype.nexus.integrationtests.nexus1599;
 
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * @author juven
@@ -126,7 +126,7 @@ public class Nexus1599ViewPrivilegeIT
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        Assert.assertFalse( containsRepo( repoMsgUtil.getList(), repoId ), "Repo '" + repoId + "' should be hidden!" );
+        Assert.assertFalse( "Repo '" + repoId + "' should be hidden!", containsRepo( repoMsgUtil.getList(), repoId ) );
     }
 
     private boolean containsRepo( List<RepositoryListResource> repos, String repoId )

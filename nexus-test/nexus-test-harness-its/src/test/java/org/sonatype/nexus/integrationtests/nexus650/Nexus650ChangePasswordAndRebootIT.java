@@ -12,14 +12,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus650;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Changes users password, restarts nexus, and verify password is correct.
@@ -29,7 +29,7 @@ public class Nexus650ChangePasswordAndRebootIT
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -46,7 +46,7 @@ public class Nexus650ChangePasswordAndRebootIT
 
         String newPassword = "123password";
         Status status = ChangePasswordUtils.changePassword( TEST_USER_NAME, TEST_USER_PASSWORD, newPassword );
-        Assert.assertTrue( status.isSuccess(), "Status: " );
+        Assert.assertTrue( "Status: ", status.isSuccess() );
 
         // now change the password
         context.setPassword( newPassword );
@@ -55,7 +55,7 @@ public class Nexus650ChangePasswordAndRebootIT
         restartNexus();
 
         // now we can verify everything worked out
-        Assert.assertTrue( getNexusStatusUtil().isNexusRunning(), "Nexus is not running" );
+        Assert.assertTrue( "Nexus is not running", getNexusStatusUtil().isNexusRunning() );
 
     }
 

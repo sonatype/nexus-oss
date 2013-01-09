@@ -17,18 +17,15 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
 
 import java.io.File;
-
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ErrorReportRequest;
 import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
@@ -36,7 +33,6 @@ import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -130,7 +126,7 @@ public class ErrorReportUtil
         File[] files = errorBundleDir.listFiles();
 
         Assert.assertNotNull( files );
-        Assert.assertEquals( 1, files.length );
+        Assert.assertEquals( files.length, 1 );
         Assert.assertTrue( files[0].getName().startsWith( "nexus-error-bundle" ) );
         Assert.assertTrue( files[0].getName().endsWith( ".zip" ) );
 

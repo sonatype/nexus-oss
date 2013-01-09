@@ -16,14 +16,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1581RemoteMetadataIT
     extends AbstractNexusProxyIntegrationTest
@@ -50,10 +50,10 @@ public class Nexus1581RemoteMetadataIT
         }
         
         Assert.assertTrue( mirrorIdMap.containsKey( "mirror1" ) );
-        Assert.assertEquals( TestProperties.getString( "proxy.repo.base.url" )+"/mirror-repo", mirrorIdMap.get( "mirror1" ) );
+        Assert.assertEquals( mirrorIdMap.get( "mirror1" ), TestProperties.getString( "proxy.repo.base.url" )+"/mirror-repo" );
         
         Assert.assertTrue( mirrorIdMap.containsKey( "mirror2" ) );
-        Assert.assertEquals( TestProperties.getString( "proxy.repo.base.url" )+"/void", mirrorIdMap.get( "mirror2" ) );
+        Assert.assertEquals( mirrorIdMap.get( "mirror2" ), TestProperties.getString( "proxy.repo.base.url" )+"/void" );
         
         
         Assert.assertEquals( 2, mirrorResources.size() );

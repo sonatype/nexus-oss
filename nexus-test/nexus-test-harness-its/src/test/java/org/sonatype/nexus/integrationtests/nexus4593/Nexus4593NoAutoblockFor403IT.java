@@ -20,6 +20,10 @@ import static org.sonatype.tests.http.server.fluent.Behaviours.get;
 
 import java.io.IOException;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
@@ -27,10 +31,6 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.tests.http.server.fluent.Server;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * IT testing that a remote answering with '403 Forbidden' will not be auto-blocked.
@@ -50,7 +50,7 @@ public class Nexus4593NoAutoblockFor403IT
 
     private Server server;
 
-    @AfterMethod
+    @After
     public void stopServer()
         throws Exception
     {
@@ -104,7 +104,7 @@ public class Nexus4593NoAutoblockFor403IT
      * <p/>
      * This test will change repo status to auto blocked.
      */
-    @Test( dependsOnMethods = "testNoAutoblockOn403" )
+    @Test //( dependsOnMethods = "testNoAutoblockOn403" )
     public void testAutoblockOn401()
         throws Exception
     {
@@ -127,7 +127,7 @@ public class Nexus4593NoAutoblockFor403IT
     /**
      * Verify that un-autoblocking a repo works when 'HEAD /' is giving 403.
      */
-    @Test( dependsOnMethods = "testAutoblockOn401" )
+    @Test //( dependsOnMethods = "testAutoblockOn401" )
     public void testUnAutoblockFor403()
         throws Exception
     {

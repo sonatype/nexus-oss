@@ -14,8 +14,8 @@ package org.sonatype.nexus.integrationtests.nexus4955;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.testng.annotations.Test;
 
 /**
  * try to upload (deploy it) a file like "id" (no extension, just file name "id") into repo, nexus will die, it was

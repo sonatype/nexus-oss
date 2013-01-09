@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -76,6 +77,15 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-bouncycastle-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-h2-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -188,6 +198,13 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-h2-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-restlet1x-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
@@ -289,7 +306,7 @@
                   </excludes>
                   <includes>
                     <include>**/*.js</include>
-                  </includes> 
+                  </includes>
                 </aggregation>
                 <aggregation>
                   <output>${project.build.outputDirectory}/style/sonatype-all.css</output>

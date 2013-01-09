@@ -26,6 +26,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.it.Verifier;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
@@ -33,9 +37,6 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus2497ConcurrentRepoAccessIT
     extends AbstractNexusIntegrationTest
@@ -62,7 +63,7 @@ public class Nexus2497ConcurrentRepoAccessIT
         // files[9] = populate( new File( "./target/downloads/nexus2497", "file0.jar" ) );
     }
 
-    @Test(enabled=false, description="Test is unstable - needs to be rewritten or replaced. See NEXUS-4606")
+    @Test @Ignore("Test is unstable - needs to be rewritten or replaced. See NEXUS-4606")
     public void doConcurrence()
         throws Exception
     {
@@ -138,6 +139,6 @@ public class Nexus2497ConcurrentRepoAccessIT
 
             Assert.fail( "Found some errors deploying:\n" + str.toString() );
         }
-        Assert.assertEquals( "Ok", TaskScheduleUtil.getStatus( TASK_NAME ) );
+        Assert.assertEquals( TaskScheduleUtil.getStatus( TASK_NAME ), "Ok" );
     }
 }

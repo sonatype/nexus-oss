@@ -14,9 +14,9 @@ package org.sonatype.nexus.integrationtests.nexus166;
 
 import javax.swing.JOptionPane;
 
+import org.junit.AfterClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.Test;
 
 public class StartStopLeak
     extends AbstractNexusIntegrationTest

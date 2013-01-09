@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.hamcrest.text.IsEmptyString;
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -41,7 +42,6 @@ import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -121,7 +121,7 @@ public class RoutesMessageUtil
         String responseString = response.getEntity().getText();
         LOG.debug( "responseText: " + responseString );
 
-        Assert.assertTrue( response.getStatus().isSuccess(), response.getStatus() + "\n" + responseString );
+        Assert.assertTrue( response.getStatus() + "\n" + responseString, response.getStatus().isSuccess() );
 
         return getResourceFromText( responseString );
     }
@@ -158,14 +158,14 @@ public class RoutesMessageUtil
         {
             RepositoryRouteMemberRepository repo1 = repos1.get( ii );
             String repo2 = repos2.get( ii );
-            Assert.assertEquals( repo1.getId(), repo2 );
+            Assert.assertEquals( repo2, repo1.getId() );
         }
     }
 
     public void validateSame( RepositoryRouteMemberRepository repo1, RepositoryRouteMemberRepository repo2 )
     {
         // we only care about the Id field
-        Assert.assertEquals( repo1.getId(), repo2.getId() );
+        Assert.assertEquals( repo2.getId(), repo1.getId() );
     }
 
     public void validateRoutesConfig( RepositoryRouteResource resource )
@@ -178,10 +178,10 @@ public class RoutesMessageUtil
             "Should be the same route. \n Expected:\n" + new XStream().toXML( resource ) + " \n \n Got: \n"
                 + new XStream().toXML( cRoute );
 
-        Assert.assertEquals( cRoute.getId(), resource.getId(), msg );
-        Assert.assertEquals( cRoute.getGroupId(), resource.getGroupId(), msg );
-        Assert.assertEquals( cRoute.getRoutePatterns(), Collections.singletonList( resource.getPattern() ), msg );
-        Assert.assertEquals( cRoute.getRouteType(), resource.getRuleType(), msg );
+        Assert.assertEquals( msg, cRoute.getId(), resource.getId() );
+        Assert.assertEquals( msg, cRoute.getGroupId(), resource.getGroupId() );
+        Assert.assertEquals( msg, cRoute.getRoutePatterns(), Collections.singletonList( resource.getPattern() ) );
+        Assert.assertEquals( msg, cRoute.getRouteType(), resource.getRuleType() );
 
         this.validateSameRepoIds( resource.getRepositories(), cRoute.getRepositories() );
 
@@ -192,12 +192,12 @@ public class RoutesMessageUtil
 
         ErrorResponse errorResponse = (ErrorResponse) xstream.fromXML( xml, new ErrorResponse() );
 
-        Assert.assertTrue( errorResponse.getErrors().size() > 0, "Error response is empty." );
+        Assert.assertTrue( "Error response is empty.", errorResponse.getErrors().size() > 0 );
 
         for ( Iterator<ErrorMessage> iter = errorResponse.getErrors().iterator(); iter.hasNext(); )
         {
             ErrorMessage error = iter.next();
-            Assert.assertFalse( StringUtils.isEmpty( error.getMsg() ), "Response Error message is empty." );
+            Assert.assertFalse( "Response Error message is empty.", StringUtils.isEmpty( error.getMsg() ) );
 
         }
 
@@ -227,8 +227,8 @@ public class RoutesMessageUtil
         for ( RepositoryRouteListResource route : routes )
         {
             Status status = delete( route.getResourceURI() ).getStatus();
-            Assert.assertTrue( status.isSuccess(), "Unable to delete route: '" + route.getResourceURI() + "', due to: "
-                                                       + status.getDescription() );
+            Assert.assertTrue( "Unable to delete route: '" + route.getResourceURI() + "', due to: "
+                                                       + status.getDescription(), status.isSuccess() );
         }
     }
 

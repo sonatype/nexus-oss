@@ -18,11 +18,11 @@ import java.util.Date;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Deploys a snapshot artifact using a wagon and REST (both gav and pom) REST should fail 
@@ -39,7 +39,7 @@ public class Nexus259SnapshotDeployIT
     }
     
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -78,7 +78,7 @@ public class Nexus259SnapshotDeployIT
             fileWasUploaded = false;
         }
 
-        Assert.assertFalse( fileWasUploaded, "The file was uploaded and it should not have been." );
+        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
 
     }
 
@@ -119,6 +119,6 @@ public class Nexus259SnapshotDeployIT
             fileWasUploaded = false;
         }
 
-        Assert.assertFalse( fileWasUploaded, "The file was uploaded and it should not have been." );
+        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
     }
 }

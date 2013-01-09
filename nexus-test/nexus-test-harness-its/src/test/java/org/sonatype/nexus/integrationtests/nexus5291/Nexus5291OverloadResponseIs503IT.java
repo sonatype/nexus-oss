@@ -14,17 +14,17 @@ package org.sonatype.nexus.integrationtests.nexus5291;
 
 import static org.sonatype.nexus.integrationtests.RequestFacade.doGet;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * NEXUS-5291: When nexus transport connection pool (using HC4x RRS) gets depleted, Nexus should respond with transient
@@ -37,24 +37,24 @@ public class Nexus5291OverloadResponseIs503IT
 {
     protected Server server;
 
-    @BeforeClass( alwaysRun = true )
-    protected static void setHc4Parameters()
+    @BeforeClass
+    public static void setHc4Parameters()
     {
         System.setProperty( "nexus.apacheHttpClient4x.connectionPoolMaxSize", "1" );
         System.setProperty( "nexus.apacheHttpClient4x.connectionPoolSize", "1" );
         System.setProperty( "nexus.apacheHttpClient4x.connectionPoolTimeout", "50" );
     }
 
-    @AfterClass( alwaysRun = true )
-    protected static void unsetHc4Parameters()
+    @AfterClass
+    public static void unsetHc4Parameters()
     {
         System.clearProperty( "nexus.apacheHttpClient4x.connectionPoolMaxSize" );
         System.clearProperty( "nexus.apacheHttpClient4x.connectionPoolSize" );
         System.clearProperty( "nexus.apacheHttpClient4x.connectionPoolTimeout" );
     }
 
-    @BeforeMethod( alwaysRun = true )
-    protected void replaceServers()
+    @Before
+    public void replaceServers()
         throws Exception
     {
         final int proxyPort = proxyServer.getPort();
@@ -63,8 +63,8 @@ public class Nexus5291OverloadResponseIs503IT
         server = Server.withPort( proxyPort ).serve( "/" ).withBehaviours( Behaviours.pause( Time.days( 1 ) ) ).start();
     }
 
-    @AfterMethod( alwaysRun = true )
-    protected void stopServers()
+    @After
+    public void stopServers()
         throws Exception
     {
         if ( server != null )

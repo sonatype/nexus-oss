@@ -16,13 +16,13 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.After;
+import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 
 public abstract class AbstractNexusProxyIntegrationTest
     extends AbstractNexusIntegrationTest
@@ -54,7 +54,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         this.repositoryUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
-    @BeforeMethod(alwaysRun = true)
+    @Before
     public void startProxy()
         throws Exception
     {
@@ -62,7 +62,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         this.proxyServer.start();
     }
 
-    @AfterMethod(alwaysRun = true)
+    @After
     public void stopProxy()
         throws Exception
     {

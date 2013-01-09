@@ -16,16 +16,15 @@ import java.io.File;
 
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus2351DisableRedeployMaven2IT
     extends AbstractNexusIntegrationTest
@@ -37,7 +36,7 @@ public class Nexus2351DisableRedeployMaven2IT
 
     private File artifactMD5;
 
-    @BeforeMethod
+    @Before
     public void setup()
         throws Exception
     {
@@ -50,7 +49,7 @@ public class Nexus2351DisableRedeployMaven2IT
 
     }
 
-    @BeforeClass
+    @Before
     public void init()
         throws ComponentLookupException
     {

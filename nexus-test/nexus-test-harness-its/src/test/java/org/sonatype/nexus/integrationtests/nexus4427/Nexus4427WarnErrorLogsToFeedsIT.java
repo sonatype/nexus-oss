@@ -14,11 +14,12 @@ package org.sonatype.nexus.integrationtests.nexus4427;
 
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.ITHelperLogUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;

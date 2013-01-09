@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus394;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Test the privilege for forgot password.
@@ -28,7 +28,7 @@ public class Nexus394ForgotPasswordPermissionIT
 {
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -46,11 +46,11 @@ public class Nexus394ForgotPasswordPermissionIT
         // NOT Should be able to forgot anyone password
         Response response =
             ForgotPasswordUtils.get( this ).recoverUserPassword( "anonymous", "changeme2@yourcompany.com" );
-        Assert.assertFalse( response.getStatus().isSuccess(), "Status" );
+        Assert.assertFalse( "Status", response.getStatus().isSuccess() );
 
         // Should be able to forgot my own password
         response = ForgotPasswordUtils.get( this ).recoverUserPassword( TEST_USER_NAME, "nexus-dev2@sonatype.org" );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status" );
+        Assert.assertTrue( "Status", response.getStatus().isSuccess() );
 
     }
 

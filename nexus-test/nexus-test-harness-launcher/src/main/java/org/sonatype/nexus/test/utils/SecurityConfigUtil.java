@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.Assert;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
@@ -37,7 +38,6 @@ import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -76,7 +76,7 @@ public class SecurityConfigUtil
                 continue;
             }
 
-            Assert.assertNotNull( roleResource, "Role '" + cRole.getId() + "' should be contained!" );
+            Assert.assertNotNull( "Role '" + cRole.getId() + "' should be contained!", roleResource );
 
             CRole role = RoleConverter.toCRole( roleResource );
 
@@ -94,8 +94,8 @@ public class SecurityConfigUtil
         String roleStringA = xStream.toXML( roleA );
         String roleStringB = xStream.toXML( roleB );
 
-        Assert.assertTrue( new RoleComparator().compare( roleA, roleB ) == 0, "Role A:\n" + roleStringB + "\nRole B:\n"
-            + roleStringA );
+        Assert.assertTrue( "Role A:\n" + roleStringB + "\nRole B:\n"
+            + roleStringA, new RoleComparator().compare( roleA, roleB ) == 0 );
     }
 
     private RoleResource getRoleResource( String id, List<RoleResource> roles )
@@ -142,7 +142,7 @@ public class SecurityConfigUtil
 
             CUser secUser = getCUser( userResource.getUserId() );
 
-            Assert.assertNotNull( secUser, "Cannot find user: " + userResource.getUserId() );
+            Assert.assertNotNull( "Cannot find user: " + userResource.getUserId(), secUser );
 
             CUser user = UserConverter.toCUser( userResource );
 
@@ -175,13 +175,13 @@ public class SecurityConfigUtil
 
             Assert.assertNotNull( secPriv );
 
-            Assert.assertEquals( privResource.getId(), secPriv.getId() );
-            Assert.assertEquals( privResource.getName(), secPriv.getName() );
-            Assert.assertEquals( privResource.getDescription(), secPriv.getDescription() );
+            Assert.assertEquals( secPriv.getId(), privResource.getId() );
+            Assert.assertEquals( secPriv.getName(), privResource.getName() );
+            Assert.assertEquals( secPriv.getDescription(), privResource.getDescription() );
 
             for ( CProperty prop : secPriv.getProperties() )
             {
-                Assert.assertEquals( getPrivilegeProperty( privResource, prop.getKey() ), prop.getValue() );
+                Assert.assertEquals( prop.getValue(), getPrivilegeProperty( privResource, prop.getKey() ) );
             }
         }
     }
@@ -332,9 +332,19 @@ public class SecurityConfigUtil
                 addStaticSecurity( configuration, resource.getConfiguration() );
             }
         }
+        catch ( IOException e )
+        {
+            throw e;
+        }
+        catch ( RuntimeException e )
+        {
+            throw e;
+        }
         catch ( Exception e )
         {
-            Assert.fail( "could not parse security.xml ", e );
+            IOException ioe = new IOException( "could not parse security.xml" );
+            ioe.initCause( e );
+            throw ioe;
         }
         return configuration;
     }

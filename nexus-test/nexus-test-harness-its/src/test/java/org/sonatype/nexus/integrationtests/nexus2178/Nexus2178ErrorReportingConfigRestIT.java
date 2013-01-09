@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2178;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus2178ErrorReportingConfigRestIT
     extends AbstractNexusIntegrationTest
@@ -30,8 +30,8 @@ public class Nexus2178ErrorReportingConfigRestIT
         // Default config
         GlobalConfigurationResource resource = SettingsMessageUtil.getCurrentSettings();
 
-        Assert.assertFalse( resource.getErrorReportingSettings().isReportErrorsAutomatically(),
-                            "Error reporting should be null by default" );
+        Assert.assertFalse( "Error reporting should be null by default",
+                            resource.getErrorReportingSettings().isReportErrorsAutomatically() );
 
         // Set some values
         ErrorReportingSettings settings = resource.getErrorReportingSettings();
@@ -43,10 +43,10 @@ public class Nexus2178ErrorReportingConfigRestIT
 
         resource = SettingsMessageUtil.getCurrentSettings();
 
-        Assert.assertNotNull( resource.getErrorReportingSettings(), "Error reporting should not be null" );
-        Assert.assertEquals( "someusername", resource.getErrorReportingSettings().getJiraUsername() );
-        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER,
-                             resource.getErrorReportingSettings().getJiraPassword() );
+        Assert.assertNotNull( "Error reporting should not be null", resource.getErrorReportingSettings() );
+        Assert.assertEquals( resource.getErrorReportingSettings().getJiraUsername(), "someusername" );
+        Assert.assertEquals( resource.getErrorReportingSettings().getJiraPassword(),
+                             AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER );
 
         // Clear them again
         resource.setErrorReportingSettings( null );
@@ -55,7 +55,7 @@ public class Nexus2178ErrorReportingConfigRestIT
 
         resource = SettingsMessageUtil.getCurrentSettings();
 
-        Assert.assertFalse( resource.getErrorReportingSettings().isReportErrorsAutomatically(),
-                            "Error reporting should be null" );
+        Assert.assertFalse( "Error reporting should be null",
+                            resource.getErrorReportingSettings().isReportErrorsAutomatically() );
     }
 }

@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
@@ -27,9 +30,6 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 
 /**
@@ -40,7 +40,7 @@ public class Nexus778SearchResultsFilteringIT
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
@@ -49,10 +49,10 @@ public class Nexus778SearchResultsFilteringIT
         throws Exception
     {
         List<NexusArtifact> results = searchFor( "test1" );
-        Assert.assertEquals( results.size(), 1, "Results found " + printResults( results ) );
+        Assert.assertEquals( "Results found " + printResults( results ), results.size(), 1 );
 
         results = searchFor( "test2" );
-        Assert.assertEquals( results.size(), 1, "Results found " + printResults( results ) );
+        Assert.assertEquals( "Results found " + printResults( results ), results.size(), 1 );
     }
 
     @Test
@@ -88,10 +88,10 @@ public class Nexus778SearchResultsFilteringIT
 
         // Should be able to retrieve both test1 & test2 artifacts
         List<NexusArtifact> results = searchFor( "test1" );
-        Assert.assertEquals( results.size(), 1, "Results found " + printResults( results ) );
+        Assert.assertEquals( "Results found " + printResults( results ), results.size(), 1 );
 
         results = searchFor( "test2" );
-        Assert.assertEquals( results.size(), 1, "Results found " + printResults( results ) );
+        Assert.assertEquals( "Results found " + printResults( results ), results.size(), 1 );
 
         // Now update the test user so that the user can only access test1
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -103,10 +103,10 @@ public class Nexus778SearchResultsFilteringIT
 
         // Should be able to retrieve only test1 artifacts
         results = searchFor( "test1" );
-        Assert.assertEquals( results.size(), 1, "Results found " + printResults( results ) );
+        Assert.assertEquals( "Results found " + printResults( results ), results.size(), 1 );
 
         results = searchFor( "test2" );
-        Assert.assertEquals( results.size(), 0, "Results found " + printResults( results ) );
+        Assert.assertEquals( "Results found " + printResults( results ), results.size(), 0 );
 
         // Now update the test user so that the user can only access test2
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -118,10 +118,10 @@ public class Nexus778SearchResultsFilteringIT
 
         // Should be able to retrieve only test2 artifacts
         results = searchFor( "test1" );
-        Assert.assertEquals( results.size(), 0, "Results found " + printResults( results ) );
+        Assert.assertEquals( "Results found " + printResults( results ), results.size(), 0 );
 
         results = searchFor( "test2" );
-        Assert.assertEquals( results.size(), 1, "Results found " + printResults( results ) );
+        Assert.assertEquals( "Results found " + printResults( results ), results.size(), 1 );
     }
 
     private List<NexusArtifact> searchFor( String artifactId )

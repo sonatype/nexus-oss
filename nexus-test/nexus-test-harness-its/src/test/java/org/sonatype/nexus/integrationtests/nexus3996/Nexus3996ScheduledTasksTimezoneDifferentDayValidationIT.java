@@ -12,22 +12,21 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3996;
 
-import com.google.common.collect.Lists;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
-import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
-import org.sonatype.nexus.test.utils.NexusRequestMatchers;
-import org.sonatype.nexus.test.utils.ResponseMatchers;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Test;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
+import org.sonatype.nexus.test.utils.NexusRequestMatchers;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+
+import com.google.common.collect.Lists;
 
 /**
  * Nexus would not create tasks for the same day if the client is in a timezone with a larger offset from UTC than

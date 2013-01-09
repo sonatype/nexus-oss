@@ -14,6 +14,9 @@ package org.sonatype.nexus.integrationtests.nexus1563;
 
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
@@ -21,9 +24,6 @@ import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus1563ExternalRealmsIT
     extends AbstractNexusIntegrationTest
@@ -33,7 +33,7 @@ public class Nexus1563ExternalRealmsIT
 
     private RoleMessageUtil roleUtil;
 
-    @BeforeMethod
+    @Before
     public void init()
     {
         this.userUtil = new UserMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
@@ -45,9 +45,9 @@ public class Nexus1563ExternalRealmsIT
         throws Exception
     {
         List<PlexusUserResource> users = userUtil.searchPlexusUsers( "Simple" );
-        Assert.assertTrue( containsUser( users, "admin-simple" ), "User not found" );
-        Assert.assertTrue( containsUser( users, "anonymous-simple" ), "User not found" );
-        Assert.assertTrue( containsUser( users, "deployment-simple" ), "User not found" );
+        Assert.assertTrue( "User not found", containsUser( users, "admin-simple" ) );
+        Assert.assertTrue( "User not found", containsUser( users, "anonymous-simple" ) );
+        Assert.assertTrue( "User not found", containsUser( users, "deployment-simple" ) );
     }
 
     @Test
@@ -55,9 +55,9 @@ public class Nexus1563ExternalRealmsIT
         throws Exception
     {
         List<PlexusRoleResource> roles = roleUtil.getRoles( "Simple" );
-        Assert.assertTrue( containsRole( roles, "role-123" ), "Role not found" );
-        Assert.assertTrue( containsRole( roles, "role-abc" ), "Role not found" );
-        Assert.assertTrue( containsRole( roles, "role-xyz" ), "Role not found" );
+        Assert.assertTrue( "Role not found", containsRole( roles, "role-123" ) );
+        Assert.assertTrue( "Role not found", containsRole( roles, "role-abc" ) );
+        Assert.assertTrue( "Role not found", containsRole( roles, "role-xyz" ) );
     }
 
     @Test
@@ -65,7 +65,7 @@ public class Nexus1563ExternalRealmsIT
         throws Exception
     {
         List<PlexusUserResource> users = userUtil.searchPlexusUsers( "Simple", "admin-simple" );
-        Assert.assertEquals( users.size(), 1, "User not found" );
+        Assert.assertEquals( "User not found", users.size(), 1 );
     }
 
     private boolean containsRole( List<PlexusRoleResource> roles, String roleName )

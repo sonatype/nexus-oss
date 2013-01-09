@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus412;
 
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.testng.annotations.Test;
 
 public class Nexus412RemoteLeakIT
     extends AbstractNexusIntegrationTest

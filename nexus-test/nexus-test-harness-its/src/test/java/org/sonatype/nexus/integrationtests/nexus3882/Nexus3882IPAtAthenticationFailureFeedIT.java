@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -55,8 +55,8 @@ public class Nexus3882IPAtAthenticationFailureFeedIT
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( entries.size() >= 1, "Expected more then 1 entries, but got " + entries.size() + " - "
-            + entries );
+        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - "
+            + entries, entries.size() >= 1 );
 
         validateIP( entries );
     }

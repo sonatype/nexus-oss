@@ -14,8 +14,8 @@ package org.sonatype.nexus.integrationtests.nexus2692;
 
 import java.util.SortedSet;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class Nexus2692EvictAllTaskIT
     extends AbstractEvictTaskIt
@@ -35,14 +35,14 @@ public class Nexus2692EvictAllTaskIT
 
         // calc the diff ( files that were deleted and should not have been )
         expectedResults.removeAll( resultStorageFiles );
-        Assert.assertTrue( expectedResults.isEmpty(), "The following files were deleted and should not have been: "
-            + expectedResults );
+        Assert.assertTrue( "The following files were deleted and should not have been: "
+            + expectedResults, expectedResults.isEmpty() );
 
         // now the other way
         expectedResults = buildListOfExpectedFilesForAllRepos( days );
         resultStorageFiles.removeAll( expectedResults );
-        Assert.assertTrue( resultStorageFiles.isEmpty(), "The following files should have been deleted: "
-            + resultStorageFiles );
+        Assert.assertTrue( "The following files should have been deleted: "
+            + resultStorageFiles, resultStorageFiles.isEmpty() );
 
         // make sure we don't have any empty directories
         checkForEmptyDirectories();

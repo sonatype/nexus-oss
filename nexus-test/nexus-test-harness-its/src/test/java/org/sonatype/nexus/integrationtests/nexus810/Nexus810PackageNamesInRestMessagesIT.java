@@ -12,18 +12,21 @@
  */
 package org.sonatype.nexus.integrationtests.nexus810;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.isSuccessful;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.responseText;
 
 import java.io.IOException;
 
 import org.hamcrest.Matcher;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Checks to make sure the tasks don't have packages in the type field.
@@ -32,7 +35,7 @@ public class Nexus810PackageNamesInRestMessagesIT
     extends AbstractNexusIntegrationTest
 {
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }

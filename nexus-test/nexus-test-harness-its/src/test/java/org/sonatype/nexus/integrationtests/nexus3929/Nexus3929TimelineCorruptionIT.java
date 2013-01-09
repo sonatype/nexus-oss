@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3929;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
-import static org.testng.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,17 +21,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus3929TimelineCorruptionIT
     extends AbstractNexusIntegrationTest
 {
 
     @Override
-    @BeforeMethod( alwaysRun = true )
+    @Before
     public void oncePerClassSetUp()
         throws Exception
     {
@@ -94,6 +94,6 @@ public class Nexus3929TimelineCorruptionIT
     public void status()
         throws Exception
     {
-        assertEquals( getNexusStatusUtil().getNexusStatus().getData().getState(), "STARTED" );
+        Assert.assertEquals( "STARTED", getNexusStatusUtil().getNexusStatus().getData().getState() );
     }
 }

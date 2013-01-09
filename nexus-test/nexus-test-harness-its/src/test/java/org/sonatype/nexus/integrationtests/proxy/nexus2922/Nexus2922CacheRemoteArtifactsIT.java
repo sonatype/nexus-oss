@@ -12,21 +12,21 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus2922;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus2922CacheRemoteArtifactsIT
     extends AbstractNexusProxyIntegrationTest
@@ -45,8 +45,8 @@ public class Nexus2922CacheRemoteArtifactsIT
         SettingsMessageUtil.save( settings );
     }
     
-    @BeforeClass(alwaysRun = true)
-    public void enableSecurity(){
+    @BeforeClass
+    public static void enableSecurity(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -63,7 +63,7 @@ public class Nexus2922CacheRemoteArtifactsIT
         TestContainer.getInstance().getTestContext().setPassword("");
     }
 
-    @Test(groups = PROXY)
+    @Test @Category(PROXY.class)
     public void downloadNoPriv()
         throws IOException
     {
@@ -82,12 +82,12 @@ public class Nexus2922CacheRemoteArtifactsIT
         }
 
         File file = new File( nexusWorkDir, "storage/release-proxy-repo-1/nexus2922/artifact/1.0.0/artifact-1.0.0.jar" );
-        Assert.assertFalse( file.exists(), file.toString() );
+        Assert.assertFalse( file.toString(), file.exists() );
 
-        Assert.assertTrue( msg.contains( "401" ), msg );
+        Assert.assertTrue( msg, msg.contains( "401" ) );
     }
 
-    @Test(groups = PROXY)
+    @Test @Category(PROXY.class)
     public void downloadNoPrivFromProxy()
         throws IOException
     {
@@ -107,12 +107,12 @@ public class Nexus2922CacheRemoteArtifactsIT
 
         File file =
             new File( nexusWorkDir, "storage/nexus-test-harness-repo/nexus2922/artifact/1.0.0/artifact-1.0.0.jar" );
-        Assert.assertFalse( file.exists(), file.toString() );
+        Assert.assertFalse( file.toString(), file.exists() );
 
-        Assert.assertTrue( msg.contains( "401" ), msg );
+        Assert.assertTrue( msg, msg.contains( "401" ) );
     }
 
-    @Test(groups = PROXY)
+    @Test @Category(PROXY.class)
     public void downloadAdmin()
         throws Exception
     {
@@ -121,6 +121,6 @@ public class Nexus2922CacheRemoteArtifactsIT
         this.downloadArtifactFromRepository( REPO_RELEASE_PROXY_REPO1, GAV2, "target/downloads" );
 
         File file = new File( nexusWorkDir, "storage/release-proxy-repo-1/nexus2922/artifact/2.0.0/artifact-2.0.0.jar" );
-        Assert.assertTrue( file.exists(), file.toString() );
+        Assert.assertTrue( file.toString(), file.exists() );
     }
 }

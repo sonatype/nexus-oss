@@ -21,15 +21,15 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Tests to make sure the session is removed when the logout resource is called.
@@ -40,7 +40,7 @@ extends AbstractNexusIntegrationTest
 {
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -95,7 +95,7 @@ extends AbstractNexusIntegrationTest
         }
         
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
-        Assert.assertNotNull( sessionCookie, "Session Cookie not set" );
+        Assert.assertNotNull( "Session Cookie not set", sessionCookie );
         
         httpClient.getState().clear(); // remove cookies, credentials, etc
         
@@ -116,7 +116,7 @@ extends AbstractNexusIntegrationTest
         try
         {
             Assert.assertEquals( httpClient.executeMethod( logoutGetMethod ), 200 );
-            Assert.assertEquals( logoutGetMethod.getResponseBodyAsString(), "OK" );
+            Assert.assertEquals( "OK", logoutGetMethod.getResponseBodyAsString() );
         }
         finally
         {

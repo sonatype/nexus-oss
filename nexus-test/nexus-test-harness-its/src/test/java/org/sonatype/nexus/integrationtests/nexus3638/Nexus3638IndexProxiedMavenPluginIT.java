@@ -22,16 +22,16 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
 import org.hamcrest.MatcherAssert;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus3638IndexProxiedMavenPluginIT
     extends AbstractNexusIntegrationTest
@@ -39,7 +39,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
 
     private ControlledServer server;
 
-    @BeforeMethod
+    @Before
     public void start()
         throws Exception
     {
@@ -48,7 +48,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
         server.start();
     }
 
-    @AfterMethod
+    @After
     public void stop()
         throws Exception
     {
@@ -107,7 +107,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
         List<NexusArtifact> items =
             getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), "nexus3638" );
         Assert.assertFalse( items.isEmpty() );
-        Assert.assertEquals( "maven-plugin", items.get( 0 ).getPackaging() );
+        Assert.assertEquals( items.get( 0 ).getPackaging(), "maven-plugin" );
 
         final File nexusLog = getNexusLogFile();
 

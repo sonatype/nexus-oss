@@ -17,6 +17,8 @@ import java.io.IOException;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
@@ -27,8 +29,6 @@ import org.sonatype.nexus.rest.model.SystemNotificationSettings;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus421PlainNotificationIT
     extends AbstractEmailServerNexusIT
@@ -95,8 +95,8 @@ public class Nexus421PlainNotificationIT
         // enable notification
         notificationSettings.setEnabled( true );
 
-        Assert.assertTrue( SettingsMessageUtil.save( globalSettings ).isSuccess(),
-            "On saving global config, response should be success." );
+        Assert.assertTrue( "On saving global config, response should be success.",
+            SettingsMessageUtil.save( globalSettings ).isSuccess() );
 
         // make a proxy server to block (do it by taking central, and breaking it's remoteURL)
         RepositoryProxyResource central = (RepositoryProxyResource) repoMessageUtil.getRepository( "central" );
@@ -147,7 +147,7 @@ public class Nexus421PlainNotificationIT
 
         MimeMessage[] msgs = server.getReceivedMessages();
 
-        Assert.assertNotNull( msgs, "Messages array should not be null!" );
+        Assert.assertNotNull( "Messages array should not be null!", msgs );
 
         int blockedMails = 0;
 
@@ -167,10 +167,10 @@ public class Nexus421PlainNotificationIT
             }
         }
 
-        Assert.assertEquals( blockedMails, expectedBlockedMails, "We should have " + expectedBlockedMails
-            + " auto-blocked mails!" );
+        Assert.assertEquals( "We should have " + expectedBlockedMails
+            + " auto-blocked mails!", blockedMails, expectedBlockedMails );
 
-        Assert.assertEquals( unblockedMails, expectedUnblockedMails, "We should have " + expectedUnblockedMails
-            + " auto-UNblocked mails!" );
+        Assert.assertEquals( "We should have " + expectedUnblockedMails
+            + " auto-UNblocked mails!", unblockedMails, expectedUnblockedMails );
     }
 }

@@ -15,9 +15,9 @@ package org.sonatype.nexus.integrationtests.nexus1923;
 import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1923ProxyIncrementalDeleteIT
 extends AbstractNexus1923

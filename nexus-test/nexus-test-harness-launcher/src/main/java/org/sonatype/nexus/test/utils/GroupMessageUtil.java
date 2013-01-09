@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -25,11 +26,8 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
-import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -65,9 +63,9 @@ public class GroupMessageUtil
     public void validateResourceResponse( RepositoryGroupResource expected, RepositoryGroupResource actual )
         throws IOException
     {
-        Assert.assertEquals( expected.getId(), actual.getId() );
-        Assert.assertEquals( expected.getName(), actual.getName() );
-        Assert.assertEquals( expected.getFormat(), actual.getFormat() );
+        Assert.assertEquals( actual.getId(), expected.getId() );
+        Assert.assertEquals( actual.getName(), expected.getName() );
+        Assert.assertEquals( actual.getFormat(), expected.getFormat() );
 
         LOG.debug( "group repos: " + expected.getRepositories() );
         LOG.debug( "other repos: " + actual.getRepositories() );
@@ -85,8 +83,8 @@ public class GroupMessageUtil
     public void validateRepoLists( List<RepositoryGroupMemberRepository> expected, List<?> actual )
     {
 
-        Assert.assertEquals( actual.size(), expected.size(), "Size of groups repository list, \nexpected: " + this.repoListToStringList( expected )
-                + "\nactual: " + this.repoListToStringList( actual ) + "\n" );
+        Assert.assertEquals( "Size of groups repository list, \nexpected: " + this.repoListToStringList( expected )
+                + "\nactual: " + this.repoListToStringList( actual ) + "\n", actual.size(), expected.size() );
 
         for ( int ii = 0; ii < expected.size(); ii++ )
         {
@@ -104,7 +102,7 @@ public class GroupMessageUtil
                 actualRepoId = tmpObj.toString();
             }
 
-            Assert.assertEquals( actualRepoId, expectedRepo.getId(), "Repo Id:" );
+            Assert.assertEquals( "Repo Id:", actualRepoId, expectedRepo.getId() );
         }
     }
 
@@ -164,8 +162,8 @@ public class GroupMessageUtil
     {
         CRepository cGroup = getTest().getNexusConfigUtil().getRepo( group.getId() );
 
-        Assert.assertEquals( group.getId(), cGroup.getId() );
-        Assert.assertEquals( group.getName(), cGroup.getName() );
+        Assert.assertEquals( cGroup.getId(), group.getId() );
+        Assert.assertEquals( cGroup.getName(), group.getName() );
 
         List<RepositoryGroupMemberRepository> expectedRepos = group.getRepositories();
         List<String> actualRepos = getTest().getNexusConfigUtil().getGroup( group.getId() ).getMemberRepositoryIds();

@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.integrationtests.nexus395;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.test.utils.ForgotUsernameUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Test forgot username system. Check if nexus is sending the e-mail.

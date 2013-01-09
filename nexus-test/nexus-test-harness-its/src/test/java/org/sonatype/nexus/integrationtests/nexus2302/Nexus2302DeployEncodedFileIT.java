@@ -15,9 +15,9 @@ package org.sonatype.nexus.integrationtests.nexus2302;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +28,7 @@ import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ContentListResource;
@@ -36,7 +37,6 @@ import org.sonatype.nexus.test.utils.ContentListMessageUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 public class Nexus2302DeployEncodedFileIT
     extends AbstractNexusIntegrationTest
@@ -211,7 +211,7 @@ public class Nexus2302DeployEncodedFileIT
                 g = content;
             }
         }
-        assertNotNull( g, text + " not found" );
+        assertNotNull( text + " not found", g );
         assertThat( g.getResourceURI(), containsString( text ) );
 
         return g;
@@ -250,7 +250,7 @@ public class Nexus2302DeployEncodedFileIT
         File artifact =
             new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gav ) );
 
-        assertTrue( artifact.exists(), "File not found: " + artifact.getAbsolutePath() );
+        assertTrue( "File not found: " + artifact.getAbsolutePath(), artifact.exists() );
     }
 
     private void delete( Gav gav )

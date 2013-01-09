@@ -17,6 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -31,16 +34,13 @@ import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class Nexus1170ReducePermissionCheckingIT
     extends AbstractNexusIntegrationTest
 {
 
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

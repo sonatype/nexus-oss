@@ -12,21 +12,23 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3832;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
-import org.testng.annotations.Test;
 
+@Ignore
 public class Nexus3832GroupLocalOverRemoteContentIT
     extends AbstractNexusProxyIntegrationTest
 {
 
-    @Test( enabled = false )
+    @Test
     public void onLocalCache()
         throws Exception
     {
@@ -36,7 +38,7 @@ public class Nexus3832GroupLocalOverRemoteContentIT
         assertTrue( FileTestingUtils.compareFileSHA1s( downloaded, getTestResourceAsFile( "projects/p1/artifact.jar" ) ) );
     }
 
-    @Test( enabled = false )
+    @Test
     public void onlyRemote()
         throws Exception
     {
@@ -48,7 +50,7 @@ public class Nexus3832GroupLocalOverRemoteContentIT
         assertTrue( FileTestingUtils.compareFileSHA1s( downloaded, localFile ) );
     }
 
-    @Test( enabled = false )
+    @Test
     public void onlyLocal()
         throws Exception
     {

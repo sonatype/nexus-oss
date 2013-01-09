@@ -15,6 +15,7 @@ package org.sonatype.nexus.integrationtests.nexus3257;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
@@ -23,7 +24,6 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
-import org.testng.annotations.Test;
 
 public class Nexus3257ModifyRepoTargetIT
     extends AbstractNexusIntegrationTest

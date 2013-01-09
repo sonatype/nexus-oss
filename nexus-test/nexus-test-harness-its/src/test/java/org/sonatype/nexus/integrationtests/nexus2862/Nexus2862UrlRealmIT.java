@@ -19,6 +19,11 @@ import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 import java.io.IOException;
 
 import org.hamcrest.collection.IsEmptyCollection;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -26,11 +31,6 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 
 /**
@@ -103,7 +103,7 @@ public class Nexus2862UrlRealmIT
         Assert.assertTrue( status.isSuccess() );
     }
 
-    @AfterMethod
+    @After
     public void cleanAccessedUris()
     {
         server.getAccessedUri().clear();

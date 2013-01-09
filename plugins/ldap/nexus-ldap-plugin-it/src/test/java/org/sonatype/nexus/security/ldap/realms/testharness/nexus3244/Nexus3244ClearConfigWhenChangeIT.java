@@ -15,11 +15,13 @@ package org.sonatype.nexus.security.ldap.realms.testharness.nexus3244;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUserGroupMessageUtil;
@@ -28,9 +30,6 @@ import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -47,7 +46,7 @@ extends AbstractLdapIntegrationIT
         super();
     }
     
-    @BeforeClass
+    @Before
     public void init()
     {
         this.xstream = this.getJsonXStream();
@@ -97,7 +96,7 @@ extends AbstractLdapIntegrationIT
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
+        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
 
         PlexusUserListResourceResponse userList = (PlexusUserListResourceResponse) this.parseResponse(
             response,

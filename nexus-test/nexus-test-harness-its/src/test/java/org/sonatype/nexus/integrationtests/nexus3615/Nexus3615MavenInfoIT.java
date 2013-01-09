@@ -12,7 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3615;
 
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.hasStatusCode;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,13 +21,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
-import org.sonatype.nexus.test.utils.DeployUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -148,8 +148,8 @@ public class Nexus3615MavenInfoIT
     {
         Maven2ArtifactInfoResource data = downloadViewResource( gav, repoId );
 
-        Assert.assertEquals( gav.getArtifactId(), data.getArtifactId() );
-        Assert.assertEquals( gav.getGroupId(), data.getGroupId() );
+        Assert.assertEquals( data.getArtifactId(), gav.getArtifactId() );
+        Assert.assertEquals( data.getGroupId(), gav.getGroupId() );
 
         if ( gav.isSnapshot() && gav.getSnapshotTimeStamp() != null )
         {
@@ -159,18 +159,18 @@ public class Nexus3615MavenInfoIT
                     "SNAPSHOT",
                     new SimpleDateFormat( "yyyyMMdd.HHmmss" ).format( new Date( gav.getSnapshotTimeStamp() ) ) + "-"
                         + gav.getSnapshotBuildNumber() );
-            Assert.assertEquals( expectedVersion, data.getVersion() );
+            Assert.assertEquals( data.getVersion(), expectedVersion );
         }
         else
         {
             // non snapshot
-            Assert.assertEquals( gav.getVersion(), data.getVersion() );
+            Assert.assertEquals( data.getVersion(), gav.getVersion() );
         }
-        Assert.assertEquals( gav.getBaseVersion(), data.getBaseVersion() );
-        Assert.assertEquals( gav.getClassifier(), data.getClassifier() );
-        Assert.assertEquals( gav.getExtension(), data.getExtension() );
+        Assert.assertEquals( data.getBaseVersion(), gav.getBaseVersion() );
+        Assert.assertEquals( data.getClassifier(), gav.getClassifier() );
+        Assert.assertEquals( data.getExtension(), gav.getExtension() );
 
-        Assert.assertEquals( data.getDependencyXmlChunk(), buildExpectedDepBlock( gav ) );
+        Assert.assertEquals( buildExpectedDepBlock( gav ), data.getDependencyXmlChunk() );
     }
 
     private Maven2ArtifactInfoResource downloadViewResource( Gav gav, String repoId )

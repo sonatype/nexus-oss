@@ -12,20 +12,20 @@
  */
 package org.sonatype.nexus.integrationtests.nexus977privilege;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsPrivilegeIT
     extends AbstractPrivilegeTest

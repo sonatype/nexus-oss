@@ -19,11 +19,11 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Blocking, Exclusive, Inclusive Routes Tests
@@ -33,7 +33,7 @@ public class Nexus387RoutesIT
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -60,14 +60,14 @@ public class Nexus387RoutesIT
         Assert.assertNotNull( artifact );
 
         String line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( line, "exclusive2", "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: exclusive2" );
+        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
+            + ", expected: exclusive2", line, "exclusive2" );
 
         artifact = this.downloadArtifactFromGroup( "other-group", gav, "target/downloads/exclude" );
         Assert.assertNotNull( artifact );
 
         line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( line, "exclusive1", "Jar contained: " + line + ", expected: exclusive1" );
+        Assert.assertEquals( "Jar contained: " + line + ", expected: exclusive1", line, "exclusive1" );
 
     }
 
@@ -83,20 +83,20 @@ public class Nexus387RoutesIT
         File artifact = this.downloadArtifactFromGroup( "inclusive-single", gav, "target/downloads/include" );
 
         String line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( line, "inclusive1", "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: inclusive1" );
+        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
+            + ", expected: inclusive1", line, "inclusive1" );
 
         artifact = this.downloadArtifactFromGroup( "inclusive-group", gav, "target/downloads/include" );
 
         line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( line, "inclusive2", "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: inclusive2" );
+        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
+            + ", expected: inclusive2", line, "inclusive2" );
 
         artifact = this.downloadArtifactFromGroup( "other-group", gav, "target/downloads/include" );
 
         line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( line, "inclusive1", "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: inclusive1" );
+        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
+            + ", expected: inclusive1", line, "inclusive1" );
 
     }
 
@@ -122,8 +122,8 @@ public class Nexus387RoutesIT
         File artifact = this.downloadArtifactFromGroup( "other-group", gav, "target/downloads/blocking" );
 
         String line = this.getFirstLineOfFile( artifact );
-        Assert.assertEquals( line, "blocking1", "Jar contained: " + this.getFirstLineOfFile( artifact )
-            + ", expected: blocking1" );
+        Assert.assertEquals( "Jar contained: " + this.getFirstLineOfFile( artifact )
+            + ", expected: blocking1", line, "blocking1" );
 
     }
 

@@ -16,9 +16,9 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1329ChecksumIT
     extends AbstractMirrorIT
@@ -45,9 +45,9 @@ public class Nexus1329ChecksumIT
         File originalFile = this.getTestFile( "basic/nexus1329/sample/1.0.0/sample-1.0.0.xml" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( originalFile, artifactFile ) );
 
-        Assert.assertTrue( mirror2Urls.isEmpty(), "Nexus should not access second mirror " + mirror2Urls );
-        Assert.assertFalse( repoUrls.isEmpty(), "Nexus did not download checksum " + repoUrls );
-        Assert.assertFalse( mirror1Urls.isEmpty(), "Nexus should access first mirror " + mirror1Urls );
+        Assert.assertTrue( "Nexus should not access second mirror " + mirror2Urls, mirror2Urls.isEmpty() );
+        Assert.assertFalse( "Nexus did not download checksum " + repoUrls, repoUrls.isEmpty() );
+        Assert.assertFalse( "Nexus should access first mirror " + mirror1Urls, mirror1Urls.isEmpty() );
     }
 
 }

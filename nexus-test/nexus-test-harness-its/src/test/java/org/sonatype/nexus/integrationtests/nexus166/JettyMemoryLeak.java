@@ -23,17 +23,17 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.BlockingServer;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class JettyMemoryLeak
 {
 
     private Server server;
 
-    @BeforeMethod
+    @Before
     public void start()
         throws Exception
     {
@@ -63,7 +63,7 @@ public class JettyMemoryLeak
         server.start();
     }
 
-    @AfterTest
+    @After
     public void stop()
         throws Exception
     {

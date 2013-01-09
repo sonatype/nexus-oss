@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -26,8 +28,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledServiceBaseResource>
     extends AbstractNexusIntegrationTest
@@ -65,8 +65,8 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
         CScheduledTask task = tasks.get( 0 );
         E scheduledTask = getTaskScheduled();
 
-        Assert.assertEquals( scheduledTask.getName(), task.getName() );
-        Assert.assertEquals( scheduledTask.getTypeId(), task.getType() );
+        Assert.assertEquals( task.getName(), scheduledTask.getName() );
+        Assert.assertEquals( task.getType(), scheduledTask.getTypeId() );
     }
 
     public void updateTasks()

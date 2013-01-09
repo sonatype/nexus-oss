@@ -12,22 +12,22 @@
  */
 package org.sonatype.nexus.integrationtests.nxcm2124;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.plugin.nexus2810.AbstractPluginConsoleIT;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Originally, this IT was as it's name says, simply check for presence

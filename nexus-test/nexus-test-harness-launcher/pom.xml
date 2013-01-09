@@ -100,12 +100,6 @@
       </exclusions>
     </dependency>
 
-    <!-- Test frameworks: we use TestNG but some tests refers to JUnit annos still -->
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
@@ -140,7 +134,7 @@
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
-      <version>1.2</version>
+      <version>1.4</version>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>

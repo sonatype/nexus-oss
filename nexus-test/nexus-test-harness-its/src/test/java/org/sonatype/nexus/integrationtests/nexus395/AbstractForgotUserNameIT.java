@@ -14,8 +14,8 @@ package org.sonatype.nexus.integrationtests.nexus395;
 
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Assert;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
-import org.testng.Assert;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 
@@ -50,6 +50,6 @@ public abstract class AbstractForgotUserNameIT
             username = body.substring( usernameStartIndex, body.indexOf( '\"', usernameStartIndex ) ).trim();
         }
 
-        Assert.assertEquals( expectedUserName, username );
+        Assert.assertEquals( username, expectedUserName );
     }
 }

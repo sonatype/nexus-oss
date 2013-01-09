@@ -21,6 +21,10 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.jira.AttachmentHandler;
 import org.sonatype.jira.mock.MockAttachmentHandler;
 import org.sonatype.jira.mock.StubJira;
@@ -30,10 +34,7 @@ import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+
 import com.google.common.io.Files;
 
 public class Nexus5026GenerateProblemReportViaWebProxyIT
@@ -42,14 +43,14 @@ public class Nexus5026GenerateProblemReportViaWebProxyIT
 
     private JettyServerProvider jettyServer;
 
-    @BeforeMethod
+    @Before
     public void setupJiraMock()
         throws Exception
     {
         setupMockJira();
     }
 
-    @AfterMethod
+    @After
     public void shutdownJiraMock()
         throws Exception
     {

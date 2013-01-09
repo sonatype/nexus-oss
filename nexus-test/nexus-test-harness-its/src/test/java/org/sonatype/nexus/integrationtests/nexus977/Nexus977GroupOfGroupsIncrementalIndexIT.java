@@ -12,15 +12,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus977;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
-
 import java.io.File;
 import java.util.Properties;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import org.sonatype.nexus.integrationtests.nexus1923.AbstractNexus1923;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsIncrementalIndexIT
     extends AbstractNexus1923
@@ -40,7 +40,7 @@ public class Nexus977GroupOfGroupsIncrementalIndexIT
         return "nexus1923";
     }
 
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void validateIncrementalIndexesCreated()
         throws Exception
     {

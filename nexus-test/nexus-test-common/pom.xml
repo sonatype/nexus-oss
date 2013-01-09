@@ -57,6 +57,13 @@
       <version>1.7.1</version>
     </dependency>
 
+    <!-- @PerfTest support; http://databene.org/contiperf.html -->
+    <dependency>
+      <groupId>org.databene</groupId>
+      <artifactId>contiperf</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
     <dependency>
       <groupId>org.eclipse.jetty.orbit</groupId>
       <artifactId>javax.servlet</artifactId>

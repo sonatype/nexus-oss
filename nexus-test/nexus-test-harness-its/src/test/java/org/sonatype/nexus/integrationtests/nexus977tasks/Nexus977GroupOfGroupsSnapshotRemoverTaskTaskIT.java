@@ -20,13 +20,13 @@ import java.net.URL;
 
 import org.apache.maven.model.Model;
 import org.hamcrest.MatcherAssert;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
     extends AbstractNexusProxyIntegrationTest

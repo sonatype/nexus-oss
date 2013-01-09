@@ -14,6 +14,10 @@ package org.sonatype.nexus.integrationtests.nexus385;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -22,10 +26,6 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -39,15 +39,16 @@ public class Nexus385RoutesCrudXmlIT
     protected RoutesMessageUtil messageUtil;
 
     @BeforeClass
-    public void setSecureTest(){
-    	this.messageUtil = new RoutesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    public static void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @BeforeMethod
-    public void cleanRoutes()
+    @Before
+    public void setUp()
         throws IOException
     {
+        this.messageUtil = new RoutesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         RoutesMessageUtil.removeAllRoutes();
     }
 
@@ -96,9 +97,9 @@ public class Nexus385RoutesCrudXmlIT
 
         Assert.assertNotNull( resourceResponse.getId() );
 
-        Assert.assertEquals( resource.getGroupId(), resourceResponse.getGroupId() );
-        Assert.assertEquals( resource.getPattern(), resourceResponse.getPattern() );
-        Assert.assertEquals( resource.getRuleType(), resourceResponse.getRuleType() );
+        Assert.assertEquals( resourceResponse.getGroupId(), resource.getGroupId() );
+        Assert.assertEquals( resourceResponse.getPattern(), resource.getPattern() );
+        Assert.assertEquals( resourceResponse.getRuleType(), resource.getRuleType() );
         this.messageUtil.validateSame( resource.getRepositories(), resourceResponse.getRepositories() );
 
         // now check the nexus config
@@ -128,9 +129,9 @@ public class Nexus385RoutesCrudXmlIT
 
         Assert.assertNotNull( resourceResponse.getId() );
 
-        Assert.assertEquals( resource.getGroupId(), resourceResponse.getGroupId() );
-        Assert.assertEquals( resource.getPattern(), resourceResponse.getPattern() );
-        Assert.assertEquals( resource.getRuleType(), resourceResponse.getRuleType() );
+        Assert.assertEquals( resourceResponse.getGroupId(), resource.getGroupId() );
+        Assert.assertEquals( resourceResponse.getPattern(), resource.getPattern() );
+        Assert.assertEquals( resourceResponse.getRuleType(), resource.getRuleType() );
         this.messageUtil.validateSame( resource.getRepositories(), resourceResponse.getRepositories() );
 
         // now check the nexus config
@@ -166,9 +167,9 @@ public class Nexus385RoutesCrudXmlIT
 
         Assert.assertNotNull( resourceResponse.getId() );
 
-        Assert.assertEquals( resource.getGroupId(), resourceResponse.getGroupId() );
-        Assert.assertEquals( resource.getPattern(), resourceResponse.getPattern() );
-        Assert.assertEquals( resource.getRuleType(), resourceResponse.getRuleType() );
+        Assert.assertEquals( resourceResponse.getGroupId(), resource.getGroupId() );
+        Assert.assertEquals( resourceResponse.getPattern(), resource.getPattern() );
+        Assert.assertEquals( resourceResponse.getRuleType(), resource.getRuleType() );
         this.messageUtil.validateSame( resource.getRepositories(), resourceResponse.getRepositories() );
 
         // now check the nexus config
@@ -191,7 +192,7 @@ public class Nexus385RoutesCrudXmlIT
             Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
         }
 
-        Assert.assertTrue( getNexusConfigUtil().getRoute( resource.getId() ) == null, "Route was not deleted." );
+        Assert.assertTrue( "Route was not deleted.", getNexusConfigUtil().getRoute( resource.getId() ) == null );
 
     }
 

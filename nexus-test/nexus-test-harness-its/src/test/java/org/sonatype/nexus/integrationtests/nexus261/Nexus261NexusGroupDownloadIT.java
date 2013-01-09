@@ -12,18 +12,18 @@
  */
 package org.sonatype.nexus.integrationtests.nexus261;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Date;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Tests to make sure an artifact deployed in multiple repositories will respect the group order. 
@@ -33,7 +33,7 @@ public class Nexus261NexusGroupDownloadIT
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

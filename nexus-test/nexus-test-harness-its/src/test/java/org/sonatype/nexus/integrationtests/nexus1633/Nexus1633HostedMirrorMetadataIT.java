@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
@@ -25,8 +27,6 @@ import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1633HostedMirrorMetadataIT
     extends AbstractNexusIntegrationTest
@@ -87,9 +87,9 @@ public class Nexus1633HostedMirrorMetadataIT
         MirrorResource two = response.getData().get( 1 );
         MirrorResource three = response.getData().get( 2 );
 
-        Assert.assertEquals( "http://updateMirrorTest4", one.getUrl() );
-        Assert.assertEquals( "http://updateMirrorTest2", two.getUrl() );
-        Assert.assertEquals( "http://updateMirrorTest3", three.getUrl() );
+        Assert.assertEquals( one.getUrl(), "http://updateMirrorTest4" );
+        Assert.assertEquals( two.getUrl(), "http://updateMirrorTest2" );
+        Assert.assertEquals( three.getUrl(), "http://updateMirrorTest3" );
     }
 
     @Test
@@ -113,8 +113,8 @@ public class Nexus1633HostedMirrorMetadataIT
         MirrorResource one = response.getData().get( 0 );
         MirrorResource two = response.getData().get( 1 );
 
-        Assert.assertEquals( "http://getMirrorTest1", one.getUrl() );
-        Assert.assertEquals( "http://getMirrorTest2", two.getUrl() );
+        Assert.assertEquals( one.getUrl(), "http://getMirrorTest1" );
+        Assert.assertEquals( two.getUrl(), "http://getMirrorTest2" );
     }
 
     @Test
@@ -138,12 +138,12 @@ public class Nexus1633HostedMirrorMetadataIT
         MirrorResourceListResponse response = messageUtil.setMirrors( repositoryId, request );
 
         Assert.assertEquals( 3, response.getData().size() );
-        Assert.assertEquals( "http://updateMirrorTest1", ( response.getData().get( 0 ) ).getId() );
-        Assert.assertEquals( "http://updateMirrorTest1", ( response.getData().get( 0 ) ).getUrl() );
-        Assert.assertEquals( "http://updateMirrorTest2", ( response.getData().get( 1 ) ).getId() );
-        Assert.assertEquals( "http://updateMirrorTest2", ( response.getData().get( 1 ) ).getUrl() );
-        Assert.assertEquals( "http://updateMirrorTest3", ( response.getData().get( 2 ) ).getId() );
-        Assert.assertEquals( "http://updateMirrorTest3", ( response.getData().get( 2 ) ).getUrl() );
+        Assert.assertEquals( ( response.getData().get( 0 ) ).getId(), "http://updateMirrorTest1" );
+        Assert.assertEquals( ( response.getData().get( 0 ) ).getUrl(), "http://updateMirrorTest1" );
+        Assert.assertEquals( ( response.getData().get( 1 ) ).getId(), "http://updateMirrorTest2" );
+        Assert.assertEquals( ( response.getData().get( 1 ) ).getUrl(), "http://updateMirrorTest2" );
+        Assert.assertEquals( ( response.getData().get( 2 ) ).getId(), "http://updateMirrorTest3" );
+        Assert.assertEquals( ( response.getData().get( 2 ) ).getUrl(), "http://updateMirrorTest3" );
 
         // Now read the metadata
         File metadata =
@@ -159,18 +159,18 @@ public class Nexus1633HostedMirrorMetadataIT
             RepositoryMetadata rm = reader.read( fis );
 
             Assert.assertEquals( 3, rm.getMirrors().size() );
-            Assert.assertEquals( "http://updateMirrorTest1",
-                                 ( (RepositoryMirrorMetadata) rm.getMirrors().get( 0 ) ).getId() );
-            Assert.assertEquals( "http://updateMirrorTest1",
-                                 ( (RepositoryMirrorMetadata) rm.getMirrors().get( 0 ) ).getUrl() );
-            Assert.assertEquals( "http://updateMirrorTest2",
-                                 ( (RepositoryMirrorMetadata) rm.getMirrors().get( 1 ) ).getId() );
-            Assert.assertEquals( "http://updateMirrorTest2",
-                                 ( (RepositoryMirrorMetadata) rm.getMirrors().get( 1 ) ).getUrl() );
-            Assert.assertEquals( "http://updateMirrorTest3",
-                                 ( (RepositoryMirrorMetadata) rm.getMirrors().get( 2 ) ).getId() );
-            Assert.assertEquals( "http://updateMirrorTest3",
-                                 ( (RepositoryMirrorMetadata) rm.getMirrors().get( 2 ) ).getUrl() );
+            Assert.assertEquals( ( (RepositoryMirrorMetadata) rm.getMirrors().get( 0 ) ).getId(),
+                                 "http://updateMirrorTest1" );
+            Assert.assertEquals( ( (RepositoryMirrorMetadata) rm.getMirrors().get( 0 ) ).getUrl(),
+                                 "http://updateMirrorTest1" );
+            Assert.assertEquals( ( (RepositoryMirrorMetadata) rm.getMirrors().get( 1 ) ).getId(),
+                                 "http://updateMirrorTest2" );
+            Assert.assertEquals( ( (RepositoryMirrorMetadata) rm.getMirrors().get( 1 ) ).getUrl(),
+                                 "http://updateMirrorTest2" );
+            Assert.assertEquals( ( (RepositoryMirrorMetadata) rm.getMirrors().get( 2 ) ).getId(),
+                                 "http://updateMirrorTest3" );
+            Assert.assertEquals( ( (RepositoryMirrorMetadata) rm.getMirrors().get( 2 ) ).getUrl(),
+                                 "http://updateMirrorTest3" );
         }
         finally
         {
