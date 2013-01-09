@@ -3,17 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.spice</groupId>
-    <artifactId>spice-parent</artifactId>
-    <version>19</version>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>30</version>
+    <relativePath/>
   </parent>
 
   <groupId>org.sonatype.sisu</groupId>
   <artifactId>sisu-ehcache</artifactId>
   <version>1.2-SNAPSHOT</version>
-
-  <name>SISU EHCache Component</name>
-  <description>SISU EHCache Component</description>
 
   <url>https://github.com/sonatype/sisu-ehcache</url>
 
@@ -23,63 +21,45 @@
     <developerConnection>scm:git:git@github.com:sonatype/sisu-ehcache.git</developerConnection>
   </scm>
 
-  <properties>
-    <ehcache.version>2.5.1</ehcache.version>
-  </properties>
-
   <dependencies>
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.5.1</version>
+    </dependency>
 
-    <!-- AppContext as one of the few "real" dependencies -->
     <dependency>
       <groupId>org.sonatype.appcontext</groupId>
       <artifactId>appcontext</artifactId>
       <version>3.1</version>
-      <scope>compile</scope>
     </dependency>
 
-    <!-- Actual dependencies -->
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <version>${ehcache.version}</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <!-- EHCache uses this for logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <version>1.7.2</version>
     </dependency>
 
-    <!-- SISU, needed if you use this library as a SISU component -->
-    <!-- Then you will have to add this to SISUized enviornment anyway -->
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
-      <scope>provided</scope>
+      <optional>true</optional>
+      <version>1</version>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-bean</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-guice</artifactId>
-      <classifier>no_aop</classifier>
+      <version>2.3.2</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Test stuff -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <version>1.5</version>
+      <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>
-
   </dependencies>
   
 </project>
