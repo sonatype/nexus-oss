@@ -739,7 +739,7 @@ public abstract class AbstractProxyRepository
         {
             if ( cause.getCause() instanceof SSLPeerUnverifiedException )
             {
-                return "untrusted remote";
+                return "Untrusted Remote";
             }
             if ( cause.getCause() instanceof SSLException )
             {
