@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.integrationtests.nexus586;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Saving the Nexus config needs to validate the anonymous user information

@@ -12,17 +12,17 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus262;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
-
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 
 /**
@@ -36,12 +36,12 @@ public class Nexus262SimpleProxyIT extends AbstractNexusProxyIntegrationTest
         super( "release-proxy-repo-1" );
     }
     
-    @BeforeClass(alwaysRun = true)
-    public void setSecureTest(){
+    @BeforeClass
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
-    @Test(groups = PROXY)
+    @Test @Category(PROXY.class)
     public void downloadFromProxy() throws IOException
     {
         File localFile = this.getLocalFile( "release-proxy-repo-1", "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml" );

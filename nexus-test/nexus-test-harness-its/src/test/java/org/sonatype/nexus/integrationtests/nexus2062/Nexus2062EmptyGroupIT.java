@@ -13,13 +13,13 @@
 package org.sonatype.nexus.integrationtests.nexus2062;
 
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus2062EmptyGroupIT
     extends AbstractNexusIntegrationTest

@@ -12,19 +12,19 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus177;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Create three repositories, deploys a different artifact with the same name in each repo. Add each repo to a group
@@ -41,12 +41,12 @@ public class Nexus177OutOfServiceIT
         super( TEST_RELEASE_REPO );
     }
     
-    @BeforeClass(alwaysRun = true)
-    public void setSecureTest(){
+    @BeforeClass
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test(groups = PROXY)
+    @Test @Category(PROXY.class)
     public void outOfServiceTest()
         throws Exception
     {

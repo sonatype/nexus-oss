@@ -18,14 +18,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.security.ldap.realms.api.LdapXStreamConfigurator;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -42,7 +42,7 @@ public abstract class AbstractLdapIntegrationIT
     }
 
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -90,7 +90,7 @@ public abstract class AbstractLdapIntegrationIT
         return this.ldapServer.getPort();
     }
 
-    @BeforeMethod
+    @Before
     public void beforeLdapTests()
         throws Exception
     {
@@ -111,7 +111,7 @@ public abstract class AbstractLdapIntegrationIT
         return lookup( LdapServer.class );
     }
 
-    @AfterMethod
+    @After
     public void afterLdapTests()
         throws Exception
     {

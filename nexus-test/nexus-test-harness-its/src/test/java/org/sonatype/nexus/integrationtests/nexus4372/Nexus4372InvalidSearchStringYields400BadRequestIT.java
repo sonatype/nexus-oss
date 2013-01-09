@@ -22,13 +22,13 @@ import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
-import org.testng.annotations.Test;
 
 public class Nexus4372InvalidSearchStringYields400BadRequestIT
     extends AbstractNexusIntegrationTest

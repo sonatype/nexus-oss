@@ -12,12 +12,13 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -33,7 +34,6 @@ import org.sonatype.security.rest.model.PlexusUserResourceResponse;
 import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 public class UserMessageUtil
@@ -68,15 +68,15 @@ public class UserMessageUtil
         UserResource responseResource = this.getResourceFromResponse( response );
 
         // make sure the id != null
-        Assert.assertNotNull( responseResource.getUserId(), "User ID shouldn't be null: "
-            + response.getEntity().getText() );
+        Assert.assertNotNull( "User ID shouldn't be null: "
+            + response.getEntity().getText(), responseResource.getUserId() );
         user.setUserId( responseResource.getUserId() );
 
-        Assert.assertEquals( user.getFirstName(), responseResource.getFirstName() );
-        Assert.assertEquals( user.getLastName(), responseResource.getLastName() );
-        Assert.assertEquals( user.getUserId(), responseResource.getUserId() );
-        Assert.assertEquals( user.getStatus(), responseResource.getStatus() );
-        Assert.assertEquals( user.getEmail(), responseResource.getEmail() );
+        Assert.assertEquals( responseResource.getFirstName(), user.getFirstName() );
+        Assert.assertEquals( responseResource.getLastName(), user.getLastName() );
+        Assert.assertEquals( responseResource.getUserId(), user.getUserId() );
+        Assert.assertEquals( responseResource.getStatus(), user.getStatus() );
+        Assert.assertEquals( responseResource.getEmail(), user.getEmail() );
         Assert.assertEquals( user.getRoles(), responseResource.getRoles() );
 
         getTest().getSecurityConfigUtil().verifyUser( user );
@@ -114,11 +114,11 @@ public class UserMessageUtil
 
         // make sure the id != null
 
-        Assert.assertEquals( user.getFirstName(), responseResource.getFirstName() );
-        Assert.assertEquals( user.getLastName(), responseResource.getLastName() );
-        Assert.assertEquals( user.getUserId(), responseResource.getUserId() );
-        Assert.assertEquals( user.getStatus(), responseResource.getStatus() );
-        Assert.assertEquals( user.getEmail(), responseResource.getEmail() );
+        Assert.assertEquals( responseResource.getFirstName(), user.getFirstName() );
+        Assert.assertEquals( responseResource.getLastName(), user.getLastName() );
+        Assert.assertEquals( responseResource.getUserId(), user.getUserId() );
+        Assert.assertEquals( responseResource.getStatus(), user.getStatus() );
+        Assert.assertEquals( responseResource.getEmail(), user.getEmail() );
         Assert.assertEquals( user.getRoles(), responseResource.getRoles() );
 
         getTest().getSecurityConfigUtil().verifyUser( user );

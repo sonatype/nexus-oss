@@ -15,13 +15,13 @@ package org.sonatype.nexus.integrationtests.nexus383;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Test the privilege for search operations.
@@ -30,7 +30,7 @@ public class Nexus383SearchPermissionIT
     extends AbstractPrivilegeTest
 {
     @BeforeClass
-    public void setSecureTest()
+    public static void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }

@@ -12,14 +12,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3039;
 
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.annotations.Test;
 
 public class Nexus3039IndexTreeIT
     extends AbstractNexusIntegrationTest

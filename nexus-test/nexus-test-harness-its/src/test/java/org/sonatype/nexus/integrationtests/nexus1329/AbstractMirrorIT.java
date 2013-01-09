@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1329;
 
+import org.junit.After;
+import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 
 public abstract class AbstractMirrorIT
     extends AbstractNexusIntegrationTest
@@ -43,14 +43,14 @@ public abstract class AbstractMirrorIT
         this.messageUtil = new MirrorMessageUtils( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
-    @BeforeMethod
+    @Before
     public void start()
         throws Exception
     {
         server = lookup( ControlledServer.class );
     }
 
-    @AfterMethod
+    @After
     public void stop()
         throws Exception
     {

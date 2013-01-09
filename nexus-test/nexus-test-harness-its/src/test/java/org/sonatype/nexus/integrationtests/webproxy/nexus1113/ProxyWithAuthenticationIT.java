@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1113;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -24,19 +22,21 @@ import java.net.URLConnection;
 import java.util.List;
 
 import org.codehaus.plexus.util.Base64;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class ProxyWithAuthenticationIT
     extends AbstractNexusWebProxyIntegrationTest
 {
 
     @Override
-    @BeforeMethod( alwaysRun = true )
+    @Before
     public void startWebProxy()
         throws Exception
     {
@@ -48,7 +48,7 @@ public class ProxyWithAuthenticationIT
         server.getProxyServlet().getAuthentications().put( "admin", "123" );
     }
 
-    @Test( groups = PROXY )
+    @Test @Category(PROXY.class)
     public void validUser()
         throws Exception
     {
@@ -79,7 +79,8 @@ public class ProxyWithAuthenticationIT
         Assert.fail( "Proxy was not able to access google.com" );
     }
 
-    @Test( groups = PROXY, expectedExceptions = IOException.class )
+    @Test( expected = IOException.class )
+    @Category( PROXY.class )
     public void invalidUser()
         throws Exception
     {
@@ -96,7 +97,8 @@ public class ProxyWithAuthenticationIT
         Assert.fail( "Proxy was not able to access google.com" );
     }
 
-    @Test( groups = PROXY, expectedExceptions = IOException.class )
+    @Test( expected = IOException.class )
+    @Category( PROXY.class )
     public void withoutUser()
         throws Exception
     {
@@ -112,7 +114,7 @@ public class ProxyWithAuthenticationIT
     }
 
     @Override
-    @AfterMethod( alwaysRun = true )
+    @After
     public void stopWebProxy()
         throws Exception
     {

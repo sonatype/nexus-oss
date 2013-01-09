@@ -35,6 +35,9 @@ import java.util.regex.Pattern;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
@@ -44,9 +47,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -62,8 +62,8 @@ public class AbstractEvictTaskIt
 
     private File storageWorkDir;
 
-    @BeforeClass( alwaysRun = true )
-    public void trickNexusToUseLegacyAttributes()
+    @BeforeClass
+    public static void trickNexusToUseLegacyAttributes()
         throws Exception
     {
         final File legacyAttributes = new File(new File( nexusWorkDir ), "proxy/attributes" );
@@ -75,7 +75,7 @@ public class AbstractEvictTaskIt
         System.setProperty( "org.sonatype.nexus.proxy.attributes.upgrade.AttributesUpgradeEventInspector.upgrade", Boolean.FALSE.toString() );
     }
 
-    @BeforeMethod
+    @Before
     public void setupStorageAndAttributes()
         throws Exception
     {
@@ -286,7 +286,7 @@ public class AbstractEvictTaskIt
             }
         }
 
-        Assert.assertTrue( emptyDirectories.size() == 0, "Found empty directories: " + emptyDirectories );
+        Assert.assertTrue( "Found empty directories: " + emptyDirectories, emptyDirectories.size() == 0 );
     }
 
     protected String prettyList( Set<String> list )

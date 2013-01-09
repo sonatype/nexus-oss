@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1506;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1506NonProxyHostIT
 extends AbstractNexusIntegrationTest
@@ -41,8 +41,8 @@ extends AbstractNexusIntegrationTest
         Assert.assertEquals( 2, settings.getGlobalHttpProxySettings().getNonProxyHosts().size() );
         
         CRemoteHttpProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getGlobalHttpProxySettings();
-        Assert.assertEquals( "foo", proxySettings.getNonProxyHosts().get( 0 ) );
-        Assert.assertEquals( "bar", proxySettings.getNonProxyHosts().get( 1 ) );
+        Assert.assertEquals( proxySettings.getNonProxyHosts().get( 0 ), "foo" );
+        Assert.assertEquals( proxySettings.getNonProxyHosts().get( 1 ), "bar" );
         Assert.assertEquals( 2, proxySettings.getNonProxyHosts().size() );
     }
     
@@ -65,7 +65,7 @@ extends AbstractNexusIntegrationTest
         Assert.assertEquals( 1, settings.getGlobalHttpProxySettings().getNonProxyHosts().size() );
         
         CRemoteHttpProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getGlobalHttpProxySettings();
-        Assert.assertEquals( "foo", proxySettings.getNonProxyHosts().get( 0 ) );
+        Assert.assertEquals( proxySettings.getNonProxyHosts().get( 0 ), "foo" );
         Assert.assertEquals( 1, proxySettings.getNonProxyHosts().size() );
     }
     

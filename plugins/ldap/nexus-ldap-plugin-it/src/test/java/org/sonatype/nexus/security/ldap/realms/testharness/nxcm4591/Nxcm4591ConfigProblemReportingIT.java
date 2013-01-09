@@ -15,7 +15,6 @@ package org.sonatype.nexus.security.ldap.realms.testharness.nxcm4591;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.ByteArrayInputStream;
@@ -27,9 +26,10 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
 import org.codehaus.swizzle.jira.Attachment;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.jira.AttachmentHandler;
 import org.sonatype.jira.mock.MockAttachmentHandler;
 import org.sonatype.jira.mock.StubJira;
@@ -39,9 +39,9 @@ import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrati
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 
 /**
  * Verifies that ldap.xml is included in problem report bundles.
@@ -54,7 +54,7 @@ public class Nxcm4591ConfigProblemReportingIT
 
     private StubJira jira;
 
-    @BeforeMethod
+    @Before
     public void setupJiraMock()
         throws Exception
     {
@@ -80,7 +80,7 @@ public class Nxcm4591ConfigProblemReportingIT
         server.start();
     }
 
-    @AfterMethod
+    @After
     public void shutdownJiraMock()
         throws Exception
     {

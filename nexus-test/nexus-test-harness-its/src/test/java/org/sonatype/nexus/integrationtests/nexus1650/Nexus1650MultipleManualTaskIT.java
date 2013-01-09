@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
@@ -32,9 +34,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus1650MultipleManualTaskIT
     extends AbstractNexusIntegrationTest
@@ -55,7 +54,7 @@ public class Nexus1650MultipleManualTaskIT
         super( "nexus-test-harness-snapshot-repo" );
     }
 
-    @BeforeMethod
+    @Before
     public void deploySnapshotArtifacts()
         throws Exception
     {

@@ -19,24 +19,24 @@ import java.net.URL;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus1560LegacyAllowRulesIT
     extends AbstractLegacyRulesIT
 {
 	
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @BeforeMethod
+    @Before
     public void init()
         throws Exception
     {
@@ -68,7 +68,7 @@ public class Nexus1560LegacyAllowRulesIT
         download( downloadUrl, ResponseMatchers.respondsWithStatusCode( 403 ) );
     }
 
-    @Test( expectedExceptions = FileNotFoundException.class )
+    @Test( expected = FileNotFoundException.class )
     public void checkMetadataOnGroup()
         throws Exception
     {
@@ -93,7 +93,7 @@ public class Nexus1560LegacyAllowRulesIT
         Xpp3Dom[] versions = dom.getChild( "versioning" ).getChild( "versions" ).getChildren( "version" );
         for ( Xpp3Dom version : versions )
         {
-            Assert.assertEquals( version.getValue(), "1.0", "Invalid version available on metadata" + dom.toString() );
+            Assert.assertEquals( "Invalid version available on metadata" + dom.toString(), version.getValue(), "1.0" );
         }
     }
 

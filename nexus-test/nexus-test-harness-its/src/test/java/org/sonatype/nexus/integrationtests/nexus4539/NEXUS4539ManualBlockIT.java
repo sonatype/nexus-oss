@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4539;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * while a proxy is auto-blocked move the proxy repository state to manually blocked. make sure it is still manually
@@ -25,7 +25,7 @@ public class NEXUS4539ManualBlockIT
     extends AutoBlockITSupport
 {
 
-    @BeforeMethod
+    @Before
     public void setTimeout()
     {
         super.sleepTime = 100;

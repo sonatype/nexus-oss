@@ -21,11 +21,11 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.wagon.TransferFailedException;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 
 /**
@@ -42,7 +42,7 @@ public class Nexus168SnapshotToReleaseIT
         super( TEST_RELEASE_REPO );
     }
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -114,7 +114,7 @@ public class Nexus168SnapshotToReleaseIT
             fileWasUploaded = false;
         }
         
-        Assert.assertFalse( fileWasUploaded, "The file was uploaded and it should not have been." );
+        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
     }
     
     
@@ -157,7 +157,7 @@ public class Nexus168SnapshotToReleaseIT
             fileWasUploaded = false;
         }
         
-        Assert.assertFalse( fileWasUploaded, "The file was uploaded and it should not have been." );
+        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
 
     }
     

@@ -12,17 +12,17 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1071;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
-
 import java.io.File;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
+import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * @author Juven Xu
@@ -30,12 +30,12 @@ import org.testng.annotations.Test;
 public class Nexus1071DeployToRepoAnonCannotAccessIT
     extends AbstractMavenNexusIT
 {
-    @BeforeClass(alwaysRun = true)
-    public void setSecureTest(){
+    @BeforeClass
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test(groups = SECURITY)
+    @Test @Category(SECURITY.class)
     public void deployRepeatly()
         throws Exception
     {
@@ -73,7 +73,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
         }
     }
 
-    @Test(groups = SECURITY)
+    @Test @Category(SECURITY.class)
     public void deploySnapshot()
         throws Exception
     {
@@ -98,7 +98,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
         }
     }
 
-    @Test(groups = SECURITY)
+    @Test @Category(SECURITY.class)
     public void deployToAnotherRepo()
         throws Exception
     {
@@ -122,7 +122,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
         }
     }
 
-    @Test(groups = SECURITY)
+    @Test @Category(SECURITY.class)
     public void anonDeploy()
         throws Exception
     {

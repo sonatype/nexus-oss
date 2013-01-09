@@ -12,14 +12,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4635upgrade;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResource;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * placing old config to force upgrade and firing up Nexus.<BR>
@@ -35,7 +35,7 @@ public class Nexus4635FullUpgradeIT
     extends AbstractNexusIntegrationTest
 {
     @BeforeClass
-    protected void disableSecurity()
+    public static void disableSecurity()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( false );
     }

@@ -20,11 +20,10 @@ import static org.sonatype.nexus.test.utils.FileTestingUtils.createSHA1FromFile;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.nexus.integrationtests.ITGroups;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * This test ensures that the commons-httpclient (v3) and httpclient v4 remote storage implementations
@@ -40,7 +39,7 @@ public class Nexus4780NonProxyHostsRemoteStorage
     /**
      * Retrieve two artifacts from a proxy repo set up with the httpclient v3 remote storage.
      */
-    @Test( groups = ITGroups.PROXY )
+    @Test @Category( PROXY.class )
     public void apache3xDownloadArtifactNonProxyHost()
         throws Exception
     {
@@ -50,7 +49,7 @@ public class Nexus4780NonProxyHostsRemoteStorage
     /**
      * Retrieve artifacts from a proxy repo set up with the httpclient v4 remote storage.
      */
-    @Test( groups = ITGroups.PROXY )
+    @Test @Category( PROXY.class )
     public void apache4xDownloadArtifactNonProxyHost()
         throws Exception
     {

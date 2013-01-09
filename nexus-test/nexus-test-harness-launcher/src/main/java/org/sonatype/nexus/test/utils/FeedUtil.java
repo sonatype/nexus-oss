@@ -19,10 +19,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
+import org.junit.Assert;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.testng.Assert;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -43,7 +43,7 @@ public class FeedUtil
             RequestFacade.sendMessage( FEED_URL_PART + feedId + "?_dc=" + System.currentTimeMillis(), Method.GET );
 
         String text = response.getEntity().getText();
-        Assert.assertTrue( response.getStatus().isSuccess(), "Unexpected content: " + text );
+        Assert.assertTrue( "Unexpected content: " + text, response.getStatus().isSuccess() );
 
         SyndFeed feed = input.build( new XmlReader( new ByteArrayInputStream( text.getBytes() ) ) );
         return feed;
@@ -59,7 +59,7 @@ public class FeedUtil
                 + "&count=" + count, Method.GET );
 
         String text = response.getEntity().getText();
-        Assert.assertTrue( response.getStatus().isSuccess(), "Unexpected content: " + text );
+        Assert.assertTrue( "Unexpected content: " + text, response.getStatus().isSuccess() );
 
         SyndFeed feed = input.build( new XmlReader( new ByteArrayInputStream( text.getBytes() ) ) );
         return feed;

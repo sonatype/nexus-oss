@@ -12,19 +12,20 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus635;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.compareFileSHA1s;
 
 import java.io.File;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Tests the expire cache task.
@@ -49,7 +50,7 @@ public class Nexus635ExpireCacheTaskIT
         MavenDeployer.deployAndGetVerifier( GAV, repositoryUrl, fileToDeploy, null );
     }
 
-    @Test(groups = PROXY)
+    @Test @Category( PROXY.class )
     public void expireCacheTask()
         throws Exception
     {
@@ -62,14 +63,14 @@ public class Nexus635ExpireCacheTaskIT
         addSnapshotArtifactToProxy( artifact1 );
 
         File firstDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
-        Assert.assertTrue( compareFileSHA1s( firstDownload, artifact1 ), //
-                           "First time, should download artifact 1" );
+        Assert.assertTrue( "First time, should download artifact 1", //
+                           compareFileSHA1s( firstDownload, artifact1 ) );
 
         File artifact2 = getTestFile( "artifact-2.jar" );
         addSnapshotArtifactToProxy( artifact2 );
         File secondDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
-        Assert.assertTrue( compareFileSHA1s( secondDownload, artifact1 ),//
-                           "Before ExpireCache should download artifact 1" );
+        Assert.assertTrue( "Before ExpireCache should download artifact 1",//
+                           compareFileSHA1s( secondDownload, artifact1 ) );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryId" );
@@ -83,8 +84,8 @@ public class Nexus635ExpireCacheTaskIT
         TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
         
         File thirdDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
-        Assert.assertTrue( compareFileSHA1s( thirdDownload, artifact2 ), //
-                           "After ExpireCache should download artifact 2" );
+        Assert.assertTrue( "After ExpireCache should download artifact 2", //
+                           compareFileSHA1s( thirdDownload, artifact2 ) );
     }
 
 }

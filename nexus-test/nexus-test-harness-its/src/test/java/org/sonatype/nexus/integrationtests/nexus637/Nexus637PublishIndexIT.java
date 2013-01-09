@@ -12,18 +12,20 @@
  */
 package org.sonatype.nexus.integrationtests.nexus637;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+
 import java.io.File;
 import java.util.Arrays;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Test task Publish Indexes is working.
@@ -71,6 +73,6 @@ public class Nexus637PublishIndexIT
 
         TaskScheduleUtil.runTask( PublishIndexesTaskDescriptor.ID, prop );
 
-        Assert.assertTrue( index.exists(), ".index should exists after publish index task was run." );
+        Assert.assertTrue( ".index should exists after publish index task was run.", index.exists() );
     }
 }

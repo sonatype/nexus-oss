@@ -29,6 +29,7 @@ import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
@@ -50,7 +51,6 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 

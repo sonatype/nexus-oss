@@ -23,16 +23,16 @@ import java.io.IOException;
 
 import javax.mail.internet.MimeMessage;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.test.utils.EmailUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
@@ -48,7 +48,7 @@ public class Nexus1806ValidateSmtpConfigurationIT
 
     private GreenMail originalServer;
 
-    @BeforeClass
+    @Before
     public void init()
     {
         port = TestProperties.getInteger( "webproxy-server-port" );
@@ -140,17 +140,17 @@ public class Nexus1806ValidateSmtpConfigurationIT
         MimeMessage msg = msgs[0];
         String body = GreenMailUtil.getBody( msg );
 
-        Assert.assertNotNull( "Missing message", body );
-        Assert.assertFalse( body.trim().length() == 0, "Got empty message" );
+        Assert.assertNotNull( body, "Missing message" );
+        Assert.assertFalse( "Got empty message", body.trim().length() == 0 );
     }
 
-    @AfterClass( alwaysRun = true )
+    @After
     public void stop()
     {
         if ( originalServer != null )
         {
-            originalServer.stop();
-            
+            EmailUtil.stopEmailServer();
+
             originalServer = null;
         }
         if ( changedServer != null )

@@ -12,26 +12,26 @@
  */
 package org.sonatype.nexus.integrationtests.nexus507;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.security.rest.model.RoleResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class Nexus507UserTimeoutIT
     extends AbstractPrivilegeTest
 {
 
-    @BeforeMethod
+    @Before
     public void reduceAdminRoleTimeout()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         RoleResource role = roleUtil.getRole( "test-admin" );
-        Assert.assertNotNull( role, "Invalid test-admin role timeout");
+        Assert.assertNotNull( "Invalid test-admin role timeout", role);
     }
 
     @Test

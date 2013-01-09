@@ -12,20 +12,20 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1101;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
-
 import java.io.File;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1101NexusOverWebproxyIT
     extends AbstractNexusWebProxyIntegrationTest
 {
 
-    @Test(groups = PROXY)
+    @Test @Category( PROXY.class )
     public void downloadArtifactOverWebProxy()
         throws Exception
     {
@@ -38,7 +38,7 @@ public class Nexus1101NexusOverWebproxyIT
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( jarArtifact, jarFile ) );
 
         String artifactUrl = baseProxyURL + "release-proxy-repo-1/nexus1101/artifact/1.0/artifact-1.0.jar";
-        Assert.assertTrue( server.getAccessedUris().contains( artifactUrl ), "Proxy was not accessed" );
+        Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
     }
 
 }

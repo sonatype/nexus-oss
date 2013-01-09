@@ -15,8 +15,8 @@ package org.sonatype.nexus.integrationtests.nexus634;
 import java.io.File;
 import java.util.Collection;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test SnapshotRemoverTask to remove old artifacts but keep updated artifacts
@@ -35,7 +35,7 @@ public class Nexus634KeepTwoSnapshotsIT
         runSnapshotRemover( "nexus-test-harness-snapshot-repo", 2, 0, true );
 
         Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
-        Assert.assertEquals( jars.size(), 2, "SnapshotRemoverTask should remove only old artifacts" );
+        Assert.assertEquals( "SnapshotRemoverTask should remove only old artifacts", jars.size(), 2 );
     }
 
 }

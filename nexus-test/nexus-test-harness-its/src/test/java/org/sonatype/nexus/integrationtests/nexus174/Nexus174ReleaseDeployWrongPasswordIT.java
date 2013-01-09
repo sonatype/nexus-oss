@@ -12,19 +12,19 @@
  */
 package org.sonatype.nexus.integrationtests.nexus174;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
-
 import java.io.File;
 import java.util.Date;
 
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.MavenDeployer;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Test deploying artifacts using the wrong password. (expected to fail)
@@ -40,12 +40,12 @@ public class Nexus174ReleaseDeployWrongPasswordIT
         super( TEST_RELEASE_REPO );
     }
     
-    @BeforeClass(alwaysRun = true)
-    public void setSecureTest(){
+    @BeforeClass
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test(groups = SECURITY)
+    @Test @Category(SECURITY.class)
     public void deployWithMaven()
         throws Exception
     {

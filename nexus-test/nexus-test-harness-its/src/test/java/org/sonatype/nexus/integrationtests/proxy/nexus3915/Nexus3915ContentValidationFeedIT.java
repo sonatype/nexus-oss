@@ -20,15 +20,15 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -39,7 +39,7 @@ public class Nexus3915ContentValidationFeedIT
 
     private Gav gav;
 
-    @BeforeMethod
+    @Before
     public void createGAV()
     {
         gav = GavUtil.newGav( "nexus3915", "artifact", "1.0.0" );
@@ -70,9 +70,9 @@ public class Nexus3915ContentValidationFeedIT
         }
 
         File file = new File( nexusWorkDir, "storage/release-proxy-repo-1/nexus2922/artifact/1.0.0/artifact-1.0.0.jar" );
-        Assert.assertFalse( file.exists(), file.toString() );
+        Assert.assertFalse( file.toString(), file.exists() );
 
-        Assert.assertTrue( msg.contains( "404" ), msg );
+        Assert.assertTrue( msg, msg.contains( "404" ) );
 
         // brokenFiles feed is a asynchronous event, so need to wait async event to finish running
         getEventInspectorsUtil().waitForCalmPeriod();
@@ -82,8 +82,8 @@ public class Nexus3915ContentValidationFeedIT
         @SuppressWarnings( "unchecked" )
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( entries.size() >= 1, "Expected more then 1 entries, but got " + entries.size() + " - "
-            + entries );
+        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - "
+            + entries, entries.size() >= 1 );
 
         validateContent( entries );
 

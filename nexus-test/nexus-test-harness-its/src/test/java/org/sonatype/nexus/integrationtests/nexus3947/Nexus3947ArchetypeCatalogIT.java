@@ -16,13 +16,13 @@ import java.net.URL;
 
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Reader;
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus3947ArchetypeCatalogIT
     extends AbstractNexusIntegrationTest
@@ -52,7 +52,7 @@ public class Nexus3947ArchetypeCatalogIT
         int httpResponseCode =
             getDeployUtils().deployUsingPomWithRest( getTestRepositoryId(), getTestFile( "simple-archetype2.jar" ),
                 getTestFile( "simple-archetype2.pom" ), null, null );
-        Assert.assertTrue( Status.isSuccess( httpResponseCode ), "Unable to deploy artifact " + httpResponseCode );
+        Assert.assertTrue( "Unable to deploy artifact " + httpResponseCode, Status.isSuccess( httpResponseCode ) );
         
         // wait
         getEventInspectorsUtil().waitForCalmPeriod();

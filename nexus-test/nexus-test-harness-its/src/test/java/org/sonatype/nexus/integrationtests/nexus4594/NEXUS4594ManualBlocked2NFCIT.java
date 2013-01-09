@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4594;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 public class NEXUS4594ManualBlocked2NFCIT
     extends Blocked2NFCITSupport

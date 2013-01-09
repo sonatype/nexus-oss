@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -28,9 +32,6 @@ import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * CRUD tests for XML request/response.
@@ -42,9 +43,15 @@ public class Nexus233PrivilegesCrudXMLIT
     protected PrivilegesMessageUtil messageUtil;
 
     @BeforeClass
-    public void setSecureTest(){
-    	this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    public static void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+
+    @Before
+    public void setUp()
+    {
+        this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -69,13 +76,13 @@ public class Nexus233PrivilegesCrudXMLIT
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "createReadMethodTest - (read)" ); // ' - (read)' is
+        Assert.assertEquals( "read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "createReadMethodTest - (read)", statusResources.get( 0 ).getName() ); // ' - (read)' is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         getSecurityConfigUtil().verifyPrivileges( statusResources );
     }
@@ -102,14 +109,14 @@ public class Nexus233PrivilegesCrudXMLIT
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "create,read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "createCreateMethodTest - (create)" ); // ' - (read)'
+        Assert.assertEquals( "create,read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "createCreateMethodTest - (create)", statusResources.get( 0 ).getName() ); // ' - (read)'
         // is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         getSecurityConfigUtil().verifyPrivileges( statusResources );
     }
@@ -136,14 +143,14 @@ public class Nexus233PrivilegesCrudXMLIT
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "update,read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "createUpdateMethodTest - (update)" ); // ' - (read)'
+        Assert.assertEquals( "update,read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "createUpdateMethodTest - (update)", statusResources.get( 0 ).getName() ); // ' - (read)'
         // is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         getSecurityConfigUtil().verifyPrivileges( statusResources );
     }
@@ -170,14 +177,14 @@ public class Nexus233PrivilegesCrudXMLIT
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "delete,read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "createDeleteMethodTest - (delete)" ); // ' - (read)'
+        Assert.assertEquals( "delete,read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "createDeleteMethodTest - (delete)", statusResources.get( 0 ).getName() ); // ' - (read)'
         // is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         getSecurityConfigUtil().verifyPrivileges( statusResources );
     }
@@ -206,39 +213,39 @@ public class Nexus233PrivilegesCrudXMLIT
 
         PrivilegeStatusResource createPriv = this.getPrivilegeByMethod( "create,read", statusResources );
         Assert.assertNotNull( createPriv.getId() );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( createPriv,
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "create,read" );
-        Assert.assertEquals( createPriv.getName(), "createAllMethodTest - (create)" );
-        Assert.assertEquals( createPriv.getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( createPriv,
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( "create,read", getSecurityConfigUtil().getPrivilegeProperty( createPriv,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "createAllMethodTest - (create)", createPriv.getName() );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, createPriv.getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( createPriv,
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         PrivilegeStatusResource readPriv = this.getPrivilegeByMethod( "read", statusResources );
         Assert.assertNotNull( readPriv.getId() );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( readPriv,
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "read" );
-        Assert.assertEquals( readPriv.getName(), "createAllMethodTest - (read)" );
-        Assert.assertEquals( readPriv.getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( readPriv,
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( "read", getSecurityConfigUtil().getPrivilegeProperty( readPriv,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "createAllMethodTest - (read)", readPriv.getName() );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, readPriv.getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( readPriv,
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         PrivilegeStatusResource updatePriv = this.getPrivilegeByMethod( "update,read", statusResources );
         Assert.assertNotNull( updatePriv.getId() );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( updatePriv,
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "update,read" );
-        Assert.assertEquals( updatePriv.getName(), "createAllMethodTest - (update)" );
-        Assert.assertEquals( updatePriv.getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( updatePriv,
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( "update,read", getSecurityConfigUtil().getPrivilegeProperty( updatePriv,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "createAllMethodTest - (update)", updatePriv.getName() );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, updatePriv.getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( updatePriv,
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         PrivilegeStatusResource deletePriv = this.getPrivilegeByMethod( "delete,read", statusResources );
         Assert.assertNotNull( deletePriv.getId() );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( deletePriv,
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "delete,read" );
-        Assert.assertEquals( deletePriv.getName(), "createAllMethodTest - (delete)" );
-        Assert.assertEquals( deletePriv.getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( deletePriv,
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( "delete,read", getSecurityConfigUtil().getPrivilegeProperty( deletePriv,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "createAllMethodTest - (delete)", deletePriv.getName() );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, deletePriv.getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( deletePriv,
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         getSecurityConfigUtil().verifyPrivileges( statusResources );
     }
@@ -282,13 +289,13 @@ public class Nexus233PrivilegesCrudXMLIT
 
         String readPrivId = statusResources.get( 0 ).getId();
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "readTest - (read)" ); // ' - (read)' is automatically
+        Assert.assertEquals( "read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "readTest - (read)", statusResources.get( 0 ).getName() ); // ' - (read)' is automatically
         // added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource, readPrivId );
 
@@ -304,13 +311,13 @@ public class Nexus233PrivilegesCrudXMLIT
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "readTest - (read)" ); // ' - (read)' is automatically
+        Assert.assertEquals( "read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "readTest - (read)", statusResources.get( 0 ).getName() ); // ' - (read)' is automatically
         // added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         getSecurityConfigUtil().verifyPrivileges( statusResources );
 
@@ -340,14 +347,14 @@ public class Nexus233PrivilegesCrudXMLIT
 
         String readPrivId = statusResources.get( 0 ).getId();
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "updateTest - (read)" ); // ' - (read)' is
+        Assert.assertEquals( "read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "updateTest - (read)", statusResources.get( 0 ).getName() ); // ' - (read)' is
         // automatically
         // added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         Response response = this.messageUtil.sendMessage( Method.PUT, resource, readPrivId );
 
@@ -382,14 +389,14 @@ public class Nexus233PrivilegesCrudXMLIT
 
         String readPrivId = statusResources.get( 0 ).getId();
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "deleteTest - (read)" ); // ' - (read)' is
+        Assert.assertEquals( "read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "deleteTest - (read)", statusResources.get( 0 ).getName() ); // ' - (read)' is
         // automatically
         // added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         Response response = this.messageUtil.sendMessage( Method.DELETE, resource, readPrivId );
 
@@ -429,13 +436,13 @@ public class Nexus233PrivilegesCrudXMLIT
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            ApplicationPrivilegeMethodPropertyDescriptor.ID ), "read" );
-        Assert.assertEquals( statusResources.get( 0 ).getName(), "listTest - (read)" ); // ' - (read)' is
+        Assert.assertEquals( "read", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+        Assert.assertEquals( "listTest - (read)", statusResources.get( 0 ).getName() ); // ' - (read)' is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), TargetPrivilegeDescriptor.TYPE );
-        Assert.assertEquals( getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
-            TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ), "testTarget" );
+        Assert.assertEquals( TargetPrivilegeDescriptor.TYPE, statusResources.get( 0 ).getType() );
+        Assert.assertEquals( "testTarget", getSecurityConfigUtil().getPrivilegeProperty( statusResources.get( 0 ),
+                TargetPrivilegeRepositoryTargetPropertyDescriptor.ID ) );
 
         getSecurityConfigUtil().verifyPrivileges( statusResources );
 

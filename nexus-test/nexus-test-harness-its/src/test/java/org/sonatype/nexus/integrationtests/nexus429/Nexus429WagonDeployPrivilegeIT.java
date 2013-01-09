@@ -21,15 +21,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.MavenDeployer;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Test the privilege wagon style deployments.
@@ -47,7 +47,7 @@ public class Nexus429WagonDeployPrivilegeIT
     }
     
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -179,14 +179,14 @@ public class Nexus429WagonDeployPrivilegeIT
         Response response =
             RequestFacade.sendMessage( new URL( this.getNexusTestRepoServiceUrl() + gav.getGroupId().replace( '.', '/' ) + "/" + gav.getArtifactId() + "/" + gav.getVersion() + "/"),
                                        Method.GET, null );
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Artifact should have been downloaded" );
+        Assert.assertEquals( "Artifact should have been downloaded", response.getStatus().getCode(), 200 );
         
         
         // make sure delete does not work
         response =
             RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/" + this.getTestId(),
                                        Method.DELETE );
-        Assert.assertEquals( response.getStatus().getCode(), 403, "Artifact should have been deleted" );
+        Assert.assertEquals( "Artifact should have been deleted", response.getStatus().getCode(), 403 );
 
     }
 

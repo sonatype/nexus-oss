@@ -964,10 +964,12 @@ public abstract class AbstractProxyRepository
 
             itemLock.lock( Action.create );
 
-            final Action action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+            final Action action;
 
             try
             {
+                action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+
                 getLocalStorage().storeItem( this, item );
 
                 removeFromNotFoundCache( item.getResourceStoreRequest() );

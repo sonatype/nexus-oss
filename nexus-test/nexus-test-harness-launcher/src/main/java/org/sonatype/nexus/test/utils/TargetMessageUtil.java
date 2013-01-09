@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -37,7 +38,6 @@ import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -84,11 +84,11 @@ public class TargetMessageUtil
         Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
         if ( update )
         {
-            Assert.assertEquals( target.getId(), responseResource.getId() );
+            Assert.assertEquals( responseResource.getId(), target.getId() );
         }
 
-        Assert.assertEquals( target.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( target.getName(), responseResource.getName() );
+        Assert.assertEquals( responseResource.getContentClass(), target.getContentClass() );
+        Assert.assertEquals( responseResource.getName(), target.getName() );
         Assert.assertEquals( target.getPatterns(), responseResource.getPatterns() );
 
         this.verifyTargetsConfig( responseResource );
@@ -192,9 +192,9 @@ public class TargetMessageUtil
                 if ( targetResource.getId().equals( repositoryTarget.getId() ) )
                 {
                     found = true;
-                    Assert.assertEquals( targetResource.getId(), repositoryTarget.getId() );
-                    Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
-                    Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
+                    Assert.assertEquals( repositoryTarget.getId(), targetResource.getId() );
+                    Assert.assertEquals( repositoryTarget.getContentClass(), targetResource.getContentClass() );
+                    Assert.assertEquals( repositoryTarget.getName(), targetResource.getName() );
                     // order doesn't matter
                     Assert.assertEquals( new HashSet<String>( targetResource.getPatterns() ), new HashSet<String>(
                         repositoryTarget.getPatterns() ) );
@@ -220,8 +220,8 @@ public class TargetMessageUtil
 
         List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
         // check to see if the size matches
-        Assert.assertTrue( repoTargets.size() == targets.size(), "Configuration had a different number: (" + repoTargets.size()
-                + ") of targets then expected: (" + targets.size() + ")" );
+        Assert.assertTrue( "Configuration had a different number: (" + repoTargets.size()
+                + ") of targets then expected: (" + targets.size() + ")", repoTargets.size() == targets.size() );
 
         // look for the target by id
 
@@ -237,9 +237,9 @@ public class TargetMessageUtil
                 if ( targetResource.getId().equals( repositoryTarget.getId() ) )
                 {
                     found = true;
-                    Assert.assertEquals( targetResource.getId(), repositoryTarget.getId() );
-                    Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
-                    Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
+                    Assert.assertEquals( repositoryTarget.getId(), targetResource.getId() );
+                    Assert.assertEquals( repositoryTarget.getContentClass(), targetResource.getContentClass() );
+                    Assert.assertEquals( repositoryTarget.getName(), targetResource.getName() );
 
                     break;
                 }
@@ -263,7 +263,7 @@ public class TargetMessageUtil
         {
             Status status =
                 RequestFacade.sendMessage( "service/local/repo_targets/" + target.getId(), Method.DELETE ).getStatus();
-            Assert.assertTrue( status.isSuccess(), "Failt to delete: " + status.getDescription() );
+            Assert.assertTrue( "Failt to delete: " + status.getDescription(), status.isSuccess() );
         }
     }
 

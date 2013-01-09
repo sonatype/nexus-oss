@@ -12,19 +12,18 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
+
 import java.io.IOException;
 
-
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.LogConfigResource;
 import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import com.thoughtworks.xstream.XStream;
 
 /**

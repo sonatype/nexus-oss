@@ -15,13 +15,13 @@ package org.sonatype.nexus.integrationtests.nexus4390;
 import java.io.IOException;
 import java.util.Date;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * This test tests NEXUS-4390 and Nexus' capability to properly respond to repeated conditionalGET requests. We simply

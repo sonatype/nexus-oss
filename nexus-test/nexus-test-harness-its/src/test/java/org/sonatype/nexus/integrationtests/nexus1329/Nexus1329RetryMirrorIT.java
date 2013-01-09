@@ -18,9 +18,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.index.artifact.Gav;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus1329RetryMirrorIT
     extends AbstractMirrorIT
@@ -49,10 +49,10 @@ public class Nexus1329RetryMirrorIT
         File originalFile = this.getTestFile( "basic/nexus1329/sample/1.0.0/sample-1.0.0.xml" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( originalFile, artifactFile ) );
 
-        Assert.assertTrue( repoUrls.isEmpty(), "Nexus should not access repository canonical url " + repoUrls );
-        Assert.assertTrue( mirror2Urls.isEmpty(), "Nexus should not access second mirror " + mirror2Urls );
-        Assert.assertFalse( mirror1Urls.isEmpty(), "Nexus should access first mirror " + mirror1Urls );
-        Assert.assertEquals( mirror1Urls.size(), 2, "Nexus should retry first mirror " + mirror1Urls );
+        Assert.assertTrue( "Nexus should not access repository canonical url " + repoUrls, repoUrls.isEmpty() );
+        Assert.assertTrue( "Nexus should not access second mirror " + mirror2Urls, mirror2Urls.isEmpty() );
+        Assert.assertFalse( "Nexus should access first mirror " + mirror1Urls, mirror1Urls.isEmpty() );
+        Assert.assertEquals( "Nexus should retry first mirror " + mirror1Urls, mirror1Urls.size(), 2 );
     }
 
 }

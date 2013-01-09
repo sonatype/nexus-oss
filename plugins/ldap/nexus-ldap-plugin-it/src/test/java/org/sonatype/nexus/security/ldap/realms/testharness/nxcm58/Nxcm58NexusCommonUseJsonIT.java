@@ -14,6 +14,9 @@ package org.sonatype.nexus.security.ldap.realms.testharness.nxcm58;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -30,9 +33,6 @@ import org.sonatype.nexus.security.ldap.realms.testharness.LdapUserGroupMessageU
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUsersMessageUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.security.rest.model.UserToRoleResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -49,7 +49,7 @@ public class Nxcm58NexusCommonUseJsonIT
         super();
     }
 
-    @BeforeClass
+    @Before
     public void init()
     {
         this.xstream = this.getJsonXStream();
@@ -66,7 +66,7 @@ public class Nxcm58NexusCommonUseJsonIT
         // this.copyConfigFile( "ldap.xml", RELATIVE_WORK_CONF_DIR );
 
         // delete the ldap file.
-        Assert.assertTrue( this.deleteLdapConfig(), "Failed to delete the ldap.xml config file" );
+        Assert.assertTrue( "Failed to delete the ldap.xml config file", this.deleteLdapConfig() );
 
         this.copyConfigFile( "test.ldif", LDIF_DIR );
     }
@@ -81,7 +81,7 @@ public class Nxcm58NexusCommonUseJsonIT
 
         // get
         LdapConnectionInfoDTO dto = connUtil.getConnectionInfo();
-        Assert.assertEquals( new LdapConnectionInfoDTO(), dto ); // expected empty object
+        Assert.assertEquals( dto, new LdapConnectionInfoDTO() ); // expected empty object
 
         // configure LDAP connection info
         dto = new LdapConnectionInfoDTO();
@@ -128,8 +128,8 @@ public class Nxcm58NexusCommonUseJsonIT
 
         // test
         testResponse = userGroupUtil.sendTestMessage( userGroupTestDto );
-        Assert.assertEquals( testResponse.getStatus().getCode(), Status.SUCCESS_OK.getCode(),
-                             "Test connection failed: " + testResponse.getEntity().getText() );
+        Assert.assertEquals( "Test connection failed: " + testResponse.getEntity().getText(), testResponse.getStatus().getCode(),
+                             Status.SUCCESS_OK.getCode() );
         // TODO: check result
 
         LdapUserAndGroupConfigurationDTO userGroupConfig = new LdapUserAndGroupConfigurationDTO();
@@ -163,15 +163,15 @@ public class Nxcm58NexusCommonUseJsonIT
         ldapUser.setSource( "LDAP" );
         ldapUser.addRole( "nx-admin" );
         Response response = userUtil.sendMessage( Method.PUT, ldapUser, "LDAP" );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() + "\nresponse: "
-            + response.getEntity().getText() );
+        Assert.assertTrue( "Status: " + response.getStatus() + "\nresponse: "
+            + response.getEntity().getText(), response.getStatus().isSuccess() );
 
         // login/do something with an ldap user
         TestContainer.getInstance().getTestContext().setUsername( "cstamas" );
         TestContainer.getInstance().getTestContext().setPassword( "cstamas123" );
         response = RequestFacade.sendMessage( "service/local/global_settings/current", Method.GET );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() + "\nresponse Text: "
-            + response.getEntity().getText() );
+        Assert.assertTrue( "Status: " + response.getStatus() + "\nresponse Text: "
+            + response.getEntity().getText(), response.getStatus().isSuccess() );
 
         // wrong password
         TestContainer.getInstance().getTestContext().setPassword( "WRONG-PASSWORD" );

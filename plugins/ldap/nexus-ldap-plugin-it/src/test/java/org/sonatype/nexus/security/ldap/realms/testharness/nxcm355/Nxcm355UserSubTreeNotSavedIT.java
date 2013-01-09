@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.security.ldap.realms.testharness.nxcm355;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUserGroupMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -34,7 +34,7 @@ public class Nxcm355UserSubTreeNotSavedIT
         super();
     }
 
-    @BeforeClass
+    @Before
     public void init()
     {
         this.xstream = this.getJsonXStream();
@@ -68,7 +68,7 @@ public class Nxcm355UserSubTreeNotSavedIT
         userGroupDto.setUserMemberOfAttribute( "" );
 
         LdapUserAndGroupConfigurationDTO result = userGroupUtil.updateUserGroupConfig( userGroupDto );
-        Assert.assertEquals( userGroupDto, result );
+        Assert.assertEquals( result, userGroupDto );
 
     }
 }

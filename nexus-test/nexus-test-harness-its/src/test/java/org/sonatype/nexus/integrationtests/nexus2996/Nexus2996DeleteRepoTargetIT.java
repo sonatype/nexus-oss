@@ -12,16 +12,16 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2996;
 
-import org.hamcrest.MatcherAssert;
 import static org.hamcrest.Matchers.hasItem;
+
+import org.hamcrest.MatcherAssert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus2996DeleteRepoTargetIT
     extends AbstractNexusIntegrationTest

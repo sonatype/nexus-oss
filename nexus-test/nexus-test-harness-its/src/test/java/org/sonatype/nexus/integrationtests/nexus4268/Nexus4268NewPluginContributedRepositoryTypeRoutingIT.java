@@ -14,12 +14,12 @@ package org.sonatype.nexus.integrationtests.nexus4268;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * This test tests NEXUS-4268 and Nexus' capability to route properly repository types contributed by plugins, hence
@@ -49,8 +49,8 @@ public class Nexus4268NewPluginContributedRepositoryTypeRoutingIT
 
             response = RequestFacade.sendMessage( servicePath, Method.GET );
 
-            Assert.assertEquals( response.getStatus().getCode(), 200, "Repository should be accessible over "
-                + servicePath );
+            Assert.assertEquals( "Repository should be accessible over "
+                + servicePath, response.getStatus().getCode(), 200 );
         }
         finally
         {
@@ -72,8 +72,8 @@ public class Nexus4268NewPluginContributedRepositoryTypeRoutingIT
 
             response = RequestFacade.sendMessage( servicePath, Method.GET );
 
-            Assert.assertEquals( response.getStatus().getCode(), 200, "Repository should be accessible over "
-                + servicePath );
+            Assert.assertEquals( "Repository should be accessible over "
+                + servicePath, response.getStatus().getCode(), 200 );
         }
         finally
         {

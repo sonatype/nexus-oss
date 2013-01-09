@@ -19,6 +19,8 @@ import java.util.List;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.treeview.TreeNode;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -40,8 +42,6 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -75,7 +75,7 @@ public class Nexus3567GroupMemberChangesIndexIT
         List<TreeNode> children = node.getChildren();
 
         Assert.assertEquals( 1, children.size() );
-        Assert.assertEquals( "nexus3567", children.get( 0 ).getNodeName() );
+        Assert.assertEquals( children.get( 0 ).getNodeName(), "nexus3567" );
 
         // now delete the child repo and validate that there is no root node
         Response response = repoUtil.sendMessage( Method.DELETE, repoResource );
@@ -104,7 +104,7 @@ public class Nexus3567GroupMemberChangesIndexIT
         List<TreeNode> children = node.getChildren();
 
         Assert.assertEquals( 1, children.size() );
-        Assert.assertEquals( "nexus3567", children.get( 0 ).getNodeName() );
+        Assert.assertEquals( children.get( 0 ).getNodeName(), "nexus3567" );
 
         // now remove the child repo and validate that there is no root node
         RepositoryGroupResource group = groupUtil.getGroup( "nexus3567removemembergroup" );
@@ -165,7 +165,7 @@ public class Nexus3567GroupMemberChangesIndexIT
         File artifact = getTestFile( "artifact.jar" );
         Gav gav = GavUtil.newGav( "nexus3567", "artifact", "1.0.0" );
         int code = getDeployUtils().deployUsingGavWithRest( repoId, gav, artifact );
-        Assert.assertTrue( Status.isSuccess( code ), "Unable to deploy artifact " + code );
+        Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
 
         getEventInspectorsUtil().waitForCalmPeriod();
     }

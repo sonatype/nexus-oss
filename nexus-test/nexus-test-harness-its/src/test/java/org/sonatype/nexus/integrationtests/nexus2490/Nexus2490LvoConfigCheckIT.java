@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2490;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -20,8 +22,6 @@ import org.sonatype.nexus.plugins.lvo.api.dto.LvoConfigDTO;
 import org.sonatype.nexus.plugins.lvo.api.dto.LvoConfigRequest;
 import org.sonatype.nexus.plugins.lvo.api.dto.LvoConfigResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus2490LvoConfigCheckIT
     extends AbstractNexusIntegrationTest

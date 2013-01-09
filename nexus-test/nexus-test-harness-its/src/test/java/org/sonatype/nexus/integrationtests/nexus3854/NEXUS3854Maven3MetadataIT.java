@@ -13,8 +13,8 @@
 package org.sonatype.nexus.integrationtests.nexus3854;
 
 import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,12 +24,12 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 public class NEXUS3854Maven3MetadataIT
     extends AbstractNexusIntegrationTest
@@ -62,22 +62,22 @@ public class NEXUS3854Maven3MetadataIT
         assertNotNull( m1 );
         assertNotNull( m2 );
 
-        assertEquals( m1.getArtifactId(), m2.getArtifactId() );
-        assertEquals( m1.getGroupId(), m2.getGroupId() );
-        assertEquals( m1.getVersion(), m2.getVersion() );
+        assertEquals( m2.getArtifactId(), m1.getArtifactId() );
+        assertEquals( m2.getGroupId(), m1.getGroupId() );
+        assertEquals( m2.getVersion(), m1.getVersion() );
 
         assertNotNull( m1.getVersioning() );
         assertNotNull( m2.getVersioning() );
 
-        assertEquals( m1.getVersioning().getLatest(), m2.getVersioning().getLatest() );
-        assertEquals( m1.getVersioning().getRelease(), m2.getVersioning().getRelease() );
+        assertEquals( m2.getVersioning().getLatest(), m1.getVersioning().getLatest() );
+        assertEquals( m2.getVersioning().getRelease(), m1.getVersioning().getRelease() );
 
         if ( m1.getVersioning().getSnapshot() != null || m1.getVersioning().getSnapshot() != null )
         {
             assertEquals( m1.getVersioning().getSnapshot().getBuildNumber(),
                 m2.getVersioning().getSnapshot().getBuildNumber() );
-            assertEquals( m1.getVersioning().getSnapshot().getTimestamp(),
-                m2.getVersioning().getSnapshot().getTimestamp() );
+            assertEquals( m2.getVersioning().getSnapshot().getTimestamp(),
+                m1.getVersioning().getSnapshot().getTimestamp() );
         }
 
         assertEquals( m1.getVersioning().getSnapshotVersions().size(), m2.getVersioning().getSnapshotVersions().size() );
@@ -88,10 +88,10 @@ public class NEXUS3854Maven3MetadataIT
 
             assertNotNull( s1 );
             assertNotNull( s2 );
-            assertEquals( s1.getClassifier(), s2.getClassifier() );
-            assertEquals( s1.getExtension(), s2.getExtension() );
-            assertEquals( s1.getUpdated(), s2.getUpdated() );
-            assertEquals( s1.getVersion(), s2.getVersion() );
+            assertEquals( s2.getClassifier(), s1.getClassifier() );
+            assertEquals( s2.getExtension(), s1.getExtension() );
+            assertEquals( s2.getUpdated(), s1.getUpdated() );
+            assertEquals( s2.getVersion(), s1.getVersion() );
         }
     }
 

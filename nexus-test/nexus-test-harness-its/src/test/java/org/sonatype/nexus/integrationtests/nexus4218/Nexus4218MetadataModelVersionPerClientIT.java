@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,11 +32,11 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 public class Nexus4218MetadataModelVersionPerClientIT
     extends AbstractNexusIntegrationTest
@@ -104,7 +104,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
         cl.createArg().setValue( "-Dmaven.repo.local=" + repo.getCanonicalPath() );
         int exit = CommandLineUtils.executeCommandLine( cl, out, out );
 
-        assertEquals( exit, 0, sb.toString() );
+        assertEquals( sb.toString(), exit, 0 );
         assertThat( sb.toString(), containsString( "nexus4218/md-test/0.1-SNAPSHOT/md-test-0.1-20110415.143359-7.pom" ) );
         assertThat( sb.toString(), containsString( "nexus4218/md-test/0.1-SNAPSHOT/md-test-0.1-20110415.143359-7.txt" ) );
         assertThat( sb.toString(),
@@ -118,7 +118,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
             new FileInputStream( new File( repo, "nexus4218/md-test/0.1-SNAPSHOT/maven-metadata-nexus.xml" ) );
         Metadata md = new MetadataXpp3Reader().read( in );
         in.close();
-        assertEquals( md.getModelVersion(), "1.1.0" );
+        assertEquals( "1.1.0", md.getModelVersion() );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -161,7 +161,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
         cl.addEnvironment( "M2_HOME", m2Home );
         int exit = CommandLineUtils.executeCommandLine( cl, out, out );
 
-        assertEquals( exit, 0, sb.toString() );
+        assertEquals( sb.toString(), exit, 0 );
         assertThat( sb.toString(), containsString( "nexus4218/md-test/0.1-SNAPSHOT/md-test-0.1-20110415.143359-7.pom" ) );
         assertThat( sb.toString(), containsString( "nexus4218/md-test/0.1-SNAPSHOT/md-test-0.1-20110415.143359-7.txt" ) );
 
@@ -209,7 +209,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
         cl.createArg().setValue( repo.getCanonicalPath() );
         int exit = CommandLineUtils.executeCommandLine( cl, out, out );
 
-        assertEquals( exit, 0, sb.toString() );
+        assertEquals( sb.toString(), exit, 0 );
         assertThat( sb.toString(), containsString( "nexus4218/md-test/0.1-SNAPSHOT/md-test-0.1-20110415.143359-7.txt" ) );
     }
 

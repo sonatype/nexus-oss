@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -24,7 +25,6 @@ import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescri
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.BeforeMethod;
 
 public abstract class AbstractLegacyRulesIT
     extends AbstractPrivilegeTest
@@ -36,7 +36,7 @@ public abstract class AbstractLegacyRulesIT
 
     protected Gav gavArtifact2;
 
-    @BeforeMethod
+    @Before
     public void createGav1()
         throws Exception
     {

@@ -57,6 +57,7 @@
       </activation>
 
       <modules>
+        <module>h2</module>
         <module>siesta</module>
         <module>restlet1x</module>
         <module>indexer</module>

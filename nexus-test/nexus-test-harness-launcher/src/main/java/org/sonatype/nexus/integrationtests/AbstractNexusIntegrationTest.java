@@ -15,10 +15,10 @@ package org.sonatype.nexus.integrationtests;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.isRedirecting;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.redirectLocation;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
-import static org.testng.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,6 +48,11 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
@@ -72,11 +77,6 @@ import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.WagonDeployer;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.guice.SecurityModule;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
@@ -148,7 +148,7 @@ public abstract class AbstractNexusIntegrationTest
 
     protected static Logger staticLog = LoggerFactory.getLogger( AbstractNexusIntegrationTest.class );
 
-    private Properties systemPropertiesBackup;
+    private static Properties systemPropertiesBackup;
 
     static
     {
@@ -296,7 +296,7 @@ public abstract class AbstractNexusIntegrationTest
 
     // == Test "lifecycle" (@Before/@After...)
 
-    @BeforeClass( alwaysRun = true )
+    @BeforeClass
     public static void staticOncePerClassSetUp()
         throws Exception
     {
@@ -306,13 +306,6 @@ public abstract class AbstractNexusIntegrationTest
         NEEDS_INIT = true;
     }
     
-    @BeforeClass( alwaysRun = true )
-    public void startITPlexusContainer()
-    {
-        // start per-IT plexus container
-        TestContainer.getInstance().startPlexusContainer( getClass(), new SecurityModule() );
-    }
-
     /**
      * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>
      * If you see this and think: "Wow, why did he to that instead of XYZ, please let me know." <BR/>
@@ -323,7 +316,7 @@ public abstract class AbstractNexusIntegrationTest
      * 
      * @throws Exception
      */
-    @BeforeMethod( alwaysRun = true )
+    @Before
     public void oncePerClassSetUp()
         throws Exception
     {
@@ -331,6 +324,9 @@ public abstract class AbstractNexusIntegrationTest
         {
             if ( NEEDS_INIT )
             {
+                // start per-IT plexus container
+                TestContainer.getInstance().startPlexusContainer( getClass(), new SecurityModule() );
+
                 systemPropertiesBackup = System.getProperties();
 
                 final String useDebugFor = System.getProperty( "it.nexus.log.level.use.debug" );
@@ -393,7 +389,7 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
-    @AfterMethod( alwaysRun = true )
+    @After
     public void afterTest()
         throws Exception
     {
@@ -402,14 +398,7 @@ public abstract class AbstractNexusIntegrationTest
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @AfterClass( alwaysRun = true )
-    public void afterClassTearDown()
-    {
-        System.setProperties( systemPropertiesBackup );
-        Nullificator.nullifyMembers( this );
-    }
-
-    @AfterClass( alwaysRun = true )
+    @AfterClass
     public static void oncePerClassTearDown()
         throws Exception
     {
@@ -433,6 +422,8 @@ public abstract class AbstractNexusIntegrationTest
 
         // stop per-IT plexus container
         TestContainer.getInstance().stopPlexusContainer();
+
+        System.setProperties( systemPropertiesBackup );
     }
 
     protected void runOnce()

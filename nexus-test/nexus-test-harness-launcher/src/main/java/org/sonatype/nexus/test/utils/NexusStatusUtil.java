@@ -134,7 +134,7 @@ public class NexusStatusUtil
     {
         if ( isNexusApplicationPortOpen() )
         {
-            throw new NexusIllegalStateException( "Ports in use!!!" );
+            throw new NexusIllegalStateException( "Port is in use: " + AbstractNexusIntegrationTest.nexusApplicationPort );
         }
 
         nexusBooter.startNexus( testId );

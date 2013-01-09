@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus395;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.ForgotUsernameUtils;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * Test the privilege Forgot username.
@@ -27,7 +27,7 @@ public class Nexus395ForgotUsernamePermissionIT
     extends AbstractPrivilegeTest
 {
     @BeforeClass
-    public void setSecureTest(){
+    public static void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

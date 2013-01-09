@@ -14,6 +14,7 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -28,7 +29,6 @@ import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
-import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -130,21 +130,21 @@ public class LdapUserGroupMessageUtil
         throws Exception
     {
         CUserAndGroupAuthConfiguration fileConfig = LdapConfigurationUtil.getConfiguration().getUserAndGroupConfig();
-        Assert.assertEquals(connInfo.getGroupBaseDn(), fileConfig.getGroupBaseDn());
-        Assert.assertEquals(connInfo.getGroupIdAttribute(), fileConfig.getGroupIdAttribute());
-        Assert.assertEquals(connInfo.getGroupMemberAttribute(), fileConfig.getGroupMemberAttribute());
-        Assert.assertEquals(connInfo.getGroupMemberFormat(), fileConfig.getGroupMemberFormat());
-        Assert.assertEquals(connInfo.getGroupObjectClass(), fileConfig.getGroupObjectClass());
-        Assert.assertEquals(connInfo.getUserBaseDn(), fileConfig.getUserBaseDn());
-        Assert.assertEquals(connInfo.getUserIdAttribute(), fileConfig.getUserIdAttribute());
-        Assert.assertEquals(connInfo.getUserObjectClass(), fileConfig.getUserObjectClass());
-        Assert.assertEquals(connInfo.getUserPasswordAttribute(), fileConfig.getUserPasswordAttribute());
-        Assert.assertEquals(connInfo.getUserRealNameAttribute(), fileConfig.getUserRealNameAttribute());
-        Assert.assertEquals(connInfo.getEmailAddressAttribute(), fileConfig.getEmailAddressAttribute());
-        Assert.assertEquals(connInfo.isLdapGroupsAsRoles(), fileConfig.isLdapGroupsAsRoles() );
-        Assert.assertEquals(connInfo.getUserMemberOfAttribute(), fileConfig.getUserMemberOfAttribute() );
-        Assert.assertEquals(connInfo.isGroupSubtree(), fileConfig.isGroupSubtree() );
-        Assert.assertEquals(connInfo.isUserSubtree(), fileConfig.isUserSubtree() );
+        Assert.assertEquals(fileConfig.getGroupBaseDn(), connInfo.getGroupBaseDn());
+        Assert.assertEquals(fileConfig.getGroupIdAttribute(), connInfo.getGroupIdAttribute());
+        Assert.assertEquals(fileConfig.getGroupMemberAttribute(), connInfo.getGroupMemberAttribute());
+        Assert.assertEquals(fileConfig.getGroupMemberFormat(), connInfo.getGroupMemberFormat());
+        Assert.assertEquals(fileConfig.getGroupObjectClass(), connInfo.getGroupObjectClass());
+        Assert.assertEquals(fileConfig.getUserBaseDn(), connInfo.getUserBaseDn());
+        Assert.assertEquals(fileConfig.getUserIdAttribute(), connInfo.getUserIdAttribute());
+        Assert.assertEquals(fileConfig.getUserObjectClass(), connInfo.getUserObjectClass());
+        Assert.assertEquals(fileConfig.getUserPasswordAttribute(), connInfo.getUserPasswordAttribute());
+        Assert.assertEquals(fileConfig.getUserRealNameAttribute(), connInfo.getUserRealNameAttribute());
+        Assert.assertEquals(fileConfig.getEmailAddressAttribute(), connInfo.getEmailAddressAttribute());
+        Assert.assertEquals(fileConfig.isLdapGroupsAsRoles(), connInfo.isLdapGroupsAsRoles() );
+        Assert.assertEquals(fileConfig.getUserMemberOfAttribute(), connInfo.getUserMemberOfAttribute() );
+        Assert.assertEquals(fileConfig.isGroupSubtree(), connInfo.isGroupSubtree() );
+        Assert.assertEquals(fileConfig.isUserSubtree(), connInfo.isUserSubtree() );
     }
 
     public void validateResourceResponse( LdapUserAndGroupConfigurationDTO expected, LdapUserAndGroupConfigurationDTO actual )
@@ -153,22 +153,22 @@ public class LdapUserGroupMessageUtil
 
         // this object has an equals method, but it makes for not so easy debuging, so call it after each field compare to make
         // sure we didn't forget anything
-        Assert.assertEquals(expected.getGroupBaseDn(), actual.getGroupBaseDn());
-        Assert.assertEquals(expected.getGroupIdAttribute(), actual.getGroupIdAttribute());
-        Assert.assertEquals(expected.getGroupMemberAttribute(), actual.getGroupMemberAttribute());
-        Assert.assertEquals(expected.getGroupMemberFormat(), actual.getGroupMemberFormat());
-        Assert.assertEquals(expected.getGroupObjectClass(), actual.getGroupObjectClass());
-        Assert.assertEquals(expected.getUserBaseDn(), actual.getUserBaseDn());
-        Assert.assertEquals(expected.getUserIdAttribute(), actual.getUserIdAttribute());
-        Assert.assertEquals(expected.getUserObjectClass(), actual.getUserObjectClass());
-        Assert.assertEquals(expected.getUserPasswordAttribute(), actual.getUserPasswordAttribute());
-        Assert.assertEquals(expected.getUserRealNameAttribute(), actual.getUserRealNameAttribute());
-        Assert.assertEquals(expected.getEmailAddressAttribute(), actual.getEmailAddressAttribute());
-        Assert.assertEquals(expected.isLdapGroupsAsRoles(), actual.isLdapGroupsAsRoles() );
-        Assert.assertEquals(expected.getUserMemberOfAttribute(), actual.getUserMemberOfAttribute() );
-        Assert.assertEquals(expected.isGroupSubtree(), actual.isGroupSubtree() );
-        Assert.assertEquals(expected.isUserSubtree(), actual.isUserSubtree() );
-        Assert.assertEquals( expected, actual );
+        Assert.assertEquals(actual.getGroupBaseDn(), expected.getGroupBaseDn());
+        Assert.assertEquals(actual.getGroupIdAttribute(), expected.getGroupIdAttribute());
+        Assert.assertEquals(actual.getGroupMemberAttribute(), expected.getGroupMemberAttribute());
+        Assert.assertEquals(actual.getGroupMemberFormat(), expected.getGroupMemberFormat());
+        Assert.assertEquals(actual.getGroupObjectClass(), expected.getGroupObjectClass());
+        Assert.assertEquals(actual.getUserBaseDn(), expected.getUserBaseDn());
+        Assert.assertEquals(actual.getUserIdAttribute(), expected.getUserIdAttribute());
+        Assert.assertEquals(actual.getUserObjectClass(), expected.getUserObjectClass());
+        Assert.assertEquals(actual.getUserPasswordAttribute(), expected.getUserPasswordAttribute());
+        Assert.assertEquals(actual.getUserRealNameAttribute(), expected.getUserRealNameAttribute());
+        Assert.assertEquals(actual.getEmailAddressAttribute(), expected.getEmailAddressAttribute());
+        Assert.assertEquals(actual.isLdapGroupsAsRoles(), expected.isLdapGroupsAsRoles() );
+        Assert.assertEquals(actual.getUserMemberOfAttribute(), expected.getUserMemberOfAttribute() );
+        Assert.assertEquals(actual.isGroupSubtree(), expected.isGroupSubtree() );
+        Assert.assertEquals(actual.isUserSubtree(), expected.isUserSubtree() );
+        Assert.assertEquals( actual, expected );
 
         // also validate the file config
         this.validateLdapConfig( expected );

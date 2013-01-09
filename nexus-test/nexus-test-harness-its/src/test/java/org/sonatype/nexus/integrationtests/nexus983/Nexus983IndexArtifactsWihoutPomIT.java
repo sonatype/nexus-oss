@@ -14,18 +14,19 @@ package org.sonatype.nexus.integrationtests.nexus983;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 
 import java.io.File;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.SearchType;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.annotations.Test;
 
 /**
  * Copy (filesystem copy) a jar to a nexus repo and run reindex to see what happens
@@ -33,7 +34,7 @@ import org.testng.annotations.Test;
 public class Nexus983IndexArtifactsWihoutPomIT
     extends AbstractNexusIntegrationTest
 {
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void deployPomlessArtifact()
         throws Exception
     {
@@ -48,7 +49,7 @@ public class Nexus983IndexArtifactsWihoutPomIT
         assertThat( "Should find exactly one artifact", artifacts, hasSize( 1 ) );
     }
 
-    @Test(groups = INDEX)
+    @Test @Category(INDEX.class)
     public void copyPomlessArtifact()
         throws Exception
     {
