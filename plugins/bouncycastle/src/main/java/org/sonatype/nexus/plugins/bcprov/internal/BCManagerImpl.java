@@ -14,41 +14,83 @@ package org.sonatype.nexus.plugins.bcprov.internal;
 
 import java.security.Security;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.bcprov.BCManager;
-import org.sonatype.nexus.plugins.bcprov.BCProvider;
 
-import com.google.common.base.Preconditions;
-
+/**
+ * Default {@link BCManager}.
+ * 
+ * @author cstamas
+ * @since 2.4
+ */
 @Named
 @Singleton
 public class BCManagerImpl
     extends AbstractLoggingComponent
     implements BCManager
 {
-    private final BCProvider bcProvider;
+    private final BouncyCastleProvider bouncyCastleProvider;
 
-    @Inject
-    public BCManagerImpl( final BCProvider bcProvider )
+    private boolean registeredBouncyCastleProvider;
+
+    private boolean uninstallBouncyCastleProvider;
+
+    /**
+     * Default constructor.
+     */
+    public BCManagerImpl()
     {
-        this.bcProvider = Preconditions.checkNotNull( bcProvider );
+        this.bouncyCastleProvider = new BouncyCastleProvider();
+        this.registeredBouncyCastleProvider = false;
+        this.uninstallBouncyCastleProvider = false;
     }
 
     @Override
-    public void registerProvider()
+    public synchronized boolean registerProvider()
     {
-        getLogger().debug( "Registering BC Provider with JCE..." );
-        Security.addProvider( bcProvider.getProvider() );
+        if ( !registeredBouncyCastleProvider )
+        {
+            getLogger().info( "Registering BC Provider with JCE..." );
+            uninstallBouncyCastleProvider = Security.addProvider( bouncyCastleProvider ) != -1;
+            registeredBouncyCastleProvider = true;
+
+            if ( !uninstallBouncyCastleProvider )
+            {
+                getLogger().info(
+                    "BC JCE provider is already registered wih JCE by another party. This might lead to problems if registered version is not the one expected by Nexus!" );
+            }
+        }
+        return uninstallBouncyCastleProvider;
     }
 
     @Override
-    public void unregisterProvider()
+    public synchronized boolean unregisterProvider()
     {
-        getLogger().debug( "Removing BC Provider from JCE..." );
-        Security.removeProvider( bcProvider.getProvider().getName() );
+        if ( registeredBouncyCastleProvider )
+        {
+            if ( uninstallBouncyCastleProvider )
+            {
+                getLogger().info( "Removing BC Provider from JCE..." );
+                Security.removeProvider( BouncyCastleProvider.PROVIDER_NAME );
+                uninstallBouncyCastleProvider = false;
+            }
+            else
+            {
+                getLogger().info( "Not removing BC Provider from JCE as it was registered by some other party..." );
+            }
+            registeredBouncyCastleProvider = false;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public BouncyCastleProvider getProvider()
+    {
+        return bouncyCastleProvider;
     }
 }

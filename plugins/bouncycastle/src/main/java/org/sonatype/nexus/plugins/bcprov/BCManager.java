@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.plugins.bcprov;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 /**
- * BCManager that manages BC Provider registration and unregistration from JCE.
+ * BCManager that manages BC Provider registration and removal from JCE.
  * 
  * @author cstamas
  * @since 2.4
@@ -22,11 +24,24 @@ public interface BCManager
 {
     /**
      * Register BC provider with JCE.
+     * 
+     * @return {@code true} if JCE provider was successfully installed. {@code false} if JCE did not install it as it was
+     *         already present and added to JCE.
      */
-    void registerProvider();
+    boolean registerProvider();
 
     /**
      * Unregister BC provider from JCE.
+     * 
+     * @return {@code true} if provider was unregistered from JCE. or {@code false} if unregistering was not done, see
+     *         {@link #registerProvider()} for reasons.
      */
-    void unregisterProvider();
+    boolean unregisterProvider();
+
+    /**
+     * Returns the shared instance of the {@link BouncyCastleProvider}.
+     * 
+     * @return the shared instance of {@link BouncyCastleProvider}.
+     */
+    BouncyCastleProvider getProvider();
 }

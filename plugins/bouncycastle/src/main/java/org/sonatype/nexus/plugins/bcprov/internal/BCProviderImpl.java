@@ -12,27 +12,42 @@
  */
 package org.sonatype.nexus.plugins.bcprov.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.sonatype.nexus.plugins.bcprov.BCProvider;
+import org.sonatype.nexus.plugins.bcprov.BCManager;
 
+/**
+ * Guice {@link Provider} for {@link BouncyCastleProvider} JCE provider. It gives away always the same singleton/shared
+ * instance of {@link BouncyCastleProvider} (same one that is registered with JCE).
+ * 
+ * @author cstamas
+ * @since 2.4
+ */
 @Named
 @Singleton
 public class BCProviderImpl
-    implements BCProvider
+    implements Provider<BouncyCastleProvider>
 {
-    private final BouncyCastleProvider bouncyCastleProvider;
+    private final BCManager bcManager;
 
-    public BCProviderImpl()
+    /**
+     * Default constructor.
+     * 
+     * @param bcManager the {@link BCManager} instance.
+     */
+    @Inject
+    public BCProviderImpl( final BCManager bcManager )
     {
-        this.bouncyCastleProvider = new BouncyCastleProvider();
+        this.bcManager = bcManager;
     }
 
     @Override
-    public BouncyCastleProvider getProvider()
+    public BouncyCastleProvider get()
     {
-        return bouncyCastleProvider;
+        return bcManager.getProvider();
     }
 }
