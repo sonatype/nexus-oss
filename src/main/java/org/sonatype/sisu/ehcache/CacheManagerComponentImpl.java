@@ -181,6 +181,7 @@ public class CacheManagerComponentImpl
     protected String locateCacheManagerConfigurationFromFile( final File file )
         throws IOException
     {
+        // FIXME: Buffer!
         final FileInputStream fis = new FileInputStream( file );
         try
         {
