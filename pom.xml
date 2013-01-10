@@ -1688,6 +1688,15 @@
                 <artifactId>enunciate-docs</artifactId>
                 <version>${enunciate.version}</version>
               </dependency>
+              <!--
+              enunciate-xml module is needed to properly handle rest defaultRestSubcontext configuration.
+              when this dependency is included the module appears to be automatically enabled.
+              -->
+              <dependency>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>enunciate-xml</artifactId>
+                <version>${enunciate.version}</version>
+              </dependency>
             </dependencies>
             <executions>
               <execution>
