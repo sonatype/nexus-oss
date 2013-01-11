@@ -273,31 +273,45 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         }
 
         var
+              available, unknown, reason,
               remoteStatus = (String(status.remoteStatus)).toLowerCase(),
               sOut = (status.localStatus === 'IN_SERVICE') ? 'In Service' : 'Out of Service';
 
+        available = remoteStatus === 'available';
+        unknown = remoteStatus === 'unknown';
+
+        // unavailable: $reason
+        reason = remoteStatus.indexOf('unavailable:') === 0 ? '<br/><I>' + Ext.util.Format.htmlEncode(status.remoteStatus.substr(12)) + '</I>' : null;
+
         if (parent.repoType === 'proxy')
         {
-
           if (status.proxyMode.search(/BLOCKED/) === 0)
           {
             sOut += status.proxyMode === 'BLOCKED_AUTO' ? ' - Remote Automatically Blocked' : ' - Remote Manually Blocked';
-            sOut += remoteStatus === 'available' ? ' and Available' : ' and Unavailable';
+            if (available) {
+              sOut += ' and Available';
+            } else {
+              sOut += ' and Unavailable';
+            }
           }
           else
           { // allow
             if (status.localStatus === 'IN_SERVICE')
             {
-              if (remoteStatus !== 'available')
+              if (!available && unknown)
               {
-                sOut += remoteStatus === 'unknown' ? ' - <I>checking remote...</I>' : ' - Attempting to Proxy and Remote Unavailable';
+                sOut += unknown ? ' - <I>checking remote...</I>' : ' - Attempting to Proxy and Remote Unavailable';
               }
             }
             else
             { // Out of service
-              sOut += remoteStatus === 'available' ? ' - Remote Available' : ' - Remote Unavailable';
+              sOut += available ? ' - Remote Available' : ' - Remote Unavailable';
             }
           }
+        }
+
+        if (reason !== null) {
+          sOut += reason;
         }
 
         return sOut;
