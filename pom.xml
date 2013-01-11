@@ -880,7 +880,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.5.2</version>
+        <version>1.6-SNAPSHOT</version>
       </dependency>
 
       <!-- FIXME: This _should_ be sorted out in litmus already, need to check if we have any straggling deps locally which pull this in however -->
