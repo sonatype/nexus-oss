@@ -21,7 +21,7 @@ Yum metadata, so that RedHat-compatible system can use Nexus as software reposit
 
 ## Audience
 
-The Nexus Yum Plugin is for all guys, who are deploying Java application for RedHat-compatible (RHEL, Centos, Fedora) servers and deploy via RPM.
+The Nexus Yum Plugin is for anyone who is deploying Java applications to RedHat-compatible (RHEL, Centos, Fedora) servers via RPM.
 
 ### Default use case
 
