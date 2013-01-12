@@ -37,6 +37,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
       <artifactId>server-provider</artifactId>
     </dependency>
