@@ -31,39 +31,6 @@
     <nexus.plugin.description>Adds browsing support for browsing remote proxy remote repositories.</nexus.plugin.description>
   </properties>
 
-  <developers>
-    <developer>
-      <id>anders.hammar</id>
-      <name>Anders Hammar</name>
-      <email>anders.hammar@devoteam.com</email>
-      <organization>Devoteam Sweden</organization>
-      <organizationUrl>http://www.devoteam.se</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>bjorn.eiderback</id>
-      <name>Björn Eiderbäck</name>
-      <email>bjorn.eiderback@devoteam.com</email>
-      <organization>Devoteam Sweden</organization>
-      <organizationUrl>http://www.devoteam.se</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>torbjorn.ekmark</id>
-      <name>Torbjörn Ekmark</name>
-      <email>torbjorn.ekmark@devoteam.com</email>
-      <organization>Devoteam Sweden</organization>
-      <organizationUrl>http://www.devoteam.se</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
