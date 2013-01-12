@@ -1620,6 +1620,7 @@
     <module>nexus-compat</module>
     <module>nexus-oss-edition</module>
     <module>nexus-configuration-model</module>
+    <module>plugin-parent</module>
     <module>plugins</module>
     <module>nexus-webapp</module>
     <module>nexus-launcher</module>
