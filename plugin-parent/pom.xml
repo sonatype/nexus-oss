@@ -55,8 +55,9 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-api-dependencies</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <type>pom</type>
         <scope>import</scope>
+        <version>2.4-SNAPSHOT</version>
       </dependency>
 
       <dependency>
