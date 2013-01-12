@@ -78,7 +78,7 @@
       </dependency>
 
       <!--
-      Basic dependency for Nexus plugins which provide _new-style_ integration-tests.
+      Basic dependency for Nexus plugins which provide _bundle-launcher-style_ integration-tests.
       -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
