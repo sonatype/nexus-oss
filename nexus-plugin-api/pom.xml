@@ -85,12 +85,11 @@
       </plugin>
 
       <!--
-      Generate -dependencies (and -compile) poms, so we can scope=import it in the plugin-parent.
+      Generate *-dependencies POM, so we can scope=import it in the plugin-parent.
       -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <version>1.6-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>

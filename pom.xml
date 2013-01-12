@@ -1321,10 +1321,11 @@
             </systemPropertyVariables>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>provided-dependencies-maven-plugin</artifactId>
-          <version>1.5</version>
+          <version>1.6-SNAPSHOT</version>
         </plugin>
 
         <plugin>
