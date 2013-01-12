@@ -76,10 +76,55 @@
         <version>${nexus.version}</version>
       </dependency>
 
+      <!--
+      HACK: Exposed here for a lack of a better way to manage.  Need to kill all these -tests.jar dependencies.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-restlet1x-plugin</artifactId>
+        <classifier>tests</classifier>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      HACK: Exposed here for a lack of a better way to manage.
+      -->
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-restlet1x-model</artifactId>
         <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      FIXME: Remove need for this dep once we have most bits on JAX-RS compatible resources.
+      FIXME: Short-term, may want to just include this in deps provided by nexus-restlet1x-plugin?
+      -->
+      <dependency>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>enunciate-core</artifactId>
+        <version>${enunciate.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>net.sf.apt-jelly</groupId>
+            <artifactId>apt-jelly-freemarker</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!--
@@ -124,43 +169,12 @@
 
       <!--
       Basic dependency for Nexus plugins which provide _bundle-launcher-style_ integration-tests.
+      FIXME: Consider adding this into nexus-plugin-test-api
       -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-support</artifactId>
         <version>${nexus.version}</version>
-      </dependency>
-
-      <!--
-      FIXME: Remove need for this dep once we have most bits on JAX-RS compatible resources.
-      FIXME: Short-term, may want to just include this in deps provided by nexus-restlet1x-plugin?
-      -->
-      <dependency>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>enunciate-core</artifactId>
-        <version>${enunciate.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-digester</groupId>
-            <artifactId>commons-digester</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>net.sf.apt-jelly</groupId>
-            <artifactId>apt-jelly-freemarker</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
     </dependencies>

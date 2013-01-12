@@ -30,6 +30,14 @@
       <artifactId>nexus-core</artifactId>
     </dependency>
 
+    <!--
+    TODO: Probably should be in nexus-core, its here to promote this dep for plugins to depend on.
+    -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras</artifactId>
