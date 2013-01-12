@@ -371,6 +371,9 @@
         <version>1.7</version>
       </dependency>
 
+      <!--
+      FIXME: Should not need this here, its plugin specific.
+      -->
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-restlet-bridge</artifactId>
@@ -482,6 +485,13 @@
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
+        <version>${plexus-security.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.security.realms</groupId>
+        <artifactId>security-xml-realm</artifactId>
+        <classifier>tests</classifier>
         <version>${plexus-security.version}</version>
       </dependency>
 
@@ -711,12 +721,6 @@
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
         <version>1.4.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>1.2.2</version>
       </dependency>
 
       <dependency>
