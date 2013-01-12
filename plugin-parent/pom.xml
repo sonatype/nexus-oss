@@ -39,12 +39,18 @@
 
   <dependencyManagement>
     <dependencies>
+      <!--
+      Basic dependency for *all* Nexus plugins.
+      -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-api</artifactId>
         <version>2.4-SNAPSHOT</version>
       </dependency>
 
+      <!--
+      Required for Nexus plugins which provide legacy restlet-1.x REST apis.
+      -->
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-restlet1x-plugin</artifactId>
@@ -52,6 +58,9 @@
         <version>2.4-SNAPSHOT</version>
       </dependency>
 
+      <!--
+      Required for plugins which provide JAX-RS REST apis.
+      -->
       <!--<dependency>-->
         <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
         <!--<artifactId>nexus-siesta-plugin</artifactId>-->
@@ -59,12 +68,18 @@
         <!--<version>2.4-SNAPSHOT</version>-->
       <!--</dependency>-->
 
+      <!--
+      Basic dependency for *all* Nexus plugins which provide tests.
+      -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-test-api</artifactId>
         <version>2.4-SNAPSHOT</version>
       </dependency>
 
+      <!--
+      Basic dependency for Nexus plugins which provide _new-style_ integration-tests.
+      -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-support</artifactId>
