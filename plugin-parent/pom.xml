@@ -314,7 +314,7 @@
                 <version>${enunciate.version}</version>
               </dependency>
               <!--
-              enunciate-xml module is needed to properly handle rest defaultRestSubcontext configuration.
+              enunciate-xml module is needed to properly handle 'defaultRestSubcontext' configuration, which is used to generate the mount point location in documentation.
               when this dependency is included the module appears to be automatically enabled.
               -->
               <dependency>
