@@ -220,13 +220,8 @@
                 <goal>compress</goal>
               </goals>
               <configuration>
-                <!--
-                The plugin spews warnings when code is not in a shape that's optimized for minifying.
-                Plugins interested in these warnings should configure the jslint goal instead.
-                -->
                 <jswarn>false</jswarn>
                 <failOnWarning>false</failOnWarning>
-
                 <aggregations>
                   <aggregation>
                     <inputDir>${project.build.directory}/generated-sources/yuicompressor</inputDir>
