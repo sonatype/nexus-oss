@@ -13,14 +13,16 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-core-plugins</artifactId>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugin-parent</artifactId>
     <version>2.4-SNAPSHOT</version>
+    <relativePath>../../plugin-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>nexus-rrb-plugin</artifactId>
@@ -28,7 +30,7 @@
 
   <properties>
     <nexus.plugin.name>Nexus Remote Repository Browsing Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds browsing support for browsing remote proxy remote repositories.</nexus.plugin.description>
+    <nexus.plugin.description>Adds support for browsing proxy repositories remote storage.</nexus.plugin.description>
   </properties>
 
   <dependencies>
@@ -44,12 +46,22 @@
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!--
+    FIXME: These might be better off as part of nexus-plugin-test-api?
+    -->
 
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
@@ -66,6 +78,16 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>

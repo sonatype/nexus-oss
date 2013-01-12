@@ -50,7 +50,6 @@
 
       <!--
       Import all DM entries for all dependencies known by nexus-plugin-api.
-      FIXME: This isn't really all dependencies, as it strips out scope=test,system,import may want to change this to at least include test scope deps?
       -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -98,6 +97,17 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-test-api</artifactId>
+        <version>2.4-SNAPSHOT</version>
+      </dependency>
+
+      <!--
+      Import all DM entries for all dependencies known by nexus-plugin-test-api.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-test-api-dependencies</artifactId>
+        <type>pom</type>
+        <scope>import</scope>
         <version>2.4-SNAPSHOT</version>
       </dependency>
 
