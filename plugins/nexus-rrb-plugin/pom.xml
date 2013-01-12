@@ -25,6 +25,7 @@
     <relativePath>../../plugin-parent/pom.xml</relativePath>
   </parent>
 
+  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-rrb-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
