@@ -46,6 +46,8 @@
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
+
+    <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
   </properties>
 
   <dependencyManagement>
@@ -255,9 +257,6 @@
               <version>1.7</version>
             </dependency>
           </dependencies>
-          <configuration>
-            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
-          </configuration>
         </plugin>
 
         <!--
