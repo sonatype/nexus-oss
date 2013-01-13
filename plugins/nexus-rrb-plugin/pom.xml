@@ -30,8 +30,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Remote Repository Browsing Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds support for browsing proxy repositories remote storage.</nexus.plugin.description>
+    <pluginName>Nexus Remote Repository Browsing Plugin</pluginName>
+    <pluginDescription>Adds support for browsing proxy repositories remote storage.</pluginDescription>
   </properties>
 
   <dependencies>

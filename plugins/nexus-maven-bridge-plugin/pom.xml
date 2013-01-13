@@ -30,8 +30,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Maven Bridge Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds an API to access maven dependency resolution for Nexus plugins.</nexus.plugin.description>
+    <pluginName>Nexus Maven Bridge Plugin</pluginName>
+    <pluginDescription>Adds an API to access maven dependency resolution for Nexus plugins.</pluginDescription>
 
     <maven.version>3.0.4</maven.version>
     <aether.version>1.13.1</aether.version>

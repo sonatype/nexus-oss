@@ -26,8 +26,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus OSS LDAP Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds a LDAP security realm to Nexus.</nexus.plugin.description>
+    <pluginName>Nexus OSS LDAP Plugin</pluginName>
+    <pluginDescription>Adds a LDAP security realm to Nexus.</pluginDescription>
   </properties>
 
   <dependencies>

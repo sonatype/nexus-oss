@@ -29,8 +29,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Timeline Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds timeline and feeds based on it.</nexus.plugin.description>
+    <pluginName>Nexus Timeline Plugin</pluginName>
+    <pluginDescription>Adds timeline and feeds based on it.</pluginDescription>
   </properties>
 
   <dependencies>

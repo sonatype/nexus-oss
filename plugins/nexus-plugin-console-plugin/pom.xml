@@ -29,8 +29,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Plugin Console Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds a UI to view installed plugins.</nexus.plugin.description>
+    <pluginName>Nexus Plugin Console Plugin</pluginName>
+    <pluginDescription>Adds a UI to view installed plugins.</pluginDescription>
   </properties>
 
   <dependencies>

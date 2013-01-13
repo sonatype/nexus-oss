@@ -28,8 +28,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus LVO Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Reminds about newer Nexus versions.</nexus.plugin.description>
+    <pluginName>Nexus LVO Plugin</pluginName>
+    <pluginDescription>Reminds about newer Nexus versions.</pluginDescription>
   </properties>
 
   <dependencies>

@@ -30,8 +30,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Maven Archetype Catalog Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds a content generator for archetype.xml files.</nexus.plugin.description>
+    <pluginName>Nexus Maven Archetype Catalog Plugin</pluginName>
+    <pluginDescription>Adds a content generator for archetype.xml files.</pluginDescription>
   </properties>
 
   <dependencies>
