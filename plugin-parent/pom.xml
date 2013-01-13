@@ -70,6 +70,16 @@
       </dependency>
 
       <!--
+      Required for plugins which use the maven-bridge.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-maven-bridge-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
       Required for plugins which provide legacy restlet-1.x REST resources.
       -->
       <dependency>
