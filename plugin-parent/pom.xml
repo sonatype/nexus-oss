@@ -48,6 +48,12 @@
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
     <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
+
+    <!-- Default debug friendly options; see 'optimize-js' profile -->
+    <maven.yuicompressor.jswarn>true</maven.yuicompressor.jswarn>
+    <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
+    <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+    <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
   </properties>
 
   <dependencyManagement>
@@ -405,6 +411,23 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+
+    <!--
+    Optimize javascript & css files, for use on production/release builds.
+    -->
+    <profile>
+      <id>optimize-js</id>
+
+      <properties>
+        <!--
+        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
+        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
+        -->
+        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+        <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
+        <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
+      </properties>
     </profile>
 
     <!--
