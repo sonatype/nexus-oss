@@ -32,12 +32,11 @@
 
   <properties>
     <pluginName>Nexus Yum Plugin</pluginName>
-    <pluginDescription>Allows Nexus to create yum repositories for uploaded RPM packages</pluginDescription>
+    <pluginDescription>Allows Nexus to create yum repositories for uploaded RPM packages.</pluginDescription>
     <pluginSiteUrl>https://github.com/sonatype/nexus-yum-plugin</pluginSiteUrl>
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
@@ -47,14 +46,13 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <type>${nexus.plugin.type}</type>
+      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -65,7 +63,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <type>${nexus.plugin.type}</type>
+      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -74,22 +72,19 @@
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-utils</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>com.google.code.tempus-fugit</groupId>
       <artifactId>tempus-fugit</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.redline-rpm</groupId>
       <artifactId>redline</artifactId>
@@ -102,20 +97,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.7</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.7</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <pluginName>${pluginName}</pluginName>
-          <pluginDescription>${pluginDescription}</pluginDescription>
-          <pluginSiteUrl>${pluginSiteUrl}</pluginSiteUrl>
-        </configuration>
       </plugin>
     </plugins>
   </build>

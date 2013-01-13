@@ -18,18 +18,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>30</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugin-parent</artifactId>
+    <version>2.4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.yum</groupId>
   <artifactId>nexus-yum</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
-
   <packaging>pom</packaging>
 
-  <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
+  <version>3.0.1-SNAPSHOT</version>
 
   <developers>
     <developer>
@@ -66,66 +64,27 @@
   </modules>
 
   <properties>
-    <nexus.version>2.3.0</nexus.version>
-    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
-
-    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
-    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
-    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
-
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-api</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-restlet1x-plugin</artifactId>
-        <version>${nexus.version}</version>
-        <type>${nexus.plugin.type}</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-test-utils</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-testsuite-support</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-test-api</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-exec</artifactId>
         <version>1.1</version>
       </dependency>
+
       <dependency>
         <groupId>xmlunit</groupId>
         <artifactId>xmlunit</artifactId>
         <version>1.3</version>
-        <scope>test</scope>
       </dependency>
+
       <dependency>
         <groupId>com.google.code.tempus-fugit</groupId>
         <artifactId>tempus-fugit</artifactId>
         <version>1.1</version>
-        <scope>test</scope>
         <exclusions>
           <exclusion>
             <groupId>org.hamcrest</groupId>
@@ -138,17 +97,27 @@
         </exclusions>
       </dependency>
 
-      <dependency>
-        <groupId>com.sun.jersey.contribs</groupId>
-        <artifactId>jersey-multipart</artifactId>
-        <version>1.12</version>
-      </dependency>
+      <!--
+      FIXME: Sort out where these DM entries were here...
+      -->
 
-      <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>3.2.1</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.sun.jersey.contribs</groupId>-->
+        <!--<artifactId>jersey-multipart</artifactId>-->
+        <!--<version>1.12</version>-->
+      <!--</dependency>-->
+
+      <!--<dependency>-->
+        <!--<groupId>commons-collections</groupId>-->
+        <!--<artifactId>commons-collections</artifactId>-->
+        <!--<version>3.2.1</version>-->
+      <!--</dependency>-->
+
+      <!--<dependency>-->
+        <!--<groupId>org.codehaus.jackson</groupId>-->
+        <!--<artifactId>jackson-mapper-asl</artifactId>-->
+        <!--<version>1.9.10</version>-->
+      <!--</dependency>-->
 
       <dependency>
         <groupId>commons-io</groupId>
@@ -163,19 +132,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.nexus.client</groupId>
-        <artifactId>nexus-client-core</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
         <version>1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-mapper-asl</artifactId>
-        <version>1.9.10</version>
       </dependency>
 
       <!-- Pure Java RPM-library -->
@@ -183,22 +142,13 @@
         <groupId>org.redline-rpm</groupId>
         <artifactId>redline</artifactId>
         <version>1.1.9</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>${it.nexus.bundle.groupId}</groupId>
-        <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-        <version>${it.nexus.bundle.version}</version>
-        <type>zip</type>
-        <classifier>bundle</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-capabilities-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
         <version>2.2</version>
-        <type>${nexus.plugin.type}</type>
       </dependency>
 
       <dependency>
@@ -207,13 +157,15 @@
         <version>2.2</version>
       </dependency>
 
-      <!-- Internal Dependencies -->
+      <!-- INTERNAL -->
+
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-yum-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
         <version>3.0.1-SNAPSHOT</version>
-        <type>${nexus.plugin.type}</type>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.nexus.yum</groupId>
         <artifactId>nexus-yum-client</artifactId>
@@ -221,83 +173,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <workingDirectory>${project.build.directory}</workingDirectory>
-            <excludes>
-              <exclude>**/Abstract*.java</exclude>
-              <exclude>**/Test*.java</exclude>
-            </excludes>
-            <includes>
-              <include>**/*Test.java</include>
-            </includes>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <workingDirectory>${project.build.directory}</workingDirectory>
-          </configuration>
-        </plugin>
-
-        <!-- Make project M2e friendly -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>[2.1,)</versionRange>
-                    <goals>
-                      <goal>unpack</goal>
-                      <goal>copy</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-
-      </plugins>
-    </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
-
-  </build>
-
-  <profiles>
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
-    <profile>
-      <id>idea</id>
-      <properties>
-        <nexus.plugin.type>jar</nexus.plugin.type>
-      </properties>
-    </profile>
-  </profiles>
 
 </project>
