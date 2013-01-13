@@ -59,7 +59,7 @@
         <version>${nexus.version}</version>
       </dependency>
 
-      <!-- PLUGINS -->
+      <!-- ******************** PLUGINS ******************** -->
 
       <!--
       Required for plugins which use H2 databases.
@@ -174,7 +174,7 @@
         <version>${nexus.version}</version>
       </dependency>
 
-      <!-- TESTING -->
+      <!-- ******************** TESTING ******************** -->
 
       <!--
       Basic dependency for *all* plugins which provide tests.
