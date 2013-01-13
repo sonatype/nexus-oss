@@ -85,22 +85,6 @@
           <skipIfEmpty>false</skipIfEmpty>
         </configuration>
       </plugin>
-
-      <!--
-      Generate *-dependencies POM, so we can scope=import it in the plugin-parent.
-      -->
-      <!--<plugin>-->
-        <!--<groupId>org.sonatype.plugins</groupId>-->
-        <!--<artifactId>provided-dependencies-maven-plugin</artifactId>-->
-        <!--<executions>-->
-          <!--<execution>-->
-            <!--<goals>-->
-              <!--<goal>generate</goal>-->
-              <!--<goal>attach-signatures</goal>-->
-            <!--</goals>-->
-          <!--</execution>-->
-        <!--</executions>-->
-      <!--</plugin>-->
     </plugins>
   </build>
 
