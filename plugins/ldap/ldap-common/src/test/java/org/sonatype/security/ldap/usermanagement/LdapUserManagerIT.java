@@ -82,7 +82,7 @@ public class LdapUserManagerIT
         Assert.assertTrue( roleIds.contains( "repoconsumer" ) ); // from LDAP
         Assert.assertTrue( roleIds.contains( "developer" ) ); // FROM LDAP and XML
         Assert.assertTrue( roleIds.contains( "anonymous" ) ); // FROM XML
-        Assert.assertEquals( 3, roleIds.size() );
+        Assert.assertEquals( "Expected 3 roles; found " + roleIds.size() + ": " + roleIds, 3, roleIds.size() );
     }
 
     @Test
