@@ -32,10 +32,11 @@
       <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <type>${nexusPluginType}</type>
+      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -45,15 +46,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.7</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.7</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>

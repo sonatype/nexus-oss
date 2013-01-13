@@ -50,7 +50,7 @@ public class CapabilityNexusIndexHtmlCustomizer
 
         if ( System.getProperty( "useOriginalJS" ) == null )
         {
-            return "<script src=\"static/js/org.sonatype.nexus.plugins.capabilities-all.js" + suffixParameters
+            return "<script src=\"static/js/nexus-capabilities-plugin-all.js" + suffixParameters
                 + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
         }
         else

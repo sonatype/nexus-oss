@@ -31,19 +31,14 @@
       <artifactId>nexus-restlet1x-model</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <!--
+    Use scope=provided dep on nexus-plugin-api here to avoid needing to explicitly call out versions of
+    plexus-utils, xstream and commons-lang, and keep the versions in sync with current NX release.
+    -->
     <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -64,20 +59,11 @@
               <models>
                 <model>src/main/mdo/capabilities-rest.xml</model>
               </models>
+              <packageWithVersion>false</packageWithVersion>
+              <useJava5>true</useJava5>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-          <useJava5>true</useJava5>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>
