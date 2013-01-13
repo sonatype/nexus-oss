@@ -19,13 +19,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-plugin-parent</artifactId>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-plugins</artifactId>
     <version>2.4-SNAPSHOT</version>
-    <relativePath>../../plugin-parent/pom.xml</relativePath>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-rrb-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
@@ -59,22 +57,6 @@
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!--
-    FIXME: These might be better off as part of nexus-plugin-test-api?
-    -->
-
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.plexus</groupId>-->
-      <!--<artifactId>plexus-jetty-testsuite</artifactId>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>org.eclipse.jetty</groupId>-->
-      <!--<artifactId>jetty-webapp</artifactId>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
   </dependencies>
 
   <build>
