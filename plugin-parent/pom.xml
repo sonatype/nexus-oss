@@ -30,6 +30,12 @@
 
   <version>2.4-SNAPSHOT</version>
 
+  <!--
+  ******************************************************************
+  MUST KEEP IN SYNC WITH PRO com.sonatype.nexus:nexus-plugin-parent!
+  ******************************************************************
+  -->
+
   <properties>
     <nexus.version>2.4-SNAPSHOT</nexus.version>
     <enunciate.version>1.26.2</enunciate.version>
@@ -40,9 +46,7 @@
     <!-- Used in enunciate.xml -->
     <copyright.year>2012</copyright.year>
 
-    <!--
-    FIXME: Find better names for these properties... all these dots bother me.
-    -->
+    <!-- Nexus _bundle-launcher-style_ integration-tests configuration -->
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
@@ -392,7 +396,7 @@
 
   <profiles>
     <!--
-    Enable integration-tests.
+    Enable running of integration-tests.
     -->
     <profile>
       <id>it</id>
