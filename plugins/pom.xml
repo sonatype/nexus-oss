@@ -17,8 +17,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!--
-  FIXME: Should eventually be able to use this as parent for all OSS plugins.
+  FIXME: Should eventually be able to use this as parent for all OSS plugins, and in that case can add some common configuration here.
   -->
+
   <!--<parent>-->
     <!--<groupId>org.sonatype.nexus</groupId>-->
     <!--<artifactId>nexus-plugin-parent</artifactId>-->
@@ -35,27 +36,6 @@
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-core-plugins</artifactId>
   <packaging>pom</packaging>
-
-  <dependencies>
-    <!--
-    FIXME: See note on DM entry.
-    -->
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
 
   <profiles>
     <profile>

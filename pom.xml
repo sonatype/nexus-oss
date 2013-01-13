@@ -174,7 +174,6 @@
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>
     <aether.version>1.13.1</aether.version>
-    <enunciate.version>1.26.1</enunciate.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
     <plexus-security.version>3.0.1</plexus-security.version>
@@ -189,12 +188,6 @@
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${project.version}</it.nexus.bundle.version>
-
-    <nexus.plugin.name>CHANGEME-PLUGIN-NAME-NOT-CONFIGURED</nexus.plugin.name>
-    <nexus.plugin.description>CHANGEME-PLUGIN-DESCRIPTION-NOT-CONFIGURED</nexus.plugin.description>
-
-    <!-- used in enunciate.xml -->
-    <copyright.year>2012</copyright.year>
   </properties>
 
   <prerequisites>
@@ -409,7 +402,7 @@
       </dependency>
 
       <!--
-      FIXME: This is used by a few tests in nexus-proxy (org.codehaus.plexus.digest.{Md5|Sha1}Digester).
+      FIXME: This is used by a few tests in nexus-core (org.codehaus.plexus.digest.{Md5|Sha1}Digester).
       -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -632,6 +625,10 @@
         </exclusions>
       </dependency>
 
+      <!--
+      FIXME: Sort out what maven/aether stuff is actually needed by core and what is needed by plugins.
+      -->
+
       <!-- Maven -->
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -756,6 +753,10 @@
         <artifactId>ehcache-core</artifactId>
         <version>2.5.1</version>
       </dependency>
+
+      <!--
+      FIXME: Move this to the restlet1x plugin.
+      -->
 
       <!-- Restlet.org et al -->
       <dependency>
@@ -925,38 +926,6 @@
         <groupId>org.sonatype.sisu.pr</groupId>
         <artifactId>sisu-pr-testutil</artifactId>
         <version>1.5.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>enunciate-core</artifactId>
-        <version>${enunciate.version}</version>
-        <!--
-        Only used for generated REST API documentation, and only used for @ResourceMethodSignature.
-        FIXME: This can be removed if plugins implement proper JAX-RS apis, and delegate to restlet crud.
-        -->
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-digester</groupId>
-            <artifactId>commons-digester</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>net.sf.apt-jelly</groupId>
-            <artifactId>apt-jelly-freemarker</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
@@ -1206,6 +1175,9 @@
           </executions>
         </plugin>
 
+        <!--
+        FIXME: This is still needed here, as there are some nexus-plugins defined outside of the plugins group (nexus-it-helper-plugin for one).
+        -->
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>app-lifecycle-maven-plugin</artifactId>
@@ -1679,56 +1651,6 @@
     </profile>
 
     <profile>
-      <id>enunciate</id>
-      <activation>
-        <file>
-          <exists>enunciate.xml</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.enunciate</groupId>
-            <artifactId>maven-enunciate-slim-plugin</artifactId>
-            <version>${enunciate.version}</version>
-            <dependencies>
-              <dependency>
-                <groupId>org.codehaus.enunciate</groupId>
-                <artifactId>enunciate-docs</artifactId>
-                <version>${enunciate.version}</version>
-              </dependency>
-              <!--
-              enunciate-xml module is needed to properly handle rest defaultRestSubcontext configuration.
-              when this dependency is included the module appears to be automatically enabled.
-              -->
-              <dependency>
-                <groupId>org.codehaus.enunciate</groupId>
-                <artifactId>enunciate-xml</artifactId>
-                <version>${enunciate.version}</version>
-              </dependency>
-            </dependencies>
-            <executions>
-              <execution>
-                <phase>process-classes</phase>
-                <goals>
-                  <goal>docs</goal>
-                </goals>
-                <configuration>
-                  <configFile>enunciate.xml</configFile>
-                  <docsDir>${project.build.outputDirectory}/docs</docsDir>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!--
-          TODO: Configure yui-compression on relevant files here.
-          -->
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>it</id>
       <activation>
         <property>
@@ -1891,19 +1813,6 @@
                         <versionRange>[1.7,)</versionRange>
                         <goals>
                           <goal>install</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore />
-                      </action>
-                    </pluginExecution>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>org.codehaus.enunciate</groupId>
-                        <artifactId>maven-enunciate-slim-plugin</artifactId>
-                        <versionRange>[1.26,)</versionRange>
-                        <goals>
-                          <goal>docs</goal>
                         </goals>
                       </pluginExecutionFilter>
                       <action>
