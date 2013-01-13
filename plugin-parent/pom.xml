@@ -71,7 +71,7 @@
       </dependency>
 
       <!--
-      Required for plugins which provide legacy restlet-1.x REST apis.
+      Required for plugins which provide legacy restlet-1.x REST resources.
       -->
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
@@ -144,7 +144,7 @@
       </dependency>
 
       <!--
-      Required for plugins which provide JAX-RS REST apis.
+      Required for plugins which provide modern JAX-RS 1.1 REST resources.
       -->
       <!--<dependency>-->
       <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
