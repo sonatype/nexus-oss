@@ -60,6 +60,16 @@
       </dependency>
 
       <!--
+      Required for plugins which use H2 databases.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-h2-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
       Required for plugins which provide legacy restlet-1.x REST resources.
       -->
       <dependency>
