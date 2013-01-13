@@ -40,6 +40,9 @@
     <!-- Used in enunciate.xml -->
     <copyright.year>2012</copyright.year>
 
+    <!--
+    FIXME: Find better names for these properties... all these dots bother me.
+    -->
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
@@ -204,9 +207,9 @@
       <dependency>
         <groupId>${it.nexus.bundle.groupId}</groupId>
         <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-        <version>${it.nexus.bundle.version}</version>
-        <type>zip</type>
         <classifier>bundle</classifier>
+        <type>zip</type>
+        <version>${it.nexus.bundle.version}</version>
       </dependency>
 
       <!--
