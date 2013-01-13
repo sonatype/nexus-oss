@@ -78,15 +78,6 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-velocity</artifactId>
     </dependency>
-
-    <!--
-    FIXME: Kill this pointless dependency.
-    -->
-
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-api</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
