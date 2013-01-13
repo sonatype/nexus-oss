@@ -27,8 +27,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Site Repository Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds a repository type for deploying web sites.</nexus.plugin.description>
+    <pluginName>Nexus Site Repository Plugin</pluginName>
+    <pluginDescription>Adds a repository type for deploying web sites.</pluginDescription>
   </properties>
 
   <dependencies>
@@ -41,7 +41,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -50,28 +49,12 @@
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
-        <version>1.1</version>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
       </plugin>
+
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>0.0.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/classes/static/js/${project.version}/${project.artifactId}-all.js</output>
-              <nosuffix>true</nosuffix>
-              <nomunge>true</nomunge>
-              <jswarn>false</jswarn>
-              <insertNewLine>true</insertNewLine>
-              <disableOptimizations>true</disableOptimizations>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
