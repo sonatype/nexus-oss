@@ -109,6 +109,9 @@
       </dependency>
 
       <!--
+      Here only to bring in org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature so that enunciate can understand
+      restlet1x plugins which have these annotations for documentation generation.
+
       FIXME: Remove need for this dep once we have most bits on JAX-RS compatible resources.
       FIXME: Short-term, may want to just include this in deps provided by nexus-restlet1x-plugin?
       -->
