@@ -82,6 +82,10 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <!--
+    FIXME: Avoid the need for this plugin, allocate ports in tests instead.
+    -->
     <dependency>
       <groupId>org.sonatype.plugins</groupId>
       <artifactId>port-allocator-maven-plugin</artifactId>
@@ -93,6 +97,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
