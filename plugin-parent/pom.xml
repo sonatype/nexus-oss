@@ -32,10 +32,13 @@
 
   <properties>
     <nexus.version>2.4-SNAPSHOT</nexus.version>
-    <enunciate.version>1.26.1</enunciate.version>
+    <enunciate.version>1.26.2</enunciate.version>
 
     <!-- See 'idea' profile -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
+
+    <!-- Used in enunciate.xml -->
+    <copyright.year>2012</copyright.year>
   </properties>
 
   <dependencyManagement>
@@ -229,6 +232,9 @@
               <version>1.7</version>
             </dependency>
           </dependencies>
+          <configuration>
+            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
+          </configuration>
         </plugin>
 
         <!--
