@@ -53,17 +53,6 @@
         <version>${nexus.version}</version>
       </dependency>
 
-      <!--
-      Import all DM entries for all dependencies known by nexus-plugin-api.
-      -->
-      <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus</groupId>-->
-      <!--<artifactId>nexus-plugin-api-dependencies</artifactId>-->
-      <!--<type>pom</type>-->
-      <!--<scope>import</scope>-->
-      <!--<version>${nexus.version}</version>-->
-      <!--</dependency>-->
-
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
         <artifactId>nexus-client-core</artifactId>
@@ -171,17 +160,6 @@
         <artifactId>nexus-plugin-test-api</artifactId>
         <version>${nexus.version}</version>
       </dependency>
-
-      <!--
-      Import all DM entries for all dependencies known by nexus-plugin-test-api.
-      -->
-      <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus</groupId>-->
-      <!--<artifactId>nexus-plugin-test-api-dependencies</artifactId>-->
-      <!--<type>pom</type>-->
-      <!--<scope>import</scope>-->
-      <!--<version>${nexus.version}</version>-->
-      <!--</dependency>-->
 
       <!--
       Basic dependency for plugins which provide _bundle-launcher-style_ integration-tests.
