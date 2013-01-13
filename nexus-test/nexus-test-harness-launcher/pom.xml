@@ -247,14 +247,4 @@
 
   </dependencies>
 
-  <!--<build>-->
-    <!--<plugins>-->
-      <!--<plugin>-->
-        <!--<groupId>org.sonatype.plugins</groupId>-->
-        <!--<artifactId>app-lifecycle-maven-plugin</artifactId>-->
-        <!--<extensions>true</extensions>-->
-      <!--</plugin>-->
-    <!--</plugins>-->
-  <!--</build>-->
-
 </project>
