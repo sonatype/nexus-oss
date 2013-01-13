@@ -167,11 +167,14 @@
 
   <build>
     <plugins>
-      <!--<plugin>-->
-        <!--<groupId>org.sonatype.plugins</groupId>-->
-        <!--<artifactId>app-lifecycle-maven-plugin</artifactId>-->
-        <!--<extensions>true</extensions>-->
-      <!--</plugin>-->
+      <!--
+      FIXME: This may be needed for the testsuite execution to resolve nexus-plugin types?
+      -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

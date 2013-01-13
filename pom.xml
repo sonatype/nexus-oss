@@ -1176,18 +1176,14 @@
         </plugin>
 
         <!--
-        FIXME: This is still needed here, as there are some nexus-plugins defined outside of the plugins group (nexus-it-helper-plugin for one).
+        FIXME: This is still needed here, as there are some nexus-plugins defined outside of the plugins group
+        FIXME: (nexus-it-helper-plugin for one, maybe needed for nexus-test-harness-its too).
         -->
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>app-lifecycle-maven-plugin</artifactId>
           <version>1.7</version>
           <extensions>true</extensions>
-          <configuration>
-            <pluginName>${nexus.plugin.name}</pluginName>
-            <pluginDescription>${nexus.plugin.description}</pluginDescription>
-            <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
-          </configuration>
           <dependencies>
             <dependency>
               <groupId>org.sonatype.plugins</groupId>
