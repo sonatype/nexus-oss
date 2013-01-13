@@ -36,6 +36,14 @@
   <artifactId>nexus-core-plugins</artifactId>
   <packaging>pom</packaging>
 
+  <properties>
+    <!--
+    FIXME: Sort out what we want to use as the default configuration for the nexus-plugin muck.
+    -->
+    <pluginName>${nexus.plugin.name}</pluginName>
+    <pluginDescription>${nexus.plugin.description}</pluginDescription>
+  </properties>
+
   <dependencies>
     <!--
     FIXME: See note on DM entry.
