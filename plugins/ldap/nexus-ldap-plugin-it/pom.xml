@@ -35,12 +35,12 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>ant</artifactId>
-          <groupId>ant</groupId>
-        </exclusion>
-      </exclusions>
+      <!--<exclusions>-->
+        <!--<exclusion>-->
+          <!--<artifactId>ant</artifactId>-->
+          <!--<groupId>ant</groupId>-->
+        <!--</exclusion>-->
+      <!--</exclusions>-->
     </dependency>
 
     <!--<dependency>-->

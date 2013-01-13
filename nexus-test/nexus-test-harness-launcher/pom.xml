@@ -57,6 +57,7 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>

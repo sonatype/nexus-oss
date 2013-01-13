@@ -40,8 +40,9 @@
 
   <dependencyManagement>
     <dependencies>
+
       <!--
-      Basic dependency for *all* Nexus plugins.
+      Basic dependency for *all* plugins.
       -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -52,13 +53,13 @@
       <!--
       Import all DM entries for all dependencies known by nexus-plugin-api.
       -->
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-api-dependencies</artifactId>
-        <type>pom</type>
-        <scope>import</scope>
-        <version>${nexus.version}</version>
-      </dependency>
+      <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-plugin-api-dependencies</artifactId>-->
+      <!--<type>pom</type>-->
+      <!--<scope>import</scope>-->
+      <!--<version>${nexus.version}</version>-->
+      <!--</dependency>-->
 
       <dependency>
         <groupId>org.sonatype.nexus.client</groupId>
@@ -67,7 +68,7 @@
       </dependency>
 
       <!--
-      Required for Nexus plugins which provide legacy restlet-1.x REST apis.
+      Required for plugins which provide legacy restlet-1.x REST apis.
       -->
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
@@ -147,7 +148,7 @@
       <!--</dependency>-->
 
       <!--
-      Required for Nexus plugins which provide indexer integration.
+      Required for plugins which provide indexer integration.
       -->
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
@@ -157,7 +158,7 @@
       </dependency>
 
       <!--
-      Basic dependency for *all* Nexus plugins which provide tests.
+      Basic dependency for *all* plugins which provide tests.
       -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -168,21 +169,30 @@
       <!--
       Import all DM entries for all dependencies known by nexus-plugin-test-api.
       -->
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-test-api-dependencies</artifactId>
-        <type>pom</type>
-        <scope>import</scope>
-        <version>${nexus.version}</version>
-      </dependency>
+      <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-plugin-test-api-dependencies</artifactId>-->
+      <!--<type>pom</type>-->
+      <!--<scope>import</scope>-->
+      <!--<version>${nexus.version}</version>-->
+      <!--</dependency>-->
 
       <!--
-      Basic dependency for Nexus plugins which provide _bundle-launcher-style_ integration-tests.
-      FIXME: Consider adding this into nexus-plugin-test-api
+      Basic dependency for plugins which provide _bundle-launcher-style_ integration-tests.
       -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-support</artifactId>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      Dependency for all plugins which provide _legacy-style_ integration-tests.
+      This can *NOT* be included in nexus-plugin-test-api as it depends on several plugins.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-harness-launcher</artifactId>
         <version>${nexus.version}</version>
       </dependency>
 
@@ -314,7 +324,7 @@
         </plugin>
 
         <!--
-        Support for bridging maven configuration to test-suite executions.
+        Support for bridging maven configuration to test-suite executions; see 'it' profile.
         -->
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
@@ -371,6 +381,7 @@
 
     <!--
     Generates Nexus plugin REST documentation, which is included in plugin bundles.
+    Enunciate is *only* used to generate documentation presently.
     -->
     <profile>
       <id>enunciate</id>
@@ -394,7 +405,8 @@
                 <version>${enunciate.version}</version>
               </dependency>
               <!--
-              enunciate-xml module is needed to properly handle 'defaultRestSubcontext' configuration, which is used to generate the mount point location in documentation.
+              enunciate-xml module is needed to properly handle 'defaultRestSubcontext' configuration,
+              which is used to generate the mount point location in documentation.
               when this dependency is included the module appears to be automatically enabled.
               -->
               <dependency>
@@ -421,7 +433,7 @@
     </profile>
 
     <!--
-    Support for loading Nexus plugin projects in Intellij IDEA.
+    Support for loading Nexus plugin projects in Intellij IDEA; as it doesn't handle the 'nexus-plugin' packaging WRT to dependency calculations.
     -->
     <profile>
       <id>idea</id>

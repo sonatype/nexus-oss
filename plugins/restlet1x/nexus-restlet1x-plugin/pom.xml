@@ -41,21 +41,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!--
-    FIXME: If these are really provided by NX, then they should be picked up by nexus-plugin-api to avoid plugins having to manage this dependency configuration.
-    -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-logging-extras</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-web-utils</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
@@ -132,11 +117,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
@@ -158,12 +138,12 @@
     <!--
     FIXME: Really need to kill these -tests.jar bits, they only complicate development/build-configuration/dependency-management.
     -->
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-xml-realm</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.security.realms</groupId>-->
+      <!--<artifactId>security-xml-realm</artifactId>-->
+      <!--<classifier>tests</classifier>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
   </dependencies>
 
   <build>

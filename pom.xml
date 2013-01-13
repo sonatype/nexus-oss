@@ -203,6 +203,12 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <!--
+      FIXME: Kill scope=import... its a huge FUCKING PITA not worth the trouble.
+      FIXME: On each new build, which does not already have deployed/available dependencies, the build will fail to resolve this dependency.
+      FIXME: Builds afterwards will also be inconsistent and pick the deployed version (instead of local version); this resolution happens very early.
+      -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-runtime-platform</artifactId>
@@ -1164,7 +1170,6 @@
   </dependencyManagement>
 
   <build>
-
     <pluginManagement>
       <plugins>
 

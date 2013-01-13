@@ -36,10 +36,13 @@
       <scope>runtime</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-launcher</artifactId>
-    </dependency>
+    <!--
+    NOTE: Can *NOT* include this dependency here, as it introduces a bunch of nasty dependency cycles, since it depends on some plugins.
+    -->
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-test-harness-launcher</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
@@ -86,18 +89,18 @@
       <!--
       Generate *-dependencies POM, so we can scope=import it in the plugin-parent.
       -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-              <goal>attach-signatures</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>org.sonatype.plugins</groupId>-->
+        <!--<artifactId>provided-dependencies-maven-plugin</artifactId>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<goals>-->
+              <!--<goal>generate</goal>-->
+              <!--<goal>attach-signatures</goal>-->
+            <!--</goals>-->
+          <!--</execution>-->
+        <!--</executions>-->
+      <!--</plugin>-->
     </plugins>
   </build>
 

@@ -22,6 +22,10 @@
     <version>2.4-SNAPSHOT</version>
   </parent>
 
+  <!--
+  FIXME: This appears to be only used by nexus-test-harness-launcher (legacy IT framework) and should be merged into that module if that is the case.
+  -->
+
   <artifactId>nexus-test-utils</artifactId>
 
   <dependencies>
@@ -31,6 +35,9 @@
       <scope>compile</scope>
     </dependency>
 
+    <!--
+    FIXME: Should not depend on a plugin here!
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
@@ -48,7 +55,7 @@
     </dependency>
 
     <!--
-    FIXME: Should not depend on a plugin here... !!!!!!  This is needed for TasksNexusRestClient via XStreamFactory.
+    FIXME: Should not depend on a plugin here! This is needed for TasksNexusRestClient via XStreamFactory.
     -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>

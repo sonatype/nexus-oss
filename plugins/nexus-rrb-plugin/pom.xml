@@ -64,17 +64,17 @@
     FIXME: These might be better off as part of nexus-plugin-test-api?
     -->
 
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.plexus</groupId>-->
+      <!--<artifactId>plexus-jetty-testsuite</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.eclipse.jetty</groupId>-->
+      <!--<artifactId>jetty-webapp</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
   </dependencies>
 
   <build>

@@ -117,11 +117,11 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.plexus</groupId>-->
+      <!--<artifactId>plexus-jetty-testsuite</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
     <!-- FIXME: This dependency is here only for TestMarshalUnmarchal via TestLuceneRestMarshalUnmarchal -->
     <dependency>

@@ -73,20 +73,16 @@
       </exclusions>
     </dependency>
 
-    <!--
-    FIXME: While NX core does provide these, perhaps this plugin is better off using its own versions of these Maven specific bits?
-    -->
-
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-metadata</artifactId>
-      <scope>provided</scope>
+      <version>${maven.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <scope>provided</scope>
+      <version>${maven.version}</version>
     </dependency>
 
     <dependency>
