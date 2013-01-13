@@ -233,6 +233,11 @@
     </dependencies>
   </dependencyManagement>
 
+  <!--
+  Explicitly *NOT* adding a <dependencies> section to this POM, children must configure what they need.
+  We must *NOT* assume we know what artifacts should be depended upon.
+  -->
+
   <build>
     <pluginManagement>
       <plugins>
@@ -378,6 +383,11 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <!--
+    Explicitly *NOT* adding a <plugins> section to this POM, children must configure what they need.
+    We must *NOT* assume we know what plugins should execute by default.
+    -->
   </build>
 
   <profiles>
