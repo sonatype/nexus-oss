@@ -1107,11 +1107,7 @@
         <artifactId>nexus-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-manager</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-test-api</artifactId>
@@ -1137,6 +1133,30 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <modules>
+    <module>nexus-runtime-platform</module>
+    <module>nexus-bootstrap</module>
+    <module>nexus-plugin-api</module>
+    <module>nexus-plugin-test-api</module>
+    <module>nexus-core</module>
+    <module>nexus-web-utils</module>
+    <module>nexus-logging-extras</module>
+    <module>nexus-logging-extras-appender</module>
+    <module>nexus-compat</module>
+    <module>nexus-oss-edition</module>
+    <module>nexus-configuration-model</module>
+    <module>plugin-parent</module>
+    <module>plugins</module>
+    <module>nexus-webapp</module>
+    <module>nexus-launcher</module>
+    <module>nexus-client-core</module>
+    <module>nexus-clients</module>
+    <module>nexus-oss-webapp</module>
+    <module>nexus-stories</module>
+    <module>nexus-test</module>
+    <module>nexus-client-core-testsuite</module>
+  </modules>
 
   <build>
     <pluginManagement>
@@ -1585,30 +1605,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <modules>
-    <module>nexus-runtime-platform</module>
-    <module>nexus-bootstrap</module>
-    <module>nexus-plugin-api</module>
-    <module>nexus-plugin-test-api</module>
-    <module>nexus-core</module>
-    <module>nexus-web-utils</module>
-    <module>nexus-logging-extras</module>
-    <module>nexus-logging-extras-appender</module>
-    <module>nexus-compat</module>
-    <module>nexus-oss-edition</module>
-    <module>nexus-configuration-model</module>
-    <module>plugin-parent</module>
-    <module>plugins</module>
-    <module>nexus-webapp</module>
-    <module>nexus-launcher</module>
-    <module>nexus-client-core</module>
-    <module>nexus-clients</module>
-    <module>nexus-oss-webapp</module>
-    <module>nexus-stories</module>
-    <module>nexus-test</module>
-    <module>nexus-client-core-testsuite</module>
-  </modules>
 
   <profiles>
     <profile>
