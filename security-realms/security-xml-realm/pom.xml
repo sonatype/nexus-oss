@@ -52,6 +52,11 @@
       <artifactId>plexus-utils</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+    </dependency>
+
     <!-- A backend for testing -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -64,12 +69,5 @@
       <artifactId>multithreadedtc</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-host-api</artifactId>
-      <version>1.0.2</version>
-    </dependency>
-
   </dependencies>
 </project>
