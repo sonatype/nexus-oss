@@ -1084,8 +1084,8 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
-        <version>2.4-SNAPSHOT</version>
         <type>war</type>
+        <version>2.4-SNAPSHOT</version>
       </dependency>
 
       <dependency>
