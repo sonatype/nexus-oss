@@ -180,19 +180,4 @@
     </dependencies>
   </dependencyManagement>
 
-  <!--
-  FIXME: Sort out if this should be here or not, looks unused, given use of scope=import only applies to DM
-  -->
-  <dependencies>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-  </dependencies>
-
 </project>
