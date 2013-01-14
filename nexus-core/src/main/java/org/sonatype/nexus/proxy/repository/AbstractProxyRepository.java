@@ -1064,6 +1064,7 @@ public abstract class AbstractProxyRepository
 
             db.append( " :: localOnly=" ).append( request.isRequestLocalOnly() );
             db.append( ", remoteOnly=" ).append( request.isRequestRemoteOnly() );
+            db.append( ", asExpired=" ).append( request.isRequestAsExpired() );
 
             if ( getProxyMode() != null )
             {
@@ -1107,7 +1108,7 @@ public abstract class AbstractProxyRepository
                     {
                         localItem = (AbstractStorageItem) super.doRetrieveItem( request );
 
-                        if ( localItem != null && !isOld( localItem ) )
+                        if ( localItem != null && !request.isRequestAsExpired() && !isOld( localItem ) )
                         {
                             // local copy is just fine, so, we are proxy but we have valid local copy in cache
                             return localItem;
@@ -1136,7 +1137,7 @@ public abstract class AbstractProxyRepository
                         {
                             localItem = (AbstractStorageItem) super.doRetrieveItem( request );
 
-                            if ( localItem != null && !isOld( localItem ) )
+                            if ( localItem != null && !request.isRequestAsExpired() &&  !isOld( localItem ) )
                             {
                                 // local copy is just fine (downloaded by a thread holding us blocked on acquiring
                                 // exclusive lock)
@@ -1191,7 +1192,7 @@ public abstract class AbstractProxyRepository
         if ( shouldProxy )
         {
             // we are able to go remote
-            if ( localItem == null || isOld( localItem ) )
+            if ( localItem == null || request.isRequestAsExpired() || isOld( localItem ) )
             {
                 // we should go remote coz we have no local copy or it is old
                 try

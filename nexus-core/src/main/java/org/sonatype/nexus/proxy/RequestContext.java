@@ -41,6 +41,9 @@ public class RequestContext
     /** Context flag to mark a request local only. For {@link GroupRepository} instances: do not "dive" into members, else: no effect. */
     public static final String CTX_GROUP_LOCAL_ONLY_FLAG = "request.groupLocalOnly";
 
+    /** Context flag to mark a request be processed as the item would be expired.  For {@link ProxyRepository} instances: do check remote for newer but take into account local cache content, else: no effect. */
+    public static final String CTX_AS_EXPIRED_FLAG = "request.asExpired";
+
     /** Context key for condition "if-modified-since" */
     public static final String CTX_CONDITION_IF_MODIFIED_SINCE = "request.condition.ifModifiedSince";
 
@@ -210,6 +213,33 @@ public class RequestContext
     public void setRequestGroupLocalOnly( boolean requestGroupLocal )
     {
         put( CTX_GROUP_LOCAL_ONLY_FLAG, requestGroupLocal );
+    }
+
+    /**
+     * Checks if request should be handled as expired.
+     * 
+     * @return true, if request should be handled as expired
+     */
+    public boolean isRequestAsExpired()
+    {
+        if ( containsKey( CTX_AS_EXPIRED_FLAG ) )
+        {
+            return (Boolean) get( CTX_AS_EXPIRED_FLAG );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Sets the request to be handled as expired.
+     * 
+     * @param asExpired the new asExpired value
+     */
+    public void setRequestAsExpired( boolean asExpired )
+    {
+        put( CTX_AS_EXPIRED_FLAG, asExpired );
     }
 
     /**
