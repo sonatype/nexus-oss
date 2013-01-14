@@ -182,7 +182,7 @@
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.5.1</goodies.version>
 
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
+    <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
     <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
