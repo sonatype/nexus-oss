@@ -43,17 +43,11 @@
       <!--</exclusions>-->
     </dependency>
 
-    <!--<dependency>-->
-    <!--<groupId>org.sonatype.security</groupId>-->
-    <!--<artifactId>security-rest-api</artifactId>-->
-    <!--<scope>test</scope>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-    <!--<groupId>org.sonatype.nexus</groupId>-->
-    <!--<artifactId>nexus-web-utils</artifactId>-->
-    <!--<scope>provided</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-web-utils</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
