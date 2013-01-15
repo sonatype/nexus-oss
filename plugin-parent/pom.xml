@@ -367,6 +367,15 @@
         </plugin>
 
         <!--
+        Plugin supporting _legacy-style_ integration-tests.
+        -->
+        <plugin>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-test-environment-maven-plugin</artifactId>
+          <version>${nexus.version}</version>
+        </plugin>
+
+        <!--
         Support for bridging maven configuration to test-suite executions; see 'it' profile.
         -->
         <plugin>
