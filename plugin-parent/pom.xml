@@ -51,6 +51,7 @@
     <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
+    <!-- Configuration for 'nexus-plugin' packaging. -->
     <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
 
     <!-- Default debug friendly options; see 'optimize-js' profile -->
