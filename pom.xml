@@ -177,7 +177,6 @@
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
     <plexus-security.version>3.0.1</plexus-security.version>
-    <restlet.version>1.1.6-SONATYPE-5348-V8</restlet.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.5.1</goodies.version>
@@ -371,37 +370,6 @@
       </dependency>
 
       <!--
-      FIXME: Should not need this here, its plugin specific.
-      -->
-      <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>plexus-restlet-bridge</artifactId>
-        <version>1.24</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-sslengine</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <!--
       FIXME: This is used by a few tests in nexus-core (org.codehaus.plexus.digest.{Md5|Sha1}Digester).
       -->
       <dependency>
@@ -542,7 +510,6 @@
 
       <!--
       Use our custom build of commons-beanutils 1.8.3 which excludes the commons-collections classes.
-      For more details see:
       https://issues.sonatype.org/browse/NEXUS-5336
       -->
       <dependency>
@@ -730,47 +697,6 @@
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache-core</artifactId>
         <version>2.5.1</version>
-      </dependency>
-
-      <!--
-      FIXME: Move this to the restlet1x plugin.
-      -->
-
-      <!-- Restlet.org et al -->
-      <dependency>
-        <groupId>org.restlet</groupId>
-        <artifactId>org.restlet</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.restlet</groupId>
-        <artifactId>org.restlet.ext.fileupload</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.restlet</groupId>
-        <artifactId>org.restlet.ext.jaxrs</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.restlet</groupId>
-        <artifactId>org.restlet.ext.velocity</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.noelios.restlet</groupId>
-        <artifactId>com.noelios.restlet</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.noelios.restlet</groupId>
-        <artifactId>com.noelios.restlet.ext.servlet</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.noelios.restlet</groupId>
-        <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-        <version>${restlet.version}</version>
       </dependency>
 
       <dependency>

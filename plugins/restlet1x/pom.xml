@@ -26,6 +26,10 @@
   <artifactId>nexus-restlet1x-parent</artifactId>
   <packaging>pom</packaging>
 
+  <properties>
+    <restlet.version>1.1.6-SONATYPE-5348-V8</restlet.version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <!--
@@ -57,6 +61,48 @@
             <artifactId>activation</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.restlet</groupId>
+        <artifactId>org.restlet</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.restlet</groupId>
+        <artifactId>org.restlet.ext.fileupload</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.restlet</groupId>
+        <artifactId>org.restlet.ext.jaxrs</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.restlet</groupId>
+        <artifactId>org.restlet.ext.velocity</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.noelios.restlet</groupId>
+        <artifactId>com.noelios.restlet</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.noelios.restlet</groupId>
+        <artifactId>com.noelios.restlet.ext.servlet</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.noelios.restlet</groupId>
+        <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
+        <version>${restlet.version}</version>
       </dependency>
 
       <dependency>
