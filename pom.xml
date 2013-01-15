@@ -798,14 +798,6 @@
         <version>1.6-SNAPSHOT</version>
       </dependency>
 
-      <!-- FIXME: This _should_ be sorted out in litmus already, need to check if we have any straggling deps locally which pull this in however -->
-      <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
-      <dependency>
-        <groupId>org.objenesis</groupId>
-        <artifactId>objenesis</artifactId>
-        <version>1.2</version>
-      </dependency>
-
       <dependency>
         <groupId>org.sonatype.sisu.pr</groupId>
         <artifactId>sisu-problem-reporter</artifactId>
