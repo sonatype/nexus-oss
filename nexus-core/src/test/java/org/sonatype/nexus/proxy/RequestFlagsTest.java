@@ -14,7 +14,10 @@ package org.sonatype.nexus.proxy;
 
 import static org.sonatype.tests.http.server.fluent.Behaviours.content;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -50,6 +53,14 @@ import org.sonatype.tests.http.server.jetty.behaviour.Record;
 
 import com.google.inject.Module;
 
+/**
+ * Unit test testing Nexus behaviour (with regard to remote fetches) with default behaviour, and then with the presence
+ * of the {@link ResourceStoreRequest} flags like "localOnly", "remoteOnly" and the new "asExpired" and their
+ * combination.
+ * 
+ * @author cstamas
+ * @since 2.4
+ */
 public class RequestFlagsTest
     extends NexusTestSupport
 {
@@ -65,7 +76,7 @@ public class RequestFlagsTest
 
     private Server server;
 
-    private Record recordedRequests;
+    private Record recordedRequestsBehaviour;
 
     private LastModifiedSender lastModifiedSender;
 
@@ -79,13 +90,14 @@ public class RequestFlagsTest
     {
         HttpServletResponse resp;
 
-        recordedRequests = new Record();
+        recordedRequestsBehaviour = new Record();
         // somewhere in near past
         lastModifiedSender =
             new LastModifiedSender( new Date( System.currentTimeMillis() - TimeUnit.DAYS.toMillis( 3 ) ) );
 
         server =
-            Proxy.withPort( 0 ).serve( PATH ).withBehaviours( recordedRequests, lastModifiedSender, content( CONTENT ) ).start();
+            Proxy.withPort( 0 ).serve( PATH ).withBehaviours( recordedRequestsBehaviour, lastModifiedSender,
+                content( CONTENT ) ).start();
         nexus = lookup( Nexus.class );
         proxyRepository = createProxyRepository();
 
@@ -119,7 +131,112 @@ public class RequestFlagsTest
         return mavenProxyRepository;
     }
 
-    // ==
+    protected List<String> getRecordedRequests()
+    {
+        // for me it was a surprise that Record behaviour reverses list, so this
+        // here just "undos" that, to make assertions in proper order (as requests happened)
+        // instead of doing it in reverse order (from last to 1st)
+        // Why does Record reverse requests anyway?
+        final List<String> list = new ArrayList<String>( recordedRequestsBehaviour.getRequests() );
+        Collections.reverse( list );
+        return list;
+    }
+
+    // == Normal behaviour: this is how Nexus performs in various cases when NO request flag is set at all
+    // == Cases like empty cache, primed cache, expired cache and remote is same, and expired cache and remote is newer
+
+    @Test
+    public void noFlagEmptyCacheIsServed()
+        throws Exception
+    {
+        final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+        final StorageItem item = proxyRepository.retrieveItem( request );
+
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
+
+        final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
+        MatcherAssert.assertThat( content, Matchers.equalTo( CONTENT ) );
+
+    }
+
+    @Test
+    public void noFlagPrimedCacheIsServed()
+        throws Exception
+    {
+        // prime the cache
+        {
+            final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+            proxyRepository.retrieveItem( request );
+        }
+
+        final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+        final StorageItem item = proxyRepository.retrieveItem( request );
+
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
+
+        final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
+        MatcherAssert.assertThat( content, Matchers.equalTo( CONTENT ) );
+    }
+
+    @Test
+    public void noFlagExpiredCacheIsServed()
+        throws Exception
+    {
+        // prime the cache and make it expired
+        {
+            final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+            proxyRepository.retrieveItem( request );
+            proxyRepository.expireCaches( new ResourceStoreRequest( "/" ) );
+        }
+
+        final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+        final StorageItem item = proxyRepository.retrieveItem( request );
+
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 2 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "HEAD" ) );
+        MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
+
+        final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
+        MatcherAssert.assertThat( content, Matchers.equalTo( CONTENT ) );
+    }
+
+    @Test
+    public void noFlagExpiredCacheRemoteIsNewerIsServed()
+        throws Exception
+    {
+        // prime the cache and make it expired
+        {
+            final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+            proxyRepository.retrieveItem( request );
+            proxyRepository.expireCaches( new ResourceStoreRequest( "/" ) );
+        }
+
+        lastModifiedSender.setLastModified( new Date() );
+
+        final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+        final StorageItem item = proxyRepository.retrieveItem( request );
+
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 3 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "HEAD" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 2 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
+
+        final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
+        MatcherAssert.assertThat( content, Matchers.equalTo( CONTENT ) );
+    }
+
+    // == LocalOnly flag: this flag PREVENTS nexus to go remote at all (even if it would normally)
+    // == All the recorded requests (if any) are made by "priming", not be the flagged request
 
     @Test
     public void localOnlyFlagWithEmptyCacheIs404()
@@ -137,7 +254,7 @@ public class RequestFlagsTest
             // good
         }
 
-        MatcherAssert.assertThat( recordedRequests.getRequests(), Matchers.empty() );
+        MatcherAssert.assertThat( getRecordedRequests(), Matchers.empty() );
     }
 
     @Test
@@ -154,8 +271,9 @@ public class RequestFlagsTest
         request.setRequestLocalOnly( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 1 ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
@@ -177,15 +295,18 @@ public class RequestFlagsTest
         request.setRequestLocalOnly( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 1 ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
         MatcherAssert.assertThat( content, Matchers.equalTo( CONTENT ) );
     }
 
-    // ==
+    // == RemoteOnly: this flag FORCES Nexus to go remotely and always fetch from remote
+    // == (even if it would not) and REPLACE the cached content (if any)
+    // == Note: as this test shows, with this flag Nexus will delete cache content if remote is 404!
 
     @Test
     public void remoteOnlyFlagWithEmptyCacheGoesRemoteAndIsServed()
@@ -195,8 +316,9 @@ public class RequestFlagsTest
         request.setRequestRemoteOnly( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 1 ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
@@ -217,11 +339,12 @@ public class RequestFlagsTest
         request.setRequestRemoteOnly( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
+        final List<String> recordedRequests = getRecordedRequests();
         // BOTH requests will go to remote server!
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 2 ) );
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 2 ) );
         // BOTH requests were GETs
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 1 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "GET" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
@@ -246,7 +369,8 @@ public class RequestFlagsTest
         final int port = server.getPort();
         server.stop();
         server =
-            Proxy.withPort( port ).serve( PATH ).withBehaviours( recordedRequests, Behaviours.error( 404, "Not found" ) ).start();
+            Proxy.withPort( port ).serve( PATH ).withBehaviours( recordedRequestsBehaviour,
+                Behaviours.error( 404, "Not found" ) ).start();
 
         final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
         request.setRequestRemoteOnly( true );
@@ -260,11 +384,12 @@ public class RequestFlagsTest
             // good
         }
 
+        final List<String> recordedRequests = getRecordedRequests();
         // BOTH requests will go to remote server!
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 2 ) );
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 2 ) );
         // BOTH requests were GETs
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 1 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "GET" ) );
 
         // cache got removed coz of 404!
         MatcherAssert.assertThat(
@@ -287,18 +412,24 @@ public class RequestFlagsTest
         request.setRequestRemoteOnly( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
+        final List<String> recordedRequests = getRecordedRequests();
         // BOTH requests will go to remote server!
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 2 ) );
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 2 ) );
         // BOTH requests were GETs
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 1 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "GET" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
         MatcherAssert.assertThat( content, Matchers.equalTo( CONTENT ) );
     }
 
-    // ==
+    // == AsExpired: this flag controls the "expiration", making the item requested behave as "expired"
+    // == This means it's better than remoteOnly (that blindly GETs), as this one will do same as Nexus
+    // == does with expired items (even if it is actually not expired, nor aged). Usable when payload
+    // == is bigger one (to save redundant download if you already have it cached, you just want to be sure it's
+    // == same as the remote), or explicitly keeping some local file in sync with remote, without doing
+    // == costly "expire proxy caches"
 
     @Test
     public void asExpireFlagWithEmptyCacheGoesRemoteAndIsServed()
@@ -308,8 +439,9 @@ public class RequestFlagsTest
         request.setRequestAsExpired( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 1 ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
@@ -330,12 +462,12 @@ public class RequestFlagsTest
         request.setRequestAsExpired( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
+        final List<String> recordedRequests = getRecordedRequests();
         // BOTH requests will go to remote server
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 2 ) );
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 2 ) );
         // But, requests are GET and HEAD (1st is for "prime", 2nd is checking for remote)
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 1 ), Matchers.startsWith( "HEAD" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 2 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "HEAD" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
@@ -351,20 +483,21 @@ public class RequestFlagsTest
             final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
             proxyRepository.retrieveItem( request );
         }
-        
+
         lastModifiedSender.setLastModified( new Date() );
 
         final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
         request.setRequestAsExpired( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
+        final List<String> recordedRequests = getRecordedRequests();
         // BOTH requests will go to remote server (but 2nd will do HEAD only request)!
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 3 ) );
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 3 ) );
         // But, requests are GET, HEAD and GET (1st is for "prime", 2nd is checking for remote, and 3rd one actually
         // GETs it
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 1 ), Matchers.startsWith( "HEAD" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 2 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "HEAD" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 2 ), Matchers.startsWith( "GET" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
@@ -386,11 +519,12 @@ public class RequestFlagsTest
         request.setRequestAsExpired( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
+        final List<String> recordedRequests = getRecordedRequests();
         // BOTH requests will go to remote server
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 2 ) );
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 2 ) );
         // But, requests are GET and HEAD (1st is for "prime", 2nd is checking for remote)
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 1 ), Matchers.startsWith( "HEAD" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "HEAD" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
@@ -407,24 +541,107 @@ public class RequestFlagsTest
             proxyRepository.retrieveItem( request );
             proxyRepository.expireCaches( new ResourceStoreRequest( "/" ) );
         }
-        
+
         lastModifiedSender.setLastModified( new Date() );
 
         final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
         request.setRequestAsExpired( true );
         final StorageItem item = proxyRepository.retrieveItem( request );
 
+        final List<String> recordedRequests = getRecordedRequests();
         // BOTH requests will go to remote server (but 2nd will do TWO HTTP requests)!
-        MatcherAssert.assertThat( recordedRequests.getRequests().size(), Matchers.equalTo( 3 ) );
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 3 ) );
         // But, requests are GET, HEAD and GET (1st is for "prime", 2nd is checking for remote, and 3rd one actually
         // GETs it
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 0 ), Matchers.startsWith( "GET" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 1 ), Matchers.startsWith( "HEAD" ) );
-        MatcherAssert.assertThat( recordedRequests.getRequests().get( 2 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 1 ), Matchers.startsWith( "HEAD" ) );
+        MatcherAssert.assertThat( recordedRequests.get( 2 ), Matchers.startsWith( "GET" ) );
         MatcherAssert.assertThat( item, Matchers.instanceOf( StorageFileItem.class ) );
 
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
         MatcherAssert.assertThat( content, Matchers.equalTo( CONTENT ) );
+    }
+    
+    // == localOnly + remoteOnly : Not found always, as we forbid use
+    // == of local and remote storage, so nowhere to serve from
+
+    @Test
+    public void localAndRemoteOnlyFlagWithEmptyCacheIs404()
+        throws Exception
+    {
+        final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+        request.setRequestLocalOnly( true );
+        request.setRequestRemoteOnly( true );
+        try
+        {
+            proxyRepository.retrieveItem( request );
+            Assert.fail( "We should get INFEx!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
+        }
+
+        MatcherAssert.assertThat( getRecordedRequests(), Matchers.empty() );
+    }
+
+    @Test
+    public void localAndRemoteOnlyFlagWithPrimedCacheIsServed()
+        throws Exception
+    {
+        // prime the cache
+        {
+            final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+            proxyRepository.retrieveItem( request );
+        }
+
+        final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+        request.setRequestLocalOnly( true );
+        request.setRequestRemoteOnly( true );
+        try
+        {
+            proxyRepository.retrieveItem( request );
+            Assert.fail( "We should get INFEx!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
+        }
+
+        // the priming did this
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+    }
+
+    @Test
+    public void localAndRemoteOnlyFlagWithExpiredCacheIsServed()
+        throws Exception
+    {
+        // prime the cache and make it expired
+        {
+            final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+            proxyRepository.retrieveItem( request );
+            proxyRepository.expireCaches( new ResourceStoreRequest( "/" ) );
+        }
+
+        final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+        request.setRequestLocalOnly( true );
+        request.setRequestRemoteOnly( true );
+        try
+        {
+            proxyRepository.retrieveItem( request );
+            Assert.fail( "We should get INFEx!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
+        }
+
+        // the priming did this
+        final List<String> recordedRequests = getRecordedRequests();
+        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
+        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
     }
 
     // ==
