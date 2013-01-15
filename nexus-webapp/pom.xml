@@ -359,22 +359,6 @@
       </plugin>
 
       <!--
-      Generate *-dependencies and *-compile POM files.
-      -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-              <goal>attach-signatures</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!--
       <plugin>
         <groupId>com.github.mcheely</groupId>
         <artifactId>requirejs-maven-plugin</artifactId>
