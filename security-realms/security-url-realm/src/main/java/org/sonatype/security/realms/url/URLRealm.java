@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
@@ -12,14 +12,27 @@
  */
 package org.sonatype.security.realms.url;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.params.AuthPNames;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.AuthPolicy;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -32,14 +45,6 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.restlet.Client;
-import org.restlet.Context;
-import org.restlet.data.ChallengeResponse;
-import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Method;
-import org.restlet.data.Protocol;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.inject.Description;
@@ -51,7 +56,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * A Realm that connects to a remote URL to verify authorization.<BR/>
  * All URL realm users are given the role defined by ${url-authentication-default-role}.<BR/>
  * NOTE: Redirects are NOT followed.
- * 
+ *
  * @author Brian Demers
  */
 @Singleton
@@ -61,17 +66,22 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 public class URLRealm
     extends AuthorizingRealm
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    private final UserManager userManager;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final UrlRealmConfiguration urlRealmConfiguration;
 
+    private final UserManager userManager;
+
+    private final Provider<HttpClient> httpClientProvider;
+
     @Inject
-    public URLRealm( UrlRealmConfiguration urlRealmConfiguration, @Named( "url" ) UserManager userManager )
+    public URLRealm( final UrlRealmConfiguration urlRealmConfiguration, @Named( "url" ) final UserManager userManager,
+        final Provider<HttpClient> httpClientProvider )
     {
         this.urlRealmConfiguration = urlRealmConfiguration;
         this.userManager = userManager;
+        this.httpClientProvider = httpClientProvider;
         this.setAuthenticationCachingEnabled( true );
     }
 
@@ -119,28 +129,39 @@ public class URLRealm
 
     private boolean authenticateViaUrl( String username, String password )
     {
-        Client restClient = new Client( new Context(), Protocol.HTTP );
+        // risky, but we must blindly assume it is
+        final DefaultHttpClient client = (DefaultHttpClient) httpClientProvider.get();
 
-        ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
-        ChallengeResponse authentication = new ChallengeResponse( scheme, username, password );
+        final List<String> authorisationPreference = new ArrayList<String>( 2 );
+        authorisationPreference.add( AuthPolicy.DIGEST );
+        authorisationPreference.add( AuthPolicy.BASIC );
+        final Credentials credentials = new UsernamePasswordCredentials( username, password );
+        client.getCredentialsProvider().setCredentials( AuthScope.ANY, credentials );
+        client.getParams().setParameter( AuthPNames.TARGET_AUTH_PREF, authorisationPreference );
 
-        Request request = new Request();
-        request.setResourceRef( this.urlRealmConfiguration.getConfiguration().getUrl() );
-        request.setMethod( Method.GET );
-        request.setChallengeResponse( authentication );
-
-        Response response = restClient.handle( request );
         try
         {
-            this.logger.debug( "User: " + username + " url validation status: " + response.getStatus() );
-            return response.getStatus().isSuccess();
-        }
-        finally
-        {
-            if ( response != null )
+            final String url = urlRealmConfiguration.getConfiguration().getUrl();
+            final HttpResponse response =
+                client.execute( new HttpGet( url ) );
+
+            try
             {
-                response.release();
+                logger.debug( "User \"{}\" validated against URL={} as {}", username, url,
+                              response.getStatusLine() );
+                final boolean success = response.getStatusLine().getStatusCode() >= 200
+                    && response.getStatusLine().getStatusCode() <= 299;
+                return success;
             }
+            finally
+            {
+                HttpClientUtils.closeQuietly( response );
+            }
+        }
+        catch ( IOException e )
+        {
+            logger.info( "URLRealm was unable to perform authentication.", e );
+            return false;
         }
     }
 

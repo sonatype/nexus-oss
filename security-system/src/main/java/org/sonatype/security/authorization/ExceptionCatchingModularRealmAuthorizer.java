@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
@@ -150,10 +150,11 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                if ( logger.isTraceEnabled() )
-                {
-                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-                }
+                logAndIgnore( realm, e );
+            }
+            catch ( RuntimeException e )
+            {
+                logAndIgnore( realm, e );
             }
         }
 
@@ -183,10 +184,11 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                if ( logger.isTraceEnabled() )
-                {
-                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-                }
+                logAndIgnore( realm, e );
+            }
+            catch ( RuntimeException e )
+            {
+                logAndIgnore( realm, e );
             }
         }
 
@@ -225,10 +227,11 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                if ( logger.isTraceEnabled() )
-                {
-                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-                }
+                logAndIgnore( realm, e );
+            }
+            catch ( RuntimeException e )
+            {
+                logAndIgnore( realm, e );
             }
         }
 
@@ -253,10 +256,11 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                if ( logger.isTraceEnabled() )
-                {
-                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-                }
+                logAndIgnore( realm, e );
+            }
+            catch ( RuntimeException e )
+            {
+                logAndIgnore( realm, e );
             }
         }
 
@@ -285,10 +289,11 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                if ( logger.isTraceEnabled() )
-                {
-                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-                }
+                logAndIgnore( realm, e );
+            }
+            catch ( RuntimeException e )
+            {
+                logAndIgnore( realm, e );
             }
         }
 
@@ -317,17 +322,11 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                if ( logger.isTraceEnabled() )
-                {
-                    logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-                }
+                logAndIgnore( realm, e );
             }
-            catch ( Exception e )
+            catch ( RuntimeException e )
             {
-                if ( logger.isTraceEnabled() )
-                {
-                    logger.warn( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-                }
+                logAndIgnore( realm, e );
             }
         }
 
@@ -362,4 +361,11 @@ public class ExceptionCatchingModularRealmAuthorizer
         return true;
     }
 
+    private void logAndIgnore( Realm realm, Exception e )
+    {
+        if ( logger.isTraceEnabled() )
+        {
+            logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+        }
+    }
 }

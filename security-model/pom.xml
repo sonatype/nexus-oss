@@ -13,15 +13,15 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>security-parent</artifactId>
-    <groupId>org.sonatype.security</groupId>
-    <version>3.0-SNAPSHOT</version>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.sonatype.security</groupId>
+  
+  <parent>
+    <groupId>org.sonatype.security</groupId>
+    <artifactId>security-parent</artifactId>
+    <version>3.0.2-SNAPSHOT</version>
+  </parent>
+
   <artifactId>security-model</artifactId>
-  <name>Security: Model</name>
   <description>The modello model for the storage of users, roles, privileges, and the mapping of users to roles. (and a bit of legacy code, not yet refactored out.)</description>
 
   <dependencies>
@@ -95,10 +95,9 @@
       </plugin>
 
       <plugin>
-        <!-- TODO remove when upgrade generator is marged into modello -->
+        <!-- TODO remove when upgrade generator is merged into modello -->
         <groupId>org.sonatype.plugins</groupId>
-        <artifactId>modello-plugin-upgrade
-        </artifactId>
+        <artifactId>modello-plugin-upgrade</artifactId>
         <version>1.0</version>
         <executions>
           <execution>

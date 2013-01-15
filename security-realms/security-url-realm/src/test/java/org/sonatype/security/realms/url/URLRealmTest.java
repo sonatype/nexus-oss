@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
@@ -15,8 +15,12 @@ package org.sonatype.security.realms.url;
 import java.util.Arrays;
 import java.util.Properties;
 
+import javax.inject.Provider;
+
 import junit.framework.Assert;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -33,6 +37,8 @@ import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
 import org.sonatype.security.usermanagement.UserManager;
 
+import com.google.inject.Binder;
+import com.google.inject.TypeLiteral;
 import com.sonatype.security.realms.url.config.model.Configuration;
 
 public class URLRealmTest
@@ -48,6 +54,12 @@ public class URLRealmTest
     private final static String DEFAULT_ROLE = "default-url-role";
 
     private static final String AUTH_APP_NAME = "auth_app";
+
+    public void configure( final Binder binder )
+    {
+        super.configure( binder );
+        binder.bind( HttpClient.class ).toInstance( new DefaultHttpClient() );
+    }
 
     private URLRealm getRealm()
         throws Exception
