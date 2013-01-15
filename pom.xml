@@ -163,14 +163,13 @@
     <tattletale.failOnWarn>false</tattletale.failOnWarn>
     <tattletale.failOnError>true</tattletale.failOnError>
 
-    <nexus.version>${project.version}</nexus.version>
-
     <!-- logging configuration used in logback config files to control test logging -->
     <test.log.level>INFO</test.log.level>
     <it.test.log.level>INFO</it.test.log.level>
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
     <!-- version properties -->
+    <nexus.version>${project.version}</nexus.version>
     <sonatype.plugin.version>1.1.0</sonatype.plugin.version>
     <slf4j.version>1.7.2</slf4j.version>
     <logback.version>1.0.7</logback.version>

@@ -25,14 +25,22 @@
   <artifactId>nexus-rest-client-java</artifactId>
 
   <dependencies>
+    <!--
+    FIXME: Should not be dependent on a plugin here.
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
 
+    <!--
+    FIXME: Should not be dependent on a plugin here.
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
 
     <dependency>
