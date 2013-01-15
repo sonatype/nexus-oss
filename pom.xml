@@ -1282,8 +1282,6 @@
               <exclude>**/atlassian-ide-plugin.xml</exclude>
               <exclude>nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
               <exclude>nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
-              <!-- Exclude zion work directory -->
-              <exclude>zwork/**</exclude>
             </excludes>
           </configuration>
         </plugin>
