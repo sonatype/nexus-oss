@@ -152,12 +152,12 @@
         <version>${enunciate.version}</version>
         <exclusions>
           <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>enunciate-core-rt</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
           </exclusion>
           <exclusion>
             <groupId>commons-digester</groupId>
