@@ -131,16 +131,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <!--
-    FIXME: Really need to kill these -tests.jar bits, they only complicate development/build-configuration/dependency-management.
-    -->
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.security.realms</groupId>-->
-      <!--<artifactId>security-xml-realm</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
   </dependencies>
 
   <build>
