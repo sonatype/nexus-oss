@@ -66,10 +66,6 @@
     </dependency>
 
     <!--
-    FIXME: Put these into DM
-    -->
-
-    <!--
     There are problems with the Maven reactor that would require these modules.
     However if we include as a test scope the reactor will be happy and the dependency pom will be correct.
     -->
