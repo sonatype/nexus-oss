@@ -26,61 +26,40 @@
   <artifactId>nexus-unpack-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <description>Automatically unpack deployed bundles</description>
+  <properties>
+    <pluginName>Nexus Unpack Plugin</pluginName>
+    <pluginDescription>Automatically unpack deployed bundles.</pluginDescription>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- This is a plugin that contributes REST API -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <type>${nexusPluginType}</type>
-      <version>${nexus.version}</version>
+      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.codehaus.enunciate</groupId>
       <artifactId>enunciate-core</artifactId>
-      <version>1.20</version>
-      <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
-      <!-- But nothing is using that annotation after build happened, and doco is generated -->
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun</groupId>
-          <artifactId>tools</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
-    <!-- AllInOne for UTs -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
 
-    <!-- AllInOne for ITs -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -98,7 +77,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -106,44 +84,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.7</version>
-        <extensions>true</extensions>
-        <configuration>
-          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/unpack</pluginSiteUrl>
-          <pluginName>${nexus.plugin.name}</pluginName>
-          <pluginDescription>${nexus.plugin.description}</pluginDescription>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.7</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>maven-enunciate-slim-plugin</artifactId>
-        <version>1.26</version>
-        <executions>
-          <execution>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>docs</goal>
-            </goals>
-            <configuration>
-              <docsDir>${project.build.outputDirectory}/docs</docsDir>
-              <configFile>enunciate.xml</configFile>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.enunciate</groupId>
-            <artifactId>enunciate-docs</artifactId>
-            <version>1.26</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>
@@ -198,7 +138,9 @@
               </nexusPluginsArtifacts>
             </configuration>
           </plugin>
+
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
             <configuration>
               <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
@@ -239,18 +181,6 @@
                 <phase>pre-integration-test</phase>
                 <goals>
                   <goal>install</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
                 </goals>
               </execution>
             </executions>

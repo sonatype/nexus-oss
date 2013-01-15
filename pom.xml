@@ -17,16 +17,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>30</version>
-    <relativePath />
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugin-parent</artifactId>
+    <version>2.4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.unpack</groupId>
   <artifactId>nexus-unpack</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+
+  <version>1.0.1-SNAPSHOT</version>
 
   <inceptionYear>2009</inceptionYear>
   <url>http://github.com/sonatype/nexus-unpack-plugin</url>
@@ -50,16 +50,6 @@
   </issueManagement>
 
   <properties>
-    <nexus.version>2.4-SNAPSHOT</nexus.version>
-
-    <nexus.plugin.name>Nexus Unpack Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Automatically unpack deployed bundles.</nexus.plugin.description>
-    <nexusPluginType>nexus-plugin</nexusPluginType>
-
-    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
-    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
-    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
-
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
   </properties>
 
@@ -73,77 +63,5 @@
   <modules>
     <module>nexus-unpack-plugin</module>
   </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${nexus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.sonatype.nexus.plugins</groupId>
-          <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>${nexus.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <argLine>-Xmx512m</argLine>
-            <testNGArtifactName>none:none</testNGArtifactName>
-            <systemProperties>
-              <property>
-                <name>user.home</name>
-                <value>${project.build.directory}/user_home</value>
-              </property>
-            </systemProperties>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <argLine>-Xmx512m</argLine>
-            <workingDirectory>${project.build.directory}</workingDirectory>
-            <excludes>
-              <exclude>**/*$*</exclude>
-              <exclude>**/Abstract*</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-
-  <profiles>
-
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
-    <profile>
-      <id>idea</id>
-      <properties>
-        <nexusPluginType>jar</nexusPluginType>
-      </properties>
-    </profile>
-  </profiles>
 
 </project>
