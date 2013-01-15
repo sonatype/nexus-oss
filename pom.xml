@@ -1007,24 +1007,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.nexus.restlight</groupId>
-        <artifactId>nexus-restlight-stage-client</artifactId>
-        <version>2.4-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.restlight</groupId>
-        <artifactId>nexus-restlight-m2-settings-client</artifactId>
-        <version>2.4-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.restlight</groupId>
-        <artifactId>nexus-restlight-client-common</artifactId>
-        <version>2.4-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-webapp</artifactId>
         <version>2.4-SNAPSHOT</version>

@@ -26,11 +26,6 @@
   <artifactId>nexus-ldap-plugin-it</artifactId>
 
   <dependencies>
-    <!--<dependency>-->
-    <!--<groupId>org.sonatype.sisu</groupId>-->
-    <!--<artifactId>sisu-inject-plexus</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
@@ -41,12 +36,6 @@
           <!--<groupId>ant</groupId>-->
         <!--</exclusion>-->
       <!--</exclusions>-->
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-web-utils</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
