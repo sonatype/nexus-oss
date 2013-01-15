@@ -30,12 +30,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
       <scope>test</scope>
-      <!--<exclusions>-->
-        <!--<exclusion>-->
-          <!--<artifactId>ant</artifactId>-->
-          <!--<groupId>ant</groupId>-->
-        <!--</exclusion>-->
-      <!--</exclusions>-->
     </dependency>
 
     <dependency>
@@ -69,14 +63,6 @@
       <artifactId>plexus-ldap-testsuite</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!--<dependency>-->
-    <!--<groupId>org.sonatype.nexus</groupId>-->
-    <!--<artifactId>nexus-oss-webapp</artifactId>-->
-    <!--<classifier>bundle</classifier>-->
-    <!--<type>zip</type>-->
-    <!--<scope>test</scope>-->
-    <!--</dependency>-->
 
     <!-- NXCM-4591 -->
     <dependency>
