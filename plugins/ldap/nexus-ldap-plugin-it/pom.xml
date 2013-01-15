@@ -89,6 +89,14 @@
 
   <build>
     <plugins>
+      <!--
+      Need to know about 'nexus-plugin' packaging for integration-tests.
+      -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
