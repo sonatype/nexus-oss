@@ -32,10 +32,12 @@
       <groupId>org.sonatype.nexus.client</groupId>
       <artifactId>nexus-client-core</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.capabilities</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
     </dependency>
+
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
