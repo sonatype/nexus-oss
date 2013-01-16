@@ -207,10 +207,10 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
         <configuration>
-          <assemblyDescriptor>src/main/assemble/bundle.xml</assemblyDescriptor>
+          <assemblyDescriptor>${project.basedir}/src/main/assemble/bundle.xml</assemblyDescriptor>
         </configuration>
       </plugin>
     </plugins>
