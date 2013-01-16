@@ -232,16 +232,10 @@
       <groupId>eu.medsea.mimeutil</groupId>
       <artifactId>mime-util</artifactId>
     </dependency>
-    
-    <!-- Plugin Manager -->
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-host-api</artifactId>
-    </dependency>
+
+    <!--
+    FIXME: Remove when app-lifecycle is replaced by nexus-plugin-bundle.
+    -->
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-model-api</artifactId>

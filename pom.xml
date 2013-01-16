@@ -176,7 +176,7 @@
     <aether.version>1.13.1</aether.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <plexus-security.version>3.0.1</plexus-security.version>
+    <plexus-security.version>3.0.2-SNAPSHOT</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.5.1</goodies.version>
@@ -210,30 +210,8 @@
       </dependency>
 
       <!--
-      FIXME: These should be removed, but until then update to 1.1.1-SNAPSHOT and avoid needing to exclude javax.inject here.
+      FIXME: Remove when app-lifecycle is replaced by nexus-plugin-bundle.
       -->
-      <dependency>
-        <groupId>org.sonatype.plugin</groupId>
-        <artifactId>plugin-api</artifactId>
-        <version>${sonatype.plugin.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.plugin</groupId>
-        <artifactId>plugin-host-api</artifactId>
-        <version>${sonatype.plugin.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-model-api</artifactId>
