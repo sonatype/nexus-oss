@@ -45,6 +45,7 @@
 
     <!--
     NOTE: Huge mess of excludes here to avoid pulling bits from dependencies which are provided by NX core :-(
+    NOTE: This could be better off as a separate module to define the deps, and then include that here and apply all exclusions to it.
     -->
 
     <dependency>
@@ -52,6 +53,10 @@
       <artifactId>sisu-maven-bridge</artifactId>
       <version>3.0</version>
       <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>jcl-over-slf4j</artifactId>
