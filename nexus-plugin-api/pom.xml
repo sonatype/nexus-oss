@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -31,7 +32,12 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-logging-extras</artifactId>
+      <artifactId>nexus-web-utils</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
     </dependency>
 
     <dependency>
@@ -40,8 +46,17 @@
     </dependency>
 
     <dependency>
-      <groupId>org.eclipse.jetty.orbit</groupId>
-      <artifactId>javax.servlet</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-logging-extras</artifactId>
+    </dependency>
+
+    <!--
+    FIXME: Sort out what if/any of this is already included via nexus-core.
+    -->
+
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
     </dependency>
 
     <dependency>
@@ -62,11 +77,6 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-velocity</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-api</artifactId>
     </dependency>
   </dependencies>
 

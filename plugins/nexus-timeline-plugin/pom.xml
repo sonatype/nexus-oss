@@ -12,13 +12,14 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-core-plugins</artifactId>
+    <artifactId>nexus-plugins</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
 
@@ -26,8 +27,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Timeline Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds timeline and feeds based on it.</nexus.plugin.description>
+    <pluginName>Nexus Timeline Plugin</pluginName>
+    <pluginDescription>Adds timeline and feeds based on it.</pluginDescription>
   </properties>
 
   <dependencies>
@@ -38,33 +39,30 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-web-utils</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
-    <!-- TimelinePersistor uses Protobuf -->
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
       <version>2.3.0</version>
     </dependency>
 
-    <!-- TimelineIndexer uses Lucene -->
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
       <version>3.6.1</version>
     </dependency>
 
-    <!-- RSS feeds -->
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
@@ -88,6 +86,11 @@
             <sharedDependencies>rome:rome</sharedDependencies>
           </sharedDependencies>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
       </plugin>
     </plugins>
   </build>
