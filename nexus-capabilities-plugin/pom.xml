@@ -29,11 +29,10 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <debug-js>false</debug-js>
-
     <pluginName>Nexus Capabilities Plugin</pluginName>
     <pluginDescription>Allows Nexus to define and manage capabilities.</pluginDescription>
-    <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
+
+    <debug-js>false</debug-js>
   </properties>
 
   <dependencies>
