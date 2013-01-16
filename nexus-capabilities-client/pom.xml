@@ -29,13 +29,17 @@
     <dependency>
       <groupId>org.sonatype.nexus.client</groupId>
       <artifactId>nexus-client-core</artifactId>
-      <scope>compile</scope>
     </dependency>
+
+    <!--
+    TODO: Consider making this a non-provided dep on nexus-client-core, so we don't have to keep defining this everywhere.
+    -->
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.capabilities</groupId>
       <artifactId>nexus-capabilities-model</artifactId>

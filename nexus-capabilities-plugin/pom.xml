@@ -32,7 +32,7 @@
     <debug-js>false</debug-js>
 
     <pluginName>Nexus Capabilities Plugin</pluginName>
-    <pluginDescription>Allows Nexus to define configurable capabilities</pluginDescription>
+    <pluginDescription>Allows Nexus to define and manage capabilities.</pluginDescription>
     <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/home</pluginSiteUrl>
   </properties>
 
@@ -41,6 +41,7 @@
       <groupId>org.sonatype.nexus.capabilities</groupId>
       <artifactId>nexus-capabilities-model</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
@@ -50,7 +51,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <type>${nexusPluginType}</type>
+      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -66,25 +67,14 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.7</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.7</version>
-          </dependency>
-        </dependencies>
         <configuration>
-          <pluginName>${pluginName}</pluginName>
-          <pluginDescription>${pluginDescription}</pluginDescription>
-          <pluginSiteUrl>${pluginSiteUrl}</pluginSiteUrl>
           <sharedDependencies>
             <sharedDependency>org.sonatype.sisu.goodies:goodies-eventbus</sharedDependency>
             <sharedDependencies>org.sonatype.nexus.capabilities:nexus-capabilities-model</sharedDependencies>
           </sharedDependencies>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
@@ -102,40 +92,16 @@
               <models>
                 <model>src/main/mdo/capabilities-configuration.xml</model>
               </models>
+              <packageWithVersion>false</packageWithVersion>
+              <useJava5>true</useJava5>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-          <useJava5>true</useJava5>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
-          </dependency>
-        </dependencies>
       </plugin>
+
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>0.0.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/classes/static/js/org.sonatype.nexus.plugins.capabilities-all.js</output>
-              <nomunge>true</nomunge>
-              <nominify>${debug-js}</nominify>
-              <jswarn>false</jswarn>
-              <insertNewLine>true</insertNewLine>
-              <disableOptimizations>true</disableOptimizations>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

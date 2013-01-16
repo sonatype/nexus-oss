@@ -18,9 +18,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>30</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugin-parent</artifactId>
+    <version>2.4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.capabilities</groupId>
@@ -51,154 +51,46 @@
   </modules>
 
   <properties>
-    <nexus.version>2.3.0</nexus.version>
-    <nexusPluginType>nexus-plugin</nexusPluginType>
-
-    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
-    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
-    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
-
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>com.thoughtworks.xstream</groupId>
-        <artifactId>xstream</artifactId>
-        <version>1.4.3</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.3</version>
-      </dependency>
       <dependency>
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
         <version>1</version>
       </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>3.0.8</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-api</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-test-api</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-testsuite-support</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${it.nexus.bundle.groupId}</groupId>
-        <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-        <version>${it.nexus.bundle.version}</version>
-        <type>zip</type>
-        <classifier>bundle</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus.client</groupId>
-        <artifactId>nexus-client-core</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
 
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-restlet1x-model</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
+      <!-- INTERNAL -->
 
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-restlet1x-plugin</artifactId>
-        <type>${nexusPluginType}</type>
-        <version>${nexus.version}</version>
-      </dependency>
-
-      <!-- Internal -->
       <dependency>
         <groupId>org.sonatype.nexus.capabilities</groupId>
         <artifactId>nexus-capabilities-model</artifactId>
         <version>2.2.1-SNAPSHOT</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.nexus.capabilities</groupId>
         <artifactId>nexus-capabilities-client</artifactId>
         <version>2.2.1-SNAPSHOT</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-capabilities-plugin</artifactId>
-        <type>${nexusPluginType}</type>
+        <type>${nexus-plugin.type}</type>
         <version>2.2.1-SNAPSHOT</version>
       </dependency>
+
       <dependency>
         <groupId>org.sonatype.nexus.capabilities</groupId>
         <artifactId>nexus-capabilities-testsuite-helper</artifactId>
-        <type>${nexusPluginType}</type>
+        <type>${nexus-plugin.type}</type>
         <version>2.2.1-SNAPSHOT</version>
       </dependency>
 
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <workingDirectory>${project.build.directory}</workingDirectory>
-            <excludes>
-              <exclude>**/Abstract*.java</exclude>
-              <exclude>**/Test*.java</exclude>
-            </excludes>
-            <includes>
-              <include>**/*Test.java</include>
-            </includes>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <workingDirectory>${project.build.directory}</workingDirectory>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
-    <profile>
-      <id>idea</id>
-      <properties>
-        <nexusPluginType>jar</nexusPluginType>
-      </properties>
-    </profile>
-  </profiles>
 
 </project>
