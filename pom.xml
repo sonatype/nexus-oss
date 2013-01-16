@@ -18,15 +18,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>30</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugin-parent</artifactId>
+    <version>2.4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-p2-bridge-plugin</artifactId>
-  <version>2.1.1-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
+
+  <version>2.1.1-SNAPSHOT</version>
 
   <licenses>
     <license>
@@ -42,11 +43,10 @@
   </scm>
 
   <properties>
-    <nexus.version>2.3.0</nexus.version>
-    <p2-bridge.version>1.1.5</p2-bridge.version>
+    <pluginName>Nexus P2 Bridge Plugin</pluginName>
+    <pluginDescription>Bridge between Nexus and P2 Eclipse Runtime.</pluginDescription>
 
-    <nexus.plugin.name>Nexus P2 Bridge Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Bridge between Nexus and P2 Eclipse Runtime</nexus.plugin.description>
+    <p2-bridge.version>1.1.5</p2-bridge.version>
   </properties>
 
   <dependencyManagement>
@@ -71,6 +71,12 @@
 
       <dependency>
         <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>eclipse-bridge</artifactId>
+        <version>${p2-bridge.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
         <artifactId>p2-runtime</artifactId>
         <version>${p2-bridge.version}</version>
         <type>zip</type>
@@ -86,9 +92,14 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.p2.bridge</groupId>
       <artifactId>eclipse-bridge</artifactId>
-      <version>${p2-bridge.version}</version>
     </dependency>
 
     <dependency>
@@ -98,43 +109,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-manager</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <failIfNoTests>false</failIfNoTests>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -198,6 +179,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -223,24 +205,13 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.7</version>
-        <extensions>true</extensions>
         <configuration>
-          <pluginSiteUrl>http://links.sonatype.com/products/nexus/oss/plugins/p2</pluginSiteUrl>
-          <pluginName>${nexus.plugin.name}</pluginName>
-          <pluginDescription>${nexus.plugin.description}</pluginDescription>
           <assemblyDescriptor>src/main/assemble/bundle.xml</assemblyDescriptor>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.7</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>
