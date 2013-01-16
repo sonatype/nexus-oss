@@ -13,21 +13,22 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>30</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugin-parent</artifactId>
+    <version>2.4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.obr</groupId>
   <artifactId>nexus-obr</artifactId>
-  <version>2.1.1-SNAPSHOT</version>
-
   <packaging>pom</packaging>
+
+  <version>2.1.1-SNAPSHOT</version>
 
   <licenses>
     <license>
@@ -42,25 +43,8 @@
     <url>http://github.com/sonatype/nexus-obr-plugin</url>
   </scm>
 
-  <modules>
-    <module>nexus-obr-plugin</module>
-    <module>nexus-obr-client</module>
-    <module>nexus-obr-testsuite</module>
-  </modules>
-
   <properties>
-    <nexus.version>2.3.0</nexus.version>
-    <applifecycle.version>1.7</applifecycle.version>
-
-    <nexus.plugin.name>Nexus OBR Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds a repository type for OBR repositories.</nexus.plugin.description>
-
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
-
-    <it.nexus.bundle.groupId>org.sonatype.nexus</it.nexus.bundle.groupId>
-    <it.nexus.bundle.artifactId>nexus-oss-webapp</it.nexus.bundle.artifactId>
-    <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
-
   </properties>
 
   <dependencyManagement>
@@ -73,30 +57,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-api</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-restlet1x-plugin</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-test-api</artifactId>
-        <version>${nexus.version}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.client</groupId>
-        <artifactId>nexus-client-core</artifactId>
-        <version>${nexus.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
         <version>1</version>
@@ -105,9 +65,9 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.main.distribution</artifactId>
-        <version>3.2.2</version>
         <classifier>project</classifier>
         <type>tar.gz</type>
+        <version>3.2.2</version>
       </dependency>
 
       <dependency>
@@ -116,12 +76,6 @@
         <version>3.0.4</version>
         <classifier>bin</classifier>
         <type>zip</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-testsuite-support</artifactId>
-        <version>${nexus.version}</version>
       </dependency>
 
       <dependency>
@@ -140,13 +94,7 @@
         </exclusions>
       </dependency>
 
-      <dependency>
-        <groupId>${it.nexus.bundle.groupId}</groupId>
-        <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-        <version>${it.nexus.bundle.version}</version>
-        <type>zip</type>
-        <classifier>bundle</classifier>
-      </dependency>
+      <!-- INTERNAL -->
 
       <dependency>
         <groupId>org.sonatype.nexus.obr</groupId>
@@ -157,44 +105,17 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-obr-plugin</artifactId>
-        <type>nexus-plugin</type>
+        <type>${nexus-plugin.type}</type>
         <version>2.1.1-SNAPSHOT</version>
       </dependency>
 
     </dependencies>
   </dependencyManagement>
 
-  <build>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <workingDirectory>${project.build.directory}</workingDirectory>
-            <excludes>
-              <exclude>**/Abstract*.java</exclude>
-              <exclude>**/Test*.java</exclude>
-            </excludes>
-            <includes>
-              <include>**/*Test.java</include>
-            </includes>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <!--
-            For each test, so that we can use the process timeout.
-            forkMode=always will cause duplicate "T E S T S" header to be rendered :-(
-            -->
-            <workingDirectory>${project.build.directory}</workingDirectory>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+  <modules>
+    <module>nexus-obr-plugin</module>
+    <module>nexus-obr-client</module>
+    <module>nexus-obr-testsuite</module>
+  </modules>
 
 </project>
