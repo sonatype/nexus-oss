@@ -47,6 +47,10 @@
       <artifactId>nexus-indexer-lucene-model</artifactId>
     </dependency>
 
+    <!--
+    FIXME: nexus-restlet1x-model is being included in this plugin directly, instead of picking it up as plugin dependency.
+    -->
+
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-artifact</artifactId>
