@@ -80,7 +80,7 @@ Ask for help at our [Google Group][7] or [create a new issue][8].
     unzip nexus-yum-plugin-1.13-bundle-zip -d $NEXUS_WORK_DIR/plugin-repository/
 1. Install [createrepo][10] using your update manager (*yum*, *apt-get*, etc.) eg.
     sudo yum install createrepo
-1. Make sure that in *Nexus Adminstration --> Settings --> Application Server Settings (optional) --> Base URL* is set to a vaild URL like :
+1. Make sure that in *Nexus Administration --> Server --> Application Server Settings (optional) --> Base URL* is set to a valid URL like :
     http://your.nexus.domain:8081/nexus
 1. Sometimes *Force Base URL* is nessessary, too, see [ISSUE 4][11] . Otherwise the plugin can't determine the server URL and you got RPM locations like *null/content/repositories/*... in *primary.xml*.
 1. Configure Nexus Yum Plugin via *yum.xml*. See Configuration.
@@ -134,6 +134,10 @@ Example *yum.xml*:
   </aliasMappings>
 </configuration>
 ```
+
+In Nexus 2.3, you will have to add a new capability for each repository hosting RPMs.
+
+Go to *Nexus Administration --> Capabilities --> Add* and choose the *Yum: Generate Metadata* type. In case you have a repository group for multiple RPM hosting repositories, you need to merge the metadata from these repositories. For this you will choose the *Yum: Merge Metadata* type.
 
 ## Getting Started
 
