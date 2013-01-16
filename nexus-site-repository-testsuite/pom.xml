@@ -53,18 +53,9 @@
       </activation>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
-            <version>3.0</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>export</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
+          <!--
+          Additional configuration required for integration-tests; nexus-plugin-parent defines the basic configuration.
+          -->
 
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -110,19 +101,6 @@
                 <phase>pre-integration-test</phase>
                 <goals>
                   <goal>install</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
                 </goals>
               </execution>
             </executions>
