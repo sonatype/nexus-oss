@@ -27,10 +27,13 @@
   <artifactId>nexus-client-core</artifactId>
 
   <dependencies>
-    <!-- Core API Models -->
+    <!--
+    FIXME: Should not be dependent on a plugin here.
+    -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!-- = Other client dependencies = -->

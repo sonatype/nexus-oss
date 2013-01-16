@@ -15,36 +15,20 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <!--
+  All Nexus OSS plugins extend from the nexus-plugin-parent POM configuration.
+  -->
   <parent>
-    <artifactId>nexus</artifactId>
     <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugin-parent</artifactId>
     <version>2.4-SNAPSHOT</version>
+    <relativePath>../plugin-parent/pom.xml</relativePath>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
-  <artifactId>nexus-core-plugins</artifactId>
+  <artifactId>nexus-plugins</artifactId>
   <packaging>pom</packaging>
-
-  <dependencies>
-    <!--
-    FIXME: See note on DM entry.
-    -->
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
 
   <profiles>
     <profile>

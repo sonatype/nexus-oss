@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,13 +28,20 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <maven.indexer.version>5.1.1-d928049c927da992071a6c6bba892568dbcf27a3</maven.indexer.version>
+    <pluginName>Nexus Indexer Lucene Plugin</pluginName>
+    <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
 
-    <nexus.plugin.name>Nexus Indexer Lucene Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds search capabilities for repository content.</nexus.plugin.description>
+    <mavenIndexer.version>5.1.1-d928049c927da992071a6c6bba892568dbcf27a3</mavenIndexer.version>
+    <aether.version>1.13.1</aether.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus.indexer-lucene</groupId>
       <artifactId>nexus-indexer-lucene-model</artifactId>
@@ -42,7 +50,7 @@
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-artifact</artifactId>
-      <version>${maven.indexer.version}</version>
+      <version>${mavenIndexer.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
@@ -58,7 +66,7 @@
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-core</artifactId>
-      <version>${maven.indexer.version}</version>
+      <version>${mavenIndexer.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
@@ -75,23 +83,19 @@
       </exclusions>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- Aether is needed and will be published too (see applifecycle config) -->
     <!-- since sadly Maven Indexer exposes it's classes over it's public API -->
     <!-- All this because of the presence of Version in ArtifactInfo -->
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>
+      <version>${aether.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-util</artifactId>
+      <version>${aether.version}</version>
     </dependency>
 
     <dependency>
@@ -102,14 +106,14 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
-      <scope>test</scope>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -139,6 +143,11 @@
             <sharedDependencies>org.sonatype.aether:aether-util</sharedDependencies>
           </sharedDependencies>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
       </plugin>
 
       <plugin>
