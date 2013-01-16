@@ -12,16 +12,13 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.security.model.Configuration;
 
 /**
- * A StaticSecurityResource all for other components/plugins to contributes users/roles/privileges to the security
- * model.
+ * A StaticSecurityResource all for other components/plugins to contributes users/roles/privileges to the security model.
  * 
  * @author Brian Demers
  */
-@ExtensionPoint
 public interface StaticSecurityResource
 {
     /**
