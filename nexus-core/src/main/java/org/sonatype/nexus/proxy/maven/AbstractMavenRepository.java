@@ -27,11 +27,13 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
@@ -450,9 +452,12 @@ public abstract class AbstractMavenRepository
     {
         try
         {
+            String sha1path = request.getRequestPath() + ".sha1";
+            RepositoryItemUidLock sha1lock = createUid( sha1path ).getLock();
+            sha1lock.lock( Action.delete );
             try
             {
-                request.pushRequestPath( request.getRequestPath() + ".sha1" );
+                request.pushRequestPath( sha1path );
 
                 try
                 {
@@ -462,15 +467,22 @@ public abstract class AbstractMavenRepository
                 {
                     // this is exactly what we're trying to achieve
                 }
+                finally
+                {
+                    request.popRequestPath();
+                }
             }
             finally
             {
-                request.popRequestPath();
+                sha1lock.unlock();
             }
 
+            String md5path = request.getRequestPath() + ".md5";
+            RepositoryItemUidLock md5lock = createUid( md5path ).getLock();
+            md5lock.lock( Action.delete );
             try
             {
-                request.pushRequestPath( request.getRequestPath() + ".md5" );
+                request.pushRequestPath( md5path );
 
                 try
                 {
@@ -480,10 +492,14 @@ public abstract class AbstractMavenRepository
                 {
                     // this is exactly what we're trying to achieve
                 }
+                finally
+                {
+                    request.popRequestPath();
+                }
             }
             finally
             {
-                request.popRequestPath();
+                md5lock.unlock();
             }
         }
         catch ( UnsupportedStorageOperationException e )

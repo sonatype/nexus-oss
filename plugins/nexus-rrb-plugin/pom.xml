@@ -13,13 +13,14 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-core-plugins</artifactId>
+    <artifactId>nexus-plugins</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
 
@@ -27,42 +28,9 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Remote Repository Browsing Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds browsing support for browsing remote proxy remote repositories.</nexus.plugin.description>
+    <pluginName>Nexus Remote Repository Browsing Plugin</pluginName>
+    <pluginDescription>Adds support for browsing proxy repositories remote storage.</pluginDescription>
   </properties>
-
-  <developers>
-    <developer>
-      <id>anders.hammar</id>
-      <name>Anders Hammar</name>
-      <email>anders.hammar@devoteam.com</email>
-      <organization>Devoteam Sweden</organization>
-      <organizationUrl>http://www.devoteam.se</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>bjorn.eiderback</id>
-      <name>Björn Eiderbäck</name>
-      <email>bjorn.eiderback@devoteam.com</email>
-      <organization>Devoteam Sweden</organization>
-      <organizationUrl>http://www.devoteam.se</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>torbjorn.ekmark</id>
-      <name>Torbjörn Ekmark</name>
-      <email>torbjorn.ekmark@devoteam.com</email>
-      <organization>Devoteam Sweden</organization>
-      <organizationUrl>http://www.devoteam.se</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
 
   <dependencies>
     <dependency>
@@ -77,28 +45,32 @@
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>

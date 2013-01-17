@@ -12,7 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -25,8 +26,8 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus OSS LDAP Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Adds a LDAP security realm to Nexus.</nexus.plugin.description>
+    <pluginName>Nexus OSS LDAP Plugin</pluginName>
+    <pluginDescription>Adds a LDAP security realm to Nexus.</pluginDescription>
   </properties>
 
   <dependencies>
@@ -41,6 +42,12 @@
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-core</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -64,17 +71,27 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <!-- workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart -->
           <argLine>-XX:MaxPermSize=160m -Xmx300M</argLine>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

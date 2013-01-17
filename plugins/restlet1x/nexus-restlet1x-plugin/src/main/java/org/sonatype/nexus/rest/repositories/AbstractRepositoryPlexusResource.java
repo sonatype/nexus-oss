@@ -129,7 +129,7 @@ public abstract class AbstractRepositoryPlexusResource
             response.setStatus( Status.SUCCESS_ACCEPTED );
         }
 
-        return rs == null ? null : rs.toString();
+        return rs == null ? null : rs.toString() + ( rs.getReason() == null ? "" : ":" + rs.getReason() );
     }
 
     // clean

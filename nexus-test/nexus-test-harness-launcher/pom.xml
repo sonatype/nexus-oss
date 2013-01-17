@@ -53,27 +53,28 @@
       <artifactId>maven-repository-metadata</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-plugin</artifactId>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-jetty8</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+      <!--<artifactId>nexus-restlet1x-model</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+      <!--<artifactId>nexus-restlet1x-plugin</artifactId>-->
+      <!--<scope>provided</scope>-->
+      <!--<exclusions>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.sonatype.sisu</groupId>-->
+          <!--<artifactId>sisu-jetty8</artifactId>-->
+        <!--</exclusion>-->
+      <!--</exclusions>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+      <!--<artifactId>nexus-indexer-lucene-plugin</artifactId>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -245,15 +246,5 @@
     </dependency>
 
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

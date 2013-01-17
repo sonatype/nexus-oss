@@ -66,10 +66,6 @@
     </dependency>
 
     <!--
-    FIXME: Put these into DM
-    -->
-
-    <!--
     There are problems with the Maven reactor that would require these modules.
     However if we include as a test scope the reactor will be happy and the dependency pom will be correct.
     -->
@@ -394,29 +390,6 @@
         </configuration>
       </plugin>
 
-      <!--
-      NOTE: This makes a new artifact (not attached w/classifier) with artifactId nexus-webapp-dependencies :-(
-      -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-dependency-poms</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>attach-signatures</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>attach-signatures</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <!--
       <plugin>
         <groupId>com.github.mcheely</groupId>
