@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.siesta;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
+import org.sonatype.security.web.guice.SecurityWebFilter;
 import org.sonatype.sisu.siesta.jackson.SiestaJacksonModule;
 import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryApplication;
 import org.sonatype.sisu.siesta.server.internal.SiestaServlet;
@@ -25,14 +26,27 @@ import javax.inject.Singleton;
 /**
  * Siesta plugin module.
  *
- * @since 2.3
+ * @since 2.4
  */
 @Named
 public class SiestaModule
     extends AbstractModule
 {
+    public static final String MOUNT_POINT = "/service/rest";
+
     @Override
     protected void configure() {
+        // FIXME: Sort this out... nexus-restlet1x-plugin should not have anything to do with this plugin
+
+        // We need to import some components from nexus-restlet1x-plugin for SecurityWebFilter, but its use is
+        // hidden behind guice-servlet muck. We therefore bind it explicitly here so it will get seen by Sisu.
+        // It would have been preferable to use "requireBinding(SecurityWebFilter.class)" to import the
+        // SecurityWebFilter instance from nexus-restlet1x-plugin, but guice-servlet only wants to see filters
+        // bound directly as singletons in this Injector (odd limitation). An alternative would have been to
+        // requireBinding's for SecuritySystem and FilterChainResolver, which are the filter's dependencies.
+
+        bind(SecurityWebFilter.class);
+
         install(new org.sonatype.sisu.siesta.server.internal.SiestaModule());
         install(new SiestaJerseyModule());
         install(new SiestaJacksonModule());
@@ -44,9 +58,8 @@ public class SiestaModule
         {
             @Override
             protected void configureServlets() {
-                // FIXME: Resolve how we want to expose this, might want to add some structure here if we every want/plan/need-to support changing this again
-                // FIXME: Maybe /service/<api>/ where <api> is siesta or local (for legacy)?  Since that part will never likely be used for what it was originally intended (a remoting/hostname mechanism IIUC).
-                serve("/rest/*").with(SiestaServlet.class);
+                serve(MOUNT_POINT + "/*").with(SiestaServlet.class);
+                filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
             }
         });
     }

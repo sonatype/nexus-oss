@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.plugins.siesta.test.model.UserXO;
 import org.sonatype.sisu.siesta.common.Resource;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,7 +37,7 @@ import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 /**
  * Siesta testing resource.
  *
- * @since 2.3
+ * @since 2.4
  */
 @Named
 @Singleton
@@ -56,6 +57,7 @@ public class TestResource
 
     @GET
     @Produces({APPLICATION_XML, APPLICATION_JSON})
+    @RequiresPermissions("nexus:logs")
     public UserXO get() {
         log.info("GET");
 

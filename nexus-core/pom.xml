@@ -81,6 +81,11 @@
       <artifactId>jsr305</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+    </dependency>
+
     <!-- Plexus et al -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -150,7 +155,12 @@
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-aspectj</artifactId>
+    </dependency>
+
     <!-- SISU Container -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>

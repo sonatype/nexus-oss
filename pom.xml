@@ -180,6 +180,7 @@
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.5.1</goodies.version>
+    <aspectj.version>1.6.11</aspectj.version>
 
     <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -213,6 +214,12 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-model</artifactId>
         <version>1.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjrt</artifactId>
+        <version>${aspectj.version}</version>
       </dependency>
 
       <dependency>
@@ -451,6 +458,12 @@
             <artifactId>commons-beanutils</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-aspectj</artifactId>
+        <version>${shiro.version}</version>
       </dependency>
 
       <dependency>
@@ -960,6 +973,31 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>aspectj-maven-plugin</artifactId>
+          <version>1.4</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.aspectj</groupId>
+              <artifactId>aspectjtools</artifactId>
+              <version>${aspectj.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
 
         <plugin>
           <groupId>org.jboss.tattletale</groupId>
@@ -1388,14 +1426,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
+
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
@@ -1404,6 +1435,64 @@
   </build>
 
   <profiles>
+    <!--
+    FIXME: Need to find a better way to configure this, as many modules will not need/require weaving.
+    FIXME: With this enabled, all modules with classes will have to have the aspectjrt dependency.
+    -->
+    <profile>
+      <id>weave</id>
+
+      <activation>
+        <property>
+          <name>!skip-weave</name>
+        </property>
+      </activation>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.aspectj</groupId>
+          <artifactId>aspectjrt</artifactId>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>aspectj-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>compile</goal>
+                  <goal>test-compile</goal>
+                </goals>
+                <configuration>
+                  <!--<Xlint>ignore</Xlint>-->
+                  <!--<XaddSerialVersionUID>true</XaddSerialVersionUID>-->
+                  <showWeaveInfo>true</showWeaveInfo>
+                  <!--<aspectLibraries>-->
+                    <!--<aspectLibrary>-->
+                      <!--<groupId>org.apache.shiro</groupId>-->
+                      <!--<artifactId>shiro-aspectj</artifactId>-->
+                    <!--</aspectLibrary>-->
+                  <!--</aspectLibraries>-->
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/builddef.lst</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <profile>
       <id>debug</id>
       <activation>

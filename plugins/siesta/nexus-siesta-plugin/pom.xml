@@ -27,33 +27,16 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <siestaVersion>1.3</siestaVersion>
-    <nexus.plugin.name>Nexus Siesta Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Support for Siesta (Jersey) REST API.</nexus.plugin.description>
+    <pluginName>Nexus Siesta Plugin</pluginName>
+    <pluginDescription>Support for Siesta (Jersey) REST API.</pluginDescription>
+
+    <siesta.version>1.3</siesta.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-logging-extras</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty.orbit</groupId>
-      <artifactId>javax.servlet</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-servlet</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -65,7 +48,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-common</artifactId>
-      <version>${siestaVersion}</version>
+      <version>${siesta.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.google.guava</groupId>
@@ -81,7 +64,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-server</artifactId>
-      <version>${siestaVersion}</version>
+      <version>${siesta.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.xml.bind</groupId>
@@ -93,7 +76,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-client</artifactId>
-      <version>${siestaVersion}</version>
+      <version>${siesta.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.xml.bind</groupId>
@@ -117,7 +100,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-jackson</artifactId>
-      <version>${siestaVersion}</version>
+      <version>${siesta.version}</version>
     </dependency>
 
     <dependency>
@@ -140,8 +123,8 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
         <configuration>
           <sharedDependencies>
             <sharedDependency>javax.ws.rs:jsr311-api</sharedDependency>

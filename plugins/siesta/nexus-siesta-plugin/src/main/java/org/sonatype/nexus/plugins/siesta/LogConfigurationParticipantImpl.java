@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * Contributes "logback-siesta.xml" logging configuration.
  * 
- * @since 2.3
+ * @since 2.4
  */
 @Named
 @Singleton

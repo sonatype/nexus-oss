@@ -177,12 +177,12 @@
       <!--
       Required for plugins which provide modern JAX-RS 1.1 REST resources.
       -->
-      <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
-      <!--<artifactId>nexus-siesta-plugin</artifactId>-->
-      <!--<type>${nexus-plugin.type}</type>-->
-      <!--<version>${nexus.version}</version>-->
-      <!--</dependency>-->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-siesta-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
 
       <!--
       Required for plugins which provide indexer integration.
