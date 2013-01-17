@@ -79,8 +79,8 @@
       Need to know about 'nexus-plugin' packaging for integration-tests.
       -->
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
       </plugin>
 
       <plugin>
