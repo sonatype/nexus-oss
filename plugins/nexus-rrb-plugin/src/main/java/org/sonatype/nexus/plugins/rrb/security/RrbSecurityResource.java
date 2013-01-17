@@ -15,6 +15,11 @@ package org.sonatype.nexus.plugins.rrb.security;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+@Named
+@Singleton
 public class RrbSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
