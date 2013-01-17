@@ -561,87 +561,35 @@ public class RequestFlagsTest
         final String content = IOUtils.toString( ( (StorageFileItem) item ).getContentLocator().getContent() );
         MatcherAssert.assertThat( content, Matchers.equalTo( CONTENT ) );
     }
-    
+
     // == localOnly + remoteOnly : Not found always, as we forbid use
     // == of local and remote storage, so nowhere to serve from
 
-    @Test
-    public void localAndRemoteOnlyFlagWithEmptyCacheIs404()
+    @Test( expected = IllegalArgumentException.class )
+    public void localAndRemoteOnlyFlagsAreIllegalTogether()
         throws Exception
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
         request.setRequestLocalOnly( true );
         request.setRequestRemoteOnly( true );
-        try
-        {
-            proxyRepository.retrieveItem( request );
-            Assert.fail( "We should get INFEx!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        MatcherAssert.assertThat( getRecordedRequests(), Matchers.empty() );
     }
 
-    @Test
-    public void localAndRemoteOnlyFlagWithPrimedCacheIsServed()
+    @Test( expected = IllegalArgumentException.class )
+    public void localAndExpiredFlagsAreIllegalTogether()
         throws Exception
     {
-        // prime the cache
-        {
-            final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
-            proxyRepository.retrieveItem( request );
-        }
-
         final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
+        request.setRequestAsExpired( true );
         request.setRequestLocalOnly( true );
-        request.setRequestRemoteOnly( true );
-        try
-        {
-            proxyRepository.retrieveItem( request );
-            Assert.fail( "We should get INFEx!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        // the priming did this
-        final List<String> recordedRequests = getRecordedRequests();
-        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
-        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
     }
 
-    @Test
-    public void localAndRemoteOnlyFlagWithExpiredCacheIsServed()
+    @Test( expected = IllegalArgumentException.class )
+    public void remoteAndExpiredFlagsAreIllegalTogether()
         throws Exception
     {
-        // prime the cache and make it expired
-        {
-            final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
-            proxyRepository.retrieveItem( request );
-            proxyRepository.expireCaches( new ResourceStoreRequest( "/" ) );
-        }
-
         final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
-        request.setRequestLocalOnly( true );
         request.setRequestRemoteOnly( true );
-        try
-        {
-            proxyRepository.retrieveItem( request );
-            Assert.fail( "We should get INFEx!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        // the priming did this
-        final List<String> recordedRequests = getRecordedRequests();
-        MatcherAssert.assertThat( recordedRequests.size(), Matchers.equalTo( 1 ) );
-        MatcherAssert.assertThat( recordedRequests.get( 0 ), Matchers.startsWith( "GET" ) );
+        request.setRequestAsExpired( true );
     }
 
     // ==
