@@ -262,56 +262,22 @@
         Support for nexus-plugin packaging.
         -->
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>1.7</version>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
           <extensions>true</extensions>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.plugins</groupId>
-              <artifactId>app-lifecycle-nexus</artifactId>
-              <version>1.7</version>
-            </dependency>
-          </dependencies>
         </plugin>
-
-        <!--
-        Support for nexus-plugin packaging (replaces app-lifecycle-maven-plugin).
-        -->
-        <!--<plugin>-->
-        <!--<groupId>org.sonatype.nexus</groupId>-->
-        <!--<artifactId>nexus-plugin-bundle-maven-plugin</artifactId>-->
-        <!--<version>1.0-SNAPSHOT</version>-->
-        <!--<extensions>true</extensions>-->
-        <!--</plugin>-->
 
         <!--
         Required for nexus-plugin packaging (via nexus-plugin-bundle-maven-plugin).
         -->
-        <!--<plugin>-->
-        <!--<groupId>org.codehaus.mojo</groupId>-->
-        <!--<artifactId>aspectj-maven-plugin</artifactId>-->
-        <!--<configuration>-->
-        <!--<source>1.6</source>-->
-        <!--<target>1.6</target>-->
-        <!--</configuration>-->
-        <!--</plugin>-->
-
-        <!--
-        For modern-plugins to generate Sisu index files.
-        -->
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>sisu-maven-plugin</artifactId>
-          <version>1.1</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>main-index</goal>
-                <goal>test-index</goal>
-              </goals>
-            </execution>
-          </executions>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>aspectj-maven-plugin</artifactId>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
         </plugin>
 
         <!--
@@ -543,6 +509,46 @@
       <properties>
         <nexus-plugin.type>jar</nexus-plugin.type>
       </properties>
+    </profile>
+
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.codehaus.enunciate</groupId>
+                        <artifactId>maven-enunciate-slim-plugin</artifactId>
+                        <versionRange>[0,)</versionRange>
+                        <goals>
+                          <goal>docs</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore></ignore>
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 

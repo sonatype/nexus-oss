@@ -209,19 +209,10 @@
         <scope>import</scope>
       </dependency>
 
-      <!--
-      FIXME: Remove when app-lifecycle is replaced by nexus-plugin-bundle.
-      -->
       <dependency>
-        <groupId>org.sonatype.plugin</groupId>
-        <artifactId>plugin-model-api</artifactId>
-        <version>${sonatype.plugin.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-model</artifactId>
+        <version>1.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -1007,17 +998,10 @@
         FIXME: (nexus-it-helper-plugin for one, maybe needed for nexus-test-harness-its too).
         -->
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>1.7</version>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
           <extensions>true</extensions>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.plugins</groupId>
-              <artifactId>app-lifecycle-nexus</artifactId>
-              <version>1.7</version>
-            </dependency>
-          </dependencies>
         </plugin>
 
         <plugin>

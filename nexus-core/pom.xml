@@ -233,12 +233,9 @@
       <artifactId>mime-util</artifactId>
     </dependency>
 
-    <!--
-    FIXME: Remove when app-lifecycle is replaced by nexus-plugin-bundle.
-    -->
     <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-model-api</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-bundle-model</artifactId>
     </dependency>
 
     <dependency>

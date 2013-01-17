@@ -17,7 +17,11 @@ define('nexus/error/ErrorHandler', ['extjs', 'nexus', 'nexus/log'], function(Ext
   Nexus.error.ErrorHandler = function() {
     return {
       init : function() {
-        window.onerror = !window.onerror ? Nexus.error.handle : window.onerror.createSequence(Nexus.error.handle);
+        if ( !window.onerror ) {
+          window.onerror = Nexus.error.handle;
+        } else if ( window.onerror.createSequence ) {
+          window.onerror = window.onerror.createSequence(Nexus.error.handle);
+        } // else we don't have error display (e.g. with nexus-ui-testsuite siesta tests)
       },
       getFormattedMessage : function(args) {
         var
