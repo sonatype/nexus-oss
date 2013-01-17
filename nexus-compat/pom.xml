@@ -23,7 +23,6 @@
     <version>2.4-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-compat</artifactId>
 
   <description>Classes/Components for keeping Nexus compatible with older versions</description>
@@ -34,11 +33,13 @@
       <artifactId>javax.inject</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-eventbus</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>

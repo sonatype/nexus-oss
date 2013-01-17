@@ -25,6 +25,11 @@
   <artifactId>nexus-rest-client-java</artifactId>
 
   <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
     <!--
     FIXME: Should not be dependent on a plugin here.
     -->
