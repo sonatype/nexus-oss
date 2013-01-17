@@ -12,11 +12,13 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.security;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
+@Named
 @Singleton
 public class CapabilitySecurityResource
     extends AbstractStaticSecurityResource

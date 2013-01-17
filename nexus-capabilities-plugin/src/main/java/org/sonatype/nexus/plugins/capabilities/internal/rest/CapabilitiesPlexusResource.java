@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -50,6 +51,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.thoughtworks.xstream.XStream;
 
+@Named
 @Singleton
 @Path( CapabilitiesPlexusResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )

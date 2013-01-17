@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import java.util.List;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -34,6 +35,7 @@ import org.sonatype.nexus.rest.formfield.AbstractFormFieldResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+@Named
 @Singleton
 @Path( CapabilityTypesPlexusResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )

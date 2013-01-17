@@ -18,6 +18,7 @@ import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPl
 
 import java.io.IOException;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -40,6 +41,7 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+@Named
 @Singleton
 @Path( CapabilityStatusPlexusResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )
