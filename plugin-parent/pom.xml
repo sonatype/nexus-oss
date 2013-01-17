@@ -262,40 +262,23 @@
         Support for nexus-plugin packaging.
         -->
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>app-lifecycle-maven-plugin</artifactId>
-          <version>1.7</version>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
           <extensions>true</extensions>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.plugins</groupId>
-              <artifactId>app-lifecycle-nexus</artifactId>
-              <version>1.7</version>
-            </dependency>
-          </dependencies>
         </plugin>
-
-        <!--
-        Support for nexus-plugin packaging (replaces app-lifecycle-maven-plugin).
-        -->
-        <!--<plugin>-->
-        <!--<groupId>org.sonatype.nexus</groupId>-->
-        <!--<artifactId>nexus-plugin-bundle-maven-plugin</artifactId>-->
-        <!--<version>1.0-SNAPSHOT</version>-->
-        <!--<extensions>true</extensions>-->
-        <!--</plugin>-->
 
         <!--
         Required for nexus-plugin packaging (via nexus-plugin-bundle-maven-plugin).
         -->
-        <!--<plugin>-->
-        <!--<groupId>org.codehaus.mojo</groupId>-->
-        <!--<artifactId>aspectj-maven-plugin</artifactId>-->
-        <!--<configuration>-->
-        <!--<source>1.6</source>-->
-        <!--<target>1.6</target>-->
-        <!--</configuration>-->
-        <!--</plugin>-->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>aspectj-maven-plugin</artifactId>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
 
         <!--
         For legacy-plugins which still need Plexus descriptors.
