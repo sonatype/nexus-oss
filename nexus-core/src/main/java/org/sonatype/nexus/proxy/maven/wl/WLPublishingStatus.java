@@ -14,11 +14,28 @@ package org.sonatype.nexus.proxy.maven.wl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Punlishing status of a repository.
+ * 
+ * @author cstamas
+ * @since 2.4
+ */
 public class WLPublishingStatus
 {
+    /**
+     * Status enumeration.
+     */
     public static enum PStatus
     {
-        PUBLISHED, NOT_PUBLISHED;
+        /**
+         * WL is published okay for given repository.
+         */
+        PUBLISHED,
+
+        /**
+         * WL is not published for given repository.
+         */
+        NOT_PUBLISHED;
     }
 
     private final PStatus status;
@@ -27,6 +44,13 @@ public class WLPublishingStatus
 
     private final String lastPublishedFilePath;
 
+    /**
+     * Constructor.
+     * 
+     * @param status
+     * @param lastPublishedTimestamp
+     * @param lastPublishedFilePath
+     */
     public WLPublishingStatus( final PStatus status, final long lastPublishedTimestamp,
                                final String lastPublishedFilePath )
     {
@@ -35,11 +59,21 @@ public class WLPublishingStatus
         this.lastPublishedFilePath = lastPublishedFilePath;
     }
 
+    /**
+     * Publishing status.
+     * 
+     * @return publishing status.
+     */
     public PStatus getStatus()
     {
         return status;
     }
 
+    /**
+     * Time stamp (milliseconds) of the last published WL, or -1 if not published.
+     * 
+     * @return time stamp (milliseconds) of the last published WL, or -1 if not published.
+     */
     public long getLastPublishedTimestamp()
     {
         if ( getStatus() == PStatus.PUBLISHED )
@@ -52,6 +86,11 @@ public class WLPublishingStatus
         }
     }
 
+    /**
+     * Repository path of the published WL file, or, {@code null} if not published.
+     * 
+     * @return repository path of the published WL file, or, {@code null} if not published.
+     */
     public String getLastPublishedFilePath()
     {
         if ( getStatus() == PStatus.PUBLISHED )

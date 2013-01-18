@@ -15,15 +15,37 @@ package org.sonatype.nexus.proxy.maven.wl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Status properties of the remote content discovery.
+ * Remote discovery status of a repository.
  * 
  * @author cstamas
+ * @since 2.4
  */
 public class WLDiscoveryStatus
 {
+    /**
+     * Remote discovery status enumeration.
+     */
     public static enum DStatus
     {
-        NOT_A_PROXY, DISABLED, SUCCESSFUL, FAILED;
+        /**
+         * Given repository is not a proxy (remote discovery not applicable).
+         */
+        NOT_A_PROXY,
+
+        /**
+         * Remote discovery not enabled for given repository.
+         */
+        DISABLED,
+
+        /**
+         * Remote discovery enabled and was successful.
+         */
+        SUCCESSFUL,
+
+        /**
+         * Remote discovery enabled and was unsuccessful.
+         */
+        FAILED;
     }
 
     private final DStatus status;
@@ -32,6 +54,13 @@ public class WLDiscoveryStatus
 
     private final long lastDiscoveryTimestamp;
 
+    /**
+     * Constructor.
+     * 
+     * @param status
+     * @param lastDiscoveryStrategy
+     * @param lastDiscoveryTimestamp
+     */
     public WLDiscoveryStatus( final DStatus status, final String lastDiscoveryStrategy,
                               final long lastDiscoveryTimestamp )
     {
@@ -40,6 +69,10 @@ public class WLDiscoveryStatus
         this.lastDiscoveryTimestamp = lastDiscoveryTimestamp;
     }
 
+    /**
+     * Remote discovery status.
+     * @return remote discovery status.
+     */
     public DStatus getStatus()
     {
         return status;

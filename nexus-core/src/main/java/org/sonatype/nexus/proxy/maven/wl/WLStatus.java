@@ -14,23 +14,45 @@ package org.sonatype.nexus.proxy.maven.wl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * WL Status.
+ * 
+ * @author cstamas
+ * @since 2.4
+ */
 public class WLStatus
 {
     private final WLPublishingStatus publishingStatus;
 
     private final WLDiscoveryStatus discoveryStatus;
 
+    /**
+     * Constructor.
+     * 
+     * @param publishingStatus
+     * @param discoveryStatus
+     */
     public WLStatus( final WLPublishingStatus publishingStatus, final WLDiscoveryStatus discoveryStatus )
     {
         this.publishingStatus = checkNotNull( publishingStatus );
         this.discoveryStatus = checkNotNull( discoveryStatus );
     }
 
+    /**
+     * Returns the publishing status.
+     * 
+     * @return the publishing status.
+     */
     public WLPublishingStatus getPublishingStatus()
     {
         return publishingStatus;
     }
 
+    /**
+     * Returns the discovery status.
+     * 
+     * @return the discovery status.
+     */
     public WLDiscoveryStatus getDiscoveryStatus()
     {
         return discoveryStatus;
