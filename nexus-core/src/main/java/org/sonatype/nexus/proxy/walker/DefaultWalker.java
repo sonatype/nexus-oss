@@ -233,7 +233,7 @@ public class DefaultWalker
 
             if ( context.getItemComparator() != null )
             {
-                final ArrayList list = new ArrayList( ls );
+                final ArrayList<StorageItem> list = new ArrayList<StorageItem>( ls );
                 Collections.sort( list, context.getItemComparator() );
                 ls = list;
             }
