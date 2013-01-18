@@ -126,9 +126,9 @@ public final class NexusTypeVisitor
     public AnnotationVisitor visitAnnotation( final String desc, final boolean visible )
     {
         // Remember if we saw @Component, @Named or @Singleton for legacy warning detection
-        sawComponent = COMPONENT_DESC.equals(desc);
-        sawNamed = NAMED_DESC.equals(desc);
-        sawSingleton = SINGLETON_DESC.equals(desc);
+        sawComponent = sawComponent || COMPONENT_DESC.equals(desc);
+        sawNamed = sawNamed || NAMED_DESC.equals(desc);
+        sawSingleton = sawSingleton || SINGLETON_DESC.equals(desc);
 
         final AnnotationVisitor annotationVisitor = plexusTypeVisitor.visitAnnotation( desc, visible );
         return nexusType.isComponent() && NAMED_DESC.equals( desc ) ? namedHintVisitor : annotationVisitor;
