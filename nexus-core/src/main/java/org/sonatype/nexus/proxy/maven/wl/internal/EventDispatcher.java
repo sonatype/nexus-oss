@@ -50,9 +50,9 @@ import com.google.common.eventbus.Subscribe;
  * <p>
  * Note: This component was initially marked as {@code @EagerSingleton}, but it did not play well with rest of plexus
  * components, as it broke everything. Seems like this component was created "too early", also, some UTs does not
- * prepare environment properly (like DefaultPasswordGeneratorTest, that does not set even the minimal
- * properties needed). Hence, this component is made a "plain" singleton (not eager), and {@link WLManager}
- * implementation will pull it up, to have it created and to start ticking.
+ * prepare environment properly (like DefaultPasswordGeneratorTest, that does not set even the minimal properties
+ * needed). Hence, this component is made a "plain" singleton (not eager), and {@link WLManager} implementation will
+ * pull it up, to have it created and to start ticking.
  * 
  * @author cstamas
  * @since 2.4
@@ -107,6 +107,20 @@ public class EventDispatcher
     protected void handlePublishedWLUpdate( final MavenRepository mavenRepository )
     {
         wlManager.propagateWLUpdateOf( mavenRepository );
+    }
+
+    protected void handleWLUpdate( final MavenRepository mavenRepository )
+    {
+        try
+        {
+            wlManager.updateWhitelist( mavenRepository );
+        }
+        catch ( IOException e )
+        {
+            getLogger().warn(
+                "Problem while updating WL for repository "
+                    + RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+        }
     }
 
     protected void handlePrefixFileUpdate( final RepositoryItemEvent evt )
@@ -306,16 +320,7 @@ public class EventDispatcher
         if ( isRepositoryHandled( evt.getRepository() ) )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
-            try
-            {
-                wlManager.updateWhitelist( mavenRepository );
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn(
-                    "Problem while updating published WL for repository "
-                        + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + " in response to " + evt, e );
-            }
+            handleWLUpdate( mavenRepository );
         }
     }
 
@@ -337,17 +342,7 @@ public class EventDispatcher
                 final MavenGroupRepository mavenGroupRepository = repository.adaptToFacet( MavenGroupRepository.class );
                 if ( mavenGroupRepository != null )
                 {
-                    try
-                    {
-                        wlManager.updateWhitelist( mavenGroupRepository );
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().warn(
-                            "Problem while updating published WL for repository "
-                                + RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository )
-                                + " in response to " + evt, e );
-                    }
+                    handleWLUpdate( mavenGroupRepository );
                 }
             }
         }

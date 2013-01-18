@@ -133,7 +133,7 @@ public class WLManagerImpl
             if ( entrySource.exists() )
             {
                 // good, we assume is up to date, which should be unless user tampered with it
-                // in that case, just delete it + reboot and should be fixed.
+                // in that case, just delete it + update and should be fixed.
                 publish( mavenRepository, entrySource );
                 getLogger().info( "Existing WL of {} initialized.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
