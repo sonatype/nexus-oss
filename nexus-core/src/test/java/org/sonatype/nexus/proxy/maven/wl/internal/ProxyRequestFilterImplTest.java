@@ -13,7 +13,6 @@
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.is;
 
 import java.util.Arrays;
@@ -26,14 +25,13 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-public class ProxyWhitelistFilterImplTest
+public class ProxyRequestFilterImplTest
     extends TestSupport
 {
     @Mock
@@ -62,7 +60,7 @@ public class ProxyWhitelistFilterImplTest
         Mockito.when( mavenProxyRepository.getName() ).thenReturn( "Central Repository" );
     }
 
-    protected void doTestAllowed( final ProxyWhitelistFilterImpl filter, final String path,
+    protected void doTestAllowed( final ProxyRequestFilterImpl filter, final String path,
                                   final boolean shouldBeAllowed )
     {
         final ResourceStoreRequest resourceStoreRequest = new ResourceStoreRequest( path );
@@ -74,8 +72,8 @@ public class ProxyWhitelistFilterImplTest
     public void smoke()
     {
         // no WL exists at all, we must pass all
-        final ProxyWhitelistFilterImpl filter =
-            new ProxyWhitelistFilterImpl( eventBus, applicationStatusSource, config, wlManager );
+        final ProxyRequestFilterImpl filter =
+            new ProxyRequestFilterImpl( eventBus, applicationStatusSource, config, wlManager );
 
         doTestAllowed( filter, "/some/path/and/file/at/the/end.txt", true );
         doTestAllowed( filter, "/foo/bar", true );
@@ -90,8 +88,8 @@ public class ProxyWhitelistFilterImplTest
             entrySource );
 
         // WL will be built, not every request should be allowed
-        final ProxyWhitelistFilterImpl filter =
-            new ProxyWhitelistFilterImpl( eventBus, applicationStatusSource, config, wlManager );
+        final ProxyRequestFilterImpl filter =
+            new ProxyRequestFilterImpl( eventBus, applicationStatusSource, config, wlManager );
 
         // ping (this would happen on event)
         filter.buildWhitelistFor( mavenProxyRepository );

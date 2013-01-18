@@ -23,7 +23,7 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
  * @author cstamas
  * @since 2.4
  */
-public interface ProxyWhitelistFilter
+public interface ProxyRequestFilter
 {
     /**
      * Evaluates the passed in combination of {@link MavenProxyRepository} and {@link ResourceStoreRequest} and decides

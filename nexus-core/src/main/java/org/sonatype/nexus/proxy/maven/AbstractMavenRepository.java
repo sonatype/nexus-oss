@@ -38,7 +38,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.maven.wl.ProxyWhitelistFilter;
+import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -73,7 +73,7 @@ public abstract class AbstractMavenRepository
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     @Requirement
-    protected ProxyWhitelistFilter proxyWhitelistFilter;
+    protected ProxyRequestFilter proxyRequestFilter;
 
     private MutableProxyRepositoryKind repositoryKind;
 
@@ -135,9 +135,9 @@ public abstract class AbstractMavenRepository
         return artifactPackagingMapper;
     }
 
-    protected ProxyWhitelistFilter getProxyWhitelistFilter()
+    protected ProxyRequestFilter getProxyRequestFilter()
     {
-        return proxyWhitelistFilter;
+        return proxyRequestFilter;
     }
 
     /**
@@ -419,7 +419,7 @@ public abstract class AbstractMavenRepository
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
-            final boolean whitelistMatched = getProxyWhitelistFilter().allowed( this, request );
+            final boolean whitelistMatched = getProxyRequestFilter().allowed( this, request );
             if ( !whitelistMatched )
             {
                 getLogger().info( "WL filter rejected remote request for path {} in {}.", request.getRequestPath(),

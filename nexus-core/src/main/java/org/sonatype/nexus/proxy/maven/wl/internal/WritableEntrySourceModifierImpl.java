@@ -41,7 +41,7 @@ public class WritableEntrySourceModifierImpl
 
     private List<String> entrySourceEntries;
 
-    private WhitelistMatcher whitelistMatcher;
+    private PathMatcher whitelistMatcher;
 
     /**
      * Constructor.
@@ -132,6 +132,6 @@ public class WritableEntrySourceModifierImpl
         this.toBeAdded.clear();
         this.toBeRemoved.clear();
         this.entrySourceEntries = entries;
-        this.whitelistMatcher = new WhitelistMatcherImpl( entries );
+        this.whitelistMatcher = new PathMatcherImpl( entries );
     }
 }

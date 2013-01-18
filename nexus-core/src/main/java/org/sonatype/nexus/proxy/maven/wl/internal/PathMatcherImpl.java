@@ -28,13 +28,13 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 
 /**
- * Default implementation of {@link WhitelistMatcher}. Implemented using {@link ParentOMatic}, and performs matching by
+ * Default implementation of {@link PathMatcher}. Implemented using {@link ParentOMatic}, and performs matching by
  * building a maximized (capped) tree in memory out of path entries.
  * 
  * @author cstamas
  */
-public class WhitelistMatcherImpl
-    implements WhitelistMatcher
+public class PathMatcherImpl
+    implements PathMatcher
 {
     private final Node<Payload> root;
 
@@ -43,7 +43,7 @@ public class WhitelistMatcherImpl
      * 
      * @param entries
      */
-    public WhitelistMatcherImpl( final List<String> entries )
+    public PathMatcherImpl( final List<String> entries )
     {
         this( entries, Integer.MAX_VALUE );
     }
@@ -54,7 +54,7 @@ public class WhitelistMatcherImpl
      * @param entries
      * @param maxDepth
      */
-    public WhitelistMatcherImpl( final List<String> entries, final int maxDepth )
+    public PathMatcherImpl( final List<String> entries, final int maxDepth )
     {
         checkArgument( maxDepth >= 2 );
         this.root = buildRoot( checkNotNull( entries ), maxDepth );

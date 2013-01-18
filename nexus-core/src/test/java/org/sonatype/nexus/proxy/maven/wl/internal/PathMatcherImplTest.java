@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class WhitelistMatcherImplTest
+public class PathMatcherImplTest
 {
     protected List<String> entries1 = Arrays.asList( "/org/sonatype", "/com/sonatype/nexus",
         "/biz/sonatype/nexus/plugins", "/archetype-metadata.xml" );
@@ -30,7 +30,7 @@ public class WhitelistMatcherImplTest
     @Test
     public void smoke()
     {
-        final WhitelistMatcherImpl wl = new WhitelistMatcherImpl( entries1, 2 );
+        final PathMatcherImpl wl = new PathMatcherImpl( entries1, 2 );
 
         assertThat( "Should not match!", !wl.matches( "/org" ) );
         assertThat( "Should not match!", !wl.matches( "/archetype" ) );
@@ -67,7 +67,7 @@ public class WhitelistMatcherImplTest
         assertThat( "Should match!", wl.matches( "/biz/sonatype/foobar" ) );
     }
 
-    protected void check( WhitelistMatcher wl, String path, boolean shouldMatch )
+    protected void check( PathMatcher wl, String path, boolean shouldMatch )
     {
         if ( shouldMatch )
         {
@@ -82,9 +82,9 @@ public class WhitelistMatcherImplTest
     @Test
     public void testMaxDepth()
     {
-        final WhitelistMatcherImpl wl1 = new WhitelistMatcherImpl( entries2, 2 );
-        final WhitelistMatcherImpl wl2 = new WhitelistMatcherImpl( entries2, 3 );
-        final WhitelistMatcherImpl wl3 = new WhitelistMatcherImpl( entries2, 4 );
+        final PathMatcherImpl wl1 = new PathMatcherImpl( entries2, 2 );
+        final PathMatcherImpl wl2 = new PathMatcherImpl( entries2, 3 );
+        final PathMatcherImpl wl3 = new PathMatcherImpl( entries2, 4 );
 
         // wl1 is 2 deep, so whatever is on level 3+ is neglected
         check( wl1, "/A/1/X/3/4/5/6/7/8/9/0", true );

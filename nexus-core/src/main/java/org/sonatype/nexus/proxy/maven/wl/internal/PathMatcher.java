@@ -18,7 +18,7 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
  * @author cstamas
  * @since 2.4
  */
-public interface WhitelistMatcher
+public interface PathMatcher
 {
     /**
      * Performs a match against passed in path.

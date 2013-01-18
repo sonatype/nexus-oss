@@ -26,7 +26,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
-import org.sonatype.nexus.proxy.maven.wl.ProxyWhitelistFilter;
+import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.events.WLPublishedRepositoryEvent;
@@ -37,15 +37,15 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 /**
- * Default implementation of the {@link ProxyWhitelistFilter}.
+ * Default implementation of the {@link ProxyRequestFilter}.
  * 
  * @author cstamas
  */
 @Named
 @Singleton
-public class ProxyWhitelistFilterImpl
+public class ProxyRequestFilterImpl
     extends AbstractLoggingComponent
-    implements ProxyWhitelistFilter
+    implements ProxyRequestFilter
 {
     private final ApplicationStatusSource applicationStatusSource;
 
@@ -62,7 +62,7 @@ public class ProxyWhitelistFilterImpl
      * @param wlManager
      */
     @Inject
-    public ProxyWhitelistFilterImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
+    public ProxyRequestFilterImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
                                      final WLConfig config, final WLManager wlManager )
     {
         checkNotNull( eventBus );
@@ -76,7 +76,7 @@ public class ProxyWhitelistFilterImpl
     public boolean allowed( final MavenProxyRepository mavenProxyRepository,
                             final ResourceStoreRequest resourceStoreRequest )
     {
-        final WhitelistMatcher whitelist = getWhitelistFor( mavenProxyRepository );
+        final PathMatcher whitelist = getWhitelistFor( mavenProxyRepository );
         if ( whitelist != null )
         {
             return whitelist.matches( resourceStoreRequest.getRequestPath() );
@@ -87,10 +87,10 @@ public class ProxyWhitelistFilterImpl
 
     // ==
 
-    private final ConcurrentHashMap<String, WhitelistMatcher> whitelists =
-        new ConcurrentHashMap<String, WhitelistMatcher>();
+    private final ConcurrentHashMap<String, PathMatcher> whitelists =
+        new ConcurrentHashMap<String, PathMatcher>();
 
-    protected WhitelistMatcher getWhitelistFor( final MavenProxyRepository mavenProxyRepository )
+    protected PathMatcher getWhitelistFor( final MavenProxyRepository mavenProxyRepository )
     {
         return whitelists.get( mavenProxyRepository.getId() );
     }
@@ -108,8 +108,8 @@ public class ProxyWhitelistFilterImpl
             final EntrySource entrySource = wlManager.getEntrySourceFor( mavenProxyRepository );
             if ( entrySource.exists() )
             {
-                final WhitelistMatcher whitelist =
-                    new WhitelistMatcherImpl( entrySource.readEntries(), config.getWLMatchingDepth() );
+                final PathMatcher whitelist =
+                    new PathMatcherImpl( entrySource.readEntries(), config.getWLMatchingDepth() );
                 whitelists.put( mavenProxyRepository.getId(), whitelist );
             }
         }
