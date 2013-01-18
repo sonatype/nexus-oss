@@ -21,13 +21,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import com.google.inject.BindingAnnotation;
+import javax.inject.Qualifier;
 
-@BindingAnnotation
+@Qualifier
 @Target( { TYPE, FIELD, PARAMETER, METHOD } )
 @Retention( RUNTIME )
 public @interface NexusSpecific
 {
-
+    // empty
 }
 
