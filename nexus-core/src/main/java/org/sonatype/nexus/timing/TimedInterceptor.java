@@ -79,6 +79,8 @@ public class TimedInterceptor
         }
         finally {
             split.stop();
+
+            // TODO: log.trace
             log.info(TIMING, "{}", watch);
         }
     }
