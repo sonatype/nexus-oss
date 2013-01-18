@@ -31,9 +31,10 @@ public interface EntrySource
     boolean exists();
 
     /**
-     * Reads entries for this source.
+     * Reads entries for this source, of {@code null} if not exists ({@link #exists()} returns {@code false} in this
+     * case).
      * 
-     * @return list of entries contained in this source.
+     * @return list of entries contained in this source, or {@code null} in no entries could be read.
      * @throws IOException
      */
     List<String> readEntries()
@@ -42,9 +43,10 @@ public interface EntrySource
     /**
      * Returns the timestamp of this entry source. Based on implementation, this might mean different things: if backed
      * by file, the file timestamp, or the timestamp when enties were collected in some way, or when the entries was
-     * generated in some way, etc. Simply put, the "when" point in time that this instance reflects.
+     * generated in some way, etc. Simply put, the "when" point in time that this instance reflects. If not exists,
+     * result is -1.
      * 
-     * @return timestamp in millis of this entry source.
+     * @return timestamp in millis of this entry source, or -1 if not exists.
      */
     long getLostModifiedTimestamp();
 }

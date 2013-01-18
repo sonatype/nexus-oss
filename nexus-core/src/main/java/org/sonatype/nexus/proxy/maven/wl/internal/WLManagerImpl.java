@@ -173,7 +173,7 @@ public class WLManagerImpl
         EntrySource entrySource = null;
         if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
         {
-            // save merged WL into group's local storage (if all members has lists)
+            // save merged WL into group's local storage (if all members has WL)
             boolean allMembersHaveWLPublished = true;
             final MavenGroupRepository mavenGroupRepository = mavenRepository.adaptToFacet( MavenGroupRepository.class );
             final ArrayList<EntrySource> memberEntrySources = new ArrayList<EntrySource>();

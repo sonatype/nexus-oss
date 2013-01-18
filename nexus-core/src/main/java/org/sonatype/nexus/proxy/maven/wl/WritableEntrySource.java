@@ -34,7 +34,8 @@ public interface WritableEntrySource
         throws IOException;
 
     /**
-     * Deletes this entry source.
+     * Deletes this entry source. After return from this method (and having no exception), the {@link #exists()} method
+     * returns {@code true}.
      * 
      * @throws IOException
      */
