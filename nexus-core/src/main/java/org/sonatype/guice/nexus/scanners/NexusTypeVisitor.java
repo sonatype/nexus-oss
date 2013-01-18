@@ -16,8 +16,11 @@ import java.lang.annotation.Annotation;
 import java.net.URL;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.scanners.ClassSpaceVisitor;
 import org.sonatype.guice.bean.scanners.EmptyAnnotationVisitor;
@@ -39,6 +42,8 @@ public final class NexusTypeVisitor
     extends EmptyClassVisitor
     implements ClassSpaceVisitor
 {
+    private static final Logger log = LoggerFactory.getLogger(NexusTypeVisitor.class);
+
     // ----------------------------------------------------------------------
     // Constants
     // ----------------------------------------------------------------------
@@ -46,6 +51,8 @@ public final class NexusTypeVisitor
     static final String COMPONENT_DESC = Type.getDescriptor( Component.class );
 
     static final String NAMED_DESC = Type.getDescriptor( Named.class );
+
+    static final String SINGLETON_DESC = Type.getDescriptor( Singleton.class );
 
     // ----------------------------------------------------------------------
     // Implementation fields
@@ -61,7 +68,13 @@ public final class NexusTypeVisitor
 
     private ClassSpace space;
 
+    private String clazz;
+
     private NexusType nexusType = MarkedNexusTypes.UNKNOWN;
+
+    private boolean sawNamed;
+
+    private boolean sawSingleton;
 
     // ----------------------------------------------------------------------
     // Constructors
@@ -94,7 +107,7 @@ public final class NexusTypeVisitor
     public void visit( final int version, final int access, final String name, final String signature,
                        final String superName, final String[] interfaces )
     {
-        final String clazz = name.replace( '/', '.' );
+        clazz = name.replace( '/', '.' );
         nexusTypeListener.hear( clazz );
 
         if ( ( access & ( Opcodes.ACC_ABSTRACT | Opcodes.ACC_INTERFACE | Opcodes.ACC_SYNTHETIC ) ) == 0 )
@@ -107,6 +120,10 @@ public final class NexusTypeVisitor
     @Override
     public AnnotationVisitor visitAnnotation( final String desc, final boolean visible )
     {
+        // Remember if we saw @Named or @Singleton for legacy warning detection
+        sawNamed = NAMED_DESC.equals( desc );
+        sawSingleton = SINGLETON_DESC.equals( desc );
+
         final AnnotationVisitor annotationVisitor = plexusTypeVisitor.visitAnnotation( desc, visible );
         return nexusType.isComponent() && NAMED_DESC.equals( desc ) ? namedHintVisitor : annotationVisitor;
     }
@@ -120,6 +137,25 @@ public final class NexusTypeVisitor
             nexusTypeListener.hear( (RepositoryType) details );
         }
         plexusTypeVisitor.visitEnd();
+
+        // Complain if we found a component relying on legacy @ExtensionPoint or @Managed semantics
+        if (nexusType == MarkedNexusTypes.EXTENSION_POINT && !sawNamed) {
+            log.warn("Found legacy component relying on @ExtensionPoint magic to automatically imply @Named: {}", clazz);
+        }
+        else if (nexusType == MarkedNexusTypes.EXTENSION_POINT_SINGLETON && !sawNamed && !sawSingleton) {
+            log.warn("Found legacy component relying on @ExtensionPoint magic to automatically imply @Named @Singleton: {}", clazz);
+        }
+        else if (nexusType == MarkedNexusTypes.MANAGED && !sawNamed) {
+            log.warn("Found legacy component relying on @Managed magic to automatically imply @Named: {}", clazz);
+        }
+        else if (nexusType == MarkedNexusTypes.MANAGED_SINGLETON && !sawNamed && !sawSingleton) {
+            log.warn("Found legacy component relying on @Managed magic to automatically imply @Named @Singleton: {}", clazz);
+        }
+
+        // reset state
+        clazz = null;
+        sawNamed = false;
+        sawSingleton = false;
     }
 
     // ----------------------------------------------------------------------
