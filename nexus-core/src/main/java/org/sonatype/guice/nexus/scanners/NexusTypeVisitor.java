@@ -139,11 +139,11 @@ public final class NexusTypeVisitor
             // TODO: Flip this to WARN when aggressively killing legacy component annotations
             // Complain if we see legacy annotations
             if (EXTENSION_POINT_DESC.equals(desc)) {
-                log.debug("Detected legacy @ExtensionPoint annotation: {}", clazz);
+                log.debug("Found legacy @ExtensionPoint annotation: {}", clazz);
                 log.debug("Source: {}", source);
             }
             else if (MANAGED_DESC.equals(desc)) {
-                log.debug("Detected legacy @Managed annotation: {}", clazz);
+                log.debug("Found legacy @Managed annotation: {}", clazz);
                 log.debug("Source: {}", source);
             }
         }
