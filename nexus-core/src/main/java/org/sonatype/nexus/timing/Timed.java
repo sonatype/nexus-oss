@@ -29,7 +29,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface Timed
 {
-    public static final String DEFAULT_VALUE = "";
+    String DEFAULT_VALUE = "";
 
     /**
      * The name of the timing metric.  If left as {@link #DEFAULT_VALUE} or a blank/empty string,
