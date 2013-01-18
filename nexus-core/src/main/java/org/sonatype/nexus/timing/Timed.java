@@ -31,5 +31,9 @@ public @interface Timed
 {
     public static final String DEFAULT_VALUE = "";
 
+    /**
+     * The name of the timing metric.  If left as {@link #DEFAULT_VALUE} or a blank/empty string,
+     * then a name will be determined from the aspect context around the method being woven.
+     */
     String value() default DEFAULT_VALUE;
 }
