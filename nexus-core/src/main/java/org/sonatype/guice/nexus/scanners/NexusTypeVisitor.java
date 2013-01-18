@@ -54,6 +54,10 @@ public final class NexusTypeVisitor
 
     static final String SINGLETON_DESC = Type.getDescriptor( Singleton.class );
 
+    static final String EXTENSION_POINT_DESC = Type.getDescriptor( ExtensionPoint.class );
+
+    static final String MANAGED_DESC = Type.getDescriptor( Managed.class );
+
     // ----------------------------------------------------------------------
     // Implementation fields
     // ----------------------------------------------------------------------
@@ -129,6 +133,20 @@ public final class NexusTypeVisitor
         sawComponent = sawComponent || COMPONENT_DESC.equals(desc);
         sawNamed = sawNamed || NAMED_DESC.equals(desc);
         sawSingleton = sawSingleton || SINGLETON_DESC.equals(desc);
+
+        // If we detected a class, then ...
+        if (clazz != null) {
+            // TODO: Flip this to WARN when aggressively killing legacy component annotations
+            // Complain if we see legacy annotations
+            if (EXTENSION_POINT_DESC.equals(desc)) {
+                log.debug("Detected legacy @ExtensionPoint annotation: {}", clazz);
+                log.debug("Source: {}", source);
+            }
+            else if (MANAGED_DESC.equals(desc)) {
+                log.debug("Detected legacy @Managed annotation: {}", clazz);
+                log.debug("Source: {}", source);
+            }
+        }
 
         final AnnotationVisitor annotationVisitor = plexusTypeVisitor.visitAnnotation( desc, visible );
         return nexusType.isComponent() && NAMED_DESC.equals( desc ) ? namedHintVisitor : annotationVisitor;
