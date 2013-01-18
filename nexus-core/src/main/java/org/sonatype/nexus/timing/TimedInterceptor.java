@@ -55,7 +55,7 @@ public class TimedInterceptor
 
         // This should not happen, as we only intercept methods which have @Timed on them, but just in-case
         if (annotation == null) {
-            log.error("Missing @Timed annotation on method: {}", invocation);
+            log.error("Missing @Timed annotation on method: {}", method);
             // will construct an automatic name
         }
         else {
