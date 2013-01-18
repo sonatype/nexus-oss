@@ -21,13 +21,6 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 public interface WhitelistMatcher
 {
     /**
-     * Returns the number of path elements used in matching.
-     * 
-     * @return the max depth of the used path elements in matching.
-     */
-    int getMaxDepth();
-
-    /**
      * Performs a match against passed in path.
      * 
      * @param path

@@ -36,9 +36,17 @@ import com.google.common.base.Function;
 public class WhitelistMatcherImpl
     implements WhitelistMatcher
 {
-    private final int maxDepth;
-
     private final Node<Payload> root;
+
+    /**
+     * Constructor.
+     * 
+     * @param entries
+     */
+    public WhitelistMatcherImpl( final List<String> entries )
+    {
+        this( entries, Integer.MAX_VALUE );
+    }
 
     /**
      * Constructor.
@@ -49,14 +57,7 @@ public class WhitelistMatcherImpl
     public WhitelistMatcherImpl( final List<String> entries, final int maxDepth )
     {
         checkArgument( maxDepth >= 2 );
-        this.maxDepth = maxDepth;
         this.root = buildRoot( checkNotNull( entries ), maxDepth );
-    }
-
-    @Override
-    public int getMaxDepth()
-    {
-        return maxDepth;
     }
 
     @Override
@@ -90,23 +91,26 @@ public class WhitelistMatcherImpl
         {
             parentOMatic.addPath( entry );
         }
-        parentOMatic.applyRecursively( parentOMatic.getRoot(), new Function<Node<Payload>, Node<Payload>>()
+        if ( maxDepth != Integer.MAX_VALUE )
         {
-            @Override
-            @Nullable
-            public Node<Payload> apply( @Nullable Node<Payload> input )
+            parentOMatic.applyRecursively( parentOMatic.getRoot(), new Function<Node<Payload>, Node<Payload>>()
             {
-                if ( input.getDepth() == maxDepth )
+                @Override
+                @Nullable
+                public Node<Payload> apply( @Nullable Node<Payload> input )
                 {
-                    // simply "cut off" children if any
-                    for ( Node<Payload> child : input.getChildren() )
+                    if ( input.getDepth() == maxDepth )
                     {
-                        input.removeChild( child );
+                        // simply "cut off" children if any
+                        for ( Node<Payload> child : input.getChildren() )
+                        {
+                            input.removeChild( child );
+                        }
                     }
+                    return null;
                 }
-                return null;
-            }
-        } );
+            } );
+        }
         return parentOMatic.getRoot();
     }
 }

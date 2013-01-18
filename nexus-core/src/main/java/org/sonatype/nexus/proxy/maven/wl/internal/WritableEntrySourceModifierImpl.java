@@ -35,11 +35,11 @@ public class WritableEntrySourceModifierImpl
 {
     private final WritableEntrySource writableEntrySource;
 
-    private final int wlMaxDepth;
-
     private final List<String> toBeAdded;
 
     private final List<String> toBeRemoved;
+
+    private List<String> entrySourceEntries;
 
     private WhitelistMatcher whitelistMatcher;
 
@@ -47,14 +47,12 @@ public class WritableEntrySourceModifierImpl
      * Constructor.
      * 
      * @param writableEntrySource
-     * @param wlMaxDepth
      * @throws IOException
      */
-    public WritableEntrySourceModifierImpl( final WritableEntrySource writableEntrySource, final int wlMaxDepth )
+    public WritableEntrySourceModifierImpl( final WritableEntrySource writableEntrySource )
         throws IOException
     {
         this.writableEntrySource = checkNotNull( writableEntrySource );
-        this.wlMaxDepth = wlMaxDepth;
         this.toBeAdded = new ArrayList<String>();
         this.toBeRemoved = new ArrayList<String>();
         reset( writableEntrySource.readEntries() );
@@ -66,10 +64,10 @@ public class WritableEntrySourceModifierImpl
         boolean modified = false;
         for ( String entry : entries )
         {
-            final String maxedEntry = pathFrom( elementsOf( entry ), whitelistMatcher.getMaxDepth() );
-            if ( !whitelistMatcher.matches( maxedEntry ) && !toBeAdded.contains( maxedEntry ) )
+            final String normalizedEntry = pathFrom( elementsOf( entry ) );
+            if ( !whitelistMatcher.matches( normalizedEntry ) && !toBeAdded.contains( normalizedEntry ) )
             {
-                toBeAdded.add( maxedEntry );
+                toBeAdded.add( normalizedEntry );
                 modified = true;
             }
         }
@@ -82,10 +80,10 @@ public class WritableEntrySourceModifierImpl
         boolean modified = false;
         for ( String entry : entries )
         {
-            final String maxedEntry = pathFrom( elementsOf( entry ), whitelistMatcher.getMaxDepth() );
-            if ( whitelistMatcher.matches( maxedEntry ) && !toBeRemoved.contains( maxedEntry ) )
+            final String normalizedEntry = pathFrom( elementsOf( entry ) );
+            if ( entrySourceEntries.contains( normalizedEntry ) && !toBeRemoved.contains( normalizedEntry ) )
             {
-                toBeRemoved.add( maxedEntry );
+                toBeRemoved.add( normalizedEntry );
                 modified = true;
             }
         }
@@ -133,6 +131,7 @@ public class WritableEntrySourceModifierImpl
     {
         this.toBeAdded.clear();
         this.toBeRemoved.clear();
-        this.whitelistMatcher = new WhitelistMatcherImpl( entries, wlMaxDepth );
+        this.entrySourceEntries = entries;
+        this.whitelistMatcher = new WhitelistMatcherImpl( entries );
     }
 }
