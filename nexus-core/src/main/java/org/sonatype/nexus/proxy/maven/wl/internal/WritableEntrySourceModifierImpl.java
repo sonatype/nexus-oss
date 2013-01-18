@@ -61,7 +61,7 @@ public class WritableEntrySourceModifierImpl
     }
 
     @Override
-    public boolean addEntries( String... entries )
+    public boolean offerEntries( final String... entries )
     {
         boolean modified = false;
         for ( String entry : entries )
@@ -77,7 +77,7 @@ public class WritableEntrySourceModifierImpl
     }
 
     @Override
-    public boolean removeEntries( String... entries )
+    public boolean revokeEntries( final String... entries )
     {
         boolean modified = false;
         for ( String entry : entries )
@@ -99,7 +99,7 @@ public class WritableEntrySourceModifierImpl
     }
 
     @Override
-    public void apply()
+    public boolean apply()
         throws IOException
     {
         if ( hasChanges() )
@@ -110,7 +110,21 @@ public class WritableEntrySourceModifierImpl
             final ArrayListEntrySource newEntries = new ArrayListEntrySource( entries );
             writableEntrySource.writeEntries( newEntries );
             reset( newEntries.readEntries() );
+            return true;
         }
+        return false;
+    }
+
+    @Override
+    public boolean reset()
+        throws IOException
+    {
+        if ( hasChanges() )
+        {
+            reset( writableEntrySource.readEntries() );
+            return true;
+        }
+        return false;
     }
 
     // ==

@@ -386,10 +386,9 @@ public class WLManagerImpl
         final WritableEntrySource entrySource = getEntrySourceFor( mavenHostedRepository );
         final WritableEntrySourceModifier wesm =
             new WritableEntrySourceModifierImpl( entrySource, config.getLocalScrapeDepth() );
-        wesm.addEntries( entries );
-        if ( wesm.hasChanges() )
+        wesm.offerEntries( entries );
+        if ( wesm.apply() )
         {
-            wesm.apply();
             publish( mavenHostedRepository, entrySource );
             return true;
         }
@@ -402,10 +401,9 @@ public class WLManagerImpl
         final WritableEntrySource entrySource = getEntrySourceFor( mavenHostedRepository );
         final WritableEntrySourceModifier wesm =
             new WritableEntrySourceModifierImpl( entrySource, config.getLocalScrapeDepth() );
-        wesm.removeEntries( entries );
-        if ( wesm.hasChanges() )
+        wesm.revokeEntries( entries );
+        if ( wesm.apply() )
         {
-            wesm.apply();
             publish( mavenHostedRepository, entrySource );
             return true;
         }
