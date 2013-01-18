@@ -120,6 +120,12 @@
       </dependency>
 
       <dependency>
+        <groupId>aopalliance</groupId>
+        <artifactId>aopalliance</artifactId>
+        <version>1.0</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-inject-bean</artifactId>
         <version>${sisu-inject.version}</version>
