@@ -247,6 +247,11 @@
       <artifactId>jsoup</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.javasimon</groupId>
+      <artifactId>javasimon-core</artifactId>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
