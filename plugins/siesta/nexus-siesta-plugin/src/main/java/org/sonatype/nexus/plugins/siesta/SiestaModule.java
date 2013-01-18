@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.siesta;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
+import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 import org.sonatype.sisu.siesta.jackson.SiestaJacksonModule;
 import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryApplication;
@@ -32,7 +33,9 @@ import javax.inject.Singleton;
 public class SiestaModule
     extends AbstractModule
 {
-    public static final String MOUNT_POINT = "/service/rest";
+    public static final String SERVICE_NAME = "siesta";
+
+    public static final String MOUNT_POINT = "/service/" + SERVICE_NAME;
 
     @Override
     protected void configure() {
@@ -46,6 +49,9 @@ public class SiestaModule
         // requireBinding's for SecuritySystem and FilterChainResolver, which are the filter's dependencies.
 
         bind(SecurityWebFilter.class);
+
+        // FIXME: Sort out if we want aspectj or guice-aop
+        //install(new ShiroAopModule());
 
         install(new org.sonatype.sisu.siesta.server.internal.SiestaModule());
         install(new SiestaJerseyModule());
