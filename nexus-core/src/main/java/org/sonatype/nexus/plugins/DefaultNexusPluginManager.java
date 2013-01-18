@@ -466,7 +466,14 @@ public class DefaultNexusPluginManager
         final ClassSpace annSpace = new URLClassSpace( pluginRealm, scanList.toArray( new URL[scanList.size()] ) );
         beanModules.add( new NexusAnnotatedBeanModule( annSpace, variables, exportedClassNames, repositoryTypes ) );
 
-        container.addPlexusInjector( beanModules, resourceModule );
+        final Module[] modules = {
+            resourceModule,
+
+            // Add support for @Timed
+            new TimingModule()
+        };
+
+        container.addPlexusInjector( beanModules, modules );
 
         for ( final RepositoryTypeDescriptor r : repositoryTypes )
         {
