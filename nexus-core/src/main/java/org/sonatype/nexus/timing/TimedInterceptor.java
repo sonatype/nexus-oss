@@ -38,9 +38,16 @@ public class TimedInterceptor
     private static final Logger log = LoggerFactory.getLogger(TimedInterceptor.class);
 
     // TODO: Sort out javasimon configuration, JMX and callbacks to handling logging or not, etc.
+    // TODO: Probably want to do all of this ^^^ in a helper class
 
     // TODO: Could potentially implement a simple cache here if we think perf of name calculation is too high
 
+    /**
+     * Construct name from a {@link MethodInvocation}.  If {@link Timed#value()} is default/blank, then
+     * a name will be constructed from the given {@link Method}.
+     *
+     * @see #nameOf(Method)
+     */
     private String nameOf(final MethodInvocation invocation) {
         Method method = invocation.getMethod();
         Timed annotation = method.getAnnotation(Timed.class);
@@ -55,17 +62,27 @@ public class TimedInterceptor
             name = annotation.value();
         }
 
-        // autodetect a name if needed; class-name + "." + method-name + "-" + argument variance
+        // autodetect a name if needed
         if (StringUtil.isBlank(name)) {
-            name = String.format("%s.%s-%s",
-                method.getDeclaringClass().getName(),
-                method.getName(),
-                method.getParameterTypes().length);
+            name = nameOf(method);
         }
 
         return name;
     }
 
+    /**
+     * Construct name from a {@link Method}.
+     */
+    private String nameOf(final Method method) {
+        return String.format("%s.%s-%s",
+            method.getDeclaringClass().getName(),
+            method.getName(),
+            method.getParameterTypes().length);
+    }
+
+    /**
+     * Wrap method invocation with a Javasimon {@link Stopwatch} to capture timing metrics.
+     */
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
         String name = nameOf(invocation);
