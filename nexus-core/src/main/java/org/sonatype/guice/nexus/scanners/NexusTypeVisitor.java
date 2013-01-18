@@ -68,9 +68,13 @@ public final class NexusTypeVisitor
 
     private ClassSpace space;
 
+    private URL source;
+
     private String clazz;
 
     private NexusType nexusType = MarkedNexusTypes.UNKNOWN;
+
+    private boolean sawComponent;
 
     private boolean sawNamed;
 
@@ -98,6 +102,7 @@ public final class NexusTypeVisitor
 
     public ClassVisitor visitClass( final URL url )
     {
+        source = url;
         nexusType = MarkedNexusTypes.UNKNOWN;
         plexusTypeVisitor.visitClass( url );
         return this;
@@ -120,9 +125,10 @@ public final class NexusTypeVisitor
     @Override
     public AnnotationVisitor visitAnnotation( final String desc, final boolean visible )
     {
-        // Remember if we saw @Named or @Singleton for legacy warning detection
-        sawNamed = NAMED_DESC.equals( desc );
-        sawSingleton = SINGLETON_DESC.equals( desc );
+        // Remember if we saw @Component, @Named or @Singleton for legacy warning detection
+        sawComponent = COMPONENT_DESC.equals(desc);
+        sawNamed = NAMED_DESC.equals(desc);
+        sawSingleton = SINGLETON_DESC.equals(desc);
 
         final AnnotationVisitor annotationVisitor = plexusTypeVisitor.visitAnnotation( desc, visible );
         return nexusType.isComponent() && NAMED_DESC.equals( desc ) ? namedHintVisitor : annotationVisitor;
@@ -138,22 +144,39 @@ public final class NexusTypeVisitor
         }
         plexusTypeVisitor.visitEnd();
 
-        // Complain if we found a component relying on legacy @ExtensionPoint or @Managed semantics
-        if (nexusType == MarkedNexusTypes.EXTENSION_POINT && !sawNamed) {
-            log.warn("Found legacy component relying on @ExtensionPoint magic to automatically imply @Named: {}", clazz);
-        }
-        else if (nexusType == MarkedNexusTypes.EXTENSION_POINT_SINGLETON && !sawNamed && !sawSingleton) {
-            log.warn("Found legacy component relying on @ExtensionPoint magic to automatically imply @Named @Singleton: {}", clazz);
-        }
-        else if (nexusType == MarkedNexusTypes.MANAGED && !sawNamed) {
-            log.warn("Found legacy component relying on @Managed magic to automatically imply @Named: {}", clazz);
-        }
-        else if (nexusType == MarkedNexusTypes.MANAGED_SINGLETON && !sawNamed && !sawSingleton) {
-            log.warn("Found legacy component relying on @Managed magic to automatically imply @Named @Singleton: {}", clazz);
+        // If we detected a class, then ...
+        if (clazz != null) {
+            // If not a legacy Plexus component, check if we have "magic" in play...
+            if (!sawComponent) {
+                // Complain if we found a JSR-330 component relying on legacy @ExtensionPoint or @Managed semantics
+                if (nexusType == MarkedNexusTypes.EXTENSION_POINT && !sawNamed) {
+                    log.warn("Found legacy component relying on @ExtensionPoint magic to automatically imply @Named: {}", clazz);
+                    log.debug("Source: {}", source);
+                }
+                else if (nexusType == MarkedNexusTypes.EXTENSION_POINT_SINGLETON && !(sawNamed && sawSingleton)) {
+                    log.warn("Found legacy component relying on @ExtensionPoint magic to automatically imply @Named @Singleton: {}", clazz);
+                    log.debug("Source: {}", source);
+                }
+                else if (nexusType == MarkedNexusTypes.MANAGED && !sawNamed) {
+                    log.warn("Found legacy component relying on @Managed magic to automatically imply @Named: {}", clazz);
+                    log.debug("Source: {}", source);
+                }
+                else if (nexusType == MarkedNexusTypes.MANAGED_SINGLETON && !(sawNamed && sawSingleton)) {
+                    log.warn("Found legacy component relying on @Managed magic to automatically imply @Named @Singleton: {}", clazz);
+                    log.debug("Source: {}", source);
+                }
+            }
+            else {
+                // TODO: Flip this to WARN when aggressively killing plexus components
+                log.debug("Found legacy plexus component: {}", clazz);
+                log.debug("Source: {}", source);
+            }
         }
 
         // reset state
+        source = null;
         clazz = null;
+        sawComponent = false;
         sawNamed = false;
         sawSingleton = false;
     }
