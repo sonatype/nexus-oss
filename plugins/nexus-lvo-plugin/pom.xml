@@ -91,7 +91,7 @@
       </plugin>
 
       <plugin>
-        <groupId>net.alchim31.maven</groupId>
+        <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
     </plugins>

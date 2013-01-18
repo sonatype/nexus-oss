@@ -13,13 +13,20 @@
 package org.sonatype.nexus.proxy;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Stack;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
+/**
+ * Context map, used in {@link ResourceStoreRequest}, but also in {@link StorageItem} and related events.
+ * 
+ * @author cstamas
+ */
 public class RequestContext
     extends HashMap<String, Object>
     implements Map<String, Object>
@@ -32,14 +39,29 @@ public class RequestContext
     /** Context URL of the original resource requested on the incoming connector. */
     public static final String CTX_REQUEST_URL = "request.url";
 
-    /** Context flag to mark a request local only. For {@link ProxyRepository} instances: do not attempt remote access at all, else: no effect. */
+    /**
+     * Context flag to mark a request local only. For {@link ProxyRepository} instances: do not attempt remote access at
+     * all, else: no effect.
+     */
     public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
-    /** Context flag to mark a request local only. For {@link ProxyRepository} instances: force remote access -- might still serve local if cache is fresh, else: no effect. */
+    /**
+     * Context flag to mark a request local only. For {@link ProxyRepository} instances: force remote access -- might
+     * still serve local if cache is fresh, else: no effect.
+     */
     public static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
 
-    /** Context flag to mark a request local only. For {@link GroupRepository} instances: do not "dive" into members, else: no effect. */
+    /**
+     * Context flag to mark a request local only. For {@link GroupRepository} instances: do not "dive" into members,
+     * else: no effect.
+     */
     public static final String CTX_GROUP_LOCAL_ONLY_FLAG = "request.groupLocalOnly";
+
+    /**
+     * Context flag to mark a request be processed as the item would be expired. For {@link ProxyRepository} instances:
+     * do check remote for newer but take into account local cache content, else: no effect.
+     */
+    public static final String CTX_AS_EXPIRED_FLAG = "request.asExpired";
 
     /** Context key for condition "if-modified-since" */
     public static final String CTX_CONDITION_IF_MODIFIED_SINCE = "request.condition.ifModifiedSince";
@@ -131,6 +153,30 @@ public class RequestContext
         }
     }
 
+    protected void checkLocalRemoteExpiredFlags()
+        throws IllegalArgumentException
+    {
+        final HashSet<String> enabledFlags = new HashSet<String>();
+        if ( isRequestLocalOnly() )
+        {
+            enabledFlags.add( "localOnly" );
+        }
+        if ( isRequestRemoteOnly() )
+        {
+            enabledFlags.add( "remoteOnly" );
+        }
+        if ( isRequestAsExpired() )
+        {
+            enabledFlags.add( "asExpired" );
+        }
+        if ( enabledFlags.size() > 1 )
+        {
+            throw new IllegalArgumentException(
+                "Only one of the \"localOnly\", \"remoteOnly\" and \"asExpired\" might be enabled (set to true), but enabled ones are: "
+                    + enabledFlags );
+        }
+    }
+
     /**
      * Checks if is request local only.
      * 
@@ -156,6 +202,7 @@ public class RequestContext
     public void setRequestLocalOnly( boolean requestLocalOnly )
     {
         put( CTX_LOCAL_ONLY_FLAG, requestLocalOnly );
+        checkLocalRemoteExpiredFlags();
     }
 
     /**
@@ -183,6 +230,7 @@ public class RequestContext
     public void setRequestRemoteOnly( boolean requestRemoteOnly )
     {
         put( CTX_REMOTE_ONLY_FLAG, requestRemoteOnly );
+        checkLocalRemoteExpiredFlags();
     }
 
     /**
@@ -210,6 +258,34 @@ public class RequestContext
     public void setRequestGroupLocalOnly( boolean requestGroupLocal )
     {
         put( CTX_GROUP_LOCAL_ONLY_FLAG, requestGroupLocal );
+    }
+
+    /**
+     * Checks if request should be handled as expired.
+     * 
+     * @return true, if request should be handled as expired
+     */
+    public boolean isRequestAsExpired()
+    {
+        if ( containsKey( CTX_AS_EXPIRED_FLAG ) )
+        {
+            return (Boolean) get( CTX_AS_EXPIRED_FLAG );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Sets the request to be handled as expired.
+     * 
+     * @param asExpired the new asExpired value
+     */
+    public void setRequestAsExpired( boolean asExpired )
+    {
+        put( CTX_AS_EXPIRED_FLAG, asExpired );
+        checkLocalRemoteExpiredFlags();
     }
 
     /**
@@ -366,9 +442,6 @@ public class RequestContext
     @Override
     public String toString()
     {
-        return "RequestContext{" +
-            "this=" + super.toString() +
-            ", parent=" + parent +
-            '}';
+        return "RequestContext{" + "this=" + super.toString() + ", parent=" + parent + '}';
     }
 }

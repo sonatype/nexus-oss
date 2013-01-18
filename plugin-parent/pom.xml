@@ -59,6 +59,8 @@
     <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
     <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
     <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
+    <!-- preserve linebreaks -->
+    <maven.yuicompressor.linebreakpos>0</maven.yuicompressor.linebreakpos>
   </properties>
 
   <dependencyManagement>
@@ -308,6 +310,8 @@
         Support for Nexus plugins which provide a UI.
         -->
         <plugin>
+          <!-- TODO remove after all plugins are migrated -->
+          <!-- this is here so we don't have to migrate all plugiuns at once -->
           <groupId>net.alchim31.maven</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.3.2</version>
@@ -345,6 +349,43 @@
                     </includes>
                   </aggregation>
                 </aggregations>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.0.0-SNAPSHOT</version>
+          <configuration>
+            <!-- 
+               yuicompressor warns when code is not in a shape that's optimized for minifying. 
+               ATM this only pollutes the log (~9400 warnings)
+            -->
+            <jswarn>false</jswarn>
+            <nominify>${maven.yuicompressor.nocompress}</nominify>
+            <nomunge>${maven.yuicompressor.nomunge}</nomunge>
+            <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
+            <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
+          </configuration>
+          <executions>
+            <execution>
+              <id>js</id>
+              <goals>
+                <goal>aggregate</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
+              </configuration>
+            </execution>
+            <execution>
+              <id>css</id>
+              <goals>
+                <goal>aggregate-css</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
+                <required>false</required>
               </configuration>
             </execution>
           </executions>
@@ -445,6 +486,8 @@
         <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
         <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
         <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
+        <!-- do not preserve linebreaks -->
+        <maven.yuicompressor.linebreakpos>-1</maven.yuicompressor.linebreakpos>
       </properties>
     </profile>
 
@@ -540,6 +583,20 @@
                       </pluginExecutionFilter>
                       <action>
                         <ignore></ignore>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.sonatype.nexus</groupId>
+                        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+                        <versionRange>[0,)</versionRange>
+                        <goals>
+                          <goal>check-dependencies</goal>
+                          <goal>generate-metadata</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore />
                       </action>
                     </pluginExecution>
                   </pluginExecutions>
