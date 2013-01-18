@@ -52,6 +52,8 @@ public abstract class AbstractNexusPlexusResource
 
     public static final String IS_REMOTE_PARAMETER = "isRemote";
 
+    public static final String AS_EXPIRED_PARAMETER = "asExpired";
+
     @Requirement
     private Nexus nexus;
 
@@ -131,6 +133,14 @@ public abstract class AbstractNexusPlexusResource
     {
         // check do we need remote only access
         boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst( IS_REMOTE_PARAMETER ) != null;
+
+        return isRemote;
+    }
+
+    protected boolean asExpired( Request request, String resourceStorePath )
+    {
+        // check do we need expired access
+        boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst( AS_EXPIRED_PARAMETER ) != null;
 
         return isRemote;
     }
