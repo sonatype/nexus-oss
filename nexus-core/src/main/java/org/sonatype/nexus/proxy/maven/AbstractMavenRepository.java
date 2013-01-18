@@ -35,8 +35,10 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
+import org.sonatype.nexus.proxy.maven.wl.ProxyWhitelistFilter;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -45,6 +47,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
@@ -68,6 +71,9 @@ public abstract class AbstractMavenRepository
      */
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
+
+    @Requirement
+    protected ProxyWhitelistFilter proxyWhitelistFilter;
 
     private MutableProxyRepositoryKind repositoryKind;
 
@@ -127,6 +133,11 @@ public abstract class AbstractMavenRepository
     public ArtifactPackagingMapper getArtifactPackagingMapper()
     {
         return artifactPackagingMapper;
+    }
+
+    protected ProxyWhitelistFilter getProxyWhitelistFilter()
+    {
+        return proxyWhitelistFilter;
     }
 
     /**
@@ -393,6 +404,30 @@ public abstract class AbstractMavenRepository
         }
 
         return super.doRetrieveItem( request );
+    }
+
+    @Override
+    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException
+    {
+        final boolean shouldTryRemote = super.shouldTryRemote( request );
+        if ( !shouldTryRemote )
+        {
+            return false;
+        }
+        // apply WLFilter to "normal" requests only, not hidden (which is meta or plain hidden)
+        final RepositoryItemUid uid = createUid( request.getRequestPath() );
+        if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
+        {
+            final boolean whitelistMatched = getProxyWhitelistFilter().allowed( this, request );
+            if ( !whitelistMatched )
+            {
+                getLogger().info( "WL filter rejected remote request for path {} in {}.", request.getRequestPath(),
+                    RepositoryStringUtils.getHumanizedNameString( this ) );
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

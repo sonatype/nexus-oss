@@ -162,11 +162,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
         throws ResourceException
     {
 
-        ResourceStoreRequest req = getResourceStoreRequest( request );
-
         try
         {
-            ResourceStore store = getResourceStore( request );
+            final ResourceStore store = getResourceStore( request );
+            final ResourceStoreRequest req = getResourceStoreRequest( request );
 
             try
             {
@@ -225,7 +224,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         try
         {
-            ResourceStoreRequest req = getResourceStoreRequest( request );
+            final ResourceStoreRequest req = getResourceStoreRequest( request );
 
             for ( FileItem fileItem : files )
             {
@@ -245,9 +244,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         try
         {
-            ResourceStore store = getResourceStore( request );
-
-            ResourceStoreRequest req = getResourceStoreRequest( request );
+            final ResourceStore store = getResourceStore( request );
+            final ResourceStoreRequest req = getResourceStoreRequest( request );
 
             store.deleteItem( req );
 
