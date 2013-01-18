@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.util.PathUtils.elementsOf;
 import static org.sonatype.nexus.util.PathUtils.pathFrom;
@@ -35,6 +36,8 @@ public class WritableEntrySourceModifierImpl
 {
     private final WritableEntrySource writableEntrySource;
 
+    private final int maxDepth;
+
     private final List<String> toBeAdded;
 
     private final List<String> toBeRemoved;
@@ -47,12 +50,15 @@ public class WritableEntrySourceModifierImpl
      * Constructor.
      * 
      * @param writableEntrySource
+     * @param maxDepth
      * @throws IOException
      */
-    public WritableEntrySourceModifierImpl( final WritableEntrySource writableEntrySource )
+    public WritableEntrySourceModifierImpl( final WritableEntrySource writableEntrySource, final int maxDepth )
         throws IOException
     {
+        checkArgument( maxDepth >= 2 );
         this.writableEntrySource = checkNotNull( writableEntrySource );
+        this.maxDepth = maxDepth;
         this.toBeAdded = new ArrayList<String>();
         this.toBeRemoved = new ArrayList<String>();
         reset( writableEntrySource.readEntries() );
@@ -64,7 +70,7 @@ public class WritableEntrySourceModifierImpl
         boolean modified = false;
         for ( String entry : entries )
         {
-            final String normalizedEntry = pathFrom( elementsOf( entry ) );
+            final String normalizedEntry = pathFrom( elementsOf( entry ), maxDepth );
             if ( !whitelistMatcher.matches( normalizedEntry ) && !toBeAdded.contains( normalizedEntry ) )
             {
                 toBeAdded.add( normalizedEntry );

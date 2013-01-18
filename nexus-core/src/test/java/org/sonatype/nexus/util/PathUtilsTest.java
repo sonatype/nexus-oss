@@ -57,6 +57,8 @@ public class PathUtilsTest
         assertThat( PathUtils.pathFrom( PathUtils.elementsOf( "/org/apache/maven" ) ), equalTo( "/org/apache/maven" ) );
         assertThat( PathUtils.pathFrom( PathUtils.elementsOf( "/org/apache/maven/" ) ), equalTo( "/org/apache/maven" ) );
         assertThat( PathUtils.pathFrom( PathUtils.elementsOf( "/org/apache///maven/" ) ), equalTo( "/org/apache/maven" ) );
+
+        assertThat( PathUtils.pathFrom( PathUtils.elementsOf( "/archetype-catalog.xml" ) ), equalTo( "/archetype-catalog.xml" ) );
     }
 
     @Test

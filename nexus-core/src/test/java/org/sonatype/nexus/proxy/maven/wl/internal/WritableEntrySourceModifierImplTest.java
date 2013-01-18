@@ -42,7 +42,7 @@ public class WritableEntrySourceModifierImplTest
         throws IOException
     {
         writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries1 ) );
-        wesm = new WritableEntrySourceModifierImpl( writableEntrySource );
+        wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 2 );
     }
 
     @Test
@@ -91,8 +91,7 @@ public class WritableEntrySourceModifierImplTest
         assertThat( "Changes were added", wesm.apply() );
         assertThat( "No changes added yet, wesm was applied", !wesm.hasChanges() );
         assertThat( "Entries unchanged", writableEntrySource.readEntries(), hasItems( entries1 ) );
-        assertThat( "Entries unchanged", writableEntrySource.readEntries(), hasItems( new String[] { "/com/sonatype/nexus",
-            "/com/mycorp" } ) );
+        assertThat( "Entries unchanged", writableEntrySource.readEntries(), hasItems( new String[] { "/com/mycorp" } ) );
     }
 
     @Test
@@ -148,7 +147,7 @@ public class WritableEntrySourceModifierImplTest
     {
         // Note: using entries2 that has 3 depth entries
         writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries2 ) );
-        wesm = new WritableEntrySourceModifierImpl( writableEntrySource );
+        wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 3 );
 
         assertThat( "WL would not be changed", !wesm.revokeEntries( "/org/sonatype" ) ); // child is in list
         assertThat( "No changes added yet", !wesm.hasChanges() );
@@ -177,7 +176,7 @@ public class WritableEntrySourceModifierImplTest
         throws IOException
     {
         writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries1 ) );
-        wesm = new WritableEntrySourceModifierImpl( writableEntrySource );
+        wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 2 );
 
         assertThat( "WL would not be changed", !wesm.revokeEntries( "/org/sonatype/nexus" ) ); // parent is in list
         assertThat( "No changes added yet", !wesm.hasChanges() );
@@ -196,7 +195,7 @@ public class WritableEntrySourceModifierImplTest
 
         assertThat( "Changes were added", wesm.apply() );
 
-        assertThat( writableEntrySource.readEntries(), contains( "/com/sonatype/nexus", "/com/mycorp" ) );
+        assertThat( writableEntrySource.readEntries(), contains( "/com/sonatype", "/com/mycorp" ) );
     }
 
     @Test
@@ -204,7 +203,7 @@ public class WritableEntrySourceModifierImplTest
         throws IOException
     {
         writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries2 ) );
-        wesm = new WritableEntrySourceModifierImpl( writableEntrySource );
+        wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 2 );
 
         assertThat( "WL would not be changed", !wesm.revokeEntries( "/org/sonatype" ) ); // child is in list
         assertThat( "No changes added yet", !wesm.hasChanges() );
@@ -223,7 +222,7 @@ public class WritableEntrySourceModifierImplTest
 
         assertThat( "Changes were added", wesm.apply() );
 
-        assertThat( writableEntrySource.readEntries(), contains( "/com/sonatype/nexus", "/com/mycorp" ) );
+        assertThat( writableEntrySource.readEntries(), contains( "/com/sonatype", "/com/mycorp" ) );
     }
 
     // ==

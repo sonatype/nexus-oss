@@ -12,20 +12,19 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -41,7 +40,6 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.util.Node;
-import org.sonatype.nexus.util.PathUtils;
 
 import com.google.common.base.Function;
 
@@ -75,8 +73,8 @@ public class LocalWalkerStrategy
         throws IOException
     {
         final WalkerContext context =
-            new DefaultWalkerContext( mavenRepository, new ResourceStoreRequest( "/" ), new DepthFilter(
-                config.getLocalScrapeDepth() ), true );
+            new DefaultWalkerContext( mavenRepository, new ResourceStoreRequest( "/" ), new DefaultStoreWalkerFilter(),
+                true );
         final PrefixCollectorProcessor prefixCollectorProcessor = new PrefixCollectorProcessor();
         context.getProcessors().add( prefixCollectorProcessor );
 
@@ -93,13 +91,35 @@ public class LocalWalkerStrategy
                 throw e;
             }
         }
-        return new ArrayListEntrySource( getAllLeafPaths( prefixCollectorProcessor.getParentOMatic() ) );
+        return new ArrayListEntrySource( getAllLeafPaths( prefixCollectorProcessor.getParentOMatic(),
+            config.getLocalScrapeDepth() ) );
     }
 
     // ==
 
-    protected List<String> getAllLeafPaths( final ParentOMatic parentOMatic )
+    protected List<String> getAllLeafPaths( final ParentOMatic parentOMatic, final int maxDepth )
     {
+        // cut the tree
+        if ( maxDepth != Integer.MAX_VALUE )
+        {
+            parentOMatic.applyRecursively( parentOMatic.getRoot(), new Function<Node<Payload>, Node<Payload>>()
+            {
+                @Override
+                @Nullable
+                public Node<Payload> apply( @Nullable Node<Payload> input )
+                {
+                    if ( input.getDepth() == maxDepth )
+                    {
+                        // simply "cut off" children if any
+                        for ( Node<Payload> child : input.getChildren() )
+                        {
+                            input.removeChild( child );
+                        }
+                    }
+                    return null;
+                }
+            } );
+        }
         // doing scanning
         final ArrayList<String> paths = new ArrayList<String>();
         final Function<Node<Payload>, Node<Payload>> markedCollector = new Function<Node<Payload>, Node<Payload>>()
@@ -110,44 +130,20 @@ public class LocalWalkerStrategy
                 if ( input.isLeaf() )
                 {
                     final String thePath = input.getPath();
-                    paths.add( thePath.substring( 0, thePath.length() - 1 ) );
+                    if ( thePath.endsWith( "/" ) )
+                    {
+                        paths.add( thePath.substring( 0, thePath.length() - 1 ) );
+                    }
+                    else
+                    {
+                        paths.add( thePath );
+                    }
                 }
                 return null;
             }
         };
         parentOMatic.applyRecursively( parentOMatic.getRoot(), markedCollector );
         return paths;
-    }
-
-    public static class DepthFilter
-        extends DefaultStoreWalkerFilter
-    {
-        private final int maxDepth;
-
-        public DepthFilter( final int maxDepth )
-        {
-            checkArgument( maxDepth >= 1 );
-            this.maxDepth = maxDepth;
-        }
-
-        @Override
-        public boolean shouldProcess( WalkerContext context, StorageItem item )
-        {
-            return super.shouldProcess( context, item ) && aboveOrAtMaxDepth( item.getPath() );
-        }
-
-        @Override
-        public boolean shouldProcessRecursively( WalkerContext context, StorageCollectionItem coll )
-        {
-            return super.shouldProcessRecursively( context, coll ) && aboveOrAtMaxDepth( coll.getPath() );
-        }
-
-        // ==
-
-        protected boolean aboveOrAtMaxDepth( final String path )
-        {
-            return PathUtils.depthOf( path ) <= maxDepth;
-        }
     }
 
     public static class PrefixCollectorProcessor
@@ -166,21 +162,10 @@ public class LocalWalkerStrategy
         }
 
         @Override
-        public void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
-            throws Exception
-        {
-            parentOMatic.addPath( coll.getPath() );
-        }
-
-        @Override
         public void processItem( final WalkerContext context, final StorageItem item )
             throws Exception
         {
             if ( item instanceof StorageFileItem )
-            {
-                parentOMatic.addAndMarkPath( item.getPath() );
-            }
-            else
             {
                 parentOMatic.addPath( item.getPath() );
             }

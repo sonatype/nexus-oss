@@ -39,11 +39,14 @@ public class WLConfigImpl
     private static final String[] REMOTE_PREFIX_FILE_PATHS = SystemPropertiesHelper.getStringlist(
         WLConfig.class.getName() + ".prefixFilePaths", "/.meta/prefixes.txt", "/.meta/prefixes.txt.gz" );
 
-    private static final int SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
-        + ".scrapeDepth", 2 );
+    private static final int REMOTE_SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
+        + ".remoteScrapeDepth", 2 );
+
+    private static final int LOCAL_SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
+        + ".localScrapeDepth", 2 );
 
     private static final int WL_MATCHING_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
-        + ".wlMatchingDepth", SCRAPE_DEPTH );
+        + ".wlMatchingDepth", REMOTE_SCRAPE_DEPTH );
 
     @Override
     public String getNoScrapeFlagPath()
@@ -66,13 +69,13 @@ public class WLConfigImpl
     @Override
     public int getRemoteScrapeDepth()
     {
-        return SCRAPE_DEPTH;
+        return REMOTE_SCRAPE_DEPTH;
     }
 
     @Override
     public int getLocalScrapeDepth()
     {
-        return SCRAPE_DEPTH;
+        return LOCAL_SCRAPE_DEPTH;
     }
 
     @Override

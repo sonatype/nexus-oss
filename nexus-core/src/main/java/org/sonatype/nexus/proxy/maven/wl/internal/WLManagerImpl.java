@@ -384,7 +384,8 @@ public class WLManagerImpl
         throws IOException
     {
         final WritableEntrySource entrySource = getEntrySourceFor( mavenHostedRepository );
-        final WritableEntrySourceModifier wesm = new WritableEntrySourceModifierImpl( entrySource );
+        final WritableEntrySourceModifier wesm =
+            new WritableEntrySourceModifierImpl( entrySource, config.getLocalScrapeDepth() );
         wesm.offerEntries( entries );
         if ( wesm.apply() )
         {
@@ -398,7 +399,8 @@ public class WLManagerImpl
         throws IOException
     {
         final WritableEntrySource entrySource = getEntrySourceFor( mavenHostedRepository );
-        final WritableEntrySourceModifier wesm = new WritableEntrySourceModifierImpl( entrySource );
+        final WritableEntrySourceModifier wesm =
+            new WritableEntrySourceModifierImpl( entrySource, config.getLocalScrapeDepth() );
         wesm.revokeEntries( entries );
         if ( wesm.apply() )
         {
