@@ -54,13 +54,6 @@ public interface WLManager
         throws IOException;
 
     /**
-     * Bookkeeping for WL update propagation.
-     * 
-     * @param mavenRepository
-     */
-    void propagateWLUpdateOf( MavenRepository mavenRepository );
-
-    /**
      * Returns the WL status for given repository.
      * 
      * @param mavenRepository

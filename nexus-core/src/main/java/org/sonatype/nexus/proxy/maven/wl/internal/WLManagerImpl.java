@@ -262,32 +262,6 @@ public class WLManagerImpl
     }
 
     @Override
-    public void propagateWLUpdateOf( final MavenRepository mavenRepository )
-    {
-        MavenRepository containingGroupRepository = null;
-        final List<GroupRepository> groups = repositoryRegistry.getGroupsOfRepository( mavenRepository );
-        for ( GroupRepository groupRepository : groups )
-        {
-            containingGroupRepository = groupRepository.adaptToFacet( MavenRepository.class );
-            if ( mavenRepository != null )
-            {
-                try
-                {
-                    updateWhitelist( containingGroupRepository, false );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn(
-                        "Problem while cascade updating WL for repository "
-                            + RepositoryStringUtils.getHumanizedNameString( containingGroupRepository )
-                            + " in response to WL update in member "
-                            + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + ".", e );
-                }
-            }
-        }
-    }
-
-    @Override
     public WLStatus getStatusFor( final MavenRepository mavenRepository )
     {
         WLPublishingStatus publishingStatus = null;
@@ -425,6 +399,9 @@ public class WLManagerImpl
 
         // event
         eventBus.post( new WLPublishedRepositoryEvent( mavenRepository, prefixesFile ) );
+
+        // propagate
+        propagateWLUpdateOf( mavenRepository );
     }
 
     @Override
@@ -453,6 +430,34 @@ public class WLManagerImpl
 
         // event
         eventBus.post( new WLUnpublishedRepositoryEvent( mavenRepository ) );
+
+        // propagate
+        propagateWLUpdateOf( mavenRepository );
+    }
+
+    protected void propagateWLUpdateOf( final MavenRepository mavenRepository )
+    {
+        MavenRepository containingGroupRepository = null;
+        final List<GroupRepository> groups = repositoryRegistry.getGroupsOfRepository( mavenRepository );
+        for ( GroupRepository groupRepository : groups )
+        {
+            containingGroupRepository = groupRepository.adaptToFacet( MavenRepository.class );
+            if ( mavenRepository != null )
+            {
+                try
+                {
+                    updateWhitelist( containingGroupRepository, false );
+                }
+                catch ( IOException e )
+                {
+                    getLogger().warn(
+                        "Problem while cascade updating WL for repository "
+                            + RepositoryStringUtils.getHumanizedNameString( containingGroupRepository )
+                            + " in response to WL update in member "
+                            + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + ".", e );
+                }
+            }
+        }
     }
 
     // ==

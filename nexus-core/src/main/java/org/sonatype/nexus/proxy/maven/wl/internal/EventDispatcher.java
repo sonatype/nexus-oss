@@ -37,8 +37,6 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
-import org.sonatype.nexus.proxy.maven.wl.events.WLPublishedRepositoryEvent;
-import org.sonatype.nexus.proxy.maven.wl.events.WLUnpublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -102,11 +100,6 @@ public class EventDispatcher
                 "Problem while updating published WL for newly added repository "
                     + RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
         }
-    }
-
-    protected void handlePublishedWLUpdate( final MavenRepository mavenRepository )
-    {
-        wlManager.propagateWLUpdateOf( mavenRepository );
     }
 
     protected void handleWLUpdate( final MavenRepository mavenRepository )
@@ -207,26 +200,6 @@ public class EventDispatcher
             && !wlManager.isRequestContextMarked( evt.getItem().getItemContext() )
             && evt.getItem() instanceof StorageFileItem
             && !evt.getItem().getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class );
-    }
-
-    // == handlers for WL events
-
-    @Subscribe
-    public void onWLPUblishedEvent( WLPublishedRepositoryEvent evt )
-    {
-        if ( isRepositoryHandled( evt.getRepository() ) )
-        {
-            handlePublishedWLUpdate( evt.getRepository() );
-        }
-    }
-
-    @Subscribe
-    public void onWLUnpblishedEvent( WLUnpublishedRepositoryEvent evt )
-    {
-        if ( isRepositoryHandled( evt.getRepository() ) )
-        {
-            handlePublishedWLUpdate( evt.getRepository() );
-        }
     }
 
     // == handlers for item events (to maintain WL file)
