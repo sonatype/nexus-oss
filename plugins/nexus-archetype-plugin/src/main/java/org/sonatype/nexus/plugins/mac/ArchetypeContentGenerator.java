@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.mac;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
@@ -35,6 +36,7 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
  * @author cstamas
  */
 @Named( ArchetypeContentGenerator.ID )
+@Singleton
 public class ArchetypeContentGenerator
     implements ContentGenerator
 {
