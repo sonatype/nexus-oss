@@ -22,7 +22,8 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import com.google.common.base.Preconditions;
 
 /**
- * Entry source that merges multiple {@link EntrySource}s into one. It retains order by watch for uniqueness.
+ * Entry source that merges multiple {@link EntrySource}s into one. It retains order and watch for uniqueness, but does
+ * not filter out redundant entries (like both, child and it's parent is present in entries).
  * 
  * @author cstamas
  */
