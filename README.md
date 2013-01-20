@@ -74,21 +74,7 @@ Ask for help at our [Google Group][7] or [create a new issue][8].
 
 ## Installation
 
-1. [Install Sonatype Nexus][9]
-1. Download latest *nexus-yum-plugin-bundle.zip* from our downloads page
-1. Unzip the bundle to *$NEXUS_WORK_DIR/plugin-repository/*. The default for *$NEXUS_WORK_DIR* is *~/sonatype-work/nexus/*. For example:
-    unzip nexus-yum-plugin-1.13-bundle-zip -d $NEXUS_WORK_DIR/plugin-repository/
-1. Install [createrepo][10] using your update manager (*yum*, *apt-get*, etc.) eg.
-    sudo yum install createrepo
-1. Make sure that in *Nexus Administration --> Server --> Application Server Settings (optional) --> Base URL* is set to a valid URL like :
-    http://your.nexus.domain:8081/nexus
-1. Sometimes *Force Base URL* is nessessary, too, see [ISSUE 4][11] . Otherwise the plugin can't determine the server URL and you got RPM locations like *null/content/repositories/*... in *primary.xml*.
-1. Configure Nexus Yum Plugin via *yum.xml*. See Configuration.
-1. Restart Nexus. Eg.
-    sudo service nexus stop
-    sudo service nexus start
-
-Now the plugin should be installed.
+From version 2.3 on the plugin is automatically bundled together with Nexus and Nexus Pro.
 
 ## Configuration
 
