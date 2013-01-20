@@ -129,7 +129,11 @@ public class GenerateMetadataTask
             File rpmListFile = createRpmListFile();
             new CommandLineExecutor().exec( buildCreateRepositoryCommand( rpmListFile ) );
 
-            replaceUrl();
+            if ( isUseAbsoluteUrls() )
+            {
+                replaceUrlInRepomdXml();
+            }
+
         }
         catch ( IOException e )
         {
@@ -289,7 +293,7 @@ public class GenerateMetadataTask
         return getRepositoryId() + ( isNotBlank( getVersion() ) ? ( "-version-" + getVersion() ) : "" );
     }
 
-    private void replaceUrl()
+    private void replaceUrlInRepomdXml()
         throws IOException
     {
         File repomd = new File( getRepoDir(), Yum.PATH_OF_REPOMD_XML );
@@ -303,10 +307,17 @@ public class GenerateMetadataTask
 
     private String buildCreateRepositoryCommand( File packageList )
     {
-        String packageFile = packageList.getAbsolutePath();
-        String cacheDir = createCacheDir().getAbsolutePath();
-        return format( "createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getRepoDir().getAbsolutePath(),
-                       getRpmUrl(), packageFile, cacheDir, getRpmDir() );
+        StringBuilder commandLine = new StringBuilder( "createrepo --update --verbose --database" );
+        commandLine.append( " --outputdir " ).append( getRepoDir().getAbsolutePath() );
+        commandLine.append( " --pkglist " ).append( packageList.getAbsolutePath() );
+        commandLine.append( " --cachedir " ).append( createCacheDir().getAbsolutePath() );
+        if ( isUseAbsoluteUrls() )
+        {
+            commandLine.append( " --baseurl " ).append( getRpmUrl() );
+        }
+        commandLine.append( " " ).append( getRpmDir() );
+
+        return commandLine.toString();
     }
 
     @Override
@@ -332,6 +343,11 @@ public class GenerateMetadataTask
         );
         cacheDir.mkdirs();
         return cacheDir;
+    }
+
+    private boolean isUseAbsoluteUrls()
+    {
+        return isNotBlank( getVersion() );
     }
 
     @Override
