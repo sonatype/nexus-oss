@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonatype/strings'], function(Ext, Sonatype, format, Strings) {
+define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonatype/strings', 'sonatype'], function(Ext, Config, format, Strings, Sonatype) {
 
   var ns = Ext.namespace('Sonatype.utils');
 
@@ -70,7 +70,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonat
       Ext.Ajax.request({
             method : 'GET',
             scope : this,
-            url : Sonatype.config.repos.urls.restApiSettings,
+            url : Config.repos.urls.restApiSettings,
             callback : function(options, success, response) {
               if (success)
               {

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('nexus/log', ['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype) {
+define('nexus/log', ['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Config) {
   /**
    * Nexus logging utility.
    *
@@ -39,7 +39,7 @@ define('nexus/log', ['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Son
       debug : function(msg) {
         // Sonatype.config may be undefined if Nexus.log is called on setup of ext js extensions
         // it should always be there on runtime for UI components, but better safe than sorry
-        if (Sonatype.config && Sonatype.config.isDebug) {
+        if (Config && Config.isDebug) {
           log('DEBUG', msg);
         }
       },

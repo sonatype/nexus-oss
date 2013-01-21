@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
+/*global define, top*/
 define('nexus/form/roleselector',['extjs', 'nexus'], function(Ext, Nexus) {
-Ext.namespace('Nexus.form');
+var ns = Ext.namespace('Nexus.form');
 /**
  * A RoleManager is used to display assigned roles and privileges (optional) in a grid, with a toolbar
  * that has options to add roles/privileges (which will open up a new window that will show a specialized role/privilege list
@@ -25,8 +25,7 @@ Ext.namespace('Nexus.form');
  * userId - userId which is used to properly retrieve the data for UI (most specifically the external roles)
  */
 
-/*global Ext,Nexus,Sonatype, top*/
-Nexus.form.RoleManager = function(cfg) {
+ns.RoleManager = function(cfg) {
   var
         config = cfg || {},
         defaultConfig = {
@@ -127,14 +126,14 @@ Nexus.form.RoleManager = function(cfg) {
 
   this.tbar = ['<b>Role' + (this.usePrivileges ? '/Privilege' : '') + ' Management</b>', '->', '-', this.addButton, '-', this.removeButton];
 
-  Nexus.form.RoleManager.superclass.constructor.call(this, {});
+  ns.RoleManager.superclass.constructor.call(this, {});
 
   this.getView().scrollOffset = 1;
 
   this.getSelectionModel().on('selectionchange', this.selectionChangeHandler, this);
 };
 
-Ext.extend(Nexus.form.RoleManager, Ext.grid.GridPanel, {
+Ext.extend(ns.RoleManager, Ext.grid.GridPanel, {
       selectionChangeHandler : function(selectionModel) {
         if (selectionModel.getCount() > 0 && !this.readOnly)
         {
@@ -425,17 +424,17 @@ Ext.extend(Nexus.form.RoleManager, Ext.grid.GridPanel, {
       }
     });
 
-Ext.reg('rolemanager', Nexus.form.RoleManager);
+Ext.reg('rolemanager', ns.RoleManager);
 
 /**
- * A Nexus.form.RoleSelectorGrid is used to display the roles and privileges (optional) in a grid with checkboxes for simple selection
+ * A ns.RoleSelectorGrid is used to display the roles and privileges (optional) in a grid with checkboxes for simple selection
  * The grid supports pagination
  *  
  * usePrivileges - boolean flag, if true will show the privileges along with the roles 
  * selectedRoleIds - role ids that should show as selected 
  * selectedPrivilegeIds - privilege ids that should show as selected
  */
-Nexus.form.RoleSelectorGrid = function(cfg) {
+ns.RoleSelectorGrid = function(cfg) {
   var
         config = cfg || {},
         defaultConfig = {
@@ -675,10 +674,10 @@ Nexus.form.RoleSelectorGrid = function(cfg) {
       });
 
   //constructor call, adding the panel setup here
-  Nexus.form.RoleSelectorGrid.superclass.constructor.call(this, {});
+  ns.RoleSelectorGrid.superclass.constructor.call(this, {});
 };
 
-Ext.extend(Nexus.form.RoleSelectorGrid, Ext.grid.GridPanel, {
+Ext.extend(ns.RoleSelectorGrid, Ext.grid.GridPanel, {
       filterTextSpecialkeyListener : function(f, e) {
         if (e.getKey() === e.ENTER)
         {
@@ -687,7 +686,7 @@ Ext.extend(Nexus.form.RoleSelectorGrid, Ext.grid.GridPanel, {
       },
       //implement local onRender to load the first page of store
       onRender : function() {
-        Nexus.form.RoleSelectorGrid.superclass.onRender.apply(this, arguments);
+        ns.RoleSelectorGrid.superclass.onRender.apply(this, arguments);
         this.store.load({
               params : {
                 start : 0,
@@ -845,8 +844,8 @@ Ext.extend(Nexus.form.RoleSelectorGrid, Ext.grid.GridPanel, {
       }
     });
 
-top.RoleManager = Nexus.form.RoleManager;
-top.RoleSelectorGrid = Nexus.form.RoleSelectorGrid;
+top.RoleManager = ns.RoleManager;
+top.RoleSelectorGrid = ns.RoleSelectorGrid;
 
-Ext.reg('roleselector', Nexus.form.RoleSelectorGrid);
+Ext.reg('roleselector', ns.RoleSelectorGrid);
 });

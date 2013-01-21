@@ -14,7 +14,7 @@
  * Target Edit/Create panel layout and controller
  */
 /*global define*/
-define('nexus/ext/twinpanelcontroller',['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype) {
+define('nexus/ext/twinpanelcontroller', ['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Config) {
 
 Ext.namespace('Nexus.ext');
 
@@ -26,7 +26,7 @@ Nexus.ext.TwinPanelController = function(cfg) {
         handler : this.addOne,
         scope : this,
         tooltip : 'Add',
-        icon : Sonatype.config.extPath + '/resources/images/default/grid/page-prev.gif',
+        icon : Config.extPath + '/resources/images/default/grid/page-prev.gif',
         cls : 'x-btn-icon'
       });
 
@@ -35,7 +35,7 @@ Nexus.ext.TwinPanelController = function(cfg) {
         handler : this.addAll,
         scope : this,
         tooltip : 'Add All',
-        icon : Sonatype.config.extPath + '/resources/images/default/grid/page-first.gif',
+        icon : Config.extPath + '/resources/images/default/grid/page-first.gif',
         cls : 'x-btn-icon'
       });
 
@@ -44,7 +44,7 @@ Nexus.ext.TwinPanelController = function(cfg) {
         handler : this.removeOne,
         scope : this,
         tooltip : 'Remove',
-        icon : Sonatype.config.extPath + '/resources/images/default/grid/page-next.gif',
+        icon : Config.extPath + '/resources/images/default/grid/page-next.gif',
         cls : 'x-btn-icon'
       });
 
@@ -53,7 +53,7 @@ Nexus.ext.TwinPanelController = function(cfg) {
         handler : this.removeAll,
         scope : this,
         tooltip : 'Remove All',
-        icon : Sonatype.config.extPath + '/resources/images/default/grid/page-last.gif',
+        icon : Config.extPath + '/resources/images/default/grid/page-last.gif',
         cls : 'x-btn-icon'
       });
 
@@ -172,7 +172,7 @@ Nexus.ext.TwinPanelChooser = function(cfg) {
           displayField : 'name',
           validateLeftItems : false,
           validateLeftItemsText : 'Invalid items selected.',
-          nodeIcon : Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
+          nodeIcon : Config.extPath + '/resources/images/default/tree/leaf.gif'
         };
   Ext.apply(this, config, defaultConfig);
 

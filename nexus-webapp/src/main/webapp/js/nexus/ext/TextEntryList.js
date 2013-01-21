@@ -13,7 +13,7 @@
 
 /*global define*/
 
-define('nexus/ext/TextEntryList',['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Sonatype){
+define('nexus/ext/TextEntryList',['extjs', 'nexus', 'nexus/config'], function(Ext, Nexus, Config){
 Ext.namespace('Nexus.ext');
 
 /*
@@ -151,7 +151,7 @@ Ext.extend(Nexus.ext.TextEntryList, Ext.FormPanel, {
                   draggable : false,
                   leaf : true,
                   nodeType : 'entry',
-                  icon : Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
+                  icon : Config.extPath + '/resources/images/default/tree/leaf.gif'
                 }));
       },
 

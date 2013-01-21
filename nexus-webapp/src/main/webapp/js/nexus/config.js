@@ -146,5 +146,5 @@ define('nexus/config',['extjs', 'nexus/messagebox', 'sonatype/init'], function(E
     };
   }());
 
-  return Sonatype;
+  return Sonatype.config;
 });

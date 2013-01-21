@@ -10,12 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext,Sonatype,Nexus*/
+/*global define*/
 /*jslint evil:true*/
-define('nexus/panels/TreePanel',['extjs', 'nexus/config'], function(Ext, Sonatype) {
-Ext.namespace('Sonatype.panels');
+define('nexus/panels/TreePanel',['extjs', 'nexus/config', 'sonatype'], function(Ext, Config, Sonatype) {
+var ns = Ext.namespace('Sonatype.panels');
 
-Sonatype.panels.TreePanel = function(cfg) {
+ns.TreePanel = function(cfg) {
   var
         config = cfg || {},
         defaultConfig = {
@@ -36,7 +36,7 @@ Sonatype.panels.TreePanel = function(cfg) {
 
   this.tbar = [{
     text : 'Refresh',
-    icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+    icon : Config.resourcePath + '/images/icons/arrow_refresh.png',
     cls : 'x-btn-text-icon',
     scope : this,
     handler : this.refreshHandler
@@ -47,7 +47,7 @@ Sonatype.panels.TreePanel = function(cfg) {
     Sonatype.Events.fireEvent(this.toolbarInitEvent, this, this.tbar);
   }
 
-  Sonatype.panels.TreePanel.superclass.constructor.call(this, {
+  ns.TreePanel.superclass.constructor.call(this, {
     anchor : '0 -2',
     bodyStyle : 'background-color:#FFFFFF',
     animate : true,
@@ -151,10 +151,8 @@ Sonatype.panels.TreePanel = function(cfg) {
         {
           return new Ext.tree.TreePanel.nodeTypes[attr.nodeType](attr);
         }
-        else
-        {
-          return attr.leaf ? new Ext.tree.TreeNode(attr) : new Ext.tree.AsyncTreeNode(attr);
-        }
+
+        return attr.leaf ? new Ext.tree.TreeNode(attr) : new Ext.tree.AsyncTreeNode(attr);
       },
       processResponse : function(response, node, callback) {
         var i, len, n, o, json = response.responseText;
@@ -228,7 +226,7 @@ Sonatype.panels.TreePanel = function(cfg) {
   }
 };
 
-Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
+Ext.extend(ns.TreePanel, Ext.tree.TreePanel, {
   nodeClickHandler : function(node, e) {
     if (e.target.nodeName === 'A') {
       return; // no menu on links
