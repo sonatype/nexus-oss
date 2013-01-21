@@ -16,7 +16,7 @@
 /*
  * View Nexus serer XML configuration file
  */
-define('repoServer/ConfigViewPanel', ['extjs', 'sonatype/all', 'sonatype/config'], function(Ext, Sonatype) {
+define('repoServer/ConfigViewPanel', ['extjs', 'sonatype/all', 'nexus/config'], function(Ext, Sonatype) {
 
   Ext.namespace('Sonatype.repoServer');
 

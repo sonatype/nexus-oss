@@ -12,8 +12,9 @@
  */
 /*global define*/
 define('repoServer/Documentation', ['extjs', 'sonatype'], function(Ext, Sonatype) {
-  Ext.namespace('Sonatype.repoServer');
-  Sonatype.repoServer.Documentation = function(cfg) {
+  var repoServer = Ext.namespace('Sonatype.repoServer');
+
+  repoServer.Documentation = function(cfg) {
     Ext.apply(this, cfg || {});
 
     Sonatype.repoServer.Documentation.superclass.constructor.call(this,
@@ -33,7 +34,7 @@ define('repoServer/Documentation', ['extjs', 'sonatype'], function(Ext, Sonatype
           });
   };
 
-  Ext.extend(Sonatype.repoServer.Documentation, Ext.Panel, {
+  Ext.extend(repoServer.Documentation, Ext.Panel, {
     getHelpText : function() {
       return '<div class="little-padding">'
             + 'Sonatype Nexus&trade; '
@@ -49,6 +50,6 @@ define('repoServer/Documentation', ['extjs', 'sonatype'], function(Ext, Sonatype
     }
   });
 
-  return Sonatype.repoServer.Documentation;
+  return repoServer.Documentation;
 });
 
