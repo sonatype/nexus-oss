@@ -13,6 +13,9 @@
 // must pass in feedUrl that's local to our domain
 // config: feedUrl required
 /*global define*/
+/**
+ * FIXME This belongs to the timeline plugin and should be moved there.
+ */
 define('nexus/ext/feedgrid', ['extjs'], function(Ext) {
   var ns = Ext.namespace('Nexus.ext');
   ns.FeedGrid = function(config) {
