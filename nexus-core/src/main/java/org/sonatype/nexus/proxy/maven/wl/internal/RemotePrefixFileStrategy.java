@@ -94,6 +94,7 @@ public class RemotePrefixFileStrategy
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
         request.setRequestAsExpired( true );
+        mavenProxyRepository.removeFromNotFoundCache( request );
         try
         {
             final StorageItem item = mavenProxyRepository.retrieveItem( true, request );

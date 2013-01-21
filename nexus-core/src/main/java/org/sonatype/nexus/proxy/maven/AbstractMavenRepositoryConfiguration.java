@@ -104,7 +104,7 @@ public abstract class AbstractMavenRepositoryConfiguration
 
     public boolean isWLDiscoveryEnabled()
     {
-        return Boolean.parseBoolean( getNodeValue( getRootNode(), WL_DISCOVERY_ENABLED, Boolean.FALSE.toString() ) );
+        return Boolean.parseBoolean( getNodeValue( getRootNode(), WL_DISCOVERY_ENABLED, Boolean.TRUE.toString() ) );
     }
 
     public void setWLDiscoveryEnabled( boolean val )

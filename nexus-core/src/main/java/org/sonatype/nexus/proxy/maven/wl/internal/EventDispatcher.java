@@ -16,14 +16,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -39,12 +36,11 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 
 /**
- * Internal component routing various Nexus events to {@link WLManager}.
+ * Internal class routing various Nexus events to {@link WLManager}.
  * <p>
  * Note: This component was initially marked as {@code @EagerSingleton}, but it did not play well with rest of plexus
  * components, as it broke everything. Seems like this component was created "too early", also, some UTs does not
@@ -55,11 +51,10 @@ import com.google.common.eventbus.Subscribe;
  * @author cstamas
  * @since 2.4
  */
-@Named
-@Singleton
 public class EventDispatcher
-    extends AbstractLoggingComponent
 {
+    private final Logger logger;
+
     private final ApplicationStatusSource applicationStatusSource;
 
     private final WLManager wlManager;
@@ -67,18 +62,19 @@ public class EventDispatcher
     /**
      * Da constructor.
      * 
-     * @param eventBus
      * @param applicationStatusSource
      * @param wlManager
      */
-    @Inject
-    public EventDispatcher( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
-                            final WLManager wlManager )
+    public EventDispatcher( final ApplicationStatusSource applicationStatusSource, final WLManager wlManager )
     {
-        checkNotNull( eventBus );
+        this.logger = LoggerFactory.getLogger( getClass() );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
         this.wlManager = checkNotNull( wlManager );
-        eventBus.register( this );
+    }
+
+    protected Logger getLogger()
+    {
+        return logger;
     }
 
     // actual work is done here
@@ -205,7 +201,7 @@ public class EventDispatcher
     // == handlers for item events (to maintain WL file)
 
     @Subscribe
-    public void onRepositoryItemEventStore( RepositoryItemEventStore evt )
+    public void onRepositoryItemEventStore( final RepositoryItemEventStore evt )
     {
         if ( isPrefixFileEvent( evt ) )
         {
@@ -224,7 +220,7 @@ public class EventDispatcher
     }
 
     @Subscribe
-    public void onRepositoryItemEventCache( RepositoryItemEventCache evt )
+    public void onRepositoryItemEventCache( final RepositoryItemEventCache evt )
     {
         if ( isPrefixFileEvent( evt ) )
         {
@@ -243,7 +239,7 @@ public class EventDispatcher
     }
 
     @Subscribe
-    public void onRepositoryItemEventDelete( RepositoryItemEventDelete evt )
+    public void onRepositoryItemEventDelete( final RepositoryItemEventDelete evt )
     {
         if ( isPrefixFileEvent( evt ) )
         {
@@ -264,7 +260,7 @@ public class EventDispatcher
     // == Handler for WL initialization
 
     @Subscribe
-    public void onNexusStartedEvent( NexusStartedEvent evt )
+    public void onNexusStartedEvent( final NexusStartedEvent evt )
     {
         handleNexusStarted();
     }

@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -84,23 +85,25 @@ public class WLManagerImpl
 
     private final RemoteContentDiscoverer remoteContentDiscoverer;
 
+    private final EventDispatcher eventDispatcher;
+
     /**
      * Da constructor.
      * 
      * @param eventBus
+     * @param applicationStatusSource
      * @param applicationConfiguration
      * @param repositoryRegistry
      * @param config
      * @param localContentDiscoverer
      * @param remoteContentDiscoverer
-     * @param eventDispatcher This is a hack, just to "wake up" the {@link EventDispatcher} as Eager Singleton does not
-     *            play well with Core.
      */
     @Inject
-    public WLManagerImpl( final EventBus eventBus, final ApplicationConfiguration applicationConfiguration,
+    public WLManagerImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
+                          final ApplicationConfiguration applicationConfiguration,
                           final RepositoryRegistry repositoryRegistry, final WLConfig config,
                           final LocalContentDiscoverer localContentDiscoverer,
-                          final RemoteContentDiscoverer remoteContentDiscoverer, final EventDispatcher eventDispatcher )
+                          final RemoteContentDiscoverer remoteContentDiscoverer )
     {
         this.eventBus = checkNotNull( eventBus );
         this.applicationConfiguration = checkNotNull( applicationConfiguration );
@@ -108,6 +111,8 @@ public class WLManagerImpl
         this.config = checkNotNull( config );
         this.localContentDiscoverer = checkNotNull( localContentDiscoverer );
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
+        this.eventDispatcher = new EventDispatcher( applicationStatusSource, this );
+        this.eventBus.register( eventDispatcher );
     }
 
     @Override

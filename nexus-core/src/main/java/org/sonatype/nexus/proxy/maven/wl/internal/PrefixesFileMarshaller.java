@@ -68,7 +68,7 @@ public class PrefixesFileMarshaller
             {
                 // trim
                 line = line.trim();
-                if ( !line.startsWith( "#" ) )
+                if ( !line.startsWith( "#" ) && line.length() > 0 )
                 {
                     // Igor's find command makes path like "./org/apache/"
                     while ( line.startsWith( "." ) )

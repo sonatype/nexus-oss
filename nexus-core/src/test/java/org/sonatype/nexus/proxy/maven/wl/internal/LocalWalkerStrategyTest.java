@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 import java.io.ByteArrayInputStream;
@@ -46,7 +45,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 public class LocalWalkerStrategyTest
     extends AbstractProxyTestEnvironment
-
 {
     private static final String REPO_ID = "inhouse";
 
