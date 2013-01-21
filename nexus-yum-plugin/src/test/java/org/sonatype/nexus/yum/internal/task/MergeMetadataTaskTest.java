@@ -27,14 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.yum.internal.support.IgnoreOn;
-import org.sonatype.nexus.yum.internal.support.OsTestRule;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -47,11 +44,7 @@ public class MergeMetadataTaskTest
 
     private static final String GROUP_ID_2 = "group-repo-id-2";
 
-    @Rule
-    public OsTestRule osTestRule = new OsTestRule();
-
     @Test
-    @IgnoreOn( "mac" )
     public void shouldGenerateGroupRepo()
         throws Exception
     {

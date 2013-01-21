@@ -28,8 +28,6 @@ import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
-import org.sonatype.nexus.yum.testsuite.support.IgnoreOn;
-import org.sonatype.nexus.yum.testsuite.support.OsTestRule;
 
 /**
  * ITs related to metadata merging.
@@ -41,9 +39,6 @@ public class MergeMetadataIT
 {
 
     @Rule
-    public OsTestRule osTestRule = new OsTestRule();
-
-    @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     public MergeMetadataIT( final String nexusBundleCoordinates )
@@ -52,7 +47,6 @@ public class MergeMetadataIT
     }
 
     @Test
-    @IgnoreOn( "mac" )
     public void shouldRegenerateRepoAfterUpload()
         throws Exception
     {
@@ -64,7 +58,6 @@ public class MergeMetadataIT
     }
 
     @Test
-    @IgnoreOn( "mac" )
     public void shouldRegenerateGroupRepoWhenMemberRepoIsRemoved()
         throws Exception
     {
@@ -79,7 +72,6 @@ public class MergeMetadataIT
     }
 
     @Test
-    @IgnoreOn( "mac" )
     public void removeYumRepositoryWhenOnlyOneMember()
         throws Exception
     {
@@ -94,7 +86,6 @@ public class MergeMetadataIT
     }
 
     @Test
-    @IgnoreOn( "mac" )
     public void shouldRegenerateGroupRepoWhenMemberRepoIsAdded()
         throws Exception
     {
@@ -121,7 +112,6 @@ public class MergeMetadataIT
     }
 
     @Test
-    @IgnoreOn( "mac" )
     public void shouldIncludeProxyRepository()
         throws Exception
     {
@@ -156,7 +146,6 @@ public class MergeMetadataIT
 
     @Test
     @Ignore
-    @IgnoreOn( "mac" )
     public void shouldReFetchProxyMetadata()
         throws Exception
     {
