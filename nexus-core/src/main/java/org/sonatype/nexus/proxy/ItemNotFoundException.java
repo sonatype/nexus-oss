@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.sonatype.nexus.proxy.ItemNotFoundReason.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
@@ -25,41 +26,50 @@ public class ItemNotFoundException
 {
     private static final long serialVersionUID = -4964273361722823796L;
 
-    private final ResourceStoreRequest request;
-
-    private final Repository repository;
+    private final ItemNotFoundReason reason;
 
     /**
-     * Do not use this constructor!
+     * Constructor.
      * 
-     * @param path
-     * @deprecated use a constructor that accepts a request!
+     * @param reason
+     * @since 2.4
      */
-    @Deprecated
-    public ItemNotFoundException( String path )
+    public ItemNotFoundException( final ItemNotFoundReason reason )
     {
-        this( path, null );
+        this( reason, null );
     }
 
     /**
-     * Do not use this constructor!
+     * Constructor with cause.
      * 
-     * @param path
+     * @param reason
      * @param cause
-     * @deprecated use a constructor that accepts a request!
+     * @since 2.4
      */
-    @Deprecated
-    public ItemNotFoundException( String path, Throwable cause )
+    public ItemNotFoundException( final ItemNotFoundReason reason, final Throwable cause )
     {
-        super( "Item not found on path " + path, cause );
-        this.repository = null;
-        this.request = null;
+        super( reason.getMessage(), cause ); // will NPE with null reason
+        this.reason = reason;
     }
+
+    /**
+     * Returns the reason of the item not found exception.
+     * 
+     * @return the reason.
+     * @since 2.4
+     */
+    public ItemNotFoundReason getReason()
+    {
+        return reason;
+    }
+
+    // == Deprecated stuff below
 
     /**
      * Constructor. To be used in places where no Repository exists yet in context (like in a Router).
      * 
      * @param request
+     * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
     public ItemNotFoundException( final ResourceStoreRequest request )
     {
@@ -71,6 +81,7 @@ public class ItemNotFoundException
      * 
      * @param request
      * @param cause
+     * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
     public ItemNotFoundException( final ResourceStoreRequest request, final Throwable cause )
     {
@@ -82,6 +93,7 @@ public class ItemNotFoundException
      * 
      * @param request
      * @param repository
+     * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
     public ItemNotFoundException( final ResourceStoreRequest request, final Repository repository )
     {
@@ -94,6 +106,7 @@ public class ItemNotFoundException
      * @param request
      * @param repository
      * @param cause
+     * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
     public ItemNotFoundException( final ResourceStoreRequest request, final Repository repository, final Throwable cause )
     {
@@ -101,7 +114,7 @@ public class ItemNotFoundException
             + RepositoryStringUtils.getHumanizedNameString( repository ) + "\"!" : "Item not found for request \""
             + String.valueOf( request ) + "\"!", request, repository, cause );
     }
-    
+
     // ==
 
     /**
@@ -110,6 +123,7 @@ public class ItemNotFoundException
      * @param message
      * @param request
      * @param repository
+     * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
     protected ItemNotFoundException( final String message, final ResourceStoreRequest request,
                                      final Repository repository )
@@ -124,24 +138,39 @@ public class ItemNotFoundException
      * @param request
      * @param repository
      * @param cause
+     * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
      */
     protected ItemNotFoundException( final String message, final ResourceStoreRequest request,
                                      final Repository repository, final Throwable cause )
     {
-        super( message, cause );
-        this.request = request;
-        this.repository = repository;
+        this( ItemNotFoundReasons.legacySupport( message, request, repository ), cause );
     }
 
     // ==
 
+    /**
+     * Returns the repository.
+     * 
+     * @return the repository where this exception occurred or {@code null}.
+     * @deprecated Use {@link #getReason()} and inspect that instead.
+     */
     public Repository getRepository()
     {
-        return repository;
+        if ( reason instanceof ItemNotFoundInRepositoryReason )
+        {
+            return ( (ItemNotFoundInRepositoryReason) reason ).getRepository();
+        }
+        return null;
     }
 
+    /**
+     * The request.
+     * 
+     * @return the request that caused this exception.
+     * @deprecated Use {@link #getReason()} and inspect that instead.
+     */
     public ResourceStoreRequest getRequest()
     {
-        return request;
+        return getReason().getResourceStoreRequest();
     }
 }

@@ -26,6 +26,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -80,9 +81,12 @@ public class ArtifactStoreHelper
                     RepositoryStringUtils.getHumanizedNameString( getMavenRepository() ), request ), e );
             }
 
-            // NXCM-4861: Doing "local only" lookup, same code should be used as in org.sonatype.nexus.proxy.repository.AbstractProxyRepository#doCacheItem
-            // Note: ResourceStoreRequest( ResourceStoreRequest ) creates a "subordinate" request from passed with same path but localOnly=true
-            StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem( false, new ResourceStoreRequest( request ) );
+            // NXCM-4861: Doing "local only" lookup, same code should be used as in
+            // org.sonatype.nexus.proxy.repository.AbstractProxyRepository#doCacheItem
+            // Note: ResourceStoreRequest( ResourceStoreRequest ) creates a "subordinate" request from passed with same
+            // path but localOnly=true
+            StorageFileItem storedFile =
+                (StorageFileItem) getMavenRepository().retrieveItem( false, new ResourceStoreRequest( request ) );
 
             String sha1Hash = storedFile.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -325,7 +329,9 @@ public class ArtifactStoreHelper
 
             if ( gav == null )
             {
-                throw new ItemNotFoundException( gavRequest, repository );
+                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( gavRequest, repository,
+                    "Request %s is not resolvable in repository %s", gavRequest.toString(),
+                    RepositoryStringUtils.getHumanizedNameString( repository ) ) );
             }
 
             return gav;

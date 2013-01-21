@@ -30,6 +30,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -213,7 +214,8 @@ public class M2GroupRepository
 
         if ( items.isEmpty() )
         {
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, this,
+                "Metadata not found in any of the members." ) );
         }
 
         if ( !isMergeMetadata() )
@@ -278,19 +280,15 @@ public class M2GroupRepository
                     ops.add( new NexusMergeOperation( new MetadataOperand( existingMetadatas.get( i ) ) ) );
                 }
 
-                final Collection<MetadataException> metadataExceptions = MetadataBuilder.changeMetadataIgnoringFailures(
-                    result, ops
-                );
+                final Collection<MetadataException> metadataExceptions =
+                    MetadataBuilder.changeMetadataIgnoringFailures( result, ops );
                 if ( metadataExceptions != null && !metadataExceptions.isEmpty() )
                 {
                     for ( final MetadataException metadataException : metadataExceptions )
                     {
                         getLogger().warn(
-                            "Ignored exception during M2 metadata merging: "
-                                + metadataException.getMessage()
-                            + " (request " + request.getRequestPath() + ")",
-                            metadataException
-                        );
+                            "Ignored exception during M2 metadata merging: " + metadataException.getMessage()
+                                + " (request " + request.getRequestPath() + ")", metadataException );
                     }
                 }
             }

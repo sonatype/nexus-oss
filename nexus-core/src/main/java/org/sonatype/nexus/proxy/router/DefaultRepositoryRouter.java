@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -66,7 +67,7 @@ public class DefaultRepositoryRouter
     extends AbstractConfigurable
     implements RepositoryRouter
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -255,7 +256,8 @@ public class DefaultRepositoryRouter
                     }
                     else if ( item instanceof StorageCollectionItem )
                     {
-                        toRoute.getTargetedRepository().createCollection( to, item.getRepositoryItemAttributes().asMap() );
+                        toRoute.getTargetedRepository().createCollection( to,
+                            item.getRepositoryItemAttributes().asMap() );
                     }
                     else
                     {
@@ -499,7 +501,9 @@ public class DefaultRepositoryRouter
             if ( kind == null )
             {
                 // unknown explodedPath[0]
-                throw new ItemNotFoundException( request );
+                throw new ItemNotFoundException(
+                    ItemNotFoundReasons.reasonFor( request,
+                        "Unknown repository kind (bug, as this method should not be invoked with path having less than 2 segments)!" ) );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0] ) );
@@ -519,13 +523,14 @@ public class DefaultRepositoryRouter
                 if ( !repository.isExposed() )
                 {
                     // this is not the main facet or the repo is not exposed
-                    throw new ItemNotFoundException( request );
+                    throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request,
+                        "Repository is not exposed!" ) );
                 }
             }
             catch ( NoSuchRepositoryException e )
             {
                 // obviously, the repoId (explodedPath[1]) points to some nonexistent repoID
-                throw new ItemNotFoundException( request, e );
+                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, e.getMessage() ), e );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0], explodedPath[1] ) );
@@ -649,7 +654,8 @@ public class DefaultRepositoryRouter
             // if no prefix matched, Item not found
             if ( repositories == null || repositories.isEmpty() )
             {
-                throw new ItemNotFoundException( request );
+                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request,
+                    "No repositories found for given prefix!" ) );
             }
 
             // filter access to the repositories
@@ -691,7 +697,7 @@ public class DefaultRepositoryRouter
         }
         else
         {
-            throw new ItemNotFoundException( request );
+            throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, "No listable entry found!" ) );
         }
     }
 
@@ -743,8 +749,8 @@ public class DefaultRepositoryRouter
         catch ( ItemNotFoundException e )
         {
             // ignore it, do nothing
-            
-            // cstamas says: above is untrue. It means that user should get 404, but there is no 
+
+            // cstamas says: above is untrue. It means that user should get 404, but there is no
             // proper solution to do it from this method! The culprit is that "view privilege" piggybacks
             // on the getRequestRouteForRequest() method that is not meant for this, it does it's job
             // well for routing....

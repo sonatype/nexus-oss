@@ -22,6 +22,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -583,7 +584,8 @@ public abstract class LayoutConverterShadowRepository
 
             if ( transformedPath == null )
             {
-                throw new ItemNotFoundException( request, this );
+                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, this,
+                    "Request path %s is not transformable to master.", request.getRequestPath() ) );
             }
 
             // delegate the call to the master
