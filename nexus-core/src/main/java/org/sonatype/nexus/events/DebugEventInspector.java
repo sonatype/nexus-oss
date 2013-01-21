@@ -55,6 +55,11 @@ public class DebugEventInspector
         {
             jmxName = ObjectName.getInstance( JMX_DOMAIN, "name", DebugEventInspector.class.getSimpleName() );
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            if ( server.isRegistered( jmxName ) )
+            {
+                getLogger().warn( "MBean already registered; replacing: {}", jmxName );
+                server.unregisterMBean( jmxName );
+            }
             server.registerMBean( new DefaultDebugEventInspectorMBean( this ), jmxName );
         }
         catch ( Exception e )
