@@ -232,21 +232,17 @@
       <groupId>eu.medsea.mimeutil</groupId>
       <artifactId>mime-util</artifactId>
     </dependency>
-    
-    <!-- Plugin Manager -->
+
     <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-api</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-bundle-model</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-host-api</artifactId>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-model-api</artifactId>
-    </dependency>
-    
+
     <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

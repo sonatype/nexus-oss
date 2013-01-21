@@ -17,6 +17,11 @@ import java.util.Map;
 import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+@Named
+@Singleton
 public class RrbIndexHtmlCustomizer
     extends AbstractNexusIndexHtmlCustomizer
     implements NexusIndexHtmlCustomizer

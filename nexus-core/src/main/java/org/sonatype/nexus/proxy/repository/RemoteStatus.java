@@ -12,11 +12,90 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-public enum RemoteStatus
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class RemoteStatus
 {
-    UNKNOWN,
 
-    AVAILABLE,
+    public static final RemoteStatus UNKNOWN = new RemoteStatus( Type.UNKNOWN );
 
-    UNAVAILABLE;
+    public static final RemoteStatus AVAILABLE = new RemoteStatus( Type.AVAILABLE );
+
+    public static final RemoteStatus UNAVAILABLE = new RemoteStatus( Type.UNAVAILABLE );
+
+    private final Type type;
+
+    private final String reason;
+
+    public RemoteStatus( final Type type )
+    {
+        this.type = checkNotNull( type );
+        this.reason = null;
+    }
+
+    public RemoteStatus( final Type type, final String reason )
+    {
+        this.type = checkNotNull( type );
+        this.reason = reason;
+    }
+
+    public Type getType()
+    {
+        return type;
+    }
+
+    public String getReason()
+    {
+        return reason;
+    }
+
+    public String name()
+    {
+        return type.name();
+    }
+
+    public static RemoteStatus valueOf( final String name )
+    {
+        return new RemoteStatus( Type.valueOf( name ) );
+    }
+
+    public enum Type
+    {
+        UNKNOWN, AVAILABLE, UNAVAILABLE
+    }
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof RemoteStatus ) )
+        {
+            return false;
+        }
+
+        final RemoteStatus that = (RemoteStatus) o;
+
+        if ( type != that.type )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return type.hashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return type.toString();
+    }
+
 }

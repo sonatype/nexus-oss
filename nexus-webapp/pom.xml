@@ -66,10 +66,6 @@
     </dependency>
 
     <!--
-    FIXME: Put these into DM
-    -->
-
-    <!--
     There are problems with the Maven reactor that would require these modules.
     However if we include as a test scope the reactor will be happy and the dependency pom will be correct.
     -->
@@ -273,63 +269,54 @@
       </plugin>
 
       <plugin>
-        <groupId>net.alchim31.maven</groupId>
+        <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>aggregate</id>
-
+            <id>js</id>
             <goals>
-              <goal>compress</goal>
+              <goal>aggregate</goal>
             </goals>
-
             <configuration>
-              <sourceDirectory>${project.basedir}/src/main/webapp</sourceDirectory>
-
+              <output>${project.build.outputDirectory}/js/sonatype-all.js</output>
+              <sourceDirectory>src/main/webapp/js</sourceDirectory>
+              <excludes>
+                <exclude>lib/require*.js</exclude>
+              </excludes>
               <includes>
-                <include>js/**/*.js</include>
-                <include>style/**/*.css</include>
+                <include>**/*.js</include>
               </includes>
-
-              <!-- yuicompressor warns when code is not in a shape that's optimized for minifying. Those checks are a subset of jslint,
-                   so new/ported code in the Nexus.* namespace will be checked for that anyway. ATM this only pollutes the log (~9400 warnings) -->
-              <jswarn>false</jswarn>
-              <failOnWarning>false</failOnWarning>
-
-              <aggregations>
-                <aggregation>
-                  <insertNewLine>true</insertNewLine>
-                  <output>${project.build.outputDirectory}/js/sonatype-all.js</output>
-                  <inputDir>${project.build.directory}/generated-sources/yuicompressor/js</inputDir>
-                  <excludes>
-                    <exclude>lib/require*.js</exclude>
-                  </excludes>
-                  <includes>
-                    <include>**/*.js</include>
-                  </includes>
-                </aggregation>
-                <aggregation>
-                  <output>${project.build.outputDirectory}/style/sonatype-all.css</output>
-                  <inputDir>${project.build.directory}/generated-sources/yuicompressor/style</inputDir>
-                  <includes>
-                    <include>**/*.css</include>
-                  </includes>
-                  <excludes>
-                    <exclude>Sonatype-content.css</exclude>
-                  </excludes>
-                </aggregation>
-              </aggregations>
+            </configuration>
+          </execution>
+          <execution>
+            <id>css</id>
+            <goals>
+              <goal>aggregate-css</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/style/sonatype-all.css</output>
+              <sourceDirectory>src/main/webapp/style</sourceDirectory>
+              <includes>
+                <include>**/*.css</include>
+              </includes>
+              <excludes>
+                <exclude>Sonatype-content.css</exclude>
+              </excludes>
             </configuration>
           </execution>
           <execution>
             <id>jslint</id>
-            <phase>verify</phase>
             <goals>
               <goal>jslint</goal>
             </goals>
             <configuration>
-              <!-- jslint goal will include sources in src/main/webapp by default -->
-              <!-- only include new js resources following the Nexus.* namespace -->
+              <sourceDirectory>src/main/webapp</sourceDirectory>
+              <!-- do not fail the build, new version of jslint used by sonatype yuicompress plugin is too thorough -->
+              <fail>false</fail>
+              <jslintOptions>
+                <white>true</white> <!-- true, if sloppy whitespace is tolerated -->
+                <sloppy>true</sloppy> <!-- true, if the 'use strict'; pragma is optional -->
+              </jslintOptions>
               <includes>
                 <include>js/nexus/**/*.js</include>
                 <include>js/ext/**/*.js</include>
@@ -378,29 +365,6 @@
         </configuration>
       </plugin>
 
-      <!--
-      NOTE: This makes a new artifact (not attached w/classifier) with artifactId nexus-webapp-dependencies :-(
-      -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-dependency-poms</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>attach-signatures</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>attach-signatures</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <!--
       <plugin>
         <groupId>com.github.mcheely</groupId>

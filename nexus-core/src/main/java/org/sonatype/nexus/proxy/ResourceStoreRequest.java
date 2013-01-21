@@ -228,6 +228,27 @@ public class ResourceStoreRequest
     }
 
     /**
+     * Sets the request as expired.
+     * 
+     * @param asExpired the new request asExpired value
+     */
+    public ResourceStoreRequest setRequestAsExpired( boolean asExpired )
+    {
+        getRequestContext().setRequestAsExpired( asExpired );
+        return this;
+    }
+
+    /**
+     * Checks if request should be handled as expired.
+     * 
+     * @return true, if request should be handled as expired.
+     */
+    public boolean isRequestAsExpired()
+    {
+        return getRequestContext().isRequestAsExpired();
+    }
+
+    /**
      * Sets the request group local only.
      * 
      * @param requestGroupLocal the new request group local only

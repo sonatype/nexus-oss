@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -600,7 +603,15 @@ public abstract class AbstractProxyRepository
         }
 
         // invalidate remote status
-        setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
+        final String unavailableReason = parseRemoteUnavailableReason(cause);
+        if ( unavailableReason == null )
+        {
+            setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
+        }
+        else
+        {
+            setRemoteStatus( new RemoteStatus( RemoteStatus.Type.UNAVAILABLE, unavailableReason ), cause );
+        }
 
         // do we need to do anything at all?
         boolean autoBlockActive = isAutoBlockActive();
@@ -710,6 +721,33 @@ public abstract class AbstractProxyRepository
         // getLogger().warn(
         // "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId() + ")", e );
         // }
+    }
+
+    /**
+     * Best effort to extract reason why remote is not available.
+     *
+     * @param cause cause why the remote is not available (can be null)
+     * @return parsed reason or null if reason could not be parsed
+     */
+    protected String parseRemoteUnavailableReason( final Throwable cause )
+    {
+        if ( cause == null )
+        {
+            return null;
+        }
+        if ( cause.getCause() != null )
+        {
+            if ( cause.getCause() instanceof SSLPeerUnverifiedException )
+            {
+                return "Untrusted Remote";
+            }
+            if ( cause.getCause() instanceof SSLException )
+            {
+                return cause.getCause().getMessage();
+            }
+        }
+
+        return null;
     }
 
     public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
@@ -964,10 +1002,12 @@ public abstract class AbstractProxyRepository
 
             itemLock.lock( Action.create );
 
-            final Action action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+            final Action action;
 
             try
             {
+                action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+
                 getLocalStorage().storeItem( this, item );
 
                 removeFromNotFoundCache( item.getResourceStoreRequest() );
@@ -1024,6 +1064,7 @@ public abstract class AbstractProxyRepository
 
             db.append( " :: localOnly=" ).append( request.isRequestLocalOnly() );
             db.append( ", remoteOnly=" ).append( request.isRequestRemoteOnly() );
+            db.append( ", asExpired=" ).append( request.isRequestAsExpired() );
 
             if ( getProxyMode() != null )
             {
@@ -1067,7 +1108,7 @@ public abstract class AbstractProxyRepository
                     {
                         localItem = (AbstractStorageItem) super.doRetrieveItem( request );
 
-                        if ( localItem != null && !isOld( localItem ) )
+                        if ( localItem != null && !request.isRequestAsExpired() && !isOld( localItem ) )
                         {
                             // local copy is just fine, so, we are proxy but we have valid local copy in cache
                             return localItem;
@@ -1096,7 +1137,7 @@ public abstract class AbstractProxyRepository
                         {
                             localItem = (AbstractStorageItem) super.doRetrieveItem( request );
 
-                            if ( localItem != null && !isOld( localItem ) )
+                            if ( localItem != null && !request.isRequestAsExpired() &&  !isOld( localItem ) )
                             {
                                 // local copy is just fine (downloaded by a thread holding us blocked on acquiring
                                 // exclusive lock)
@@ -1151,7 +1192,7 @@ public abstract class AbstractProxyRepository
         if ( shouldProxy )
         {
             // we are able to go remote
-            if ( localItem == null || isOld( localItem ) )
+            if ( localItem == null || request.isRequestAsExpired() || isOld( localItem ) )
             {
                 // we should go remote coz we have no local copy or it is old
                 try

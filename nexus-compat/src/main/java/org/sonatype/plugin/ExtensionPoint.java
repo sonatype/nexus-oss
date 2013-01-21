@@ -10,23 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.rrb.security;
+package org.sonatype.plugin;
 
-import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-@Named
-@Singleton
-public class RrbSecurityResource
-    extends AbstractStaticSecurityResource
-    implements StaticSecurityResource
+/**
+ * Marks an interface as Extension Point (which is implicitly a component contract). This annotation is meant for "host"
+ * (the extensible system/app) developers to mark their extension points.
+ *
+ * @deprecated Part of ancient unfulfilled grand unified plugin system; Avoid using as it will eventually go away.
+ */
+@Documented
+@Target( ElementType.TYPE )
+@Retention( RetentionPolicy.RUNTIME )
+@Deprecated
+public @interface ExtensionPoint
 {
-    @Override
-    protected String getResourcePath()
-    {
-        return "/META-INF/nexus-rrb-plugin-security.xml";
-    }
+    // empty
 }
