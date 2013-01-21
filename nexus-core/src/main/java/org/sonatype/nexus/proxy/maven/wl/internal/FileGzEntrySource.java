@@ -31,6 +31,12 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 public class FileGzEntrySource
     extends FileEntrySource
 {
+    /**
+     * Constructor.
+     * 
+     * @param mavenRepository
+     * @param path
+     */
     public FileGzEntrySource( final MavenRepository mavenRepository, final String path )
     {
         super( mavenRepository, path );

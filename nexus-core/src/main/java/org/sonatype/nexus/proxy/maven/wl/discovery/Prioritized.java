@@ -12,22 +12,37 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.discovery;
 
+import java.util.Comparator;
 
 /**
- * Strategy for discovery of WL by some means. It is identified by {@link #getId()} and has priority
- * {@link #getPriority()}. Latter is used to sort (using natural order of integers) the instances and try the one by one
- * in sorted order.
+ * Prioritized support, when ordering of components is essential.
  * 
  * @author cstamas
  * @since 2.4
  */
-public interface Strategy
-    extends Prioritized
+public interface Prioritized
 {
     /**
-     * Returns the unique ID of the strategy, never {@code null}.
+     * Returns the priority of this instance.
      * 
-     * @return the ID of the strategy.
+     * @return the priority of this instance.
      */
-    String getId();
+    int getPriority();
+
+    // ==
+
+    /**
+     * Comparator for {@link Prioritized} instances.
+     * 
+     * @param <T>
+     */
+    public static class PriorityOrderingComparator<T extends Prioritized>
+        implements Comparator<T>
+    {
+        @Override
+        public int compare( T o1, T o2 )
+        {
+            return o1.getPriority() - o2.getPriority();
+        }
+    }
 }

@@ -15,8 +15,6 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,7 +26,6 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalStrategy;
-import org.sonatype.nexus.proxy.maven.wl.discovery.Strategy.StrategyPriorityOrderingComparator;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 
 /**
@@ -40,10 +37,16 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 @Named
 @Singleton
 public class LocalContentDiscovererImpl
+    extends AbstractContentDiscoverer<MavenRepository, LocalStrategy>
     implements LocalContentDiscoverer
 {
     private final List<LocalStrategy> localStrategies;
 
+    /**
+     * Constructor.
+     * 
+     * @param localStrategies
+     */
     @Inject
     public LocalContentDiscovererImpl( final List<LocalStrategy> localStrategies )
     {
@@ -54,35 +57,13 @@ public class LocalContentDiscovererImpl
     public DiscoveryResult discoverLocalContent( final MavenRepository mavenRepository )
         throws IOException
     {
-        final ArrayList<LocalStrategy> appliedStrategies = new ArrayList<LocalStrategy>( localStrategies );
-        Collections.sort( appliedStrategies, new StrategyPriorityOrderingComparator<LocalStrategy>() );
-        final DiscoveryResult discoveryResult = new DiscoveryResult( mavenRepository );
-        for ( LocalStrategy localStrategy : appliedStrategies )
-        {
-            discoverLocalContentWithStrategy( localStrategy, mavenRepository, discoveryResult );
-            if ( discoveryResult.isSuccessful() )
-            {
-                break;
-            }
-        }
-        return discoveryResult;
+        return discoverContent( localStrategies, mavenRepository );
     }
 
-    // ==
-
-    protected void discoverLocalContentWithStrategy( final LocalStrategy strategy,
-                                                     final MavenRepository mavenRepository,
-                                                     final DiscoveryResult discoveryResult )
-        throws IOException
+    @Override
+    protected EntrySource discover( final LocalStrategy strategy, final MavenRepository mavenRepository )
+        throws StrategyFailedException, IOException
     {
-        try
-        {
-            final EntrySource entrySource = strategy.discover( mavenRepository );
-            discoveryResult.recordSuccess( strategy, entrySource );
-        }
-        catch ( StrategyFailedException e )
-        {
-            discoveryResult.recordFailure( strategy, e );
-        }
+        return strategy.discover( mavenRepository );
     }
 }
