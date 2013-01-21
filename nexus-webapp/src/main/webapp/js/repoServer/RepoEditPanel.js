@@ -14,7 +14,7 @@
  * Repository Edit/Create panel layout and controller
  */
 
-define('repoServer/RepoEditPanel',['sonatype/all'], function(){
+define('repoServer/RepoEditPanel',['sonatype/all', 'sonatype/strings'], function(Sonatype, Strings){
 var REPO_REMOTE_STORAGE_REGEXP = /^(?:http|https|ftp):\/\//i;
 
 Sonatype.repoServer.AbstractRepositoryEditor = function(config) {
@@ -47,8 +47,8 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
         if (this.isNew)
         {
           var templateModifiers = Ext.apply({}, {
-                id : Sonatype.utils.returnEmptyStr,
-                name : Sonatype.utils.returnEmptyStr
+                id : Strings.returnEmptyStr,
+                name : Strings.returnEmptyStr
               }, this.dataModifiers.load);
 
           this.form.on('actioncomplete', function(form, action) {
@@ -235,7 +235,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
           repoPanel.statusStart();
 
           // convert case
-          receivedData.repoPolicy = Sonatype.utils.upperFirstCharLowerRest(receivedData.repoPolicy);
+          receivedData.repoPolicy = Strings.upperFirstCharLowerRest(receivedData.repoPolicy);
 
           return;
         }
@@ -245,7 +245,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
         rec.set('name', receivedData.name);
         rec.set('repoType', receivedData.repoType);
         rec.set('format', receivedData.format);
-        rec.set('repoPolicy', Sonatype.utils.upperFirstCharLowerRest(receivedData.repoPolicy));
+        rec.set('repoPolicy', Strings.upperFirstCharLowerRest(receivedData.repoPolicy));
         rec.commit();
         rec.endEdit();
 
@@ -287,7 +287,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
         if (this.isMavenFormat(format))
         {
           repoPolicyField.enable();
-          repoPolicyField.setValue(Sonatype.utils.upperFirstCharLowerRest(repoPolicy || 'RELEASE'));
+          repoPolicyField.setValue(Strings.upperFirstCharLowerRest(repoPolicy || 'RELEASE'));
         } else {
           repoPolicyField.setValue('Mixed');
           repoPolicyField.disable();
@@ -343,16 +343,16 @@ Sonatype.repoServer.HostedRepositoryEditor = function(config) {
   var defaultConfig = {
     dataModifiers : {
       load : {
-        repoPolicy : Sonatype.utils.upperFirstCharLowerRest,
-        browseable : Sonatype.utils.capitalize,
-        indexable : Sonatype.utils.capitalize,
-        exposed : Sonatype.utils.capitalize
+        repoPolicy : Strings.upperFirstCharLowerRest,
+        browseable : Strings.capitalize,
+        indexable : Strings.capitalize,
+        exposed : Strings.capitalize
       },
       submit : {
-        repoPolicy : Sonatype.utils.uppercase,
-        browseable : Sonatype.utils.convert.stringContextToBool,
-        indexable : Sonatype.utils.convert.stringContextToBool,
-        exposed : Sonatype.utils.convert.stringContextToBool,
+        repoPolicy : Strings.uppercase,
+        browseable : Strings.stringContextToBool,
+        indexable : Strings.stringContextToBool,
+        exposed : Strings.stringContextToBool,
         downloadRemoteIndexes : function() {
           return false;
         },
@@ -419,7 +419,7 @@ Sonatype.repoServer.HostedRepositoryEditor = function(config) {
               width : 200,
               allowBlank : false,
               disabled : !this.isNew,
-              validator : Sonatype.utils.validateId
+              validator : Strings.validateId
             }, {
               xtype : 'textfield',
               fieldLabel : 'Repository Name',
@@ -628,24 +628,24 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
   var defaultConfig = {
     dataModifiers : {
       load : {
-        repoPolicy : Sonatype.utils.upperFirstCharLowerRest,
-        browseable : Sonatype.utils.capitalize,
-        indexable : Sonatype.utils.capitalize,
-        exposed : Sonatype.utils.capitalize,
-        downloadRemoteIndexes : Sonatype.utils.capitalize,
-        autoBlockActive : Sonatype.utils.capitalize,
-        fileTypeValidation : Sonatype.utils.capitalize,
-        checksumPolicy : Sonatype.utils.upperFirstCharLowerRest
+        repoPolicy : Strings.upperFirstCharLowerRest,
+        browseable : Strings.capitalize,
+        indexable : Strings.capitalize,
+        exposed : Strings.capitalize,
+        downloadRemoteIndexes : Strings.capitalize,
+        autoBlockActive : Strings.capitalize,
+        fileTypeValidation : Strings.capitalize,
+        checksumPolicy : Strings.upperFirstCharLowerRest
       },
       submit : {
-        repoPolicy : Sonatype.utils.uppercase,
-        browseable : Sonatype.utils.convert.stringContextToBool,
-        indexable : Sonatype.utils.convert.stringContextToBool,
-        exposed : Sonatype.utils.convert.stringContextToBool,
-        downloadRemoteIndexes : Sonatype.utils.convert.stringContextToBool,
-        autoBlockActive : Sonatype.utils.convert.stringContextToBool,
-        fileTypeValidation : Sonatype.utils.convert.stringContextToBool,
-        checksumPolicy : Sonatype.utils.uppercase
+        repoPolicy : Strings.uppercase,
+        browseable : Strings.stringContextToBool,
+        indexable : Strings.stringContextToBool,
+        exposed : Strings.stringContextToBool,
+        downloadRemoteIndexes : Strings.stringContextToBool,
+        autoBlockActive : Strings.stringContextToBool,
+        fileTypeValidation : Strings.stringContextToBool,
+        checksumPolicy : Strings.uppercase
       }
     },
     validationModifiers : {
@@ -706,7 +706,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
               width : 200,
               allowBlank : false,
               disabled : !this.isNew,
-              validator : Sonatype.utils.validateId
+              validator : Strings.validateId
             }, {
               xtype : 'textfield',
               fieldLabel : 'Repository Name',
@@ -1197,10 +1197,10 @@ Sonatype.repoServer.VirtualRepositoryEditor = function(config) {
   var defaultConfig = {
     dataModifiers : {
       load : {
-        syncAtStartup : Sonatype.utils.capitalize
+        syncAtStartup : Strings.capitalize
       },
       submit : {
-        syncAtStartup : Sonatype.utils.convert.stringContextToBool,
+        syncAtStartup : Strings.stringContextToBool,
         exposed : function() {
           return true;
         }
@@ -1274,7 +1274,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function(config) {
               width : 200,
               allowBlank : false,
               disabled : !this.isNew,
-              validator : Sonatype.utils.validateId
+              validator : Strings.validateId
             }, {
               xtype : 'textfield',
               fieldLabel : 'Repository Name',

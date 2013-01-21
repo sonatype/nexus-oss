@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('nexus/navigation/section',['extjs', 'sonatype'], function(Ext, Sonatype){
+define('nexus/navigation/section',['extjs', 'sonatype', 'sonatype/strings'], function(Ext, Sonatype, Strings){
 Ext.namespace('Sonatype.navigation');
 
 Sonatype.navigation.Section = function(cfg) {
@@ -177,7 +177,7 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
           
         var _fSorter = function(obj1, obj2) {
            var fieldName = "sortable_title";
-           return Sonatype.utils.sortFn(obj1[fieldName], obj2[fieldName]);
+           return Strings.sortFn(obj1[fieldName], obj2[fieldName]);
         };
         this.items.sort(asOrder || 'ASC', _fSorter);
       }

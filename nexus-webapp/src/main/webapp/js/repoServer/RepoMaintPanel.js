@@ -14,7 +14,7 @@
  * Repository Maintenance panel layout and controller
  */
 
-define('repoServer/RepoMaintPanel',['sonatype/all', 'nexus/repository/AbstractRepoPanel'], function(Sonatype){
+define('repoServer/RepoMaintPanel',['sonatype/all', 'nexus/repository/AbstractRepoPanel', 'sonatype/strings'], function(Sonatype, AbstractRepoPanel, Strings){
 /*
  * config options: { id: the is of this panel instance [required] title: title
  * of this panel (shows in tab) }
@@ -193,7 +193,7 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
     name : 'repoPolicy',
     header : 'Policy',
     width : 70,
-    convert : Sonatype.utils.upperFirstCharLowerRest
+    convert : Strings.upperFirstCharLowerRest
   }, {
     name : 'displayStatus',
     header : 'Repository Status',

@@ -33,6 +33,19 @@ define('sonatype/init',['extjs', 'sonatype', 'nexus/util/observable', 'sonatype'
             });
 
             Sonatype.resources.help = {};
+
+            // Default anonymous user permissions; 3-bit permissions: delete | edit | read
+            Sonatype.user.anon = {
+              username : '',
+              isLoggedIn : false,
+              repoServer : {}
+            };
+
+            Sonatype.user.curr = {
+              username : '',
+              isLoggedIn : false,
+              repoServer : {}
+            };
           }
         }
   );

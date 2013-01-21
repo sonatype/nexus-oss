@@ -11,115 +11,16 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], function(Ext, Sonatype, format) {
+define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonatype/strings'], function(Ext, Sonatype, format, Strings) {
 
-  Sonatype.utils = {
-    passwordPlaceholder : '|$|N|E|X|U|S|$|',
+  Ext.applyIf(Ext.namespace('Sonatype.utils'),  {
     edition : '',
     editionShort : '',
     version : '',
     attributionsURL : '',
     purchaseURL : '',
     userLicenseURL : '',
-    lowercase : function(str) {
-      if (Ext.isEmpty(str))
-      {
-        return str;
-      }
-      str = str.toString();
-      return str.toLowerCase();
-    },
-    lowercaseFirstChar : function(str) {
-      if (Ext.isEmpty(str))
-      {
-        return str;
-      }
-      str = str.toString();
-      return str.charAt(0).toLowerCase() + str.slice(1);
-    },
-    upperFirstCharLowerRest : function(str) {
-      if (Ext.isEmpty(str))
-      {
-        return str;
-      }
-      str = str.toString();
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-    },
-    uppercase : function(str) {
-      if (Ext.isEmpty(str))
-      {
-        return str;
-      }
-      str = str.toString();
-      return str.toUpperCase();
-    },
-    capitalize : function(str) {
-      if (Ext.isEmpty(str))
-      {
-        return str;
-      }
-      str = str.toString();
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    },
-    returnEmptyStr : function() {
-      return '';
-    },
-    returnValidStr : function(str) {
-      if (str)
-      {
-        return str;
-      }
-      else
-      {
-        return Sonatype.utils.returnEmptyStr();
-      }
-    },
 
-    validateNoSpaces : function(value) {
-      if (value && value.indexOf(' ') !== -1)
-      {
-        return 'Spaces are not allowed in ID';
-      }
-
-      return true;
-    },
-
-    validateId : function(value) {
-      var idPattern = /^[a-zA-Z0-9_\-\.]+$/;
-      if (idPattern.test(value))
-      {
-        return true;
-      }
-      else
-      {
-        return 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in ID';
-      }
-    },
-
-    sortFn : function(r1, r2) {
-        var v1 = Sonatype.utils.lowercase(r1), v2 = Sonatype.utils.lowercase(r2);
-        return v1 > v2 ? 1 : (v1 < v2 ? -1 : 0);
-    },
-
-    convert : {
-      stringContextToBool : function(str) {
-        return (str.toLowerCase() === 'true');
-      },
-      passwordToString : function(str) {
-        if (Sonatype.utils.passwordPlaceholder === str)
-        {
-          return null;
-        }
-        else if (str)
-        {
-          return str;
-        }
-        else
-        {
-          return Sonatype.utils.returnEmptyStr();
-        }
-      }
-    },
     // deep copy of an object. All references independent from object passed in.
     cloneObj : function(o) {
       if (typeof(o) !== 'object' || o === null)
@@ -132,7 +33,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
       for (i in o)
       {
         if (o.hasOwnProperty(i)) {
-          newObj[i] = Sonatype.utils.cloneObj(o[i]);
+          newObj[i] = Ext.namespace('Sonatype.utils').cloneObj(o[i]);
         }
       }
 
@@ -177,7 +78,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               else
               {
                 Ext.Ajax.timeout = 60000;
-                Sonatype.utils.connectionError(response, 'Error retrieving rest timeout');
+                Ext.namespace('Sonatype.utils').connectionError(response, 'Error retrieving rest timeout');
               }
             }
           });
@@ -223,7 +124,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
           if (nexusReason && nexusReason.substring(0, 7) == 'expired')
           {
             Sonatype.repoServer.RepoServer.loginWindow.hide();
-            Sonatype.utils.changePassword(Sonatype.repoServer.RepoServer.loginForm.find('name', 'username')[0].getValue());
+            Ext.namespace('Sonatype.utils').changePassword(Sonatype.repoServer.RepoServer.loginForm.find('name', 'username')[0].getValue());
           }
           else
           {
@@ -541,7 +442,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
                                   var errorOptions = {
                                     hideErrorStatus : true
                                   };
-                                  Sonatype.utils.connectionError(response, 'There is a problem retrieving your username.', false, errorOptions)
+                                  Ext.namespace('Sonatype.utils').connectionError(response, 'There is a problem retrieving your username.', false, errorOptions)
                                 }
                               });
                         }
@@ -624,7 +525,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
                                   var errorOptions = {
                                     hideErrorStatus : true
                                   };
-                                  Sonatype.utils.connectionError(response, 'There is a problem resetting your password.', false, errorOptions)
+                                  Ext.namespace('Sonatype.utils').connectionError(response, 'There is a problem resetting your password.', false, errorOptions)
                                 }
                               });
                         }
@@ -722,7 +623,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
                                 success : function(response, options) {
                                   if (expiredUsername)
                                   {
-                                    Sonatype.utils.doLogin(w, expiredUsername, newPassword);
+                                    Ext.namespace('Sonatype.utils').doLogin(w, expiredUsername, newPassword);
                                     w.close();
                                   }
                                   else
@@ -738,7 +639,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
                                   }
                                 },
                                 failure : function(response, options) {
-                                  Sonatype.utils.connectionError(response, 'There is a problem changing your password.', false, { hideErrorStatus: true })
+                                  Ext.namespace('Sonatype.utils').connectionError(response, 'There is a problem changing your password.', false, { hideErrorStatus: true })
                                 }
                               });
                         }
@@ -757,7 +658,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
     },
 
     getAuthToken : function(username, password) {
-      return Sonatype.utils.base64.encode(username + ':' + password);
+      return Ext.namespace('Sonatype.utils').base64.encode(username + ':' + password);
     },
 
     refreshTask : (function() {
@@ -777,7 +678,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               // do nothing, we only request to refresh session
               // but stop the task if something goes wrong (forbidden, not found, connection refused etc.)
               if (!success) {
-                Sonatype.utils.refreshTask.stop();
+                Ext.namespace('Sonatype.utils').refreshTask.stop();
               }
             }
           });
@@ -788,7 +689,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
       // catch the case of page reload, which will leave the user logged in but not go through the login handler
       Sonatype.Events.addListener('nexusStatus', function() {
         if (Sonatype.user.curr && Sonatype.user.curr.isLoggedIn) {
-          Sonatype.utils.refreshTask.start();
+          Ext.namespace('Sonatype.utils').refreshTask.start();
         }
       }, this, {single: true});
 
@@ -819,7 +720,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               username : username
             },
             headers : {
-              'Authorization' : 'Basic ' + Sonatype.utils.getAuthToken(username, password)
+              'Authorization' : 'Basic ' + Ext.namespace('Sonatype.utils').getAuthToken(username, password)
             }, // @todo: send HTTP basic auth data
             url : Sonatype.config.repos.urls.login,
             success : function(response, options) {
@@ -836,13 +737,13 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               }
 
               var respObj = Ext.decode(response.responseText);
-              Sonatype.utils.loadNexusStatus(respObj.data.clientPermissions.loggedInUserSource);
+              Ext.namespace('Sonatype.utils').loadNexusStatus(respObj.data.clientPermissions.loggedInUserSource);
 
-              Sonatype.utils.refreshTask.start();
+              Ext.namespace('Sonatype.utils').refreshTask.start();
             },
             failure : function(response, options) {
-              Sonatype.utils.refreshTask.stop();
-              Sonatype.utils.clearCookie('JSESSIONID');
+              Ext.namespace('Sonatype.utils').refreshTask.stop();
+              Ext.namespace('Sonatype.utils').clearCookie('JSESSIONID');
               if (activeWindow)
               {
                 activeWindow.getEl().unmask();
@@ -858,7 +759,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
                   method : 'GET',
                   url : Sonatype.config.repos.urls.logout,
                   callback : function(options, success, response) {
-                    Sonatype.utils.clearCookie('JSESSIONID');
+                    Ext.namespace('Sonatype.utils').clearCookie('JSESSIONID');
                     Sonatype.view.justLoggedOut = true;
                   }
                 });
@@ -875,7 +776,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
     loadNexusStatus : function(loggedInUserSource, versionOnly) {
       if (!versionOnly)
       {
-        Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
+        Sonatype.user.curr = Ext.namespace('Sonatype.utils').cloneObj(Sonatype.user.anon);
       }
 
       Ext.Ajax.request({
@@ -893,19 +794,19 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               {
                 var respObj = Ext.decode(response.responseText);
 
-                Sonatype.utils.edition = respObj.data.editionLong;
-                Sonatype.utils.editionShort = respObj.data.editionShort;
-                Sonatype.utils.version = respObj.data.version;
-                Sonatype.utils.attributionsURL = respObj.data.attributionsURL;
-                Sonatype.utils.purchaseURL = respObj.data.purchaseURL;
-                Sonatype.utils.userLicenseURL = respObj.data.userLicenseURL;
-                Sonatype.utils.licenseInstalled = respObj.data.licenseInstalled;
-                Sonatype.utils.licenseExpired = respObj.data.licenseExpired;
-                Sonatype.utils.trialLicense = respObj.data.trialLicense;
+                Ext.namespace('Sonatype.utils').edition = respObj.data.editionLong;
+                Ext.namespace('Sonatype.utils').editionShort = respObj.data.editionShort;
+                Ext.namespace('Sonatype.utils').version = respObj.data.version;
+                Ext.namespace('Sonatype.utils').attributionsURL = respObj.data.attributionsURL;
+                Ext.namespace('Sonatype.utils').purchaseURL = respObj.data.purchaseURL;
+                Ext.namespace('Sonatype.utils').userLicenseURL = respObj.data.userLicenseURL;
+                Ext.namespace('Sonatype.utils').licenseInstalled = respObj.data.licenseInstalled;
+                Ext.namespace('Sonatype.utils').licenseExpired = respObj.data.licenseExpired;
+                Ext.namespace('Sonatype.utils').trialLicense = respObj.data.trialLicense;
 
-                Sonatype.utils.formattedAppName = Sonatype.utils.parseFormattedAppName(respObj.data.formattedAppName);
+                Ext.namespace('Sonatype.utils').formattedAppName = Ext.namespace('Sonatype.utils').parseFormattedAppName(respObj.data.formattedAppName);
 
-                Ext.get('logo').update('<span>' + Sonatype.utils.formattedAppName + '</span>');
+                Ext.get('logo').update('<span>' + Ext.namespace('Sonatype.utils').formattedAppName + '</span>');
 
                 Sonatype.view.headerPanel.doLayout();
 
@@ -919,11 +820,11 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               }
               else
               {
-                Sonatype.utils.edition = '';
-                Sonatype.utils.licenseInstalled = null;
-                Sonatype.utils.licenseExpired = null;
-                Sonatype.utils.trialLicense = null;
-                Sonatype.utils.anonDisabled = (response.status === 401);
+                Ext.namespace('Sonatype.utils').edition = '';
+                Ext.namespace('Sonatype.utils').licenseInstalled = null;
+                Ext.namespace('Sonatype.utils').licenseExpired = null;
+                Ext.namespace('Sonatype.utils').trialLicense = null;
+                Ext.namespace('Sonatype.utils').anonDisabled = (response.status === 401);
 
                 Sonatype.user.curr.repoServer = null;
                 Sonatype.user.curr.isLoggedIn = null;
@@ -937,7 +838,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               {
                 if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined')
                 {
-                  Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
+                  Sonatype[srv][Strings.capitalize(srv)].statusComplete(respObj);
                 }
               }
 
@@ -947,7 +848,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
 
               if (baseUrlMismatch && Sonatype.lib.Permissions.checkPermission('nexus:settings', Sonatype.lib.Permissions.READ))
               {
-                Sonatype.utils.postWelcomePageAlert('<b>WARNING:</b> ' + 'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' + 'does not match your actual URL! ' + 'If you\'re running Apache mod_proxy, here\'s '
+                Ext.namespace('Sonatype.utils').postWelcomePageAlert('<b>WARNING:</b> ' + 'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' + 'does not match your actual URL! ' + 'If you\'re running Apache mod_proxy, here\'s '
                     + '<a href="http://links.sonatype.com/products/nexus/oss/docs-mod-proxy">' + 'more information</a> on configuring Nexus with it.' );
               }
 
@@ -960,8 +861,8 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
                 token = Sonatype.view.loginSuccessfulToken;
                 Sonatype.view.loginSuccessfulToken = null;
               }
-              Sonatype.utils.onHistoryChange(token);
-              Sonatype.utils.updateHistory();
+              Ext.namespace('Sonatype.utils').onHistoryChange(token);
+              Ext.namespace('Sonatype.utils').updateHistory();
               Sonatype.view.justLoggedOut = false;
             }
           });
@@ -1031,7 +932,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
     },
 
     updateHistory : function(tab) {
-      var bookmark = Sonatype.utils.getBookmark(tab);
+      var bookmark = Ext.namespace('Sonatype.utils').getBookmark(tab);
       if (!bookmark)
       {
         return;
@@ -1044,7 +945,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
     },
 
     replaceHistory : function(tab) {
-      var bookmark = Sonatype.utils.getBookmark(tab);
+      var bookmark = Ext.namespace('Sonatype.utils').getBookmark(tab);
       if (!bookmark)
       {
         return;
@@ -1107,11 +1008,11 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               {
                 var dec = Ext.decode(response.responseText);
                 var needCredentials = dec.data.errorReportingSettings == null || dec.data.errorReportingSettings.jiraUsername == null || dec.data.errorReportingSettings.jiraUsername == '';
-                Sonatype.utils.showProbleReport(needCredentials);
+                Ext.namespace('Sonatype.utils').showProbleReport(needCredentials);
               }
               else
               {
-                Sonatype.utils.connectionError(response, 'Error generating Problem Report');
+                Ext.namespace('Sonatype.utils').connectionError(response, 'Error generating Problem Report');
               }
             }
           });
@@ -1236,11 +1137,11 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
                             {
                               saveErrorReportingSettings = false
                             }
-                            Sonatype.utils.createProblemReport(w, title, description, jiraUser, jiraPass, saveErrorReportingSettings);
+                            Ext.namespace('Sonatype.utils').createProblemReport(w, title, description, jiraUser, jiraPass, saveErrorReportingSettings);
                           }
                           else
                           {
-                            Sonatype.utils.createProblemReport(w, title, description);
+                            Ext.namespace('Sonatype.utils').createProblemReport(w, title, description);
                           }
                         }
                       }, {
@@ -1293,13 +1194,13 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format'], funct
               }
               else
               {
-                Sonatype.utils.connectionError(response, 'Error generating Problem Report');
+                Ext.namespace('Sonatype.utils').connectionError(response, 'Error generating Problem Report');
               }
             }
           });
     }
 
-  };
+  });
 
   return Sonatype;
 });

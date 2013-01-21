@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all'], function(Ext, Sonatype) {
+define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all', 'sonatype/strings'], function(Ext, Sonatype, Strings) {
   // Instance of Ext.FormPanel
   Sonatype.repoServer.ServerEditPanel = function(cfg) {
 
@@ -733,9 +733,9 @@ define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all'], function(Ext, So
         waitMsg : 'Updating server configuration...',
         fpanel : this,
         dataModifiers : {
-          "routing.followLinks" : Sonatype.utils.convert.stringContextToBool,
-          "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.convert.stringContextToBool,
-          "routing.groups.mergeMetadata" : Sonatype.utils.convert.stringContextToBool,
+          "routing.followLinks" : Strings.stringContextToBool,
+          "routing.groups.stopItemSearchOnFirstFoundFile" : Strings.stringContextToBool,
+          "routing.groups.mergeMetadata" : Strings.stringContextToBool,
           "securityRealms" : function(val, fpanel) {
             return fpanel.find('name', 'securityRealms')[0].getValue();
           },
@@ -800,9 +800,9 @@ define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all'], function(Ext, So
         method : 'GET',
         fpanel : fpanel,
         dataModifiers : {
-          "routing.followLinks" : Sonatype.utils.capitalize,
-          "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.capitalize,
-          "routing.groups.mergeMetadata" : Sonatype.utils.capitalize,
+          "routing.followLinks" : Strings.capitalize,
+          "routing.groups.stopItemSearchOnFirstFoundFile" : Strings.capitalize,
+          "routing.groups.mergeMetadata" : Strings.capitalize,
           "securityRealms" : function(arr, srcObj, fpanel) {
             fpanel.find('name', 'securityRealms')[0].setValue(arr);
             return arr; // return arr, even if empty to comply with sonatypeLoad data modifier requirement

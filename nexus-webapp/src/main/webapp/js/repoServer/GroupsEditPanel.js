@@ -14,7 +14,7 @@
 /*
  * Repository Groups Edit/Create panel layout and controller
  */
-define('repoServer/GroupsEditPanel', ['extjs', 'sonatype/all', 'nexus/ext/formpanel'], function(Ext, Sonatype, FormPanel){
+define('repoServer/GroupsEditPanel', ['extjs', 'sonatype/all', 'nexus/ext/formpanel', 'sonatype/strings'], function(Ext, Sonatype, FormPanel, Strings){
 Sonatype.repoServer.RepositoryGroupEditor = function(config) {
   var
         ht = Sonatype.repoServer.resources.help.groups,
@@ -22,11 +22,11 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
     dataModifiers : {
       load : {
         repositories : this.loadRepositories.createDelegate(this),
-        exposed : Sonatype.utils.capitalize
+        exposed : Strings.capitalize
       },
       submit : {
         repositories : this.saveRepositories.createDelegate(this),
-        exposed : Sonatype.utils.convert.stringContextToBool
+        exposed : Strings.stringContextToBool
       }
     },
     validationModifiers : {
@@ -105,7 +105,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
               width : 200,
               allowBlank : false,
               disabled : !this.isNew,
-              validator : Sonatype.utils.validateId
+              validator : Strings.validateId
             }, {
               xtype : 'textfield',
               fieldLabel : 'Group Name',

@@ -14,7 +14,7 @@
  * Service Schedule Edit/Create panel layout and controller
  */
 
-define('repoServer/SchedulesEditPanel',['sonatype/all'], function(){
+define('repoServer/SchedulesEditPanel',['sonatype/all', 'sonatype/strings'], function(Sonatype, Strings){
 Sonatype.repoServer.SchedulesEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {};
@@ -81,47 +81,47 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   // controls
   this.loadDataModFuncs = {
     internal : {
-      schedule : Sonatype.utils.capitalize,
+      schedule : Strings.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this)
     },
     manual : {
-      schedule : Sonatype.utils.capitalize,
+      schedule : Strings.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this)
     },
     once : {
-      schedule : Sonatype.utils.capitalize,
+      schedule : Strings.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this),
       startDate : this.importStartDateHelper.createDelegate(this),
       startTime : this.importStartTimeHelper.createDelegate(this)
     },
     hourly : {
-      schedule : Sonatype.utils.capitalize,
+      schedule : Strings.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this),
       startDate : this.importStartDateHelper.createDelegate(this),
       startTime : this.importStartTimeHelper.createDelegate(this)
     },
     daily : {
-      schedule : Sonatype.utils.capitalize,
+      schedule : Strings.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this),
       startDate : this.importStartDateHelper.createDelegate(this),
       recurringTime : this.importRecurringTimeHelper.createDelegate(this)
     },
     weekly : {
-      schedule : Sonatype.utils.capitalize,
+      schedule : Strings.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this),
       startDate : this.importStartDateHelper.createDelegate(this),
       recurringTime : this.importRecurringTimeHelper.createDelegate(this),
       recurringDay : this.importRecurringDayHelper.createDelegate(this)
     },
     monthly : {
-      schedule : Sonatype.utils.capitalize,
+      schedule : Strings.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this),
       startDate : this.importStartDateHelper.createDelegate(this),
       recurringTime : this.importRecurringTimeHelper.createDelegate(this),
       recurringDay : this.importMonthlyRecurringDayHelper.createDelegate(this)
     },
     advanced : {
-      schedule : Sonatype.utils.capitalize,
+      schedule : Strings.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this)
     }
   };
@@ -129,43 +129,43 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   // Methods that will take the data from the ui controls and map over to json
   this.submitDataModFuncs = {
     manual : {
-      schedule : Sonatype.utils.lowercase,
+      schedule : Strings.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this)
     },
     once : {
-      schedule : Sonatype.utils.lowercase,
+      schedule : Strings.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this),
       startDate : this.exportStartDateHelper.createDelegate(this),
       startTime : this.exportStartTimeHelper.createDelegate(this)
     },
     hourly : {
-      schedule : Sonatype.utils.lowercase,
+      schedule : Strings.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this),
       startDate : this.exportStartDateHelper.createDelegate(this),
       startTime : this.exportStartTimeHelper.createDelegate(this)
     },
     daily : {
-      schedule : Sonatype.utils.lowercase,
+      schedule : Strings.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this),
       startDate : this.exportStartDateHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this)
     },
     weekly : {
-      schedule : Sonatype.utils.lowercase,
+      schedule : Strings.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this),
       startDate : this.exportStartDateHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this),
       recurringDay : this.exportRecurringDayHelper.createDelegate(this)
     },
     monthly : {
-      schedule : Sonatype.utils.lowercase,
+      schedule : Strings.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this),
       startDate : this.exportStartDateHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this),
       recurringDay : this.exportMonthlyRecurringDayHelper.createDelegate(this)
     },
     advanced : {
-      schedule : Sonatype.utils.lowercase,
+      schedule : Strings.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this)
     }
   };
@@ -1885,7 +1885,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         var response = [];
         for (var i = 0; i < weekdaysIds.length; i++)
         {
-          response[i] = Sonatype.utils.lowercase(weekdaysIds[i]);
+          response[i] = Strings.lowercase(weekdaysIds[i]);
         }
 
         return response;

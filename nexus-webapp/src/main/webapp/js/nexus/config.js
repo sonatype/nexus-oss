@@ -146,31 +146,5 @@ define('nexus/config',['extjs', 'nexus/messagebox', 'sonatype/init'], function(E
     };
   }());
 
-  // Default anonymous user permissions; 3-bit permissions: delete | edit | read
-  Sonatype.user.anon = {
-    username : '',
-    isLoggedIn : false,
-    repoServer : {}
-  };
-
-  // FIXME c/p from Sonatype.utils to break circular dependency between config and utils
-  function cloneObj(o) {
-    if (typeof(o) !== 'object' || o === null)
-    {
-      return o;
-    }
-
-    var i, newObj = {};
-
-    for (i in o)
-    {
-      newObj[i] = cloneObj(o[i]);
-    }
-
-    return newObj;
-  }
-
-  Sonatype.user.curr = cloneObj(Sonatype.user.anon);
-
   return Sonatype;
 });
