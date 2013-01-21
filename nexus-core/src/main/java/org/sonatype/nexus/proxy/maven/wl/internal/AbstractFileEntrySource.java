@@ -141,6 +141,7 @@ public abstract class AbstractFileEntrySource
             request.setRequestLocalOnly( true );
             request.setRequestGroupLocalOnly( true );
             request.getRequestContext().put( MARKER_KEY, Boolean.TRUE );
+            @SuppressWarnings( "deprecation" )
             final StorageItem item = getMavenRepository().retrieveItem( true, request );
             if ( item instanceof StorageFileItem )
             {

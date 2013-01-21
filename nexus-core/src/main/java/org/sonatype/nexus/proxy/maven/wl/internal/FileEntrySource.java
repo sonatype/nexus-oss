@@ -33,6 +33,12 @@ public class FileEntrySource
     extends AbstractFileEntrySource
     implements WritableEntrySource
 {
+    /**
+     * Constructor.
+     * 
+     * @param mavenRepository
+     * @param path
+     */
     public FileEntrySource( final MavenRepository mavenRepository, final String path )
     {
         super( mavenRepository, path, new PrefixesFileMarshaller() );

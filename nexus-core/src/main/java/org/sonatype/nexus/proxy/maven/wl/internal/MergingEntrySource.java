@@ -19,8 +19,6 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 
-import com.google.common.base.Preconditions;
-
 /**
  * Entry source that merges multiple {@link EntrySource}s into one. It retains order and watch for uniqueness, but does
  * not filter out redundant entries (like both, child and it's parent is present in entries).
@@ -28,28 +26,21 @@ import com.google.common.base.Preconditions;
  * @author cstamas
  */
 public class MergingEntrySource
-    implements EntrySource
+    extends ArrayListEntrySource
 {
-    private final List<EntrySource> entrySources;
-
     /**
      * Constructor.
      * 
      * @param entrySources entry sources that you want to have merged.
+     * @throws IOException
      */
     public MergingEntrySource( final List<EntrySource> entrySources )
+        throws IOException
     {
-        this.entrySources = Preconditions.checkNotNull( entrySources );
+        super( mergeEntries( entrySources ) );
     }
 
-    @Override
-    public boolean exists()
-    {
-        return true;
-    }
-
-    @Override
-    public List<String> readEntries()
+    protected static List<String> mergeEntries( final List<EntrySource> entrySources )
         throws IOException
     {
         final LinkedHashSet<String> set = new LinkedHashSet<String>();
@@ -58,16 +49,5 @@ public class MergingEntrySource
             set.addAll( entrySource.readEntries() );
         }
         return new ArrayList<String>( set );
-    }
-
-    @Override
-    public long getLostModifiedTimestamp()
-    {
-        long result = -1;
-        for ( EntrySource entrySource : entrySources )
-        {
-            result = Math.max( result, entrySource.getLostModifiedTimestamp() );
-        }
-        return result;
     }
 }
