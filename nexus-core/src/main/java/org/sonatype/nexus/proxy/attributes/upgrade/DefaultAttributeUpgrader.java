@@ -122,7 +122,11 @@ public class DefaultAttributeUpgrader
         {
             try
             {
-                ManagementFactory.getPlatformMBeanServer().unregisterMBean( jmxName );
+                final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+                if ( server.isRegistered( jmxName ) )
+                {
+                    server.unregisterMBean( jmxName );
+                }
             }
             catch ( final Exception e )
             {
