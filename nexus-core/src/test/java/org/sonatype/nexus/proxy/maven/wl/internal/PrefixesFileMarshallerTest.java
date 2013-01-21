@@ -52,6 +52,59 @@ public class PrefixesFileMarshallerTest
         return sw.toString();
     }
 
+    protected String prefixFile2( boolean withComments )
+    {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter( sw );
+        if ( withComments )
+        {
+            pw.println( "# This is mighty prefix file!" );
+        }
+        pw.println( "./org/apache/maven" );
+        pw.println( "./org/sonatype" );
+        if ( withComments )
+        {
+            pw.println( "# Added later" );
+        }
+        pw.println( "./eu/flatwhite" );
+        return sw.toString();
+    }
+
+    protected String prefixFile3( boolean withComments )
+    {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter( sw );
+        if ( withComments )
+        {
+            pw.println( "# This is mighty prefix file!" );
+        }
+        pw.println( "/" );
+        return sw.toString();
+    }
+
+    protected String prefixFile4( boolean withComments, boolean fixed )
+    {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter( sw );
+        if ( withComments )
+        {
+            pw.println( "# This is mighty prefix file!" );
+        }
+        if ( fixed )
+        {
+            pw.println( "/foo" );
+            pw.println( "/bar/blah" );
+            pw.println( "/bar/foo" );
+        }
+        else
+        {
+            pw.println( "foo" );
+            pw.println( "bar\\blah" );
+            pw.println( "\\\\bar////foo" );
+        }
+        return sw.toString();
+    }
+
     @Test
     public void roundtrip()
         throws IOException
@@ -66,5 +119,65 @@ public class PrefixesFileMarshallerTest
 
         final String output = new String( outputStream.toByteArray(), UTF8 );
         assertThat( output, equalTo( prefixFile1( false ) ) );
+    }
+
+    @Test
+    public void roundtrip2()
+        throws IOException
+    {
+        // prefixFile2 is "find created" like, see CENTRAL-515
+        final EntrySource readEntrySource = m.read( new ByteArrayInputStream( prefixFile2( true ).getBytes( UTF8 ) ) );
+        assertThat( readEntrySource.exists(), is( true ) );
+        assertThat( readEntrySource.readEntries().size(), is( 3 ) );
+
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        m.write( readEntrySource, outputStream );
+        assertThat( outputStream.size(), greaterThan( 15 ) );
+
+        final String output = new String( outputStream.toByteArray(), UTF8 );
+        // once read, the file looses "peculiarities" as dots from start and comments
+        // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
+        // passed on as-is (unchanged)
+        assertThat( output, equalTo( prefixFile1( false ) ) );
+    }
+
+    @Test
+    public void roundtrip3()
+        throws IOException
+    {
+        // prefixFile2 is "find created" like, see CENTRAL-515
+        final EntrySource readEntrySource = m.read( new ByteArrayInputStream( prefixFile3( true ).getBytes( UTF8 ) ) );
+        assertThat( readEntrySource.exists(), is( true ) );
+        assertThat( readEntrySource.readEntries().size(), is( 1 ) );
+
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        m.write( readEntrySource, outputStream );
+        assertThat( outputStream.size(), greaterThan( 1 ) );
+
+        final String output = new String( outputStream.toByteArray(), UTF8 );
+        // once read, the file looses "peculiarities" as dots from start and comments
+        // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
+        // passed on as-is (unchanged)
+        assertThat( output, equalTo( prefixFile3( false ) ) );
+    }
+
+    @Test
+    public void roundtrip4()
+        throws IOException
+    {
+        // prefixFile2 is "find created" like, see CENTRAL-515
+        final EntrySource readEntrySource = m.read( new ByteArrayInputStream( prefixFile4( true, false ).getBytes( UTF8 ) ) );
+        assertThat( readEntrySource.exists(), is( true ) );
+        assertThat( readEntrySource.readEntries().size(), is( 3 ) );
+
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        m.write( readEntrySource, outputStream );
+        assertThat( outputStream.size(), greaterThan( 1 ) );
+
+        final String output = new String( outputStream.toByteArray(), UTF8 );
+        // once read, the file looses "peculiarities" as dots from start and comments
+        // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
+        // passed on as-is (unchanged)
+        assertThat( output, equalTo( prefixFile4( false, true ) ) );
     }
 }

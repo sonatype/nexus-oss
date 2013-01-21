@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
+import static org.sonatype.nexus.util.PathUtils.elementsOf;
+import static org.sonatype.nexus.util.PathUtils.pathFrom;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,8 +77,8 @@ public class PrefixesFileMarshaller
                     }
                     // win file separators? Highly unlikely but still...
                     line = line.replace( '\\', '/' );
-
-                    entries.add( line );
+                    // normalization
+                    entries.add( pathFrom( elementsOf( line ) ) );
                 }
                 line = reader.readLine();
             }
