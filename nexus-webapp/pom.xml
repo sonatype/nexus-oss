@@ -346,6 +346,15 @@
             js/lib/*,
             style/sonatype-all.css
           </warSourceIncludes>
+          <webResources>
+            <resource>
+              <directory>${project.basedir}/src/main/webapp</directory>
+              <includes>
+                <include>js/**/*.js</include>
+                <include>style/**/*.css</include>
+              </includes>
+            </resource>
+          </webResources>
         </configuration>
       </plugin>
 
