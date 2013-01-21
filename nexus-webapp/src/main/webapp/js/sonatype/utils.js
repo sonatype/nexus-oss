@@ -130,11 +130,11 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonat
           }
           else
           {
-            Sonatype.MessageBox.show({
+            Ext.MessageBox.show({
                   title : 'Login Error',
                   msg : 'Incorrect username, password or no permission to use the Nexus User Interface.<br />Try again.' + serverMessage,
-                  buttons : Sonatype.MessageBox.OK,
-                  icon : Sonatype.MessageBox.ERROR,
+                  buttons : Ext.MessageBox.OK,
+                  icon : Ext.MessageBox.ERROR,
                   animEl : 'mb3',
                   fn : this.focusPassword
                 });
@@ -184,11 +184,11 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonat
                           )
                           // FIXME offerRestart is never used (?)
                           + (offerRestart ? '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' : '');
-        Sonatype.MessageBox.show({
+        Ext.MessageBox.show({
           title : "Error",
           msg : displayMessage,
-              buttons : offerRestart ? Sonatype.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
-              icon : Sonatype.MessageBox.ERROR,
+              buttons : offerRestart ? Ext.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
+              icon : Ext.MessageBox.ERROR,
               animEl : 'mb3',
               fn : function(button) {
                 if (offerRestart && button == "ok")
@@ -354,12 +354,12 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonat
 
     defaultToNo : function() {
       // @note: this handler selects the "No" button as the default
-      // @todo: could extend Sonatype.MessageBox to take the button to select as
+      // @todo: could extend Ext.MessageBox to take the button to select as
       // a param
-      Sonatype.MessageBox.getDialog().on('show', function() {
+      Ext.MessageBox.getDialog().on('show', function() {
             this.focusEl = this.buttons[2]; // ack! we're offset dependent here
             this.focus();
-          }, Sonatype.MessageBox.getDialog(), {
+          }, Ext.MessageBox.getDialog(), {
             single : true
           });
     },
@@ -432,11 +432,11 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonat
                                 url : Sonatype.config.repos.urls.usersForgotId + '/' + email,
                                 success : function(response, options) {
                                   w.close();
-                                  Sonatype.MessageBox.show({
+                                  Ext.MessageBox.show({
                                         title : 'Username Recovery',
                                         msg : 'Username request completed successfully.' + '<br /><br />' + 'Check your mailbox, the username reminder should arrive in a few minutes.',
-                                        buttons : Sonatype.MessageBox.OK,
-                                        icon : Sonatype.MessageBox.INFO,
+                                        buttons : Ext.MessageBox.OK,
+                                        icon : Ext.MessageBox.INFO,
                                         animEl : 'mb3'
                                       });
                                 },
@@ -515,11 +515,11 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonat
                                 url : Sonatype.config.repos.urls.usersForgotPassword,
                                 success : function(response, options) {
                                   w.close();
-                                  Sonatype.MessageBox.show({
+                                  Ext.MessageBox.show({
                                         title : 'Reset Password',
                                         msg : 'Password request completed successfully.' + '<br /><br />' + 'Check your mailbox, your new password should arrive in a few minutes.',
-                                        buttons : Sonatype.MessageBox.OK,
-                                        icon : Sonatype.MessageBox.INFO,
+                                        buttons : Ext.MessageBox.OK,
+                                        icon : Ext.MessageBox.INFO,
                                         animEl : 'mb3'
                                       });
                                 },
@@ -1161,7 +1161,7 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonat
     },
 
     createProblemReport : function(window, title, description, username, password, saveErrorReportingSettings) {
-      Sonatype.MessageBox.wait('Generating Report ...');
+      Ext.MessageBox.wait('Generating Report ...');
       Ext.Ajax.request({
             method : 'PUT',
             url : Sonatype.config.servicePath + '/error_reporting',
@@ -1187,11 +1187,11 @@ define('sonatype/utils',['../extjs', 'nexus/config', 'nexus/util/Format', 'sonat
               if (success)
               {
                 options.cbPassThru.window.close();
-                Sonatype.MessageBox.show({
+                Ext.MessageBox.show({
                       title : 'Problem Report Generated',
                       msg : 'Your Problem Report was generated <a href=' + json.data.jiraUrl + ' target="_new">here</a>.',
-                      buttons : Sonatype.MessageBox.OK,
-                      icon : Sonatype.MessageBox.INFO
+                      buttons : Ext.MessageBox.OK,
+                      icon : Ext.MessageBox.INFO
                     });
               }
               else
