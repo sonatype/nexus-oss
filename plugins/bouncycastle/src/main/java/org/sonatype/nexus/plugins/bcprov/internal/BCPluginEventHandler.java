@@ -7,7 +7,6 @@ import javax.inject.Named;
 
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugins.bcprov.BCManager;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -37,16 +36,6 @@ public class BCPluginEventHandler
     {
         this.bcManager = checkNotNull( bcManager );
         eventBus.register( this );
-    }
-
-    /**
-     * {@link NexusInitializedEvent} handler: registers BC provider.
-     * 
-     * @param e the event (not used)
-     */
-    @Subscribe
-    public void onNexusInitializedEvent( final NexusInitializedEvent e )
-    {
         bcManager.registerProvider();
     }
 
