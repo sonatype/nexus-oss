@@ -556,10 +556,3 @@ Ext.extend(Nexus.ext.TwinPanelChooser, Ext.Panel, {
 Ext.reg('twinpanelchooser', Nexus.ext.TwinPanelChooser);
 return Nexus;
 });
-
-define('sonatype/ext/twinpanelcontroller', ['sonatype', 'nexus/ext/twinpanelcontroller'], function(Sonatype, Nexus){
-Sonatype.ext.TwinPanelChooser = Nexus.ext.TwinPanelChooser;
-Sonatype.ext.TwinPanelController = Nexus.ext.TwinPanelController;
-return Sonatype;
-});
-
