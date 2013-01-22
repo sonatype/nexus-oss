@@ -32,6 +32,7 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.timing.Timed;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.rest.authentication.AbstractUIPermissionCalculatingPlexusResource;
@@ -70,6 +71,7 @@ public class StatusPlexusResource
     /**
      * Get the status of the nexus server.
      */
+    @Timed
     @Override
     @GET
     @ResourceMethodSignature( output = StatusResourceResponse.class )

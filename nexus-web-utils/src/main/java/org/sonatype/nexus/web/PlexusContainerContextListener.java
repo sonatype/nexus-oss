@@ -39,6 +39,7 @@ import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
 
 import com.google.inject.Module;
+import org.sonatype.nexus.timing.TimingModule;
 
 /**
  * This ServeletContextListener boots up Plexus in a webapp environment, if needed. It is safe to have it multiple times
@@ -80,6 +81,9 @@ public class PlexusContainerContextListener
                 final ArrayList<Module> modules = new ArrayList<Module>( 2 );
                 modules.add( new NexusWebModule( sce.getServletContext() ) );
                 modules.add( new AppContextModule( appContext ) );
+
+                // Add support for @Timed
+                modules.add( new TimingModule() );
 
                 final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );
 
