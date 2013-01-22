@@ -39,6 +39,8 @@ public class SiestaModule
 
     @Override
     protected void configure() {
+        install(new ShiroAopModule());
+
         // FIXME: Sort this out... nexus-restlet1x-plugin should not have anything to do with this plugin
 
         // We need to import some components from nexus-restlet1x-plugin for SecurityWebFilter, but its use is
@@ -49,9 +51,6 @@ public class SiestaModule
         // requireBinding's for SecuritySystem and FilterChainResolver, which are the filter's dependencies.
 
         bind(SecurityWebFilter.class);
-
-        // FIXME: Sort out if we want aspectj or guice-aop
-        //install(new ShiroAopModule());
 
         install(new org.sonatype.sisu.siesta.server.internal.SiestaModule());
         install(new SiestaJerseyModule());

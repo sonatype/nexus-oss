@@ -455,6 +455,26 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-guice</artifactId>
+        <version>${shiro.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-configuration</artifactId>
         <version>${plexus-security.version}</version>
