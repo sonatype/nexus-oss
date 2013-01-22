@@ -26,8 +26,11 @@ import java.util.List;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -169,6 +172,14 @@ public class WLUpdatePropagationTest
                 }
             }
         };
+    }
+
+    @Before
+    public void makeASStarted()
+        throws Exception
+    {
+        // this is needed to activate EventDispatcher, as nothing in current UI infra does this
+        lookup( ApplicationStatusSource.class ).setState( SystemState.STARTED );
     }
 
     protected String prefixFile1( boolean withComments )
