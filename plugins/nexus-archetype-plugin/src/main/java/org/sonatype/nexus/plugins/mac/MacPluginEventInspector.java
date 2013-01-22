@@ -14,6 +14,7 @@ package org.sonatype.nexus.plugins.mac;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
@@ -38,6 +39,8 @@ import org.sonatype.plexus.appevents.Event;
  * 
  * @author cstamas
  */
+@Named
+@Singleton
 public class MacPluginEventInspector
     extends AbstractLoggingComponent
     implements EventInspector

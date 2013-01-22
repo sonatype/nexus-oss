@@ -15,11 +15,13 @@ package org.sonatype.nexus.plugin.lucene.ui;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 
 @Named( "IndexerLuceneNexusIndexHtmlCustomizer" )
+@Singleton
 public class IndexerLuceneNexusIndexHtmlCustomizer
     extends AbstractNexusIndexHtmlCustomizer
     implements NexusIndexHtmlCustomizer

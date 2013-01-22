@@ -47,14 +47,8 @@ public abstract class AbstractStorageContext
     {
         if ( parent != null )
         {
-            int parentGeneration = parent.getGeneration();
-
-            if ( parentGeneration > generation.get() )
-            {
-                this.generation.set( parentGeneration );
-            }
+            return parent.getGeneration() + generation.get();
         }
-
         return generation.get();
     }
 

@@ -379,7 +379,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.6</version>
+        <version>1.7-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>javax.activation</groupId>
@@ -804,6 +804,12 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-api</artifactId>
         <version>1.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.javasimon</groupId>
+        <artifactId>javasimon-core</artifactId>
+        <version>3.3.0</version>
       </dependency>
 
       <!-- INTERNAL -->
