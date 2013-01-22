@@ -39,7 +39,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -1266,9 +1265,9 @@ public abstract class AbstractRepository
     }
 
     /**
-     * Check conditions, such as availability, permissions, etc. <<<<<<< HEAD
+     * Check conditions, such as availability, permissions, etc.
      * 
-     * @param request the request ======= >>>>>>> refs/heads/master
+     * @param request the request
      * @return false, if the request should not be processed with response appropriate for current method, or true is
      *         execution should continue as usual.
      * @throws RepositoryNotAvailableException the repository not available exception
@@ -1310,7 +1309,7 @@ public abstract class AbstractRepository
             {
                 if ( !processor.process( this, request, action ) )
                 {
-                    request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
+                    request.addItemNotFoundReason( reasonFor( request, this,
                         "Processing of request %s in repository %s prevented.", request.getRequestPath(),
                         RepositoryStringUtils.getHumanizedNameString( this ) ) );
                     return false;
@@ -1330,7 +1329,7 @@ public abstract class AbstractRepository
             {
                 if ( !processor.shouldRetrieve( this, request, item ) )
                 {
-                    request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
+                    request.addItemNotFoundReason( reasonFor( request, this,
                         "Retrieval of request %s in repository %s prevented.", request.getRequestPath(),
                         RepositoryStringUtils.getHumanizedNameString( this ) ) );
                     return false;

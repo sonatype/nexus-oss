@@ -1836,7 +1836,8 @@ public abstract class AbstractProxyRepository
                         setRemoteStatus(
                             RemoteStatus.UNAVAILABLE,
                             new ItemNotFoundException( checkReasonFrom( request, AbstractProxyRepository.this,
-                                "Proxy mode %s forbids remote storage use.", getProxyMode() ) ) );
+                                "Proxy mode %s or repository %s forbids remote storage use.", getProxyMode(),
+                                RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
                     }
                     else
                     {
@@ -1847,7 +1848,9 @@ public abstract class AbstractProxyRepository
                         else
                         {
                             autoBlockProxying( new ItemNotFoundException( checkReasonFrom( request,
-                                AbstractProxyRepository.this, "Remote detected as unavailable by remote storage." ) ) );
+                                AbstractProxyRepository.this,
+                                "Remote peer of repository %s detected as unavailable.",
+                                RepositoryStringUtils.getHumanizedNameString( AbstractProxyRepository.this ) ) ) );
                         }
                     }
                 }

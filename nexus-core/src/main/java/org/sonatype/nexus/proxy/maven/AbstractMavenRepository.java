@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,7 +26,6 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -391,7 +392,7 @@ public abstract class AbstractMavenRepository
                     "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
             }
 
-            throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, this,
+            throw new ItemNotFoundException( reasonFor( request, this,
                 "Retrieval of %s from %s is forbidden by repository policy %s.", request.getRequestPath(),
                 RepositoryStringUtils.getHumanizedNameString( this ), getRepositoryPolicy() ) );
         }

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +28,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -329,7 +330,7 @@ public class ArtifactStoreHelper
 
             if ( gav == null )
             {
-                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( gavRequest, repository,
+                throw new ItemNotFoundException( reasonFor( gavRequest, repository,
                     "Request %s is not resolvable in repository %s", gavRequest.getRequestPath(),
                     RepositoryStringUtils.getHumanizedNameString( repository ) ) );
             }
