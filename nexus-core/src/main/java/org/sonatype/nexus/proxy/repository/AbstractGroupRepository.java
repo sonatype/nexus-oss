@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import static org.sonatype.nexus.proxy.ItemNotFoundReasons.checkReasonFrom;
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,11 +26,9 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -57,7 +55,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.charger.CallableExecutor;
 import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
 import org.sonatype.sisu.charger.internal.FirstArrivedInOrderChargeStrategy;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -253,8 +251,9 @@ public abstract class AbstractGroupRepository
         }
         else
         {
-            request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
-                "The request for %s in group repository %s is group-local-only,  no member processing happened." ) );
+            request.addItemNotFoundReason( reasonFor( request, this,
+                "The %s not found in local storage of group repository %s (no member processing happened).",
+                request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
 
         if ( !found )
@@ -409,8 +408,9 @@ public abstract class AbstractGroupRepository
             }
             else
             {
-                request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
-                    "The request for %s in group repository %s is group-local-only,  no member processing happened." ) );
+                request.addItemNotFoundReason( reasonFor( request, this,
+                    "The %s not found in local storage of group repository %s (no member processing happened).",
+                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
             }
         }
         finally
@@ -652,8 +652,9 @@ public abstract class AbstractGroupRepository
         }
         else
         {
-            request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
-                "The request for %s in group repository %s is group-local-only,  no member processing happened." ) );
+            request.addItemNotFoundReason( reasonFor( request, this,
+                "The %s not found in local storage of group repository %s (no member processing happened).",
+                request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
 
         if ( items.isEmpty() )

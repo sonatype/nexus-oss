@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven.maven2;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +32,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -215,7 +216,7 @@ public class M2GroupRepository
 
         if ( items.isEmpty() )
         {
-            throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, this,
+            throw new ItemNotFoundException( reasonFor( request, this,
                 "Metadata %s not found in any of the members of %s.", request.getRequestPath(),
                 RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
@@ -267,7 +268,7 @@ public class M2GroupRepository
 
             if ( existingMetadatas.isEmpty() )
             {
-                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, this,
+                throw new ItemNotFoundException( reasonFor( request, this,
                     "Metadata %s not parseable in any of the members of %s.", request.getRequestPath(),
                     RepositoryStringUtils.getHumanizedNameString( this ) ) );
             }
