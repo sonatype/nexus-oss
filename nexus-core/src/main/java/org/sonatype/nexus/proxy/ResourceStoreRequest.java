@@ -19,8 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -45,9 +48,12 @@ public class ResourceStoreRequest
     /** Used internally to track applied mappins */
     private final Map<String, List<String>> appliedMappings;
 
+    /** Used internally to track reasons why request cannot be fulfilled */
+    private final List<ItemNotFoundInRepositoryReason> notFoundReasons;
+
     /**
      * Constructor.
-     *
+     * 
      * @param requestPath the request path.
      * @param localOnly See {@link RequestContext#CTX_LOCAL_ONLY_FLAG}.
      * @param remoteOnly See {@link RequestContext#CTX_REMOTE_ONLY_FLAG}.
@@ -58,6 +64,7 @@ public class ResourceStoreRequest
         this.pathStack = new Stack<String>();
         this.processedRepositories = new ArrayList<String>();
         this.appliedMappings = new HashMap<String, List<String>>();
+        this.notFoundReasons = new ArrayList<ItemNotFoundInRepositoryReason>();
         this.requestContext = new RequestContext();
         this.requestContext.setRequestLocalOnly( localOnly );
         this.requestContext.setRequestRemoteOnly( remoteOnly );
@@ -65,7 +72,7 @@ public class ResourceStoreRequest
 
     /**
      * Shortcut constructor.
-     *
+     * 
      * @param requestPath
      * @param localOnly
      * @deprecated use {@link #ResourceStoreRequest(String, boolean, boolean)} instead.
@@ -77,7 +84,7 @@ public class ResourceStoreRequest
 
     /**
      * Shortcut constructor.
-     *
+     * 
      * @param requestPath
      */
     public ResourceStoreRequest( String requestPath )
@@ -266,7 +273,7 @@ public class ResourceStoreRequest
      */
     public List<String> getProcessedRepositories()
     {
-        return Collections.unmodifiableList( processedRepositories);
+        return Collections.unmodifiableList( processedRepositories );
     }
 
     /**
@@ -393,15 +400,55 @@ public class ResourceStoreRequest
         return appliedMappings;
     }
 
+    /**
+     * Adds a {@link ItemNotFoundReason} to this request used when (if at all) constructing
+     * {@link ItemNotFoundException} for this request. This makes possible to "hint" the not found outcome in advance,
+     * even before exception is being thrown, typically like when {@link #setRequestLocalOnly(boolean)} flag is used,
+     * and a {@link ProxyRepository} is asked for retrieval.
+     * 
+     * @param reason
+     * @since 2.4
+     */
+    public void addItemNotFoundReason( final ItemNotFoundInRepositoryReason reason )
+    {
+        this.notFoundReasons.add( reason );
+    }
+
+    /**
+     * Returns a copy of the the existing {@link ItemNotFoundReason} list. List order is in recording order, first
+     * recorded is first in list, last recorded is last in list.
+     * 
+     * @return a copy of the existing {@link ItemNotFoundReason} instances in this instance.
+     * @since 2.4
+     */
+    public List<ItemNotFoundInRepositoryReason> getItemNotFoundReasons()
+    {
+        return new ArrayList<ItemNotFoundInRepositoryReason>( notFoundReasons );
+    }
+
+    /**
+     * Returns the last recorded reason why item requested by this request is not to be found, or {@code null} if none
+     * exists.
+     * 
+     * @return the last recorded reason or {@code null}.
+     * @since 2.4
+     */
+    public ItemNotFoundInRepositoryReason getLastItemNotFoundReason()
+    {
+        if ( !notFoundReasons.isEmpty() )
+        {
+            return notFoundReasons.get( notFoundReasons.size() - 1 );
+        }
+        return null;
+    }
+
+    // ==
+
     @Override
     public String toString()
     {
-        return "ResourceStoreRequest{" +
-            "requestPath='" + requestPath + '\'' +
-            ", requestContext=" + requestContext +
-            ", pathStack=" + pathStack +
-            ", processedRepositories=" + processedRepositories +
-            ", appliedMappings=" + appliedMappings +
-            '}';
+        return "ResourceStoreRequest{" + "requestPath='" + requestPath + '\'' + ", requestContext=" + requestContext
+            + ", pathStack=" + pathStack + ", processedRepositories=" + processedRepositories + ", appliedMappings="
+            + appliedMappings + '}';
     }
 }

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.index;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -100,7 +102,6 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -1236,8 +1237,9 @@ public class DefaultIndexerManager
                     }
                     else
                     {
-                        throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( req, repository,
-                            "Repository %s not a proxy, not retrieving index file %s!",
+                        // why were we called at all???
+                        throw new ItemNotFoundException( reasonFor( req, repository,
+                            "BUG: Repository %s is not a proxy, cannot retrieve remote index file %s!",
                             RepositoryStringUtils.getHumanizedNameString( repository ), req.getRequestPath() ) );
                     }
 

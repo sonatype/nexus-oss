@@ -330,7 +330,7 @@ public class ArtifactStoreHelper
             if ( gav == null )
             {
                 throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( gavRequest, repository,
-                    "Request %s is not resolvable in repository %s", gavRequest.toString(),
+                    "Request %s is not resolvable in repository %s", gavRequest.getRequestPath(),
                     RepositoryStringUtils.getHumanizedNameString( repository ) ) );
             }
 

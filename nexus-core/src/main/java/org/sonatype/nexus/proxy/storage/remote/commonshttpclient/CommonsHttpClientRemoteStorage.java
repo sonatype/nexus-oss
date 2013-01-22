@@ -130,9 +130,7 @@ public class CommonsHttpClientRemoteStorage
                 // give us URL with ending "/"
                 method.releaseConnection();
 
-                throw new RemoteItemNotFoundException(
-                    "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
-                        + remoteURL.toString() + "\")", request, repository );
+                throw new RemoteItemNotFoundException( request, repository, "remoteIsCollection", remoteURL.toString() );
             }
 
             GetMethod get = (GetMethod) method;
@@ -202,9 +200,7 @@ public class CommonsHttpClientRemoteStorage
 
             if ( response == HttpStatus.SC_NOT_FOUND )
             {
-                throw new RemoteItemNotFoundException(
-                    "The remoteURL we requested does not exists on remote server (remoteUrl=\"" + remoteURL.toString()
-                        + "\", response code is 404)", request, repository );
+                throw new RemoteItemNotFoundException( request, repository, "NotFound", remoteURL.toString() );
             }
             else
             {

@@ -46,6 +46,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
@@ -391,7 +392,8 @@ public abstract class AbstractMavenRepository
             }
 
             throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, this,
-                "Retrieval forbidden by repository policy." ) );
+                "Retrieval of %s from %s is forbidden by repository policy %s.", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( this ), getRepositoryPolicy() ) );
         }
 
         return super.doRetrieveItem( request );

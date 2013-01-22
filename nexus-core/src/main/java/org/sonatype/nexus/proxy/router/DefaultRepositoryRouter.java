@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.router;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -55,6 +57,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
@@ -502,8 +505,10 @@ public class DefaultRepositoryRouter
             {
                 // unknown explodedPath[0]
                 throw new ItemNotFoundException(
-                    ItemNotFoundReasons.reasonFor( request,
-                        "Unknown repository kind (bug, as this method should not be invoked with path having less than 2 segments)!" ) );
+                    reasonFor(
+                        request,
+                        "BUG: Cannot deduce repository kind from request %s (this method should not be invoked with path having less than 2 segments)!",
+                        request.getRequestPath() ) );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0] ) );
@@ -523,14 +528,14 @@ public class DefaultRepositoryRouter
                 if ( !repository.isExposed() )
                 {
                     // this is not the main facet or the repo is not exposed
-                    throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request,
-                        "Repository is not exposed!" ) );
+                    throw new ItemNotFoundException( reasonFor( request, "Repository %s exists but is not exposed!",
+                        RepositoryStringUtils.getHumanizedNameString( repository ) ) );
                 }
             }
             catch ( NoSuchRepositoryException e )
             {
                 // obviously, the repoId (explodedPath[1]) points to some nonexistent repoID
-                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, e.getMessage() ), e );
+                throw new ItemNotFoundException( reasonFor( request, e.getMessage() ), e );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0], explodedPath[1] ) );
@@ -654,8 +659,8 @@ public class DefaultRepositoryRouter
             // if no prefix matched, Item not found
             if ( repositories == null || repositories.isEmpty() )
             {
-                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request,
-                    "No repositories found for given prefix!" ) );
+                throw new ItemNotFoundException( reasonFor( request,
+                    "No repositories found for given %s prefix!", route.getStrippedPrefix() ) );
             }
 
             // filter access to the repositories
@@ -697,7 +702,8 @@ public class DefaultRepositoryRouter
         }
         else
         {
-            throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, "No listable entry found!" ) );
+            throw new ItemNotFoundException( reasonFor( request,
+                "BUG: request depth is bigger than 1, route=%s", route ) );
         }
     }
 

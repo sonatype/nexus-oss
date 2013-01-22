@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -22,7 +24,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -584,7 +585,7 @@ public abstract class LayoutConverterShadowRepository
 
             if ( transformedPath == null )
             {
-                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request, this,
+                throw new ItemNotFoundException( reasonFor( request, this,
                     "Request path %s is not transformable to master.", request.getRequestPath() ) );
             }
 

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.rest;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -50,7 +52,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageEofException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -646,8 +647,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
             // make sure we have valid content
             if ( result == null )
             {
-                throw new ItemNotFoundException( ItemNotFoundReasons.reasonFor( request,
-                    "View provider keyed \"%s\" did not provide valid content.", key ) );
+                throw new ItemNotFoundException( reasonFor( request,
+                    "View provider keyed \"%s\" did not provide content.", key ) );
             }
             else
             {

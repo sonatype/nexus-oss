@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.checkReasonFrom;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Thrown by the {@link GroupRepository#retrieveItem(ResourceStoreRequest)},
@@ -42,21 +45,34 @@ public class GroupItemNotFoundException
      * 
      * @param request
      * @param repository
+     * @param memberReasons
      */
     public GroupItemNotFoundException( final ResourceStoreRequest request, final GroupRepository repository,
                                        final Map<Repository, Throwable> memberReasons )
     {
-        super( request, repository );
+        super( checkReasonFrom( request, repository, "Path %s not found in group repository %s.",
+            RepositoryStringUtils.getHumanizedNameString( repository ) ) );
         // copy it and make it unmodifiable
         this.memberReasons = Collections.unmodifiableMap( new HashMap<Repository, Throwable>( memberReasons ) );
     }
 
     @Override
-    public GroupRepository getRepository()
+    public ItemNotFoundInRepositoryReason getReason()
     {
-        return (GroupRepository) super.getRepository();
+        return (ItemNotFoundInRepositoryReason) super.getReason();
     }
 
+    @Override
+    public GroupRepository getRepository()
+    {
+        return (GroupRepository) getReason().getRepository();
+    }
+
+    /**
+     * Returns the map of reasons ({@link Throwable} instances) per Repository.
+     * 
+     * @return the map of reasons.
+     */
     public Map<Repository, Throwable> getMemberReasons()
     {
         return memberReasons;

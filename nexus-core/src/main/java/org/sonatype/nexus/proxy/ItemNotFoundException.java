@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import org.sonatype.nexus.proxy.ItemNotFoundReason.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
@@ -25,6 +24,45 @@ public class ItemNotFoundException
     extends Exception
 {
     private static final long serialVersionUID = -4964273361722823796L;
+
+    /**
+     * Reason of the item not found.
+     * 
+     * @since 2.4
+     */
+    public static interface ItemNotFoundReason
+    {
+        /**
+         * The textual reason why item was not found.
+         * 
+         * @return the textual explanation.
+         */
+        String getMessage();
+
+        /**
+         * The resource store request that is unable to be fulfilled.
+         * 
+         * @return the request resulting in not found.
+         */
+        ResourceStoreRequest getResourceStoreRequest();
+
+    }
+
+    /**
+     * Reason of the item not found that involved a {@link Repository} too.
+     * 
+     * @since 2.4
+     */
+    public interface ItemNotFoundInRepositoryReason
+        extends ItemNotFoundReason
+    {
+        /**
+         * Returns the involved repository.
+         * 
+         * @return the repository.
+         */
+        Repository getRepository();
+    }
 
     private final ItemNotFoundReason reason;
 
@@ -114,8 +152,6 @@ public class ItemNotFoundException
             + RepositoryStringUtils.getHumanizedNameString( repository ) + "\"!" : "Item not found for request \""
             + String.valueOf( request ) + "\"!", request, repository, cause );
     }
-
-    // ==
 
     /**
      * Protected constructor, to be used by this class and subclass constructors.

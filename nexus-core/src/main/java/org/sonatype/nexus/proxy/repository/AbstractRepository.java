@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.checkReasonFrom;
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -36,6 +39,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -99,14 +103,14 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  * </ul>
  * <p>
  * The subclasses only needs to implement the abstract method focusing on item retrieaval and other "basic" functions.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractRepository
     extends ConfigurableRepository
     implements Repository
 {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -279,7 +283,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the cache manager.
-     *
+     * 
      * @return the cache manager
      */
     protected CacheManager getCacheManager()
@@ -289,7 +293,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the cache manager.
-     *
+     * 
      * @param cacheManager the new cache manager
      */
     protected void setCacheManager( CacheManager cacheManager )
@@ -299,7 +303,7 @@ public abstract class AbstractRepository
 
     /**
      * Returns the repository Item Uid Factory.
-     *
+     * 
      * @return
      */
     protected RepositoryItemUidFactory getRepositoryItemUidFactory()
@@ -309,7 +313,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the not found cache.
-     *
+     * 
      * @return the not found cache
      */
     public PathCache getNotFoundCache()
@@ -325,7 +329,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the not found cache.
-     *
+     * 
      * @param notFoundcache the new not found cache
      */
     public void setNotFoundCache( PathCache notFoundcache )
@@ -537,10 +541,8 @@ public abstract class AbstractRepository
         }
 
         eventBus().post(
-            new RepositoryEventExpireNotFoundCaches(
-                this, request.getRequestPath(), request.getRequestContext().flatten(), cacheAltered
-            )
-        );
+            new RepositoryEventExpireNotFoundCaches( this, request.getRequestPath(),
+                request.getRequestContext().flatten(), cacheAltered ) );
 
         return cacheAltered;
     }
@@ -640,7 +642,9 @@ public abstract class AbstractRepository
     {
         if ( !checkConditions( request, Action.read ) )
         {
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( checkReasonFrom( request, this,
+                "Retrieval of path %s is rejected by repository %s.", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
 
         StorageItem item = retrieveItem( false, request );
@@ -651,12 +655,15 @@ public abstract class AbstractRepository
                 getId() + " retrieveItem() :: FOUND a collection on " + request.toString()
                     + " but repository is not Browseable." );
 
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable.",
+                RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
 
         if ( !checkPostConditions( request, item ) )
         {
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( checkReasonFrom( request, this,
+                "Retrieval of path %s is rejected by repository %s.", request.getRequestPath(),
+                RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
 
         return item;
@@ -753,7 +760,7 @@ public abstract class AbstractRepository
     {
         if ( !checkConditions( request, Action.read ) )
         {
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( checkReasonFrom( request, this ) );
         }
 
         Collection<StorageItem> items = null;
@@ -764,7 +771,7 @@ public abstract class AbstractRepository
         }
         else
         {
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this, "Repository %s is not browsable!" ) );
         }
 
         return items;
@@ -862,7 +869,7 @@ public abstract class AbstractRepository
                             "The file in repository %s on path=\"%s\" should be generated by ContentGeneratorId=%s, but component does not exists!",
                             RepositoryStringUtils.getHumanizedNameString( this ), uid.getPath(), key ) );
 
-                    throw new ItemNotFoundException( request, this );
+                    throw new ItemNotFoundException( reasonFor( request, this, "The generator for generated path %s not found!" ) );
                 }
             }
 
@@ -1132,7 +1139,8 @@ public abstract class AbstractRepository
         }
         else
         {
-            throw new ItemNotFoundException( request, this );
+            throw new ItemNotFoundException( reasonFor( request, this, "Path %s in repository %s is not a collection.",
+                request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
         }
     }
 
@@ -1176,7 +1184,7 @@ public abstract class AbstractRepository
     // Inner stuff
     /**
      * Maintains not found cache.
-     *
+     * 
      * @throws ItemNotFoundException the item not found exception
      */
     public void maintainNotFoundCache( ResourceStoreRequest request )
@@ -1204,7 +1212,9 @@ public abstract class AbstractRepository
                                 + " is in NFC and still active, throwing ItemNotFoundException." );
                     }
 
-                    throw new ItemNotFoundException( request, this );
+                    throw new ItemNotFoundException( reasonFor( request, this,
+                        "The path %s is in NFC of repository %s.", request.getRequestPath(),
+                        RepositoryStringUtils.getHumanizedNameString( this ) ) );
                 }
             }
         }
@@ -1256,12 +1266,9 @@ public abstract class AbstractRepository
     }
 
     /**
-     * Check conditions, such as availability, permissions, etc.
-     *
-<<<<<<< HEAD
-     * @param request the request
-=======
->>>>>>> refs/heads/master
+     * Check conditions, such as availability, permissions, etc. <<<<<<< HEAD
+     * 
+     * @param request the request ======= >>>>>>> refs/heads/master
      * @return false, if the request should not be processed with response appropriate for current method, or true is
      *         execution should continue as usual.
      * @throws RepositoryNotAvailableException the repository not available exception
@@ -1303,6 +1310,9 @@ public abstract class AbstractRepository
             {
                 if ( !processor.process( this, request, action ) )
                 {
+                    request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
+                        "Processing of request %s in repository %s forbidden.", request.getRequestPath(),
+                        RepositoryStringUtils.getHumanizedNameString( this ) ) );
                     return false;
                 }
             }
@@ -1320,6 +1330,9 @@ public abstract class AbstractRepository
             {
                 if ( !processor.shouldRetrieve( this, request, item ) )
                 {
+                    request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
+                        "Retrieval of request %s in repository %s forbidden.", request.getRequestPath(),
+                        RepositoryStringUtils.getHumanizedNameString( this ) ) );
                     return false;
                 }
             }
@@ -1416,7 +1429,7 @@ public abstract class AbstractRepository
 
     /**
      * Whether or not the requested path should be added to NFC. Item will be added to NFC if is not local/remote only.
-     *
+     * 
      * @param request resource store request
      * @return true if requested path should be added to NFC
      * @since 2.0

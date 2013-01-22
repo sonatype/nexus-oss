@@ -27,7 +27,6 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreHelper;
@@ -128,16 +127,12 @@ public class ArtifactResolvePlexusResource
 
         try
         {
-            MavenRepository mavenRepository = getMavenRepository( repositoryId );
+            final MavenRepository mavenRepository = getMavenRepository( repositoryId );
 
-            ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
+            final ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
-            Gav resolvedGav = helper.resolveArtifact( gavRequest );
-
-            if ( resolvedGav == null )
-            {
-                throw new ItemNotFoundException( gavRequest, mavenRepository );
-            }
+            // not returning null, will throw INFEx instead
+            final Gav resolvedGav = helper.resolveArtifact( gavRequest );
 
             String repositoryPath = mavenRepository.getGavCalculator().gavToPath( resolvedGav );
 

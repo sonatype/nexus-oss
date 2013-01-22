@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -29,6 +31,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Maven checksum content validator.
@@ -150,8 +153,8 @@ public class ChecksumContentValidator
                 }
                 catch ( IOException e )
                 {
-                    getLogger().warn( "Cannot read hash string for remotely fetched StorageFileItem: " + uid.toString(),
-                                      e );
+                    getLogger().warn(
+                        "Cannot read hash string for remotely fetched StorageFileItem: " + uid.toString(), e );
                 }
             }
             finally
@@ -182,11 +185,17 @@ public class ChecksumContentValidator
         }
         catch ( RemoteAccessException e )
         {
-            throw new ItemNotFoundException( request, proxy, e );
+            // not quite true, but this was told before too
+            throw new ItemNotFoundException( reasonFor( request, proxy,
+                "Path %s not found in repository %s",
+                RepositoryStringUtils.getHumanizedNameString( proxy ) ), e );
         }
         catch ( RemoteStorageException e )
         {
-            throw new ItemNotFoundException( request, proxy, e );
+            // not quite true, but this was told before too
+            throw new ItemNotFoundException( reasonFor( request, proxy,
+                "Path %s not found in repository %s",
+                RepositoryStringUtils.getHumanizedNameString( proxy ) ), e );
         }
     }
 }

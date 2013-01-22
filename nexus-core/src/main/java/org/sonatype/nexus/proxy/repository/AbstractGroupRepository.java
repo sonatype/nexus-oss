@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import static org.sonatype.nexus.proxy.ItemNotFoundReasons.checkReasonFrom;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +30,7 @@ import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -59,7 +62,7 @@ import com.google.common.eventbus.Subscribe;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractGroupRepository
@@ -116,7 +119,7 @@ public abstract class AbstractGroupRepository
             membersChanged =
                 getCurrentCoreConfiguration().isDirty()
                     && !getExternalConfiguration( false ).getMemberRepositoryIds().equals(
-                    getExternalConfiguration( true ).getMemberRepositoryIds() );
+                        getExternalConfiguration( true ).getMemberRepositoryIds() );
 
             // we have to "remember" these before commit happens in super.onEvent
             // but ONLY if we are dirty and we do have "member changes" (see membersChanged above)
@@ -247,6 +250,11 @@ public abstract class AbstractGroupRepository
                     }
                 }
             }
+        }
+        else
+        {
+            request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
+                "The request for %s in group repository %s is group-local-only,  no member processing happened." ) );
         }
 
         if ( !found )
@@ -399,6 +407,11 @@ public abstract class AbstractGroupRepository
                     }
                 }
             }
+            else
+            {
+                request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
+                    "The request for %s in group repository %s is group-local-only,  no member processing happened." ) );
+            }
         }
         finally
         {
@@ -505,7 +518,7 @@ public abstract class AbstractGroupRepository
                 {
                     this.getLogger().warn( "Could not find repository '{}' while iterating members", repoId );
                 }
-                // XXX throw new StorageException( e )  ;
+                // XXX throw new StorageException( e ) ;
             }
         }
 
@@ -636,6 +649,11 @@ public abstract class AbstractGroupRepository
                     }
                 }
             }
+        }
+        else
+        {
+            request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
+                "The request for %s in group repository %s is group-local-only,  no member processing happened." ) );
         }
 
         if ( items.isEmpty() )
