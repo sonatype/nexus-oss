@@ -157,6 +157,10 @@
       <artifactId>sisu-inject-bean</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.sisu.inject</groupId>
       <artifactId>guice-multibindings</artifactId>
     </dependency>
@@ -241,6 +245,11 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.javasimon</groupId>
+      <artifactId>javasimon-core</artifactId>
     </dependency>
 
     <!-- Testing -->

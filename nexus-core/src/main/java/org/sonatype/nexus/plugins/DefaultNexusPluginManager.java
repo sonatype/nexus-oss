@@ -54,6 +54,8 @@ import org.sonatype.nexus.proxy.maven.version.Version;
 import org.sonatype.nexus.proxy.maven.version.VersionParser;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.timing.Timed;
+import org.sonatype.nexus.timing.TimingModule;
 import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
@@ -132,6 +134,7 @@ public class DefaultNexusPluginManager
         return new HashMap<GAVCoordinate, PluginResponse>( pluginResponses );
     }
 
+    @Timed("nexus.pluginManager.activatePlugins")
     public Collection<PluginManagerResponse> activateInstalledPlugins()
     {
         final List<PluginManagerResponse> result = new ArrayList<PluginManagerResponse>();
@@ -266,6 +269,7 @@ public class DefaultNexusPluginManager
         return getActivatedPluginGav( gav, strict ) != null;
     }
 
+    @Timed
     protected PluginManagerResponse activatePlugin( final GAVCoordinate gav, final boolean strict,
                                                     final Set<GAVCoordinate> installedPluginsFilteredByGA )
     {
@@ -462,7 +466,14 @@ public class DefaultNexusPluginManager
         final ClassSpace annSpace = new URLClassSpace( pluginRealm, scanList.toArray( new URL[scanList.size()] ) );
         beanModules.add( new NexusAnnotatedBeanModule( annSpace, variables, exportedClassNames, repositoryTypes ) );
 
-        container.addPlexusInjector( beanModules, resourceModule );
+        final Module[] modules = {
+            resourceModule,
+
+            // Add support for @Timed
+            new TimingModule()
+        };
+
+        container.addPlexusInjector( beanModules, modules );
 
         for ( final RepositoryTypeDescriptor r : repositoryTypes )
         {

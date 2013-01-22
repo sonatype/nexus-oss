@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.sonatype.plugin.ExtensionPoint;
 
-import com.google.inject.Singleton;
+import javax.inject.Singleton;
 
 /**
  * RepositoryItemUid Attribute source that is contributing attributes to core.
