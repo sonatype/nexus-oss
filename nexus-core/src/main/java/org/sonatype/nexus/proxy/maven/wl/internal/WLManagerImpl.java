@@ -291,25 +291,36 @@ public class WLManagerImpl
         final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
         if ( mavenProxyRepository == null )
         {
-            discoveryStatus = new WLDiscoveryStatus( DStatus.NOT_A_PROXY, null, -1 );
+            discoveryStatus = new WLDiscoveryStatus( DStatus.NOT_A_PROXY, null, null, -1 );
         }
         else
         {
             final WLDiscoveryConfig discoveryConfig = getRemoteDiscoveryConfig( mavenProxyRepository );
             if ( !discoveryConfig.isEnabled() )
             {
-                discoveryStatus = new WLDiscoveryStatus( DStatus.DISABLED, null, -1 );
+                discoveryStatus = new WLDiscoveryStatus( DStatus.DISABLED, null, null, -1 );
             }
             else
             {
                 if ( !publishedEntrySource.exists() )
                 {
-                    discoveryStatus = new WLDiscoveryStatus( DStatus.FAILED, null, -1 );
+                    // still running
+                    discoveryStatus = new WLDiscoveryStatus( DStatus.ENABLED, null, null, -1 );
+                    
+                    // TODO: decide from persisted informations
+                    discoveryStatus = new WLDiscoveryStatus( DStatus.FAILED, "dunno-yet", "no msg yet", -1 );
                 }
                 else
                 {
+                    // wrt lastDiscoveryTimestamp that is set to publishedEntrySource.getLostModifiedTimestamp()
+                    // if prefix file is used, Nexus eagerly keeps remote file timestamps (if remote server sends those), and
+                    // proxy cache will have set it's file timestamp to the one got from remote. In this case, the value is fine
+                    // as it will be actually the "prefix file published" date!
+                    // if scrape is used, again, the prefix file _generated_ from the scrape results will retain it's timestamp
+                    // of the moment when it was saved (as last step of discovery), hence, the moment when scrap did finish successfully
+                    // it is the FAILED case, where the lastDiscoveryTimestamp will come from persisted info, and will mean "last failed"
                     discoveryStatus =
-                        new WLDiscoveryStatus( DStatus.SUCCESSFUL, "dunno-yet",
+                        new WLDiscoveryStatus( DStatus.SUCCESSFUL, "dunno-yet", "no msg yet",
                             publishedEntrySource.getLostModifiedTimestamp() );
                 }
             }

@@ -38,6 +38,11 @@ public class WLDiscoveryStatus
         DISABLED,
 
         /**
+         * Remote discovery enabled without results yet (is still working).
+         */
+        ENABLED,
+
+        /**
          * Remote discovery enabled and was successful.
          */
         SUCCESSFUL,
@@ -52,6 +57,8 @@ public class WLDiscoveryStatus
 
     private final String lastDiscoveryStrategy;
 
+    private final String lastDiscoveryMessage;
+
     private final long lastDiscoveryTimestamp;
 
     /**
@@ -59,18 +66,21 @@ public class WLDiscoveryStatus
      * 
      * @param status
      * @param lastDiscoveryStrategy
+     * @param lastDiscoveryMessage
      * @param lastDiscoveryTimestamp
      */
     public WLDiscoveryStatus( final DStatus status, final String lastDiscoveryStrategy,
-                              final long lastDiscoveryTimestamp )
+                              final String lastDiscoveryMessage, final long lastDiscoveryTimestamp )
     {
         this.status = checkNotNull( status );
         this.lastDiscoveryStrategy = lastDiscoveryStrategy;
+        this.lastDiscoveryMessage = lastDiscoveryMessage;
         this.lastDiscoveryTimestamp = lastDiscoveryTimestamp;
     }
 
     /**
      * Remote discovery status.
+     * 
      * @return remote discovery status.
      */
     public DStatus getStatus()
@@ -90,9 +100,21 @@ public class WLDiscoveryStatus
         }
     }
 
+    public String getLastDiscoveryMessage()
+    {
+        if ( getStatus().ordinal() > DStatus.ENABLED.ordinal() )
+        {
+            return lastDiscoveryMessage;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public long getLastDiscoveryTimestamp()
     {
-        if ( getStatus() == DStatus.SUCCESSFUL )
+        if ( getStatus().ordinal() > DStatus.ENABLED.ordinal() )
         {
             return lastDiscoveryTimestamp;
         }
