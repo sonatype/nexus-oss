@@ -271,18 +271,6 @@
         </plugin>
 
         <!--
-        Required for nexus-plugin packaging (via nexus-plugin-bundle-maven-plugin).
-        -->
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>aspectj-maven-plugin</artifactId>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-          </configuration>
-        </plugin>
-
-        <!--
         For legacy-plugins which still need Plexus descriptors.
         -->
         <plugin>

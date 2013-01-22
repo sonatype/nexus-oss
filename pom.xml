@@ -181,7 +181,6 @@
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
     <goodies.version>1.5.1</goodies.version>
-    <aspectj.version>1.6.12</aspectj.version>
 
     <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -215,18 +214,6 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-model</artifactId>
         <version>1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjrt</artifactId>
-        <version>${aspectj.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjweaver</artifactId>
-        <version>${aspectj.version}</version>
       </dependency>
 
       <dependency>
@@ -465,12 +452,6 @@
             <artifactId>commons-beanutils</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-aspectj</artifactId>
-        <version>${shiro.version}</version>
       </dependency>
 
       <dependency>
@@ -985,57 +966,6 @@
           <configuration>
             <source>1.6</source>
             <target>1.6</target>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>aspectj-maven-plugin</artifactId>
-          <version>1.4</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.aspectj</groupId>
-              <artifactId>aspectjtools</artifactId>
-              <version>${aspectj.version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>compile</goal>
-                <goal>test-compile</goal>
-              </goals>
-              <configuration>
-                <showWeaveInfo>true</showWeaveInfo>
-                <verbose>true</verbose>
-                <!--<Xlint>ignore</Xlint>-->
-                <XaddSerialVersionUID>true</XaddSerialVersionUID>
-                <Xreweavable>true</Xreweavable>
-                <!--<aspectLibraries>-->
-                  <!--<aspectLibrary>-->
-                    <!--<groupId>org.apache.shiro</groupId>-->
-                    <!--<artifactId>shiro-aspectj</artifactId>-->
-                  <!--</aspectLibrary>-->
-                <!--</aspectLibraries>-->
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <excludes>
-              <!--
-              Exclude ancillary aspectj generated files.
-              -->
-              <exclude>**/builddef.lst</exclude>
-            </excludes>
           </configuration>
         </plugin>
 
