@@ -135,7 +135,7 @@ public class LocalWalkerStrategyTest
     public void smoke()
         throws Exception
     {
-        final MavenRepository mavenRepository =
+        final MavenHostedRepository mavenRepository =
             getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenHostedRepository.class );
 
         addSomeContent( mavenRepository, PATHS1 );
