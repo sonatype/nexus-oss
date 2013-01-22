@@ -45,7 +45,7 @@ public class RemoteItemNotFoundException
     {
         super( checkReasonFrom( request, repository,
             "Path %s not found in remote storage of repository %s (reason=%s, remoteUrl=%s).",
-            RepositoryStringUtils.getHumanizedNameString( repository ), remoteUrl ) );
+            request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( repository ), reason, remoteUrl ) );
     }
 
     @Override

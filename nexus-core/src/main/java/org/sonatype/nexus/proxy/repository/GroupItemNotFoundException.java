@@ -51,7 +51,7 @@ public class GroupItemNotFoundException
                                        final Map<Repository, Throwable> memberReasons )
     {
         super( checkReasonFrom( request, repository, "Path %s not found in group repository %s.",
-            RepositoryStringUtils.getHumanizedNameString( repository ) ) );
+            request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( repository ) ) );
         // copy it and make it unmodifiable
         this.memberReasons = Collections.unmodifiableMap( new HashMap<Repository, Throwable>( memberReasons ) );
     }
