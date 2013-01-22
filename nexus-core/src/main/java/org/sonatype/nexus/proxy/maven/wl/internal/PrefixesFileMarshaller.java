@@ -31,8 +31,8 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import com.google.common.io.Closeables;
 
 /**
- * Simple text based file with prefixes with dead simple syntax: Lines starting with '#' are comments, and any other
- * line is actually a prefix.
+ * Simple text based file with prefixes with dead simple syntax: Lines starting with '#' are comments, and any other non
+ * empty line is actually a prefix.
  * 
  * @author cstamas
  * @since 2.4
