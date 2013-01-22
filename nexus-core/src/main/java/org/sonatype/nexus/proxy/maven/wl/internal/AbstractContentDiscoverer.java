@@ -34,15 +34,15 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
  * @param <R>
  * @param <S>
  */
-public abstract class AbstractContentDiscoverer<R extends MavenRepository, S extends Strategy>
+public abstract class AbstractContentDiscoverer<R extends MavenRepository, S extends Strategy<R>>
 {
 
-    protected DiscoveryResult discoverContent( final List<S> strategies, final R mavenRepository )
+    protected DiscoveryResult<R> discoverContent( final List<S> strategies, final R mavenRepository )
         throws IOException
     {
         final ArrayList<S> appliedStrategies = new ArrayList<S>( strategies );
         Collections.sort( appliedStrategies, new PriorityOrderingComparator<S>() );
-        final DiscoveryResult discoveryResult = new DiscoveryResult( mavenRepository );
+        final DiscoveryResult<R> discoveryResult = new DiscoveryResult<R>( mavenRepository );
         for ( S strategy : appliedStrategies )
         {
             discoverContentWithStrategy( strategy, mavenRepository, discoveryResult );
@@ -55,12 +55,12 @@ public abstract class AbstractContentDiscoverer<R extends MavenRepository, S ext
     }
 
     protected void discoverContentWithStrategy( final S strategy, final R mavenRepository,
-                                                final DiscoveryResult discoveryResult )
+                                                final DiscoveryResult<R> discoveryResult )
         throws IOException
     {
         try
         {
-            final EntrySource entrySource = discover( strategy, mavenRepository );
+            final EntrySource entrySource = strategy.discover( mavenRepository );
             discoveryResult.recordSuccess( strategy, entrySource );
         }
         catch ( StrategyFailedException e )
@@ -68,7 +68,4 @@ public abstract class AbstractContentDiscoverer<R extends MavenRepository, S ext
             discoveryResult.recordFailure( strategy, e );
         }
     }
-
-    protected abstract EntrySource discover( S strategy, R mavenRepository )
-        throws StrategyFailedException, IOException;
 }

@@ -41,7 +41,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 @Named( RemotePrefixFileStrategy.ID )
 @Singleton
 public class RemotePrefixFileStrategy
-    extends AbstractStrategy
+    extends AbstractStrategy<MavenProxyRepository>
     implements RemoteStrategy
 {
     protected static final String ID = "prefix-file";

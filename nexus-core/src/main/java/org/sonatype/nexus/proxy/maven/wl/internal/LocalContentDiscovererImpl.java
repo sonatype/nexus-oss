@@ -21,12 +21,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalStrategy;
-import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 
 /**
  * Default {@link LocalContentDiscoverer} implementation.
@@ -37,7 +35,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 @Named
 @Singleton
 public class LocalContentDiscovererImpl
-    extends AbstractContentDiscoverer<MavenRepository, LocalStrategy>
+    extends AbstractContentDiscoverer<MavenHostedRepository, LocalStrategy>
     implements LocalContentDiscoverer
 {
     private final List<LocalStrategy> localStrategies;
@@ -54,16 +52,9 @@ public class LocalContentDiscovererImpl
     }
 
     @Override
-    public DiscoveryResult discoverLocalContent( final MavenRepository mavenRepository )
+    public DiscoveryResult<MavenHostedRepository> discoverLocalContent( final MavenHostedRepository mavenRepository )
         throws IOException
     {
         return discoverContent( localStrategies, mavenRepository );
-    }
-
-    @Override
-    protected EntrySource discover( final LocalStrategy strategy, final MavenRepository mavenRepository )
-        throws StrategyFailedException, IOException
-    {
-        return strategy.discover( mavenRepository );
     }
 }

@@ -214,7 +214,7 @@ public class WLManagerImpl
             final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
             if ( config.isEnabled() )
             {
-                final DiscoveryResult discoveryResult =
+                final DiscoveryResult<MavenProxyRepository> discoveryResult =
                     remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository );
                 if ( discoveryResult.isSuccessful() )
                 {
@@ -234,7 +234,10 @@ public class WLManagerImpl
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
-            final DiscoveryResult discoveryResult = localContentDiscoverer.discoverLocalContent( mavenRepository );
+            final MavenHostedRepository mavenHostedRepository =
+                mavenRepository.adaptToFacet( MavenHostedRepository.class );
+            final DiscoveryResult<MavenHostedRepository> discoveryResult =
+                localContentDiscoverer.discoverLocalContent( mavenHostedRepository );
             if ( discoveryResult.isSuccessful() )
             {
                 entrySource = discoveryResult.getEntrySource();

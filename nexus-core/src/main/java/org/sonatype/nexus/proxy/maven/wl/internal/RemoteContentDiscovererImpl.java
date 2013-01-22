@@ -22,11 +22,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
-import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 
 /**
  * Default {@link RemoteContentDiscoverer} implementation.
@@ -54,16 +52,9 @@ public class RemoteContentDiscovererImpl
     }
 
     @Override
-    public DiscoveryResult discoverRemoteContent( final MavenProxyRepository mavenProxyRepository )
+    public DiscoveryResult<MavenProxyRepository> discoverRemoteContent( final MavenProxyRepository mavenProxyRepository )
         throws IOException
     {
         return discoverContent( remoteStrategies, mavenProxyRepository );
-    }
-
-    @Override
-    protected EntrySource discover( final RemoteStrategy strategy, final MavenProxyRepository mavenProxyRepository )
-        throws StrategyFailedException, IOException
-    {
-        return strategy.discover( mavenProxyRepository );
     }
 }

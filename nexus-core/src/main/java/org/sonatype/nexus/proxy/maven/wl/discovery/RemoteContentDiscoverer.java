@@ -32,6 +32,6 @@ public interface RemoteContentDiscoverer
      * @return the result of discovery,
      * @throws IOException in case of IO problem.
      */
-    DiscoveryResult discoverRemoteContent( MavenProxyRepository mavenProxyRepository )
+    DiscoveryResult<MavenProxyRepository> discoverRemoteContent( MavenProxyRepository mavenProxyRepository )
         throws IOException;
 }

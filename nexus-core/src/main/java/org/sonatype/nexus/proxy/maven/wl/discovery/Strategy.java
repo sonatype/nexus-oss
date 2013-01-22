@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.discovery;
 
+import java.io.IOException;
+
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 
 /**
  * Strategy for discovery of WL by some means. It is identified by {@link #getId()} and has priority
@@ -20,8 +24,9 @@ package org.sonatype.nexus.proxy.maven.wl.discovery;
  * 
  * @author cstamas
  * @since 2.4
+ * @param <R>
  */
-public interface Strategy
+public interface Strategy<R extends MavenRepository>
     extends Prioritized
 {
     /**
@@ -30,4 +35,15 @@ public interface Strategy
      * @return the ID of the strategy.
      */
     String getId();
+
+    /**
+     * Discovers the content of the given {@link MavenRepository}.
+     * 
+     * @param mavenRepository to have local content discovered.
+     * @return the entry source with discovered entries.
+     * @throws StrategyFailedException if "soft" failure detected.
+     * @throws IOException in case of IO problem.
+     */
+    EntrySource discover( R mavenRepository )
+        throws StrategyFailedException, IOException;
 }

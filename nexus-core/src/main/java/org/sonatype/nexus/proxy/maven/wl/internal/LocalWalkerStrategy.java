@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalStrategy;
@@ -51,7 +51,7 @@ import com.google.common.base.Function;
 @Named( LocalWalkerStrategy.ID )
 @Singleton
 public class LocalWalkerStrategy
-    extends AbstractStrategy
+    extends AbstractStrategy<MavenHostedRepository>
     implements LocalStrategy
 {
     protected static final String ID = "walker";
@@ -69,7 +69,7 @@ public class LocalWalkerStrategy
     }
 
     @Override
-    public EntrySource discover( final MavenRepository mavenRepository )
+    public EntrySource discover( final MavenHostedRepository mavenRepository )
         throws IOException
     {
         final WalkerContext context =

@@ -14,7 +14,7 @@ package org.sonatype.nexus.proxy.maven.wl.discovery;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 
 /**
  * Component used to perform local content discovery. It relies on multiple {@link LocalStrategy} to achieve it's goal.
@@ -31,6 +31,6 @@ public interface LocalContentDiscoverer
      * @return the result of discovery,
      * @throws IOException in case of IO problem.
      */
-    DiscoveryResult discoverLocalContent( MavenRepository mavenRepository )
+    DiscoveryResult<MavenHostedRepository> discoverLocalContent( MavenHostedRepository mavenRepository )
         throws IOException;
 }

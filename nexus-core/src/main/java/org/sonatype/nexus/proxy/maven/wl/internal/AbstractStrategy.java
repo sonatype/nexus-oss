@@ -15,16 +15,18 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.discovery.Strategy;
 
 /**
  * Abstract class for {@link Strategy} implementations.
  * 
  * @author cstamas
+ * @param <R>
  */
-public abstract class AbstractStrategy
+public abstract class AbstractStrategy<R extends MavenRepository>
     extends AbstractLoggingComponent
-    implements Strategy
+    implements Strategy<R>
 {
     private final String id;
 

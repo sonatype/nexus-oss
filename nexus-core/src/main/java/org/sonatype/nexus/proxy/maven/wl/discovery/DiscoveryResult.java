@@ -25,16 +25,17 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
  * 
  * @author cstamas
  * @since 2.4
+ * @param <R>
  */
-public class DiscoveryResult
+public class DiscoveryResult<R extends MavenRepository>
 {
-    private final MavenRepository mavenRepository;
+    private final R mavenRepository;
 
     private final Map<String, Throwable> failures;
 
     private boolean successful;
 
-    private Strategy strategy;
+    private Strategy<R> strategy;
 
     private EntrySource entrySource;
 
@@ -43,7 +44,7 @@ public class DiscoveryResult
      * 
      * @param mavenRepository the repository having been discovered.
      */
-    public DiscoveryResult( final MavenRepository mavenRepository )
+    public DiscoveryResult( final R mavenRepository )
     {
         this.mavenRepository = checkNotNull( mavenRepository );
         this.failures = new HashMap<String, Throwable>();
@@ -57,7 +58,7 @@ public class DiscoveryResult
      * 
      * @return the discovered repository.
      */
-    public MavenRepository getMavenRepository()
+    public R getMavenRepository()
     {
         return mavenRepository;
     }
@@ -88,7 +89,7 @@ public class DiscoveryResult
      * 
      * @return strategy that succeeded.
      */
-    public Strategy getStrategy()
+    public Strategy<R> getStrategy()
     {
         return strategy;
     }
@@ -109,7 +110,7 @@ public class DiscoveryResult
      * @param usedStrategy
      * @param entrySource
      */
-    public void recordSuccess( final Strategy usedStrategy, final EntrySource entrySource )
+    public void recordSuccess( final Strategy<R> usedStrategy, final EntrySource entrySource )
     {
         this.successful = true;
         this.strategy = checkNotNull( usedStrategy );
@@ -122,7 +123,7 @@ public class DiscoveryResult
      * @param usedStrategy
      * @param failureCause
      */
-    public void recordFailure( final Strategy usedStrategy, final Throwable failureCause )
+    public void recordFailure( final Strategy<R> usedStrategy, final Throwable failureCause )
     {
         this.failures.put( usedStrategy.getId(), failureCause );
     }

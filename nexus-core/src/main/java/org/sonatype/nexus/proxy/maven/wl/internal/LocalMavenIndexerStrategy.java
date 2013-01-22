@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalStrategy;
@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 @Named( LocalMavenIndexerStrategy.ID )
 @Singleton
 public class LocalMavenIndexerStrategy
-    extends AbstractStrategy
+    extends AbstractStrategy<MavenHostedRepository>
     implements LocalStrategy
 {
     protected static final String ID = "maven-indexer";
@@ -50,7 +50,7 @@ public class LocalMavenIndexerStrategy
     }
 
     @Override
-    public EntrySource discover( MavenRepository mavenRepository )
+    public EntrySource discover( MavenHostedRepository mavenRepository )
         throws StrategyFailedException, IOException
     {
         throw new StrategyFailedException( "Not implemented!" );

@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 @Named( RemoteScrapeStrategy.ID )
 @Singleton
 public class RemoteScrapeStrategy
-    extends AbstractStrategy
+    extends AbstractStrategy<MavenProxyRepository>
     implements RemoteStrategy
 {
     protected static final String ID = "scrape";

@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.discovery;
 
-import java.io.IOException;
-
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.walker.Walker;
 
 /**
@@ -26,16 +23,6 @@ import org.sonatype.nexus.proxy.walker.Walker;
  * @since 2.4
  */
 public interface LocalStrategy
-    extends Strategy
+    extends Strategy<MavenHostedRepository>
 {
-    /**
-     * Discovers the local content of the given {@link MavenRepository}.
-     * 
-     * @param mavenRepository to have local content discovered.
-     * @return the entry source with discovered entries.
-     * @throws StrategyFailedException if "soft" failure detected.
-     * @throws IOException in case of IO problem.
-     */
-    EntrySource discover( MavenRepository mavenRepository )
-        throws StrategyFailedException, IOException;
 }

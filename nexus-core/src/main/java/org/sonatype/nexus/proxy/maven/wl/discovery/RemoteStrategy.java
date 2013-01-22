@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.discovery;
 
-import java.io.IOException;
-
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 
@@ -25,17 +23,6 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
  * @since 2.4
  */
 public interface RemoteStrategy
-    extends Strategy
+    extends Strategy<MavenProxyRepository>
 {
-    /**
-     * Discovers the remote content of the {@link MavenProxyRepository} and returns an {@link EntrySource} if
-     * successful.
-     * 
-     * @param mavenProxyRepository to have remote content discovered.
-     * @return entry source with discovered entries.
-     * @throws StrategyFailedException if "soft" failure detected.
-     * @throws IOException in case of IO problem.
-     */
-    EntrySource discover( MavenProxyRepository mavenProxyRepository )
-        throws StrategyFailedException, IOException;
 }
