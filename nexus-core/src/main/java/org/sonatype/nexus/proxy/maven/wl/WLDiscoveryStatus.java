@@ -90,7 +90,7 @@ public class WLDiscoveryStatus
 
     public String getLastDiscoveryStrategy()
     {
-        if ( getStatus() == DStatus.SUCCESSFUL )
+        if ( getStatus().ordinal() > DStatus.ENABLED.ordinal() )
         {
             return lastDiscoveryStrategy;
         }
