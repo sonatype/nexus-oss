@@ -10,24 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.support;
+package org.sonatype.nexus.timing;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import com.google.inject.AbstractModule;
+import com.google.inject.matcher.Matchers;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import javax.inject.Qualifier;
-
-@Qualifier
-@Target( { TYPE, FIELD, PARAMETER, METHOD } )
-@Retention( RUNTIME )
-public @interface NexusSpecific
+/**
+ * Adds support for {@link Timed} method invocations.
+ *
+ * @see TimedInterceptor
+ *
+ * @since 2.4
+ */
+public class TimingModule
+    extends AbstractModule
 {
-    // empty
+    @Override
+    protected void configure() {
+        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Timed.class), new TimedInterceptor());
+    }
 }
-

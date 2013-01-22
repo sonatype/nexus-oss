@@ -10,24 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.support;
+package org.sonatype.nexus.timing;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
+import javax.inject.Qualifier;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.inject.Qualifier;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Marker for methods which should have timing details sampled.
+ *
+ * @since 2.4
+ */
 @Qualifier
-@Target( { TYPE, FIELD, PARAMETER, METHOD } )
-@Retention( RUNTIME )
-public @interface NexusSpecific
+@Target({METHOD})
+@Retention(RUNTIME)
+public @interface Timed
 {
-    // empty
-}
+    String DEFAULT_VALUE = "";
 
+    /**
+     * The name of the timing metric.  If left as {@link #DEFAULT_VALUE} or a blank/empty string,
+     * then a name will be determined from the aspect context around the method being woven.
+     */
+    String value() default DEFAULT_VALUE;
+}
