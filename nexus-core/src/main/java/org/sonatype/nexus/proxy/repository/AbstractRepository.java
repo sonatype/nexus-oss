@@ -1311,7 +1311,7 @@ public abstract class AbstractRepository
                 if ( !processor.process( this, request, action ) )
                 {
                     request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
-                        "Processing of request %s in repository %s forbidden.", request.getRequestPath(),
+                        "Processing of request %s in repository %s prevented.", request.getRequestPath(),
                         RepositoryStringUtils.getHumanizedNameString( this ) ) );
                     return false;
                 }
@@ -1331,7 +1331,7 @@ public abstract class AbstractRepository
                 if ( !processor.shouldRetrieve( this, request, item ) )
                 {
                     request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
-                        "Retrieval of request %s in repository %s forbidden.", request.getRequestPath(),
+                        "Retrieval of request %s in repository %s prevented.", request.getRequestPath(),
                         RepositoryStringUtils.getHumanizedNameString( this ) ) );
                     return false;
                 }

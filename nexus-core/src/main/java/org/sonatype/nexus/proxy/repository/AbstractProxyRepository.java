@@ -36,6 +36,7 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -1174,6 +1175,16 @@ public abstract class AbstractProxyRepository
         // proxyMode and request.localOnly decides 1st
         boolean shouldProxy = !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
 
+        if ( !shouldProxy )
+        {
+            request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor(
+                request,
+                this,
+                "Proxying of path %s in repository %s prevented by local-only flag or proxy mode (localOnly=%s, proxyMode=%s).",
+                request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ),
+                request.isRequestLocalOnly(), getProxyMode() ) );
+        }
+
         if ( shouldProxy )
         {
             // let's ask RequestProcessor
@@ -1184,6 +1195,9 @@ public abstract class AbstractProxyRepository
                 if ( !shouldProxy )
                 {
                     // escape
+                    request.addItemNotFoundReason( ItemNotFoundReasons.reasonFor( request, this,
+                        "Proxying of path %s in repository %s prevented", request.getRequestPath(),
+                        RepositoryStringUtils.getHumanizedNameString( this ) ) );
                     break;
                 }
             }
