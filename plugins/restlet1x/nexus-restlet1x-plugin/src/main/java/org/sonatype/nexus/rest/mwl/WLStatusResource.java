@@ -19,6 +19,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryStatus.DStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus;
@@ -73,10 +74,10 @@ public class WLStatusResource
         final WLStatus status = getWLManager().getStatusFor( mavenRepository );
         final WLStatusMessage payload = new WLStatusMessage();
         payload.setPublished( PStatus.PUBLISHED == status.getPublishingStatus().getStatus() );
+        payload.setPublishedMessage( status.getPublishingStatus().getLastPublishedMessage() );
         if ( payload.isPublished() )
         {
             final WLPublishingStatus pstatus = status.getPublishingStatus();
-            payload.setPublishedMessage( "Published." );
             payload.setPublishedTimestamp( pstatus.getLastPublishedTimestamp() );
             if ( pstatus.getLastPublishedFilePath() != null )
             {
@@ -89,7 +90,6 @@ public class WLStatusResource
         }
         else
         {
-            payload.setPublishedMessage( "Not published." );
             payload.setPublishedTimestamp( -1 );
             payload.setPublishedUrl( null );
         }
@@ -112,9 +112,13 @@ public class WLStatusResource
             }
             else
             {
-                payload.getDiscoveryStatus().setEnabled( true );
-                payload.getDiscoveryStatus().setStatus(
-                    DStatus.SUCCESSFUL == status.getDiscoveryStatus().getStatus() ? "Successful" : "Failed" );
+                final MavenProxyRepository mavenProxyRepository =
+                    getMavenRepository( request, MavenProxyRepository.class );
+                final WLDiscoveryConfig config = getWLManager().getRemoteDiscoveryConfig( mavenProxyRepository );
+                payload.getDiscoveryStatus().setEnabled( config.isEnabled() );
+                payload.getDiscoveryStatus().setUpdateInterval( config.getDiscoveryInterval() );
+                // last- messages
+                payload.getDiscoveryStatus().setLastStatus( dstatus.getStatus().name() );
                 payload.getDiscoveryStatus().setLastStrategy( dstatus.getLastDiscoveryStrategy() );
                 payload.getDiscoveryStatus().setLastMessage( dstatus.getLastDiscoveryMessage() );
                 payload.getDiscoveryStatus().setLastRunTimestamp( dstatus.getLastDiscoveryTimestamp() );

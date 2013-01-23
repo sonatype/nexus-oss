@@ -40,6 +40,8 @@ public class WLPublishingStatus
 
     private final PStatus status;
 
+    private final String lastPublishedMessage;
+
     private final long lastPublishedTimestamp;
 
     private final String lastPublishedFilePath;
@@ -48,13 +50,15 @@ public class WLPublishingStatus
      * Constructor.
      * 
      * @param status
+     * @param lastPublishedMessage
      * @param lastPublishedTimestamp
      * @param lastPublishedFilePath
      */
-    public WLPublishingStatus( final PStatus status, final long lastPublishedTimestamp,
-                               final String lastPublishedFilePath )
+    public WLPublishingStatus( final PStatus status, final String lastPublishedMessage,
+                               final long lastPublishedTimestamp, final String lastPublishedFilePath )
     {
         this.status = checkNotNull( status );
+        this.lastPublishedMessage = checkNotNull( lastPublishedMessage );
         this.lastPublishedTimestamp = lastPublishedTimestamp;
         this.lastPublishedFilePath = lastPublishedFilePath;
     }
@@ -67,6 +71,16 @@ public class WLPublishingStatus
     public PStatus getStatus()
     {
         return status;
+    }
+
+    /**
+     * Returns the publishing message.
+     * 
+     * @return the message.
+     */
+    public String getLastPublishedMessage()
+    {
+        return lastPublishedMessage;
     }
 
     /**

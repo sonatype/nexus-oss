@@ -4568,11 +4568,18 @@
           <description>The discovery is enabled or not.</description>
         </field>
         <field>
-          <name>status</name>
+          <name>updateInterval</name>
+          <version>1.0.0+</version>
+          <type>long</type>
+          <required>true</required>
+          <description>Update interval in hours.</description>
+        </field>
+        <field>
+          <name>lastStatus</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The discovery status, like "" accompanying message.</description>
+          <description>The discovery status, was it successful or not, or still running.</description>
         </field>
         <field>
           <name>lastStrategy</name>

@@ -280,6 +280,18 @@ public class WLManagerImpl
     @Override
     public WLStatus getStatusFor( final MavenRepository mavenRepository )
     {
+        final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
+        final boolean remoteDiscoveryEnabled;
+        if ( mavenProxyRepository != null )
+        {
+            final WLDiscoveryConfig discoveryConfig = getRemoteDiscoveryConfig( mavenProxyRepository );
+            remoteDiscoveryEnabled = discoveryConfig.isEnabled();
+        }
+        else
+        {
+            remoteDiscoveryEnabled = false;
+        }
+
         WLPublishingStatus publishingStatus = null;
         WLDiscoveryStatus discoveryStatus = null;
 
@@ -287,24 +299,42 @@ public class WLManagerImpl
         final FileEntrySource publishedEntrySource = getEntrySourceFor( mavenRepository );
         if ( !publishedEntrySource.exists() )
         {
-            publishingStatus = new WLPublishingStatus( PStatus.NOT_PUBLISHED, -1, null );
+            final String message;
+            if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
+            {
+                message = "Publishing not possible, as not all members have whitelist published.";
+            }
+            else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+            {
+                if ( remoteDiscoveryEnabled )
+                {
+                    message = "Unable to discover remote content.";
+                }
+                else
+                {
+                    message = "Remote discovery not enabled.";
+                }
+            }
+            else
+            {
+                message = "Check Nexus logs for more details.";
+            }
+            publishingStatus = new WLPublishingStatus( PStatus.NOT_PUBLISHED, message, -1, null );
         }
         else
         {
             publishingStatus =
-                new WLPublishingStatus( PStatus.PUBLISHED, publishedEntrySource.getLostModifiedTimestamp(),
-                    publishedEntrySource.getFilePath() );
+                new WLPublishingStatus( PStatus.PUBLISHED, "Whitelist published successfully.",
+                    publishedEntrySource.getLostModifiedTimestamp(), publishedEntrySource.getFilePath() );
         }
 
-        final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
         if ( mavenProxyRepository == null )
         {
             discoveryStatus = new WLDiscoveryStatus( DStatus.NOT_A_PROXY );
         }
         else
         {
-            final WLDiscoveryConfig discoveryConfig = getRemoteDiscoveryConfig( mavenProxyRepository );
-            if ( !discoveryConfig.isEnabled() )
+            if ( !remoteDiscoveryEnabled )
             {
                 discoveryStatus = new WLDiscoveryStatus( DStatus.DISABLED );
             }
