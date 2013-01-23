@@ -97,8 +97,8 @@ public class TimedInterceptor
         finally {
             split.stop();
 
-            // TODO: log.trace, or probably remove logging here and handle by a callback or only expose via JMX?
-            log.info(TIMING, "{}", watch);
+            // TODO: Remove logging here and handle by a callback or only expose via JMX?
+            log.trace(TIMING, "{}", watch);
         }
     }
 }
