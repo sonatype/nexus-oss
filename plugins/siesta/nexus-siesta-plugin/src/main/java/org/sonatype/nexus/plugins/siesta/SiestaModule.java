@@ -39,6 +39,7 @@ public class SiestaModule
 
     @Override
     protected void configure() {
+        // TODO: We might want to make this default for core+plugins as its generally useful.
         install(new ShiroAopModule());
 
         // FIXME: Sort this out... nexus-restlet1x-plugin should not have anything to do with this plugin
