@@ -29,10 +29,10 @@ define('ext/define', ['extjs', 'nexus/log'], function () {
     /**
      * Define a new class.
      *
-     * @param {String} className    The name of the class to define.
-     * @param {Object} data         Configuration for the class.
-     * @param {Function} createdFn  Function to execute when class has been defined.
-     * @return {Function}           A reference to the defined class.
+     * @param {String} className        The name of the class to define.
+     * @param {Object} data             Configuration for the class.
+     * @param {Function} [createdFn]    Function to execute when class has been defined.
+     * @return {Function}               A reference to the defined class.
      * @static
      */
     Ext.define = function (className, data, createdFn) {
