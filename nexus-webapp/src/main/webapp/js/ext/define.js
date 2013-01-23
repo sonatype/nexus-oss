@@ -30,16 +30,35 @@
     /**
      * Define a new class.
      *
+     * @static
+     *
      * @param {String} className        The name of the class to define.
      * @param {Object} data             Configuration for the class.
      * @param {Function} [createdFn]    Function to execute when class has been defined.
-     * @return {Function}               A reference to the defined class.
-     * @static
+     *
+     * @cfg {String} extend             Super-class name.
+     * @cfg {*} statics                 Static members.
+     * @cfg {*} requirejs               Array of requirejs module dependencies
+     * @cfg {*} requires                Array of class names (created by Ext.define) which are dependencies.
+     * @cfg {boolean} requireSuper      Flag to enable/disable automatic dependency on super-class.
      */
     Ext.define = function (className, data, createdFn) {
         data = data || {};
 
-        var i, nameSpace, baseClassName, superName, type, superClass, statics, obj;
+        var i,
+            nameSpace,
+            baseClassName,
+            superName,
+            type,
+            requireSuper,
+            superClass,
+            statics,
+            requiredClasses,
+            requiredModules,
+            moduleName,
+            obj,
+            arrayify,
+            tmp;
 
         obj = function (path) {
             var context = window;
@@ -47,6 +66,30 @@
                 context = context[part];
             });
             return context;
+        };
+
+        // turns input into an array of strings
+        arrayify = function (input) {
+            var list = [];
+
+            if (Ext.isArray(input)) {
+                for (i = 0; i < input.length; i++) {
+                    if (Ext.isString(input[i])) {
+                        list.push(input[i]);
+                    }
+                    else {
+                        throw "Invalid entry: " + input[i];
+                    }
+                }
+            }
+            else if (Ext.isString(input)) {
+                list.push(input);
+            }
+            else if (input !== undefined) {
+                throw "Invalid value: " + input;
+            }
+
+            return list;
         };
 
         // Find the namespace (if any) for the new class
@@ -59,63 +102,110 @@
             baseClassName = className;
         }
 
+        // Default to requiring super class, but allow user to force the value
+        if (data.requireSuper === undefined) {
+            requireSuper = true;
+        }
+        else {
+            requireSuper = data.requireSuper;
+            delete data.requireSuper;
+        }
+
         // Determine the super-class
-        superName = data.extend || 'Ext.Base';
-        delete data.extend;
+        if (data.extend !== undefined) {
+            superName = data.extend;
+            delete data.extend;
+        }
+        else {
+            superName = 'Ext.Base';
+            requireSuper = false;
+        }
 
         // Extract static configuration
         statics = data.statics;
         delete data.statics;
 
-        Nexus.log('Defining class: ' + className + ' (ns: ' + nameSpace + ', super: ' + superName + ')');
+        // Extract requirejs dependencies
+        requiredModules = arrayify(data.requirejs);
+        delete data.requirejs;
 
-        // Create namespace if required
-        if (nameSpace) {
-            Ext.namespace(nameSpace);
+        // Extract class dependencies (which were defined using Ext.define)
+        requiredClasses = arrayify(data.requires);
+        delete data.requires;
+
+        // Require super if enabled
+        if (requireSuper) {
+            requiredModules.push(superName.replaceAll('.', '/'));
         }
 
-        // Get a reference to the super-class
-        superClass = obj(superName);
+        // append translated dependency classes on to required modules
+        for (i=0; i < requiredClasses.length; i++) {
+            tmp = requiredClasses[i].replaceAll('.', '/');
+            requiredModules.push(tmp);
+        }
 
-        // When no constructor given in configuration (its always there due to picking upt from Object.prototype), use a synthetic version
-        if (data.constructor === Object.prototype.constructor) {
-            data.constructor = function () {
-                // Just call superclass constructor
-                this.constructor.superclass.constructor.apply(this, arguments);
+        // Translate class name into module name
+        moduleName = className.replaceAll('.', '/');
+
+        if (requiredModules.length !== 0) {
+            Nexus.log('Defining module: ' + moduleName + ' dependencies: ' + requiredModules);
+        }
+        else {
+            Nexus.log('Defining module: ' + moduleName);
+        }
+
+        define(moduleName, requiredModules, function()
+        {
+            Nexus.log('Defining class: ' + className + ' (ns: ' + nameSpace + ', super: ' + superName + ')');
+
+            // Create namespace if required
+            if (nameSpace) {
+                Ext.namespace(nameSpace);
+            }
+
+            // Get a reference to the super-class
+            superClass = obj(superName);
+
+            // When no constructor given in configuration (its always there due to picking upt from Object.prototype), use a synthetic version
+            if (data.constructor === Object.prototype.constructor) {
+                data.constructor = function () {
+                    // Just call superclass constructor
+                    this.constructor.superclass.constructor.apply(this, arguments);
+                };
+            }
+
+            // Create the sub-class
+            type = Ext.extend(superClass, data);
+
+            // Assign to global namespace
+            obj(nameSpace)[baseClassName] = type;
+
+            // Enrich the sub-class prototype
+            type.prototype.$className = className;
+
+            // FIXME: Figure out how to fucking define this properly, all seem to work in different fucking ways
+            //type.prototype.superclass = superClass;
+            //type.prototype.$super = superClass.prototype;
+            //type.prototype.$super = eval(className + '.superclass');
+            //type.prototype.$super = function () {};
+
+            type.prototype.$log = function (message) {
+                Nexus.log(this.$className + ': ' + message);
             };
-        }
 
-        // Create the sub-class
-        type = Ext.extend(superClass, data);
+            // Apply any static members
+            if (statics !== undefined) {
+                Ext.apply(type, statics);
+            }
 
-        // Assign to global namespace
-        obj(nameSpace)[baseClassName] = type;
+            // Call post-define hook
+            if (createdFn !== undefined) {
+                // Scope to created type, empty args seems to be required here
+                createdFn.call(type, []);
+            }
 
-        // Enrich the sub-class prototype
-        type.prototype.$className = className;
-
-        // FIXME: Figure out how to fucking define this properly, all seem to work in different fucking ways
-        //type.prototype.superclass = superClass;
-        //type.prototype.$super = superClass.prototype;
-        //type.prototype.$super = eval(className + '.superclass');
-        //type.prototype.$super = function () {};
-
-        type.prototype.$log = function (message) {
-            Nexus.log(this.$className + ': ' + message);
-        };
-
-        // Apply any static members
-        if (statics !== undefined) {
-            Ext.apply(type, statics);
-        }
-
-        // Call post-define hook
-        if (createdFn !== undefined) {
-            // Scope to created type, empty args seems to be required here
-            createdFn.call(type, []);
-        }
-
-        return type;
+            return type;
+        });
     };
 
     // FIXME: Port over extjs-4 Ext.create() bits so we can have sane[r] object creation
