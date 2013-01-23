@@ -21,10 +21,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 
 /**
  * Remote scrape strategy.
@@ -49,7 +49,7 @@ public class RemoteScrapeStrategy
     }
 
     @Override
-    public EntrySource discover( final MavenProxyRepository mavenProxyRepository )
+    public StrategyResult discover( final MavenProxyRepository mavenProxyRepository )
         throws StrategyFailedException, IOException
     {
         // scrape remote of passed in proxy repository up to config.getRemoteScrapeDepth() depth

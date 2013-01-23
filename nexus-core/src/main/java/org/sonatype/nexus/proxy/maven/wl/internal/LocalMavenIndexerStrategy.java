@@ -21,11 +21,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.Strategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 
 /**
  * Local {@link Strategy} that uses Maven Indexer data.
@@ -50,7 +50,7 @@ public class LocalMavenIndexerStrategy
     }
 
     @Override
-    public EntrySource discover( MavenHostedRepository mavenRepository )
+    public StrategyResult discover( MavenHostedRepository mavenRepository )
         throws StrategyFailedException, IOException
     {
         throw new StrategyFailedException( "Not implemented!" );

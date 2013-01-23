@@ -14,8 +14,8 @@ package org.sonatype.nexus.proxy.maven.wl.discovery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
@@ -29,13 +29,66 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
  */
 public class DiscoveryResult<R extends MavenRepository>
 {
+    public static abstract class Outcome
+    {
+        private final String strategyId;
+
+        private final boolean successful;
+
+        private final String message;
+
+        public Outcome( final String strategyId, final boolean successful, final String message )
+        {
+            this.strategyId = checkNotNull( strategyId );
+            this.successful = successful;
+            this.message = checkNotNull( message );
+        }
+
+        public String getStrategyId()
+        {
+            return strategyId;
+        }
+
+        public boolean isSuccessful()
+        {
+            return successful;
+        }
+
+        public String getMessage()
+        {
+            return message;
+        }
+    }
+
+    public static class SuccessfulOutcome
+        extends Outcome
+    {
+        public SuccessfulOutcome( final String strategyId, final String message )
+        {
+            super( strategyId, true, message );
+        }
+    }
+
+    public static class FailedOutcome
+        extends Outcome
+    {
+        private final Throwable throwable;
+
+        public FailedOutcome( final String strategyId, final Throwable throwable )
+        {
+            super( strategyId, false, throwable.getMessage() );
+            this.throwable = throwable;
+        }
+
+        public Throwable getThrowable()
+        {
+            return throwable;
+        }
+    }
+
     private final R mavenRepository;
 
-    private final Map<String, Throwable> failures;
-
-    private boolean successful;
-
-    private Strategy<R> strategy;
+    private final List<Outcome> outcomes;
 
     private EntrySource entrySource;
 
@@ -47,9 +100,7 @@ public class DiscoveryResult<R extends MavenRepository>
     public DiscoveryResult( final R mavenRepository )
     {
         this.mavenRepository = checkNotNull( mavenRepository );
-        this.failures = new HashMap<String, Throwable>();
-        this.successful = false;
-        this.strategy = null;
+        this.outcomes = new ArrayList<Outcome>();
         this.entrySource = null;
     }
 
@@ -64,24 +115,13 @@ public class DiscoveryResult<R extends MavenRepository>
     }
 
     /**
-     * Failures happened during discovery reported by failed strategies. Map is keyed with {@link Strategy#getId()} and
-     * values are the {@link Throwable} instances reported by them.
-     * 
-     * @return map with failures.
-     */
-    public Map<String, Throwable> getFailures()
-    {
-        return failures;
-    }
-
-    /**
      * Returns {@code true} if discovery was successful.
      * 
      * @return {@code true} if discovery was successful.
      */
     public boolean isSuccessful()
     {
-        return successful;
+        return getLastSuccessOutcome() != null;
     }
 
     /**
@@ -89,9 +129,9 @@ public class DiscoveryResult<R extends MavenRepository>
      * 
      * @return strategy that succeeded.
      */
-    public Strategy<R> getStrategy()
+    public Outcome getLastResult()
     {
-        return strategy;
+        return getLastOutcome();
     }
 
     /**
@@ -108,13 +148,20 @@ public class DiscoveryResult<R extends MavenRepository>
      * Records a success on behalf of a strategy.
      * 
      * @param usedStrategy
+     * @param message
      * @param entrySource
      */
-    public void recordSuccess( final Strategy<R> usedStrategy, final EntrySource entrySource )
+    public void recordSuccess( final Strategy<R> usedStrategy, final String message, final EntrySource entrySource )
     {
-        this.successful = true;
-        this.strategy = checkNotNull( usedStrategy );
-        this.entrySource = checkNotNull( entrySource );
+        checkNotNull( usedStrategy );
+        checkNotNull( message );
+        checkNotNull( entrySource );
+        if ( !isSuccessful() )
+        {
+            final SuccessfulOutcome success = new SuccessfulOutcome( usedStrategy.getId(), message );
+            this.outcomes.add( success );
+            this.entrySource = entrySource;
+        }
     }
 
     /**
@@ -125,6 +172,34 @@ public class DiscoveryResult<R extends MavenRepository>
      */
     public void recordFailure( final Strategy<R> usedStrategy, final Throwable failureCause )
     {
-        this.failures.put( usedStrategy.getId(), failureCause );
+        checkNotNull( usedStrategy );
+        checkNotNull( failureCause );
+        if ( !isSuccessful() )
+        {
+            final FailedOutcome failure = new FailedOutcome( usedStrategy.getId(), failureCause );
+            this.outcomes.add( failure );
+        }
+    }
+
+    // ==
+
+    protected Outcome getLastOutcome()
+    {
+        if ( outcomes.size() > 0 )
+        {
+            final Outcome outcome = outcomes.get( outcomes.size() - 1 );
+            return outcome;
+        }
+        return null;
+    }
+
+    protected SuccessfulOutcome getLastSuccessOutcome()
+    {
+        final Outcome outcome = getLastOutcome();
+        if ( outcome instanceof SuccessfulOutcome )
+        {
+            return (SuccessfulOutcome) outcome;
+        }
+        return null;
     }
 }

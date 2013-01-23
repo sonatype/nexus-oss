@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 
 /**
  * Remote prefix file strategy.
@@ -56,7 +57,7 @@ public class RemotePrefixFileStrategy
     }
 
     @Override
-    public EntrySource discover( final MavenProxyRepository mavenProxyRepository )
+    public StrategyResult discover( final MavenProxyRepository mavenProxyRepository )
         throws StrategyFailedException, IOException
     {
         StorageFileItem item;
@@ -67,7 +68,8 @@ public class RemotePrefixFileStrategy
             item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
             if ( item != null )
             {
-                return createEntrySource( mavenProxyRepository, path );
+                return new StrategyResult( "Remote publishes prefix file.", createEntrySource( mavenProxyRepository,
+                    path ) );
             }
         }
         throw new StrategyFailedException( "Remote does not publish prefix files on paths " + remoteFilePath );

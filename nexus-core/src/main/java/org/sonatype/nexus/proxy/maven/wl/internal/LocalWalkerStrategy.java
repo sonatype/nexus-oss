@@ -28,9 +28,9 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalStrategy;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -69,7 +69,7 @@ public class LocalWalkerStrategy
     }
 
     @Override
-    public EntrySource discover( final MavenHostedRepository mavenRepository )
+    public StrategyResult discover( final MavenHostedRepository mavenRepository )
         throws IOException
     {
         final WalkerContext context =
@@ -91,8 +91,8 @@ public class LocalWalkerStrategy
                 throw e;
             }
         }
-        return new ArrayListEntrySource( getAllLeafPaths( prefixCollectorProcessor.getParentOMatic(),
-            config.getLocalScrapeDepth() ) );
+        return new StrategyResult( "Repository crawled successfully", new ArrayListEntrySource( getAllLeafPaths(
+            prefixCollectorProcessor.getParentOMatic(), config.getLocalScrapeDepth() ) ) );
     }
 
     // ==

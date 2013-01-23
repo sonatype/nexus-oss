@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.maven.wl.WLStatus;
 import org.sonatype.nexus.proxy.maven.wl.WritableEntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WritableEntrySourceModifier;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
+import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult.Outcome;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.events.WLPublishedRepositoryEvent;
@@ -60,6 +61,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import com.google.common.base.Throwables;
 
 /**
  * Default implementation.
@@ -225,6 +228,11 @@ public class WLManagerImpl
                     getLogger().debug( "{} remote discovery unsuccessful.",
                         RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 }
+                final DiscoveryStatusSource discoveryStatusSource =
+                    new PropfileDiscoveryStatusSource( mavenProxyRepository );
+                final Outcome lastOutcome = discoveryResult.getLastResult();
+                discoveryStatusSource.write( new WLDiscoveryStatus( lastOutcome.isSuccessful() ? DStatus.SUCCESSFUL
+                    : DStatus.FAILED, lastOutcome.getStrategyId(), lastOutcome.getMessage(), System.currentTimeMillis() ) );
             }
             else
             {
@@ -291,37 +299,34 @@ public class WLManagerImpl
         final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
         if ( mavenProxyRepository == null )
         {
-            discoveryStatus = new WLDiscoveryStatus( DStatus.NOT_A_PROXY, null, null, -1 );
+            discoveryStatus = new WLDiscoveryStatus( DStatus.NOT_A_PROXY );
         }
         else
         {
             final WLDiscoveryConfig discoveryConfig = getRemoteDiscoveryConfig( mavenProxyRepository );
             if ( !discoveryConfig.isEnabled() )
             {
-                discoveryStatus = new WLDiscoveryStatus( DStatus.DISABLED, null, null, -1 );
+                discoveryStatus = new WLDiscoveryStatus( DStatus.DISABLED );
             }
             else
             {
-                if ( !publishedEntrySource.exists() )
+                final DiscoveryStatusSource discoveryStatusSource =
+                    new PropfileDiscoveryStatusSource( mavenProxyRepository );
+                if ( !discoveryStatusSource.exists() )
                 {
-                    // still running
-                    discoveryStatus = new WLDiscoveryStatus( DStatus.ENABLED, null, null, -1 );
-                    
-                    // TODO: decide from persisted informations
-                    discoveryStatus = new WLDiscoveryStatus( DStatus.FAILED, "dunno-yet", "no msg yet", -1 );
+                    // still running or never run yet
+                    discoveryStatus = new WLDiscoveryStatus( DStatus.ENABLED );
                 }
                 else
                 {
-                    // wrt lastDiscoveryTimestamp that is set to publishedEntrySource.getLostModifiedTimestamp()
-                    // if prefix file is used, Nexus eagerly keeps remote file timestamps (if remote server sends those), and
-                    // proxy cache will have set it's file timestamp to the one got from remote. In this case, the value is fine
-                    // as it will be actually the "prefix file published" date!
-                    // if scrape is used, again, the prefix file _generated_ from the scrape results will retain it's timestamp
-                    // of the moment when it was saved (as last step of discovery), hence, the moment when scrap did finish successfully
-                    // it is the FAILED case, where the lastDiscoveryTimestamp will come from persisted info, and will mean "last failed"
-                    discoveryStatus =
-                        new WLDiscoveryStatus( DStatus.SUCCESSFUL, "dunno-yet", "no msg yet",
-                            publishedEntrySource.getLostModifiedTimestamp() );
+                    try
+                    {
+                        discoveryStatus = discoveryStatusSource.read();
+                    }
+                    catch ( IOException e )
+                    {
+                        Throwables.propagate( e );
+                    }
                 }
             }
         }

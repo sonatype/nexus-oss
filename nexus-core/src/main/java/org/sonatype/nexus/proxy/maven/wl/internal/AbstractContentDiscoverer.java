@@ -18,13 +18,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.Prioritized.PriorityOrderingComparator;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.Strategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 
 /**
  * Common grounds for {@link LocalContentDiscoverer} and {@link RemoteContentDiscoverer} implementations.
@@ -60,8 +60,8 @@ public abstract class AbstractContentDiscoverer<R extends MavenRepository, S ext
     {
         try
         {
-            final EntrySource entrySource = strategy.discover( mavenRepository );
-            discoveryResult.recordSuccess( strategy, entrySource );
+            final StrategyResult strategyResult = strategy.discover( mavenRepository );
+            discoveryResult.recordSuccess( strategy, strategyResult.getMessage(), strategyResult.getEntrySource() );
         }
         catch ( StrategyFailedException e )
         {

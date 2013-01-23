@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven.wl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -62,7 +63,21 @@ public class WLDiscoveryStatus
     private final long lastDiscoveryTimestamp;
 
     /**
-     * Constructor.
+     * Constructor for statuses that represent state where discovery not yet ran.
+     * 
+     * @param status
+     */
+    public WLDiscoveryStatus( final DStatus status )
+    {
+        checkArgument( status.ordinal() < DStatus.SUCCESSFUL.ordinal() );
+        this.status = checkNotNull( status );
+        this.lastDiscoveryStrategy = null;
+        this.lastDiscoveryMessage = null;
+        this.lastDiscoveryTimestamp = -1;
+    }
+
+    /**
+     * Constructor for statuses that represent state where discovery did ran.
      * 
      * @param status
      * @param lastDiscoveryStrategy
@@ -72,9 +87,11 @@ public class WLDiscoveryStatus
     public WLDiscoveryStatus( final DStatus status, final String lastDiscoveryStrategy,
                               final String lastDiscoveryMessage, final long lastDiscoveryTimestamp )
     {
+        checkArgument( status.ordinal() >= DStatus.SUCCESSFUL.ordinal() );
+        checkArgument( lastDiscoveryTimestamp > 0 );
         this.status = checkNotNull( status );
-        this.lastDiscoveryStrategy = lastDiscoveryStrategy;
-        this.lastDiscoveryMessage = lastDiscoveryMessage;
+        this.lastDiscoveryStrategy = checkNotNull( lastDiscoveryStrategy );
+        this.lastDiscoveryMessage = checkNotNull( lastDiscoveryMessage );
         this.lastDiscoveryTimestamp = lastDiscoveryTimestamp;
     }
 
@@ -90,37 +107,16 @@ public class WLDiscoveryStatus
 
     public String getLastDiscoveryStrategy()
     {
-        if ( getStatus().ordinal() > DStatus.ENABLED.ordinal() )
-        {
-            return lastDiscoveryStrategy;
-        }
-        else
-        {
-            return null;
-        }
+        return lastDiscoveryStrategy;
     }
 
     public String getLastDiscoveryMessage()
     {
-        if ( getStatus().ordinal() > DStatus.ENABLED.ordinal() )
-        {
-            return lastDiscoveryMessage;
-        }
-        else
-        {
-            return null;
-        }
+        return lastDiscoveryMessage;
     }
 
     public long getLastDiscoveryTimestamp()
     {
-        if ( getStatus().ordinal() > DStatus.ENABLED.ordinal() )
-        {
-            return lastDiscoveryTimestamp;
-        }
-        else
-        {
-            return -1;
-        }
+        return lastDiscoveryTimestamp;
     }
 }

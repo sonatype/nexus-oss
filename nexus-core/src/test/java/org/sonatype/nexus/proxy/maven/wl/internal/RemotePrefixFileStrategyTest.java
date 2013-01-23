@@ -46,6 +46,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -204,10 +205,11 @@ public class RemotePrefixFileStrategyTest
             server.start();
 
             final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );
-            final EntrySource entrySource =
+            final StrategyResult result =
                 subject.discover( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
                     MavenProxyRepository.class ) );
 
+            final EntrySource entrySource = result.getEntrySource();
             assertThat( entrySource.exists(), is( true ) );
             assertThat( entrySource.readEntries(), contains( "/org/apache/maven", "/org/sonatype", "/eu/flatwhite" ) );
             assertThat( entrySource.readEntries().size(), equalTo( 3 ) );
@@ -237,10 +239,11 @@ public class RemotePrefixFileStrategyTest
             server.start();
 
             final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );
-            final EntrySource entrySource =
+            final StrategyResult result =
                 subject.discover( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
                     MavenProxyRepository.class ) );
 
+            final EntrySource entrySource = result.getEntrySource();
             assertThat( entrySource.exists(), is( true ) );
             assertThat( entrySource.readEntries(), contains( "/org/apache/maven", "/org/sonatype", "/eu/flatwhite" ) );
             assertThat( entrySource.readEntries().size(), equalTo( 3 ) );

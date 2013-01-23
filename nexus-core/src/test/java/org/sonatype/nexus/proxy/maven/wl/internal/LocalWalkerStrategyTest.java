@@ -41,6 +41,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalStrategy;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class LocalWalkerStrategyTest
@@ -107,7 +108,6 @@ public class LocalWalkerStrategyTest
         throws Exception
     {
         localWalkerStrategy = (LocalWalkerStrategy) lookup( LocalStrategy.class, LocalWalkerStrategy.ID );
-
     }
 
     protected void addSomeContent( final MavenRepository mavenRepository, final List<String> paths )
@@ -141,37 +141,39 @@ public class LocalWalkerStrategyTest
         addSomeContent( mavenRepository, PATHS1 );
 
         {
-            final EntrySource entrySource1 = localWalkerStrategy.discover( mavenRepository );
+            final StrategyResult result = localWalkerStrategy.discover( mavenRepository );
+            final EntrySource entrySource = result.getEntrySource();
             assertThat(
-                entrySource1.readEntries(),
+                entrySource.readEntries(),
                 hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
                     "/org/sonatype", "/org/apache" ) );
-            assertThat( entrySource1.readEntries(), not( hasItems( "/com/sonatype" ) ) );
-            assertThat( entrySource1.readEntries().size(), equalTo( 5 ) );
+            assertThat( entrySource.readEntries(), not( hasItems( "/com/sonatype" ) ) );
+            assertThat( entrySource.readEntries().size(), equalTo( 5 ) );
         }
 
         addSomeContent( mavenRepository, PATHS2 );
 
         {
-            final EntrySource entrySource2 = localWalkerStrategy.discover( mavenRepository );
-            System.out.println( entrySource2.readEntries() );
+            final StrategyResult result = localWalkerStrategy.discover( mavenRepository );
+            final EntrySource entrySource = result.getEntrySource();
             assertThat(
-                entrySource2.readEntries(),
+                entrySource.readEntries(),
                 hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
                     "/org/sonatype", "/com/sonatype", "/org/apache" ) );
-            assertThat( entrySource2.readEntries().size(), equalTo( 6 ) );
+            assertThat( entrySource.readEntries().size(), equalTo( 6 ) );
         }
 
         removeSomeContent( mavenRepository, PATHS3 );
 
         {
-            final EntrySource entrySource3 = localWalkerStrategy.discover( mavenRepository );
+            final StrategyResult result = localWalkerStrategy.discover( mavenRepository );
+            final EntrySource entrySource = result.getEntrySource();
             assertThat(
-                entrySource3.readEntries(),
+                entrySource.readEntries(),
                 hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
                     "/com/sonatype", "/org/apache" ) );
-            assertThat( entrySource3.readEntries(), not( hasItems( "/org/sonatype" ) ) );
-            assertThat( entrySource3.readEntries().size(), equalTo( 5 ) );
+            assertThat( entrySource.readEntries(), not( hasItems( "/org/sonatype" ) ) );
+            assertThat( entrySource.readEntries().size(), equalTo( 5 ) );
         }
     }
 }
