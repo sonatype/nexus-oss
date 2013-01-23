@@ -24,7 +24,7 @@ import org.sonatype.nexus.rest.model.WLConfigMessageWrapper;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
- * WL Config REST resource.
+ * WL Configuration REST resource, usable only on Maven Proxy repositories.
  * 
  * @author cstamas
  * @since 2.4
@@ -52,6 +52,9 @@ public class WLConfigResource
         return RESOURCE_URI;
     }
 
+    /**
+     * Returns the current WL configuration for given repository.
+     */
     @Override
     @GET
     @ResourceMethodSignature( pathParams = { @PathParam( REPOSITORY_ID_KEY ) }, output = WLConfigMessageWrapper.class )
@@ -77,6 +80,9 @@ public class WLConfigResource
         return responseNessage;
     }
 
+    /**
+     * Sets the WL configuration for given repository.
+     */
     @Override
     @PUT
     @ResourceMethodSignature( pathParams = { @PathParam( REPOSITORY_ID_KEY ) }, input = WLConfigMessageWrapper.class, output = WLConfigMessageWrapper.class )
@@ -89,8 +95,10 @@ public class WLConfigResource
             final MavenProxyRepository mavenProxyRepository = getMavenRepository( request, MavenProxyRepository.class );
             final WLConfigMessageWrapper wrapper = WLConfigMessageWrapper.class.cast( payload );
             final WLDiscoveryConfig config =
-                new WLDiscoveryConfig( wrapper.getData().isDiscoveryEnabled(),
-                    wrapper.getData().isDiscoveryEnabled() ? wrapper.getData().getDiscoveryInterval() : -1L );
+                new WLDiscoveryConfig(
+                    wrapper.getData().isDiscoveryEnabled(),
+                    wrapper.getData().isDiscoveryEnabled() ? TimeUnit.HOURS.toMillis( wrapper.getData().getDiscoveryInterval() )
+                        : -1L );
             getWLManager().setRemoteDiscoveryConfig( mavenProxyRepository, config );
             return wrapper;
         }

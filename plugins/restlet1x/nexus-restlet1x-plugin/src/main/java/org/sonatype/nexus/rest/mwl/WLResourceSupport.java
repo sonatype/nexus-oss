@@ -61,29 +61,37 @@ public abstract class WLResourceSupport
         return new PathProtectionDescriptor( "/repositories/*", "authcBasic,perms[nexus:repositories]" );
     }
 
+    /**
+     * Returns properly adapted {@link MavenRepository} instance, or handles cases like not exists or not having
+     * required type (kind in Nx lingo).
+     * 
+     * @param request
+     * @param clazz
+     * @return
+     * @throws ResourceException
+     */
     protected <T extends MavenRepository> T getMavenRepository( final Request request, Class<T> clazz )
         throws ResourceException
     {
+        final String repositoryId = request.getAttributes().get( REPOSITORY_ID_KEY ).toString();
         try
         {
-            final Repository repository =
-                getRepositoryRegistry().getRepository( request.getAttributes().get( REPOSITORY_ID_KEY ).toString() );
-
+            final Repository repository = getRepositoryRegistry().getRepository( repositoryId );
             final T mavenRepository = repository.adaptToFacet( clazz );
-
             if ( mavenRepository != null )
             {
                 return mavenRepository;
             }
             else
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository not of required type!" );
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID=\"" + repositoryId
+                    + "\" is not a required type of " + clazz.getSimpleName() + "." );
             }
         }
         catch ( NoSuchRepositoryException e )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No such repository.", e );
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No repository with ID=\"" + repositoryId
+                + "\" found.", e );
         }
     }
-
 }

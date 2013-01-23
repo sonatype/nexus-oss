@@ -17,6 +17,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryStatus.DStatus;
@@ -125,6 +126,9 @@ public class WLStatusResource
         return responseNessage;
     }
 
+    /**
+     * Force updates WL for given proxy repository. If invoked for non-Maven proxy repository, response is Bad Request.
+     */
     @Override
     @DELETE
     @ResourceMethodSignature( pathParams = { @PathParam( REPOSITORY_ID_KEY ) } )
@@ -133,8 +137,10 @@ public class WLStatusResource
     {
         try
         {
-            final MavenRepository mavenRepository = getMavenRepository( request, MavenRepository.class );
+            final MavenProxyRepository mavenRepository = getMavenRepository( request, MavenProxyRepository.class );
             getWLManager().updateWhitelist( mavenRepository );
+            // currently this happens synchronously, but it is the status that will reveal real outcome of the operation
+            response.setStatus( Status.SUCCESS_ACCEPTED );
         }
         catch ( IOException e )
         {
