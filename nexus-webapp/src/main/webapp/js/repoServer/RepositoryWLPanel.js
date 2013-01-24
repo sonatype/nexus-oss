@@ -11,7 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, Sonatype) {
+define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], function(Ext, Sonatype, Nexus) {
+
+  var resourceUrl = new Ext.Template(Sonatype.config.repos.urls.repositories + "/{0}/wl").compile();
 
   var discoveryUpdateIntervalStore = new Ext.data.ArrayStore({
     fields : ['intervalLabel', 'valueHrs'],
@@ -27,6 +29,24 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
     ]
   });
 
+  var publishStatusStore = new Ext.data.ArrayStore({
+    fields : ['text', 'value'],
+    data : [
+      ['Not published.', '-1'],
+      ['Unknown.', '0'],
+      ['Published.', '1']
+    ]
+  });
+
+  var discoveryStatusStore = new Ext.data.ArrayStore({
+    fields : ['text', 'value'],
+    data : [
+      ['Unsuccessful.', '-1'],
+      ['Working...', '0'],
+      ['Successful.', '1']
+    ]
+  });
+
   Sonatype.repoServer.RepositoryWLPanel = function(cfg) {
     if (!cfg || !cfg.payload) {
       throw new Error("payload missing: need repository record");
@@ -37,10 +57,36 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
           defaultConfig = {
             frame : true,
             autoScroll : true,
-            defaultAnchor : '-15'
+            defaultAnchor : '-15',
+            readOnly : true, // don't want save/cancel buttons
+            url : resourceUrl.apply([cfg.payload.data.id])
           };
 
+    var payload = cfg.payload;
+
+    this.payload = {
+      data : {
+        id : cfg.payload.data.id,
+        resourceURI : resourceUrl.apply([cfg.payload.data.id])
+      }
+    };
+
+    // don't use payload directly, this panel does not behave as expected by Nexus.ext.FormPanel
+    delete cfg.payload;
+
     Ext.apply(this, cfg, defaultConfig);
+
+    this.dataModifiers = {
+      load : {
+        'publishedStatus' : function(value) {
+          return publishStatusStore.getAt(publishStatusStore.find('value', value)).get('text');
+        },
+
+        'discovery.discoveryLastStatus' : function(value) {
+          return discoveryStatusStore.getAt(discoveryStatusStore.find('value', value)).get('text');
+        }
+      }
+    };
 
     this.items = [
       {
@@ -59,20 +105,17 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
               {
                 xtype : 'displayfield',
                 fieldLabel : 'Status',
-                name : 'pub_status',
-                value : 'Published.'
+                name : 'publishedStatus'
               },
               {
                 xtype : 'displayfield',
                 fieldLabel : 'Message',
-                name : 'pub_message',
-                value : 'Prefix file published.'
+                name : 'publishedMessage'
               },
               {
                 xtype : 'timestampDisplayField',
                 fieldLabel : 'Published on',
-                name : 'pub_lastRun',
-                value : 123456789123456
+                name : 'publishedTimestamp'
               }
             ]
           },
@@ -86,11 +129,8 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
             items : [
               {
                 xtype : 'link-button',
-                fieldLabel : 'View prefix file',
-                hideLabel : true,
-                name : 'pub_fileLink',
                 text : 'Show prefix file',
-                href : 'http://localhost:8081/nexus/content/repositories/releases/.meta/prefixes.txt',
+                href : Sonatype.config.content.repositories + '/' + this.payload.data.id + '/.meta/prefixes.txt',
                 target : '_blank'
               }
             ]
@@ -100,7 +140,7 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
       {
         xtype : 'checkbox',
         fieldLabel : 'Enable Discovery',
-        name : 'dis_enable',
+        name : 'discovery.discoveryEnabled',
         value : false,
         hidden : subjectIsNotProxy,
         handler : this.enableDiscoveryHandler
@@ -114,25 +154,22 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
           {
             xtype : 'displayfield',
             fieldLabel : 'Status',
-            name : 'dis_status',
-            value : 'Remote content discovered successfully (prefix file).'
+            name : 'discovery.discoveryLastStatus'
           },
           {
             xtype : 'displayfield',
             fieldLabel : 'Message',
-            name : 'dis_message',
-            value : 'Remote prefix file published on XXXXX'
+            name : 'discovery.discoveryLastMessage'
           },
           {
             xtype : 'timestampDisplayField',
             fieldLabel : 'Last run',
-            name : 'dis_lastRun',
-            value : 123456789123456
+            name : 'discovery.discoveryLastRunTimestamp'
           },
           {
             xtype : 'combo',
             fieldLabel : 'Update interval',
-            name : 'dis_updateInterval',
+            name : 'discovery.discoveryInterval',
             store : discoveryUpdateIntervalStore,
             displayField : 'intervalLabel',
             valueField : 'valueHrs',
@@ -148,15 +185,22 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
             forceSelection : true,
             triggerAction : 'all',
             typeAhead : true,
+            listeners : {
+              select : function(combo, record, index) {
+                Ext.Ajax.request({
+
+                });
+
+              }
+            },
             width : 150
           },
           {
             xtype : 'button',
-            fieldLabel : 'Force remote discovery',
             hideLabel : true,
-            name : 'dis_forceRemoteDiscovery',
             text : 'Force remote discovery',
-            handler : this.forceRemoteDiscoveryHandler
+            handler : this.forceRemoteDiscoveryHandler,
+            scope : this
           }
         ]
       }
@@ -165,7 +209,7 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
     Sonatype.repoServer.RepositoryWLPanel.superclass.constructor.call(this);
   };
 
-  Ext.extend(Sonatype.repoServer.RepositoryWLPanel, Ext.FormPanel, {
+  Ext.extend(Sonatype.repoServer.RepositoryWLPanel, Nexus.ext.FormPanel, {
 
     enableDiscoveryHandler : function(checkbox, checked) {
       // 'this' is the checkbox
@@ -179,7 +223,13 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all'], function(Ext, 
     },
 
     forceRemoteDiscoveryHandler : function(button, event) {
-      window.alert("bbrbrbrrrr, it's remote discovey working!");
+      Ext.Ajax.request({
+        method : 'DELETE',
+        url : resourceUrl.apply([this.payload.data.id]),
+        callback : function() {
+          alert('done');
+        }
+      });
     }
   });
 
