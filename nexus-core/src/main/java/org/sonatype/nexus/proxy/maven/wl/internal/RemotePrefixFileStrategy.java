@@ -68,8 +68,11 @@ public class RemotePrefixFileStrategy
             item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
             if ( item != null )
             {
-                return new StrategyResult( "Remote publishes prefix file.", createEntrySource( mavenProxyRepository,
-                    path ) );
+                // TODO: measure somehow with "age" of the file (is 1234 dqys old) or such, but watch formatting as this
+                // message
+                // is formatted server side, while other date fields are JS formatted!
+                return new StrategyResult( "Remote publishes prefix file (is XXX days old), using it.",
+                    createEntrySource( mavenProxyRepository, path ) );
             }
         }
         throw new StrategyFailedException( "Remote does not publish prefix files on paths " + remoteFilePath );
