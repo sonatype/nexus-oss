@@ -1,6 +1,7 @@
 package org.sonatype.nexus.rest.mwl;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -73,11 +74,22 @@ public class WLStatusResource
         final MavenRepository mavenRepository = getMavenRepository( request, MavenRepository.class );
         final WLStatus status = getWLManager().getStatusFor( mavenRepository );
         final WLStatusMessage payload = new WLStatusMessage();
-        payload.setPublished( PStatus.PUBLISHED == status.getPublishingStatus().getStatus() );
-        payload.setPublishedMessage( status.getPublishingStatus().getLastPublishedMessage() );
-        if ( payload.isPublished() )
+        switch ( status.getPublishingStatus().getStatus() )
         {
-            final WLPublishingStatus pstatus = status.getPublishingStatus();
+            case PUBLISHED:
+                payload.setPublishedStatus( 1 );
+                break;
+            case NOT_PUBLISHED:
+                payload.setPublishedStatus( -1 );
+                break;
+            default:
+                payload.setPublishedStatus( 0 );
+                break;
+        }
+        payload.setPublishedMessage( status.getPublishingStatus().getLastPublishedMessage() );
+        final WLPublishingStatus pstatus = status.getPublishingStatus();
+        if ( PStatus.PUBLISHED == pstatus.getStatus() )
+        {
             payload.setPublishedTimestamp( pstatus.getLastPublishedTimestamp() );
             if ( pstatus.getLastPublishedFilePath() != null )
             {
@@ -95,33 +107,42 @@ public class WLStatusResource
         }
         if ( DStatus.NOT_A_PROXY == status.getDiscoveryStatus().getStatus() )
         {
-            payload.setDiscoveryStatus( null );
+            payload.setDiscovery( null );
         }
         else
         {
             final WLDiscoveryStatus dstatus = status.getDiscoveryStatus();
-            payload.setDiscoveryStatus( new WLDiscoveryStatusMessage() );
+            final WLDiscoveryStatusMessage discoveryPayload = new WLDiscoveryStatusMessage();
+            payload.setDiscovery( discoveryPayload );
             if ( DStatus.DISABLED == status.getDiscoveryStatus().getStatus() )
             {
-                payload.getDiscoveryStatus().setEnabled( false );
-            }
-            else if ( DStatus.ENABLED == status.getDiscoveryStatus().getStatus() )
-            {
-                payload.getDiscoveryStatus().setEnabled( true );
-                // no last run, so nothing else to say
+                discoveryPayload.setDiscoveryEnabled( false );
             }
             else
             {
                 final MavenProxyRepository mavenProxyRepository =
                     getMavenRepository( request, MavenProxyRepository.class );
                 final WLDiscoveryConfig config = getWLManager().getRemoteDiscoveryConfig( mavenProxyRepository );
-                payload.getDiscoveryStatus().setEnabled( config.isEnabled() );
-                payload.getDiscoveryStatus().setUpdateInterval( config.getDiscoveryInterval() );
-                // last- messages
-                payload.getDiscoveryStatus().setLastStatus( dstatus.getStatus().name() );
-                payload.getDiscoveryStatus().setLastStrategy( dstatus.getLastDiscoveryStrategy() );
-                payload.getDiscoveryStatus().setLastMessage( dstatus.getLastDiscoveryMessage() );
-                payload.getDiscoveryStatus().setLastRunTimestamp( dstatus.getLastDiscoveryTimestamp() );
+                discoveryPayload.setDiscoveryEnabled( true );
+                discoveryPayload.setDiscoveryInterval( TimeUnit.MILLISECONDS.toHours( config.getDiscoveryInterval() ) );
+                discoveryPayload.setDiscoveryLastStatus( 0 );
+
+                // if we have it run at all
+                if ( DStatus.ENABLED.ordinal() < status.getDiscoveryStatus().getStatus().ordinal() )
+                {
+                    if ( DStatus.SUCCESSFUL == status.getDiscoveryStatus().getStatus() )
+                    {
+                        discoveryPayload.setDiscoveryLastStatus( 1 );
+                    }
+                    else
+                    {
+                        discoveryPayload.setDiscoveryLastStatus( -1 );
+                    }
+                    // last- messages
+                    discoveryPayload.setDiscoveryLastStrategy( dstatus.getLastDiscoveryStrategy() );
+                    discoveryPayload.setDiscoveryLastMessage( dstatus.getLastDiscoveryMessage() );
+                    discoveryPayload.setDiscoveryLastRunTimestamp( dstatus.getLastDiscoveryTimestamp() );
+                }
             }
         }
 
