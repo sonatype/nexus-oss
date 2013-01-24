@@ -155,6 +155,29 @@
           </sharedDependencies>
         </configuration>
       </plugin>
+
+      <!--
+      FIXME: Use requirejs and avoid needing explicit ordering here, and to be able to use the default configuration.
+      -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>js</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <!-- relative to src/main/js -->
+                <include>nexus/**</include>
+                <include>${project.artifactId}.js</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
