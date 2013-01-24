@@ -12,8 +12,12 @@
  */
 package org.sonatype.nexus.proxy;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.sisu.goodies.common.FormatTemplate;
 
 /**
  * Thrown if the requested item is not found.
@@ -26,42 +30,81 @@ public class ItemNotFoundException
     private static final long serialVersionUID = -4964273361722823796L;
 
     /**
-     * Reason of the item not found.
-     * 
-     * @since 2.4
+     * Reason of item not found when no repository is involved. Usually ther IS one, so you should use
+     * {@link ItemNotFoundInRepositoryReason} instead. This one is used in places like {@link RepositoryRouter}, where
+     * the "targeted" repository is still unknown or similar places.
      */
-    public static interface ItemNotFoundReason
+    public static class ItemNotFoundReason
     {
-        /**
-         * The textual reason why item was not found.
-         * 
-         * @return the textual explanation.
-         */
-        String getMessage();
+        private final FormatTemplate message;
+
+        private final ResourceStoreRequest resourceStoreRequest;
 
         /**
-         * The resource store request that is unable to be fulfilled.
+         * Constructor.
          * 
-         * @return the request resulting in not found.
+         * @param message reason message (might not be {@code null}).
+         * @param resourceStoreRequest request (might not be {@code null}).
          */
-        ResourceStoreRequest getResourceStoreRequest();
+        public ItemNotFoundReason( final FormatTemplate message, final ResourceStoreRequest resourceStoreRequest )
+        {
+            this.message = checkNotNull( message );
+            this.resourceStoreRequest = checkNotNull( resourceStoreRequest );
+        }
 
+        /**
+         * Returns the reason message.
+         * 
+         * @return the reason message.
+         */
+        public String getMessage()
+        {
+            return message.toString();
+        }
+
+        /**
+         * Returns the request.
+         * 
+         * @return the request.
+         */
+        public ResourceStoreRequest getResourceStoreRequest()
+        {
+            return resourceStoreRequest;
+        }
     }
 
     /**
-     * Reason of the item not found that involved a {@link Repository} too.
-     * 
-     * @since 2.4
+     * Reason of item not found that is triggered within a {@link Repository} instance.
      */
-    public interface ItemNotFoundInRepositoryReason
+    public static class ItemNotFoundInRepositoryReason
         extends ItemNotFoundReason
     {
+        private final Repository repository;
+
         /**
-         * Returns the involved repository.
+         * Constructor.
          * 
-         * @return the repository.
+         * @param message reason message (might not be {@code null}).
+         * @param resourceStoreRequest request (might not be {@code null}).
+         * @param repository repository (might not be {@code null}).
          */
-        Repository getRepository();
+        public ItemNotFoundInRepositoryReason( final FormatTemplate message,
+                                               final ResourceStoreRequest resourceStoreRequest,
+                                               final Repository repository )
+        {
+            super( message, resourceStoreRequest );
+            this.repository = checkNotNull( repository );
+        }
+
+        /**
+         * Returns the involved {@link Repository} instance.
+         * 
+         * @return the repository in which item-not-found occurred.
+         */
+        public Repository getRepository()
+        {
+            return repository;
+        }
     }
 
     private final ItemNotFoundReason reason;
@@ -69,7 +112,7 @@ public class ItemNotFoundException
     /**
      * Constructor.
      * 
-     * @param reason
+     * @param reason (might not be {@code null}).
      * @since 2.4
      */
     public ItemNotFoundException( final ItemNotFoundReason reason )
@@ -80,18 +123,19 @@ public class ItemNotFoundException
     /**
      * Constructor with cause.
      * 
-     * @param reason
+     * @param reason (might not be {@code null}).
      * @param cause
+     * @throws NullPointerException if passed in reason parameter is {@code null}.
      * @since 2.4
      */
     public ItemNotFoundException( final ItemNotFoundReason reason, final Throwable cause )
     {
-        super( reason.getMessage(), cause ); // will NPE with null reason
+        super( reason.getMessage(), cause );
         this.reason = reason;
     }
 
     /**
-     * Returns the reason of the item not found exception.
+     * Returns the reason of the item not found exception (never {@code null}).
      * 
      * @return the reason.
      * @since 2.4

@@ -12,71 +12,27 @@
  */
 package org.sonatype.nexus.proxy;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.sisu.goodies.common.FormatTemplate;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 /**
- * Class with some handy static methods to contruct reasoning for {@link ItemNotFoundException}.
+ * Helper class with some handy static methods to construct reasoning for {@link ItemNotFoundException}.
  * 
  * @author cstamas
  * @since 2.4
  */
 public class ItemNotFoundReasons
 {
-    private static class ItemNotFoundReasonImpl
-        implements ItemNotFoundReason
+    /**
+     * The "do not create" constructor.
+     */
+    private ItemNotFoundReasons()
     {
-        private final FormatTemplate message;
-
-        private final ResourceStoreRequest resourceStoreRequest;
-
-        public ItemNotFoundReasonImpl( final FormatTemplate message, final ResourceStoreRequest resourceStoreRequest )
-        {
-            this.message = checkNotNull( message );
-            this.resourceStoreRequest = checkNotNull( resourceStoreRequest );
-        }
-
-        @Override
-        public String getMessage()
-        {
-            return message.toString();
-        }
-
-        @Override
-        public ResourceStoreRequest getResourceStoreRequest()
-        {
-            return resourceStoreRequest;
-        }
+        // do no create this one
     }
-
-    private static class ItemNotFoundInRepositoryReasonImpl
-        extends ItemNotFoundReasonImpl
-        implements ItemNotFoundInRepositoryReason
-    {
-        private final Repository repository;
-
-        public ItemNotFoundInRepositoryReasonImpl( final FormatTemplate message,
-                                                   final ResourceStoreRequest resourceStoreRequest,
-                                                   final Repository repository )
-        {
-            super( message, resourceStoreRequest );
-            this.repository = checkNotNull( repository );
-        }
-
-        @Override
-        public Repository getRepository()
-        {
-            return repository;
-        }
-    }
-
-    // ==
 
     /**
      * Creates a new instance of {@link ItemNotFoundReason}.
@@ -89,7 +45,7 @@ public class ItemNotFoundReasons
     public static ItemNotFoundReason reasonFor( final ResourceStoreRequest request, final String message,
                                                 final Object... params )
     {
-        return new ItemNotFoundReasonImpl( SimpleFormat.template( message, params ), request );
+        return new ItemNotFoundReason( SimpleFormat.template( message, params ), request );
     }
 
     /**
@@ -105,7 +61,7 @@ public class ItemNotFoundReasons
                                                             final Repository repository, final String message,
                                                             final Object... params )
     {
-        return new ItemNotFoundInRepositoryReasonImpl( SimpleFormat.template( message, params ), request, repository );
+        return new ItemNotFoundInRepositoryReason( SimpleFormat.template( message, params ), request, repository );
     }
 
     /**
@@ -169,11 +125,11 @@ public class ItemNotFoundReasons
     {
         if ( repository != null )
         {
-            return new ItemNotFoundInRepositoryReasonImpl( SimpleFormat.template( message ), request, repository );
+            return new ItemNotFoundInRepositoryReason( SimpleFormat.template( message ), request, repository );
         }
         else
         {
-            return new ItemNotFoundReasonImpl( SimpleFormat.template( message ), request );
+            return new ItemNotFoundReason( SimpleFormat.template( message ), request );
         }
     }
 }

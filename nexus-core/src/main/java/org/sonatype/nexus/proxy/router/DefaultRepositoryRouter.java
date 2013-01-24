@@ -37,7 +37,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundReasons;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -528,7 +527,7 @@ public class DefaultRepositoryRouter
                 if ( !repository.isExposed() )
                 {
                     // this is not the main facet or the repo is not exposed
-                    throw new ItemNotFoundException( reasonFor( request, "Repository %s exists but is not exposed!",
+                    throw new ItemNotFoundException( reasonFor( request, "Repository %s exists but is not exposed.",
                         RepositoryStringUtils.getHumanizedNameString( repository ) ) );
                 }
             }
