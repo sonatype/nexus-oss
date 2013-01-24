@@ -4510,7 +4510,7 @@
       <version>1.0.0+</version>
       <description>WL Discovery Configuration.</description>
       <annotations>
-        <annotation>@javax.xml.bind.annotation.XmlType( name = "wlConfiguration" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "configMessage" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
       <fields>
@@ -4556,47 +4556,47 @@
       <version>1.0.0+</version>
       <description>WL Discovery Status details.</description>
       <annotations>
-        <annotation>@javax.xml.bind.annotation.XmlType( name = "wlDiscoveryStatus" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "discovery" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
       <fields>
         <field>
-          <name>enabled</name>
+          <name>discoveryEnabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
           <description>The discovery is enabled or not.</description>
         </field>
         <field>
-          <name>updateInterval</name>
+          <name>discoveryInterval</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
           <description>Update interval in hours.</description>
         </field>
         <field>
-          <name>lastStatus</name>
+          <name>discoveryLastStatus</name>
           <version>1.0.0+</version>
-          <type>String</type>
+          <type>int</type>
           <required>true</required>
-          <description>The discovery status, was it successful or not, or still running.</description>
+          <description>The last discovery status, was it successful (1) or not (-1), or still running (0).</description>
         </field>
         <field>
-          <name>lastStrategy</name>
+          <name>discoveryLastStrategy</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>The strategy used (once finished).</description>
         </field>
         <field>
-          <name>lastMessage</name>
+          <name>discoveryLastMessage</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>The message of discovery (strategy dependant, once finished).</description>
         </field>
         <field>
-          <name>lastRunTimestamp</name>
+          <name>discoveryLastRunTimestamp</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
@@ -4609,16 +4609,16 @@
       <version>1.0.0+</version>
       <description>WL Status details.</description>
       <annotations>
-        <annotation>@javax.xml.bind.annotation.XmlType( name = "wlStatus" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "statusMessage" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
       <fields>
         <field>
-          <name>published</name>
+          <name>publishedStatus</name>
           <version>1.0.0+</version>
-          <type>boolean</type>
+          <type>int</type>
           <required>true</required>
-          <description>The publishing status.</description>
+          <description>The publishing status, was it published (1), or not (-1) or not processed or still processing (0).</description>
         </field>
         <field>
           <name>publishedMessage</name>
@@ -4642,7 +4642,7 @@
           <description>The URL of the published WL prefix file or null if not published.</description>
         </field>
         <field>
-          <name>discoveryStatus</name>
+          <name>discovery</name>
           <version>1.0.0+</version>
           <association>
             <type>WLDiscoveryStatusMessage</type>
