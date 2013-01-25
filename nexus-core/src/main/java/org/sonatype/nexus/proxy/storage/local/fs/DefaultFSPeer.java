@@ -473,8 +473,8 @@ public class DefaultFSPeer
         // if retries enabled go ahead and start the retry process
         for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
         {
-            getLogger().debug( "Rename operation attempt {} failed on {} --> {}, will wait {} ms and try again",
-                new Object[] { i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), getRenameRetryDelay() } );
+            getLogger().debug( "Rename operation attempt {} failed on {} --> {}, will wait {} ms and try again", i,
+                hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), getRenameRetryDelay() );
 
             try
             {
@@ -495,8 +495,8 @@ public class DefaultFSPeer
 
             if ( success )
             {
-                getLogger().info( "Rename operation succeeded after {} retries on {} --> {}",
-                    new Object[] { i, hiddenTarget.getAbsolutePath(), target.getAbsolutePath() } );
+                getLogger().info( "Rename operation succeeded after {} retries on {} --> {}", i,
+                    hiddenTarget.getAbsolutePath(), target.getAbsolutePath() );
             }
         }
 
@@ -508,10 +508,9 @@ public class DefaultFSPeer
             }
             catch ( IOException e )
             {
-                getLogger().error(
-                    "Rename operation failed after {} retries in {} ms intervals {} --> {}",
-                    new Object[] { getRenameRetryCount(), getRenameRetryDelay(), hiddenTarget.getAbsolutePath(),
-                        target.getAbsolutePath() } );
+                getLogger().error( "Rename operation failed after {} retries in {} ms intervals {} --> {}",
+                    getRenameRetryCount(), getRenameRetryDelay(), hiddenTarget.getAbsolutePath(),
+                    target.getAbsolutePath() );
 
                 throw new IOException( String.format( "Cannot rename file \"%s\" to \"%s\"! Message: %s",
                     hiddenTarget.getAbsolutePath(), target.getAbsolutePath(), e.getMessage() ), e );
