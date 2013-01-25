@@ -138,18 +138,22 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
         ]
       },
       {
-        xtype : 'checkbox',
-        fieldLabel : 'Enable Discovery',
-        name : 'discovery.discoveryEnabled',
-        value : false,
-        hidden : subjectIsNotProxy,
-        handler : this.enableDiscoveryHandler
-      },
-      {
         xtype : 'fieldset',
         title : 'Discovery',
+//        collapsible : false,
+        checkboxToggle : true,
+        checkboxName : 'discover.discoveryEnabled',
         name : 'dis_fieldset',
-        hidden : subjectIsNotProxy,
+        collapsed : subjectIsNotProxy,
+        listeners : {
+          expand : function() {
+            this.enableDiscoveryHandler(true);
+          },
+          collapse : function() {
+            this.disableDiscovery();
+          },
+          scope : this
+        },
         items : [
           {
             xtype : 'displayfield',
@@ -206,11 +210,11 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
 
   Ext.extend(Sonatype.repoServer.RepositoryWLPanel, Nexus.ext.FormPanel, {
 
-    enableDiscoveryHandler : function(checkbox, checked) {
+    enableDiscoveryHandler : function(checked) {
       // 'this' is the checkbox
       var
-            combo = this.ownerCt.find('name', 'discovery.discoveryInterval'),
-            fieldset = this.ownerCt.find('name', 'dis_fieldset');
+            combo = this.find('name', 'discovery.discoveryInterval'),
+            fieldset = this.find('name', 'dis_fieldset');
 
       if (!(fieldset.length > 0 && combo.length > 0)) {
         throw new Error('could not find interval combo box or fieldset');
@@ -221,12 +225,13 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
         return;
       }
 
-      fieldset[0].setVisible(checked);
 
       if (checked) {
-        this.ownerCt.enableDiscovery(parseInt(combo[0].getValue(), 10));
+        this.enableDiscovery(parseInt(combo[0].getValue(), 10));
+        fieldset[0].expand();
       } else {
-        this.ownerCt.disableDiscovery();
+        this.disableDiscovery();
+        fieldset[0].collapse();
       }
     },
 
