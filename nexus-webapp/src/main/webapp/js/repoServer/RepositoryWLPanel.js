@@ -187,11 +187,9 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
             typeAhead : true,
             listeners : {
               select : function(combo, record, index) {
-                Ext.Ajax.request({
-
-                });
-
-              }
+                this.enableDiscovery(parseInt(combo.getValue(), 10));
+              },
+              scope : this
             },
             width : 150
           },
@@ -213,22 +211,84 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
 
     enableDiscoveryHandler : function(checkbox, checked) {
       // 'this' is the checkbox
-      var fieldset = this.ownerCt.find('name', 'dis_fieldset');
-      if (fieldset.length > 0) {
-        fieldset[0].setVisible(checked);
-      } else {
-        throw new Error('could not find "dis_fieldset"');
+      var
+            combo = this.ownerCt.find('name', 'discovery.discoveryInterval'),
+            fieldset = this.ownerCt.find('name', 'dis_fieldset');
+
+      if (!(fieldset.length > 0 && combo.length > 0)) {
+        throw new Error('could not find interval combo box or fieldset');
       }
 
+      if ( Ext.isEmpty(combo[0].getValue()) ) {
+        // still in loadData(), do nothing
+        return;
+      }
+
+      fieldset[0].setVisible(checked);
+
+      if (checked) {
+        this.ownerCt.enableDiscovery(parseInt(combo[0].getValue(), 10));
+      } else {
+        this.ownerCt.disableDiscovery();
+      }
+    },
+
+    disableDiscovery : function() {
+      var
+            self = this,
+            mask = new Ext.LoadMask(this.el, {
+              msg : 'Disabling discovery...'
+            });
+      mask.show();
+      Ext.Ajax.request({
+        method : 'PUT',
+        url : resourceUrl.apply([this.payload.data.id]) + '/config',
+        jsonData : {
+          data : {
+            discoveryEnabled : false,
+            discoveryInterval : -1
+          }
+        },
+        callback : function() {
+          mask.hide();
+        },
+        scope : this
+      });
+    },
+
+    enableDiscovery : function(interval) {
+      var mask = new Ext.LoadMask(this.el, {
+        msg : 'Updating discovery...'
+      });
+      mask.show();
+      Ext.Ajax.request({
+        method : 'PUT',
+        url : resourceUrl.apply([this.payload.data.id]) + '/config',
+        jsonData : {
+          data : {
+            discoveryEnabled : true,
+            discoveryInterval : interval
+          }
+        },
+        callback : function() {
+          mask.hide();
+        },
+        scope : this
+      });
     },
 
     forceRemoteDiscoveryHandler : function(button, event) {
+      var mask = new Ext.LoadMask(this.el, {
+        msg : 'Forcing discovery...'
+      });
+      mask.show();
       Ext.Ajax.request({
         method : 'DELETE',
         url : resourceUrl.apply([this.payload.data.id]),
         callback : function() {
-          alert('done');
-        }
+          mask.hide();
+        },
+        scope : this
       });
     }
   });
