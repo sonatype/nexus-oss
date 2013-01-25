@@ -15,8 +15,6 @@ package org.sonatype.nexus.proxy.walker;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.util.Node;
 import org.sonatype.nexus.util.PathUtils;
@@ -232,7 +230,7 @@ public class ParentOMatic
         applyRecursively( getRoot(), new Function<Node<Payload>, Node<Payload>>()
         {
             @Override
-            public Node<Payload> apply( @Nullable Node<Payload> input )
+            public Node<Payload> apply( Node<Payload> input )
             {
                 if ( input.getDepth() == maxDepth )
                 {
