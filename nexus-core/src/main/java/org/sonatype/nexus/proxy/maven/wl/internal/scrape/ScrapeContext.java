@@ -2,10 +2,7 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.jsoup.nodes.Document;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 
 /**
@@ -21,10 +18,6 @@ public class ScrapeContext
 
     private final int scrapeDepth;
 
-    private final HttpResponse remoteRepositoryRootResponse;
-
-    private final Document remoteRepositoryRootDocument;
-
     private boolean stopped;
 
     private EntrySource entrySource;
@@ -37,17 +30,12 @@ public class ScrapeContext
      * @param httpClient
      * @param remoteRepositoryRootUrl
      * @param scrapeDepth
-     * @param remoteRepositoryRootResponse
-     * @param remoteRepositoryRootDocument
      */
-    public ScrapeContext( final HttpClient httpClient, final String remoteRepositoryRootUrl, final int scrapeDepth,
-                          final HttpResponse remoteRepositoryRootResponse, final Document remoteRepositoryRootDocument )
+    public ScrapeContext( final HttpClient httpClient, final String remoteRepositoryRootUrl, final int scrapeDepth )
     {
         this.httpClient = checkNotNull( httpClient );
         this.remoteRepositoryRootUrl = checkNotNull( remoteRepositoryRootUrl );
         this.scrapeDepth = checkNotNull( scrapeDepth );
-        this.remoteRepositoryRootResponse = checkNotNull( remoteRepositoryRootResponse );
-        this.remoteRepositoryRootDocument = checkNotNull( remoteRepositoryRootDocument );
         this.stopped = false;
     }
 
@@ -147,26 +135,5 @@ public class ScrapeContext
     public int getScrapeDepth()
     {
         return scrapeDepth;
-    }
-
-    /**
-     * The response of doing HTTP GET against {@link #getRemoteRepositoryRootUrl()}, but with {@link HttpEntity}
-     * consumed. See {@link #getRemoteRepositoryRootDocument()} for entity parsed.
-     * 
-     * @return response with entity consumed.
-     */
-    public HttpResponse getRemoteRepositoryRootResponse()
-    {
-        return remoteRepositoryRootResponse;
-    }
-
-    /**
-     * The document built from {@link #getRemoteRepositoryRootResponse()} entity.
-     * 
-     * @return the root {@link Document}.
-     */
-    public Document getRemoteRepositoryRootDocument()
-    {
-        return remoteRepositoryRootDocument;
     }
 }

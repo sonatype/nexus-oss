@@ -69,14 +69,14 @@ public abstract class AbstractScraper
     }
 
     @Override
-    public void scrape( final ScrapeContext context )
+    public void scrape( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument )
         throws IOException
     {
-        final RemoteDetectionResult detectionResult = detectRemoteRepository( context );
+        final RemoteDetectionResult detectionResult = detectRemoteRepository( context, rootResponse, rootDocument );
         switch ( detectionResult )
         {
             case RECOGNIZED_SHOULD_BE_SCRAPED:
-                final EntrySource entrySource = diveIn( context );
+                final EntrySource entrySource = diveIn( context, rootResponse, rootDocument );
                 context.stop( entrySource, "Remote recognized as " + getTargetedServer() + "." );
                 break;
 
@@ -94,9 +94,9 @@ public abstract class AbstractScraper
 
     protected abstract String getTargetedServer();
 
-    protected abstract RemoteDetectionResult detectRemoteRepository( final ScrapeContext context );
+    protected abstract RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument );
 
-    protected abstract EntrySource diveIn( final ScrapeContext context )
+    protected abstract EntrySource diveIn( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument )
         throws IOException;
 
     // ==

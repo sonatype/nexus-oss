@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.http.HttpResponse;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -42,10 +43,11 @@ public class NexusScraper
     }
 
     @Override
-    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context )
+    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
+                                                            final HttpResponse rootResponse, final Document rootDocument )
     {
         // cheap checks first, to quickly eliminate target without doing any remote requests
-        final Elements elements = context.getRemoteRepositoryRootDocument().getElementsByTag( "a" );
+        final Elements elements = rootDocument.getElementsByTag( "a" );
         if ( elements.isEmpty() )
         {
             // not even close to nexus index page format, as it always have at least one element
@@ -84,12 +86,13 @@ public class NexusScraper
     }
 
     @Override
-    protected EntrySource diveIn( final ScrapeContext context )
+    protected EntrySource diveIn( final ScrapeContext context, final HttpResponse rootResponse,
+                                  final Document rootDocument )
         throws IOException
     {
         // we use the great and all-mighty ParentOMatic
         final ParentOMatic parentOMatic = new ParentOMatic();
-        diveIn( context, context.getRemoteRepositoryRootDocument(), 0, parentOMatic, parentOMatic.getRoot() );
+        diveIn( context, rootDocument, 0, parentOMatic, parentOMatic.getRoot() );
         return new ArrayListEntrySource( parentOMatic.getAllLeafPaths() );
     }
 

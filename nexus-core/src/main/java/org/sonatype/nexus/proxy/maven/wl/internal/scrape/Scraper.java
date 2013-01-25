@@ -2,6 +2,8 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
 import java.io.IOException;
 
+import org.apache.http.HttpResponse;
+import org.jsoup.nodes.Document;
 import org.sonatype.nexus.proxy.maven.wl.discovery.Prioritized;
 
 /**
@@ -23,8 +25,10 @@ public interface Scraper
      * Tries to scrape. Scraper should flag the {@link ScrapeContext} if it wants to stop the processing.
      * 
      * @param context
+     * @param rootResponse
+     * @param rootDocument
      * @throws IOException
      */
-    void scrape( ScrapeContext context )
+    void scrape( ScrapeContext context, HttpResponse rootResponse, Document rootDocument )
         throws IOException;
 }

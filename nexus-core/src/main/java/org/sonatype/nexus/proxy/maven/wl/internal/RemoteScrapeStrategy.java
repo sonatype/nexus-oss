@@ -86,64 +86,68 @@ public class RemoteScrapeStrategy
         final String remoteRepositoryRootUrl = mavenProxyRepository.getRemoteUrl();
         if ( isMarkedForNoScrape( httpClient, remoteRepositoryRootUrl ) )
         {
-            throw new StrategyFailedException( "Remote flagged itself as NOSCRAPE, obeying it." );
+            throw new StrategyFailedException( "Remote forbids scraping, is flagged as \"no-scrape\"." );
         }
-        HttpResponse remoteRepositoryRootResponse = null;
         try
         {
+            HttpResponse remoteRepositoryRootResponse = null;
+            final Document remoteRepositoryRootDocument;
             final HttpGet get = new HttpGet( remoteRepositoryRootUrl );
-            remoteRepositoryRootResponse = httpClient.execute( get );
-            if ( remoteRepositoryRootResponse.getStatusLine().getStatusCode() == 200 )
+            try
             {
-                // TODO: detect redirects
-                final Document remoteRepositoryRootDocument =
-                    Jsoup.parse( remoteRepositoryRootResponse.getEntity().getContent(), null, remoteRepositoryRootUrl );
-
-                final ScrapeContext context =
-                    new ScrapeContext( httpClient, remoteRepositoryRootUrl, config.getRemoteScrapeDepth(),
-                        remoteRepositoryRootResponse, remoteRepositoryRootDocument );
-
-                final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
-                Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
-
-                for ( Scraper scraper : appliedScrapers )
+                remoteRepositoryRootResponse = httpClient.execute( get );
+                if ( remoteRepositoryRootResponse.getStatusLine().getStatusCode() == 200 )
                 {
-                    try
+                    // TODO: detect redirects
+                    remoteRepositoryRootDocument =
+                        Jsoup.parse( remoteRepositoryRootResponse.getEntity().getContent(), null,
+                            remoteRepositoryRootUrl );
+
+                }
+                else
+                {
+                    throw new StrategyFailedException( "Unexpected response from remote repository root: "
+                        + remoteRepositoryRootResponse.getStatusLine().toString() );
+                }
+            }
+            finally
+            {
+                EntityUtils.consumeQuietly( remoteRepositoryRootResponse.getEntity() );
+            }
+
+            final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
+            Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
+
+            final ScrapeContext context =
+                new ScrapeContext( httpClient, remoteRepositoryRootUrl, config.getRemoteScrapeDepth() );
+            for ( Scraper scraper : appliedScrapers )
+            {
+                try
+                {
+                    scraper.scrape( context, remoteRepositoryRootResponse, remoteRepositoryRootDocument );
+                    if ( context.isStopped() )
                     {
-                        scraper.scrape( context );
-                        if ( context.isStopped() )
+                        if ( context.isSuccessful() )
                         {
-                            if ( context.isSuccessful() )
-                            {
-                                return new StrategyResult( context.getMessage(), context.getEntrySource() );
-                            }
-                            else
-                            {
-                                throw new StrategyFailedException( context.getMessage() );
-                            }
+                            return new StrategyResult( context.getMessage(), context.getEntrySource() );
+                        }
+                        else
+                        {
+                            throw new StrategyFailedException( context.getMessage() );
                         }
                     }
-                    catch ( IOException e )
-                    {
-                        getLogger().info( "Scraper IO problem:", e );
-                    }
                 }
+                catch ( IOException e )
+                {
+                    getLogger().info( "Scraper IO problem:", e );
+                }
+            }
 
-                throw new StrategyFailedException( "No scraper was able to scrape remote (or remote forbids scraping)." );
-            }
-            else
-            {
-                throw new StrategyFailedException( "Unexpected response from remote repository root: "
-                    + remoteRepositoryRootResponse.getStatusLine().toString() );
-            }
+            throw new StrategyFailedException( "No scraper was able to scrape remote (or remote prevents scraping)." );
         }
         catch ( IOException e )
         {
             throw new StrategyFailedException( e.getMessage(), e );
-        }
-        finally
-        {
-            EntityUtils.consumeQuietly( remoteRepositoryRootResponse.getEntity() );
         }
     }
 
@@ -159,10 +163,11 @@ public class RemoteScrapeStrategy
                 noscrapeFlag = noscrapeFlag.substring( 1 );
             }
             final String flagRemoteUrl = remoteRepositoryRootUrl + noscrapeFlag;
+            HttpResponse response = null;
             try
             {
                 final HttpHead head = new HttpHead( flagRemoteUrl );
-                final HttpResponse response = httpClient.execute( head );
+                response = httpClient.execute( head );
                 if ( response.getStatusLine().getStatusCode() > 199 && response.getStatusLine().getStatusCode() < 299 )
                 {
                     return true;
@@ -172,6 +177,10 @@ public class RemoteScrapeStrategy
             {
                 // ahem, let's skip over this
                 // remote should TELL not TRY TO TELL do not scrape me
+            }
+            finally
+            {
+                EntityUtils.consumeQuietly( response.getEntity() );
             }
         }
         return false;
