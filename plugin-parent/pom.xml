@@ -179,12 +179,12 @@
       <!--
       Required for plugins which provide modern JAX-RS 1.1 REST resources.
       -->
-      <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
-      <!--<artifactId>nexus-siesta-plugin</artifactId>-->
-      <!--<type>${nexus-plugin.type}</type>-->
-      <!--<version>${nexus.version}</version>-->
-      <!--</dependency>-->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-siesta-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
 
       <!--
       Required for plugins which provide indexer integration.
@@ -268,18 +268,6 @@
           <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
           <extensions>true</extensions>
-        </plugin>
-
-        <!--
-        Required for nexus-plugin packaging (via nexus-plugin-bundle-maven-plugin).
-        -->
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>aspectj-maven-plugin</artifactId>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-          </configuration>
         </plugin>
 
         <!--
@@ -539,20 +527,6 @@
                       </pluginExecutionFilter>
                       <action>
                         <ignore></ignore>
-                      </action>
-                    </pluginExecution>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>org.sonatype.nexus</groupId>
-                        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-                        <versionRange>[0,)</versionRange>
-                        <goals>
-                          <goal>check-dependencies</goal>
-                          <goal>generate-metadata</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore />
                       </action>
                     </pluginExecution>
                   </pluginExecutions>
