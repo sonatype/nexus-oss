@@ -82,6 +82,7 @@ public class PlexusContainerContextListener
                 modules.add( new NexusWebModule( sce.getServletContext() ) );
                 modules.add( new AppContextModule( appContext ) );
 
+                // TODO: May want a central location to configure NX core + NX plugin modules
                 // Add support for @Timed
                 modules.add( new TimingModule() );
 

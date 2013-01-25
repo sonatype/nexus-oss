@@ -154,7 +154,11 @@
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
     </dependency>
-    
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-guice</artifactId>
+    </dependency>
+
     <!-- SISU Container -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>

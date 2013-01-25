@@ -465,6 +465,7 @@ public class DefaultNexusPluginManager
         final Module[] modules = {
             resourceModule,
 
+            // TODO: May want a central location to configure NX core + NX plugin modules
             // Add support for @Timed
             new TimingModule()
         };

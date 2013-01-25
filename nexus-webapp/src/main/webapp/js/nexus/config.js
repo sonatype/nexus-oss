@@ -38,7 +38,6 @@ define('nexus/config',['extjs', 'nexus/messagebox', 'sonatype/init'], function(E
           contextPath = path.substr(0, path.lastIndexOf('/')),
           servicePathSnippet = '/service/local',
           servicePath = contextPath + servicePathSnippet,
-          resourcePath = contextPath,
           browsePathSnippet = '/content',
           contentPath = contextPath + browsePathSnippet,
           repoBrowsePathSnippet = browsePathSnippet + '/repositories',
@@ -49,9 +48,11 @@ define('nexus/config',['extjs', 'nexus/messagebox', 'sonatype/init'], function(E
     return {
       isDebug : window.location.search === '?debug',
       host : host,
+      contextPath : contextPath,
       servicePath : servicePath,
-      resourcePath : resourcePath,
-      extPath : resourcePath + '/ext-3.4.0',
+      // @deprecated use contextPath
+      resourcePath : contextPath,
+      extPath : contextPath + '/ext-3.4.0',
       contentPath : contentPath,
       cssPath : '/styles',
       jsPath : '/js',
