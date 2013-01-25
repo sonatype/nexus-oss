@@ -21,7 +21,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.internal.AbstractPrioritized;
 
 /**
@@ -76,8 +75,7 @@ public abstract class AbstractScraper
         switch ( detectionResult )
         {
             case RECOGNIZED_SHOULD_BE_SCRAPED:
-                final EntrySource entrySource = diveIn( context, rootResponse, rootDocument );
-                context.stop( entrySource, "Remote recognized as " + getTargetedServer() + "." );
+                diveIn( context, rootResponse, rootDocument );
                 break;
 
             case RECOGNIZED_SHOULD_NOT_BE_SCRAPED:
@@ -96,7 +94,7 @@ public abstract class AbstractScraper
 
     protected abstract RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument );
 
-    protected abstract EntrySource diveIn( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument )
+    protected abstract void diveIn( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument )
         throws IOException;
 
     // ==

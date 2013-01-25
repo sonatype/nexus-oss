@@ -6,14 +6,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.http.HttpResponse;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
-import org.sonatype.nexus.proxy.maven.wl.internal.ArrayListEntrySource;
-import org.sonatype.nexus.proxy.walker.ParentOMatic;
-import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
-import org.sonatype.nexus.util.Node;
 
 /**
  * Scraper for remote Nexus instances that will scrape only if remote is for sure recognized as Nexus instance, and URL
@@ -24,7 +20,7 @@ import org.sonatype.nexus.util.Node;
 @Named( NexusScraper.ID )
 @Singleton
 public class NexusScraper
-    extends AbstractScraper
+    extends AbstractGeneratedIndexPageScraper
 {
     protected static final String ID = "nexus";
 
@@ -43,18 +39,17 @@ public class NexusScraper
     }
 
     @Override
+    protected Element getParentDirectoryElement()
+    {
+        return Jsoup.parse( "<a href=\"../\">Parent Directory</a>" );
+    }
+
+    @Override
     protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
                                                             final HttpResponse rootResponse, final Document rootDocument )
     {
-        // cheap checks first, to quickly eliminate target without doing any remote requests
-        final Elements elements = rootDocument.getElementsByTag( "a" );
-        if ( elements.isEmpty() )
-        {
-            // not even close to nexus index page format, as it always have at least one element
-            return RemoteDetectionResult.UNRECOGNIZED;
-        }
-        final Element firstLinkElement = elements.get( 0 );
-        if ( "Parent Directory".equals( firstLinkElement.text() ) && "../".equals( firstLinkElement.attr( "href" ) ) )
+        final RemoteDetectionResult result = super.detectRemoteRepository( context, rootResponse, rootDocument );
+        if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
         {
             try
             {
@@ -80,49 +75,7 @@ public class NexusScraper
                 // hm, either not exists or whoknows, just ignore this as Nexus must have it and should return it
             }
         }
-
         // um, we were not totally positive, this might be some web server with index page similar to Nexus one
         return RemoteDetectionResult.UNRECOGNIZED;
-    }
-
-    @Override
-    protected EntrySource diveIn( final ScrapeContext context, final HttpResponse rootResponse,
-                                  final Document rootDocument )
-        throws IOException
-    {
-        // we use the great and all-mighty ParentOMatic
-        final ParentOMatic parentOMatic = new ParentOMatic();
-        diveIn( context, rootDocument, 0, parentOMatic, parentOMatic.getRoot() );
-        return new ArrayListEntrySource( parentOMatic.getAllLeafPaths() );
-    }
-
-    protected void diveIn( final ScrapeContext context, final Document document, final int currentDepth,
-                           final ParentOMatic parentOMatic, final Node<Payload> currentNode )
-        throws IOException
-    {
-        // entry protection
-        if ( currentDepth >= context.getScrapeDepth() )
-        {
-            return;
-        }
-        final Elements elements = document.getElementsByTag( "a" );
-        for ( Element element : elements )
-        {
-            if ( "Parent Directory".equals( element.text() ) && "../".equals( element.attr( "href" ) ) )
-            {
-                continue; // skip it, it's always the 1st link on all Nexus index pages
-            }
-            final Node<Payload> newSibling = parentOMatic.addPath( currentNode.getPath() + "/" + element.text() );
-            if ( element.attr( "href" ).endsWith( "/" ) )
-            {
-                // "cut" recursion preemptively
-                final int siblingDepth = currentDepth + 1;
-                if ( siblingDepth < context.getScrapeDepth() )
-                {
-                    final Document siblingDocument = getDocumentFor( context, newSibling.getPath() + "/" );
-                    diveIn( context, siblingDocument, siblingDepth, parentOMatic, newSibling );
-                }
-            }
-        }
     }
 }
