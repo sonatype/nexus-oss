@@ -174,9 +174,6 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
             displayField : 'intervalLabel',
             valueField : 'valueHrs',
             emptyText : 'Select...',
-            getListParent : function() {
-              return this.el.up('.x-menu');
-            },
             iconCls : 'no-icon', //use iconCls if placing within menu to shift to right side of menu
             mode : 'local',
             editable : false,
