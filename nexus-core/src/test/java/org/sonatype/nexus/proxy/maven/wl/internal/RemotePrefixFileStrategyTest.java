@@ -208,6 +208,8 @@ public class RemotePrefixFileStrategyTest
             final StrategyResult result =
                 subject.discover( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
                     MavenProxyRepository.class ) );
+            assertThat( result.getMessage(),
+                equalTo( "Remote publishes prefix file (is less than a day old), using it." ) );
 
             final EntrySource entrySource = result.getEntrySource();
             assertThat( entrySource.exists(), is( true ) );
@@ -242,6 +244,8 @@ public class RemotePrefixFileStrategyTest
             final StrategyResult result =
                 subject.discover( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
                     MavenProxyRepository.class ) );
+            assertThat( result.getMessage(),
+                equalTo( "Remote publishes prefix file (is less than a day old), using it." ) );
 
             final EntrySource entrySource = result.getEntrySource();
             assertThat( entrySource.exists(), is( true ) );

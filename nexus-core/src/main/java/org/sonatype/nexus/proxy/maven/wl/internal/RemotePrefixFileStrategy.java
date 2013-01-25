@@ -16,11 +16,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -66,11 +69,17 @@ public class RemotePrefixFileStrategy
             item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
             if ( item != null )
             {
-                // TODO: measure somehow with "age" of the file (is 1234 dqys old) or such, but watch formatting as this
-                // message
-                // is formatted server side, while other date fields are JS formatted!
-                return new StrategyResult( "Remote publishes prefix file (is XXX days old), using it.",
-                    createEntrySource( mavenProxyRepository, path ) );
+                long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000;
+                if ( prefixFileAgeInDays < 1 )
+                {
+                    return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
+                        createEntrySource( mavenProxyRepository, path ) );
+                }
+                else
+                {
+                    return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
+                        + " days old), using it.", createEntrySource( mavenProxyRepository, path ) );
+                }
             }
         }
         throw new StrategyFailedException( "Remote does not publish prefix files on paths " + remoteFilePath );
