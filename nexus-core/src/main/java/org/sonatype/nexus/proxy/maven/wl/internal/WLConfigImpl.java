@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -32,12 +35,15 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 public class WLConfigImpl
     implements WLConfig
 {
-    private static final String NO_SCRAPE_FLAG_PATH = "/.meta/noscrape.txt";
+    private static final String LOCAL_NO_SCRAPE_FLAG_PATH = "/.meta/noscrape.txt";
 
     private static final String LOCAL_PREFIX_FILE_PATH = "/.meta/prefixes.txt";
 
-    private static final String[] REMOTE_PREFIX_FILE_PATHS = SystemPropertiesHelper.getStringlist(
-        WLConfig.class.getName() + ".prefixFilePaths", "/.meta/prefixes.txt", "/.meta/prefixes.txt.gz" );
+    private static final String[] EXTRA_REMOTE_NO_SCRAPE_FLAG_PATHS =
+        SystemPropertiesHelper.getStringlist( WLConfig.class.getName() + ".extraRemoteNoscrapeFlagPaths" );
+
+    private static final String[] EXTRA_REMOTE_PREFIX_FILE_PATHS =
+        SystemPropertiesHelper.getStringlist( WLConfig.class.getName() + ".extraRemotePrefixFilePaths" );
 
     private static final int REMOTE_SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
         + ".remoteScrapeDepth", 2 );
@@ -49,9 +55,9 @@ public class WLConfigImpl
         + ".wlMatchingDepth", REMOTE_SCRAPE_DEPTH );
 
     @Override
-    public String getNoScrapeFlagPath()
+    public String getLocalNoScrapeFlagPath()
     {
-        return NO_SCRAPE_FLAG_PATH;
+        return LOCAL_NO_SCRAPE_FLAG_PATH;
     }
 
     @Override
@@ -61,9 +67,38 @@ public class WLConfigImpl
     }
 
     @Override
-    public String[] getRemotePrefixFilePaths()
+    public List<String> getRemoteNoScrapeFlagPaths()
     {
-        return REMOTE_PREFIX_FILE_PATHS;
+        final ArrayList<String> result = new ArrayList<String>();
+        result.add( LOCAL_NO_SCRAPE_FLAG_PATH );
+        for ( String extra : EXTRA_REMOTE_NO_SCRAPE_FLAG_PATHS )
+        {
+            if ( extra != null && extra.trim().length() > 0 )
+            {
+                result.add( extra );
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<String> getRemotePrefixFilePaths()
+    {
+        final ArrayList<String> result = new ArrayList<String>();
+        result.add( LOCAL_PREFIX_FILE_PATH );
+        result.add( LOCAL_PREFIX_FILE_PATH + ".gz" );
+        for ( String extra : EXTRA_REMOTE_PREFIX_FILE_PATHS )
+        {
+            if ( extra != null && extra.trim().length() > 0 )
+            {
+                result.add( extra );
+                if ( !extra.endsWith( ".gz" ) )
+                {
+                    result.add( extra + ".gz" );
+                }
+            }
+        }
+        return result;
     }
 
     @Override

@@ -12,32 +12,29 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.maven.wl.discovery.Prioritized;
 import org.sonatype.nexus.proxy.maven.wl.discovery.Strategy;
 
 /**
  * Abstract class for {@link Strategy} implementations.
  * 
  * @author cstamas
- * @param <R>
  */
-public abstract class AbstractStrategy<R extends MavenRepository>
-    extends AbstractPrioritized
-    implements Strategy<R>
+public abstract class AbstractPrioritized
+    extends AbstractLoggingComponent
+    implements Prioritized
 {
-    private final String id;
+    private final int priority;
 
-    protected AbstractStrategy( final int priority, final String id )
+    protected AbstractPrioritized( final int priority )
     {
-        super( priority );
-        this.id = checkNotNull( id );
+        this.priority = priority;
     }
 
     @Override
-    public String getId()
+    public int getPriority()
     {
-        return id;
+        return priority;
     }
 }

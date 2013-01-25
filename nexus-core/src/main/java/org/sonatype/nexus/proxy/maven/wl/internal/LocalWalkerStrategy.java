@@ -15,10 +15,9 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -35,13 +34,9 @@ import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
-import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
-import org.sonatype.nexus.util.Node;
-
-import com.google.common.base.Function;
 
 /**
  * Local walker strategy, that uses {@link Walker} to scan contents of local storage.
@@ -63,7 +58,8 @@ public class LocalWalkerStrategy
     @Inject
     public LocalWalkerStrategy( final WLConfig config, final Walker walker )
     {
-        super( ID, Integer.MAX_VALUE );
+        // "last resort"
+        super( Integer.MAX_VALUE, ID );
         this.config = checkNotNull( config );
         this.walker = checkNotNull( walker );
     }
@@ -91,8 +87,18 @@ public class LocalWalkerStrategy
                 throw e;
             }
         }
-        return new StrategyResult( "Repository crawled successfully", new ArrayListEntrySource( getAllLeafPaths(
-            prefixCollectorProcessor.getParentOMatic(), config.getLocalScrapeDepth() ) ) );
+        final ParentOMatic parentOMatic = prefixCollectorProcessor.getParentOMatic();
+        if ( parentOMatic.getRoot().isLeaf() )
+        {
+            // tree is basically empty, so make the list too
+            return new StrategyResult( "Repository crawled successfully (is empty)", new ArrayListEntrySource(
+                Collections.<String> emptyList() ) );
+        }
+        else
+        {
+            return new StrategyResult( "Repository crawled successfully", new ArrayListEntrySource( getAllLeafPaths(
+                parentOMatic, config.getLocalScrapeDepth() ) ) );
+        }
     }
 
     // ==
@@ -102,48 +108,10 @@ public class LocalWalkerStrategy
         // cut the tree
         if ( maxDepth != Integer.MAX_VALUE )
         {
-            parentOMatic.applyRecursively( parentOMatic.getRoot(), new Function<Node<Payload>, Node<Payload>>()
-            {
-                @Override
-                @Nullable
-                public Node<Payload> apply( @Nullable Node<Payload> input )
-                {
-                    if ( input.getDepth() == maxDepth )
-                    {
-                        // simply "cut off" children if any
-                        for ( Node<Payload> child : input.getChildren() )
-                        {
-                            input.removeChild( child );
-                        }
-                    }
-                    return null;
-                }
-            } );
+            parentOMatic.cutNodesDeeperThan( maxDepth );
         }
-        // doing scanning
-        final ArrayList<String> paths = new ArrayList<String>();
-        final Function<Node<Payload>, Node<Payload>> markedCollector = new Function<Node<Payload>, Node<Payload>>()
-        {
-            @Override
-            public Node<Payload> apply( Node<Payload> input )
-            {
-                if ( input.isLeaf() )
-                {
-                    final String thePath = input.getPath();
-                    if ( thePath.endsWith( "/" ) )
-                    {
-                        paths.add( thePath.substring( 0, thePath.length() - 1 ) );
-                    }
-                    else
-                    {
-                        paths.add( thePath );
-                    }
-                }
-                return null;
-            }
-        };
-        parentOMatic.applyRecursively( parentOMatic.getRoot(), markedCollector );
-        return paths;
+        // get leafs
+        return parentOMatic.getAllLeafPaths();
     }
 
     public static class PrefixCollectorProcessor

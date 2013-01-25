@@ -137,5 +137,4 @@ public class ParentOMaticTest
         printListPerLine( cn.getMarkedPaths() );
         doAssert();
     }
-
 }

@@ -22,6 +22,7 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -98,7 +99,7 @@ public class EventDispatcher
         }
     }
 
-    protected void handleWLUpdate( final MavenRepository mavenRepository )
+    protected void handleRepositoryModified( final MavenRepository mavenRepository )
     {
         try
         {
@@ -275,6 +276,18 @@ public class EventDispatcher
         }
     }
 
+    // == Handlers for Proxy remote URL changes
+
+    @Subscribe
+    public void on( final RepositoryConfigurationUpdatedEvent evt )
+    {
+        if ( isRepositoryHandled( evt.getRepository() ) && evt.isLocalUrlChanged() || evt.isRemoteUrlChanged() )
+        {
+            final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
+            handleRepositoryModified( mavenRepository );
+        }
+    }
+
     // == Handlers for Group changes (WL of group and groups of groups needs to be updated)
 
     /**
@@ -289,7 +302,7 @@ public class EventDispatcher
         if ( isRepositoryHandled( evt.getRepository() ) )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
-            handleWLUpdate( mavenRepository );
+            handleRepositoryModified( mavenRepository );
         }
     }
 
@@ -311,7 +324,7 @@ public class EventDispatcher
                 final MavenGroupRepository mavenGroupRepository = repository.adaptToFacet( MavenGroupRepository.class );
                 if ( mavenGroupRepository != null )
                 {
-                    handleWLUpdate( mavenGroupRepository );
+                    handleRepositoryModified( mavenGroupRepository );
                 }
             }
         }

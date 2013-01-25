@@ -52,6 +52,16 @@ public class WLDiscoveryStatus
          * Remote discovery enabled and was unsuccessful.
          */
         FAILED;
+
+        /**
+         * Returns {@code true} if this discovery status represents a case when it's enabled.
+         * 
+         * @return {@code true} if this is any of the enabled ones.
+         */
+        public boolean isEnabled()
+        {
+            return this.ordinal() >= ENABLED.ordinal();
+        }
     }
 
     private final DStatus status;

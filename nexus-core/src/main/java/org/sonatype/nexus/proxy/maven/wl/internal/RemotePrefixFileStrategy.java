@@ -15,8 +15,7 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -52,7 +51,7 @@ public class RemotePrefixFileStrategy
     @Inject
     public RemotePrefixFileStrategy( final WLConfig config )
     {
-        super( ID, 100 );
+        super( 100, ID );
         this.config = checkNotNull( config );
     }
 
@@ -61,8 +60,7 @@ public class RemotePrefixFileStrategy
         throws StrategyFailedException, IOException
     {
         StorageFileItem item;
-        final ArrayList<String> remoteFilePath =
-            new ArrayList<String>( Arrays.asList( config.getRemotePrefixFilePaths() ) );
+        final List<String> remoteFilePath = config.getRemotePrefixFilePaths();
         for ( String path : remoteFilePath )
         {
             item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
@@ -98,7 +96,7 @@ public class RemotePrefixFileStrategy
         throws IOException
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
-        request.setRequestAsExpired( true );
+        request.setRequestRemoteOnly( true );
         mavenProxyRepository.removeFromNotFoundCache( request );
         try
         {

@@ -149,7 +149,7 @@ public class WLManagerImpl
             else
             {
                 unpublish( mavenRepository );
-                updateWhitelist( mavenRepository, true );
+                mayUpdateWhitelist( mavenRepository, true );
             }
         }
         catch ( IOException e )
@@ -172,6 +172,21 @@ public class WLManagerImpl
         throws IOException
     {
         updateWhitelist( mavenRepository, true );
+    }
+
+    protected void mayUpdateWhitelist( final MavenRepository mavenRepository, final boolean notify )
+        throws IOException
+    {
+        final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
+        if ( mavenProxyRepository != null )
+        {
+            final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
+            if ( !config.isEnabled() )
+            {
+                return;
+            }
+        }
+        updateWhitelist( mavenRepository, notify );
     }
 
     protected void updateWhitelist( final MavenRepository mavenRepository, final boolean notify )
@@ -519,11 +534,11 @@ public class WLManagerImpl
     protected void addNoscrapeFlag( final MavenRepository mavenRepository )
         throws IOException
     {
-        final ResourceStoreRequest request = new ResourceStoreRequest( config.getNoScrapeFlagPath() );
+        final ResourceStoreRequest request = new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() );
         request.setRequestLocalOnly( true );
         request.setRequestGroupLocalOnly( true );
         final DefaultStorageFileItem file =
-            new DefaultStorageFileItem( mavenRepository, new ResourceStoreRequest( config.getNoScrapeFlagPath() ),
+            new DefaultStorageFileItem( mavenRepository, new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() ),
                 true, true, new StringContentLocator( "noscrape" ) );
         try
         {
@@ -542,7 +557,7 @@ public class WLManagerImpl
     protected void removeNoscrapeFlag( final MavenRepository mavenRepository )
         throws IOException
     {
-        final ResourceStoreRequest request = new ResourceStoreRequest( config.getNoScrapeFlagPath() );
+        final ResourceStoreRequest request = new ResourceStoreRequest( config.getLocalNoScrapeFlagPath() );
         request.setRequestLocalOnly( true );
         request.setRequestGroupLocalOnly( true );
         try

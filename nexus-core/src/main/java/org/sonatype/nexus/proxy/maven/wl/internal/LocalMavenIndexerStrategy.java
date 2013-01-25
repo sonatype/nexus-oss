@@ -45,7 +45,7 @@ public class LocalMavenIndexerStrategy
     @Inject
     public LocalMavenIndexerStrategy( final WLConfig config )
     {
-        super( ID, 100 );
+        super( 100, ID );
         this.config = checkNotNull( config );
     }
 

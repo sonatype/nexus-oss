@@ -15,16 +15,29 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
+import org.sonatype.nexus.proxy.maven.wl.internal.scrape.ScrapeContext;
+import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Scraper;
+import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientManager;
 
 /**
  * Remote scrape strategy.
@@ -41,19 +54,126 @@ public class RemoteScrapeStrategy
 
     private final WLConfig config;
 
+    private final HttpClientManager httpClientManager;
+
+    private final List<Scraper> scrapers;
+
+    /**
+     * Constructor.
+     * 
+     * @param config
+     * @param httpClientManager
+     * @param scrapers
+     */
     @Inject
-    public RemoteScrapeStrategy( final WLConfig config )
+    public RemoteScrapeStrategy( final WLConfig config, final HttpClientManager httpClientManager,
+                                 final List<Scraper> scrapers )
     {
-        super( ID, Integer.MAX_VALUE );
+        // "last resort"
+        super( Integer.MAX_VALUE, ID );
         this.config = checkNotNull( config );
+        this.httpClientManager = checkNotNull( httpClientManager );
+        this.scrapers = checkNotNull( scrapers );
     }
 
     @Override
     public StrategyResult discover( final MavenProxyRepository mavenProxyRepository )
-        throws StrategyFailedException, IOException
+        throws StrategyFailedException
     {
-        // scrape remote of passed in proxy repository up to config.getRemoteScrapeDepth() depth
-        // fail
-        throw new StrategyFailedException( "Not implemented!" );
+        // get client configured in same way as proxy is using it
+        final HttpClient httpClient =
+            httpClientManager.create( mavenProxyRepository, mavenProxyRepository.getRemoteStorageContext() );
+        final String remoteRepositoryRootUrl = mavenProxyRepository.getRemoteUrl();
+        if ( isMarkedForNoScrape( httpClient, remoteRepositoryRootUrl ) )
+        {
+            throw new StrategyFailedException( "Remote flagged itself as NOSCRAPE, obeying it." );
+        }
+        HttpResponse remoteRepositoryRootResponse = null;
+        try
+        {
+            final HttpGet get = new HttpGet( remoteRepositoryRootUrl );
+            remoteRepositoryRootResponse = httpClient.execute( get );
+            if ( remoteRepositoryRootResponse.getStatusLine().getStatusCode() == 200 )
+            {
+                // TODO: detect redirects
+                final Document remoteRepositoryRootDocument =
+                    Jsoup.parse( remoteRepositoryRootResponse.getEntity().getContent(), null, remoteRepositoryRootUrl );
+
+                final ScrapeContext context =
+                    new ScrapeContext( httpClient, remoteRepositoryRootUrl, config.getRemoteScrapeDepth(),
+                        remoteRepositoryRootResponse, remoteRepositoryRootDocument );
+
+                final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
+                Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
+
+                for ( Scraper scraper : appliedScrapers )
+                {
+                    try
+                    {
+                        scraper.scrape( context );
+                        if ( context.isStopped() )
+                        {
+                            if ( context.isSuccessful() )
+                            {
+                                return new StrategyResult( context.getMessage(), context.getEntrySource() );
+                            }
+                            else
+                            {
+                                throw new StrategyFailedException( context.getMessage() );
+                            }
+                        }
+                    }
+                    catch ( IOException e )
+                    {
+                        getLogger().info( "Scraper IO problem:", e );
+                    }
+                }
+
+                throw new StrategyFailedException( "No scraper was able to scrape remote (or remote forbids scraping)." );
+            }
+            else
+            {
+                throw new StrategyFailedException( "Unexpected response from remote repository root: "
+                    + remoteRepositoryRootResponse.getStatusLine().toString() );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new StrategyFailedException( e.getMessage(), e );
+        }
+        finally
+        {
+            EntityUtils.consumeQuietly( remoteRepositoryRootResponse.getEntity() );
+        }
+    }
+
+    // ==
+
+    protected boolean isMarkedForNoScrape( final HttpClient httpClient, final String remoteRepositoryRootUrl )
+    {
+        final List<String> noscrapeFlags = config.getRemoteNoScrapeFlagPaths();
+        for ( String noscrapeFlag : noscrapeFlags )
+        {
+            while ( noscrapeFlag.startsWith( "/" ) )
+            {
+                noscrapeFlag = noscrapeFlag.substring( 1 );
+            }
+            final String flagRemoteUrl = remoteRepositoryRootUrl + noscrapeFlag;
+            try
+            {
+                final HttpHead head = new HttpHead( flagRemoteUrl );
+                final HttpResponse response = httpClient.execute( head );
+                if ( response.getStatusLine().getStatusCode() > 199 && response.getStatusLine().getStatusCode() < 299 )
+                {
+                    return true;
+                }
+            }
+            catch ( IOException e )
+            {
+                // ahem, let's skip over this
+                // remote should TELL not TRY TO TELL do not scrape me
+            }
+        }
+        return false;
     }
 }

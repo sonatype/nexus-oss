@@ -93,23 +93,7 @@ public class PathMatcherImpl
         }
         if ( maxDepth != Integer.MAX_VALUE )
         {
-            parentOMatic.applyRecursively( parentOMatic.getRoot(), new Function<Node<Payload>, Node<Payload>>()
-            {
-                @Override
-                @Nullable
-                public Node<Payload> apply( @Nullable Node<Payload> input )
-                {
-                    if ( input.getDepth() == maxDepth )
-                    {
-                        // simply "cut off" children if any
-                        for ( Node<Payload> child : input.getChildren() )
-                        {
-                            input.removeChild( child );
-                        }
-                    }
-                    return null;
-                }
-            } );
+            parentOMatic.cutNodesDeeperThan( maxDepth );
         }
         return parentOMatic.getRoot();
     }

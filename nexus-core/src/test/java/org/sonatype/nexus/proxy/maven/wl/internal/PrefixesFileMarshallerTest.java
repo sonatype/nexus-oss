@@ -105,6 +105,18 @@ public class PrefixesFileMarshallerTest
         return sw.toString();
     }
 
+    protected String withStandardHeaders( String content )
+    {
+        final StringBuilder sb = new StringBuilder();
+
+        for ( String header : PrefixesFileMarshaller.HEADERS )
+        {
+            sb.append( header ).append( "\n" );
+        }
+        sb.append( content );
+        return sb.toString();
+    }
+
     @Test
     public void roundtrip()
         throws IOException
@@ -118,7 +130,7 @@ public class PrefixesFileMarshallerTest
         assertThat( outputStream.size(), greaterThan( 15 ) );
 
         final String output = new String( outputStream.toByteArray(), UTF8 );
-        assertThat( output, equalTo( prefixFile1( false ) ) );
+        assertThat( output, equalTo( withStandardHeaders( prefixFile1( false ) ) ) );
     }
 
     @Test
@@ -138,7 +150,7 @@ public class PrefixesFileMarshallerTest
         // once read, the file looses "peculiarities" as dots from start and comments
         // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
         // passed on as-is (unchanged)
-        assertThat( output, equalTo( prefixFile1( false ) ) );
+        assertThat( output, equalTo( withStandardHeaders( prefixFile1( false ) ) ) );
     }
 
     @Test
@@ -158,7 +170,7 @@ public class PrefixesFileMarshallerTest
         // once read, the file looses "peculiarities" as dots from start and comments
         // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
         // passed on as-is (unchanged)
-        assertThat( output, equalTo( prefixFile3( false ) ) );
+        assertThat( output, equalTo( withStandardHeaders( prefixFile3( false ) ) ) );
     }
 
     @Test
@@ -166,7 +178,8 @@ public class PrefixesFileMarshallerTest
         throws IOException
     {
         // prefixFile2 is "find created" like, see CENTRAL-515
-        final EntrySource readEntrySource = m.read( new ByteArrayInputStream( prefixFile4( true, false ).getBytes( UTF8 ) ) );
+        final EntrySource readEntrySource =
+            m.read( new ByteArrayInputStream( prefixFile4( true, false ).getBytes( UTF8 ) ) );
         assertThat( readEntrySource.exists(), is( true ) );
         assertThat( readEntrySource.readEntries().size(), is( 3 ) );
 
@@ -178,6 +191,6 @@ public class PrefixesFileMarshallerTest
         // once read, the file looses "peculiarities" as dots from start and comments
         // naturally this applies to all nexus-managed files only (hosted + groups) as proxy WLs are
         // passed on as-is (unchanged)
-        assertThat( output, equalTo( prefixFile4( false, true ) ) );
+        assertThat( output, equalTo( withStandardHeaders( prefixFile4( false, true ) ) ) );
     }
 }
