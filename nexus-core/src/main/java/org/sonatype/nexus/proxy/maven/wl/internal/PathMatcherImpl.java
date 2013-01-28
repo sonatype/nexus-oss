@@ -17,15 +17,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
 import org.sonatype.nexus.util.PathUtils;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 
 /**
  * Default implementation of {@link PathMatcher}. Implemented using {@link ParentOMatic}, and performs matching by

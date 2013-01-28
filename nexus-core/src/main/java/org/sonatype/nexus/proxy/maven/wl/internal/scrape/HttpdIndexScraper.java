@@ -23,7 +23,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
- * Scraper for remote HTTP servers.
+ * Scraper for remote Apache HTTPD hosted repositories.
  * 
  * @author cstamas
  */
