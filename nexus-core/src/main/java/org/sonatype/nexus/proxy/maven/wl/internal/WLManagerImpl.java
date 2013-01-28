@@ -149,7 +149,7 @@ public class WLManagerImpl
             else
             {
                 unpublish( mavenRepository );
-                mayUpdateWhitelist( mavenRepository, true );
+                updateWhitelist( mavenRepository, true );
             }
         }
         catch ( IOException e )
@@ -174,102 +174,52 @@ public class WLManagerImpl
         updateWhitelist( mavenRepository, true );
     }
 
-    protected void mayUpdateWhitelist( final MavenRepository mavenRepository, final boolean notify )
-        throws IOException
-    {
-        final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
-        if ( mavenProxyRepository != null )
-        {
-            final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
-            if ( !config.isEnabled() )
-            {
-                return;
-            }
-        }
-        updateWhitelist( mavenRepository, notify );
-    }
-
     protected void updateWhitelist( final MavenRepository mavenRepository, final boolean notify )
         throws IOException
     {
         getLogger().debug( "Updating WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-        EntrySource entrySource = null;
         if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
         {
-            // save merged WL into group's local storage (if all members has WL)
-            boolean allMembersHaveWLPublished = true;
-            final MavenGroupRepository mavenGroupRepository = mavenRepository.adaptToFacet( MavenGroupRepository.class );
-            final ArrayList<EntrySource> memberEntrySources = new ArrayList<EntrySource>();
-            for ( Repository member : mavenGroupRepository.getMemberRepositories() )
-            {
-                if ( member.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
-                {
-                    final EntrySource memberEntrySource =
-                        getEntrySourceFor( member.adaptToFacet( MavenRepository.class ) );
-                    if ( !memberEntrySource.exists() )
-                    {
-                        getLogger().debug( "{} group's member {} does not have WL published.",
-                            RepositoryStringUtils.getHumanizedNameString( mavenRepository ),
-                            RepositoryStringUtils.getHumanizedNameString( member ) );
-                        allMembersHaveWLPublished = false;
-                        break;
-                    }
-                    getLogger().debug( "{} group's member {} does have WL published, merging it in...",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ),
-                        RepositoryStringUtils.getHumanizedNameString( member ) );
-                    memberEntrySources.add( memberEntrySource );
-                }
-            }
-
-            if ( allMembersHaveWLPublished )
-            {
-                entrySource = new MergingEntrySource( memberEntrySources );
-            }
+            updateGroupWhitelist( mavenRepository.adaptToFacet( MavenGroupRepository.class ), notify );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
-            final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
-            final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
-            if ( config.isEnabled() )
-            {
-                final DiscoveryResult<MavenProxyRepository> discoveryResult =
-                    remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository );
-                if ( discoveryResult.isSuccessful() )
-                {
-                    entrySource = discoveryResult.getEntrySource();
-                }
-                else
-                {
-                    getLogger().debug( "{} remote discovery unsuccessful.",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
-                final DiscoveryStatusSource discoveryStatusSource =
-                    new PropfileDiscoveryStatusSource( mavenProxyRepository );
-                final Outcome lastOutcome = discoveryResult.getLastResult();
-                discoveryStatusSource.write( new WLDiscoveryStatus( lastOutcome.isSuccessful() ? DStatus.SUCCESSFUL
-                    : DStatus.FAILED, lastOutcome.getStrategyId(), lastOutcome.getMessage(), System.currentTimeMillis() ) );
-            }
-            else
-            {
-                getLogger().debug( "{} remote discovery disabled.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-            }
+            updateProxyWhitelist( mavenRepository.adaptToFacet( MavenProxyRepository.class ), notify );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
-            final MavenHostedRepository mavenHostedRepository =
-                mavenRepository.adaptToFacet( MavenHostedRepository.class );
-            final DiscoveryResult<MavenHostedRepository> discoveryResult =
-                localContentDiscoverer.discoverLocalContent( mavenHostedRepository );
+            updateHostedWhitelist( mavenRepository.adaptToFacet( MavenHostedRepository.class ), notify );
+        }
+    }
+
+    protected void updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository, final boolean notify )
+        throws IOException
+    {
+        EntrySource entrySource = null;
+        final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
+        if ( config.isEnabled() )
+        {
+            final DiscoveryResult<MavenProxyRepository> discoveryResult =
+                remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository );
             if ( discoveryResult.isSuccessful() )
             {
                 entrySource = discoveryResult.getEntrySource();
             }
             else
             {
-                getLogger().debug( "{} local discovery unsuccessful.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                getLogger().debug( "{} remote discovery unsuccessful.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             }
+            final DiscoveryStatusSource discoveryStatusSource =
+                new PropfileDiscoveryStatusSource( mavenProxyRepository );
+            final Outcome lastOutcome = discoveryResult.getLastResult();
+            discoveryStatusSource.write( new WLDiscoveryStatus( lastOutcome.isSuccessful() ? DStatus.SUCCESSFUL
+                : DStatus.FAILED, lastOutcome.getStrategyId(), lastOutcome.getMessage(), System.currentTimeMillis() ) );
+        }
+        else
+        {
+            getLogger().debug( "{} remote discovery disabled.",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         }
 
         if ( entrySource != null )
@@ -277,18 +227,105 @@ public class WLManagerImpl
             if ( notify )
             {
                 getLogger().info( "Updated and published WL of {}.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             }
-            publish( mavenRepository, entrySource );
+            publish( mavenProxyRepository, entrySource );
         }
         else
         {
             if ( notify )
             {
                 getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             }
-            unpublish( mavenRepository );
+            unpublish( mavenProxyRepository );
+        }
+    }
+
+    protected void updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository, final boolean notify )
+        throws IOException
+    {
+        EntrySource entrySource = null;
+        final DiscoveryResult<MavenHostedRepository> discoveryResult =
+            localContentDiscoverer.discoverLocalContent( mavenHostedRepository );
+        if ( discoveryResult.isSuccessful() )
+        {
+            entrySource = discoveryResult.getEntrySource();
+        }
+        else
+        {
+            getLogger().debug( "{} local discovery unsuccessful.",
+                RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
+        }
+
+        if ( entrySource != null )
+        {
+            if ( notify )
+            {
+                getLogger().info( "Updated and published WL of {}.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
+            }
+            publish( mavenHostedRepository, entrySource );
+        }
+        else
+        {
+            if ( notify )
+            {
+                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
+                    RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
+            }
+            unpublish( mavenHostedRepository );
+        }
+    }
+
+    protected void updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository, final boolean notify )
+        throws IOException
+    {
+        EntrySource entrySource = null;
+        // save merged WL into group's local storage (if all members has WL)
+        boolean allMembersHaveWLPublished = true;
+        final ArrayList<EntrySource> memberEntrySources = new ArrayList<EntrySource>();
+        for ( Repository member : mavenGroupRepository.getMemberRepositories() )
+        {
+            if ( member.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+            {
+                final EntrySource memberEntrySource = getEntrySourceFor( member.adaptToFacet( MavenRepository.class ) );
+                if ( !memberEntrySource.exists() )
+                {
+                    getLogger().debug( "{} group's member {} does not have WL published.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ),
+                        RepositoryStringUtils.getHumanizedNameString( member ) );
+                    allMembersHaveWLPublished = false;
+                    break;
+                }
+                getLogger().debug( "{} group's member {} does have WL published, merging it in...",
+                    RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ),
+                    RepositoryStringUtils.getHumanizedNameString( member ) );
+                memberEntrySources.add( memberEntrySource );
+            }
+        }
+        if ( allMembersHaveWLPublished )
+        {
+            entrySource = new MergingEntrySource( memberEntrySources );
+        }
+
+        if ( entrySource != null )
+        {
+            if ( notify )
+            {
+                getLogger().info( "Updated and published WL of {}.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ) );
+            }
+            publish( mavenGroupRepository, entrySource );
+        }
+        else
+        {
+            if ( notify )
+            {
+                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
+                    RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ) );
+            }
+            unpublish( mavenGroupRepository );
         }
     }
 
@@ -506,16 +543,16 @@ public class WLManagerImpl
 
     protected void propagateWLUpdateOf( final MavenRepository mavenRepository )
     {
-        MavenRepository containingGroupRepository = null;
+        MavenGroupRepository containingGroupRepository = null;
         final List<GroupRepository> groups = repositoryRegistry.getGroupsOfRepository( mavenRepository );
         for ( GroupRepository groupRepository : groups )
         {
-            containingGroupRepository = groupRepository.adaptToFacet( MavenRepository.class );
+            containingGroupRepository = groupRepository.adaptToFacet( MavenGroupRepository.class );
             if ( mavenRepository != null )
             {
                 try
                 {
-                    updateWhitelist( containingGroupRepository, false );
+                    updateGroupWhitelist( containingGroupRepository, false );
                 }
                 catch ( IOException e )
                 {
