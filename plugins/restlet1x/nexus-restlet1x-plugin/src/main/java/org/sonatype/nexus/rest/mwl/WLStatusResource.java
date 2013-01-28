@@ -32,6 +32,8 @@ import org.sonatype.nexus.rest.model.WLStatusMessage;
 import org.sonatype.nexus.rest.model.WLStatusMessageWrapper;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+import com.google.common.primitives.Ints;
+
 /**
  * WL Status REST resource.
  * 
@@ -124,7 +126,7 @@ public class WLStatusResource
                     getMavenRepository( request, MavenProxyRepository.class );
                 final WLDiscoveryConfig config = getWLManager().getRemoteDiscoveryConfig( mavenProxyRepository );
                 discoveryPayload.setDiscoveryEnabled( true );
-                discoveryPayload.setDiscoveryInterval( TimeUnit.MILLISECONDS.toHours( config.getDiscoveryInterval() ) );
+                discoveryPayload.setDiscoveryIntervalHours( Ints.saturatedCast( TimeUnit.MILLISECONDS.toHours( config.getDiscoveryInterval() ) ) );
                 discoveryPayload.setDiscoveryLastStatus( 0 );
 
                 // if we have it run at all

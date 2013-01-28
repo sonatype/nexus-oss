@@ -23,6 +23,8 @@ import org.sonatype.nexus.rest.model.WLConfigMessage;
 import org.sonatype.nexus.rest.model.WLConfigMessageWrapper;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+import com.google.common.primitives.Ints;
+
 /**
  * WL Configuration REST resource, usable only on Maven Proxy repositories.
  * 
@@ -68,12 +70,12 @@ public class WLConfigResource
         if ( config.isEnabled() )
         {
             payload.setDiscoveryEnabled( true );
-            payload.setDiscoveryInterval( TimeUnit.MILLISECONDS.toHours( config.getDiscoveryInterval() ) );
+            payload.setDiscoveryIntervalHours( Ints.saturatedCast( TimeUnit.MILLISECONDS.toHours( config.getDiscoveryInterval() ) ) );
         }
         else
         {
             payload.setDiscoveryEnabled( false );
-            payload.setDiscoveryInterval( -1 );
+            payload.setDiscoveryIntervalHours( -1 );
         }
         final WLConfigMessageWrapper responseNessage = new WLConfigMessageWrapper();
         responseNessage.setData( payload );
@@ -97,7 +99,7 @@ public class WLConfigResource
             final WLDiscoveryConfig config =
                 new WLDiscoveryConfig(
                     wrapper.getData().isDiscoveryEnabled(),
-                    wrapper.getData().isDiscoveryEnabled() ? TimeUnit.HOURS.toMillis( wrapper.getData().getDiscoveryInterval() )
+                    wrapper.getData().isDiscoveryEnabled() ? TimeUnit.HOURS.toMillis( wrapper.getData().getDiscoveryIntervalHours() )
                         : -1L );
             getWLManager().setRemoteDiscoveryConfig( mavenProxyRepository, config );
             return wrapper;

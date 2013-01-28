@@ -29,7 +29,7 @@ public class WLDiscoveryConfig
     /**
      * Constructor.
      * 
-     * @param enabled 
+     * @param enabled
      * @param discoveryInterval
      */
     public WLDiscoveryConfig( final boolean enabled, final long discoveryInterval )
@@ -46,11 +46,21 @@ public class WLDiscoveryConfig
         }
     }
 
+    /**
+     * Enabled flag for remote discovery.
+     * 
+     * @return {@code true} if enabled.
+     */
     public boolean isEnabled()
     {
         return enabled;
     }
 
+    /**
+     * Discovery interval in millis.
+     * 
+     * @return interval in millis.
+     */
     public long getDiscoveryInterval()
     {
         return discoveryInterval;

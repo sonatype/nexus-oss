@@ -173,7 +173,7 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
           {
             xtype : 'combo',
             fieldLabel : 'Update interval',
-            name : 'discovery.discoveryInterval',
+            name : 'discovery.discoveryIntervalHours',
             store : discoveryUpdateIntervalStore,
             displayField : 'intervalLabel',
             valueField : 'valueHrs',
@@ -248,7 +248,7 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
         jsonData : {
           data : {
             discoveryEnabled : false,
-            discoveryInterval : -1
+            discoveryIntervalHours : -1
           }
         },
         callback : function() {
@@ -269,7 +269,7 @@ define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], funct
         jsonData : {
           data : {
             discoveryEnabled : true,
-            discoveryInterval : interval
+            discoveryIntervalHours : interval
           }
         },
         callback : function() {

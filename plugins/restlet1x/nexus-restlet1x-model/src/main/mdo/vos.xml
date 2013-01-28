@@ -4522,11 +4522,11 @@
           <description>The discovery is enabled or not.</description>
         </field>
         <field>
-          <name>discoveryInterval</name>
+          <name>discoveryIntervalHours</name>
           <version>1.0.0+</version>
-          <type>long</type>
+          <type>int</type>
           <required>true</required>
-          <description>The discovery run interval, in hours.</description>
+          <description>The discovery interval in hours.</description>
         </field>
       </fields>
     </class>
@@ -4568,9 +4568,9 @@
           <description>The discovery is enabled or not.</description>
         </field>
         <field>
-          <name>discoveryInterval</name>
+          <name>discoveryIntervalHours</name>
           <version>1.0.0+</version>
-          <type>long</type>
+          <type>int</type>
           <required>true</required>
           <description>Update interval in hours.</description>
         </field>
