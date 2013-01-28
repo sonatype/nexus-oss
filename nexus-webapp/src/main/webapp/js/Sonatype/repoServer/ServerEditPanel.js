@@ -10,16 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, Sonatype*/
+/*global Ext, Sonatype, Nexus*/
 Ext.define('Sonatype.repoServer.ServerEditPanel', {
-  requirejs : 'sonatype/strings',
+  require : 'Nexus.util.Strings',
 
   extend : 'Ext.Panel',
 
   constructor : function(cfg) {
 
     // shortcut to requested module for instance methods
-    this.Strings = Sonatype.repoServer.ServerEditPanel.modules['sonatype/strings'];
+    this.Strings = Nexus.util.Strings;
 
     Ext.apply(this, cfg || {}, {
       autoScroll : true
