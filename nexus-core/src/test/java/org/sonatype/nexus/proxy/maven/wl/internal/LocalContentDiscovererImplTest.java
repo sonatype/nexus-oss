@@ -112,7 +112,7 @@ public class LocalContentDiscovererImplTest
     public void prepare()
         throws Exception
     {
-        localContentDiscoverer = (LocalContentDiscoverer) lookup( LocalContentDiscoverer.class );
+        localContentDiscoverer = lookup( LocalContentDiscoverer.class );
     }
 
     protected void addSomeContent( final MavenRepository mavenRepository, final List<String> paths )

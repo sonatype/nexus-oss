@@ -112,7 +112,10 @@ public class RemoteScrapeStrategy
             }
             finally
             {
-                EntityUtils.consumeQuietly( remoteRepositoryRootResponse.getEntity() );
+                if ( remoteRepositoryRootResponse != null )
+                {
+                    EntityUtils.consumeQuietly( remoteRepositoryRootResponse.getEntity() );
+                }
             }
 
             final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
@@ -180,7 +183,10 @@ public class RemoteScrapeStrategy
             }
             finally
             {
-                EntityUtils.consumeQuietly( response.getEntity() );
+                if ( response != null )
+                {
+                    EntityUtils.consumeQuietly( response.getEntity() );
+                }
             }
         }
         return false;
