@@ -12,9 +12,10 @@
  */
 /*global Sonatype, Ext*/
 
-// initialize Nexus namespace if necessary
-var Nexus;
+// define variable on global scope to not trigger a reference error but see the var as 'undefined'
+var Nexus, Sonatype;
 if (!Nexus) {
+  // initialize Nexus namespace if necessary
   Nexus = {};
 }
 

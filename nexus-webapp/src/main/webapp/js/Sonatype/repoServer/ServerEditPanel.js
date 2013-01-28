@@ -10,10 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all', 'sonatype/strings'], function(Ext, Sonatype, Strings) {
-  // Instance of Ext.FormPanel
-  Sonatype.repoServer.ServerEditPanel = function(cfg) {
+/*global Ext, Sonatype*/
+Ext.define('Sonatype.repoServer.ServerEditPanel', {
+  requirejs : 'sonatype/strings',
+
+  extend : 'Ext.Panel',
+
+  constructor : function(cfg) {
+
+    // shortcut to requested module for instance methods
+    this.Strings = Sonatype.repoServer.ServerEditPanel.modules['sonatype/strings'];
 
     Ext.apply(this, cfg || {}, {
       autoScroll : true
@@ -510,9 +516,8 @@ define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all', 'sonatype/strings
                 if (v.search(/:\//) === -1) {
                   return true;
                 }
-                else {
-                  return 'Specify hostname without the protocol, example "my.host.com"';
-                }
+
+                return 'Specify hostname without the protocol, example "my.host.com"';
               }
             },
             {
@@ -686,275 +691,271 @@ define('repoServer/ServerEditPanel', ['extjs', 'sonatype/all', 'sonatype/strings
 
     securityConfigField = this.formPanel.find('name', 'securityEnabled')[0];
     securityConfigField.on('select', this.securitySelectHandler, securityConfigField);
-  };
+  },
 
-  Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
-
-    optionalFieldsetExpandHandler : function(panel) {
-      panel.items.each(function(item, i, len) {
-        if (item.isXType('fieldset', true)) {
-          this.optionalFieldsetExpandHandler(item);
-        }
-        else if (item.getEl() && item.getEl().up('div.required-field', 3)) {
-          item.allowBlank = false;
-        }
-        else {
-          item.allowBlank = true;
-        }
-      }, this);
-    },
-
-    optionalFieldsetCollapseHandler : function(panel) {
-      panel.items.each(function(item, i, len) {
-        if (item.isXType('fieldset', true)) {
-          this.optionalFieldsetCollapseHandler(item);
-        }
-        else {
-          item.allowBlank = true;
-        }
-      }, this);
-    },
-
-    saveBtnHandler : function() {
-      var allValid = this.form.isValid() && this.find('name', 'securityRealms')[0].validate() && this.find('name',
-            'systemNotificationRoleManager')[0].validate();
-
-      if (allValid) {
-        this.save();
+  optionalFieldsetExpandHandler : function(panel) {
+    panel.items.each(function(item, i, len) {
+      if (item.isXType('fieldset', true)) {
+        this.optionalFieldsetExpandHandler(item);
       }
-    },
+      else if (item.getEl() && item.getEl().up('div.required-field', 3)) {
+        item.allowBlank = false;
+      }
+      else {
+        item.allowBlank = true;
+      }
+    }, this);
+  },
 
-    save : function() {
-      var form = this.form;
+  optionalFieldsetCollapseHandler : function(panel) {
+    panel.items.each(function(item, i, len) {
+      if (item.isXType('fieldset', true)) {
+        this.optionalFieldsetCollapseHandler(item);
+      }
+      else {
+        item.allowBlank = true;
+      }
+    }, this);
+  },
 
-      form.doAction('sonatypeSubmit', {
-        method : 'PUT',
-        url : Sonatype.config.repos.urls.globalSettingsState,
-        waitMsg : 'Updating server configuration...',
-        fpanel : this,
-        dataModifiers : {
-          "routing.followLinks" : Strings.stringContextToBool,
-          "routing.groups.stopItemSearchOnFirstFoundFile" : Strings.stringContextToBool,
-          "routing.groups.mergeMetadata" : Strings.stringContextToBool,
-          "securityRealms" : function(val, fpanel) {
-            return fpanel.find('name', 'securityRealms')[0].getValue();
-          },
-          "systemNotificationSettings.roles" : function(val, fpanel) {
-            return fpanel.find('name', 'systemNotificationRoleManager')[0].getSelectedRoleIds();
-          },
-          "securityAnonymousAccessEnabled" : function(val, fpanel) {
-            return fpanel.isSecurityAnonymousAccessEnabled;
-          },
-          "globalHttpProxySettings.nonProxyHosts" : function(val, fpanel) {
-            return fpanel.find('name', 'nonProxyHosts')[0].getEntries();
-          }
+  saveBtnHandler : function() {
+    var allValid = this.form.isValid() && this.find('name', 'securityRealms')[0].validate() && this.find('name',
+          'systemNotificationRoleManager')[0].validate();
+
+    if (allValid) {
+      this.save();
+    }
+  },
+
+  save : function() {
+    var form = this.form;
+
+    form.doAction('sonatypeSubmit', {
+      method : 'PUT',
+      url : Sonatype.config.repos.urls.globalSettingsState,
+      waitMsg : 'Updating server configuration...',
+      fpanel : this,
+      dataModifiers : {
+        "routing.followLinks" : this.Strings.stringContextToBool,
+        "routing.groups.stopItemSearchOnFirstFoundFile" : this.Strings.stringContextToBool,
+        "routing.groups.mergeMetadata" : this.Strings.stringContextToBool,
+        "securityRealms" : function(val, fpanel) {
+          return fpanel.find('name', 'securityRealms')[0].getValue();
         },
-        serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState,
-        success : Sonatype.utils.updateGlobalTimeout
-      });
-    },
+        "systemNotificationSettings.roles" : function(val, fpanel) {
+          return fpanel.find('name', 'systemNotificationRoleManager')[0].getSelectedRoleIds();
+        },
+        "securityAnonymousAccessEnabled" : function(val, fpanel) {
+          return fpanel.isSecurityAnonymousAccessEnabled;
+        },
+        "globalHttpProxySettings.nonProxyHosts" : function(val, fpanel) {
+          return fpanel.find('name', 'nonProxyHosts')[0].getEntries();
+        }
+      },
+      serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState,
+      success : Sonatype.utils.updateGlobalTimeout
+    });
+  },
 
-    cancelBtnHandler : function() {
-      Sonatype.view.mainTabPanel.remove(this.id, true);
-    },
+  cancelBtnHandler : function() {
+    Sonatype.view.mainTabPanel.remove(this.id, true);
+  },
 
-    beforeRenderHandler : function() {
-      var sp = Sonatype.lib.Permissions;
-      if (sp.checkPermission('nexus:settings', sp.EDIT)) {
-        this.buttons[0].disabled = false;
-      }
-    },
+  beforeRenderHandler : function() {
+    var sp = Sonatype.lib.Permissions;
+    if (sp.checkPermission('nexus:settings', sp.EDIT)) {
+      this.buttons[0].disabled = false;
+    }
+  },
 
-    afterLayoutHandler : function() {
-      this.realmTypeDataStore.load();
+  afterLayoutHandler : function() {
+    this.realmTypeDataStore.load();
 
-      function registerQuickTips() {
-        var els = Ext.select('.required-field .x-form-item-label', this.getEl());
-        els.each(function(el, els, i) {
-          Ext.QuickTips.register({
-            target : el,
-            cls : 'required-field',
-            title : '',
-            text : 'Required Field',
-            enabled : true
-          });
+    function registerQuickTips() {
+      var els = Ext.select('.required-field .x-form-item-label', this.getEl());
+      els.each(function(el, els, i) {
+        Ext.QuickTips.register({
+          target : el,
+          cls : 'required-field',
+          title : '',
+          text : 'Required Field',
+          enabled : true
         });
-      }
-
-      // register required field quicktip, but we have to wait for elements to
-      // show up in DOM
-      registerQuickTips.defer(300, this.formPanel);
-
-    },
-
-    loadServerConfig : function() {
-      // if stores aren't loaded, abort, they will load again when done
-      if (!this.realmTypeDataStore.lastOptions) {
-        return;
-      }
-
-      var fpanel = this.formPanel;
-
-      this.formPanel.getForm().doAction('sonatypeLoad', {
-        url : Sonatype.config.repos.urls.globalSettingsState,
-        method : 'GET',
-        fpanel : fpanel,
-        dataModifiers : {
-          "routing.followLinks" : Strings.capitalize,
-          "routing.groups.stopItemSearchOnFirstFoundFile" : Strings.capitalize,
-          "routing.groups.mergeMetadata" : Strings.capitalize,
-          "securityRealms" : function(arr, srcObj, fpanel) {
-            fpanel.find('name', 'securityRealms')[0].setValue(arr);
-            return arr; // return arr, even if empty to comply with sonatypeLoad data modifier requirement
-          },
-          "systemNotificationSettings.roles" : function(arr, srcObj, fpanel) {
-            fpanel.find('name', 'systemNotificationRoleManager')[0].setSelectedRoleIds(arr, true);
-            return arr;
-          },
-          "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel) {
-            fpanel.isSecurityAnonymousAccessEnabled = arr;
-          },
-          "globalHttpProxySettings.nonProxyHosts" : function(arr, srcObj, fpanel) {
-            fpanel.find('name', 'nonProxyHosts')[0].setEntries(arr);
-          }
-        }
       });
-    },
-
-    testSmtpBtnHandler : function() {
-      var data, w, fpanel = this.formPanel;
-
-      data = {
-        testEmail : '',
-        host : fpanel.form.findField('smtpSettings.host').getValue(),
-        port : fpanel.form.findField('smtpSettings.port').getValue(),
-        username : fpanel.form.findField('smtpSettings.username').getValue(),
-        password : fpanel.form.findField('smtpSettings.password').getValue(),
-        systemEmailAddress : fpanel.form.findField('smtpSettings.systemEmailAddress').getValue(),
-        sslEnabled : fpanel.form.findField('smtpSettings.sslEnabled').getValue(),
-        tlsEnabled : fpanel.form.findField('smtpSettings.tlsEnabled').getValue()
-      };
-
-      w = new Ext.Window({
-        title : 'Validate SMTP settings',
-        closable : true,
-        autoWidth : false,
-        width : 350,
-        autoHeight : true,
-        modal : true,
-        constrain : true,
-        resizable : false,
-        draggable : false,
-        items : [
-          {
-            xtype : 'form',
-            labelWidth : 60,
-            frame : true,
-            defaultType : 'textfield',
-            monitorValid : true,
-            items : [
-              {
-                xtype : 'panel',
-                style : 'padding-left: 70px; padding-bottom: 10px',
-                html : 'Please enter an email address which will receive the test email message.'
-              },
-              {
-                fieldLabel : 'E-mail',
-                name : 'email',
-                width : 200,
-                allowBlank : false
-              }
-            ],
-            buttons : [
-              {
-                text : 'Validate',
-                formBind : true,
-                scope : this,
-                handler : function() {
-                  var email = w.find('name', 'email')[0].getValue();
-                  this.runStmpConfigCheck(email, data);
-                  w.close();
-                }
-              },
-              {
-                text : 'Cancel',
-                formBind : false,
-                scope : this,
-                handler : function() {
-                  w.close();
-                }
-              }
-            ]
-          }
-        ]
-      });
-
-      w.show();
-    },
-
-    runStmpConfigCheck : function(testEmail, data) {
-
-      data.testEmail = testEmail;
-
-      Ext.Ajax.request({
-        method : 'PUT',
-        url : Sonatype.config.repos.urls.smtpSettingsState,
-        jsonData : {
-          data : data
-        },
-        callback : function(options, success, response) {
-          this.el.unmask();
-
-          if (success) {
-            Sonatype.MessageBox.show({
-              title : 'SMTP configuration',
-              msg : 'SMTP configuration validated successfully, check your inbox!',
-              buttons : Sonatype.MessageBox.OK,
-              icon : Sonatype.MessageBox.INFO
-            });
-          }
-          else {
-            Sonatype.utils.connectionError(response, 'Error on SMTP validation!');
-          }
-        },
-        scope : this
-      });
-    },
-
-    // (Ext.form.BasicForm, Ext.form.Action)
-    actionCompleteHandler : function(form, action) {
-      if (action.type === 'sonatypeLoad') {
-        // @note: this is a work around to get proper use of the isDirty()
-        // function of this field
-        if (action.options.fpanel.isSecurityAnonymousAccessEnabled) {
-          action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'anonymousAccessSettings'))[0].expand();
-        }
-      }
-    },
-
-    // (Ext.form.BasicForm, Ext.form.Action)
-    actionFailedHandler : function(form, action) {
-      if (action.failureType === Ext.form.Action.CLIENT_INVALID) {
-        Sonatype.MessageBox.alert('Missing or Invalid Fields',
-              'Please change the missing or invalid fields.').setIcon(Sonatype.MessageBox.WARNING);
-      }
-      else if (action.failureType === Ext.form.Action.CONNECT_FAILURE) {
-        Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.');
-      }
-      else if (action.failureType === Ext.form.Action.LOAD_FAILURE) {
-        Sonatype.MessageBox.alert('Load Failure',
-              'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
-      }
-    },
-
-    securitySelectHandler : function(combo, record, index) {},
-
-    anonymousCheckHandler : function(checkbox, checked) {
-      this.ownerCt.find('name', 'securityAnonymousUsername')[0].setDisabled(!checked);
-      this.ownerCt.find('name', 'securityAnonymousPassword')[0].setDisabled(!checked);
     }
 
-  });
+    // register required field quicktip, but we have to wait for elements to
+    // show up in DOM
+    registerQuickTips.defer(300, this.formPanel);
+
+  },
+
+  loadServerConfig : function() {
+    // if stores aren't loaded, abort, they will load again when done
+    if (!this.realmTypeDataStore.lastOptions) {
+      return;
+    }
+
+    var fpanel = this.formPanel;
+
+    this.formPanel.getForm().doAction('sonatypeLoad', {
+      url : Sonatype.config.repos.urls.globalSettingsState,
+      method : 'GET',
+      fpanel : fpanel,
+      dataModifiers : {
+        "routing.followLinks" : this.Strings.capitalize,
+        "routing.groups.stopItemSearchOnFirstFoundFile" : this.Strings.capitalize,
+        "routing.groups.mergeMetadata" : this.Strings.capitalize,
+        "securityRealms" : function(arr, srcObj, fpanel) {
+          fpanel.find('name', 'securityRealms')[0].setValue(arr);
+          return arr; // return arr, even if empty to comply with sonatypeLoad data modifier requirement
+        },
+        "systemNotificationSettings.roles" : function(arr, srcObj, fpanel) {
+          fpanel.find('name', 'systemNotificationRoleManager')[0].setSelectedRoleIds(arr, true);
+          return arr;
+        },
+        "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel) {
+          fpanel.isSecurityAnonymousAccessEnabled = arr;
+        },
+        "globalHttpProxySettings.nonProxyHosts" : function(arr, srcObj, fpanel) {
+          fpanel.find('name', 'nonProxyHosts')[0].setEntries(arr);
+        }
+      }
+    });
+  },
+
+  testSmtpBtnHandler : function() {
+    var data, w, fpanel = this.formPanel;
+
+    data = {
+      testEmail : '',
+      host : fpanel.form.findField('smtpSettings.host').getValue(),
+      port : fpanel.form.findField('smtpSettings.port').getValue(),
+      username : fpanel.form.findField('smtpSettings.username').getValue(),
+      password : fpanel.form.findField('smtpSettings.password').getValue(),
+      systemEmailAddress : fpanel.form.findField('smtpSettings.systemEmailAddress').getValue(),
+      sslEnabled : fpanel.form.findField('smtpSettings.sslEnabled').getValue(),
+      tlsEnabled : fpanel.form.findField('smtpSettings.tlsEnabled').getValue()
+    };
+
+    w = new Ext.Window({
+      title : 'Validate SMTP settings',
+      closable : true,
+      autoWidth : false,
+      width : 350,
+      autoHeight : true,
+      modal : true,
+      constrain : true,
+      resizable : false,
+      draggable : false,
+      items : [
+        {
+          xtype : 'form',
+          labelWidth : 60,
+          frame : true,
+          defaultType : 'textfield',
+          monitorValid : true,
+          items : [
+            {
+              xtype : 'panel',
+              style : 'padding-left: 70px; padding-bottom: 10px',
+              html : 'Please enter an email address which will receive the test email message.'
+            },
+            {
+              fieldLabel : 'E-mail',
+              name : 'email',
+              width : 200,
+              allowBlank : false
+            }
+          ],
+          buttons : [
+            {
+              text : 'Validate',
+              formBind : true,
+              scope : this,
+              handler : function() {
+                var email = w.find('name', 'email')[0].getValue();
+                this.runStmpConfigCheck(email, data);
+                w.close();
+              }
+            },
+            {
+              text : 'Cancel',
+              formBind : false,
+              scope : this,
+              handler : function() {
+                w.close();
+              }
+            }
+          ]
+        }
+      ]
+    });
+
+    w.show();
+  },
+
+  runStmpConfigCheck : function(testEmail, data) {
+
+    data.testEmail = testEmail;
+
+    Ext.Ajax.request({
+      method : 'PUT',
+      url : Sonatype.config.repos.urls.smtpSettingsState,
+      jsonData : {
+        data : data
+      },
+      callback : function(options, success, response) {
+        this.el.unmask();
+
+        if (success) {
+          Sonatype.MessageBox.show({
+            title : 'SMTP configuration',
+            msg : 'SMTP configuration validated successfully, check your inbox!',
+            buttons : Sonatype.MessageBox.OK,
+            icon : Sonatype.MessageBox.INFO
+          });
+        }
+        else {
+          Sonatype.utils.connectionError(response, 'Error on SMTP validation!');
+        }
+      },
+      scope : this
+    });
+  },
+
+  // (Ext.form.BasicForm, Ext.form.Action)
+  actionCompleteHandler : function(form, action) {
+    if (action.type === 'sonatypeLoad') {
+      // @note: this is a work around to get proper use of the isDirty()
+      // function of this field
+      if (action.options.fpanel.isSecurityAnonymousAccessEnabled) {
+        action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'anonymousAccessSettings'))[0].expand();
+      }
+    }
+  },
+
+  // (Ext.form.BasicForm, Ext.form.Action)
+  actionFailedHandler : function(form, action) {
+    if (action.failureType === Ext.form.Action.CLIENT_INVALID) {
+      Sonatype.MessageBox.alert('Missing or Invalid Fields',
+            'Please change the missing or invalid fields.').setIcon(Sonatype.MessageBox.WARNING);
+    }
+    else if (action.failureType === Ext.form.Action.CONNECT_FAILURE) {
+      Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.');
+    }
+    else if (action.failureType === Ext.form.Action.LOAD_FAILURE) {
+      Sonatype.MessageBox.alert('Load Failure',
+            'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
+    }
+  },
+
+  securitySelectHandler : function(combo, record, index) {},
+
+  anonymousCheckHandler : function(checkbox, checked) {
+    this.ownerCt.find('name', 'securityAnonymousUsername')[0].setDisabled(!checked);
+    this.ownerCt.find('name', 'securityAnonymousPassword')[0].setDisabled(!checked);
+  }
 
 });
 

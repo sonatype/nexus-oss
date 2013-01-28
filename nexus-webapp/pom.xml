@@ -298,7 +298,6 @@
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <includes>
                 <include>lib/*.js</include>
-                <include>ext/define.js</include>
               </includes>
             </configuration>
           </execution>

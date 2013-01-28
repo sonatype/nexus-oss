@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('nexus/callbackref', ['ext/define'], function () {
+define('nexus/callbackref', [], function () {
 
     /**
      * Encapsulates a callback reference.

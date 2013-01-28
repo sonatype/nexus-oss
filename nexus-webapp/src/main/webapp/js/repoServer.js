@@ -37,10 +37,10 @@ define('repoServer',
     'repoServer/RoleEditPanel',
     'repoServer/RoutesEditPanel',
     'repoServer/SchedulesEditPanel',
-    'repoServer/ServerEditPanel',
     'repoServer/UserBrowserPanel',
     'repoServer/UserEditPanel',
-    'repoServer/UserPrivilegeBrowserPanel'
+    'repoServer/UserPrivilegeBrowserPanel',
+    'Sonatype/repoServer/ServerEditPanel' // uses Ext.define
   ], function() {
 
       }
