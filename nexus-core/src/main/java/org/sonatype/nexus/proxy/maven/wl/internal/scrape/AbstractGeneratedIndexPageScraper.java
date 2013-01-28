@@ -1,3 +1,15 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2012 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
 package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
 import java.io.IOException;
@@ -32,9 +44,21 @@ public abstract class AbstractGeneratedIndexPageScraper
     {
         // cheap checks first, to quickly eliminate target without doing any remote requests
         final Elements elements = rootDocument.getElementsByTag( "a" );
-        if ( !elements.isEmpty() && getParentDirectoryElement().text().equals( elements.get( 0 ).text() ) )
+        if ( !elements.isEmpty() )
         {
-            return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+            // get "template" parent link
+            final Element templateParentLink = getParentDirectoryElement( context, rootDocument );
+            // get the page parent link (note: usually it's 1st elem, but HTTPD for example has extra links for column
+            // sorting
+            for ( Element element : elements )
+            {
+                // if text is same and abs URLs points to same place, we got it
+                if ( templateParentLink.text().equals( element.text() )
+                    && templateParentLink.absUrl( "href" ).equals( element.absUrl( "href" ) ) )
+                {
+                    return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                }
+            }
         }
 
         // um, we were not totally positive, this might be some web server with index page similar to Nexus one
@@ -71,8 +95,13 @@ public abstract class AbstractGeneratedIndexPageScraper
         {
             if ( isDeeperRepoLink( context, currentPath, element ) )
             {
+                if ( element.text().startsWith( "." ) )
+                {
+                    // skip hidden paths
+                    continue;
+                }
                 final Node<Payload> newSibling = parentOMatic.addPath( currentPath + "/" + element.text() );
-                if ( isDeeperRepoCollectionLink( context, currentPath, element ) )
+                if ( element.absUrl( "href" ).endsWith( "/" ) )
                 {
                     // "cut" recursion preemptively
                     final int siblingDepth = currentDepth + 1;
@@ -88,16 +117,15 @@ public abstract class AbstractGeneratedIndexPageScraper
 
     protected boolean isDeeperRepoLink( final ScrapeContext context, final String currentRepoPath, final Element aTag )
     {
+        // HTTPD and some others have anchors for sorting, their rel URL start with "?"
+        if ( aTag.attr( "href" ).startsWith( "?" ) )
+        {
+            return false;
+        }
         final String linkAbsoluteUrl = aTag.absUrl( "href" );
         final String currentUrl = getRemoteUrlForRepositoryPath( context, currentRepoPath );
         return linkAbsoluteUrl.startsWith( currentUrl );
     }
 
-    protected boolean isDeeperRepoCollectionLink( final ScrapeContext context, final String currentRepoPath,
-                                                  final Element aTag )
-    {
-        return aTag.attr( "href" ).endsWith( "/" );
-    }
-
-    protected abstract Element getParentDirectoryElement();
+    protected abstract Element getParentDirectoryElement( final ScrapeContext context, final Document currentDocument );
 }

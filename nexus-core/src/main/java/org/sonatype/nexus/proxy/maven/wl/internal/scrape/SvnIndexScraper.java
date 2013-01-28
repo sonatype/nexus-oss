@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
-import java.io.IOException;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -24,36 +22,35 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
- * Scraper for remote Nexus instances that will scrape only if remote is for sure recognized as Nexus instance, and URL
- * points to a hosted repository.
+ * Scraper for remote HTTP servers.
  * 
  * @author cstamas
  */
-@Named( NexusScraper.ID )
+@Named( SvnIndexScraper.ID )
 @Singleton
-public class NexusScraper
+public class SvnIndexScraper
     extends AbstractGeneratedIndexPageScraper
 {
-    protected static final String ID = "nexus";
+    protected static final String ID = "svn-index";
 
     /**
      * Default constructor.
      */
-    public NexusScraper()
+    public SvnIndexScraper()
     {
-        super( 1000, ID ); // 1st by popularity
+        super( 3000, ID ); //3rd by popularity
     }
 
     @Override
     protected String getTargetedServer()
     {
-        return "Sonatype Nexus";
+        return "Subversion Index Page";
     }
 
     @Override
     protected Element getParentDirectoryElement( final ScrapeContext context, final Document document )
     {
-        final Document doc = Jsoup.parseBodyFragment( "<a href=\"../\">Parent Directory</a>", document.baseUri() );
+        final Document doc = Jsoup.parseBodyFragment( "<a href=\"../\">..</a>", document.baseUri() );
         return doc.getElementsByTag( "a" ).first();
     }
 
@@ -64,31 +61,19 @@ public class NexusScraper
         final RemoteDetectionResult result = super.detectRemoteRepository( context, rootResponse, rootDocument );
         if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
         {
-            try
+            // ensure there is an "a" tag with href pointing to either "http://subversion.tigris.org/" or
+            // "http://subversion.apache.org/"
+            final Elements elements = rootDocument.getElementsByTag( "a" );
+            for ( Element element : elements )
             {
-                // so index page looks like Nexus index page, let's see about repo metadata
-                // this is not cheap, as we are doing extra HTTP requests to get it
-                final Document response = getDocumentFor( context, "/.meta/repository-metadata.xml" );
-                final Elements url = response.getElementsByTag( "url" ); // all nexus MD has this. sanity
-                final Elements localUrl = response.getElementsByTag( "localUrl" ); // only proxies
-                final Elements memberRepositories = response.getElementsByTag( "memberRepositories" ); // only groups
-                if ( !url.isEmpty() && localUrl.isEmpty() && memberRepositories.isEmpty() )
+                final String elementHref = element.absUrl( "href" );
+                if ( "http://subversion.tigris.org/".equals( elementHref )
+                    || "http://subversion.tigris.org/".equals( elementHref ) )
                 {
-                    // we are sure it is a nexus hosted repo
                     return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
                 }
-                else
-                {
-                    // is a proxy or a group, do not scrape
-                    return RemoteDetectionResult.RECOGNIZED_SHOULD_NOT_BE_SCRAPED;
-                }
-            }
-            catch ( IOException e )
-            {
-                // hm, either not exists or whoknows, just ignore this as Nexus must have it and should return it
             }
         }
-        // um, we were not totally positive, this might be some web server with index page similar to Nexus one
         return RemoteDetectionResult.UNRECOGNIZED;
     }
 }

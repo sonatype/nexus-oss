@@ -12,11 +12,10 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
-import java.io.IOException;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -24,30 +23,29 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
- * Scraper for remote Nexus instances that will scrape only if remote is for sure recognized as Nexus instance, and URL
- * points to a hosted repository.
+ * Scraper for remote HTTP servers.
  * 
  * @author cstamas
  */
-@Named( NexusScraper.ID )
+@Named( HttpdIndexScraper.ID )
 @Singleton
-public class NexusScraper
+public class HttpdIndexScraper
     extends AbstractGeneratedIndexPageScraper
 {
-    protected static final String ID = "nexus";
+    protected static final String ID = "httpd-index";
 
     /**
      * Default constructor.
      */
-    public NexusScraper()
+    public HttpdIndexScraper()
     {
-        super( 1000, ID ); // 1st by popularity
+        super( 2000, ID ); // 2nd by popularity
     }
 
     @Override
     protected String getTargetedServer()
     {
-        return "Sonatype Nexus";
+        return "Apache HTTPD Index Page";
     }
 
     @Override
@@ -64,31 +62,17 @@ public class NexusScraper
         final RemoteDetectionResult result = super.detectRemoteRepository( context, rootResponse, rootDocument );
         if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
         {
-            try
+            final Elements addressElements = rootDocument.getElementsByTag( "address" );
+            if ( !addressElements.isEmpty() && addressElements.get( 0 ).text().startsWith( "Apache" ) )
             {
-                // so index page looks like Nexus index page, let's see about repo metadata
-                // this is not cheap, as we are doing extra HTTP requests to get it
-                final Document response = getDocumentFor( context, "/.meta/repository-metadata.xml" );
-                final Elements url = response.getElementsByTag( "url" ); // all nexus MD has this. sanity
-                final Elements localUrl = response.getElementsByTag( "localUrl" ); // only proxies
-                final Elements memberRepositories = response.getElementsByTag( "memberRepositories" ); // only groups
-                if ( !url.isEmpty() && localUrl.isEmpty() && memberRepositories.isEmpty() )
+                final Header serverHeader = rootResponse.getFirstHeader( "Server" );
+                if ( serverHeader != null && serverHeader.getValue() != null
+                    && serverHeader.getValue().startsWith( "Apache/" ) )
                 {
-                    // we are sure it is a nexus hosted repo
                     return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
                 }
-                else
-                {
-                    // is a proxy or a group, do not scrape
-                    return RemoteDetectionResult.RECOGNIZED_SHOULD_NOT_BE_SCRAPED;
-                }
-            }
-            catch ( IOException e )
-            {
-                // hm, either not exists or whoknows, just ignore this as Nexus must have it and should return it
             }
         }
-        // um, we were not totally positive, this might be some web server with index page similar to Nexus one
         return RemoteDetectionResult.UNRECOGNIZED;
     }
 }
