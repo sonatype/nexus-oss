@@ -41,18 +41,20 @@
         };
     </script>
 
-    <script src="js/lib/require-2.1.1.js" type="text/javascript" charset="utf-8"></script>
 
   #if ($debug)
       <script src="ext-3.4.0/adapter/ext/ext-base-debug.js" type="text/javascript" charset="utf-8"></script>
       <script src="ext-3.4.0/ext-all-debug.js" type="text/javascript" charset="utf-8"></script>
+      <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>
       ## omit sonatype-all.js to pick up single file modules
   #else
       ## load aggregated/minified files
       <script src="ext-3.4.0/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
       <script src="ext-3.4.0/ext-all.js" type="text/javascript" charset="utf-8"></script>
+      <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>
       <script src="js/$buildQualifier/sonatype-all.js" type="text/javascript" charset="utf-8"></script>
   #end
+
 
     <script type="text/javascript" charset="utf-8">
 

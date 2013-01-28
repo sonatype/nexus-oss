@@ -10,7 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define('ext/define', ['extjs', 'nexus/log'], function () {
+// FIXME this file should be moved into js/lib directory, but there are pending changes on other branches ATM. Leaving it here to avoid merge issues.
+
     //
     // NOTE: extjs 3.4.1 has an Ext.define, but its no available in a GPL version, so we have to use this cruft until we move over to extjs 4.x
     //
@@ -120,4 +121,3 @@ define('ext/define', ['extjs', 'nexus/log'], function () {
     // FIXME: Port over extjs-4 Ext.create() bits so we can have sane[r] object creation
 
     // FIXME: Port over extjs-4 Ext.Error.* bits so we can have sane[r] exception handling
-});

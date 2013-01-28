@@ -289,6 +289,20 @@
         <artifactId>yuicompressor-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>js-lib</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/js/sonatype-lib.js</output>
+              <sourceDirectory>src/main/webapp/js</sourceDirectory>
+              <includes>
+                <include>lib/*.js</include>
+                <include>ext/define.js</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
             <id>js</id>
             <goals>
               <goal>aggregate</goal>
@@ -297,7 +311,7 @@
               <output>${project.build.outputDirectory}/js/sonatype-all.js</output>
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <excludes>
-                <exclude>lib/require*.js</exclude>
+                <exclude>lib/*.js</exclude>
               </excludes>
               <includes>
                 <include>**/*.js</include>
@@ -375,7 +389,6 @@
             ext-3.4.0/resources/images/**,
             images/**,
             WEB-INF/*,
-            js/lib/*,
             style/sonatype-all.css
           </warSourceIncludes>
           <webResources>
