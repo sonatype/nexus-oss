@@ -14,8 +14,8 @@
 define('repoServer',
   [
     'repoServer/RepoServer',
-    'nexus/repository/AbstractRepoPanel',
-    'nexus/repository/ArtifactContainer',
+    'Nexus/repository/AbstractRepoPanel',
+    'Nexus/repository/ArtifactContainer',
     'repoServer/ConfigViewPanel',
     'repoServer/Documentation',
     'repoServer/FeedViewPanel',

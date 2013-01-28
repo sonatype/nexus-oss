@@ -14,7 +14,7 @@
  * Repository Edit/Create panel layout and controller
  */
 
-define('repoServer/RepoEditPanel',['sonatype/all', 'sonatype/strings'], function(Sonatype, Strings){
+define('repoServer/RepoEditPanel',['Sonatype/all', 'Sonatype/strings'], function(Sonatype, Strings){
 var REPO_REMOTE_STORAGE_REGEXP = /^(?:http|https|ftp):\/\//i;
 
 Sonatype.repoServer.AbstractRepositoryEditor = function(config) {

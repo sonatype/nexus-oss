@@ -12,7 +12,7 @@
  */
 
 /*global define*/
-define('repoServer/FileUploadPanel', ['extjs', 'sonatype/all'], function(Ext, Sonatype) {
+define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, Sonatype) {
   Sonatype.repoServer.ArtifactUploadPanel = function(cfg) {
     Ext.apply(this, cfg || {});
 

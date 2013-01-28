@@ -17,7 +17,7 @@
  * View Nexus serer XML configuration file
  */
 Ext.define('Sonatype.repoServer.ConfigViewPanel', {
-  requirejs : ['sonatype/all', 'nexus/config'],
+  requirejs : ['Sonatype/all', 'Nexus/config'],
 
   extend : 'Ext.form.FormPanel',
 

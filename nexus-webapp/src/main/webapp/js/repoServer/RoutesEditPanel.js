@@ -14,7 +14,7 @@
  * Repository Routes Edit/Creat panel layout and controller
  */
 
-define('repoServer/RoutesEditPanel',['sonatype/all', 'sonatype/strings'], function(Sonatype, Strings){
+define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings'], function(Sonatype, Strings){
 Sonatype.repoServer.RoutesEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {};

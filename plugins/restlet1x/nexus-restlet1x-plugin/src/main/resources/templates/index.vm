@@ -58,7 +58,7 @@
 
     <script type="text/javascript" charset="utf-8">
 
-        requirejs(['require', 'extjs', 'nexus/ui', 'sonatype/all'], function(require, Ext, Nexus, Sonatype) {
+        requirejs(['require', 'extjs', 'Nexus/ui', 'Sonatype/all'], function(require, Ext, Nexus, Sonatype) {
             var
                     all = ${pluginJsFiles.size()},
                     loaded = 0;

@@ -15,7 +15,7 @@
 /**
  * FIXME This belongs to the timeline plugin and should be moved there.
  */
-define('repoServer/FeedViewPanel', ['extjs', 'sonatype/all', 'nexus/ext/feedgrid'], function(Ext, Sonatype, FeedGrid) {
+define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid'], function(Ext, Sonatype, FeedGrid) {
 
   var ns = Ext.namespace('Sonatype.repoServer');
 
