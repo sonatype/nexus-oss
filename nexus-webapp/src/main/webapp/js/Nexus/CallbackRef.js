@@ -11,39 +11,35 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('Nexus/callbackref', [], function () {
+/**
+ * Encapsulates a callback reference.
+ *
+ * @class Nexus.CallbackRef
+ * @namespace Nexus
+ */
+Ext.define('Nexus.CallbackRef', {
+    /**
+     * @cfg {Object}    Scope to use when invoking callback function.
+     */
+    scope: undefined,
 
     /**
-     * Encapsulates a callback reference.
-     *
-     * @class Nexus.CallbackRef
-     * @namespace Nexus
+     * @cfg {Function}  Callback function.
      */
-    Ext.define('Nexus.CallbackRef', {
-        /**
-         * @cfg {Object}    Scope to use when invoking callback function.
-         */
-        scope: undefined,
+    fn: undefined,
 
-        /**
-         * @cfg {Function}  Callback function.
-         */
-        fn: undefined,
+    /**
+     * Invoke the callback function in the configured scope.
+     *
+     * @return {*}  Whatever the callback function returns.
+     */
+    invoke: function () {
+        var self = this;
 
-        /**
-         * Invoke the callback function in the configured scope.
-         *
-         * @return {*}  Whatever the callback function returns.
-         */
-        invoke: function () {
-            var self = this;
-
-            if (self.fn === undefined) {
-                throw 'Missing configuration: fn';
-            }
-
-            return self.fn.apply(self.scope || self, arguments);
+        if (self.fn === undefined) {
+            throw 'Missing configuration: fn';
         }
-    });
 
+        return self.fn.apply(self.scope || self, arguments);
+    }
 });

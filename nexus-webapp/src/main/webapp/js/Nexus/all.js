@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 define('Nexus/all',
-      [ 'Nexus/callbackref',
+      [
         'Nexus/config',
         'Nexus/error',
         'Nexus/ext',

@@ -12,14 +12,10 @@
  */
 /*global Ext, Sonatype, Nexus*/
 Ext.define('Sonatype.repoServer.ServerEditPanel', {
-  require : 'Nexus.util.Strings',
-
   extend : 'Ext.Panel',
+  requires : 'Nexus.util.Strings',
 
   constructor : function(cfg) {
-
-    // shortcut to requested module for instance methods
-    this.Strings = Nexus.util.Strings;
 
     Ext.apply(this, cfg || {}, {
       autoScroll : true
@@ -736,9 +732,9 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       waitMsg : 'Updating server configuration...',
       fpanel : this,
       dataModifiers : {
-        "routing.followLinks" : this.Strings.stringContextToBool,
-        "routing.groups.stopItemSearchOnFirstFoundFile" : this.Strings.stringContextToBool,
-        "routing.groups.mergeMetadata" : this.Strings.stringContextToBool,
+        "routing.followLinks" : Nexus.util.Strings.stringContextToBool,
+        "routing.groups.stopItemSearchOnFirstFoundFile" : Nexus.util.Strings.stringContextToBool,
+        "routing.groups.mergeMetadata" : Nexus.util.Strings.stringContextToBool,
         "securityRealms" : function(val, fpanel) {
           return fpanel.find('name', 'securityRealms')[0].getValue();
         },
@@ -803,9 +799,9 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       method : 'GET',
       fpanel : fpanel,
       dataModifiers : {
-        "routing.followLinks" : this.Strings.capitalize,
-        "routing.groups.stopItemSearchOnFirstFoundFile" : this.Strings.capitalize,
-        "routing.groups.mergeMetadata" : this.Strings.capitalize,
+        "routing.followLinks" : Nexus.util.Strings.capitalize,
+        "routing.groups.stopItemSearchOnFirstFoundFile" : Nexus.util.Strings.capitalize,
+        "routing.groups.mergeMetadata" : Nexus.util.Strings.capitalize,
         "securityRealms" : function(arr, srcObj, fpanel) {
           fpanel.find('name', 'securityRealms')[0].setValue(arr);
           return arr; // return arr, even if empty to comply with sonatypeLoad data modifier requirement
