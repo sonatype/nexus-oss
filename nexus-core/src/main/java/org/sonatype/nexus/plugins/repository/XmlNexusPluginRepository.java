@@ -44,7 +44,6 @@ import org.sonatype.plugins.model.PluginMetadata;
  *       <groupId>org.sonatype.nexus.plugins</groupId>
  *       <artifactId>nexus-indexer-lucene-plugin</artifactId>
  *       <version>2.3-SNAPSHOT</version>
- *       <groupId>org.sonatype.nexus.plugins</groupId>
  *       <type>nexus-plugin</type>
  *     </artifact>
  *     <artifact>
@@ -52,7 +51,6 @@ import org.sonatype.plugins.model.PluginMetadata;
  *       <groupId>org.apache.maven.indexer</groupId>
  *       <artifactId>indexer-core</artifactId>
  *       <version>5.0.0</version>
- *       <groupId>org.apache.maven.indexer</groupId>
  *       <type>jar</type>
  *     </artifact>
  *   </artifacts>
