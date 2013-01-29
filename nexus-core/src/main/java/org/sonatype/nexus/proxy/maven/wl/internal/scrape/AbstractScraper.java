@@ -83,15 +83,21 @@ public abstract class AbstractScraper
         switch ( detectionResult )
         {
             case RECOGNIZED_SHOULD_BE_SCRAPED:
+                getLogger().debug( "Remote repository on URL={} recognized as {}, scraping it...",
+                    context.getRemoteRepositoryRootUrl(), getTargetedServer() );
                 diveIn( context, rootResponse, rootDocument );
                 break;
 
             case RECOGNIZED_SHOULD_NOT_BE_SCRAPED:
+                getLogger().debug( "Remote repository on URL={} recognized as {}, but must not be scraped, stopping.",
+                    context.getRemoteRepositoryRootUrl(), getTargetedServer() );
                 context.stop( "Remote recognized as " + getTargetedServer() + ", but is not a hosted repository." );
                 break;
 
             default:
                 // not recognized, just continue with next Scraper
+                getLogger().debug( "Remote repository on URL={} not recognized as {}, skipping it.",
+                    context.getRemoteRepositoryRootUrl(), getTargetedServer() );
                 break;
         }
     }
