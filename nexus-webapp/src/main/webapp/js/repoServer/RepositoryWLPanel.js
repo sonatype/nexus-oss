@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('repoServer/RepositoryWLPanel', ['extjs', 'sonatype/all', 'nexus'], function(Ext, Sonatype, Nexus) {
+define('repoServer/RepositoryWLPanel', ['extjs', 'Sonatype/all', 'nexus'], function(Ext, Sonatype, Nexus) {
 
   var resourceUrl = new Ext.Template(Sonatype.config.repos.urls.repositories + "/{0}/wl").compile();
 
