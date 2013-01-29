@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
@@ -25,6 +26,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.Strategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Common grounds for {@link LocalContentDiscoverer} and {@link RemoteContentDiscoverer} implementations.
@@ -35,6 +37,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
  * @param <S>
  */
 public abstract class AbstractContentDiscoverer<R extends MavenRepository, S extends Strategy<R>>
+    extends AbstractLoggingComponent
 {
 
     protected DiscoveryResult<R> discoverContent( final List<S> strategies, final R mavenRepository )
@@ -45,9 +48,13 @@ public abstract class AbstractContentDiscoverer<R extends MavenRepository, S ext
         final DiscoveryResult<R> discoveryResult = new DiscoveryResult<R>( mavenRepository );
         for ( S strategy : appliedStrategies )
         {
+            getLogger().debug( "Discovery of {} with strategy {} attempted",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), strategy.getId() );
             discoverContentWithStrategy( strategy, mavenRepository, discoveryResult );
             if ( discoveryResult.isSuccessful() )
             {
+                getLogger().debug( "Discovery of {} with strategy {} successful",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ), strategy.getId() );
                 break;
             }
         }

@@ -15,9 +15,12 @@ package org.sonatype.nexus.util;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -78,6 +81,18 @@ public class PathUtils
     }
 
     /**
+     * Assembles a path from all elements.
+     * 
+     * @param elements the list of path elements to assemble path from.
+     * @param f function to apply to path elements.
+     * @return a normalized path assembled from all path elements.
+     */
+    public static String pathFrom( final List<String> elements, final Function<String, String> f )
+    {
+        return pathFrom( elements, elements.size(), f );
+    }
+
+    /**
      * Assembles a path from some count of elements.
      * 
      * @param elements the list of path elements to assemble path from.
@@ -86,12 +101,26 @@ public class PathUtils
      */
     public static String pathFrom( final List<String> elements, final int maxElementsToUse )
     {
+        return pathFrom( elements, maxElementsToUse, new Ident() );
+    }
+
+    /**
+     * Assembles a path from some count of elements.
+     * 
+     * @param elements the list of path elements to assemble path from.
+     * @param maxElementsToUse has effect only if less then {@code elements.size()} naturally.
+     * @param f
+     * @return a normalized path assembled from maximized count of path elements.
+     */
+    public static String pathFrom( final List<String> elements, final int maxElementsToUse,
+                                   final Function<String, String> f )
+    {
         final StringBuilder sb = new StringBuilder( "/" );
         int elementsUsed = 0;
         final Iterator<String> elementsIterator = elements.iterator();
         while ( elementsIterator.hasNext() )
         {
-            sb.append( elementsIterator.next() );
+            sb.append( f.apply( elementsIterator.next() ) );
             elementsUsed++;
             if ( elementsUsed == maxElementsToUse )
             {
@@ -103,5 +132,18 @@ public class PathUtils
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Ident function for path elements.
+     */
+    public static final class Ident
+        implements Function<String, String>
+    {
+        @Override
+        public String apply( @Nullable String input )
+        {
+            return input;
+        }
     }
 }

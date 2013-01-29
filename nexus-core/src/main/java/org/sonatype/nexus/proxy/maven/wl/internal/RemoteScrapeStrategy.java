@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.maven.wl.internal.scrape.ScrapeContext;
 import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Scraper;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientManager;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Remote scrape strategy.
@@ -80,12 +81,16 @@ public class RemoteScrapeStrategy
     public StrategyResult discover( final MavenProxyRepository mavenProxyRepository )
         throws StrategyFailedException
     {
+        getLogger().debug( "Remote scrape on {} tried",
+            RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         // get client configured in same way as proxy is using it
         final HttpClient httpClient =
             httpClientManager.create( mavenProxyRepository, mavenProxyRepository.getRemoteStorageContext() );
         final String remoteRepositoryRootUrl = mavenProxyRepository.getRemoteUrl();
         if ( isMarkedForNoScrape( httpClient, remoteRepositoryRootUrl ) )
         {
+            getLogger().debug( "Remote {} marked as no-scrape, giving up.",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             throw new StrategyFailedException( "Remote forbids scraping, is flagged as \"no-scrape\"." );
         }
         try
@@ -106,6 +111,9 @@ public class RemoteScrapeStrategy
                 }
                 else
                 {
+                    getLogger().debug( "Recived unexpected response from {} from root listing: {}",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ),
+                        remoteRepositoryRootResponse.getStatusLine() );
                     throw new StrategyFailedException( "Unexpected response from remote repository root: "
                         + remoteRepositoryRootResponse.getStatusLine().toString() );
                 }
@@ -127,25 +135,35 @@ public class RemoteScrapeStrategy
             {
                 try
                 {
+                    getLogger().debug( "Remote scraping {} with Scraper {}",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
                     scraper.scrape( context, remoteRepositoryRootResponse, remoteRepositoryRootDocument );
                     if ( context.isStopped() )
                     {
                         if ( context.isSuccessful() )
                         {
+                            getLogger().debug( "Remote scraping {} with Scraper {} succeeded.",
+                                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
                             return new StrategyResult( context.getMessage(), context.getEntrySource() );
                         }
                         else
                         {
+                            getLogger().debug( "Remote scraping {} with Scraper {} stopped execution.",
+                                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
                             throw new StrategyFailedException( context.getMessage() );
                         }
                     }
+                    getLogger().debug( "Remote scraping {} with Scraper {} skipped.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
                 }
                 catch ( IOException e )
                 {
-                    getLogger().info( "Scraper IO problem:", e );
+                    getLogger().debug( "Scraper IO problem:", e );
                 }
             }
 
+            getLogger().debug( "Not possible remote scrape of {}, no scraper succeeded.",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             throw new StrategyFailedException( "No scraper was able to scrape remote (or remote prevents scraping)." );
         }
         catch ( IOException e )

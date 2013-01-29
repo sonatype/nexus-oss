@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Remote prefix file strategy.
@@ -63,9 +64,13 @@ public class RemotePrefixFileStrategy
         final List<String> remoteFilePath = config.getRemotePrefixFilePaths();
         for ( String path : remoteFilePath )
         {
+            getLogger().debug( "Looking for remote prefix on {} at path {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
             item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
             if ( item != null )
             {
+                getLogger().debug( "Remote prefix on {} at path {} found!",
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
                 long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000;
                 if ( prefixFileAgeInDays < 1 )
                 {

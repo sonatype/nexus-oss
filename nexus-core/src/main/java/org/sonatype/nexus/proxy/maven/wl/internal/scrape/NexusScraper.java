@@ -68,7 +68,8 @@ public class NexusScraper
             {
                 // so index page looks like Nexus index page, let's see about repo metadata
                 // this is not cheap, as we are doing extra HTTP requests to get it
-                final Document response = getDocumentFor( context, "/.meta/repository-metadata.xml" );
+                final Document response =
+                    getDocumentFor( context, context.getRemoteRepositoryRootUrl() + ".meta/repository-metadata.xml" );
                 final Elements url = response.getElementsByTag( "url" ); // all nexus MD has this. sanity
                 final Elements localUrl = response.getElementsByTag( "localUrl" ); // only proxies
                 final Elements memberRepositories = response.getElementsByTag( "memberRepositories" ); // only groups
@@ -86,6 +87,7 @@ public class NexusScraper
             catch ( IOException e )
             {
                 // hm, either not exists or whoknows, just ignore this as Nexus must have it and should return it
+                getLogger().debug( "Problem during fetch of /.meta/repository-metadata.xml", e );
             }
         }
         // um, we were not totally positive, this might be some web server with index page similar to Nexus one

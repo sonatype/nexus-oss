@@ -15,6 +15,11 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -22,6 +27,9 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.sonatype.nexus.proxy.maven.wl.internal.AbstractPrioritized;
+import org.sonatype.nexus.util.PathUtils;
+
+import com.google.common.base.Function;
 
 /**
  * Abstract class for {@link Scraper} implementations.
@@ -92,26 +100,28 @@ public abstract class AbstractScraper
 
     protected abstract String getTargetedServer();
 
-    protected abstract RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument );
+    protected abstract RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
+                                                                     final HttpResponse rootResponse,
+                                                                     final Document rootDocument );
 
-    protected abstract void diveIn( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument )
+    protected abstract void diveIn( final ScrapeContext context, final HttpResponse rootResponse,
+                                    final Document rootDocument )
         throws IOException;
 
     // ==
 
-    protected HttpResponse getHttpResponseFor( final ScrapeContext context, final String repositoryPath )
+    protected HttpResponse getHttpResponseFor( final ScrapeContext context, final String url )
         throws IOException
     {
-        final String url = getRemoteUrlForRepositoryPath( context, repositoryPath );
         // TODO: detect redirects
         final HttpGet get = new HttpGet( url );
         return context.getHttpClient().execute( get );
     }
 
-    protected Document getDocumentFor( final ScrapeContext context, final String repositoryPath )
+    protected Document getDocumentFor( final ScrapeContext context, final String url )
         throws IOException
     {
-        final String url = getRemoteUrlForRepositoryPath( context, repositoryPath );
+        getLogger().debug( "Scraping URL {}", url );
         // TODO: detect redirects
         final HttpGet get = new HttpGet( url );
         HttpResponse response = context.getHttpClient().execute( get );
@@ -133,16 +143,40 @@ public abstract class AbstractScraper
         }
     }
 
-    protected String getRemoteUrlForRepositoryPath( final ScrapeContext context, final String repositoryPath )
+    protected String getRemoteUrlForRepositoryPath( final ScrapeContext context, final List<String> pathElements )
     {
         // explanation: Nexus "repository paths" are always absolute, using "/" as separators and starting with "/"
         // but, the repo remote URL comes from Nexus config, and Nexus always "normalizes" the URL and it always ends
         // with "/"
-        String sp = repositoryPath;
+        String sp = PathUtils.pathFrom( pathElements, URLENCODE );
         while ( sp.startsWith( "/" ) )
         {
             sp = sp.substring( 1 );
         }
         return context.getRemoteRepositoryRootUrl() + sp;
+    }
+
+    // ==
+
+    private static final UrlEncode URLENCODE = new UrlEncode();
+
+    private static final class UrlEncode
+        implements Function<String, String>
+    {
+        @Override
+        public String apply( @Nullable String input )
+        {
+            try
+            {
+                // See
+                // http://en.wikipedia.org/wiki/Percent-encoding
+                return URLEncoder.encode( input, "UTF-8" ).replace( "+", "%20" );
+            }
+            catch ( UnsupportedEncodingException e )
+            {
+                // Platform not supporting UTF-8? Unlikely.
+                throw new IllegalStateException( "WAT?", e );
+            }
+        }
     }
 }

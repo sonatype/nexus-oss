@@ -13,6 +13,7 @@
 package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.jsoup.nodes.Document;
@@ -20,6 +21,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.internal.ArrayListEntrySource;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
@@ -90,10 +92,11 @@ public abstract class AbstractGeneratedIndexPageScraper
             return;
         }
         final Elements elements = document.getElementsByTag( "a" );
+        final List<String> pathElements = currentNode.getPathElements();
         final String currentPath = currentNode.getPath();
         for ( Element element : elements )
         {
-            if ( isDeeperRepoLink( context, currentPath, element ) )
+            if ( isDeeperRepoLink( context, pathElements, element ) )
             {
                 if ( element.text().startsWith( "." ) )
                 {
@@ -107,7 +110,9 @@ public abstract class AbstractGeneratedIndexPageScraper
                     final int siblingDepth = currentDepth + 1;
                     if ( siblingDepth < context.getScrapeDepth() )
                     {
-                        final Document siblingDocument = getDocumentFor( context, newSibling.getPath() + "/" );
+                        final String newSiblingEncodedUrl =
+                            getRemoteUrlForRepositoryPath( context, newSibling.getPathElements() ) + "/";
+                        final Document siblingDocument = getDocumentFor( context, newSiblingEncodedUrl );
                         diveIn( context, siblingDocument, siblingDepth, parentOMatic, newSibling );
                     }
                 }
@@ -115,7 +120,7 @@ public abstract class AbstractGeneratedIndexPageScraper
         }
     }
 
-    protected boolean isDeeperRepoLink( final ScrapeContext context, final String currentRepoPath, final Element aTag )
+    protected boolean isDeeperRepoLink( final ScrapeContext context, final List<String> pathElements, final Element aTag )
     {
         // HTTPD and some others have anchors for sorting, their rel URL start with "?"
         if ( aTag.attr( "href" ).startsWith( "?" ) )
@@ -123,7 +128,7 @@ public abstract class AbstractGeneratedIndexPageScraper
             return false;
         }
         final String linkAbsoluteUrl = aTag.absUrl( "href" );
-        final String currentUrl = getRemoteUrlForRepositoryPath( context, currentRepoPath );
+        final String currentUrl = getRemoteUrlForRepositoryPath( context, pathElements );
         return linkAbsoluteUrl.startsWith( currentUrl );
     }
 

@@ -107,7 +107,7 @@ public class Node<P>
     /**
      * Returns the "label" of this node, never {@code null}.
      * 
-     * @return
+     * @return the label of this node.
      */
     public String getLabel()
     {
@@ -121,6 +121,16 @@ public class Node<P>
      */
     public String getPath()
     {
+        return PathUtils.pathFrom( getPathElements() );
+    }
+
+    /**
+     * Returns the node path elements.
+     * 
+     * @return the path elements of the node, in proper order (root.. current node as last in list).
+     */
+    public List<String> getPathElements()
+    {
         final ArrayList<String> pathElems = new ArrayList<String>( getDepth() );
         Node<P> current = this;
         do
@@ -133,7 +143,7 @@ public class Node<P>
         }
         while ( !current.isRoot() );
         Collections.reverse( pathElems );
-        return PathUtils.pathFrom( pathElems );
+        return pathElems;
     }
 
     /**
