@@ -32,7 +32,6 @@ define('repoServer',
     'repoServer/RepoMaintPanel',
     'repoServer/RepositoryBrowserContainer',
     'repoServer/RepoSummaryPanel',
-    'repoServer/RepositoryWLPanel',
     'repoServer/RepoTargetEditPanel',
     'repoServer/resources',
     'repoServer/RoleEditPanel',
@@ -41,7 +40,8 @@ define('repoServer',
     'repoServer/UserBrowserPanel',
     'repoServer/UserEditPanel',
     'repoServer/UserPrivilegeBrowserPanel',
-    'Sonatype/repoServer/ServerEditPanel' // uses Ext.define
+    'Sonatype/repoServer/ServerEditPanel', 
+    'Sonatype/repoServer/RepositoryWLPanel'
   ], function() {
 
       }
