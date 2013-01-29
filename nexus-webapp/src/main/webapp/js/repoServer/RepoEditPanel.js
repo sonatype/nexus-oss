@@ -350,9 +350,9 @@ Sonatype.repoServer.HostedRepositoryEditor = function(config) {
       },
       submit : {
         repoPolicy : Strings.uppercase,
-        browseable : Strings.stringContextToBool,
-        indexable : Strings.stringContextToBool,
-        exposed : Strings.stringContextToBool,
+        browseable : Strings.convert.stringContextToBool,
+        indexable : Strings.convert.stringContextToBool,
+        exposed : Strings.convert.stringContextToBool,
         downloadRemoteIndexes : function() {
           return false;
         },
@@ -639,12 +639,12 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
       },
       submit : {
         repoPolicy : Strings.uppercase,
-        browseable : Strings.stringContextToBool,
-        indexable : Strings.stringContextToBool,
-        exposed : Strings.stringContextToBool,
-        downloadRemoteIndexes : Strings.stringContextToBool,
-        autoBlockActive : Strings.stringContextToBool,
-        fileTypeValidation : Strings.stringContextToBool,
+        browseable : Strings.convert.stringContextToBool,
+        indexable : Strings.convert.stringContextToBool,
+        exposed : Strings.convert.stringContextToBool,
+        downloadRemoteIndexes : Strings.convert.stringContextToBool,
+        autoBlockActive : Strings.convert.stringContextToBool,
+        fileTypeValidation : Strings.convert.stringContextToBool,
         checksumPolicy : Strings.uppercase
       }
     },
@@ -1200,7 +1200,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function(config) {
         syncAtStartup : Strings.capitalize
       },
       submit : {
-        syncAtStartup : Strings.stringContextToBool,
+        syncAtStartup : Strings.convert.stringContextToBool,
         exposed : function() {
           return true;
         }

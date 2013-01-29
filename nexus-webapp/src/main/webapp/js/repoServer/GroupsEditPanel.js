@@ -26,7 +26,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
       },
       submit : {
         repositories : this.saveRepositories.createDelegate(this),
-        exposed : Strings.stringContextToBool
+        exposed : Strings.convert.stringContextToBool
       }
     },
     validationModifiers : {

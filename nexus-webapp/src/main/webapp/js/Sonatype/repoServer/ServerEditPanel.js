@@ -732,9 +732,9 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
       waitMsg : 'Updating server configuration...',
       fpanel : this,
       dataModifiers : {
-        "routing.followLinks" : Nexus.util.Strings.stringContextToBool,
-        "routing.groups.stopItemSearchOnFirstFoundFile" : Nexus.util.Strings.stringContextToBool,
-        "routing.groups.mergeMetadata" : Nexus.util.Strings.stringContextToBool,
+        "routing.followLinks" : Nexus.util.Strings.convert.stringContextToBool,
+        "routing.groups.stopItemSearchOnFirstFoundFile" : Nexus.util.Strings.convert.stringContextToBool,
+        "routing.groups.mergeMetadata" : Nexus.util.Strings.convert.stringContextToBool,
         "securityRealms" : function(val, fpanel) {
           return fpanel.find('name', 'securityRealms')[0].getValue();
         },
