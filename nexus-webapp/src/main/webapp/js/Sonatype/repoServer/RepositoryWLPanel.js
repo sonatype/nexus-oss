@@ -150,7 +150,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
         title : 'Discovery',
 //        collapsible : false,
         checkboxToggle : true,
-        checkboxName : 'discover.discoveryEnabled',
+        checkboxName : 'discovery.discoveryEnabled',
         name : 'dis_fieldset',
         hidden : subjectIsNotProxy,
         listeners : {
