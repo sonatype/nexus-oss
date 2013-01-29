@@ -485,6 +485,7 @@ public class SearchNGIndexPlexusResource
                 for ( NexusNGArtifact artifact : gahit.getOrderedVersionHits() )
                 {
                     responseData.add( artifact );
+                    setLatest( artifact, gahit.getLatestRelease(), gahit.getLatestSnapshot() );
                     addRepositoryIds( repositoryIds, artifact );
                 }
             }

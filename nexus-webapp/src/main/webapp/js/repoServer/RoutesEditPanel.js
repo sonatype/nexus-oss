@@ -14,7 +14,7 @@
  * Repository Routes Edit/Creat panel layout and controller
  */
 
-define('repoServer/RoutesEditPanel',['sonatype/all'], function(){
+define('repoServer/RoutesEditPanel',['Sonatype/all', 'Sonatype/strings'], function(Sonatype, Strings){
 Sonatype.repoServer.RoutesEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {};
@@ -88,14 +88,14 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
 
   this.loadDataModFuncs = {
     route : {
-      ruleType : Sonatype.utils.capitalize,
+      ruleType : Strings.capitalize,
       repositories : this.loadRepoListHelper.createDelegate(this)
     }
   };
 
   this.submitDataModFuncs = {
     route : {
-      ruleType : Sonatype.utils.lowercase,
+      ruleType : Strings.lowercase,
       repositories : this.exportRepoListHelper.createDelegate(this)
     }
   };

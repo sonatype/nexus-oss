@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/form/TextField',['extjs', 'nexus/util'], function(Ext, Nexus) {
+define('ext/form/TextField',['extjs', 'Nexus/util'], function(Ext, Nexus) {
 Ext.override(Ext.form.TextField, {
   /**
    * @cfg {Boolean} htmlDecode

@@ -15,7 +15,7 @@
 /*
  * Privilege Edit/Create panel layout and controller
  */
-define('repoServer/PrivilegeEditPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
+define('repoServer/PrivilegeEditPanel',['extjs', 'Sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.PrivilegeEditPanel = function(config) {
   Ext.apply(this, config || {}, {
     title : 'Privileges'

@@ -12,11 +12,17 @@
  */
 
 /*global define*/
-define('repoServer/FeedViewPanel', ['extjs', 'sonatype/all', 'nexus'], function(Ext, Sonatype, Nexus) {
+/**
+ * FIXME This belongs to the timeline plugin and should be moved there.
+ */
+define('repoServer/FeedViewPanel', ['extjs', 'Sonatype/all', 'Nexus/ext/feedgrid'], function(Ext, Sonatype, FeedGrid) {
+
+  var ns = Ext.namespace('Sonatype.repoServer');
+
   /*
    * config object: { feedUrl ; required title }
    */
-  Sonatype.repoServer.FeedViewPanel = function(cfg) {
+  ns.FeedViewPanel = function(cfg) {
     Ext.apply(this, cfg || {}, {
       feedUrl : '',
       title : 'Feed Viewer'
@@ -127,9 +133,9 @@ define('repoServer/FeedViewPanel', ['extjs', 'sonatype/all', 'nexus'], function(
       return Ext.util.Format.stripScripts(v || all.description);
     };
 
-    this.grid = new Nexus.ext.FeedGrid({});
+    this.grid = new FeedGrid({});
 
-    Sonatype.repoServer.FeedViewPanel.superclass.constructor.call(this, {
+    ns.FeedViewPanel.superclass.constructor.call(this, {
       layout : 'border',
       title : this.title,
       hideMode : 'offsets',
@@ -141,7 +147,7 @@ define('repoServer/FeedViewPanel', ['extjs', 'sonatype/all', 'nexus'], function(
     this.grid.store.on('load', this.gsm.selectFirstRow, this.gsm);
   };
 
-  Ext.extend(Sonatype.repoServer.FeedViewPanel, Ext.Panel, {
+  Ext.extend(ns.FeedViewPanel, Ext.Panel, {
 
     rowSelect : function(selectionModel, index, rec) {
       this.grid.setFeed(rec.get('name'), rec.get('resourceURI'));
@@ -149,5 +155,6 @@ define('repoServer/FeedViewPanel', ['extjs', 'sonatype/all', 'nexus'], function(
 
   });
 
+  return ns.FeedViewPanel;
 });
 

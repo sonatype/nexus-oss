@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('repoServer/helpAbout',['extjs', 'sonatype/all'], function(Ext, Sonatype){
+define('repoServer/helpAbout',['extjs', 'Sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.HelpAboutPanel = function(config) {
   Ext.apply(this, config || {});
   
