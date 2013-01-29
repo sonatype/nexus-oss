@@ -22,7 +22,6 @@
  * @constructor
  */
 Ext.Base = function (config) {
-    //console.log('Ext.Base CTOR');
     Ext.apply(this, config);
 };
 
@@ -39,7 +38,11 @@ Ext.Base = function (config) {
  * @cfg {*} statics                 Static members.
  * @cfg {*} requirejs               Array of requirejs module dependencies
  * @cfg {*} requires                Array of class names (created by Ext.define) which are dependencies.
- * @cfg {boolean} requireSuper      Flag to enable/disable automatic dependency on super-class.
+ * @cfg {boolean} requireSuper      Flag to enable/disable automatic dependency on super-class;
+ *                                  Tries to auto-detect but just inc-ase you can enable/disable it.
+ * @cfg {String} xtype              Automatically register class as Ext xtype component.
+ * @cfg {boolean} singleton         Defines a singleton instead of a class.
+ *                                  Given class name will reference singleton object and createdFn 'this' will be the singleton object.
  */
 Ext.define = function (className, data, createdFn) {
     data = data || {};
@@ -57,6 +60,8 @@ Ext.define = function (className, data, createdFn) {
         moduleName,
         obj,
         arrayify,
+        singleton,
+        xtype,
         tmp;
 
     obj = function (path) {
@@ -101,28 +106,35 @@ Ext.define = function (className, data, createdFn) {
         baseClassName = className;
     }
 
-    // Default to requiring super class, but allow user to force the value
-    if (data.requireSuper === undefined) {
-        requireSuper = true;
-    }
-    else {
-        requireSuper = data.requireSuper;
-        delete data.requireSuper;
-    }
+    requireSuper = data.requireSuper;
+    delete data.requireSuper;
 
     // Determine the super-class
     if (data.extend !== undefined) {
         superName = data.extend;
         delete data.extend;
+
+        // require super module if there is not already a defined class of that name for legacy support
+        if (requireSuper === undefined) {
+            requireSuper = obj(superName) === undefined;
+        }
     }
     else {
         superName = 'Ext.Base';
         requireSuper = false;
     }
 
-    // Extract static configuration
+    // Extract statics
     statics = data.statics;
     delete data.statics;
+
+    // Extract singleton
+    singleton = data.singleton;
+    delete data.singleton;
+
+    // Extract xtype
+    xtype = data.xtype;
+    delete data.xtype;
 
     // Extract requirejs dependencies
     requiredModules = arrayify(data.requirejs);
@@ -133,10 +145,8 @@ Ext.define = function (className, data, createdFn) {
     delete data.requires;
 
     // Require super if enabled
-    if (requireSuper) {
-        if (typeof requireSuper === "undefined") {
-            requiredModules.push(superName.replaceAll('.', '/'));
-        }
+    if (requireSuper === true) {
+        requiredModules.push(superName.replaceAll('.', '/'));
     }
 
     // append translated dependency classes on to required modules
@@ -178,18 +188,8 @@ Ext.define = function (className, data, createdFn) {
         // Create the sub-class
         type = Ext.extend(superClass, data);
 
-        // Assign to global namespace
-        obj(nameSpace)[baseClassName] = type;
-
-        // Enrich the sub-class prototype
+        // Enrich the sub-class prototype w/ class-name and logging support
         type.prototype.$className = className;
-
-        // FIXME: Figure out how to define this properly, all seem to work in different ways
-        //type.prototype.superclass = superClass;
-        //type.prototype.$super = superClass.prototype;
-        //type.prototype.$super = eval(className + '.superclass');
-        //type.prototype.$super = function () {};
-
         type.prototype.$log = function (message) {
             Nexus.log(this.$className + ': ' + message);
         };
@@ -209,6 +209,19 @@ Ext.define = function (className, data, createdFn) {
         if (statics !== undefined) {
             Ext.apply(type, statics);
         }
+
+        // Register xtype for class
+        if (xtype !== undefined) {
+            Ext.reg(xtype, type);
+        }
+
+        // When singleton; type becomes new instance
+        if (singleton !== undefined) {
+            type = new type();
+        }
+
+        // Assign to global namespace
+        obj(nameSpace)[baseClassName] = type;
 
         // Call post-define hook
         if (createdFn !== undefined) {
