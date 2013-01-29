@@ -23,7 +23,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
@@ -35,18 +38,23 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
+import org.sonatype.nexus.proxy.maven.ChecksumContentValidator;
+import org.sonatype.nexus.proxy.maven.MUtils;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+
 import com.google.common.eventbus.Subscribe;
 
 public class M2RepositoryTest
@@ -742,15 +750,17 @@ public class M2RepositoryTest
 
         // NO file should be pulled down
         {
-            File artifactFile = new File( repositoryLocalStorageDir, path.substring( 1 ) );
-            Assert.assertFalse( artifactFile.exists() );
-
-            if ( M2ArtifactRecognizer.isChecksum( path ) )
+            File artifactFile;
+            if ( !M2ArtifactRecognizer.isChecksum( path ) )
             {
-                File artifactMainFile =
-                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() - ".sha1".length() ) );
-                Assert.assertFalse( artifactMainFile.exists() );
+                artifactFile = new File( repositoryLocalStorageDir, path.substring( 1 ) );
             }
+            else
+            {
+                artifactFile =
+                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() - ".sha1".length() ) );
+            }
+            Assert.assertFalse( artifactFile.exists() );
         }
 
         // create a request and equip it as needed (requests should NOT be reused!)
@@ -771,19 +781,130 @@ public class M2RepositoryTest
 
         // files SHOULD be pulled down
         {
-            File artifactFile = new File( repositoryLocalStorageDir, path.substring( 1 ) );
-            Assert.assertTrue( artifactFile.exists() );
-
+            File artifactFile;
             if ( !M2ArtifactRecognizer.isChecksum( path ) )
             {
-                File artifactMainFile =
-                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() ) + ".sha1" );
-                Assert.assertTrue( artifactMainFile.exists() );
+                artifactFile = new File( repositoryLocalStorageDir, path.substring( 1 ) );
             }
+            else
+            {
+                artifactFile =
+                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() - ".sha1".length() ) );
+            }
+            Assert.assertTrue( artifactFile.exists() );
         }
     }
 
     // NEXUS-4218 END
+
+    @Test
+    public void testNEXUS5418_retrieveItemWithChecksums()
+        throws Exception
+    {
+        final M2Repository repository = (M2Repository) getResourceStore();
+
+        Assert.assertTrue( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
+
+        StorageItem item = repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt" ) );
+
+        StorageFileItem sha1 =
+            (StorageFileItem) repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt.sha1" ) );
+        String sha1str = MUtils.readDigestFromFileItem( (StorageFileItem) sha1 );
+        Assert.assertEquals( item.getRepositoryItemAttributes().get( StorageFileItem.DIGEST_SHA1_KEY ), sha1str );
+        Assert.assertEquals( item.getModified(), sha1.getModified() );
+        Assert.assertEquals( 40, sha1.getLength() );
+
+        StorageFileItem md5 =
+            (StorageFileItem) repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt.md5" ) );
+        String md5str = MUtils.readDigestFromFileItem( (StorageFileItem) md5 );
+        Assert.assertEquals( item.getRepositoryItemAttributes().get( StorageFileItem.DIGEST_MD5_KEY ), md5str );
+        Assert.assertEquals( item.getModified(), md5.getModified() );
+        Assert.assertEquals( 32, md5.getLength() );
+    }
+
+    @Test
+    public void testNEXUS5418_listChecksums()
+        throws Exception
+    {
+        final M2Repository repository = (M2Repository) getResourceStore();
+
+        // sanity check
+        Assert.assertTrue( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
+        try
+        {
+            repository.list( new ResourceStoreRequest( "/spoof" ) );
+            Assert.fail();
+        }
+        catch ( ItemNotFoundException expected )
+        {
+            // expected
+        }
+
+        // cache an item and its checksums
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt" ) );
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt.sha1" ) );
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt.md5" ) );
+
+        Collection<StorageItem> items = repository.list( new ResourceStoreRequest( "/spoof" ) );
+
+        Map<String, StorageItem> paths = new HashMap<String, StorageItem>();
+        for ( StorageItem item : items )
+        {
+            paths.put( item.getPath(), item );
+        }
+
+        StorageFileItem item = (StorageFileItem) paths.get( "/spoof/simple.txt" );
+        Assert.assertNotNull( item );
+
+        StorageFileItem sha1 = (StorageFileItem) paths.get( "/spoof/simple.txt.sha1" );
+        Assert.assertNotNull( sha1 );
+        String sha1str = MUtils.readDigestFromFileItem( (StorageFileItem) sha1 );
+        Assert.assertEquals( item.getRepositoryItemAttributes().get( StorageFileItem.DIGEST_SHA1_KEY ), sha1str );
+        Assert.assertEquals( item.getModified(), sha1.getModified() );
+        Assert.assertEquals( 40, sha1.getLength() );
+
+        StorageFileItem md5 = (StorageFileItem) paths.get( "/spoof/simple.txt.md5" );
+        Assert.assertNotNull( md5 );
+        String md5str = MUtils.readDigestFromFileItem( (StorageFileItem) md5 );
+        Assert.assertEquals( item.getRepositoryItemAttributes().get( StorageFileItem.DIGEST_MD5_KEY ), md5str );
+        Assert.assertEquals( item.getModified(), md5.getModified() );
+        Assert.assertEquals( 32, md5.getLength() );
+    }
+
+    @Test
+    public void testNEXUS5418_storeItemWithChecksums()
+        throws Exception
+    {
+        final M2Repository repository = (M2Repository) getResourceStore();
+
+        Assert.assertTrue( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
+
+        String sha1str = "0123456789012345678901234567890123456789";
+        String md5str = "01234567012345670123456701234567";
+
+        StorageItem item = repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt" ) );
+
+        repository.storeItem( false, new DefaultStorageFileItem( repository, item.getPath() + ".sha1", true, true,
+                                                                 new StringContentLocator( sha1str ) ) );
+        repository.storeItem( false, new DefaultStorageFileItem( repository, item.getPath() + ".md5", true, true,
+                                                                 new StringContentLocator( md5str ) ) );
+
+        // reread the item to refresh attributes map
+        item = repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt" ) );
+
+        StorageFileItem sha1 =
+            (StorageFileItem) repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt.sha1" ) );
+        Assert.assertEquals( item.getRepositoryItemAttributes().get( ChecksumContentValidator.ATTR_REMOTE_SHA1 ),
+                             sha1str );
+        Assert.assertEquals( item.getModified(), sha1.getModified() );
+        Assert.assertEquals( 40, sha1.getLength() );
+
+        StorageFileItem md5 =
+            (StorageFileItem) repository.retrieveItem( new ResourceStoreRequest( "/spoof/simple.txt.md5" ) );
+        Assert.assertEquals( item.getRepositoryItemAttributes().get( ChecksumContentValidator.ATTR_REMOTE_MD5 ), md5str );
+        Assert.assertEquals( item.getModified(), md5.getModified() );
+        Assert.assertEquals( 32, md5.getLength() );
+    }
 
     // ==
 

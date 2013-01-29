@@ -15,10 +15,11 @@ package org.sonatype.nexus.proxy;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.ChecksumContentValidator;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 public class RepoChecksumPolicyTest
     extends AbstractProxyTestEnvironment
@@ -69,8 +70,31 @@ public class RepoChecksumPolicyTest
         throws Exception
     {
         final M2Repository repository = getRepository();
-        return repository.getLocalStorage().containsItem( repository,
-                                                          new ResourceStoreRequest( itemPath + suffix, true, false ) );
+        try
+        {
+            AbstractStorageItem item =
+                repository.getLocalStorage().retrieveItem( repository, new ResourceStoreRequest( itemPath, true, false ) );
+
+            String attrname;
+            if ( ChecksumContentValidator.SUFFIX_SHA1.equals( suffix ) )
+            {
+                attrname = ChecksumContentValidator.ATTR_REMOTE_SHA1;
+            }
+            else if ( ChecksumContentValidator.SUFFIX_MD5.equals( suffix ) )
+            {
+                attrname = ChecksumContentValidator.ATTR_REMOTE_MD5;
+            }
+            else
+            {
+                throw new IllegalArgumentException( "Invalid checksum item suffix" + suffix );
+            }
+
+            return item.getRepositoryItemAttributes().containsKey( attrname );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            return false;
+        }
     }
 
     @Test
