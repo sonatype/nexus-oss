@@ -219,7 +219,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
   enableDiscoveryHandler : function(checked) {
     // 'this' is the checkbox
     var
-          combo = this.find('name', 'discovery.discoveryInterval'),
+          combo = this.find('name', 'discovery.discoveryIntervalHours'),
           fieldset = this.find('name', 'dis_fieldset');
 
     if (!(fieldset.length > 0 && combo.length > 0)) {
