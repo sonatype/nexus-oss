@@ -199,17 +199,6 @@ Ext.define = function (className, data, createdFn) {
             }
         });
 
-        // export require.js module return values as static 'modules' object
-        if (requiredModules.length !== 0) {
-            if (typeof statics === 'undefined') {
-              statics = {};
-            }
-            statics.modules = {};
-            for (i = 0; i < requiredModules.length; i+=1) {
-                statics.modules[requiredModules[i]] = arguments[i];
-            }
-        }
-
         // Apply any static members
         if (statics !== undefined) {
             Ext.apply(type, statics);
