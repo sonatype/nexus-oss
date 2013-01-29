@@ -48,6 +48,7 @@ import org.sonatype.nexus.bootstrap.monitor.commands.StopMonitorCommand;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.internal.NexusITLauncher;
+import org.sonatype.sisu.bl.jmx.JMXConfiguration;
 import org.sonatype.sisu.bl.jsw.JSWConfig;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.RunningBundles;
@@ -226,7 +227,7 @@ public class DefaultNexusBundle
         {
             throw new RuntimeException(
                 format(
-                    "Nexus did not started up command monitor on port '%s' in allocated timeout of 10 seconds"
+                    "Nexus did not start up command monitor on port '%s' in allocated timeout of 10 seconds"
                     , commandMonitorPort
                 )
             );
@@ -598,7 +599,6 @@ public class DefaultNexusBundle
 
     private static interface ConfigurationStrategy
     {
-
         String commandMonitorProperty();
 
         String keepAliveProperty();
@@ -608,22 +608,9 @@ public class DefaultNexusBundle
         void configureNexus();
     }
 
-    private class CS22AndAbove
+    private abstract class ConfigurationStrategySupport
         implements ConfigurationStrategy
     {
-
-        @Override
-        public String commandMonitorProperty()
-        {
-            return Launcher.COMMAND_MONITOR_PORT;
-        }
-
-        @Override
-        public String keepAliveProperty()
-        {
-            return KeepAliveThread.KEEP_ALIVE_PORT;
-        }
-
         @Override
         public void configureJSW( final JSWConfig jswConfig )
         {
@@ -639,6 +626,32 @@ public class DefaultNexusBundle
                 );
                 jswConfig.addJavaSystemProperty( "java.compiler", "NONE" );
             }
+
+            JMXConfiguration jmxConfig = getConfiguration().getJmxConfiguration();
+            if ( jmxConfig.getRemotePort() != null ){
+                Map<String,String> jmxProps = jmxConfig.getSystemProperties();
+                jmxProps.put( JMXConfiguration.PROP_COM_SUN_MANAGEMENT_JMXREMOTE_PORT, Integer.toString( getJmxRemotePort() ));
+                jswConfig.addJavaSystemProperties( jmxProps );
+            }
+
+        }
+    }
+
+
+    private class CS22AndAbove extends ConfigurationStrategySupport
+        implements ConfigurationStrategy
+    {
+
+        @Override
+        public String commandMonitorProperty()
+        {
+            return Launcher.COMMAND_MONITOR_PORT;
+        }
+
+        @Override
+        public String keepAliveProperty()
+        {
+            return KeepAliveThread.KEEP_ALIVE_PORT;
         }
 
         @Override
@@ -665,7 +678,7 @@ public class DefaultNexusBundle
 
     }
 
-    private class CS21AndBellow
+    private class CS21AndBellow extends ConfigurationStrategySupport
         implements ConfigurationStrategy
     {
 
@@ -696,18 +709,8 @@ public class DefaultNexusBundle
 
             jswConfig.addJavaSystemProperties( getConfiguration().getSystemProperties() );
 
-            // configure remote debug if requested
-            if ( getConfiguration().getDebugPort() > 0 )
-            {
-                jswConfig.addJavaStartupParameter( "-Xdebug" );
-                jswConfig.addJavaStartupParameter( "-Xnoagent" );
-                jswConfig.addJavaStartupParameter(
-                    "-Xrunjdwp:transport=dt_socket,server=y,suspend="
-                        + ( getConfiguration().isSuspendOnStart() ? "y" : "n" )
-                        + ",address=" + getConfiguration().getDebugPort()
-                );
-                jswConfig.addJavaSystemProperty( "java.compiler", "NONE" );
-            }
+            super.configureJSW(jswConfig);
+
         }
 
         @Override
