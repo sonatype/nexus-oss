@@ -60,6 +60,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
     this.resourceUrl = new Ext.Template(Sonatype.config.repos.urls.repositories + "/{0}/wl").compile();
 
     var
+          self = this,
           subjectIsNotProxy = cfg.payload.data.repoType !== 'proxy',
           defaultConfig = {
             frame : true,
@@ -86,6 +87,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
     this.dataModifiers = {
       load : {
         'publishedStatus' : function(value) {
+          self.publishedStatus = value;
           return Sonatype.repoServer.RepositoryWLPanel.publishStatusStore.getAt(Sonatype.repoServer.RepositoryWLPanel.publishStatusStore.find('value', value)).get('text');
         },
 
@@ -99,6 +101,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
       {
         xtype : 'fieldset',
         title : 'Publishing',
+        name : 'publishingFieldset',
         layout : {
           type : 'hbox',
           align : 'stretchmax'
@@ -328,12 +331,19 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
     if (action.type === 'sonatypeLoad') {
       // @note: this is a work around to get proper use of the isDirty()
       // function of this field
-      if (action.options.fpanel.find('name', 'discovery.discoveryEnabled')[0].getValue() === 'true' ) {
-        action.options.fpanel.find('name', 'discoveryFieldset')[0].expand();
+      var panel = action.options.fpanel;
+      if (panel.find('name', 'discovery.discoveryEnabled')[0].getValue() === 'true' ) {
+        panel.find('name', 'discoveryFieldset')[0].expand();
       } else {
-        action.options.fpanel.find('name', 'discoveryFieldset')[0].collapse();
+        panel.find('name', 'discoveryFieldset')[0].collapse();
       }
-      action.options.fpanel.submitDiscoverySetting = true;
+      panel.submitDiscoverySetting = true;
+
+      // FIXME this does not change the height of the fieldset
+      if (panel.publishedStatus === -1) {
+        panel.find('xtype', 'container')[0].hide();
+        panel.find('name', 'publishedTimestamp')[0].hide();
+      }
     }
   }
 }, function() {
