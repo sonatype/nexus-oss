@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.rest.mwl;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.DELETE;
@@ -174,16 +173,9 @@ public class WLStatusResource
     public void delete( final Context context, final Request request, final Response response )
         throws ResourceException
     {
-        try
-        {
-            final MavenProxyRepository mavenRepository = getMavenRepository( request, MavenProxyRepository.class );
-            getWLManager().updateWhitelist( mavenRepository );
-            // currently this happens synchronously, but it is the status that will reveal real outcome of the operation
-            response.setStatus( Status.SUCCESS_ACCEPTED );
-        }
-        catch ( IOException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
-        }
+        final MavenProxyRepository mavenRepository = getMavenRepository( request, MavenProxyRepository.class );
+        getWLManager().updateWhitelist( mavenRepository );
+        // currently this happens synchronously, but it is the status that will reveal real outcome of the operation
+        response.setStatus( Status.SUCCESS_ACCEPTED );
     }
 }

@@ -36,22 +36,20 @@ public interface WLManager
     /**
      * Initializes WL of given repository (used on repo add).
      * 
-     * @param mavenRepository
+     * @param mavenRepositories
      * @throws IOException
      */
-    void initializeWhitelist( MavenRepository mavenRepository )
+    void initializeWhitelist( MavenRepository... mavenRepositories )
         throws IOException;
 
     /**
-     * Executes an update of WL for given repository. In case of {@link MavenProxyRepository} instance, it might not do
-     * anything, depends is configuration returned by {@link #getRemoteDiscoveryConfig(MavenProxyRepository)} for it
-     * enabled or not.
+     * Executes an update of WL for given repositories. In case of {@link MavenProxyRepository} instance, it might not
+     * do anything, depends is configuration returned by {@link #getRemoteDiscoveryConfig(MavenProxyRepository)} for it
+     * enabled or not. This method invocation will spawn the updates in background, and return immediately.
      * 
-     * @param mavenRepository
-     * @throws IOException
+     * @param mavenRepositories
      */
-    void updateWhitelist( MavenRepository mavenRepository )
-        throws IOException;
+    void updateWhitelist( MavenRepository... mavenRepositories );
 
     /**
      * Returns the WL status for given repository.
@@ -106,8 +104,8 @@ public interface WLManager
         throws IOException;
 
     /**
-     * Returns {@link EntrySource} for given {@link MavenRepository}.For the existence of the WL in question (if
-     * you want to read it), check {@link EntrySource#exists()} method! Never returns {@code null}.
+     * Returns {@link EntrySource} for given {@link MavenRepository}.For the existence of the WL in question (if you
+     * want to read it), check {@link EntrySource#exists()} method! Never returns {@code null}.
      * 
      * @param mavenRepository
      * @return the {@link EntrySource} for given repository.

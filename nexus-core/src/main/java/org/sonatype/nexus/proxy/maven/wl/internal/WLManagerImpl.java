@@ -16,7 +16,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -60,6 +65,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
@@ -132,67 +138,164 @@ public class WLManagerImpl
     }
 
     @Override
-    public void initializeWhitelist( final MavenRepository mavenRepository )
+    public void initializeWhitelist( final MavenRepository... mavenRepositories )
     {
-        getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-        final EntrySource entrySource = getEntrySourceFor( mavenRepository );
-        try
+        final ArrayList<MavenRepository> updateNeededRepositories = new ArrayList<MavenRepository>();
+        for ( MavenRepository mavenRepository : mavenRepositories )
         {
-            if ( entrySource.exists() )
+            getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+            final EntrySource entrySource = getEntrySourceFor( mavenRepository );
+            try
             {
-                // good, we assume is up to date, which should be unless user tampered with it
-                // in that case, just delete it + update and should be fixed.
-                publish( mavenRepository, entrySource );
-                getLogger().info( "Existing WL of {} initialized.",
+                if ( entrySource.exists() )
+                {
+                    // good, we assume is up to date, which should be unless user tampered with it
+                    // in that case, just delete it + update and should be fixed.
+                    publish( mavenRepository, entrySource );
+                    getLogger().info( "Existing WL of {} initialized.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                }
+                else
+                {
+                    unpublish( mavenRepository );
+                    updateNeededRepositories.add( mavenRepository );
+                }
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Problem during WL update of {}",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+                try
+                {
+                    unpublish( mavenRepository );
+                }
+                catch ( IOException ioe )
+                {
+                    // silently
+                }
+            }
+        }
+        if ( !updateNeededRepositories.isEmpty() )
+        {
+            updateWhitelist( updateNeededRepositories.toArray( new MavenRepository[updateNeededRepositories.size()] ) );
+        }
+    }
+
+    /**
+     * Plain set holding the repository IDs of repositories being batch-updated in background. All read-write access to
+     * this set must happen within synchronized block, using this instance as monitor object.
+     */
+    private final HashSet<String> currentlyUpdatingRepositoryIds = new HashSet<String>();
+
+    /**
+     * Plain executor for background batch-updates. Min threads are 0 and max threads are 3, die-off is 1 minute.
+     */
+    private final Executor executor = new ThreadPoolExecutor( 0, 3, 60L, TimeUnit.SECONDS,
+        new SynchronousQueue<Runnable>(), new NexusThreadFactory( "wl", "WL Updater" ),
+        new ThreadPoolExecutor.AbortPolicy() );
+
+    @Override
+    public synchronized void updateWhitelist( final MavenRepository... mavenRepositories )
+    {
+        final ArrayList<MavenRepository> repositoriesToBeUpdatedAndPublished = new ArrayList<MavenRepository>();
+        for ( MavenRepository mavenRepository : mavenRepositories )
+        {
+            if ( currentlyUpdatingRepositoryIds.contains( mavenRepository.getId() ) )
+            {
+                getLogger().info( "Repository {} is already updating WL, skipping it.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
             else
             {
-                unpublish( mavenRepository );
-                updateWhitelist( mavenRepository, true );
+                currentlyUpdatingRepositoryIds.add( mavenRepository.getId() );
+                repositoriesToBeUpdatedAndPublished.add( mavenRepository );
             }
         }
-        catch ( IOException e )
+        if ( !repositoriesToBeUpdatedAndPublished.isEmpty() )
         {
-            getLogger().warn(
-                "Problem during update " + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + " WL!", e );
-            try
+            final Runnable job = new Runnable()
             {
-                unpublish( mavenRepository );
-            }
-            catch ( IOException ioe )
-            {
-                // silently
-            }
+                @Override
+                public void run()
+                {
+                    for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
+                    {
+                        try
+                        {
+                            updateAndPublishWhitelist( mavenRepository, true );
+                        }
+                        catch ( IOException e )
+                        {
+                            getLogger().warn( "Problem during WL update of {}",
+                                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+                            try
+                            {
+                                unpublish( mavenRepository );
+                            }
+                            catch ( IOException ioe )
+                            {
+                                // silently
+                            }
+                        }
+                        finally
+                        {
+                            synchronized ( WLManagerImpl.this )
+                            {
+                                currentlyUpdatingRepositoryIds.remove( mavenRepository.getId() );
+                            }
+                        }
+                    }
+                }
+            };
+            executor.execute( job );
         }
     }
 
-    @Override
-    public void updateWhitelist( final MavenRepository mavenRepository )
-        throws IOException
-    {
-        updateWhitelist( mavenRepository, true );
-    }
-
-    protected void updateWhitelist( final MavenRepository mavenRepository, final boolean notify )
+    protected void updateAndPublishWhitelist( final MavenRepository mavenRepository, final boolean notify )
         throws IOException
     {
         getLogger().debug( "Updating WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        unpublish( mavenRepository );
+        final EntrySource entrySource;
         if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
         {
-            updateGroupWhitelist( mavenRepository.adaptToFacet( MavenGroupRepository.class ), notify );
+            entrySource = updateGroupWhitelist( mavenRepository.adaptToFacet( MavenGroupRepository.class ), notify );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
-            updateProxyWhitelist( mavenRepository.adaptToFacet( MavenProxyRepository.class ), notify );
+            entrySource = updateProxyWhitelist( mavenRepository.adaptToFacet( MavenProxyRepository.class ), notify );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
-            updateHostedWhitelist( mavenRepository.adaptToFacet( MavenHostedRepository.class ), notify );
+            entrySource = updateHostedWhitelist( mavenRepository.adaptToFacet( MavenHostedRepository.class ), notify );
+        }
+        else
+        {
+            getLogger().info( "Repository {} not supported by WL, not updating it.",
+                RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ) );
+            return;
+        }
+        if ( entrySource != null )
+        {
+            if ( notify )
+            {
+                getLogger().info( "Updated and published WL of {}.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+            }
+            publish( mavenRepository, entrySource );
+        }
+        else
+        {
+            if ( notify )
+            {
+                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+            }
+            unpublish( mavenRepository );
         }
     }
 
-    protected void updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository, final boolean notify )
+    protected EntrySource updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository, final boolean notify )
         throws IOException
     {
         EntrySource entrySource = null;
@@ -221,28 +324,10 @@ public class WLManagerImpl
             getLogger().info( "{} remote discovery disabled.",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         }
-
-        if ( entrySource != null )
-        {
-            if ( notify )
-            {
-                getLogger().info( "Updated and published WL of {}.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
-            }
-            publish( mavenProxyRepository, entrySource );
-        }
-        else
-        {
-            if ( notify )
-            {
-                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
-            }
-            unpublish( mavenProxyRepository );
-        }
+        return entrySource;
     }
 
-    protected void updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository, final boolean notify )
+    protected EntrySource updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository, final boolean notify )
         throws IOException
     {
         EntrySource entrySource = null;
@@ -257,28 +342,10 @@ public class WLManagerImpl
             getLogger().debug( "{} local discovery unsuccessful.",
                 RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
         }
-
-        if ( entrySource != null )
-        {
-            if ( notify )
-            {
-                getLogger().info( "Updated and published WL of {}.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
-            }
-            publish( mavenHostedRepository, entrySource );
-        }
-        else
-        {
-            if ( notify )
-            {
-                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
-                    RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
-            }
-            unpublish( mavenHostedRepository );
-        }
+        return entrySource;
     }
 
-    protected void updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository, final boolean notify )
+    protected EntrySource updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository, final boolean notify )
         throws IOException
     {
         EntrySource entrySource = null;
@@ -308,26 +375,10 @@ public class WLManagerImpl
         {
             entrySource = new MergingEntrySource( memberEntrySources );
         }
-
-        if ( entrySource != null )
-        {
-            if ( notify )
-            {
-                getLogger().info( "Updated and published WL of {}.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ) );
-            }
-            publish( mavenGroupRepository, entrySource );
-        }
-        else
-        {
-            if ( notify )
-            {
-                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
-                    RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ) );
-            }
-            unpublish( mavenGroupRepository );
-        }
+        return entrySource;
     }
+
+    // ==
 
     @Override
     public WLStatus getStatusFor( final MavenRepository mavenRepository )
@@ -552,7 +603,8 @@ public class WLManagerImpl
             {
                 try
                 {
-                    updateGroupWhitelist( containingGroupRepository, false );
+                    // this is a group, so we go with sync method as this is quick
+                    updateAndPublishWhitelist( containingGroupRepository, false );
                 }
                 catch ( IOException e )
                 {

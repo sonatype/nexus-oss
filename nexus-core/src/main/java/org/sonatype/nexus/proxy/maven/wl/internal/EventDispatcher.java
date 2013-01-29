@@ -101,16 +101,7 @@ public class EventDispatcher
 
     protected void handleRepositoryModified( final MavenRepository mavenRepository )
     {
-        try
-        {
-            wlManager.updateWhitelist( mavenRepository );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn(
-                "Problem while updating WL for repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-        }
+        wlManager.updateWhitelist( mavenRepository );
     }
 
     protected void handlePrefixFileUpdate( final RepositoryItemEvent evt )
