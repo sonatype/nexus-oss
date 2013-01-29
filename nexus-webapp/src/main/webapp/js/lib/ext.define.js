@@ -159,7 +159,7 @@ Ext.define = function (className, data, createdFn) {
     moduleName = className.replaceAll('.', '/');
 
     if (requiredModules.length !== 0) {
-        Nexus.log('Defining module: ' + moduleName + ' dependencies: ' + requiredModules);
+        Nexus.log('Defining module: ' + moduleName + ' depends: ' + requiredModules);
     }
     else {
         Nexus.log('Defining module: ' + moduleName);
@@ -188,11 +188,16 @@ Ext.define = function (className, data, createdFn) {
         // Create the sub-class
         type = Ext.extend(superClass, data);
 
-        // Enrich the sub-class prototype w/ class-name and logging support
-        type.prototype.$className = className;
-        type.prototype.$log = function (message) {
-            Nexus.log(this.$className + ': ' + message);
-        };
+        // Enrich the sub-class prototype
+        Ext.apply(type.prototype, {
+            // Name of defined class
+            '$className': className,
+
+             // Instance logger
+            '$log': function(message) {
+                Nexus.log(className + ': ' + message);
+            }
+        });
 
         // export require.js module return values as static 'modules' object
         if (requiredModules.length !== 0) {
