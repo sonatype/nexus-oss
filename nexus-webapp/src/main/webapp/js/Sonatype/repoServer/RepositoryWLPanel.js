@@ -56,6 +56,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
       throw new Error("payload missing: need repository record");
     }
 
+    // should be static, but Sonatype.config is not defined yet when statics are defined (before requirejs dep resolution)
     this.resourceUrl = new Ext.Template(Sonatype.config.repos.urls.repositories + "/{0}/wl").compile();
 
     var
@@ -151,7 +152,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
         checkboxToggle : true,
         checkboxName : 'discover.discoveryEnabled',
         name : 'dis_fieldset',
-        collapsed : subjectIsNotProxy,
+        hidden : subjectIsNotProxy,
         listeners : {
           expand : function() {
             this.enableDiscoveryHandler(true);
