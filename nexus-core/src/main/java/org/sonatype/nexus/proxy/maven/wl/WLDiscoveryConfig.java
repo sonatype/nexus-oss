@@ -37,7 +37,7 @@ public class WLDiscoveryConfig
         this.enabled = enabled;
         if ( enabled )
         {
-            checkArgument( discoveryInterval > 0 );
+            checkArgument( discoveryInterval > 0, "Discovery interval must be strictly positive, greater than 0!" );
             this.discoveryInterval = discoveryInterval;
         }
         else
