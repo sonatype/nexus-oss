@@ -69,7 +69,6 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
             url : this.resourceUrl.apply([cfg.payload.data.id])
           };
 
-
     var payload = cfg.payload;
 
     this.payload = {
@@ -148,10 +147,8 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
       {
         xtype : 'fieldset',
         title : 'Discovery',
-//        collapsible : false,
         checkboxToggle : true,
-        checkboxName : 'discovery.discoveryEnabled',
-        name : 'dis_fieldset',
+        name : 'discoveryFieldset',
         hidden : subjectIsNotProxy,
         listeners : {
           expand : function() {
@@ -163,6 +160,20 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
           scope : this
         },
         items : [
+          {
+            xtype : 'hidden',
+            name : 'discovery.discoveryEnabled',
+            listeners : {
+              change : function(field, enabled, oldValue) {
+                var discoveryFieldset = this.find('name', 'discoveryFieldset')[0];
+                if (enabled) {
+                  discoveryFieldset.expand();
+                } else {
+                  discoveryFieldset.collapse();
+                }
+              }
+            }
+          },
           {
             xtype : 'displayfield',
             fieldLabel : 'Status',
@@ -214,13 +225,15 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
     ];
 
     Sonatype.repoServer.RepositoryWLPanel.superclass.constructor.call(this);
+
+    this.on('actioncomplete', this.onActionComplete);
   },
 
   enableDiscoveryHandler : function(checked) {
     // 'this' is the checkbox
     var
           combo = this.find('name', 'discovery.discoveryIntervalHours'),
-          fieldset = this.find('name', 'dis_fieldset');
+          fieldset = this.find('name', 'discoveryFieldset');
 
     if (!(fieldset.length > 0 && combo.length > 0)) {
       throw new Error('could not find interval combo box or fieldset');
@@ -241,6 +254,10 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
   },
 
   disableDiscovery : function() {
+    if (!this.submitDiscoverySetting) {
+      return;
+    }
+
     var
           self = this,
           mask = new Ext.LoadMask(this.el, {
@@ -257,6 +274,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
         }
       },
       callback : function() {
+        this.loadData();
         mask.hide();
       },
       scope : this
@@ -264,7 +282,10 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
   },
 
   enableDiscovery : function(interval) {
-    if ( interval === 0 ) {
+    if (!this.submitDiscoverySetting) {
+      return;
+    }
+    if (interval === 0) {
       interval = 24;
     }
 
@@ -282,6 +303,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
         }
       },
       callback : function() {
+        this.loadData();
         mask.hide();
       },
       scope : this
@@ -301,6 +323,18 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
       },
       scope : this
     });
+  },
+  onActionComplete : function(form, action) {
+    if (action.type === 'sonatypeLoad') {
+      // @note: this is a work around to get proper use of the isDirty()
+      // function of this field
+      if (action.options.fpanel.find('name', 'discovery.discoveryEnabled')[0].getValue() === 'true' ) {
+        action.options.fpanel.find('name', 'discoveryFieldset')[0].expand();
+      } else {
+        action.options.fpanel.find('name', 'discoveryFieldset')[0].collapse();
+      }
+      action.options.fpanel.submitDiscoverySetting = true;
+    }
   }
 }, function() {
   Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
