@@ -218,7 +218,7 @@ public class WLManagerImpl
         }
         else
         {
-            getLogger().debug( "{} remote discovery disabled.",
+            getLogger().info( "{} remote discovery disabled.",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         }
 
