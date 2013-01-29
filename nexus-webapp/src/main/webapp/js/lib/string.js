@@ -11,6 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
+/* global Ext */
+
 /**
  * Add support for String.replaceAll(String,String).
  *
