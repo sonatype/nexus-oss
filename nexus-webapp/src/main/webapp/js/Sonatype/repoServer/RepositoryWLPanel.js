@@ -264,6 +264,10 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
   },
 
   enableDiscovery : function(interval) {
+    if ( interval === 0 ) {
+      interval = 24;
+    }
+
     var mask = new Ext.LoadMask(this.el, {
       msg : 'Updating discovery...'
     });
