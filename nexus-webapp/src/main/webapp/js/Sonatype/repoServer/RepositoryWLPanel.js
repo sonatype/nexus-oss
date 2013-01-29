@@ -93,6 +93,11 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
 
         'discovery.discoveryLastStatus' : function(value) {
           return Sonatype.repoServer.RepositoryWLPanel.discoveryStatusStore.getAt(Sonatype.repoServer.RepositoryWLPanel.discoveryStatusStore.find('value', value)).get('text');
+        },
+
+        'publishedUrl' : function(value) {
+          self.whitelistUrl = value;
+          return value;
         }
       }
     };
@@ -140,8 +145,9 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
               {
                 xtype : 'link-button',
                 text : 'Show prefix file',
-                href : Sonatype.config.content.repositories + '/' + this.payload.data.id + '/.meta/prefixes.txt',
-                target : '_blank'
+                handler : function() {
+                  window.open(self.whitelistUrl, '_blank');
+                }
               }
             ]
           }
