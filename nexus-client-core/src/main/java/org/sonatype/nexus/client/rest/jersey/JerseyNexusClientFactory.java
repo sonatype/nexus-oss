@@ -36,6 +36,7 @@ import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.client.rest.ProxyInfo;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
@@ -96,6 +97,7 @@ public class JerseyNexusClientFactory
         config.getSingletons().add( new XStreamXmlProvider( xstream, APPLICATION_XML_UTF8_TYPE ) );
         // set _real_ URL for baseUrl, and not a redirection (typically http instead of https)
         config.getProperties().put( ApacheHttpClient4Config.PROPERTY_FOLLOW_REDIRECTS, Boolean.FALSE );
+        config.getFeatures().put( JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE );
         applyAuthenticationIfAny( connectionInfo, config );
         applyProxyIfAny( connectionInfo, config );
 
