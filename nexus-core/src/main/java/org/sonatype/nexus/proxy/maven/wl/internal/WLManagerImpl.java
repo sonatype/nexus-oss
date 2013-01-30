@@ -207,12 +207,28 @@ public class WLManagerImpl
             }
             else
             {
-                currentlyUpdatingRepositoryIds.add( mavenRepository.getId() );
-                repositoriesToBeUpdatedAndPublished.add( mavenRepository );
+                try
+                {
+                    unpublish( mavenRepository );
+                    repositoriesToBeUpdatedAndPublished.add( mavenRepository );
+                }
+                catch ( IOException e )
+                {
+                    // if unpublish fails, we just handle it, and the repo will NOT
+                    // be added to repositoriesToBeUpdatedAndPublished, so we are fine
+                    getLogger().warn( "Problem during WL removal of {}",
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+                }
             }
         }
         if ( !repositoriesToBeUpdatedAndPublished.isEmpty() )
         {
+            // mark the updated ones "in progress"
+            for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
+            {
+                currentlyUpdatingRepositoryIds.add( mavenRepository.getId() );
+            }
+
             final Runnable job = new Runnable()
             {
                 @Override
