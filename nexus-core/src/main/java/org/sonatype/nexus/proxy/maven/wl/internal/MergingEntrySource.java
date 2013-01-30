@@ -13,15 +13,14 @@
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.walker.ParentOMatic;
 
 /**
- * Entry source that merges multiple {@link EntrySource}s into one. It retains order and watch for uniqueness, but does
- * not filter out redundant entries (like both, child and it's parent is present in entries).
+ * Entry source that merges multiple {@link EntrySource}s into one. It retains "correctness" of the result, by watching
+ * "least specific" to win (and most specific removed) in result list.
  * 
  * @author cstamas
  */
@@ -43,11 +42,15 @@ public class MergingEntrySource
     protected static List<String> mergeEntries( final List<EntrySource> entrySources )
         throws IOException
     {
-        final LinkedHashSet<String> set = new LinkedHashSet<String>();
-        for ( EntrySource entrySource : entrySources )
+        // no rule B!
+        final ParentOMatic parentOMatic = new ParentOMatic( true, true, false );
+        for ( final EntrySource entrySource : entrySources )
         {
-            set.addAll( entrySource.readEntries() );
+            for ( final String entry : entrySource.readEntries() )
+            {
+                parentOMatic.addAndMarkPath( entry );
+            }
         }
-        return new ArrayList<String>( set );
+        return parentOMatic.getAllLeafPaths();
     }
 }
