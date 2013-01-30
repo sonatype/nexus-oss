@@ -70,7 +70,10 @@ public class PathMatcherImpl
                 break;
             }
         }
-        return currentNode != null && currentNode.isLeaf();
+        // since we add marked paths, and keepMarkedNodesOnly=true, all the marked paths will be leafs anyway.
+        // also, after tree cutting, the longer nodes are also leafs (that had some marked sibling), so check for leafs
+        // only, see buildRoot
+        return currentNode != null && ( currentNode.isLeaf() );
     }
 
     // ==
@@ -83,13 +86,15 @@ public class PathMatcherImpl
 
     protected Node<Payload> buildRoot( final List<String> entries, final int maxDepth )
     {
-        final ParentOMatic parentOMatic = new ParentOMatic();
+        // no rule B!
+        final ParentOMatic parentOMatic = new ParentOMatic( true, true, false );
         for ( String entry : entries )
         {
-            parentOMatic.addPath( entry );
+            parentOMatic.addAndMarkPath( entry );
         }
         if ( maxDepth != Integer.MAX_VALUE )
         {
+            // cut the tree to maxDepth
             parentOMatic.cutNodesDeeperThan( maxDepth );
         }
         return parentOMatic.getRoot();

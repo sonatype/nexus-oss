@@ -24,8 +24,7 @@ public class PathMatcherImplTest
     protected List<String> entries1 = Arrays.asList( "/org/sonatype", "/com/sonatype/nexus",
         "/biz/sonatype/nexus/plugins", "/archetype-metadata.xml" );
 
-    protected List<String> entries2 = Arrays.asList( "/A/1", "/B/1/2", "/C/1/2/3", "/D/1/2/3/4",
-        "/E/1/2/3/4/5" );
+    protected List<String> entries2 = Arrays.asList( "/A/1", "/B/1/2", "/C/1/2/3", "/D/1/2/3/4", "/E/1/2/3/4/5" );
 
     @Test
     public void smoke()
@@ -153,4 +152,41 @@ public class PathMatcherImplTest
         check( wl3, "/F/1/2/3/X/5/6/7/8/9/0", false );
     }
 
+    @Test
+    public void testLeastSpecificWinsMaxDepth3()
+    {
+        final PathMatcherImpl wl = new PathMatcherImpl( Arrays.asList( "/a/b/c", "/a/b/c/d/e", "/a/b" ), 3 );
+        check( wl, "/a/b/c/d/e", true );
+        check( wl, "/a/b/c/d", true );
+        check( wl, "/a/b/c", true );
+        check( wl, "/a/b", true ); // "/a/b" won
+        check( wl, "/a", false );
+        check( wl, "/a/X", false );
+    }
+
+    @Test
+    public void testLeastSpecificWinsMaxDepth2()
+    {
+        final PathMatcherImpl wl = new PathMatcherImpl( Arrays.asList( "/a/b/c", "/a/b/c/d/e", "/a/b" ), 2 );
+        check( wl, "/a/b/c/d/e", true );
+        check( wl, "/a/b/c/d", true );
+        check( wl, "/a/b/c", true );
+        check( wl, "/a/b", true ); // "/a/b" won
+        check( wl, "/a", false );
+        check( wl, "/a/c", false );
+        check( wl, "/X", false );
+    }
+
+    @Test
+    public void testLeastSpecificWinsMaxDepth2EntriesLongerThenDepth()
+    {
+        final PathMatcherImpl wl = new PathMatcherImpl( Arrays.asList( "/a/b/c/d/e", "/a/b/c/d/e/f", "/a/b/c" ), 2 );
+        check( wl, "/a/b/c/d/e", true );
+        check( wl, "/a/b/c/d", true );
+        check( wl, "/a/b/c", true );
+        check( wl, "/a/b", true ); // "/a/b" won
+        check( wl, "/a", false );
+        check( wl, "/a/c", false );
+        check( wl, "/X", false );
+    }
 }
