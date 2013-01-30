@@ -78,7 +78,11 @@ public class ParentOMatic
      * consumption. They have no need to stay in memory, since the result will not need them anyway, will not be
      * returned by {@link #getMarkedPaths()}.
      */
-    private final boolean optimizeTreeSize;
+    private final boolean keepMarkedNodesOnly;
+
+    private final boolean applyRuleA;
+
+    private final boolean applyRuleB;
 
     /**
      * The root node.
@@ -93,10 +97,16 @@ public class ParentOMatic
         this( true );
     }
 
-    public ParentOMatic( final boolean optimizeTreeSize )
+    public ParentOMatic( final boolean keepMarkedNodesOnly )
     {
-        super();
-        this.optimizeTreeSize = optimizeTreeSize;
+        this( keepMarkedNodesOnly, true, true );
+    }
+
+    public ParentOMatic( final boolean keepMarkedNodesOnly, final boolean applyRuleA, final boolean applyRuleB )
+    {
+        this.keepMarkedNodesOnly = keepMarkedNodesOnly;
+        this.applyRuleA = applyRuleA;
+        this.applyRuleB = applyRuleB;
         this.ROOT = new Node<Payload>( null, "/", new Payload() );
     }
 
@@ -122,16 +132,19 @@ public class ParentOMatic
     {
         final Node<Payload> currentNode = addPath( path, false );
 
-        // unmark children if any
-        applyRecursively( currentNode, new Function<Node<Payload>, Node<Payload>>()
+        // rule A: unmark children if any
+        if ( applyRuleA )
         {
-            @Override
-            public Node<Payload> apply( Node<Payload> input )
+            applyRecursively( currentNode, new Function<Node<Payload>, Node<Payload>>()
             {
-                input.getPayload().setMarked( false );
-                return input;
-            }
-        } );
+                @Override
+                public Node<Payload> apply( Node<Payload> input )
+                {
+                    input.getPayload().setMarked( false );
+                    return input;
+                }
+            } );
+        }
 
         currentNode.getPayload().setMarked( true );
 
@@ -139,7 +152,7 @@ public class ParentOMatic
         final Node<Payload> flippedNode = reorganizeForRecursion( currentNode );
 
         // optimize tree size if asked for
-        if ( optimizeTreeSize )
+        if ( keepMarkedNodesOnly )
         {
             optimizeTreeSize( flippedNode );
         }
@@ -344,14 +357,14 @@ public class ParentOMatic
     protected Node<Payload> reorganizeForRecursion( final Node<Payload> changedNode )
     {
         // rule a: if parent is marked already, do not mark the child
-        if ( isParentMarked( changedNode ) )
+        if ( applyRuleA && isParentMarked( changedNode ) )
         {
             changedNode.getPayload().setMarked( false );
             return changedNode.getParent();
         }
 
         // rule b: if this parent's all children are marked, mark parent, unmark children
-        if ( isParentAllChildMarkedForRuleB( changedNode ) )
+        if ( applyRuleB && isParentAllChildMarkedForRuleB( changedNode ) )
         {
             changedNode.getParent().getPayload().setMarked( true );
             for ( Node<Payload> child : changedNode.getParent().getChildren() )

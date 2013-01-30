@@ -13,8 +13,11 @@
 package org.sonatype.nexus.proxy.walker;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -136,5 +139,32 @@ public class ParentOMaticTest
         print( "Maven MD recreate would run against paths:" );
         printListPerLine( cn.getMarkedPaths() );
         doAssert();
+    }
+
+    /**
+     * WL merge case: when merge of two WL's happens, and both of them contains a prefix (like "/a/b" in one and
+     * "/a/b/c" in other), the least specific must win, as otherwise if both left in merged list (if we would check
+     * entry equality only), most specific would win as least would be just a parent and not a leaf, hence, not matched
+     * when WL used in proxy.
+     */
+    @Test
+    public void wlMergeCase()
+        throws Exception
+    {
+        final ParentOMatic cn = new ParentOMatic( true, true, false );
+        cn.addAndMarkPath( "/g1/a1" );
+        cn.addAndMarkPath( "/g1/a1/v2" ); // "most specific" addition is not as "least specific" already added
+        cn.addAndMarkPath( "/g1/a1/v3" ); // "most specific" addition is not as "least specific" already added
+        cn.addAndMarkPath( "/g1/a2/v1" );
+        cn.addAndMarkPath( "/g1/a2/v2" );
+        cn.addAndMarkPath( "/g1/a2" ); // adding it later
+        cn.addAndMarkPath( "/g1/a3/v1" );
+        cn.addAndMarkPath( "/g1/a3/v2" );
+        cn.addAndMarkPath( "/g1/a3/v3" );
+
+        final List<String> mergedPaths = cn.getMarkedPaths();
+        Collections.sort( mergedPaths );
+        assertThat( mergedPaths.size(), is( 5 ) );
+        assertThat( mergedPaths, contains( "/g1/a1", "/g1/a2", "/g1/a3/v1", "/g1/a3/v2", "/g1/a3/v3" ) );
     }
 }
