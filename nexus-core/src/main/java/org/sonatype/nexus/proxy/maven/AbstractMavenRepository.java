@@ -422,7 +422,7 @@ public abstract class AbstractMavenRepository
             final boolean whitelistMatched = getProxyRequestFilter().allowed( this, request );
             if ( !whitelistMatched )
             {
-                getLogger().info( "WL filter rejected remote request for path {} in {}.", request.getRequestPath(),
+                getLogger().debug( "WL filter rejected remote request for path {} in {}.", request.getRequestPath(),
                     RepositoryStringUtils.getHumanizedNameString( this ) );
                 return false;
             }
