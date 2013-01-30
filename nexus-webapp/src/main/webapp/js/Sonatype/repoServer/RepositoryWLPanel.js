@@ -88,11 +88,14 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
       load : {
         'publishedStatus' : function(value) {
           self.publishedStatus = value;
-          return Sonatype.repoServer.RepositoryWLPanel.publishStatusStore.getAt(Sonatype.repoServer.RepositoryWLPanel.publishStatusStore.find('value', value)).get('text');
+          var store = Sonatype.repoServer.RepositoryWLPanel.publishStatusStore;
+          return store.getAt(store.find('value', value)).get('text');
         },
 
         'discovery.discoveryLastStatus' : function(value) {
-          return Sonatype.repoServer.RepositoryWLPanel.discoveryStatusStore.getAt(Sonatype.repoServer.RepositoryWLPanel.discoveryStatusStore.find('value', value)).get('text');
+          var store = Sonatype.repoServer.RepositoryWLPanel.discoveryStatusStore;
+          return store.getAt(store.find('value',
+                value)).get('text');
         },
 
         'publishedUrl' : function(value) {
@@ -338,7 +341,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
       // @note: this is a work around to get proper use of the isDirty()
       // function of this field
       var panel = action.options.fpanel;
-      if (panel.find('name', 'discovery.discoveryEnabled')[0].getValue() === 'true' ) {
+      if (panel.find('name', 'discovery.discoveryEnabled')[0].getValue() === 'true') {
         panel.find('name', 'discoveryFieldset')[0].expand();
       } else {
         panel.find('name', 'discoveryFieldset')[0].collapse();
@@ -354,10 +357,14 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
   }
 }, function() {
   Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
-    var sp = Sonatype.lib.Permissions;
+    var sp = Sonatype.lib.Permissions, newRecord;
 
-    if ( rec.id.indexOf('new_') !== 0 &&
-          (sp.checkPermission('nexus:repositories', sp.CREATE) || sp.checkPermission('nexus:repositories', sp.DELETE) || sp.checkPermission('nexus:repositories', sp.EDIT))) {
+    // Check whether record is new or received from Nexus
+    // (GridViewer convention for new records: id starts with 'new_')
+    newRecord = rec.id && rec.id.indexOf('new_') === 0;
+
+    if (!newRecord &&
+          ( sp.checkPermission('nexus:repositories', sp.CREATE) || sp.checkPermission('nexus:repositories', sp.DELETE) || sp.checkPermission('nexus:repositories', sp.EDIT) )) {
       cardPanel.add(new Sonatype.repoServer.RepositoryWLPanel({
         tabTitle : 'Whitelist',
         name : 'whitelist',
