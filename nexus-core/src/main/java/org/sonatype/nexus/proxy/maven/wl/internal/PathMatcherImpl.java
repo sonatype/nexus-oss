@@ -76,6 +76,25 @@ public class PathMatcherImpl
         return currentNode != null && ( currentNode.isLeaf() );
     }
 
+
+    @Override
+    public boolean contains( final String path )
+    {
+        final List<String> pathElements = PathUtils.elementsOf( path );
+        Node<Payload> currentNode = root;
+        for ( String pathElement : pathElements )
+        {
+            currentNode = currentNode.getChildByLabel( pathElement );
+            if ( currentNode == null || currentNode.isLeaf() )
+            {
+                break;
+            }
+        }
+        // This returns leafs but also parents. If not is not null, it means "we are on right path", like in case of
+        // one entry "/com/sonatype", contains("/com") would return true.
+        return currentNode != null;
+    }
+
     // ==
 
     @VisibleForTesting

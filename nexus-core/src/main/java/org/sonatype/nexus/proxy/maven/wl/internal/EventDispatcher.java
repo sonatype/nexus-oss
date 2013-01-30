@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRoot;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -181,13 +182,18 @@ public class EventDispatcher
             && wlManager.isEventAboutWLFile( evt );
     }
 
-    protected boolean isPlainFileEvent( final RepositoryItemEvent evt )
+    protected boolean isPlainItemEvent( final RepositoryItemEvent evt )
     {
         // is not fired as side effect of Publisher publishing this
         return isRepositoryHandled( evt.getRepository() )
             && !wlManager.isRequestContextMarked( evt.getItem().getItemContext() )
-            && evt.getItem() instanceof StorageFileItem
             && !evt.getItem().getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class );
+    }
+
+    protected boolean isPlainFileItemEvent( final RepositoryItemEvent evt )
+    {
+        // is not fired as side effect of Publisher publishing this
+        return isPlainItemEvent( evt ) && evt.getItem() instanceof StorageFileItem;
     }
 
     // == handlers for item events (to maintain WL file)
@@ -199,7 +205,7 @@ public class EventDispatcher
         {
             handlePrefixFileUpdate( evt );
         }
-        else if ( isPlainFileEvent( evt ) )
+        else if ( isPlainFileItemEvent( evt ) )
         {
             // we maintain WL for hosted reposes only!
             final MavenHostedRepository mavenHostedRepository =
@@ -218,7 +224,7 @@ public class EventDispatcher
         {
             handlePrefixFileUpdate( evt );
         }
-        else if ( isPlainFileEvent( evt ) )
+        else if ( isPlainFileItemEvent( evt ) )
         {
             // we maintain WL for hosted reposes only!
             final MavenHostedRepository mavenHostedRepository =
@@ -237,7 +243,7 @@ public class EventDispatcher
         {
             handlePrefixFileRemoval( evt );
         }
-        else if ( isPlainFileEvent( evt ) )
+        else if ( evt instanceof RepositoryItemEventDeleteRoot && isPlainItemEvent( evt ) )
         {
             // we maintain WL for hosted reposes only!
             final MavenHostedRepository mavenHostedRepository =

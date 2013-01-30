@@ -27,4 +27,13 @@ public interface PathMatcher
      * @return {@code true} if path is matched, {@code false} otherwise.
      */
     boolean matches( String path );
+
+    /**
+     * Performs a match against passed in path, and returns {@code true} if it matches (same as {@link #matches(String)}
+     * , or passed in path is a "parent" that is contained in one or more paths used for matching.
+     * 
+     * @param path
+     * @return {@code true} if path is contained, {@code false} otherwise.
+     */
+    boolean contains( String path );
 }

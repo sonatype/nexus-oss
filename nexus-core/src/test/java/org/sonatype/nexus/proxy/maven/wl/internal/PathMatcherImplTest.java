@@ -13,6 +13,7 @@
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import java.util.Arrays;
 import java.util.List;
@@ -161,7 +162,9 @@ public class PathMatcherImplTest
         check( wl, "/a/b/c", true );
         check( wl, "/a/b", true ); // "/a/b" won
         check( wl, "/a", false );
+        assertThat( wl.contains( "/a" ), is( true ) );
         check( wl, "/a/X", false );
+        assertThat( wl.contains( "/a/X" ), is( false ) );
     }
 
     @Test
@@ -173,8 +176,11 @@ public class PathMatcherImplTest
         check( wl, "/a/b/c", true );
         check( wl, "/a/b", true ); // "/a/b" won
         check( wl, "/a", false );
+        assertThat( wl.contains( "/a" ), is( true ) );
         check( wl, "/a/c", false );
+        assertThat( wl.contains( "/a/c" ), is( false ) );
         check( wl, "/X", false );
+        assertThat( wl.contains( "/X" ), is( false ) );
     }
 
     @Test
@@ -186,7 +192,10 @@ public class PathMatcherImplTest
         check( wl, "/a/b/c", true );
         check( wl, "/a/b", true ); // "/a/b" won
         check( wl, "/a", false );
+        assertThat( wl.contains( "/a" ), is( true ) );
         check( wl, "/a/c", false );
+        assertThat( wl.contains( "/a/c" ), is( false ) );
         check( wl, "/X", false );
+        assertThat( wl.contains( "/X" ), is( false ) );
     }
 }

@@ -87,10 +87,16 @@ public class WritableEntrySourceModifierImpl
         for ( String entry : entries )
         {
             final String normalizedEntry = pathFrom( elementsOf( entry ) );
-            if ( entrySourceEntries.contains( normalizedEntry ) && !toBeRemoved.contains( normalizedEntry ) )
+            if ( whitelistMatcher.contains( normalizedEntry ) && !toBeRemoved.contains( normalizedEntry ) )
             {
-                toBeRemoved.add( normalizedEntry );
-                modified = true;
+                for ( String whitelistEntry : entrySourceEntries )
+                {
+                    if ( whitelistEntry.startsWith( normalizedEntry ) )
+                    {
+                        toBeRemoved.add( normalizedEntry );
+                        modified = true;
+                    }
+                }
             }
         }
         return modified;
