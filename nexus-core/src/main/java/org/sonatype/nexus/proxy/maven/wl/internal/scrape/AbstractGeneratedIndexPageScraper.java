@@ -21,7 +21,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.internal.ArrayListEntrySource;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
@@ -77,8 +76,11 @@ public abstract class AbstractGeneratedIndexPageScraper
         if ( !context.isStopped() )
         {
             // TODO: cases like central, that would allow to be scraped with 0 results
-            final EntrySource entrySource = new ArrayListEntrySource( parentOMatic.getAllLeafPaths() );
-            context.stop( entrySource, "Remote recognized as " + getTargetedServer() + "." );
+            final List<String> entries = parentOMatic.getAllLeafPaths();
+            final EntrySource entrySource = new ArrayListEntrySource( entries );
+            context.stop( entrySource,
+                "Remote recognized as " + getTargetedServer() + " (scraped " + String.valueOf( entries.size() )
+                    + " entries, " + context.getScrapeDepth() + " levels deep)." );
         }
     }
 
