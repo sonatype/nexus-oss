@@ -356,8 +356,8 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
   Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
     var sp = Sonatype.lib.Permissions;
 
-    if (sp.checkPermission('nexus:repositories', sp.CREATE) || sp.checkPermission('nexus:repositories', sp.DELETE)
-          || sp.checkPermission('nexus:repositories', sp.EDIT)) {
+    if ( rec.id.indexOf('new_') !== 0 &&
+          (sp.checkPermission('nexus:repositories', sp.CREATE) || sp.checkPermission('nexus:repositories', sp.DELETE) || sp.checkPermission('nexus:repositories', sp.EDIT))) {
       cardPanel.add(new Sonatype.repoServer.RepositoryWLPanel({
         tabTitle : 'Whitelist',
         name : 'whitelist',
