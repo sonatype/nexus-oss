@@ -267,6 +267,11 @@ public class WLManagerImpl
         }
     }
 
+    public synchronized boolean isUpdateRunning()
+    {
+        return !currentlyUpdatingRepositoryIds.isEmpty();
+    }
+
     protected void updateAndPublishWhitelist( final MavenRepository mavenRepository, final boolean notify )
         throws IOException
     {

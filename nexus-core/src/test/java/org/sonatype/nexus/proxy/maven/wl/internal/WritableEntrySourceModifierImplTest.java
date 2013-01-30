@@ -149,10 +149,10 @@ public class WritableEntrySourceModifierImplTest
         writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries2 ) );
         wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 3 );
 
-        assertThat( "WL would not be changed", !wesm.revokeEntries( "/org/sonatype" ) ); // child is in list
-        assertThat( "No changes added yet", !wesm.hasChanges() );
-        assertThat( "WL would not be changed", !wesm.revokeEntries( "/org/apache" ) ); // child is in list
-        assertThat( "No changes added yet", !wesm.hasChanges() );
+        assertThat( "WL would be changed", wesm.revokeEntries( "/org/sonatype" ) ); // child is in list
+        assertThat( "Changes were added", wesm.hasChanges() );
+        assertThat( "WL would be changed", wesm.revokeEntries( "/org/apache" ) ); // child is in list
+        assertThat( "Changes were adde", wesm.hasChanges() );
         assertThat( "WL would not be changed", wesm.revokeEntries( "/org/sonatype/nexus" ) );
         assertThat( "No changes added yet", wesm.hasChanges() );
         assertThat( "WL would not be changed", wesm.revokeEntries( "/org/apache/maven" ) );
@@ -205,10 +205,10 @@ public class WritableEntrySourceModifierImplTest
         writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries2 ) );
         wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 2 );
 
-        assertThat( "WL would not be changed", !wesm.revokeEntries( "/org/sonatype" ) ); // child is in list
-        assertThat( "No changes added yet", !wesm.hasChanges() );
-        assertThat( "WL would not be changed", !wesm.revokeEntries( "/org/apache" ) ); // child is in list
-        assertThat( "No changes added yet", !wesm.hasChanges() );
+        assertThat( "WL is changed", wesm.revokeEntries( "/org/sonatype" ) ); // child is in list
+        assertThat( "Changes were added", wesm.hasChanges() );
+        assertThat( "WL is changed", wesm.revokeEntries( "/org/apache" ) ); // child is in list
+        assertThat( "Changes were added", wesm.hasChanges() );
         assertThat( "WL would not be changed", wesm.revokeEntries( "/org/sonatype/nexus" ) );
         assertThat( "No changes added yet", wesm.hasChanges() );
         assertThat( "WL would not be changed", wesm.revokeEntries( "/org/apache/maven" ) );

@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.ServerSocket;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -68,11 +70,23 @@ public class RemotePrefixFileStrategyTest
     public RemotePrefixFileStrategyTest()
         throws Exception
     {
-        // fluke server to not have proxy autoblock, as remote connection refused IS a valid reason to auto block
+        ServerSocket ss = new ServerSocket( 0 );
+        this.remoteServerPort = ss.getLocalPort();
+        ss.close();
+    }
+
+    @Override
+    public void setUp()
+        throws Exception
+    {
         this.server =
-            Server.withPort( 0 ).serve( "/" ).withBehaviours( Behaviours.error( 404, "don't bother yourself" ) );
-        server.start();
-        this.remoteServerPort = server.getPort();
+            Server.withPort( remoteServerPort ).serve( "/" ).withBehaviours( Behaviours.error( 404 ) ).start();
+        super.setUp();
+        final WLManager wm = lookup( WLManager.class );
+        while ( wm.isUpdateRunning() )
+        {
+            Thread.sleep( 500 );
+        }
     }
 
     @Override
@@ -193,17 +207,15 @@ public class RemotePrefixFileStrategyTest
     }
 
     @Test
-    public void smoke()
+    public void discoverPlaintextPrefixFile()
         throws Exception
     {
         server.stop();
         server =
             Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt" ).withBehaviours(
-                Behaviours.content( prefixFile1( true ) ) );
+                Behaviours.content( prefixFile1( true ) ) ).start();
         try
         {
-            server.start();
-
             final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );
             final StrategyResult result =
                 subject.discover( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
@@ -223,7 +235,7 @@ public class RemotePrefixFileStrategyTest
     }
 
     @Test
-    public void smokeGz()
+    public void discoverGzPrefixFile()
         throws Exception
     {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -235,11 +247,9 @@ public class RemotePrefixFileStrategyTest
         server.stop();
         server =
             Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt.gz" ).withBehaviours(
-                Behaviours.content( bos.toByteArray() ) );
+                Behaviours.content( bos.toByteArray() ) ).start();
         try
         {
-            server.start();
-
             final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );
             final StrategyResult result =
                 subject.discover( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,

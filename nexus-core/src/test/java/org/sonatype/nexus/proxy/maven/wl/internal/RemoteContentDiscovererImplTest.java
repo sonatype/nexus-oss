@@ -228,6 +228,10 @@ public class RemoteContentDiscovererImplTest
     {
         final WLManager wm = lookup( WLManager.class );
         wm.initializeAllWhitelists();
+        while ( wm.isUpdateRunning() )
+        {
+            Thread.sleep( 500 );
+        }
         {
             final EntrySource proxy1EntrySource =
                 wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
@@ -258,6 +262,10 @@ public class RemoteContentDiscovererImplTest
 
         final WLManager wm = lookup( WLManager.class );
         wm.initializeAllWhitelists();
+        while ( wm.isUpdateRunning() )
+        {
+            Thread.sleep( 500 );
+        }
         {
             final EntrySource proxy1EntrySource =
                 wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
@@ -295,6 +303,10 @@ public class RemoteContentDiscovererImplTest
 
         final WLManager wm = lookup( WLManager.class );
         wm.initializeAllWhitelists();
+        while ( wm.isUpdateRunning() )
+        {
+            Thread.sleep( 500 );
+        }
         {
             final EntrySource proxy1EntrySource =
                 wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,

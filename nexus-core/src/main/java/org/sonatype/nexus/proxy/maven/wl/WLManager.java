@@ -52,6 +52,13 @@ public interface WLManager
     void updateWhitelist( MavenRepository... mavenRepositories );
 
     /**
+     * Returns {@code true} if background update jobs are running. If no job runs currently, it returns {@code false}.
+     * 
+     * @return {@code true} if background jobs for updates are running.
+     */
+    boolean isUpdateRunning();
+
+    /**
      * Returns the WL status for given repository.
      * 
      * @param mavenRepository

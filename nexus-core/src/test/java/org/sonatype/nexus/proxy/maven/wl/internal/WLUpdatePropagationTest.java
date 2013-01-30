@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
@@ -47,6 +48,8 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.wl.WLStatus;
+import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus.PStatus;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -206,6 +209,10 @@ public class WLUpdatePropagationTest
     {
         final WLManager wm = lookup( WLManager.class );
         wm.initializeAllWhitelists();
+        while ( wm.isUpdateRunning() )
+        {
+            Thread.sleep( 500 );
+        }
 
         // deploy to hosted something
         {
@@ -248,8 +255,13 @@ public class WLUpdatePropagationTest
             try
             {
                 server.start();
-                wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
-                    MavenRepository.class ) );
+                final MavenProxyRepository mavenProxyRepository =
+                    getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID, MavenProxyRepository.class );
+                wm.updateWhitelist( mavenProxyRepository );
+                while ( wm.isUpdateRunning() )
+                {
+                    Thread.sleep( 500 );
+                }
 
                 final EntrySource hostedEntrySource =
                     wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( HOSTED_REPO_ID,

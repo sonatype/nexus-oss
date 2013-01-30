@@ -163,11 +163,9 @@ public class WLMaintenanceTest
     {
         final MavenHostedRepository mavenRepository =
             getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenHostedRepository.class );
-        WLStatus status = wlManager.getStatusFor( mavenRepository );
-        while ( PStatus.PUBLISHED != status.getPublishingStatus().getStatus() )
+        while ( wlManager.isUpdateRunning() )
         {
             Thread.sleep( 500 );
-            status = wlManager.getStatusFor( mavenRepository );
         }
 
         // initially WL is empty
