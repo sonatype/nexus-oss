@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/menu', ['extjs', 'nexus/error/ErrorHandler'], function(Ext, ErrorHandler){
+define('ext/menu', ['extjs', 'Nexus/error/ErrorHandler'], function(Ext, ErrorHandler){
   // HACK we cannot replace the menu class to check cfg.id, because initComponent has a static reference to Ext.menu.Menu -> recursion
   Ext.override(Ext.menu.Menu, {
     initComponentOrig : Ext.menu.Menu.prototype.initComponent,

@@ -14,7 +14,7 @@
  * Role Edit/Create panel layout and controller
  */
 
-define('repoServer/RoleEditPanel',['sonatype/all'], function(){
+define('repoServer/RoleEditPanel',['Sonatype/all'], function(){
 Sonatype.repoServer.RoleEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {
@@ -140,7 +140,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Sonatype.panels.GridViewer, {
         }
         else
         {
-          return 'Nexus';
+          return 'nexus';
         }
       },
       onAddMenuInit : function(menu) {

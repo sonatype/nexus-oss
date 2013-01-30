@@ -11,16 +11,17 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global define*/
+/*global Ext, Sonatype*/
 
 /*
  * View Nexus serer XML configuration file
  */
-define('repoServer/ConfigViewPanel', ['extjs', 'sonatype/all', 'nexus/config'], function(Ext, Sonatype) {
+Ext.define('Sonatype.repoServer.ConfigViewPanel', {
+  requirejs : ['Sonatype/all', 'Nexus/config'],
 
-  Ext.namespace('Sonatype.repoServer');
+  extend : 'Ext.form.FormPanel',
 
-  var ConfigViewPanel = function(cfg) {
+  constructor : function(cfg) {
     Ext.apply(this, cfg || {});
 
     this.listeners = {
@@ -69,32 +70,28 @@ define('repoServer/ConfigViewPanel', ['extjs', 'sonatype/all', 'nexus/config'], 
     });
 
     this.configTextArea = this.findById('config-text');
-  };
+  },
 
-  Ext.extend(ConfigViewPanel, Ext.form.FormPanel, {
-    getConfigFile : function() {
-      Ext.Ajax.request({
-        callback : this.renderResponse,
-        scope : this,
-        method : 'GET',
-        headers : {
-          'accept' : 'application/xml'
-        },
-        url : Sonatype.config.repos.urls.configCurrent
-      });
-    },
+  getConfigFile : function() {
+    Ext.Ajax.request({
+      callback : this.renderResponse,
+      scope : this,
+      method : 'GET',
+      headers : {
+        'accept' : 'application/xml'
+      },
+      url : Sonatype.config.repos.urls.configCurrent
+    });
+  },
 
-    renderResponse : function(options, success, response) {
-      if (success) {
-        this.configTextArea.setRawValue(response.responseText);
-      }
-      else {
-        Sonatype.MessageBox.alert('The data failed to load from the server.');
-      }
+  renderResponse : function(options, success, response) {
+    if (success) {
+      this.configTextArea.setRawValue(response.responseText);
     }
+    else {
+      Ext.MessageBox.alert('The data failed to load from the server.');
+    }
+  }
 
-  });
-
-  Sonatype.repoServer.ConfigViewPanel = ConfigViewPanel;
 });
 

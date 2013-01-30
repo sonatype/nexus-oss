@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('repoServer/MirrorConfigPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
+define('repoServer/MirrorConfigPanel',['extjs', 'Sonatype/all'], function(Ext, Sonatype){
 var MIRROR_URL_REGEXP = /^(?:http|https):\/\//i;
 
 Sonatype.repoServer.AbstractMirrorPanel = function(config) {
