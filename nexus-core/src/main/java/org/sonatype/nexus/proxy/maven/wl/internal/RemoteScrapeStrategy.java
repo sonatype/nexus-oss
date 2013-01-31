@@ -48,7 +48,7 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 @Named( RemoteScrapeStrategy.ID )
 @Singleton
 public class RemoteScrapeStrategy
-    extends AbstractStrategy<MavenProxyRepository>
+    extends AbstractRemoteStrategy
     implements RemoteStrategy
 {
     protected static final String ID = "scrape";

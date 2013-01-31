@@ -15,16 +15,23 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
+import org.sonatype.nexus.proxy.maven.wl.discovery.Prioritized.PriorityOrderingComparator;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
+import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Default {@link RemoteContentDiscoverer} implementation.
@@ -35,7 +42,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 @Named
 @Singleton
 public class RemoteContentDiscovererImpl
-    extends AbstractContentDiscoverer<MavenProxyRepository, RemoteStrategy>
+    extends AbstractLoggingComponent
     implements RemoteContentDiscoverer
 {
     private final List<RemoteStrategy> remoteStrategies;
@@ -55,6 +62,37 @@ public class RemoteContentDiscovererImpl
     public DiscoveryResult<MavenProxyRepository> discoverRemoteContent( final MavenProxyRepository mavenProxyRepository )
         throws IOException
     {
-        return discoverContent( remoteStrategies, mavenProxyRepository );
+        final ArrayList<RemoteStrategy> appliedStrategies = new ArrayList<RemoteStrategy>( remoteStrategies );
+        Collections.sort( appliedStrategies, new PriorityOrderingComparator<RemoteStrategy>() );
+        final DiscoveryResult<MavenProxyRepository> discoveryResult =
+            new DiscoveryResult<MavenProxyRepository>( mavenProxyRepository );
+        for ( RemoteStrategy strategy : appliedStrategies )
+        {
+            getLogger().debug( "Discovery of {} with strategy {} attempted",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );
+            try
+            {
+                final StrategyResult strategyResult = strategy.discover( mavenProxyRepository );
+                discoveryResult.recordSuccess( strategy.getId(), strategyResult.getMessage(),
+                    strategyResult.getEntrySource() );
+            }
+            catch ( StrategyFailedException e )
+            {
+                discoveryResult.recordFailure( strategy.getId(), e );
+            }
+
+            if ( discoveryResult.isSuccessful() )
+            {
+                getLogger().debug( "Discovery of {} with strategy {} successful",
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );
+                break;
+            }
+            else
+            {
+                getLogger().debug( "Discovery of {} with strategy {} unsuccessful",
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );
+            }
+        }
+        return discoveryResult;
     }
 }

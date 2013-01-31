@@ -17,7 +17,7 @@ import java.io.IOException;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 
 /**
- * Component used to perform local content discovery. It relies on multiple {@link LocalStrategy} to achieve it's goal.
+ * Component used to perform local content discovery.
  * 
  * @author cstamas
  * @since 2.4

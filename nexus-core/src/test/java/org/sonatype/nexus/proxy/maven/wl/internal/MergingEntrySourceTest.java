@@ -17,6 +17,9 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,18 +28,36 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 
 public class MergingEntrySourceTest
 {
+    private final String[] PREFIXES = { "org", "com", "net", "hu", "ca" };
+
+    private final SecureRandom random = new SecureRandom();
+
+    protected List<String> createList( int entrycount )
+    {
+        final ArrayList<String> result = new ArrayList<String>( entrycount );
+        for ( int i = 0; i < entrycount; i++ )
+        {
+            final StringBuilder sb = new StringBuilder( "/" );
+            sb.append( PREFIXES[random.nextInt( PREFIXES.length )] );
+            sb.append( "/" );
+            sb.append( new BigInteger( 130, random ).toString( 32 ) );
+            result.add( sb.toString() );
+        }
+        return result;
+    }
+
     @Test
-    public void simpleMostSpecificWins()
+    public void smoke()
         throws IOException
     {
         final EntrySource es1 = new ArrayListEntrySource( Arrays.asList( "/a/b/c" ) );
         final EntrySource es2 = new ArrayListEntrySource( Arrays.asList( "/a/b" ) );
         final EntrySource es3 = new ArrayListEntrySource( Arrays.asList( "/a/b/c/d/e" ) );
 
-        final MergingEntrySource m = new MergingEntrySource( Arrays.asList( es1, es2 ) );
+        final MergingEntrySource m = new MergingEntrySource( Arrays.asList( es1, es2, es3 ) );
 
         final List<String> mergedEntries = m.readEntries();
-        assertThat( mergedEntries.size(), is( 1 ) );
-        assertThat( mergedEntries, contains( "/a/b" ) );
+        assertThat( mergedEntries.size(), is( 3 ) );
+        assertThat( mergedEntries, contains( "/a/b/c", "/a/b", "/a/b/c/d/e" ) );
     }
 }

@@ -147,7 +147,7 @@ public class LocalContentDiscovererImplTest
                 localContentDiscoverer.discoverLocalContent( mavenRepository );
             assertThat( result, notNullValue() );
             assertThat( result.isSuccessful(), is( true ) );
-            assertThat( result.getLastResult().getStrategyId(), equalTo( LocalWalkerStrategy.ID ) );
+            assertThat( result.getLastResult().getStrategyId(), equalTo( "local" ) );
             assertThat( result.getLastResult().getMessage(), notNullValue() );
             final EntrySource entrySource = result.getEntrySource();
             assertThat(
@@ -165,7 +165,7 @@ public class LocalContentDiscovererImplTest
                 localContentDiscoverer.discoverLocalContent( mavenRepository );
             assertThat( result, notNullValue() );
             assertThat( result.isSuccessful(), is( true ) );
-            assertThat( result.getLastResult().getStrategyId(), equalTo( LocalWalkerStrategy.ID ) );
+            assertThat( result.getLastResult().getStrategyId(), equalTo( "local" ) );
             assertThat( result.getLastResult().getMessage(), notNullValue() );
             final EntrySource entrySource = result.getEntrySource();
             assertThat(
@@ -182,7 +182,7 @@ public class LocalContentDiscovererImplTest
                 localContentDiscoverer.discoverLocalContent( mavenRepository );
             assertThat( result, notNullValue() );
             assertThat( result.isSuccessful(), is( true ) );
-            assertThat( result.getLastResult().getStrategyId(), equalTo( LocalWalkerStrategy.ID ) );
+            assertThat( result.getLastResult().getStrategyId(), equalTo( "local" ) );
             assertThat( result.getLastResult().getMessage(), notNullValue() );
             final EntrySource entrySource = result.getEntrySource();
             assertThat(

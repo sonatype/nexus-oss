@@ -12,17 +12,37 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.discovery;
 
+import java.io.IOException;
+
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
- * Remote strategy is used to discover remote content. It might employ multiple means to obtain (or build)
- * {@link EntrySource} it returns, like scraping, etc.
+ * Strategy for remote content discovery for WL by some means. It is identified by {@link #getId()} and has priority
+ * {@link #getPriority()}. Latter is used to sort (using natural order of integers) the instances and try the one by one
+ * in sorted order.
  * 
  * @author cstamas
  * @since 2.4
  */
 public interface RemoteStrategy
-    extends Strategy<MavenProxyRepository>
+    extends Prioritized
 {
+    /**
+     * Returns the unique ID of the strategy, never {@code null}.
+     * 
+     * @return the ID of the strategy.
+     */
+    String getId();
+
+    /**
+     * Discovers the content of the given {@link MavenRepository}.
+     * 
+     * @param mavenRepository to have local content discovered.
+     * @return the result with discovered entries.
+     * @throws StrategyFailedException if "soft" failure detected.
+     * @throws IOException in case of IO problem.
+     */
+    StrategyResult discover( MavenProxyRepository mavenRepository )
+        throws StrategyFailedException, IOException;
 }

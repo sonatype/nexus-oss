@@ -14,10 +14,10 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.maven.wl.discovery.Prioritized;
-import org.sonatype.nexus.proxy.maven.wl.discovery.Strategy;
+import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 
 /**
- * Abstract class for {@link Strategy} implementations.
+ * Abstract class for {@link RemoteStrategy} implementations.
  * 
  * @author cstamas
  */

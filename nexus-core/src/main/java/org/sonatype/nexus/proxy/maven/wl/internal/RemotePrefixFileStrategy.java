@@ -42,7 +42,7 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 @Named( RemotePrefixFileStrategy.ID )
 @Singleton
 public class RemotePrefixFileStrategy
-    extends AbstractStrategy<MavenProxyRepository>
+    extends AbstractRemoteStrategy
     implements RemoteStrategy
 {
     protected static final String ID = "prefix-file";

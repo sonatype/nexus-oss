@@ -14,22 +14,20 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.discovery.Strategy;
+import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 
 /**
- * Abstract class for {@link Strategy} implementations.
+ * Abstract class for {@link RemoteStrategy} implementations.
  * 
  * @author cstamas
- * @param <R>
  */
-public abstract class AbstractStrategy<R extends MavenRepository>
+public abstract class AbstractRemoteStrategy
     extends AbstractPrioritized
-    implements Strategy<R>
+    implements RemoteStrategy
 {
     private final String id;
 
-    protected AbstractStrategy( final int priority, final String id )
+    protected AbstractRemoteStrategy( final int priority, final String id )
     {
         super( priority );
         this.id = checkNotNull( id );

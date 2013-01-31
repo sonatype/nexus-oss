@@ -147,18 +147,18 @@ public class DiscoveryResult<R extends MavenRepository>
     /**
      * Records a success on behalf of a strategy.
      * 
-     * @param usedStrategy
+     * @param usedStrategyId
      * @param message
      * @param entrySource
      */
-    public void recordSuccess( final Strategy<R> usedStrategy, final String message, final EntrySource entrySource )
+    public void recordSuccess( final String usedStrategyId, final String message, final EntrySource entrySource )
     {
-        checkNotNull( usedStrategy );
+        checkNotNull( usedStrategyId );
         checkNotNull( message );
         checkNotNull( entrySource );
         if ( !isSuccessful() )
         {
-            final SuccessfulOutcome success = new SuccessfulOutcome( usedStrategy.getId(), message );
+            final SuccessfulOutcome success = new SuccessfulOutcome( usedStrategyId, message );
             this.outcomes.add( success );
             this.entrySource = entrySource;
         }
@@ -167,16 +167,16 @@ public class DiscoveryResult<R extends MavenRepository>
     /**
      * Records a failure on behalf of a strategy.
      * 
-     * @param usedStrategy
+     * @param usedStrategyId
      * @param failureCause
      */
-    public void recordFailure( final Strategy<R> usedStrategy, final Throwable failureCause )
+    public void recordFailure( final String usedStrategyId, final Throwable failureCause )
     {
-        checkNotNull( usedStrategy );
+        checkNotNull( usedStrategyId );
         checkNotNull( failureCause );
         if ( !isSuccessful() )
         {
-            final FailedOutcome failure = new FailedOutcome( usedStrategy.getId(), failureCause );
+            final FailedOutcome failure = new FailedOutcome( usedStrategyId, failureCause );
             this.outcomes.add( failure );
         }
     }

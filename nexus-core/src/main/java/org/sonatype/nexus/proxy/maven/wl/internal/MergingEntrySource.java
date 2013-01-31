@@ -13,10 +13,11 @@
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
-import org.sonatype.nexus.proxy.walker.ParentOMatic;
 
 /**
  * Entry source that merges multiple {@link EntrySource}s into one. It retains "correctness" of the result, by watching
@@ -42,15 +43,11 @@ public class MergingEntrySource
     protected static List<String> mergeEntries( final List<EntrySource> entrySources )
         throws IOException
     {
-        // no rule B!
-        final ParentOMatic parentOMatic = new ParentOMatic( true, true, false );
+        final LinkedHashSet<String> result = new LinkedHashSet<String>();
         for ( final EntrySource entrySource : entrySources )
         {
-            for ( final String entry : entrySource.readEntries() )
-            {
-                parentOMatic.addAndMarkPath( entry );
-            }
+            result.addAll( entrySource.readEntries() );
         }
-        return parentOMatic.getAllLeafPaths();
+        return new ArrayList<String>( result );
     }
 }
