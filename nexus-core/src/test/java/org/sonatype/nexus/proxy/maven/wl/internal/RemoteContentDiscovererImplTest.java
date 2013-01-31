@@ -55,7 +55,7 @@ import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
 public class RemoteContentDiscovererImplTest
-    extends AbstractProxyTestEnvironment
+    extends AbstractWLProxyTest
 {
     private static final String PROXY1_REPO_ID = "proxy1";
 
@@ -80,7 +80,7 @@ public class RemoteContentDiscovererImplTest
     }
 
     @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
+    protected EnvironmentBuilder createEnvironmentBuilder()
         throws Exception
     {
         // we need one hosted repo only, so build it
@@ -184,14 +184,6 @@ public class RemoteContentDiscovererImplTest
         };
     }
 
-    @Before
-    public void makeASStarted()
-        throws Exception
-    {
-        // this is needed to activate EventDispatcher, as nothing in current UI infra does this
-        lookup( ApplicationStatusSource.class ).setState( SystemState.STARTED );
-    }
-
     protected String prefixFile1( boolean withComments )
     {
         final StringWriter sw = new StringWriter();
@@ -227,11 +219,6 @@ public class RemoteContentDiscovererImplTest
         throws Exception
     {
         final WLManager wm = lookup( WLManager.class );
-        wm.initializeAllWhitelists();
-        while ( wm.isUpdateRunning() )
-        {
-            Thread.sleep( 500 );
-        }
         {
             final EntrySource proxy1EntrySource =
                 wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
@@ -261,11 +248,8 @@ public class RemoteContentDiscovererImplTest
         server1.start();
 
         final WLManager wm = lookup( WLManager.class );
-        wm.initializeAllWhitelists();
-        while ( wm.isUpdateRunning() )
-        {
-            Thread.sleep( 500 );
-        }
+        wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ) );
+        waitForWLBackgroundUpdates();
         {
             final EntrySource proxy1EntrySource =
                 wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
@@ -302,11 +286,9 @@ public class RemoteContentDiscovererImplTest
         server2.start();
 
         final WLManager wm = lookup( WLManager.class );
-        wm.initializeAllWhitelists();
-        while ( wm.isUpdateRunning() )
-        {
-            Thread.sleep( 500 );
-        }
+        wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ),
+            getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID, MavenRepository.class ) );
+        waitForWLBackgroundUpdates();
         {
             final EntrySource proxy1EntrySource =
                 wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
@@ -321,7 +303,7 @@ public class RemoteContentDiscovererImplTest
             assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
             assertThat( "Proxy2 should have ES", proxy2EntrySource.exists() ); // we served prefix file
             assertThat( "Group should have ES", groupEntrySource.exists() ); // both proxies have it
-            
+
             // GROUP wl must have 4 entries: 1 from hosted (/com/sonatype) + 3 from proxied prefix file
             final List<String> groupEntries = groupEntrySource.readEntries();
             assertThat( groupEntries.size(), equalTo( 4 ) );

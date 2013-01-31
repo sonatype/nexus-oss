@@ -84,6 +84,8 @@ public class WLManagerImpl
 {
     private final EventBus eventBus;
 
+    final ApplicationStatusSource applicationStatusSource;
+
     private final ApplicationConfiguration applicationConfiguration;
 
     private final RepositoryRegistry repositoryRegistry;
@@ -115,6 +117,7 @@ public class WLManagerImpl
                           final RemoteContentDiscoverer remoteContentDiscoverer )
     {
         this.eventBus = checkNotNull( eventBus );
+        this.applicationStatusSource = checkNotNull( applicationStatusSource );
         this.applicationConfiguration = checkNotNull( applicationConfiguration );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.config = checkNotNull( config );
@@ -127,14 +130,10 @@ public class WLManagerImpl
     @Override
     public void initializeAllWhitelists()
     {
-        for ( MavenHostedRepository mavenRepository : repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) )
-        {
-            initializeWhitelist( mavenRepository );
-        }
-        for ( MavenProxyRepository mavenRepository : repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) )
-        {
-            initializeWhitelist( mavenRepository );
-        }
+        final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
+        initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
+        initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
+        initializeWhitelist( initableRepositories.toArray( new MavenRepository[initableRepositories.size()] ) );
     }
 
     @Override
@@ -234,28 +233,39 @@ public class WLManagerImpl
                 @Override
                 public void run()
                 {
-                    for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
+                    try
                     {
-                        try
+                        for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
                         {
-                            updateAndPublishWhitelist( mavenRepository, true );
-                        }
-                        catch ( IOException e )
-                        {
-                            getLogger().warn( "Problem during WL update of {}",
-                                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+                            if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
+                            {
+                                getLogger().warn( "Nexus stopped during background WL updates, bailing out." );
+                                break;
+                            }
                             try
                             {
-                                unpublish( mavenRepository );
+                                updateAndPublishWhitelist( mavenRepository, true );
                             }
-                            catch ( IOException ioe )
+                            catch ( IOException e )
                             {
-                                // silently
+                                getLogger().warn( "Problem during WL update of {}",
+                                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+                                try
+                                {
+                                    unpublish( mavenRepository );
+                                }
+                                catch ( IOException ioe )
+                                {
+                                    // silently
+                                }
                             }
                         }
-                        finally
+                    }
+                    finally
+                    {
+                        synchronized ( WLManagerImpl.this )
                         {
-                            synchronized ( WLManagerImpl.this )
+                            for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
                             {
                                 currentlyUpdatingRepositoryIds.remove( mavenRepository.getId() );
                             }

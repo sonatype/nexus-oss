@@ -52,13 +52,6 @@ public interface WLManager
     void updateWhitelist( MavenRepository... mavenRepositories );
 
     /**
-     * Returns {@code true} if background update jobs are running. If no job runs currently, it returns {@code false}.
-     * 
-     * @return {@code true} if background jobs for updates are running.
-     */
-    boolean isUpdateRunning();
-
-    /**
      * Returns the WL status for given repository.
      * 
      * @param mavenRepository
@@ -173,4 +166,14 @@ public interface WLManager
      * @return {@code true} if item event is about WL file.
      */
     boolean isEventAboutWLFile( final RepositoryItemEvent evt );
+
+    // ==
+
+    /**
+     * Returns {@code true} if background update jobs are running. If no job runs currently, it returns {@code false}.
+     * This method is meant merely as help in tests, as at runtime you'd not need this.
+     * 
+     * @return {@code true} if background jobs for updates are running.
+     */
+    boolean isUpdateRunning();
 }

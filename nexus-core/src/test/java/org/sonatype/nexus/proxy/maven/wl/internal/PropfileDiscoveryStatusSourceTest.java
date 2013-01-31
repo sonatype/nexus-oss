@@ -41,12 +41,12 @@ import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryStatus.DStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class PropfileDiscoveryStatusSourceTest
-    extends AbstractProxyTestEnvironment
+    extends AbstractWLProxyTest
 {
     private static final String REPO_ID = "inhouse";
 
     @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
+    protected EnvironmentBuilder createEnvironmentBuilder()
         throws Exception
     {
         // we need one hosted repo only, so build it

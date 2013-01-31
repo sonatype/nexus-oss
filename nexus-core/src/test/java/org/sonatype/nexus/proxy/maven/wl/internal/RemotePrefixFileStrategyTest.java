@@ -55,7 +55,7 @@ import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
 public class RemotePrefixFileStrategyTest
-    extends AbstractProxyTestEnvironment
+    extends AbstractWLProxyTest
 {
     private static final String HOSTED_REPO_ID = "hosted";
 
@@ -82,15 +82,10 @@ public class RemotePrefixFileStrategyTest
         this.server =
             Server.withPort( remoteServerPort ).serve( "/" ).withBehaviours( Behaviours.error( 404 ) ).start();
         super.setUp();
-        final WLManager wm = lookup( WLManager.class );
-        while ( wm.isUpdateRunning() )
-        {
-            Thread.sleep( 500 );
-        }
     }
 
     @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
+    protected EnvironmentBuilder createEnvironmentBuilder()
         throws Exception
     {
         // we need one hosted repo only, so build it

@@ -29,8 +29,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -44,12 +42,10 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
-import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus.PStatus;
-import org.sonatype.nexus.proxy.maven.wl.WLStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class WLMaintenanceTest
-    extends AbstractProxyTestEnvironment
+    extends AbstractWLProxyTest
 {
     private static final String REPO_ID = "inhouse";
 
@@ -63,7 +59,7 @@ public class WLMaintenanceTest
         "/org/apache/artifact/1.0/artifact-1.0.jar" );
 
     @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
+    protected EnvironmentBuilder createEnvironmentBuilder()
         throws Exception
     {
         // we need one hosted repo only, so build it
@@ -111,8 +107,6 @@ public class WLMaintenanceTest
     public void prepare()
         throws Exception
     {
-        // this is needed to activate EventDispatcher, as nothing in current UI infra does this
-        lookup( ApplicationStatusSource.class ).setState( SystemState.STARTED );
         wlManager = lookup( WLManager.class );
     }
 
@@ -163,10 +157,6 @@ public class WLMaintenanceTest
     {
         final MavenHostedRepository mavenRepository =
             getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenHostedRepository.class );
-        while ( wlManager.isUpdateRunning() )
-        {
-            Thread.sleep( 500 );
-        }
 
         // initially WL is empty
         {

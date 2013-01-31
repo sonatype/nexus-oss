@@ -45,7 +45,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class LocalWalkerStrategyTest
-    extends AbstractProxyTestEnvironment
+    extends AbstractWLProxyTest
 {
     private static final String REPO_ID = "inhouse";
 
@@ -59,7 +59,7 @@ public class LocalWalkerStrategyTest
         "/org/apache/artifact/1.0/artifact-1.0.jar" );
 
     @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
+    protected EnvironmentBuilder createEnvironmentBuilder()
         throws Exception
     {
         // we need one hosted repo only, so build it

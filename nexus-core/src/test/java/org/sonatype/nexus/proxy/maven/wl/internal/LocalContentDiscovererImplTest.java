@@ -27,7 +27,6 @@ import java.util.List;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
@@ -45,12 +44,10 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
-import org.sonatype.nexus.proxy.maven.wl.discovery.LocalStrategy;
-import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class LocalContentDiscovererImplTest
-    extends AbstractProxyTestEnvironment
+    extends AbstractWLProxyTest
 {
     private static final String REPO_ID = "inhouse";
 
@@ -64,7 +61,7 @@ public class LocalContentDiscovererImplTest
         "/org/apache/artifact/1.0/artifact-1.0.jar" );
 
     @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
+    protected EnvironmentBuilder createEnvironmentBuilder()
         throws Exception
     {
         // we need one hosted repo only, so build it

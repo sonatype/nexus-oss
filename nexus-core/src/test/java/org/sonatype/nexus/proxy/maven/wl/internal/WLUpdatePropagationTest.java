@@ -26,11 +26,8 @@ import java.util.List;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -48,15 +45,13 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
-import org.sonatype.nexus.proxy.maven.wl.WLStatus;
-import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus.PStatus;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
 public class WLUpdatePropagationTest
-    extends AbstractProxyTestEnvironment
+    extends AbstractWLProxyTest
 {
     private static final String HOSTED_REPO_ID = "hosted";
 
@@ -79,7 +74,7 @@ public class WLUpdatePropagationTest
     }
 
     @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
+    protected EnvironmentBuilder createEnvironmentBuilder()
         throws Exception
     {
         // we need one hosted repo only, so build it
@@ -177,14 +172,6 @@ public class WLUpdatePropagationTest
         };
     }
 
-    @Before
-    public void makeASStarted()
-        throws Exception
-    {
-        // this is needed to activate EventDispatcher, as nothing in current UI infra does this
-        lookup( ApplicationStatusSource.class ).setState( SystemState.STARTED );
-    }
-
     protected String prefixFile1( boolean withComments )
     {
         final StringWriter sw = new StringWriter();
@@ -208,11 +195,6 @@ public class WLUpdatePropagationTest
         throws Exception
     {
         final WLManager wm = lookup( WLManager.class );
-        wm.initializeAllWhitelists();
-        while ( wm.isUpdateRunning() )
-        {
-            Thread.sleep( 500 );
-        }
 
         // deploy to hosted something
         {
@@ -258,10 +240,7 @@ public class WLUpdatePropagationTest
                 final MavenProxyRepository mavenProxyRepository =
                     getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID, MavenProxyRepository.class );
                 wm.updateWhitelist( mavenProxyRepository );
-                while ( wm.isUpdateRunning() )
-                {
-                    Thread.sleep( 500 );
-                }
+                waitForWLBackgroundUpdates();
 
                 final EntrySource hostedEntrySource =
                     wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( HOSTED_REPO_ID,
