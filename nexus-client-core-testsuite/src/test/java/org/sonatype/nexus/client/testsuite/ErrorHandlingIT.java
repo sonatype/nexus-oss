@@ -16,11 +16,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
@@ -41,7 +41,7 @@ public class ErrorHandlingIT
     }
 
     @Test
-    public void notConverting400WithoutErrorMessage()
+    public void convert400WithoutErrorMessage()
     {
         final JerseyNexusClient client = (JerseyNexusClient) client();
         try
@@ -51,7 +51,7 @@ public class ErrorHandlingIT
         catch ( UniformInterfaceException e )
         {
             final NexusClientException converted = client.convertIfKnown( e );
-            assertThat( converted, is( nullValue() ) );
+            assertThat( converted, is( instanceOf( NexusClientBadRequestException.class ) ) );
         }
     }
 
@@ -87,7 +87,7 @@ public class ErrorHandlingIT
     }
 
     @Test
-    public void convert400()
+    public void convert404()
     {
         final JerseyNexusClient client = (JerseyNexusClient) client();
         try
