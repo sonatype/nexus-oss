@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/* global Ext,NX */
+/*global Ext,NX,global,require */
 
 Ext.ns('NX');
 
@@ -26,7 +26,7 @@ Ext.apply(NX, {
      *
      * @type {Object}
      */
-    global: function() {
+    global: (function() {
         if (window !== undefined) {
             return window;
         }
@@ -34,7 +34,7 @@ Ext.apply(NX, {
             return global;
         }
         throw 'Unable to determine global object';
-    }(), // assign return value of function
+    }()), // assign return value of function
 
     /**
      * Reference an object by its global name.
@@ -57,7 +57,7 @@ Ext.apply(NX, {
      * @return {Array}
      */
     arrayify: function (input) {
-        var list = [];
+        var i, list = [];
 
         if (Ext.isArray(input)) {
             for (i = 0; i < input.length; i++) {
