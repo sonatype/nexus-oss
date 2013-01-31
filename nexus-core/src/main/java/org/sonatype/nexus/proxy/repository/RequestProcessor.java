@@ -37,19 +37,25 @@ public interface RequestProcessor
      * wants to completely stop the execution of this request, it should return false. Otherwise, true should be
      * returned.
      * 
-     * @param request
+     * @param repository from which the item is about to be attempted retrieval (not null)
+     * @param request retrieval request (not null)
      * @param action
+     * @return true if item is allowed to be processed, false if request should be blocked. In case of false an generic
+     *         {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown.
      */
     boolean process( Repository repository, ResourceStoreRequest request, Action action );
 
     /**
      * Should the item be retrieved?
-     *
+     * 
      * @param repository from which the item is retrieved (not null)
-     * @param request    retrieval request (not null)
-     * @param item       item to be retrieved (not null
+     * @param request retrieval request (not null)
+     * @param item item to be retrieved (not null
      * @return true if item is allowed to be retrieved, false if item should be blocked. In case of false an generic
      *         {@link org.sonatype.nexus.proxy.ItemNotFoundException} will be thrown.
+     * @throws IllegalOperationException
+     * @throws ItemNotFoundException
+     * @throws AccessDeniedException
      */
     boolean shouldRetrieve( Repository repository, ResourceStoreRequest request, StorageItem item )
         throws IllegalOperationException, ItemNotFoundException, AccessDeniedException;
@@ -58,9 +64,9 @@ public interface RequestProcessor
      * Request processor is able to override generic behaviour of Repositories in aspect of proxying.
      * 
      * @param repository
-     * @param uid
+     * @param request
      * @param context
-     * @return
+     * @return {@code true} if repository may reach out to remote for given request.
      */
     boolean shouldProxy( ProxyRepository repository, ResourceStoreRequest request );
 
@@ -68,9 +74,8 @@ public interface RequestProcessor
      * Request processor is able to override generic behaviour of Repository in aspect of caching.
      * 
      * @param repository
-     * @param request
      * @param item
-     * @return
+     * @return {@code true} if repository may cache the item.
      */
     boolean shouldCache( ProxyRepository repository, AbstractStorageItem item );
 }

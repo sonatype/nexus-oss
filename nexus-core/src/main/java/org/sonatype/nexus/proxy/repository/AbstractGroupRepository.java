@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -249,16 +249,19 @@ public abstract class AbstractGroupRepository
                 }
             }
         }
-        else
-        {
-            request.addItemNotFoundReason( reasonFor( request, this,
-                "The %s not found in local storage of group repository %s (no member processing happened).",
-                request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
-        }
 
         if ( !found )
         {
-            throw new GroupItemNotFoundException( request, this, memberThrowables );
+            if ( !isRequestGroupLocalOnly )
+            {
+                throw new GroupItemNotFoundException( request, this, memberThrowables );
+            }
+            else
+            {
+                throw new GroupItemNotFoundException( reasonFor( request, this,
+                    "The %s not found in local storage of group repository %s (no member processing happened).",
+                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
+            }
         }
 
         return result;
@@ -406,11 +409,15 @@ public abstract class AbstractGroupRepository
                     }
                 }
             }
+            if ( !isRequestGroupLocalOnly )
+            {
+                throw new GroupItemNotFoundException( request, this, memberThrowables );
+            }
             else
             {
-                request.addItemNotFoundReason( reasonFor( request, this,
+                throw new GroupItemNotFoundException( reasonFor( request, this,
                     "The %s not found in local storage of group repository %s (no member processing happened).",
-                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
+                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
             }
         }
         finally
@@ -420,8 +427,6 @@ public abstract class AbstractGroupRepository
                 request.getRequestContext().remove( AccessManager.REQUEST_AUTHORIZED );
             }
         }
-
-        throw new GroupItemNotFoundException( request, this, memberThrowables );
     }
 
     public List<String> getMemberRepositoryIds()
@@ -650,16 +655,19 @@ public abstract class AbstractGroupRepository
                 }
             }
         }
-        else
-        {
-            request.addItemNotFoundReason( reasonFor( request, this,
-                "The %s not found in local storage of group repository %s (no member processing happened).",
-                request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ) );
-        }
 
         if ( items.isEmpty() )
         {
-            throw new GroupItemNotFoundException( request, this, memberThrowables );
+            if ( !isRequestGroupLocalOnly )
+            {
+                throw new GroupItemNotFoundException( request, this, memberThrowables );
+            }
+            else
+            {
+                throw new GroupItemNotFoundException( reasonFor( request, this,
+                    "The %s not found in local storage of group repository %s (no member processing happened).",
+                    request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) ), memberThrowables );
+            }
         }
 
         return items;

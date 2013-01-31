@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import static org.sonatype.nexus.proxy.ItemNotFoundReasons.checkReasonFrom;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +41,21 @@ public class GroupItemNotFoundException
      * Constructor for group thrown "not found" exception providing information about whole tree being processed and
      * reasons why the grand total result is "not found.
      * 
+     * @param reason
+     * @param memberReasons
+     */
+    public GroupItemNotFoundException( final ItemNotFoundInRepositoryReason reason,
+                                       final Map<Repository, Throwable> memberReasons )
+    {
+        super( reason );
+        // copy it and make it unmodifiable
+        this.memberReasons = Collections.unmodifiableMap( new HashMap<Repository, Throwable>( memberReasons ) );
+    }
+
+    /**
+     * Constructor for group thrown "not found" exception providing information about whole tree being processed and
+     * reasons why the grand total result is "not found.
+     * 
      * @param request
      * @param repository
      * @param memberReasons
@@ -50,10 +63,8 @@ public class GroupItemNotFoundException
     public GroupItemNotFoundException( final ResourceStoreRequest request, final GroupRepository repository,
                                        final Map<Repository, Throwable> memberReasons )
     {
-        super( checkReasonFrom( request, repository, "Path %s not found in group repository %s.",
-            request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( repository ) ) );
-        // copy it and make it unmodifiable
-        this.memberReasons = Collections.unmodifiableMap( new HashMap<Repository, Throwable>( memberReasons ) );
+        this( reasonFor( request, repository, "Path %s not found in group repository %s.",
+            request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( repository ) ), memberReasons );
     }
 
     @Override

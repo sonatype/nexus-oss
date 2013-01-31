@@ -19,11 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -48,9 +45,6 @@ public class ResourceStoreRequest
     /** Used internally to track applied mappins */
     private final Map<String, List<String>> appliedMappings;
 
-    /** Used internally to track reasons why request cannot be fulfilled */
-    private final List<ItemNotFoundInRepositoryReason> notFoundReasons;
-
     /**
      * Constructor.
      * 
@@ -64,7 +58,6 @@ public class ResourceStoreRequest
         this.pathStack = new Stack<String>();
         this.processedRepositories = new ArrayList<String>();
         this.appliedMappings = new HashMap<String, List<String>>();
-        this.notFoundReasons = new ArrayList<ItemNotFoundInRepositoryReason>();
         this.requestContext = new RequestContext();
         this.requestContext.setRequestLocalOnly( localOnly );
         this.requestContext.setRequestRemoteOnly( remoteOnly );
@@ -400,49 +393,26 @@ public class ResourceStoreRequest
         return appliedMappings;
     }
 
-    /**
-     * Adds a {@link ItemNotFoundReason} to this request used when (if at all) constructing
-     * {@link ItemNotFoundException} for this request. This makes possible to "hint" the not found outcome in advance,
-     * even before exception is being thrown, typically like when {@link #setRequestLocalOnly(boolean)} flag is used,
-     * and a {@link ProxyRepository} is asked for retrieval.
-     * 
-     * @param reason
-     * @since 2.4
-     */
-    public void addItemNotFoundReason( final ItemNotFoundInRepositoryReason reason )
-    {
-        this.notFoundReasons.add( reason );
-    }
-
-    /**
-     * Returns a copy of the the existing {@link ItemNotFoundReason} list. List order is in recording order, first
-     * recorded is first in list, last recorded is last in list.
-     * 
-     * @return a copy of the existing {@link ItemNotFoundReason} instances in this instance.
-     * @since 2.4
-     */
-    public List<ItemNotFoundInRepositoryReason> getItemNotFoundReasons()
-    {
-        return new ArrayList<ItemNotFoundInRepositoryReason>( notFoundReasons );
-    }
-
-    /**
-     * Returns the last recorded reason why item requested by this request is not to be found, or {@code null} if none
-     * exists.
-     * 
-     * @return the last recorded reason or {@code null}.
-     * @since 2.4
-     */
-    public ItemNotFoundInRepositoryReason getLastItemNotFoundReason()
-    {
-        if ( !notFoundReasons.isEmpty() )
-        {
-            return notFoundReasons.get( notFoundReasons.size() - 1 );
-        }
-        return null;
-    }
-
     // ==
+
+    /**
+     * Creates a clone of this request, but also "detaches" it from any parent context relationship, effectively making
+     * result new "detached" instance that captures the snapshot of the request in a moment when the clone was created.
+     * 
+     * @return the clone of this request, detached from any outgoing relations.
+     */
+    public ResourceStoreRequest cloneAndDetach()
+    {
+        final ResourceStoreRequest result = new ResourceStoreRequest( getRequestPath() );
+        result.requestContext.setParentContext( null );
+        result.requestContext.putAll( requestContext.flatten() );
+        result.pathStack.clear();
+        result.processedRepositories.clear();
+        result.processedRepositories.addAll( processedRepositories );
+        result.appliedMappings.clear();
+        result.appliedMappings.putAll( appliedMappings );
+        return result;
+    }
 
     @Override
     public String toString()

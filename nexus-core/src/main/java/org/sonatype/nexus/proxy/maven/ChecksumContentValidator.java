@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 import java.io.IOException;
 

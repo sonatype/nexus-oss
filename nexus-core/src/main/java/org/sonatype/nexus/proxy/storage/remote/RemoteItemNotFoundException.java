@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
-import static org.sonatype.nexus.proxy.ItemNotFoundReasons.checkReasonFrom;
-
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -43,7 +41,7 @@ public class RemoteItemNotFoundException
     public RemoteItemNotFoundException( final ResourceStoreRequest request, final ProxyRepository repository,
                                         final String reason, final String remoteUrl )
     {
-        super( checkReasonFrom( request, repository,
+        super( reasonFor( request, repository,
             "Path %s not found in remote storage of repository %s (reason=%s, remoteUrl=%s).",
             request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( repository ), reason, remoteUrl ) );
     }

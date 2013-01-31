@@ -13,7 +13,7 @@
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.proxy.ItemNotFoundReasons.reasonFor;
+import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 import java.io.EOFException;
 import java.io.File;

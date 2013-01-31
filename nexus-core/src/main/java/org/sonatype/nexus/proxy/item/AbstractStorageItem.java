@@ -183,7 +183,7 @@ public abstract class AbstractStorageItem
     public AbstractStorageItem( final ResourceStoreRequest request, final boolean readable, final boolean writable )
     {
         this();
-        this.request = request;
+        this.request = request.cloneAndDetach();
         this.context.setParentContext( request.getRequestContext() );
         setPath( request.getRequestPath() );
         setReadable( readable );

@@ -18,6 +18,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.sisu.goodies.common.FormatTemplate;
+import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 /**
  * Thrown if the requested item is not found.
@@ -28,6 +29,82 @@ public class ItemNotFoundException
     extends Exception
 {
     private static final long serialVersionUID = -4964273361722823796L;
+    
+    // ==
+    
+    /**
+     * Creates a new instance of {@link ItemNotFoundReason}.
+     * 
+     * @param request
+     * @param message
+     * @param params
+     * @return the newly created reason.
+     */
+    public static ItemNotFoundReason reasonFor( final ResourceStoreRequest request, final String message,
+                                                final Object... params )
+    {
+        return new ItemNotFoundReason( SimpleFormat.template( message, params ), request );
+    }
+
+    /**
+     * Creates a new instance of {@link ItemNotFoundInRepositoryReason}.
+     * 
+     * @param request
+     * @param repository
+     * @param message
+     * @param params
+     * @return the newly created reason.
+     */
+    public static ItemNotFoundInRepositoryReason reasonFor( final ResourceStoreRequest request,
+                                                            final Repository repository, final String message,
+                                                            final Object... params )
+    {
+        return new ItemNotFoundInRepositoryReason( SimpleFormat.template( message, params ), request, repository );
+    }
+
+    /**
+     * Constructs a default reasoning.
+     * {@code "Path %s not found in repository %s."}.
+     * 
+     * @param request
+     * @param repository
+     * @return reason existed in request or a new one with default message.
+     */
+    public static ItemNotFoundInRepositoryReason defaultReasonFrom( final ResourceStoreRequest request,
+                                                                  final Repository repository )
+    {
+        // default the message
+        return reasonFor( request, repository, "Path %s not found in repository %s.", request.getRequestPath(),
+            RepositoryStringUtils.getHumanizedNameString( repository ) );
+    }
+
+    // ==
+
+    /**
+     * Legacy support.
+     * 
+     * @param message
+     * @param request
+     * @param repository
+     * @return reason.
+     * @deprecated Used for legacy support, new code should NOT use this method. See other methods:
+     *             {@link #reasonFor(ResourceStoreRequest, String, Object...)} and
+     *             {@link #reasonFor(ResourceStoreRequest, Repository, String, Object...)}
+     */
+    public static ItemNotFoundReason legacySupport( final String message, final ResourceStoreRequest request,
+                                                    final Repository repository )
+    {
+        if ( repository != null )
+        {
+            return new ItemNotFoundInRepositoryReason( SimpleFormat.template( message ), request, repository );
+        }
+        else
+        {
+            return new ItemNotFoundReason( SimpleFormat.template( message ), request );
+        }
+    }
+    
+    // ==
 
     /**
      * Reason of item not found when no repository is involved. Usually ther IS one, so you should use
@@ -49,7 +126,7 @@ public class ItemNotFoundException
         public ItemNotFoundReason( final FormatTemplate message, final ResourceStoreRequest resourceStoreRequest )
         {
             this.message = checkNotNull( message );
-            this.resourceStoreRequest = checkNotNull( resourceStoreRequest );
+            this.resourceStoreRequest = checkNotNull( resourceStoreRequest ).cloneAndDetach();
         }
 
         /**
@@ -63,7 +140,7 @@ public class ItemNotFoundException
         }
 
         /**
-         * Returns the request.
+         * Returns the request (originals detached clone, see {@link ResourceStoreRequest#cloneAndDetach()} method).
          * 
          * @return the request.
          */
@@ -223,7 +300,7 @@ public class ItemNotFoundException
     protected ItemNotFoundException( final String message, final ResourceStoreRequest request,
                                      final Repository repository, final Throwable cause )
     {
-        this( ItemNotFoundReasons.legacySupport( message, request, repository ), cause );
+        this( legacySupport( message, request, repository ), cause );
     }
 
     // ==
