@@ -23,6 +23,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusStatus;
+import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
@@ -229,6 +230,20 @@ public class JerseyNexusClient
         return null;
     }
 
+    public NexusClientBadRequestException convertIf400( final UniformInterfaceException e )
+    {
+        final ClientResponse response = e.getResponse();
+        if ( ClientResponse.Status.BAD_REQUEST.equals( response.getClientResponseStatus() ) )
+        {
+            return new NexusClientBadRequestException(
+                getMessageIfPresent( ClientResponse.Status.BAD_REQUEST.getStatusCode(), e ),
+                response.getClientResponseStatus().getReasonPhrase(),
+                getResponseBody( response )
+            );
+        }
+        return null;
+    }
+
     public NexusClientErrorResponseException convertIf400WithErrorMessage( final UniformInterfaceException e )
     {
         final ClientResponse response = e.getResponse();
@@ -290,6 +305,12 @@ public class JerseyNexusClient
         }
 
         exception = convertIf400WithErrorMessage( e );
+        if ( exception != null )
+        {
+            return exception;
+        }
+
+        exception = convertIf400( e );
         if ( exception != null )
         {
             return exception;

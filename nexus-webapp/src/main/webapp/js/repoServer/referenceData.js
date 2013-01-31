@@ -16,7 +16,7 @@
  * to the service.
  */
 
-define('repoServer/referenceData',['sonatype/all'], function(){
+define('repoServer/referenceData',['Sonatype/all'], function(){
 (function() {
 
   Sonatype.repoServer.referenceData = {

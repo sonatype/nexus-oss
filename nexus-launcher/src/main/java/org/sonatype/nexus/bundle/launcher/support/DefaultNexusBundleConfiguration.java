@@ -26,9 +26,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.tools.ant.taskdefs.condition.Os;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.sisu.bl.jmx.JMXConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundleConfiguration;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
@@ -92,14 +94,11 @@ public class DefaultNexusBundleConfiguration
      */
     private String logPattern;
 
-    /**
-     * Constructor.
-     *
-     * @since 2.2
-     */
     @Inject
-    public DefaultNexusBundleConfiguration( final FileTaskBuilder fileTaskBuilder )
+    public DefaultNexusBundleConfiguration( final FileTaskBuilder fileTaskBuilder,
+        final Provider<JMXConfiguration> jmxConfigurationProvider )
     {
+        super( jmxConfigurationProvider );
         this.fileTaskBuilder = checkNotNull( fileTaskBuilder );
         this.plugins = Lists.newArrayList();
         this.logLevelsPerLoggerName = Maps.newHashMap();

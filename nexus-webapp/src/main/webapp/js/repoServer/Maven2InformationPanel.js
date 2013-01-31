@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('repoServer/Maven2InformationPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
+define('repoServer/Maven2InformationPanel',['extjs', 'Sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.Maven2InformationPanel = function(config) {
   Ext.apply(this, config || {}, {
     halfSize : false

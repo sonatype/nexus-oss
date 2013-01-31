@@ -18,7 +18,7 @@
  * the field label.
  */
 
-define('repoServer/resources',['sonatype/all'], function(){
+define('repoServer/resources',['Sonatype/all'], function(){
 (function() {
 
   // Nexus default help text values for re-use in child forms

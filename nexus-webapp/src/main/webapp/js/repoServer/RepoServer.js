@@ -12,7 +12,7 @@
  */
 
 /*global define*/
-define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/config', 'sonatype/utils', 'sonatype/view', 'nexus/navigation'], function(Ext, Sonatype){
+define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/config', 'Sonatype/utils', 'Sonatype/view', 'Nexus/navigation'], function(Ext, Sonatype){
   // Repository main Controller(conglomerate) Singleton
   Sonatype.repoServer.RepoServer = (function() {
     var cfg = Sonatype.config.repos,
@@ -124,7 +124,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
         // Left Panel
         this.nexusPanel = new Sonatype.navigation.NavigationPanel({
               id : 'st-nexus-tab',
-              title : 'Nexus'
+              title : 'nexus'
             });
 
         this.createSubComponents();
@@ -336,7 +336,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'sonatype/lib', 'nexus/conf
                     title : 'Server',
                     tabId : 'nexus-config',
                     tabCode : Sonatype.repoServer.ServerEditPanel,
-                    tabTitle : 'Nexus'
+                    tabTitle : 'nexus'
                   }, {
                     enabled : sp.checkPermission('nexus:tasks', sp.READ),
                     title : 'Scheduled Tasks',

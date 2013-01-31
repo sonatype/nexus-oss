@@ -13,7 +13,7 @@
 /*
  * Target Edit/Create panel layout and controller
  */
-define('repoServer/RepoTargetEditPanel',['sonatype/all'], function(){
+define('repoServer/RepoTargetEditPanel',['Sonatype/all'], function(){
 
 Sonatype.repoServer.RepoTargetEditPanel = function(config) {
   var config = config || {};

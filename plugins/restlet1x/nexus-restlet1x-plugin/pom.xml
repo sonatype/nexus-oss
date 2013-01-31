@@ -29,6 +29,10 @@
   <properties>
     <pluginName>Nexus Restlet 1.x Plugin</pluginName>
     <pluginDescription>Provides Restlet 1.x REST API.</pluginDescription>
+
+    <!-- build.timestamp is used for mapping the js/css files to a timestamped URL -->
+    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+    <build.timestamp>${maven.build.timestamp}</build.timestamp>
   </properties>
 
   <dependencies>

@@ -11,82 +11,87 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global define*/
+/*global Ext, Sonatype*/
 
 /*
  * View Nexus serer XML configuration file
  */
-define('repoServer/ConfigViewPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
-Sonatype.repoServer.ConfigViewPanel = function(cfg) {
-  Ext.apply(this, cfg || {});
+Ext.define('Sonatype.repoServer.ConfigViewPanel', {
+  requirejs : ['Sonatype/all', 'Nexus/config'],
 
-  this.listeners = {
-    // note: this isn't pre-render dependent, we just need an early event to
-    // start this off
-    'beforerender' : this.getConfigFile,
-    scope : this
-  };
+  extend : 'Ext.form.FormPanel',
 
-  Sonatype.repoServer.ConfigViewPanel.superclass.constructor.call(this, {
-        autoScroll : false,
-        border : false,
-        frame : false,
-        collapsible : false,
-        collapsed : false,
-        tbar : [{
-              text : 'Refresh',
-              icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
-              cls : 'x-btn-text-icon',
-              tooltip : {
-                text : 'Reloads the config file'
-              },
-              scope : this,
-              handler : this.getConfigFile
-            }, {
-              text : 'Download Config',
-              icon : Sonatype.config.resourcePath + '/images/icons/page_white_put.png',
-              cls : 'x-btn-text-icon',
-              scope : this,
-              handler : function() {
-                Sonatype.utils.openWindow(Sonatype.config.repos.urls.configCurrent);
-              }
-            }],
-        items : [{
-              xtype : 'textarea',
-              id : 'config-text',
-              readOnly : true,
-              hideLabel : true,
-              anchor : '100% 100%'
-            }]
-      });
+  constructor : function(cfg) {
+    Ext.apply(this, cfg || {});
 
-  this.configTextArea = this.findById('config-text');
-};
+    this.listeners = {
+      // note: this isn't pre-render dependent, we just need an early event to
+      // start this off
+      'beforerender' : this.getConfigFile,
+      scope : this
+    };
 
-Ext.extend(Sonatype.repoServer.ConfigViewPanel, Ext.form.FormPanel, {
-      getConfigFile : function() {
-        Ext.Ajax.request({
-              callback : this.renderResponse,
-              scope : this,
-              method : 'GET',
-              headers : {
-                'accept' : 'application/xml'
-              },
-              url : Sonatype.config.repos.urls.configCurrent
-            });
-      },
-
-      renderResponse : function(options, success, response) {
-        if (success)
+    Sonatype.repoServer.ConfigViewPanel.superclass.constructor.call(this, {
+      autoScroll : false,
+      border : false,
+      frame : false,
+      collapsible : false,
+      collapsed : false,
+      tbar : [
         {
-          this.configTextArea.setRawValue(response.responseText);
-        }
-        else
+          text : 'Refresh',
+          icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+          cls : 'x-btn-text-icon',
+          tooltip : {
+            text : 'Reloads the config file'
+          },
+          scope : this,
+          handler : this.getConfigFile
+        },
         {
-          Sonatype.MessageBox.alert('The data failed to load from the server.');
+          text : 'Download Config',
+          icon : Sonatype.config.resourcePath + '/images/icons/page_white_put.png',
+          cls : 'x-btn-text-icon',
+          scope : this,
+          handler : function() {
+            Sonatype.utils.openWindow(Sonatype.config.repos.urls.configCurrent);
+          }
         }
-      }
-
+      ],
+      items : [
+        {
+          xtype : 'textarea',
+          id : 'config-text',
+          readOnly : true,
+          hideLabel : true,
+          anchor : '100% 100%'
+        }
+      ]
     });
+
+    this.configTextArea = this.findById('config-text');
+  },
+
+  getConfigFile : function() {
+    Ext.Ajax.request({
+      callback : this.renderResponse,
+      scope : this,
+      method : 'GET',
+      headers : {
+        'accept' : 'application/xml'
+      },
+      url : Sonatype.config.repos.urls.configCurrent
+    });
+  },
+
+  renderResponse : function(options, success, response) {
+    if (success) {
+      this.configTextArea.setRawValue(response.responseText);
+    }
+    else {
+      Ext.MessageBox.alert('The data failed to load from the server.');
+    }
+  }
+
 });
 

@@ -12,7 +12,7 @@
  */
 /*global define*/
 
-define('repoServer/LogsViewPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
+define('repoServer/LogsViewPanel',['extjs', 'Sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.LogsViewPanel = function(cfg) {
   Ext.apply(this, cfg || {});
 

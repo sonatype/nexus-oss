@@ -14,8 +14,8 @@
 define('repoServer',
   [
     'repoServer/RepoServer',
-    'nexus/repository/AbstractRepoPanel',
-    'nexus/repository/ArtifactContainer',
+    'Nexus/repository/AbstractRepoPanel',
+    'Nexus/repository/ArtifactContainer',
     'repoServer/ConfigViewPanel',
     'repoServer/Documentation',
     'repoServer/FeedViewPanel',
@@ -37,10 +37,10 @@ define('repoServer',
     'repoServer/RoleEditPanel',
     'repoServer/RoutesEditPanel',
     'repoServer/SchedulesEditPanel',
-    'repoServer/ServerEditPanel',
     'repoServer/UserBrowserPanel',
     'repoServer/UserEditPanel',
-    'repoServer/UserPrivilegeBrowserPanel'
+    'repoServer/UserPrivilegeBrowserPanel',
+    'Sonatype/repoServer/ServerEditPanel' // uses Ext.define
   ], function() {
 
       }

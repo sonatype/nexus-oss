@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/util/event', ['extjs', 'nexus/log', 'nexus/error/ErrorHandler'], function(Ext, Log, ErrorHandler){
+define('ext/util/event', ['extjs', 'Nexus/log', 'Nexus/error/ErrorHandler'], function(Ext, Log, ErrorHandler){
   Ext.util.Event = Ext.extend(Ext.util.Event, {
     createListener : function() {
       var

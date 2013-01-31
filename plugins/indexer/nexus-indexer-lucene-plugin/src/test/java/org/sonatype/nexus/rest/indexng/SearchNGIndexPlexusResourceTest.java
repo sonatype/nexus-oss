@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -73,8 +74,8 @@ public class SearchNGIndexPlexusResourceTest
         when( searcher.canHandle( Mockito.any( Map.class ) ) ).thenReturn( true );
 
         when(
-              searcher.flatIteratorSearch( Mockito.any( Map.class ), anyString(), anyInt(), anyInt(), anyInt(),
-                                           anyBoolean(), Mockito.any( SearchType.class ), Mockito.any( List.class ) ) )
+            searcher.flatIteratorSearch( Mockito.any( Map.class ), anyString(), anyInt(), anyInt(), anyInt(),
+                anyBoolean(), Mockito.any( SearchType.class ), Mockito.any( List.class ) ) )
         // emulate current indexer search behavior, illegal query results in IllegalArgEx with the ParseEx as cause
         .thenThrow( new IllegalArgumentException( new ParseException( "mock" ) ) );
 
@@ -108,8 +109,9 @@ public class SearchNGIndexPlexusResourceTest
         waitForTasksToStop();
 
         int artifactCount = 30; // this is bellow collapse threshold
-        SearchNGResponse result = deployAndSearch( artifactCount );
+        SearchNGResponse result = deployAndSearch( artifactCount, DeployType.RELEASE );
         Assert.assertEquals( artifactCount, result.getData().size() );
+        ensureLatestIsPresent( result, DeployType.RELEASE, "30" );
     }
 
     @Test
@@ -123,18 +125,94 @@ public class SearchNGIndexPlexusResourceTest
         waitForTasksToStop();
 
         int artifactCount = 60; // this is above collapse threshold
-        SearchNGResponse result = deployAndSearch( artifactCount );
+        SearchNGResponse result = deployAndSearch( artifactCount, DeployType.RELEASE );
         Assert.assertEquals( 1, result.getData().size() );
+        ensureLatestIsPresent( result, DeployType.RELEASE, "60" );
     }
 
-    private SearchNGResponse deployAndSearch( int artifactCount )
+    @Test
+    public void uncollapseMixed()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        int artifactCount = 15; // this is bellow collapse threshold (count twice as DeployType.BOTH!)
+        SearchNGResponse result = deployAndSearch( artifactCount, DeployType.BOTH );
+        Assert.assertEquals( artifactCount * 2, result.getData().size() );
+        ensureLatestIsPresent( result, DeployType.BOTH, "15" );
+    }
+
+    @Test
+    public void collapseMixed()
+        throws Exception
+    {
+        // disable security completely, as it just interferes with test
+        getNexus().getNexusConfiguration().setSecurityEnabled( false );
+        getNexus().getNexusConfiguration().saveConfiguration();
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
+
+        int artifactCount = 60; // this is above collapse threshold
+        SearchNGResponse result = deployAndSearch( artifactCount, DeployType.BOTH );
+        Assert.assertEquals( 1, result.getData().size() ); // collapse by GA, so rel/snap is irrelevant
+        ensureLatestIsPresent( result, DeployType.BOTH, "60" );
+    }
+
+    private enum DeployType
+    {
+        RELEASE, SNAPSHOT, BOTH;
+    }
+
+    private void ensureLatestIsPresent( final SearchNGResponse response, final DeployType deployType,
+                                        final String latestVersion )
+    {
+        for ( NexusNGArtifact artifactHit : response.getData() )
+        {
+            if ( deployType == DeployType.RELEASE || deployType == DeployType.BOTH )
+            {
+                assertThat( artifactHit.getLatestRelease(), equalTo( latestVersion ) );
+                assertThat( artifactHit.getLatestReleaseRepositoryId(), equalTo( "releases" ) ); // hardcoded in
+                                                                                                 // deployAndSearch
+            }
+            else
+            {
+                assertThat( artifactHit.getLatestRelease(), nullValue() );
+                assertThat( artifactHit.getLatestReleaseRepositoryId(), nullValue() );
+            }
+            if ( deployType == DeployType.SNAPSHOT || deployType == DeployType.BOTH )
+            {
+                assertThat( artifactHit.getLatestSnapshot(), equalTo( latestVersion + "-SNAPSHOT" ) );
+                assertThat( artifactHit.getLatestSnapshotRepositoryId(), equalTo( "snapshots" ) ); // hardcoded in
+                                                                                                   // deployAndSearch
+            }
+            else
+            {
+                assertThat( artifactHit.getLatestSnapshot(), nullValue() );
+                assertThat( artifactHit.getLatestSnapshotRepositoryId(), nullValue() );
+            }
+        }
+    }
+
+    private SearchNGResponse deployAndSearch( int artifactCount, final DeployType deployType )
         throws Exception
     {
         final String key = "nexus5412";
         final Repository releases = repositoryRegistry.getRepository( "releases" );
+        final Repository snapshots = repositoryRegistry.getRepository( "snapshots" );
         for ( int i = 1; i <= artifactCount; i++ )
         {
-            deployDummyArtifact( releases, key, Integer.toString( i ) );
+            if ( deployType == DeployType.RELEASE || deployType == DeployType.BOTH )
+            {
+                deployDummyArtifact( releases, key, Integer.toString( i ) );
+            }
+            if ( deployType == DeployType.SNAPSHOT || deployType == DeployType.BOTH )
+            {
+                deployDummyArtifact( snapshots, key, Integer.toString( i ) + "-SNAPSHOT" );
+            }
         }
         wairForAsyncEventsToCalmDown();
         waitForTasksToStop();

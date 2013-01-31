@@ -12,7 +12,7 @@
  */
 /*global define*/
 
-define('repoServer/LogEditPanel',['extjs', 'sonatype/all'], function(Ext, Sonatype){
+define('repoServer/LogEditPanel',['extjs', 'Sonatype/all'], function(Ext, Sonatype){
 Sonatype.repoServer.LogEditPanel = function(cfg) {
   var
         config = cfg || {},
