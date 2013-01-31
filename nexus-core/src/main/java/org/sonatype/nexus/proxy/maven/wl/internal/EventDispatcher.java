@@ -307,7 +307,7 @@ public class EventDispatcher
     @Subscribe
     public void on( final RepositoryConfigurationUpdatedEvent evt )
     {
-        if ( isRepositoryHandled( evt.getRepository() ) && evt.isLocalUrlChanged() || evt.isRemoteUrlChanged() )
+        if ( isRepositoryHandled( evt.getRepository() ) && ( evt.isLocalUrlChanged() || evt.isRemoteUrlChanged() ) )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
             handleRepositoryModified( mavenRepository );
