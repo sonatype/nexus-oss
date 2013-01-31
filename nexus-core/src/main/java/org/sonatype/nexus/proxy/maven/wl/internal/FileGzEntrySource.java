@@ -22,9 +22,12 @@ import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.WritableEntrySource;
 
 /**
- * This class implements a GZipped prefixes file, that reads and writes a GZ file.
+ * {@link WritableEntrySource} implementation that is backed by a {@link StorageFileItem} in a {@link MavenRepository}.
+ * This class extends {@link FileEntrySource}, and adds on top of it GZipped prefixes file, that reads and writes a GZ
+ * file (content of the file is GZipped prefix file).
  * 
  * @author cstamas
  */
