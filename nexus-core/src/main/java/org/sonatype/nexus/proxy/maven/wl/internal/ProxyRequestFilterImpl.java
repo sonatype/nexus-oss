@@ -63,7 +63,7 @@ public class ProxyRequestFilterImpl
      */
     @Inject
     public ProxyRequestFilterImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
-                                     final WLConfig config, final WLManager wlManager )
+                                   final WLConfig config, final WLManager wlManager )
     {
         checkNotNull( eventBus );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
@@ -87,8 +87,7 @@ public class ProxyRequestFilterImpl
 
     // ==
 
-    private final ConcurrentHashMap<String, PathMatcher> whitelists =
-        new ConcurrentHashMap<String, PathMatcher>();
+    private final ConcurrentHashMap<String, PathMatcher> whitelists = new ConcurrentHashMap<String, PathMatcher>();
 
     protected PathMatcher getWhitelistFor( final MavenProxyRepository mavenProxyRepository )
     {
@@ -104,13 +103,16 @@ public class ProxyRequestFilterImpl
     {
         try
         {
-            dropWhitelistFor( mavenProxyRepository );
             final EntrySource entrySource = wlManager.getEntrySourceFor( mavenProxyRepository );
             if ( entrySource.exists() )
             {
                 final PathMatcher whitelist =
                     new PathMatcherImpl( entrySource.readEntries(), config.getWLMatchingDepth() );
                 whitelists.put( mavenProxyRepository.getId(), whitelist );
+            }
+            else
+            {
+                dropWhitelistFor( mavenProxyRepository );
             }
         }
         catch ( IOException e )
