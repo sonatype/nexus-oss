@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -55,11 +56,24 @@ import com.google.common.eventbus.Subscribe;
  */
 public class EventDispatcher
 {
+    /**
+     * System properties key that is used to read up boolean controlling is WL event dispatcher active or not. Main use
+     * case is to disable this in "legacy" ITs, but might serve too as troubleshooting in some cases. Event dispatcher
+     * is active by default, to deactivate it, specify a system property like this:
+     * 
+     * <pre>
+     * org.sonatype.nexus.proxy.maven.wl.internal.EventDispatcher.active = false
+     * </pre>
+     */
+    public static final String ACTIVE_KEY = EventDispatcher.class.getName() + ".active";
+
     private final Logger logger;
 
     private final ApplicationStatusSource applicationStatusSource;
 
     private final WLManager wlManager;
+
+    private final boolean active;
 
     /**
      * Da constructor.
@@ -72,6 +86,7 @@ public class EventDispatcher
         this.logger = LoggerFactory.getLogger( getClass() );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
         this.wlManager = checkNotNull( wlManager );
+        this.active = SystemPropertiesHelper.getBoolean( ACTIVE_KEY, true );
     }
 
     protected Logger getLogger()
@@ -167,10 +182,21 @@ public class EventDispatcher
 
     // == Filters
 
+    protected boolean isActive()
+    {
+        return active;
+    }
+
+    protected boolean isActiveAndStarted()
+    {
+        // we handle repository events only if this is Active and after nexus is started
+        return isActive() && applicationStatusSource.getSystemStatus().isNexusStarted();
+    }
+
     protected boolean isRepositoryHandled( final Repository repository )
     {
-        // we handle repository events after nexus is started, and only for repository that are Maven reposes
-        return applicationStatusSource.getSystemStatus().isNexusStarted() && repository != null
+        // we handle repository events after this isActiveAndStarted, and only for repository that are Maven reposes
+        return isActiveAndStarted() && repository != null
             && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class );
     }
 
@@ -260,7 +286,10 @@ public class EventDispatcher
     @Subscribe
     public void onNexusStartedEvent( final NexusStartedEvent evt )
     {
-        handleNexusStarted();
+        if ( isActive() )
+        {
+            handleNexusStarted();
+        }
     }
 
     @Subscribe
@@ -318,10 +347,14 @@ public class EventDispatcher
             if ( configurable instanceof Repository )
             {
                 final Repository repository = (Repository) configurable;
-                final MavenGroupRepository mavenGroupRepository = repository.adaptToFacet( MavenGroupRepository.class );
-                if ( mavenGroupRepository != null )
+                if ( isRepositoryHandled( repository ) )
                 {
-                    handleRepositoryModified( mavenGroupRepository );
+                    final MavenGroupRepository mavenGroupRepository =
+                        repository.adaptToFacet( MavenGroupRepository.class );
+                    if ( mavenGroupRepository != null )
+                    {
+                        handleRepositoryModified( mavenGroupRepository );
+                    }
                 }
             }
         }

@@ -38,6 +38,7 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.maven.wl.internal.EventDispatcher;
 
 /**
  * The simplified Nexus booter class, that boots Nexus (the IT test subject) in completely same way as it boots in
@@ -155,6 +156,14 @@ public class Jetty8NexusBooter
         // The proper fix is to make all Indexer related ITs behave "properly" (with some heuristics?), and have some
         // sort of "try-wait-try-failAfterSomeRetries" the search operation itself.
         System.setProperty( "mavenIndexerBlockingCommits", Boolean.TRUE.toString() );
+        
+        // Note: WL initialization prevented
+        // Presence breaks many ITs, especially those that either listen for proxy requests (will be more coz of prefix file
+        // and scrape discovery), or because remote proxy setup happens after nexus boot, and WL discovery makes proxies autoblock.
+        // In either case, IT working with WL should explicitly enable it.
+        // As "legacy" ITs are coming anyway from pre-WL era, they will have WL disabled ALWAYS
+        // To write IT covering WL you'd use anyway the "new" IT infrastructure instead of this.
+        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.FALSE.toString() );
 
         // ---------------
 
