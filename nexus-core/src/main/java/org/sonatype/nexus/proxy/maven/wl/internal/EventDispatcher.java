@@ -347,14 +347,10 @@ public class EventDispatcher
             if ( configurable instanceof Repository )
             {
                 final Repository repository = (Repository) configurable;
-                if ( isRepositoryHandled( repository ) )
+                final MavenGroupRepository mavenGroupRepository = repository.adaptToFacet( MavenGroupRepository.class );
+                if ( mavenGroupRepository != null && isRepositoryHandled( mavenGroupRepository ) )
                 {
-                    final MavenGroupRepository mavenGroupRepository =
-                        repository.adaptToFacet( MavenGroupRepository.class );
-                    if ( mavenGroupRepository != null )
-                    {
-                        handleRepositoryModified( mavenGroupRepository );
-                    }
+                    handleRepositoryModified( mavenGroupRepository );
                 }
             }
         }
