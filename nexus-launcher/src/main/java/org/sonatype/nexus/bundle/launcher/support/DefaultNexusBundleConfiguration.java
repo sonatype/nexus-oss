@@ -305,7 +305,7 @@ public class DefaultNexusBundleConfiguration
                 writer.println( "</included>" );
                 writer.flush();
                 overlays.add(
-                    fileTaskBuilder.create().file( path( "sonatype-work/nexus/conf/logback-tests.xml" ) )
+                    fileTaskBuilder.create().file( path( "sonatype-work/nexus/conf/logback-test.xml" ) )
                         .containing( baos.toString( "UTF-8" ) )
                         .encodedAs( "UTF-8" )
                 );

@@ -15,9 +15,14 @@ package org.sonatype.nexus.plugins.siesta;
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 import org.apache.shiro.guice.aop.ShiroAopModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.security.web.guice.SecurityWebFilter;
+import org.sonatype.sisu.siesta.common.Resource;
 import org.sonatype.sisu.siesta.jackson.SiestaJacksonModule;
 import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryApplication;
+import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryReporter;
+import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryReporterImpl;
 import org.sonatype.sisu.siesta.server.internal.SiestaServlet;
 import org.sonatype.sisu.siesta.server.internal.jersey.SiestaJerseyModule;
 
@@ -33,6 +38,8 @@ import javax.inject.Singleton;
 public class SiestaModule
     extends AbstractModule
 {
+    private static final Logger log = LoggerFactory.getLogger(SiestaModule.class);
+
     public static final String SERVICE_NAME = "siesta";
 
     public static final String MOUNT_POINT = "/service/" + SERVICE_NAME;
@@ -59,6 +66,19 @@ public class SiestaModule
 
         // Dynamically discover JAX-RS components
         bind(javax.ws.rs.core.Application.class).to(ComponentDiscoveryApplication.class).in(Singleton.class);
+
+        // Customize the report to include the MOUNT_POINT
+        bind(ComponentDiscoveryReporter.class).toInstance(new ComponentDiscoveryReporterImpl(log)
+        {
+            @Override
+            protected String pathOf(final Class<Resource> type) {
+                String path = super.pathOf(type);
+                if (!path.startsWith("/")) {
+                    path = "/" + path;
+                }
+                return MOUNT_POINT + path;
+            }
+        });
 
         install(new ServletModule()
         {

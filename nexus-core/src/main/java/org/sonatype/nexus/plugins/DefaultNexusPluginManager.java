@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -62,7 +61,6 @@ import org.sonatype.plugins.model.ClasspathDependency;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -141,6 +139,21 @@ public class DefaultNexusPluginManager
         Map<GAVCoordinate, PluginMetadata> filteredPlugins =
             filterInstalledPlugins( repositoryManager.findAvailablePlugins() );
 
+        // TODO HACK!
+        // activate first restlet1x plugin in order to not get siesta plugin activated before restlet
+        // without this, if siesta plugin activates first, siesta resources are not visible
+
+        final Iterator<GAVCoordinate> it = filteredPlugins.keySet().iterator();
+        while ( it.hasNext() )
+        {
+            final GAVCoordinate gav = it.next();
+            if ( "nexus-restlet1x-plugin".equals( gav.getArtifactId() ) )
+            {
+                result.add( activatePlugin( gav, true, filteredPlugins.keySet() ) );
+                it.remove();
+            }
+        }
+
         for ( final GAVCoordinate gav : filteredPlugins.keySet() )
         {
             // activate what we found in reposes
@@ -189,23 +202,28 @@ public class DefaultNexusPluginManager
      * Filters a map of GAVCoordinates by "max" version. Hence, in the result Map, it is guaranteed that only one GA
      * combination will exists, and if input contained multiple V's for same GA, the one GAV contained in result with
      * have max V.
-     * 
+     *
      * @param installedPlugins
      * @return
      */
-    protected Map<GAVCoordinate, PluginMetadata> filterInstalledPlugins( final Map<GAVCoordinate, PluginMetadata> installedPlugins )
+    protected Map<GAVCoordinate, PluginMetadata> filterInstalledPlugins(
+        final Map<GAVCoordinate, PluginMetadata> installedPlugins )
     {
         final HashMap<GAVCoordinate, PluginMetadata> result =
             new HashMap<GAVCoordinate, PluginMetadata>( installedPlugins.size() );
 
-        nextInstalledEntry: for ( Map.Entry<GAVCoordinate, PluginMetadata> installedEntry : installedPlugins.entrySet() )
+        nextInstalledEntry:
+        for ( Map.Entry<GAVCoordinate, PluginMetadata> installedEntry : installedPlugins.entrySet() )
         {
-            for ( Iterator<Map.Entry<GAVCoordinate, PluginMetadata>> resultItr = result.entrySet().iterator(); resultItr.hasNext(); )
+            for ( Iterator<Map.Entry<GAVCoordinate, PluginMetadata>> resultItr = result.entrySet().iterator();
+                  resultItr.hasNext(); )
             {
                 final Map.Entry<GAVCoordinate, PluginMetadata> resultEntry = resultItr.next();
                 if ( resultEntry.getKey().matchesByGA( installedEntry.getKey() ) )
                 {
-                    if ( compareVersionStrings( resultEntry.getKey().getVersion(), installedEntry.getKey().getVersion() ) < 0 )
+                    if (
+                        compareVersionStrings( resultEntry.getKey().getVersion(), installedEntry.getKey().getVersion() )
+                            < 0 )
                     {
                         resultItr.remove(); // result contains smaller version than installedOne, remove it
                     }
@@ -281,7 +299,8 @@ public class DefaultNexusPluginManager
             {
                 actualGAV = gav;
             }
-            final PluginManagerResponse response = new PluginManagerResponse( actualGAV, PluginActivationRequest.ACTIVATE );
+            final PluginManagerResponse response =
+                new PluginManagerResponse( actualGAV, PluginActivationRequest.ACTIVATE );
             try
             {
                 activatePlugin(
@@ -485,7 +504,7 @@ public class DefaultNexusPluginManager
             if ( path != null )
             {
                 staticResources.add( new PluginStaticResource( url, path,
-                    mimeSupport.guessMimeTypeFromPath( url.getPath() ) ) );
+                                                               mimeSupport.guessMimeTypeFromPath( url.getPath() ) ) );
             }
         }
 
