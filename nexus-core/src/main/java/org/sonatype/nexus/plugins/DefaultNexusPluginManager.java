@@ -139,6 +139,7 @@ public class DefaultNexusPluginManager
         Map<GAVCoordinate, PluginMetadata> filteredPlugins =
             filterInstalledPlugins( repositoryManager.findAvailablePlugins() );
 
+        // TODO HACK!
         // activate first restlet1x plugin in order to not get siesta plugin activated before restlet
         // without this, if siesta plugin activates first, siesta resources are not visible
 
