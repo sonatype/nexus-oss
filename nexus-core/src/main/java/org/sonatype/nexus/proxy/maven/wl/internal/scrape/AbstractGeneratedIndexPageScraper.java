@@ -15,8 +15,6 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
@@ -40,24 +38,27 @@ public abstract class AbstractGeneratedIndexPageScraper
     }
 
     @Override
-    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
-                                                            final HttpResponse rootResponse, final Document rootDocument )
+    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
         // cheap checks first, to quickly eliminate target without doing any remote requests
-        final Elements elements = rootDocument.getElementsByTag( "a" );
-        if ( !elements.isEmpty() )
+        if ( page.getHttpResponse().getStatusLine().getStatusCode() == 200 )
         {
-            // get "template" parent link
-            final Element templateParentLink = getParentDirectoryElement( context, rootDocument );
-            // get the page parent link (note: usually it's 1st elem, but HTTPD for example has extra links for column
-            // sorting
-            for ( Element element : elements )
+            final Elements elements = page.getDocument().getElementsByTag( "a" );
+            if ( !elements.isEmpty() )
             {
-                // if text is same and abs URLs points to same place, we got it
-                if ( templateParentLink.text().equals( element.text() )
-                    && templateParentLink.absUrl( "href" ).equals( element.absUrl( "href" ) ) )
+                // get "template" parent link
+                final Element templateParentLink = getParentDirectoryElement( page );
+                // get the page parent link (note: usually it's 1st elem, but HTTPD for example has extra links for
+                // column
+                // sorting
+                for ( Element element : elements )
                 {
-                    return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                    // if text is same and abs URLs points to same place, we got it
+                    if ( templateParentLink.text().equals( element.text() )
+                        && templateParentLink.absUrl( "href" ).equals( element.absUrl( "href" ) ) )
+                    {
+                        return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                    }
                 }
             }
         }
@@ -67,12 +68,12 @@ public abstract class AbstractGeneratedIndexPageScraper
     }
 
     @Override
-    protected void diveIn( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument )
+    protected void diveIn( final ScrapeContext context, final Page page )
         throws IOException
     {
         // we use the great and all-mighty ParentOMatic
         final ParentOMatic parentOMatic = new ParentOMatic();
-        diveIn( context, rootDocument, 0, parentOMatic, parentOMatic.getRoot() );
+        diveIn( context, page, 0, parentOMatic, parentOMatic.getRoot() );
         if ( !context.isStopped() )
         {
             // TODO: cases like central, that would allow to be scraped with 0 results
@@ -84,7 +85,7 @@ public abstract class AbstractGeneratedIndexPageScraper
         }
     }
 
-    protected void diveIn( final ScrapeContext context, final Document document, final int currentDepth,
+    protected void diveIn( final ScrapeContext context, final Page page, final int currentDepth,
                            final ParentOMatic parentOMatic, final Node<Payload> currentNode )
         throws IOException
     {
@@ -93,7 +94,7 @@ public abstract class AbstractGeneratedIndexPageScraper
         {
             return;
         }
-        final Elements elements = document.getElementsByTag( "a" );
+        final Elements elements = page.getDocument().getElementsByTag( "a" );
         final List<String> pathElements = currentNode.getPathElements();
         final String currentPath = currentNode.getPath();
         for ( Element element : elements )
@@ -114,8 +115,16 @@ public abstract class AbstractGeneratedIndexPageScraper
                     {
                         final String newSiblingEncodedUrl =
                             getRemoteUrlForRepositoryPath( context, newSibling.getPathElements() ) + "/";
-                        final Document siblingDocument = getDocumentFor( context, newSiblingEncodedUrl );
-                        diveIn( context, siblingDocument, siblingDepth, parentOMatic, newSibling );
+                        final Page siblingPage = page.getPageFor( context, newSiblingEncodedUrl );
+                        if ( siblingPage.getHttpResponse().getStatusLine().getStatusCode() == 200 )
+                        {
+                            diveIn( context, siblingPage, siblingDepth, parentOMatic, newSibling );
+                        }
+                        else
+                        {
+                            throw new IOException( "Unexpected response from remote repository URL " + page.getUrl()
+                                + " : " + page.getHttpResponse().getStatusLine().toString() );
+                        }
                     }
                 }
             }
@@ -134,5 +143,5 @@ public abstract class AbstractGeneratedIndexPageScraper
         return linkAbsoluteUrl.startsWith( currentUrl );
     }
 
-    protected abstract Element getParentDirectoryElement( final ScrapeContext context, final Document currentDocument );
+    protected abstract Element getParentDirectoryElement( final Page page );
 }

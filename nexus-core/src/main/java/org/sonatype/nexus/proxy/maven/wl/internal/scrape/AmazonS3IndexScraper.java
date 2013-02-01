@@ -13,13 +13,19 @@
 package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.internal.ArrayListEntrySource;
+import org.sonatype.nexus.util.PathUtils;
 
 /**
  * Scraper for remote AmazonS3 hosted repositories.
@@ -48,24 +54,188 @@ public class AmazonS3IndexScraper
     }
 
     @Override
-    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
-                                                            final HttpResponse rootResponse, final Document rootDocument )
+    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
-        final boolean hasAmzRequestIdHeader = rootResponse.getFirstHeader( "x-amz-request-id" ) != null;
-        final Header serverHeader = rootResponse.getFirstHeader( "Server" );
-        if ( hasAmzRequestIdHeader && serverHeader != null && serverHeader.getValue() != null
-            && serverHeader.getValue().startsWith( "AmazonS3" ) )
+        // we don't care for response code yes, it might be 200 or 404
+        if ( page.hasHeaderAndEqualsWith( "Server", "AmazonS3" ) && page.hasHeader( "x-amz-request-id" ) )
         {
-            return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+            if ( isAccessDeniedResponse( context, page ) )
+            {
+                return RemoteDetectionResult.RECOGNIZED_SHOULD_NOT_BE_SCRAPED;
+            }
+            else
+            {
+                return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+            }
         }
         return RemoteDetectionResult.UNRECOGNIZED;
     }
 
     @Override
-    protected void diveIn( ScrapeContext context, HttpResponse rootResponse, Document rootDocument )
+    protected void diveIn( final ScrapeContext context, final Page page )
         throws IOException
     {
-        // TODO:
-        context.stop( "Remote recognized as AmazonS3, but scraper is not yet implemented!" );
+        String prefix = null;
+        Page initialPage = page;
+        if ( initialPage.getHttpResponse().getStatusLine().getStatusCode() != 200 )
+        {
+            // we probably have the NoSuchKey response from S3, usually when repo root is not in bucket root
+            prefix = getKeyFromNoSuchKeyResponse( context, initialPage );
+            if ( prefix == null )
+            {
+                getLogger().info( "Unexpected S3 response, cannot scrape this: {}",
+                    initialPage.getDocument().outerHtml() );
+                context.stop( "Remote recognized as Amazon S3, but unexpected response code and response body received (see logs)." );
+                return;
+            }
+            // repo.remoteUrl does not have query parameters...
+            String fixedUrl =
+                context.getRemoteRepositoryRootUrl().substring( 0,
+                    context.getRemoteRepositoryRootUrl().length() - prefix.length() );
+            getLogger().debug( "Retrying URL {} to scrape Amazon S3 hosted repository on remote URL {}", fixedUrl,
+                context.getRemoteRepositoryRootUrl() );
+            initialPage = initialPage.getPageFor( context, fixedUrl );
+        }
+
+        // response should be 200 OK, if not, give up
+        if ( initialPage.getHttpResponse().getStatusLine().getStatusCode() != 200 )
+        {
+            context.stop( "Remote recognized as AmazonS3, but cannot be scraped (unexpected response status after fixing URL "
+                + initialPage.getHttpResponse().getStatusLine() + ")" );
+            return;
+        }
+
+        final HashSet<String> entries = new HashSet<String>();
+        diveIn( context, initialPage, initialPage.getUrl(), prefix, entries );
+        if ( !context.isStopped() )
+        {
+            // TODO: cases like central, that would allow to be scraped with 0 results
+            final EntrySource entrySource = new ArrayListEntrySource( new ArrayList<String>( entries ) );
+            context.stop( entrySource,
+                "Remote recognized as " + getTargetedServer() + " (scraped " + String.valueOf( entries.size() )
+                    + " entries, " + context.getScrapeDepth() + " levels deep)." );
+        }
+    }
+
+    // ==
+
+    protected boolean isAccessDeniedResponse( final ScrapeContext context, final Page page )
+    {
+        // status code must be 403
+        // body must contain <Error>
+        // child must contain <Code>AccessDenied</Code>
+        // but HTTP response code is actually enough
+        return page.getHttpResponse().getStatusLine().getStatusCode() == 403;
+    }
+
+    protected String getKeyFromNoSuchKeyResponse( final ScrapeContext context, final Page page )
+    {
+        // status code must be 404
+        // body must contain <Error>
+        // child must contain <Code>NoSuchKey</Code>
+        // and then extract <Key>
+        if ( page.getHttpResponse().getStatusLine().getStatusCode() == 404 )
+        {
+            final Elements errorNodes = page.getDocument().getElementsByTag( "Error" );
+            final Elements codeNodes =
+                errorNodes.isEmpty() ? new Elements() : errorNodes.get( 0 ).getElementsByTag( "Code" );
+            final Elements keyNodes =
+                errorNodes.isEmpty() ? new Elements() : errorNodes.get( 0 ).getElementsByTag( "Key" );
+            // all the conditions we must test
+            if ( errorNodes.size() == 1 && codeNodes.size() == 1 && "NoSuchKey".equals( codeNodes.get( 0 ).text() )
+                && keyNodes.size() == 1 )
+            {
+                return keyNodes.get( 0 ).text();
+            }
+        }
+        return null;
+    }
+
+    protected void diveIn( final ScrapeContext context, final Page page, final String rootUrl, final String prefix,
+                           final Set<String> entries )
+        throws IOException
+    {
+        // response should be 200 OK, if not, give up
+        if ( page.getHttpResponse().getStatusLine().getStatusCode() != 200 )
+        {
+            context.stop( "Remote recognized as AmazonS3, but cannot be scraped (unexpected response status "
+                + page.getHttpResponse().getStatusLine() + ")" );
+            return;
+        }
+
+        final Elements root = page.getDocument().getElementsByTag( "ListBucketResult" );
+        if ( root.size() != 1 || !root.get( 0 ).attr( "xmlns" ).equals( "http://s3.amazonaws.com/doc/2006-03-01/" ) )
+        {
+            context.stop( "Remote recognized as AmazonS3, but unexpected response was received (not \"ListBucketResult\")." );
+            return;
+        }
+
+        String markerElement = null;
+        final Elements elements = page.getDocument().getElementsByTag( "Contents" );
+        for ( Element element : elements )
+        {
+            final Elements keyElements = element.getElementsByTag( "Key" );
+            if ( keyElements.isEmpty() )
+            {
+                continue; // skip it
+            }
+            final String key = keyElements.get( 0 ).text();
+            markerElement = key;
+
+            // fix key with prefix
+            final String fixedKey = prefix != null ? key.substring( 0, key.length() - prefix.length() ) : key;
+
+            final String normalizedPath =
+                PathUtils.pathFrom( PathUtils.elementsOf( fixedKey ), context.getScrapeDepth() );
+            entries.add( normalizedPath );
+        }
+
+        if ( isTruncated( page ) )
+        {
+            final ArrayList<String> queryParams = new ArrayList<String>();
+            if ( prefix != null )
+            {
+                queryParams.add( "prefix=" + prefix );
+            }
+            if ( markerElement != null )
+            {
+                queryParams.add( "marker=" + markerElement );
+            }
+            final String url = appendParameters( rootUrl, queryParams );
+            final Page nextPage = page.getPageFor( context, url );
+            diveIn( context, nextPage, rootUrl, prefix, entries );
+        }
+    }
+
+    protected String appendParameters( final String baseUrl, List<String> queryParams )
+    {
+        final StringBuilder sb = new StringBuilder( baseUrl );
+        boolean first = true;
+        for ( String queryParam : queryParams )
+        {
+            if ( first )
+            {
+                sb.append( "?" );
+                first = false;
+            }
+            else
+            {
+                sb.append( "&" );
+            }
+            sb.append( queryParam );
+        }
+        return sb.toString();
+    }
+
+    protected boolean isTruncated( final Page page )
+    {
+        final Elements root = page.getDocument().getElementsByTag( "ListBucketResult" );
+        final Elements truncatedNodes =
+            root.isEmpty() ? new Elements() : root.get( 0 ).getElementsByTag( "IsTruncated" );
+        if ( root.size() == 1 && truncatedNodes.size() == 1 && "true".equals( truncatedNodes.get( 0 ).text() ) )
+        {
+            return true;
+        }
+        return false;
     }
 }

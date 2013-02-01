@@ -17,7 +17,6 @@ import java.io.IOException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.http.HttpResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -51,37 +50,43 @@ public class NexusScraper
     }
 
     @Override
-    protected Element getParentDirectoryElement( final ScrapeContext context, final Document document )
+    protected Element getParentDirectoryElement( final Page page )
     {
-        final Document doc = Jsoup.parseBodyFragment( "<a href=\"../\">Parent Directory</a>", document.baseUri() );
+        final Document doc = Jsoup.parseBodyFragment( "<a href=\"../\">Parent Directory</a>", page.getUrl() );
         return doc.getElementsByTag( "a" ).first();
     }
 
     @Override
-    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
-                                                            final HttpResponse rootResponse, final Document rootDocument )
+    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
-        final RemoteDetectionResult result = super.detectRemoteRepository( context, rootResponse, rootDocument );
+        final RemoteDetectionResult result = super.detectRemoteRepository( context, page );
         if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
         {
             try
             {
                 // so index page looks like Nexus index page, let's see about repo metadata
                 // this is not cheap, as we are doing extra HTTP requests to get it
-                final Document response =
-                    getDocumentFor( context, context.getRemoteRepositoryRootUrl() + ".meta/repository-metadata.xml" );
-                final Elements url = response.getElementsByTag( "url" ); // all nexus MD has this. sanity
-                final Elements localUrl = response.getElementsByTag( "localUrl" ); // only proxies
-                final Elements memberRepositories = response.getElementsByTag( "memberRepositories" ); // only groups
-                if ( !url.isEmpty() && localUrl.isEmpty() && memberRepositories.isEmpty() )
+                final Page repoMetadataPage =
+                    page.getPageFor( context, context.getRemoteRepositoryRootUrl() + ".meta/repository-metadata.xml" );
+                if ( page.getHttpResponse().getStatusLine().getStatusCode() == 200 )
                 {
-                    // we are sure it is a nexus hosted repo
-                    return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
-                }
-                else
-                {
-                    // is a proxy or a group, do not scrape
-                    return RemoteDetectionResult.RECOGNIZED_SHOULD_NOT_BE_SCRAPED;
+                    // sanity: all nexus repo MD has this element
+                    final Elements url = repoMetadataPage.getDocument().getElementsByTag( "url" );
+                    // only proxies has this element
+                    final Elements localUrl = repoMetadataPage.getDocument().getElementsByTag( "localUrl" );
+                    // only groups has this element
+                    final Elements memberRepositories =
+                        repoMetadataPage.getDocument().getElementsByTag( "memberRepositories" );
+                    if ( !url.isEmpty() && localUrl.isEmpty() && memberRepositories.isEmpty() )
+                    {
+                        // we are sure it is a nexus hosted repo
+                        return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                    }
+                    else
+                    {
+                        // is a proxy or a group, do not scrape
+                        return RemoteDetectionResult.RECOGNIZED_SHOULD_NOT_BE_SCRAPED;
+                    }
                 }
             }
             catch ( IOException e )

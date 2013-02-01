@@ -15,8 +15,6 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -49,25 +47,22 @@ public class HttpdIndexScraper
     }
 
     @Override
-    protected Element getParentDirectoryElement( final ScrapeContext context, final Document document )
+    protected Element getParentDirectoryElement( final Page page )
     {
-        final Document doc = Jsoup.parseBodyFragment( "<a href=\"../\">Parent Directory</a>", document.baseUri() );
+        final Document doc = Jsoup.parseBodyFragment( "<a href=\"../\">Parent Directory</a>", page.getUrl() );
         return doc.getElementsByTag( "a" ).first();
     }
 
     @Override
-    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
-                                                            final HttpResponse rootResponse, final Document rootDocument )
+    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
-        final RemoteDetectionResult result = super.detectRemoteRepository( context, rootResponse, rootDocument );
+        final RemoteDetectionResult result = super.detectRemoteRepository( context, page );
         if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
         {
-            final Elements addressElements = rootDocument.getElementsByTag( "address" );
+            final Elements addressElements = page.getDocument().getElementsByTag( "address" );
             if ( !addressElements.isEmpty() && addressElements.get( 0 ).text().startsWith( "Apache" ) )
             {
-                final Header serverHeader = rootResponse.getFirstHeader( "Server" );
-                if ( serverHeader != null && serverHeader.getValue() != null
-                    && serverHeader.getValue().startsWith( "Apache/" ) )
+                if ( page.hasHeaderAndStartsWith( "Server", "Apache/" ) )
                 {
                     return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
                 }

@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
+import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page;
 import org.sonatype.nexus.proxy.maven.wl.internal.scrape.ScrapeContext;
 import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Scraper;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientManager;
@@ -101,13 +102,14 @@ public class RemoteScrapeStrategy
             try
             {
                 remoteRepositoryRootResponse = httpClient.execute( get );
-                if ( remoteRepositoryRootResponse.getStatusLine().getStatusCode() == 200 )
+                // 404 is needed for S3, that will probably response with that one
+                if ( remoteRepositoryRootResponse.getStatusLine().getStatusCode() >= 200
+                    && remoteRepositoryRootResponse.getStatusLine().getStatusCode() <= 499 )
                 {
                     // TODO: detect redirects
                     remoteRepositoryRootDocument =
                         Jsoup.parse( remoteRepositoryRootResponse.getEntity().getContent(), null,
                             remoteRepositoryRootUrl );
-
                 }
                 else
                 {
@@ -131,13 +133,15 @@ public class RemoteScrapeStrategy
 
             final ScrapeContext context =
                 new ScrapeContext( httpClient, remoteRepositoryRootUrl, config.getRemoteScrapeDepth() );
+            final Page rootPage =
+                new Page( remoteRepositoryRootUrl, remoteRepositoryRootResponse, remoteRepositoryRootDocument );
             for ( Scraper scraper : appliedScrapers )
             {
                 try
                 {
                     getLogger().debug( "Remote scraping {} with Scraper {}",
                         RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
-                    scraper.scrape( context, remoteRepositoryRootResponse, remoteRepositoryRootDocument );
+                    scraper.scrape( context, rootPage );
                     if ( context.isStopped() )
                     {
                         if ( context.isSuccessful() )

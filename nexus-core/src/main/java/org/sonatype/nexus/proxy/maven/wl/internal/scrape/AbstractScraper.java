@@ -21,11 +21,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.sonatype.nexus.proxy.maven.wl.internal.AbstractPrioritized;
 import org.sonatype.nexus.util.PathUtils;
 
@@ -76,16 +71,16 @@ public abstract class AbstractScraper
     }
 
     @Override
-    public void scrape( final ScrapeContext context, final HttpResponse rootResponse, final Document rootDocument )
+    public void scrape( final ScrapeContext context, final Page page )
         throws IOException
     {
-        final RemoteDetectionResult detectionResult = detectRemoteRepository( context, rootResponse, rootDocument );
+        final RemoteDetectionResult detectionResult = detectRemoteRepository( context, page );
         switch ( detectionResult )
         {
             case RECOGNIZED_SHOULD_BE_SCRAPED:
                 getLogger().debug( "Remote repository on URL={} recognized as {}, scraping it...",
                     context.getRemoteRepositoryRootUrl(), getTargetedServer() );
-                diveIn( context, rootResponse, rootDocument );
+                diveIn( context, page );
                 break;
 
             case RECOGNIZED_SHOULD_NOT_BE_SCRAPED:
@@ -106,48 +101,12 @@ public abstract class AbstractScraper
 
     protected abstract String getTargetedServer();
 
-    protected abstract RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
-                                                                     final HttpResponse rootResponse,
-                                                                     final Document rootDocument );
+    protected abstract RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page );
 
-    protected abstract void diveIn( final ScrapeContext context, final HttpResponse rootResponse,
-                                    final Document rootDocument )
+    protected abstract void diveIn( final ScrapeContext context, final Page page )
         throws IOException;
 
     // ==
-
-    protected HttpResponse getHttpResponseFor( final ScrapeContext context, final String url )
-        throws IOException
-    {
-        // TODO: detect redirects
-        final HttpGet get = new HttpGet( url );
-        return context.getHttpClient().execute( get );
-    }
-
-    protected Document getDocumentFor( final ScrapeContext context, final String url )
-        throws IOException
-    {
-        getLogger().debug( "Scraping URL {}", url );
-        // TODO: detect redirects
-        final HttpGet get = new HttpGet( url );
-        HttpResponse response = context.getHttpClient().execute( get );
-        try
-        {
-            if ( response.getStatusLine().getStatusCode() == 200 )
-            {
-                return Jsoup.parse( response.getEntity().getContent(), null, url );
-            }
-            else
-            {
-                throw new IOException( "Unexpected response from remote repository URL " + url + " : "
-                    + response.getStatusLine().toString() );
-            }
-        }
-        finally
-        {
-            EntityUtils.consumeQuietly( response.getEntity() );
-        }
-    }
 
     protected String getRemoteUrlForRepositoryPath( final ScrapeContext context, final List<String> pathElements )
     {

@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.http.HttpResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -38,7 +37,7 @@ public class SvnIndexScraper
      */
     public SvnIndexScraper()
     {
-        super( 3000, ID ); //3rd by popularity
+        super( 3000, ID ); // 3rd by popularity
     }
 
     @Override
@@ -48,22 +47,21 @@ public class SvnIndexScraper
     }
 
     @Override
-    protected Element getParentDirectoryElement( final ScrapeContext context, final Document document )
+    protected Element getParentDirectoryElement( final Page page )
     {
-        final Document doc = Jsoup.parseBodyFragment( "<a href=\"../\">..</a>", document.baseUri() );
+        final Document doc = Jsoup.parseBodyFragment( "<a href=\"../\">..</a>", page.getUrl() );
         return doc.getElementsByTag( "a" ).first();
     }
 
     @Override
-    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context,
-                                                            final HttpResponse rootResponse, final Document rootDocument )
+    protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
-        final RemoteDetectionResult result = super.detectRemoteRepository( context, rootResponse, rootDocument );
+        final RemoteDetectionResult result = super.detectRemoteRepository( context, page );
         if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
         {
             // ensure there is an "a" tag with href pointing to either "http://subversion.tigris.org/" or
             // "http://subversion.apache.org/"
-            final Elements elements = rootDocument.getElementsByTag( "a" );
+            final Elements elements = page.getDocument().getElementsByTag( "a" );
             for ( Element element : elements )
             {
                 final String elementHref = element.absUrl( "href" );
