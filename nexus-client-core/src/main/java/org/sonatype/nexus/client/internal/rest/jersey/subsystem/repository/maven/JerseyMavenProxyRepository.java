@@ -70,4 +70,18 @@ public class JerseyMavenProxyRepository
         return me();
     }
 
+    @Override
+    public MavenProxyRepository downloadRemoteIndexes()
+    {
+        settings().setDownloadRemoteIndexes( true );
+        return me();
+    }
+
+    @Override
+    public MavenProxyRepository doNotDownloadRemoteIndexes()
+    {
+        settings().setDownloadRemoteIndexes( false );
+        return me();
+    }
+
 }
