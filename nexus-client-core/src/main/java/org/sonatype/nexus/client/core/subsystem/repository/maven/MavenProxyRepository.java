@@ -40,4 +40,18 @@ public interface MavenProxyRepository
      */
     MavenProxyRepository withMetadataMaxAge( int minutes );
 
+    /**
+     * Download remote indexes if they are available.
+     *
+     * @return itself, for fluent api usage
+     */
+    MavenProxyRepository downloadRemoteIndexes();
+
+    /**
+     * Don't download remote indexes.
+     *
+     * @return itself, for fluent api usage
+     */
+    MavenProxyRepository doNotDownloadRemoteIndexes();
+
 }
