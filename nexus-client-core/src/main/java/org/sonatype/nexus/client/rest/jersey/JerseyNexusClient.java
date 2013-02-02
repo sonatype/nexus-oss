@@ -23,6 +23,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusStatus;
+import org.sonatype.nexus.client.core.exception.NexusClientAccessForbiddenException;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
@@ -244,6 +245,20 @@ public class JerseyNexusClient
         return null;
     }
 
+    public NexusClientAccessForbiddenException convertIf403( final UniformInterfaceException e )
+    {
+        final ClientResponse response = e.getResponse();
+        if ( ClientResponse.Status.FORBIDDEN.equals( response.getClientResponseStatus() ) )
+        {
+            return new NexusClientAccessForbiddenException(
+                getMessageIfPresent( ClientResponse.Status.FORBIDDEN.getStatusCode(), e ),
+                response.getClientResponseStatus().getReasonPhrase(),
+                getResponseBody( response )
+            );
+        }
+        return null;
+    }
+
     public NexusClientErrorResponseException convertIf400WithErrorMessage( final UniformInterfaceException e )
     {
         final ClientResponse response = e.getResponse();
@@ -299,6 +314,12 @@ public class JerseyNexusClient
     public NexusClientException convertIfKnown( final UniformInterfaceException e )
     {
         NexusClientException exception = convertIf404( e );
+        if ( exception != null )
+        {
+            return exception;
+        }
+
+        exception = convertIf403( e );
         if ( exception != null )
         {
             return exception;
