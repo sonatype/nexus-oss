@@ -39,7 +39,7 @@ import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
 
 import com.google.inject.Module;
-import org.sonatype.nexus.timing.TimingModule;
+import org.sonatype.nexus.guice.NexusModules.CoreModule;
 
 /**
  * This ServeletContextListener boots up Plexus in a webapp environment, if needed. It is safe to have it multiple times
@@ -81,10 +81,7 @@ public class PlexusContainerContextListener
                 final ArrayList<Module> modules = new ArrayList<Module>( 2 );
                 modules.add( new NexusWebModule( sce.getServletContext() ) );
                 modules.add( new AppContextModule( appContext ) );
-
-                // TODO: May want a central location to configure NX core + NX plugin modules
-                // Add support for @Timed
-                modules.add( new TimingModule() );
+                modules.add( new CoreModule());
 
                 final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );
 
