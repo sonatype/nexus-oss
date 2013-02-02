@@ -17,8 +17,6 @@ import java.util.List;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
-import org.sonatype.nexus.proxy.maven.wl.internal.ArrayListEntrySource;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
@@ -68,21 +66,15 @@ public abstract class AbstractGeneratedIndexPageScraper
     }
 
     @Override
-    protected void diveIn( final ScrapeContext context, final Page page )
+    protected List<String> diveIn( final ScrapeContext context, final Page page )
         throws IOException
     {
         // we use the great and all-mighty ParentOMatic
         final ParentOMatic parentOMatic = new ParentOMatic();
         diveIn( context, page, 0, parentOMatic, parentOMatic.getRoot() );
-        if ( !context.isStopped() )
-        {
-            // TODO: cases like central, that would allow to be scraped with 0 results
-            final List<String> entries = parentOMatic.getAllLeafPaths();
-            final EntrySource entrySource = new ArrayListEntrySource( entries );
-            context.stop( entrySource,
-                "Remote recognized as " + getTargetedServer() + " (scraped " + String.valueOf( entries.size() )
-                    + " entries, " + context.getScrapeDepth() + " levels deep)." );
-        }
+        // TODO: cases like central, that would allow to be scraped with 0 results
+        final List<String> entries = parentOMatic.getAllLeafPaths();
+        return entries;
     }
 
     protected void diveIn( final ScrapeContext context, final Page page, final int currentDepth,

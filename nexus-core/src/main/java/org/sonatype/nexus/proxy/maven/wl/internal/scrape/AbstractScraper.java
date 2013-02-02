@@ -21,7 +21,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.internal.AbstractPrioritized;
+import org.sonatype.nexus.proxy.maven.wl.internal.ArrayListEntrySource;
 import org.sonatype.nexus.util.PathUtils;
 
 import com.google.common.base.Function;
@@ -80,7 +82,24 @@ public abstract class AbstractScraper
             case RECOGNIZED_SHOULD_BE_SCRAPED:
                 getLogger().debug( "Remote repository on URL={} recognized as {}, scraping it...",
                     context.getRemoteRepositoryRootUrl(), getTargetedServer() );
-                diveIn( context, page );
+                final List<String> entries = diveIn( context, page );
+                if ( !context.isStopped() )
+                {
+                    if ( entries != null )
+                    {
+                        // recognized and scraped with result
+                        final EntrySource entrySource = new ArrayListEntrySource( entries );
+                        context.stop( entrySource, "Remote recognized as " + getTargetedServer() + " (scraped "
+                            + String.valueOf( entries.size() ) + " entries, went " + context.getScrapeDepth()
+                            + " levels deep)." );
+                    }
+                    else
+                    {
+                        // safety net (subclass should stop it here: recognized but something went wrong)
+                        context.stop( "Remote recognized as " + getTargetedServer()
+                            + ", but could not scrape it (see logs)." );
+                    }
+                }
                 break;
 
             case RECOGNIZED_SHOULD_NOT_BE_SCRAPED:
@@ -103,7 +122,7 @@ public abstract class AbstractScraper
 
     protected abstract RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page );
 
-    protected abstract void diveIn( final ScrapeContext context, final Page page )
+    protected abstract List<String> diveIn( final ScrapeContext context, final Page page )
         throws IOException;
 
     // ==
