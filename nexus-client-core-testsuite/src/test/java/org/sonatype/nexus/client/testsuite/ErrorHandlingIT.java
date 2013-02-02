@@ -20,12 +20,14 @@ import static org.hamcrest.Matchers.notNullValue;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.sonatype.nexus.client.core.exception.NexusClientAccessForbiddenException;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.nexus.rest.model.ArtifactResolveResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.security.rest.model.UserListResourceResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 public class ErrorHandlingIT
@@ -108,6 +110,34 @@ public class ErrorHandlingIT
             {
                 final NexusClientException converted1 = client.convertIfKnown( e );
                 assertThat( converted1, is( instanceOf( NexusClientNotFoundException.class ) ) );
+            }
+        }
+    }
+
+    @Test
+    public void convert403()
+    {
+        final JerseyNexusClient client = (JerseyNexusClient) createNexusClient(
+            nexus(), "deployment", "deployment123"
+        );
+        try
+        {
+            client.serviceResource( "users" ).get( UserListResourceResponse.class );
+        }
+        catch ( UniformInterfaceException e )
+        {
+            final NexusClientException converted = client.convertIfKnown( e );
+            assertThat( converted, is( instanceOf( NexusClientAccessForbiddenException.class ) ) );
+
+            // do it again so we ensure we consumed and such connection is available
+            try
+            {
+                client.serviceResource( "users" ).get( UserListResourceResponse.class );
+            }
+            catch ( UniformInterfaceException e1 )
+            {
+                final NexusClientException converted1 = client.convertIfKnown( e );
+                assertThat( converted1, is( instanceOf( NexusClientAccessForbiddenException.class ) ) );
             }
         }
     }
