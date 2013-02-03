@@ -24,6 +24,8 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -50,6 +52,7 @@ import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.internal.NexusITLauncher;
 import org.sonatype.sisu.bl.jmx.JMXConfiguration;
 import org.sonatype.sisu.bl.jsw.JSWConfig;
+import org.sonatype.sisu.bl.support.DebuggerUtils;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.RunningBundles;
 import org.sonatype.sisu.bl.support.TimedCondition;
@@ -116,6 +119,113 @@ public class DefaultNexusBundle
         super( "nexus", configurationProvider, runningBundles, fileTaskBuilder, portReservationService );
         this.fileTaskBuilder = fileTaskBuilder;
         this.useBundlePluginsIfPresent = useBundlePluginsIfPresent;
+    }
+
+    private static void installStopShutdownHook( final int commandPort )
+    {
+        Thread stopShutdownHook = new Thread( "JSW Sanity Stopper" )
+        {
+            @Override
+            public void run()
+            {
+                terminateRemoteNexus( commandPort );
+            }
+        };
+
+        Runtime.getRuntime().addShutdownHook( stopShutdownHook );
+        log.debug( "Installed stop shutdown hook" );
+    }
+
+    private static void sendStopToNexus( final int commandPort )
+    {
+        log.debug( "Sending stop command to Nexus" );
+        try
+        {
+            // FIXME HOSTNAME should be configurable
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( StopApplicationCommand.NAME );
+        }
+        catch ( Exception e )
+        {
+            log.debug(
+                "Skipping exception got while sending stop command to Nexus {}:{}",
+                e.getClass().getName(), e.getMessage()
+            );
+        }
+    }
+
+    // FIXME accept host to terminate
+    private static void terminateRemoteNexus( final int commandPort)
+    {
+        log.debug( "attempting to terminate gracefully at {}", commandPort);
+
+        // First attempt graceful shutdown
+        sendStopToNexus( commandPort );
+
+        // FIXME LOCALHOST should be getHostName
+        CommandMonitorTalker talker = new CommandMonitorTalker( LOCALHOST, commandPort );
+        long started = System.currentTimeMillis();
+        long max = 5 * 60 * 1000; // wait 5 minutes for NX to shutdown, before attempting to halt it
+        long period = 1000;
+
+        // Then ping for a bit and finally give up and ask it to halt
+        while ( true )
+        {
+            try
+            {
+                talker.send( PingCommand.NAME );
+            }
+            catch ( ConnectException e )
+            {
+                // likely its shutdown already
+                break;
+            }
+            catch ( Exception e )
+            {
+                // ignore, not sure there is much we can do
+            }
+
+            // If we have waited long enough, then ask remote to halt
+            if ( System.currentTimeMillis() - started > max )
+            {
+                try
+                {
+                    talker.send( HaltCommand.NAME );
+                    break;
+                }
+                catch ( Exception e )
+                {
+                    // ignore, not sure there is much we can do
+                    break;
+                }
+            }
+
+            // Wait a wee bit and try again
+            try
+            {
+                Thread.sleep( period );
+            }
+            catch ( InterruptedException e )
+            {
+                // ignore
+            }
+        }
+    }
+
+    private static void sendStopToKeepAlive( final int commandPort )
+    {
+        log.debug( "Sending stop command to keep alive thread" );
+        try
+        {
+            // FIXME replace LOCALHOST with getHostName
+            new CommandMonitorTalker( LOCALHOST, commandPort ).send( StopMonitorCommand.NAME );
+        }
+        catch ( Exception e )
+        {
+            log.debug(
+                "Skipping exception got while sending stop command to keep alive thread {}:{}",
+                e.getClass().getName(), e.getMessage()
+            );
+        }
     }
 
     /**
@@ -199,6 +309,9 @@ public class DefaultNexusBundle
         makeExecutable( nexusDir, "nexus" );
         makeExecutable( nexusDir, "wrapper" );
 
+        // log whenever ports are configured to aid solving test port conflicts
+        log.info( "{} ({}) spawned env [{}={},{}={}]", getName(), getConfiguration().getId(),
+                  strategy.commandMonitorProperty(), commandMonitorPort, strategy.keepAliveProperty(), keepAlivePort );
         onDirectory( nexusDir ).apply(
             fileTaskBuilder.exec().spawn()
                 .script( path( "bin/nexus" + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? ".bat" : "" ) ) )
@@ -207,30 +320,70 @@ public class DefaultNexusBundle
                 .withEnv( strategy.keepAliveProperty(), String.valueOf( keepAlivePort ) )
         );
 
-        // check that command monitor is installed in started nexus with a delay of 1s for 5s
-        log.info( "Checking presence of command monitor in started Nexus" );
-        final boolean monitorInstalled = new TimedCondition()
+        if ( getConfiguration().isSuspendOnStart() )
         {
-            @Override
-            protected boolean isSatisfied()
-                throws Exception
+            // verify the debugger socket has been opened and is waiting for a debugger to connect
+            // command monitor thread is not started while suspended so this is the best we can do
+            final boolean jvmSuspended = new TimedCondition()
             {
-                new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PingCommand.NAME );
-                return true;
+                @Override
+                protected boolean isSatisfied()
+                    throws Exception
+                {
+                    Socket socket = new Socket();
+                    socket.setSoTimeout( 5000 );
+                    socket.connect(
+                        new InetSocketAddress( getConfiguration().getHostName(), getConfiguration().getDebugPort() ) );
+                    return true;
+                }
+            }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
+            if ( jvmSuspended )
+            {
+                log.info( "{} ({}) suspended for debugging at {}:{}", getName(), getConfiguration().getId(),
+                          getConfiguration().getHostName(), getConfiguration().getDebugPort() );
             }
-        }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
-        if ( monitorInstalled )
-        {
-            log.debug( "Command monitor installed in started Nexus on port '{}'", commandMonitorPort );
+            else
+            {
+                throw new RuntimeException(
+                    format(
+                        "%s (%s) no open socket for debugging at %s:%s within 10 seconds", getName(),
+                        getConfiguration().getId(), getConfiguration().getHostName(),
+                        getConfiguration().getDebugPort()
+                    )
+                );
+            }
         }
         else
         {
-            throw new RuntimeException(
-                format(
-                    "Nexus did not start up command monitor on port '%s' in allocated timeout of 10 seconds"
-                    , commandMonitorPort
-                )
-            );
+            // when not suspending, we expect the internal command monitor thread to start well before bundle is ready
+            // so we only give it 10 seconds to be available
+            log.info( "{} ({}) pinging command monitor at {}:{}", getName(), getConfiguration().getId(),
+                      getConfiguration().getHostName(), commandMonitorPort );
+            final boolean monitorInstalled = new TimedCondition()
+            {
+                @Override
+                protected boolean isSatisfied()
+                    throws Exception
+                {
+                    // FIXME replace LOCALHOST with getHostName() after making default hostname be 127.0.0.1
+                    new CommandMonitorTalker( LOCALHOST, commandMonitorPort ).send( PingCommand.NAME );
+                    return true;
+                }
+            }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
+            if ( monitorInstalled )
+            {
+                log.debug( "{} ({}) command monitor detected at {}:{}", getName(), getConfiguration().getId(),
+                           getConfiguration().getHostName(), commandMonitorPort );
+            }
+            else
+            {
+                throw new RuntimeException(
+                    format( "%s (%s) no command monitor detected at %s:%s within 10 seconds", getName(),
+                            getConfiguration().getId(), getConfiguration().getHostName(),
+                            commandMonitorPort
+                    )
+                );
+            }
         }
     }
 
@@ -244,9 +397,85 @@ public class DefaultNexusBundle
     @Override
     protected void stopApplication()
     {
+        // application may be in suspended state waiting for debugger to attach, if we can reasonably guess this is
+        // the case, then we should resume the vm so that we can ask command monitor to immediately halt
         try
         {
-            terminateRemoteNexus( commandMonitorPort );
+            if ( getConfiguration().isSuspendOnStart() )
+            {
+
+                boolean isSuspended = new TimedCondition()
+                {
+                    @Override
+                    protected boolean isSatisfied()
+                        throws Exception
+                    {
+                        Socket socket = new Socket();
+                        socket.setSoTimeout( 5000 );
+                        socket.connect(
+                            new InetSocketAddress( getConfiguration().getHostName(),
+                                                   getConfiguration().getDebugPort() ) );
+                        return true;
+                    }
+                }.await( Time.seconds( 1 ), Time.seconds( 10 ), Time.seconds( 1 ) );
+
+                if ( isSuspended )
+                {
+                    log.info( "{} ({}) suspended, attempting to resume {}:{} and halt {}:{}", getName(),
+                              getConfiguration().getId(),
+                              getConfiguration().getHostName(), getConfiguration().getDebugPort(),
+                              getConfiguration().getHostName(), commandMonitorPort );
+                    try
+                    {
+                        DebuggerUtils.connectRemote( getConfiguration().getHostName(),
+                                                     getConfiguration().getDebugPort(), 5000 ).resume();
+                        // in theory the jvm shutdown hook could be enough, but I'd rather try to halt explicitly
+                        boolean halted = new TimedCondition()
+                        {
+                            @Override
+                            protected boolean isSatisfied()
+                                throws Exception
+                            {
+                                new CommandMonitorTalker( getConfiguration().getHostName(), commandMonitorPort ).send(
+                                    HaltCommand.NAME );
+                                return true;
+                            }
+                        }.await( Time.millis( 500 ), Time.seconds( 10 ), Time.millis( 250 ) );
+
+                        if ( !halted )
+                        {
+                            throw new RuntimeException(
+                                format( "%s (%s) NOT halted at %s:%s within 10 seconds", getName(),
+                                        getConfiguration().getId(), getConfiguration().getHostName(),
+                                        commandMonitorPort ) );
+
+                        }
+                        log.info( "{} ({}) STOPPING, suspension resumed and sent {} to {}:{}", getName(),
+                                  getConfiguration().getId(), HaltCommand.NAME,
+                                  getConfiguration().getHostName(), commandMonitorPort );
+
+                    }
+                    catch ( Exception e )
+                    {
+                        Throwables.propagate( e );
+                    }
+                }
+                else
+                {
+                    throw new RuntimeException(
+                        format(
+                            "%s (%s) no open socket for debugging at %s:%s within 10 seconds", getName(),
+                            getConfiguration().getId(), getConfiguration().getHostName(),
+                            getConfiguration().getDebugPort()
+                        )
+                    );
+                }
+
+            }
+            else
+            {
+                terminateRemoteNexus( commandMonitorPort );
+            }
         }
         finally
         {
@@ -296,7 +525,7 @@ public class DefaultNexusBundle
                 if ( bundlePlugins.containsKey( entry.getKey() ) )
                 {
                     log.info(
-                        "Removing plugin '{}' as is already present in extracted bundle", entry.getValue().getName()
+                        "{} ({}) removing plugin '{}' already present in extracted bundle", getName(), getConfiguration().getId(),entry.getValue().getName()
                     );
                     fileTaskBuilder.delete().directory( file( entry.getValue() ) ).run();
                 }
@@ -494,109 +723,6 @@ public class DefaultNexusBundle
         }
     }
 
-    private static void installStopShutdownHook( final int commandPort )
-    {
-        Thread stopShutdownHook = new Thread( "JSW Sanity Stopper" )
-        {
-            @Override
-            public void run()
-            {
-                terminateRemoteNexus( commandPort );
-            }
-        };
-
-        Runtime.getRuntime().addShutdownHook( stopShutdownHook );
-        log.debug( "Installed stop shutdown hook" );
-    }
-
-    private static void sendStopToNexus( final int commandPort )
-    {
-        log.debug( "Sending stop command to Nexus" );
-        try
-        {
-            new CommandMonitorTalker( LOCALHOST, commandPort ).send( StopApplicationCommand.NAME );
-        }
-        catch ( Exception e )
-        {
-            log.debug(
-                "Skipping exception got while sending stop command to Nexus {}:{}",
-                e.getClass().getName(), e.getMessage()
-            );
-        }
-    }
-
-    private static void terminateRemoteNexus( final int commandPort )
-    {
-        log.debug( "Attempting to terminate remote nexus" );
-
-        // First attempt graceful shutdown
-        sendStopToNexus( commandPort );
-
-        CommandMonitorTalker talker = new CommandMonitorTalker( LOCALHOST, commandPort );
-        long started = System.currentTimeMillis();
-        long max = 5 * 60 * 1000; // wait 5 minutes for NX to shutdown, before attempting to halt it
-        long period = 1000;
-
-        // Then ping for a bit and finally give up and ask it to halt
-        while ( true )
-        {
-            try
-            {
-                talker.send( PingCommand.NAME );
-            }
-            catch ( ConnectException e )
-            {
-                // likely its shutdown already
-                break;
-            }
-            catch ( Exception e )
-            {
-                // ignore, not sure there is much we can do
-            }
-
-            // If we have waited long enough, then ask remote to halt
-            if ( System.currentTimeMillis() - started > max )
-            {
-                try
-                {
-                    talker.send( HaltCommand.NAME );
-                    break;
-                }
-                catch ( Exception e )
-                {
-                    // ignore, not sure there is much we can do
-                    break;
-                }
-            }
-
-            // Wait a wee bit and try again
-            try
-            {
-                Thread.sleep( period );
-            }
-            catch ( InterruptedException e )
-            {
-                // ignore
-            }
-        }
-    }
-
-    private static void sendStopToKeepAlive( final int commandPort )
-    {
-        log.debug( "Sending stop command to keep alive thread" );
-        try
-        {
-            new CommandMonitorTalker( LOCALHOST, commandPort ).send( StopMonitorCommand.NAME );
-        }
-        catch ( Exception e )
-        {
-            log.debug(
-                "Skipping exception got while sending stop command to keep alive thread {}:{}",
-                e.getClass().getName(), e.getMessage()
-            );
-        }
-    }
-
     private static interface ConfigurationStrategy
     {
         String commandMonitorProperty();
@@ -636,7 +762,6 @@ public class DefaultNexusBundle
 
         }
     }
-
 
     private class CS22AndAbove extends ConfigurationStrategySupport
         implements ConfigurationStrategy
