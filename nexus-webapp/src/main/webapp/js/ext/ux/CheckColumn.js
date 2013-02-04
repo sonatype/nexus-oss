@@ -57,7 +57,7 @@ define('ext/ux/CheckColumn', ['extjs'], function(Ext) {
        * Process and refire events routed from the GridView's processEvent method.
        */
       processEvent : function(name, e, grid, rowIndex, colIndex){
-          if (name == 'mousedown') {
+          if (name == 'mousedown' && !this.readOnly) {
               var record = grid.store.getAt(rowIndex);
               record.set(this.dataIndex, !record.data[this.dataIndex]);
               return false; // Cancel row selection.
