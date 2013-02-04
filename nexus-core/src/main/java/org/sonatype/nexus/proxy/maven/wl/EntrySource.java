@@ -16,7 +16,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Entry source.
+ * Entry source main purpose is to serve/read-up WL entries. It might be backed (or sourced) from multiple things, like
+ * file or even a plain array of strings.
  * 
  * @author cstamas
  * @since 2.4
@@ -42,11 +43,11 @@ public interface EntrySource
 
     /**
      * Returns the timestamp of this entry source. Based on implementation, this might mean different things: if backed
-     * by file, the file timestamp, or the timestamp when enties were collected in some way, or when the entries was
+     * by file, the file timestamp, or the timestamp when entries were collected in some way, or when the entries was
      * generated in some way, etc. Simply put, the "when" point in time that this instance reflects. If not exists,
      * result is -1.
      * 
-     * @return timestamp in millis of this entry source, or -1 if not exists.
+     * @return timestamp in milliseconds of this entry source, or -1 if not exists.
      */
     long getLostModifiedTimestamp();
 }

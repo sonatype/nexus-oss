@@ -29,7 +29,6 @@ import org.sonatype.nexus.proxy.maven.wl.WritableEntrySourceModifier;
  * when {@link #apply()} method is invoked.
  * 
  * @author cstamas
- * @since 2.4
  */
 public class WritableEntrySourceModifierImpl
     implements WritableEntrySourceModifier

@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.maven.wl;
 import java.io.IOException;
 
 /**
- * A writable {@link EntrySource} implementation. Writable entry source has capabilities to write and delete among
- * others.
+ * A writable {@link EntrySource} implementation. Writable entry source has capabilities to write and delete next to
+ * existing methods.
  * 
  * @author cstamas
  * @since 2.4

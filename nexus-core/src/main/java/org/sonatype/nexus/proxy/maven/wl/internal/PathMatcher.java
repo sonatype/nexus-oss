@@ -29,8 +29,9 @@ public interface PathMatcher
     boolean matches( String path );
 
     /**
-     * Performs a match against passed in path, and returns {@code true} if it matches (same as {@link #matches(String)}
-     * , or passed in path is a "parent" that is contained in one or more paths used for matching.
+     * Performs a match against passed in path, and returns {@code true} if it matches (same behavior as
+     * {@link #matches(String)} ), or passed in path is a "parent" that is contained in one or more paths used for
+     * matching (like "/foo/bar" is entry and "/foo" is passed in as path parameter).
      * 
      * @param path
      * @return {@code true} if path is contained, {@code false} otherwise.
