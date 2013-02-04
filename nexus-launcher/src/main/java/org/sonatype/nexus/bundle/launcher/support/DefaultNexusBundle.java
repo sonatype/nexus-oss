@@ -52,7 +52,6 @@ import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.internal.NexusITLauncher;
 import org.sonatype.sisu.bl.jmx.JMXConfiguration;
 import org.sonatype.sisu.bl.jsw.JSWConfig;
-import org.sonatype.sisu.bl.support.DebuggerUtils;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.RunningBundles;
 import org.sonatype.sisu.bl.support.TimedCondition;
@@ -421,61 +420,18 @@ public class DefaultNexusBundle
 
                 if ( isSuspended )
                 {
-                    log.info( "{} ({}) suspended, attempting to resume {}:{} and halt {}:{}", getName(),
-                              getConfiguration().getId(),
-                              getConfiguration().getHostName(), getConfiguration().getDebugPort(),
-                              getConfiguration().getHostName(), commandMonitorPort );
-                    try
-                    {
-                        DebuggerUtils.connectRemote( getConfiguration().getHostName(),
-                                                     getConfiguration().getDebugPort(), 5000 ).resume();
-                        // in theory the jvm shutdown hook could be enough, but I'd rather try to halt explicitly
-                        boolean halted = new TimedCondition()
-                        {
-                            @Override
-                            protected boolean isSatisfied()
-                                throws Exception
-                            {
-                                new CommandMonitorTalker( getConfiguration().getHostName(), commandMonitorPort ).send(
-                                    HaltCommand.NAME );
-                                return true;
-                            }
-                        }.await( Time.millis( 500 ), Time.seconds( 10 ), Time.millis( 250 ) );
-
-                        if ( !halted )
-                        {
-                            throw new RuntimeException(
-                                format( "%s (%s) NOT halted at %s:%s within 10 seconds", getName(),
-                                        getConfiguration().getId(), getConfiguration().getHostName(),
-                                        commandMonitorPort ) );
-
-                        }
-                        log.info( "{} ({}) STOPPING, suspension resumed and sent {} to {}:{}", getName(),
-                                  getConfiguration().getId(), HaltCommand.NAME,
-                                  getConfiguration().getHostName(), commandMonitorPort );
-
-                    }
-                    catch ( Exception e )
-                    {
-                        Throwables.propagate( e );
-                    }
-                }
-                else
-                {
+                    // FIXME avoiding the compile time dependency for now on jdi classes (DebuggerUtils)
                     throw new RuntimeException(
                         format(
-                            "%s (%s) no open socket for debugging at %s:%s within 10 seconds", getName(),
+                            "%s (%s) looks suspended at {}:{}, CANNOT STOP THIS BUNDLE!", getName(),
                             getConfiguration().getId(), getConfiguration().getHostName(),
                             getConfiguration().getDebugPort()
                         )
                     );
                 }
+            }
+            terminateRemoteNexus( commandMonitorPort );
 
-            }
-            else
-            {
-                terminateRemoteNexus( commandMonitorPort );
-            }
         }
         finally
         {
