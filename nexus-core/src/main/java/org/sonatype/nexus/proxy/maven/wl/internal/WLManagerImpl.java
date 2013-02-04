@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -99,6 +99,21 @@ public class WLManagerImpl
     private final EventDispatcher eventDispatcher;
 
     /**
+     * Plain set holding the repository IDs of repositories being batch-updated in background. All read-write access to
+     * this set must happen within synchronized block, using this instance as monitor object.
+     */
+    private final HashSet<String> currentlyUpdatingRepositoryIds = new HashSet<String>();
+
+    /**
+     * Plain executor for background batch-updates. This executor runs 1 periodic thread (see constructor) that performs
+     * periodic remote WL update, but also executes background "force" updates (initiated by user over REST or when
+     * repository is added). But, as background threads are bounded by presence of proxy repositories, and introduce
+     * hard limit of possible max executions, it protects this instance that is basically unbounded.
+     */
+    private final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "wl",
+        "WL-Updater" ), new ThreadPoolExecutor.AbortPolicy() );
+
+    /**
      * Da constructor.
      * 
      * @param eventBus
@@ -123,6 +138,14 @@ public class WLManagerImpl
         this.config = checkNotNull( config );
         this.localContentDiscoverer = checkNotNull( localContentDiscoverer );
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
+        this.executor.scheduleAtFixedRate( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                mayUpdateProxyWhitelist();
+            }
+        }, TimeUnit.MINUTES.toMillis( 1 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
         this.eventDispatcher = new EventDispatcher( applicationStatusSource, this );
         this.eventBus.register( eventDispatcher );
     }
@@ -181,17 +204,35 @@ public class WLManagerImpl
     }
 
     /**
-     * Plain set holding the repository IDs of repositories being batch-updated in background. All read-write access to
-     * this set must happen within synchronized block, using this instance as monitor object.
+     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of WL update period in
+     * hours too), and will perform WL update only on those proxy repositories that needs it.
      */
-    private final HashSet<String> currentlyUpdatingRepositoryIds = new HashSet<String>();
+    protected void mayUpdateProxyWhitelist()
+    {
+        final List<MavenProxyRepository> proxies =
+            repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class );
+        final ArrayList<MavenProxyRepository> updateNeededRepositories = new ArrayList<MavenProxyRepository>();
+        for ( MavenProxyRepository mavenProxyRepository : proxies )
+        {
+            final WLStatus status = getStatusFor( mavenProxyRepository );
+            final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
 
-    /**
-     * Plain executor for background batch-updates. Min threads are 0 and max threads are 3, die-off is 1 minute.
-     */
-    private final Executor executor = new ThreadPoolExecutor( 0, 3, 60L, TimeUnit.SECONDS,
-        new SynchronousQueue<Runnable>(), new NexusThreadFactory( "wl", "WL Updater" ),
-        new ThreadPoolExecutor.AbortPolicy() );
+            if ( config.isEnabled() )
+            {
+                final long lastDiscoveryTimestamp = status.getDiscoveryStatus().getLastDiscoveryTimestamp();
+                // if never run before or is stale
+                if ( lastDiscoveryTimestamp < 0
+                    || ( ( System.currentTimeMillis() - lastDiscoveryTimestamp ) > config.getDiscoveryInterval() ) )
+                {
+                    updateNeededRepositories.add( mavenProxyRepository );
+                }
+            }
+        }
+        if ( !updateNeededRepositories.isEmpty() )
+        {
+            updateWhitelist( updateNeededRepositories.toArray( new MavenProxyRepository[updateNeededRepositories.size()] ) );
+        }
+    }
 
     @Override
     public synchronized void updateWhitelist( final MavenRepository... mavenRepositories )
@@ -210,6 +251,7 @@ public class WLManagerImpl
                 {
                     unpublish( mavenRepository );
                     repositoriesToBeUpdatedAndPublished.add( mavenRepository );
+                    currentlyUpdatingRepositoryIds.add( mavenRepository.getId() );
                 }
                 catch ( IOException e )
                 {
@@ -222,12 +264,6 @@ public class WLManagerImpl
         }
         if ( !repositoriesToBeUpdatedAndPublished.isEmpty() )
         {
-            // mark the updated ones "in progress"
-            for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
-            {
-                currentlyUpdatingRepositoryIds.add( mavenRepository.getId() );
-            }
-
             final Runnable job = new Runnable()
             {
                 @Override
