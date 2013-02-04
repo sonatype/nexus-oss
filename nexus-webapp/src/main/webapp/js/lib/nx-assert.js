@@ -23,7 +23,7 @@ Ext.ns('NX');
  */
 function AssertError(message) {
     this.name = 'AssertError';
-    this.message = message;
+    this.message = message || 'Assertion failure';
 }
 AssertError.prototype = new Error();
 AssertError.prototype.constructor = AssertError;
