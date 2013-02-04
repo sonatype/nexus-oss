@@ -230,7 +230,7 @@ public class NexusApplication
             + contentResource.getResourceProtection().getFilterExpression() );
 
         // protecting service resources with "wall" permission
-        this.protectedPathManager.addProtectedResource( "/service/**",
+        this.protectedPathManager.addProtectedResource( "/service/local/**",
             "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
     }
 
@@ -251,7 +251,7 @@ public class NexusApplication
             filterExpression = "noSessionCreation," + filterExpression;
         }
 
-        this.protectedPathManager.addProtectedResource( "/service/*" + descriptor.getPathPattern(), filterExpression );
+        this.protectedPathManager.addProtectedResource( "/service/local" + descriptor.getPathPattern(), filterExpression );
     }
 
     @Override

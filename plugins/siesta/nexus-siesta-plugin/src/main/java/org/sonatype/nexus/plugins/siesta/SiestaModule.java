@@ -14,7 +14,6 @@ package org.sonatype.nexus.plugins.siesta;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
-import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.web.guice.SecurityWebFilter;
@@ -46,9 +45,6 @@ public class SiestaModule
 
     @Override
     protected void configure() {
-        // TODO: We might want to make this default for core+plugins as its generally useful.
-        install(new ShiroAopModule());
-
         // FIXME: Sort this out... nexus-restlet1x-plugin should not have anything to do with this plugin
 
         // We need to import some components from nexus-restlet1x-plugin for SecurityWebFilter, but its use is

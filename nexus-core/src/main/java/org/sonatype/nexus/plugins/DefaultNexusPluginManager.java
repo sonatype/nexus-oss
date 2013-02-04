@@ -39,6 +39,7 @@ import org.sonatype.guice.nexus.binders.NexusAnnotatedBeanModule;
 import org.sonatype.guice.plexus.binders.PlexusXmlBeanModule;
 import org.sonatype.guice.plexus.config.PlexusBeanModule;
 import org.sonatype.inject.Parameters;
+import org.sonatype.nexus.guice.NexusModules.PluginModule;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
@@ -53,7 +54,6 @@ import org.sonatype.nexus.proxy.maven.version.Version;
 import org.sonatype.nexus.proxy.maven.version.VersionParser;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.nexus.timing.TimingModule;
 import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -483,10 +483,7 @@ public class DefaultNexusPluginManager
 
         final Module[] modules = {
             resourceModule,
-
-            // TODO: May want a central location to configure NX core + NX plugin modules
-            // Add support for @Timed
-            new TimingModule()
+            new PluginModule()
         };
 
         container.addPlexusInjector( beanModules, modules );
