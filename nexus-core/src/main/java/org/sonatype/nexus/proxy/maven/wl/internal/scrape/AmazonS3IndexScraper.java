@@ -120,7 +120,8 @@ public class AmazonS3IndexScraper
         final Elements root = page.getDocument().getElementsByTag( "ListBucketResult" );
         if ( root.size() != 1 || !root.get( 0 ).attr( "xmlns" ).equals( "http://s3.amazonaws.com/doc/2006-03-01/" ) )
         {
-            context.stop( "Remote recognized as AmazonS3, but unexpected response was received (not \"ListBucketResult\")." );
+            context.stop( "Remote recognized as " + getTargetedServer()
+                + ", but unexpected response was received (not \"ListBucketResult\")." );
             return;
         }
 
@@ -142,7 +143,6 @@ public class AmazonS3IndexScraper
             final long size = Long.parseLong( sizeElements.get( 0 ).text() );
             if ( size > 0 )
             {
-                System.out.println( key );
                 markerElement = key;
                 // fix key with prefix
                 final String fixedKey = prefix != null ? key.substring( prefix.length() ) : key;

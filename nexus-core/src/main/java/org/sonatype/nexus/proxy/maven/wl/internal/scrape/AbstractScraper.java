@@ -89,8 +89,8 @@ public abstract class AbstractScraper
                     {
                         // recognized and scraped with result
                         final EntrySource entrySource = new ArrayListEntrySource( entries );
-                        context.stop( entrySource, "Remote recognized as " + getTargetedServer() + " (scraped "
-                            + String.valueOf( entries.size() ) + " entries, went " + context.getScrapeDepth()
+                        context.stop( entrySource, "Remote recognized as " + getTargetedServer() + " (harvested "
+                            + String.valueOf( entries.size() ) + " entries, " + context.getScrapeDepth()
                             + " levels deep)." );
                     }
                     else
