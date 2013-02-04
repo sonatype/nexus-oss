@@ -21,7 +21,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 
 /**
- * Class carrying the results of a discovery.
+ * Carries the results of a discovery.
  * 
  * @author cstamas
  * @since 2.4
@@ -29,7 +29,42 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
  */
 public class DiscoveryResult<R extends MavenRepository>
 {
-    public static abstract class Outcome
+    /**
+     * The outcome of discovery of a single strategy.
+     */
+    public static interface Outcome
+    {
+        /**
+         * Returns the ID of the {@link RemoteStrategy} that this outcome belongs to.
+         * 
+         * @return the strategy ID, never {@code null}.
+         */
+        String getStrategyId();
+
+        /**
+         * Returns {@code true} if this outcome is a successful one.
+         * 
+         * @return {@code true} if this outcome is a successful one.
+         */
+        boolean isSuccessful();
+
+        /**
+         * Message of the outcome, meant for {@link RemoteStrategy} to pass some strategy specific information.
+         * 
+         * @return the message of the outcome.
+         */
+        String getMessage();
+
+        /**
+         * Throwable associated with outcome, if any, of {@code null}.
+         * 
+         * @return throwable
+         */
+        Throwable getThrowable();
+    }
+
+    private static class OutcomeImpl
+        implements Outcome
     {
         private final String strategyId;
 
@@ -37,49 +72,74 @@ public class DiscoveryResult<R extends MavenRepository>
 
         private final String message;
 
-        public Outcome( final String strategyId, final boolean successful, final String message )
+        private final Throwable throwable;
+
+        private OutcomeImpl( final String strategyId, final boolean successful, final String message,
+                             final Throwable throwable )
         {
             this.strategyId = checkNotNull( strategyId );
             this.successful = successful;
             this.message = checkNotNull( message );
+            this.throwable = throwable;
         }
 
+        /**
+         * Success constructor.
+         * 
+         * @param strategyId
+         * @param message
+         */
+        OutcomeImpl( final String strategyId, final String message )
+        {
+            this( strategyId, true, message, null );
+        }
+
+        /**
+         * Failure constructor.
+         * 
+         * @param strategyId
+         * @param throwable
+         */
+        OutcomeImpl( final String strategyId, final Throwable throwable )
+        {
+            this( strategyId, false, throwable.getMessage(), throwable );
+        }
+
+        /**
+         * Returns the ID of the {@link RemoteStrategy} that this outcome belongs to.
+         * 
+         * @return the strategy ID, never {@code null}.
+         */
         public String getStrategyId()
         {
             return strategyId;
         }
 
+        /**
+         * Returns {@code true} if this outcome is a successful one.
+         * 
+         * @return {@code true} if this outcome is a successful one.
+         */
         public boolean isSuccessful()
         {
             return successful;
         }
 
+        /**
+         * Message of the outcome, meant for {@link RemoteStrategy} to pass some strategy specific information.
+         * 
+         * @return the message of the outcome.
+         */
         public String getMessage()
         {
             return message;
         }
-    }
 
-    public static class SuccessfulOutcome
-        extends Outcome
-    {
-        public SuccessfulOutcome( final String strategyId, final String message )
-        {
-            super( strategyId, true, message );
-        }
-    }
-
-    public static class FailedOutcome
-        extends Outcome
-    {
-        private final Throwable throwable;
-
-        public FailedOutcome( final String strategyId, final Throwable throwable )
-        {
-            super( strategyId, false, throwable.getMessage() );
-            this.throwable = throwable;
-        }
-
+        /**
+         * Throwable belonging to outcome.
+         * 
+         * @return the Throwable if any.
+         */
         public Throwable getThrowable()
         {
             return throwable;
@@ -145,7 +205,8 @@ public class DiscoveryResult<R extends MavenRepository>
     }
 
     /**
-     * Records a success on behalf of a strategy.
+     * Records a success on behalf of a strategy, if this has not yet recorded a success, in which case this method will
+     * do nothing.
      * 
      * @param usedStrategyId
      * @param message
@@ -153,30 +214,31 @@ public class DiscoveryResult<R extends MavenRepository>
      */
     public void recordSuccess( final String usedStrategyId, final String message, final EntrySource entrySource )
     {
-        checkNotNull( usedStrategyId );
-        checkNotNull( message );
-        checkNotNull( entrySource );
         if ( !isSuccessful() )
         {
-            final SuccessfulOutcome success = new SuccessfulOutcome( usedStrategyId, message );
+            checkNotNull( usedStrategyId );
+            checkNotNull( message );
+            checkNotNull( entrySource );
+            final OutcomeImpl success = new OutcomeImpl( usedStrategyId, message );
             this.outcomes.add( success );
             this.entrySource = entrySource;
         }
     }
 
     /**
-     * Records a failure on behalf of a strategy.
+     * Records a failure on behalf of a strategy, if this has not yet recorded a success, in which case this method will
+     * do nothing.
      * 
      * @param usedStrategyId
      * @param failureCause
      */
     public void recordFailure( final String usedStrategyId, final Throwable failureCause )
     {
-        checkNotNull( usedStrategyId );
-        checkNotNull( failureCause );
         if ( !isSuccessful() )
         {
-            final FailedOutcome failure = new FailedOutcome( usedStrategyId, failureCause );
+            checkNotNull( usedStrategyId );
+            checkNotNull( failureCause );
+            final OutcomeImpl failure = new OutcomeImpl( usedStrategyId, failureCause );
             this.outcomes.add( failure );
         }
     }
@@ -193,12 +255,12 @@ public class DiscoveryResult<R extends MavenRepository>
         return null;
     }
 
-    protected SuccessfulOutcome getLastSuccessOutcome()
+    protected Outcome getLastSuccessOutcome()
     {
         final Outcome outcome = getLastOutcome();
-        if ( outcome instanceof SuccessfulOutcome )
+        if ( outcome.isSuccessful() )
         {
-            return (SuccessfulOutcome) outcome;
+            return outcome;
         }
         return null;
     }
