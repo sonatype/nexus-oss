@@ -83,10 +83,12 @@ public class JerseyUser
         request.setData( settings() );
         try
         {
-            return getNexusClient()
+            final UserResource userResource = getNexusClient()
                 .serviceResource( "users" )
                 .post( UserResourceResponse.class, request )
                 .getData();
+            userResource.setPassword( null );
+            return userResource;
         }
         catch ( UniformInterfaceException e )
         {

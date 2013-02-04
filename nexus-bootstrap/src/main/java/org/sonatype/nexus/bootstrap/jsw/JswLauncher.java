@@ -49,10 +49,8 @@ public class JswLauncher
     protected Integer doStart(final String[] args) throws Exception {
         if (WrapperManager.isControlledByNativeWrapper()) {
             log.info("JVM ID: {}, JVM PID: {}, Wrapper PID: {}, User: {}",
-                new Object[]{
-                    WrapperManager.getJVMId(), WrapperManager.getJavaPID(), WrapperManager.getWrapperPID(),
-                    WrapperManager.getUser(false).getUser()
-                });
+                     WrapperManager.getJVMId(), WrapperManager.getJavaPID(), WrapperManager.getWrapperPID(),
+                     WrapperManager.getUser(false).getUser() );
         }
 
         return launcher.start(args);
