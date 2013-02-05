@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>30</version>
+    <version>31</version>
     <relativePath />
   </parent>
 
@@ -34,7 +34,7 @@
   <version>2.4-SNAPSHOT</version>
 
   <properties>
-    <sisu-inject.version>2.3.1</sisu-inject.version>
+    <sisu-inject.version>2.3.2</sisu-inject.version>
     <sisu-guice.version>3.1.2</sisu-guice.version>
   </properties>
 
@@ -93,53 +93,24 @@
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-guice</artifactId>
         <version>${sisu-guice.version}</version>
-        <classifier>no_aop</classifier>
       </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-guice</artifactId>
-        <version>${sisu-guice.version}</version>
-      </dependency>
-
-      <!--
-      NOTE: sisu-guice exclusions here to avoid getting both no_aop and default sisu-guice included.
-      -->
 
       <dependency>
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-servlet</artifactId>
         <version>${sisu-guice.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guice</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-multibindings</artifactId>
         <version>${sisu-guice.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guice</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-assistedinject</artifactId>
         <version>${sisu-guice.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guice</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
@@ -149,9 +120,24 @@
       </dependency>
 
       <dependency>
+        <groupId>aopalliance</groupId>
+        <artifactId>aopalliance</artifactId>
+        <version>1.0</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-inject-bean</artifactId>
         <version>${sisu-inject.version}</version>
+        <exclusions>
+          <!--
+          sisu-inject-bean depends on no_aop guice, strip it out so we don't get aop and no_aop variants.
+          -->
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -179,20 +165,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <!--
-  FIXME: Sort out if this should be here or not, looks unused, given use of scope=import only applies to DM
-  -->
-  <dependencies>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-  </dependencies>
 
 </project>
