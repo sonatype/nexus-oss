@@ -531,7 +531,7 @@ public class SimplePullTest
         jettyTestsuiteEnvironmentBuilder.stopService();
 
         final Server server = Server.withPort( port );
-        server.serve( "/*" ).withBehaviours( new DropConnection(server) ).start();
+        server.serve( "/*" ).withBehaviours( new DropConnection( server ) ).start();
         try
         {
             final Repository repository = getRepositoryRegistry().getRepository( "repo1" );
@@ -567,7 +567,7 @@ public class SimplePullTest
         implements Behaviour
     {
         private final Server server;
-        
+
         public DropConnection( final Server server )
         {
             this.server = server;
@@ -582,7 +582,8 @@ public class SimplePullTest
             response.setContentLength( 500 );
             response.getOutputStream().write( "partialcontent".getBytes() );
             response.flushBuffer();
-            // this causes noise in log (java.lang.InterruptedException: sleep interrupted) but is only way to make port get closed
+            // this causes noise in log (java.lang.InterruptedException: sleep interrupted) but is only way to make port
+            // get closed
             // otherwise SocketTimeout happens (not HC4's ConnectionClosedException)
             server.stop();
             return false;
