@@ -20,6 +20,8 @@ Ext.ns('NX');
  *
  * @param message
  * @constructor
+ *
+ * @since 2.4
  */
 function AssertError(message) {
     this.name = 'AssertError';
@@ -38,6 +40,8 @@ Ext.apply(NX, {
      *
      * @param expression    Condition expression
      * @param message       Exception message
+     *
+     * @since 2.4
      */
     assert: function (expression, message) {
         if (!expression) {
