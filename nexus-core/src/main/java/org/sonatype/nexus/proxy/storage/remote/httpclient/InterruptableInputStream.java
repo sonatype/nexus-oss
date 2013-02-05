@@ -94,6 +94,15 @@ class InterruptableInputStream
     }
 
     @Override
+    public void close()
+        throws IOException
+    {
+        // do not throw InterruptedIOException here!
+        // this will not close the stream and likely mask original exception!
+        super.close();
+    }
+
+    @Override
     public synchronized void reset()
         throws IOException
     {
