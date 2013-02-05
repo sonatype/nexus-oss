@@ -67,7 +67,7 @@ public class NexusScraper
                 // so index page looks like Nexus index page, let's see about repo metadata
                 // this is not cheap, as we are doing extra HTTP requests to get it
                 final Page repoMetadataPage =
-                    page.getPageFor( context, context.getRemoteRepositoryRootUrl() + ".meta/repository-metadata.xml" );
+                    Page.getPageFor( context, context.getRemoteRepositoryRootUrl() + ".meta/repository-metadata.xml" );
                 if ( page.getHttpResponse().getStatusLine().getStatusCode() == 200 )
                 {
                     // sanity: all nexus repo MD has this element

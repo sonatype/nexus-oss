@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.nexus.util.PathUtils;
 
 /**
@@ -95,7 +96,18 @@ public class AmazonS3IndexScraper
                     context.getRemoteRepositoryRootUrl().length() - prefix.length() );
             getLogger().debug( "Retrying URL {} to scrape Amazon S3 hosted repository on remote URL {}", fixedUrl,
                 context.getRemoteRepositoryRootUrl() );
-            initialPage = initialPage.getPageFor( context, fixedUrl + "?prefix=" + prefix );
+            try
+            {
+                initialPage = Page.getPageFor( context, fixedUrl + "?prefix=" + prefix );
+            }
+            catch ( UnexpectedPageResponse e )
+            {
+                getLogger().info( "Unexpected {} response, cannot scrape response from {} :\n{}", getTargetedServer(),
+                    fixedUrl, initialPage.getDocument().outerHtml() );
+                context.stop( "Remote recognized as " + getTargetedServer()
+                    + ", but unexpected response code and response body received (see logs)." );
+                return null;
+            }
         }
 
         final HashSet<String> entries = new HashSet<String>();
@@ -165,7 +177,7 @@ public class AmazonS3IndexScraper
                 queryParams.add( "marker=" + markerElement );
             }
             final String url = appendParameters( rootUrl, queryParams );
-            final Page nextPage = page.getPageFor( context, url );
+            final Page nextPage = Page.getPageFor( context, url );
             diveIn( context, nextPage, rootUrl, prefix, entries );
         }
     }

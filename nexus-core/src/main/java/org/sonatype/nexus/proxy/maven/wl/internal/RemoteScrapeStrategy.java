@@ -25,11 +25,8 @@ import javax.inject.Singleton;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
@@ -96,45 +93,11 @@ public class RemoteScrapeStrategy
         }
         try
         {
-            HttpResponse remoteRepositoryRootResponse = null;
-            final Document remoteRepositoryRootDocument;
-            final HttpGet get = new HttpGet( remoteRepositoryRootUrl );
-            try
-            {
-                remoteRepositoryRootResponse = httpClient.execute( get );
-                // 404 is needed for S3, that will probably response with that one
-                if ( remoteRepositoryRootResponse.getStatusLine().getStatusCode() >= 200
-                    && remoteRepositoryRootResponse.getStatusLine().getStatusCode() <= 499 )
-                {
-                    // TODO: detect redirects
-                    remoteRepositoryRootDocument =
-                        Jsoup.parse( remoteRepositoryRootResponse.getEntity().getContent(), null,
-                            remoteRepositoryRootUrl );
-                }
-                else
-                {
-                    getLogger().debug( "Recived unexpected response from {} from root listing: {}",
-                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ),
-                        remoteRepositoryRootResponse.getStatusLine() );
-                    throw new StrategyFailedException( "Unexpected response from remote repository root: "
-                        + remoteRepositoryRootResponse.getStatusLine().toString() );
-                }
-            }
-            finally
-            {
-                if ( remoteRepositoryRootResponse != null )
-                {
-                    EntityUtils.consumeQuietly( remoteRepositoryRootResponse.getEntity() );
-                }
-            }
-
-            final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
-            Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
-
             final ScrapeContext context =
                 new ScrapeContext( httpClient, remoteRepositoryRootUrl, config.getRemoteScrapeDepth() );
-            final Page rootPage =
-                new Page( remoteRepositoryRootUrl, remoteRepositoryRootResponse, remoteRepositoryRootDocument );
+            final Page rootPage = Page.getPageFor( context, remoteRepositoryRootUrl );
+            final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
+            Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
             for ( Scraper scraper : appliedScrapers )
             {
                 try
@@ -162,7 +125,7 @@ public class RemoteScrapeStrategy
                 }
                 catch ( IOException e )
                 {
-                    getLogger().debug( "Scraper IO problem:", e );
+                    getLogger().debug( "Scraper {} hit IO problem, skipping it:", scraper.getId(), e );
                 }
             }
 

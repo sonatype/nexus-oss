@@ -107,7 +107,7 @@ public abstract class AbstractGeneratedIndexPageScraper
                     {
                         final String newSiblingEncodedUrl =
                             getRemoteUrlForRepositoryPath( context, newSibling.getPathElements() ) + "/";
-                        final Page siblingPage = page.getPageFor( context, newSiblingEncodedUrl );
+                        final Page siblingPage = Page.getPageFor( context, newSiblingEncodedUrl );
                         if ( siblingPage.getHttpResponse().getStatusLine().getStatusCode() == 200 )
                         {
                             diveIn( context, siblingPage, siblingDepth, parentOMatic, newSibling );

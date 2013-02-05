@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -42,13 +43,13 @@ public class Page
      * 
      * @param url the URL from where this page was fetched.
      * @param httpResponse the HTTP response for this page (with consumed body!).
-     * @param document the JSoup document for this page.
+     * @param document the JSoup document for this page or {@code null} if no body.
      */
     public Page( final String url, final HttpResponse httpResponse, final Document document )
     {
         this.url = checkNotNull( url );
         this.httpResponse = checkNotNull( httpResponse );
-        this.document = checkNotNull( document );
+        this.document = document;
     }
 
     /**
@@ -72,9 +73,9 @@ public class Page
     }
 
     /**
-     * The body of the page, parsed by JSoup.
+     * The body of the page, parsed by JSoup, or {@code null} if server did not sent any body.
      * 
-     * @return the page body document.
+     * @return the page body document if any, or {@code null}.
      */
     public Document getDocument()
     {
@@ -130,13 +131,11 @@ public class Page
      * @return the Page for given URL.
      * @throws IOException
      */
-    public Page getPageFor( final ScrapeContext context, final String url )
+    public static Page getPageFor( final ScrapeContext context, final String url )
         throws IOException
     {
-        if ( getUrl().equals( url ) )
-        {
-            return this;
-        }
+        checkNotNull( context );
+        checkNotNull( url );
         // TODO: detect redirects
         final HttpGet get = new HttpGet( url );
         HttpResponse response = context.getHttpClient().execute( get );
@@ -151,18 +150,64 @@ public class Page
                 else
                 {
                     // no body
-                    return new Page( url, response, Jsoup.parseBodyFragment( "<html></html>", url ) );
+                    return new Page( url, response, null );
                 }
             }
             else
             {
-                throw new IOException( "Unexpected response from remote repository URL " + url + " : "
-                    + response.getStatusLine().toString() );
+                throw new UnexpectedPageResponse( url, response.getStatusLine() );
             }
         }
         finally
         {
             EntityUtils.consumeQuietly( response.getEntity() );
+        }
+    }
+
+    /**
+     * Exception thrown when unexpected response code is received from page. Used to distinguish between this case and
+     * other "real" IO problems like connectivity or transport problems. Not every scraper will want to handle this
+     * either, but in cases when target is recognized, but during scrape unexpected response is hit, something the
+     * scraping chain must be stopped. See {@link AmazonS3IndexScraper} for an example.
+     */
+    public static class UnexpectedPageResponse
+        extends IOException
+    {
+        private final String url;
+
+        private final StatusLine statusLine;
+
+        /**
+         * Constructor.
+         * 
+         * @param url
+         * @param statusLine
+         */
+        public UnexpectedPageResponse( final String url, final StatusLine statusLine )
+        {
+            super( "Unexpected response from remote repository URL " + url + " : " + statusLine );
+            this.url = url;
+            this.statusLine = statusLine;
+        }
+
+        /**
+         * The full URL that emitted the response.
+         * 
+         * @return the URL
+         */
+        public String getUrl()
+        {
+            return url;
+        }
+
+        /**
+         * The status line (code and reason phrase) that was unexpected.
+         * 
+         * @return the status line of response.
+         */
+        public StatusLine getStatusLine()
+        {
+            return statusLine;
         }
     }
 }
