@@ -412,7 +412,11 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
           }
           if (fieldSet)
           {
-            fieldSet.expand();
+	      if ( fieldSet.rendered ) {
+		  fieldSet.expand();
+	      } else {
+		  fieldSet.collapsed = false;
+	      }
           }
         }
         accObj['.' + sPrepend + sVal] = hasNonEmptyChildren;
