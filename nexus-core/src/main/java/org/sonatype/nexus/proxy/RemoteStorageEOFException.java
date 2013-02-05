@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
  * @author cstamas
  * @since 2.4
  */
-public class RemoteStorageEofException
+public class RemoteStorageEOFException
     extends RemoteStorageException
 {
     private final ProxyRepository repository;
@@ -34,7 +34,7 @@ public class RemoteStorageEofException
      * @param repository
      * @param message
      */
-    public RemoteStorageEofException( final ProxyRepository repository, final String message )
+    public RemoteStorageEOFException( final ProxyRepository repository, final String message )
     {
         this( repository, message, null );
     }
@@ -46,7 +46,7 @@ public class RemoteStorageEofException
      * @param message
      * @param cause
      */
-    public RemoteStorageEofException( final ProxyRepository repository, final String message, final Throwable cause )
+    public RemoteStorageEOFException( final ProxyRepository repository, final String message, final Throwable cause )
     {
         super( message, cause );
         this.repository = Preconditions.checkNotNull( repository );
@@ -58,7 +58,7 @@ public class RemoteStorageEofException
      * @param repository
      * @param cause
      */
-    public RemoteStorageEofException( final ProxyRepository repository, final Throwable cause )
+    public RemoteStorageEOFException( final ProxyRepository repository, final Throwable cause )
     {
         this( repository, cause.getMessage(), cause );
     }

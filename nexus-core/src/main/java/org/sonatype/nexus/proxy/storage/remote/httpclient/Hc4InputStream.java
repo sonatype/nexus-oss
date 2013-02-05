@@ -14,18 +14,16 @@ package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InterruptedIOException;
 
 import org.apache.http.ConnectionClosedException;
-import org.apache.http.client.methods.AbortableHttpRequest;
-import org.sonatype.nexus.proxy.RemoteStorageEofException;
+import org.sonatype.nexus.proxy.RemoteStorageEOFException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.util.WrappingInputStream;
 
 /**
- * Simple wrapper input stream implementation that translates some HC4 specific exceptions to Nexus Core
- * specific exceptions, making Core able to properly respond to them.
- *
+ * Simple wrapper input stream implementation that translates some HC4 specific exceptions to Nexus Core specific
+ * exceptions, making Core able to properly respond to them.
+ * 
  * @since 2.4
  */
 class Hc4InputStream
@@ -33,10 +31,9 @@ class Hc4InputStream
 {
     private final ProxyRepository proxyRepository;
 
-    public Hc4InputStream( final ProxyRepository proxyRepository,
-                           final InputStream stream )
+    public Hc4InputStream( final ProxyRepository proxyRepository, final InputStream stream )
     {
-        super(stream);
+        super( stream );
         this.proxyRepository = proxyRepository;
     }
 
@@ -50,7 +47,7 @@ class Hc4InputStream
         }
         catch ( ConnectionClosedException e )
         {
-            throw new RemoteStorageEofException( proxyRepository, e );
+            throw new RemoteStorageEOFException( proxyRepository, e );
         }
     }
 
@@ -64,7 +61,7 @@ class Hc4InputStream
         }
         catch ( ConnectionClosedException e )
         {
-            throw new RemoteStorageEofException( proxyRepository, e );
+            throw new RemoteStorageEOFException( proxyRepository, e );
         }
     }
 
@@ -78,7 +75,7 @@ class Hc4InputStream
         }
         catch ( ConnectionClosedException e )
         {
-            throw new RemoteStorageEofException( proxyRepository, e );
+            throw new RemoteStorageEOFException( proxyRepository, e );
         }
     }
 }
