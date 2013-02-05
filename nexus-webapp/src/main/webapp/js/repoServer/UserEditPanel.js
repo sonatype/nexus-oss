@@ -633,7 +633,7 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
         disabled : !this.isNew,
         allowBlank : false,
         width : this.COMBO_WIDTH,
-        validator : Strings.validateId
+        validator : Nexus.util.Strings.validateId
       }, {
         xtype : 'textfield',
         fieldLabel : 'First Name',
