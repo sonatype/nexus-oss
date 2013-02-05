@@ -35,6 +35,7 @@ import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Server;
@@ -47,6 +48,15 @@ public class AmazonS3IndexScraperTest
             + "<Code>NoSuchKey</Code>"//
             + "<Message>The specified key does not exist.</Message>"//
             + "<Key>release/</Key>"//
+            + "<RequestId>74090E77260B51CF</RequestId>"//
+            + "<HostId>s4OjyIur2nB1qBhzVao2j8HzeBtoPrHYcagfxQePqS6+T89adq89IutpSLW3kGiH</HostId>"//
+            + "</Error>";
+
+    final static String NO_SUCH_KEY_RESPONSE_ROOT = //
+        "<Error>"//
+            + "<Code>NoSuchKey</Code>"//
+            + "<Message>The specified key does not exist.</Message>"//
+            + "<Key>/</Key>"//
             + "<RequestId>74090E77260B51CF</RequestId>"//
             + "<HostId>s4OjyIur2nB1qBhzVao2j8HzeBtoPrHYcagfxQePqS6+T89adq89IutpSLW3kGiH</HostId>"//
             + "</Error>";
@@ -127,7 +137,8 @@ public class AmazonS3IndexScraperTest
             final Server result = Server.withPort( 0 );
             result.serve( "/release/" ).withBehaviours( new S3Headers(),
                 new Deliver( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
-            // everything else also returns jetty's default 404
+            result.serve( "/*" ).withBehaviours( new S3Headers(),
+                new Deliver( 404, "application/xml", NO_SUCH_KEY_RESPONSE_ROOT.getBytes( "UTF-8" ) ) );
             return result;
         }
         else if ( code == 500 )
@@ -191,10 +202,129 @@ public class AmazonS3IndexScraperTest
         return s3scraper;
     }
 
-    // ==
+    // == One page:
+    // These scenarios covers when repo URL actually points to a bucket root, and no URL fix happens.
+    // Here we test scenarios when remote S3 is recognized, but various responses are received.
 
     @Test
     public void onePageHttp200()
+        throws Exception
+    {
+        final Server server = prepareServer();
+        server.start();
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/";
+            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            getScraper().scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( true ) );
+            assertThat( context.getEntrySource(), notNullValue() );
+            final List<String> entries = context.getEntrySource().readEntries();
+            assertThat( entries, notNullValue() );
+            assertThat( entries.size(), equalTo( 1 ) );
+            assertThat( entries, contains( "/release/foo" ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    @Test
+    public void onePageHttp403()
+        throws Exception
+    {
+        // server recognized as S3 but AccessDenied:
+        // context should be stopped and unsuccessful
+        final Server server = prepareErrorServer( 403 );
+        server.start();
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/";
+            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            getScraper().scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( false ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    /**
+     * Unsure is this a valid test case at all. Unsure when bucket root would respond with 404 at all? Empty bucket?
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void onePageHttp404()
+        throws Exception
+    {
+        // server recognized as S3 but 404:
+        // context should be stopped and unsuccessful
+        final Server server = prepareErrorServer( 404 );
+        server.start();
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/";
+            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            getScraper().scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( false ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    /**
+     * This test makes no sense, as HTTP 500 response triggers mechanism in
+     * {@link Page#getPageFor(ScrapeContext, String)}, so S3 scraper is not tested at all actually.
+     * 
+     * @throws Exception
+     */
+    @Test( expected = UnexpectedPageResponse.class )
+    public void onePageHttp500()
+        throws Exception
+    {
+        // server recognized as S3 but 500:
+        // context should be stopped and unsuccessful
+        final Server server = prepareErrorServer( 500 );
+        server.start();
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/";
+            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            getScraper().scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( false ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    // == Two pages:
+    // Scenarios generally covers case when the repo root (that is nested in bucket, not at it's root)
+    // responds as expected (NoSuchKey), and then tests simulates various responses for "fixed" URL
+    // Point here, is that we did recognize remote as S3, and in any case, we should STOP scraping
+    // instead throwing generic IOEx that would make other scrapers pick up and continue trying to scrape
+    // the URL.
+
+    @Test
+    public void twoPagesHttp200()
         throws Exception
     {
         final Server server = prepareServer();
@@ -221,31 +351,7 @@ public class AmazonS3IndexScraperTest
     }
 
     @Test
-    public void onePageHttp404()
-        throws Exception
-    {
-        // server recognized as S3 but 404:
-        // context should be stopped and unsuccessful
-        final Server server = prepareErrorServer( 404 );
-        server.start();
-        try
-        {
-            final HttpClient httpClient = new DefaultHttpClient();
-            final String repoRoot = server.getUrl().toString() + "/release/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
-            final Page page = Page.getPageFor( context, repoRoot );
-            getScraper().scrape( context, page );
-            assertThat( context.isStopped(), is( true ) );
-            assertThat( context.isSuccessful(), is( false ) );
-        }
-        finally
-        {
-            server.stop();
-        }
-    }
-
-    @Test
-    public void onePageHttp403()
+    public void twoPagesHttp403()
         throws Exception
     {
         // server recognized as S3 but AccessDenied:
@@ -269,7 +375,31 @@ public class AmazonS3IndexScraperTest
     }
 
     @Test
-    public void onePageHttp500()
+    public void twoPagesHttp404()
+        throws Exception
+    {
+        // server recognized as S3 but 404:
+        // context should be stopped and unsuccessful
+        final Server server = prepareErrorServer( 404 );
+        server.start();
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final String repoRoot = server.getUrl().toString() + "/release/";
+            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            final Page page = Page.getPageFor( context, repoRoot );
+            getScraper().scrape( context, page );
+            assertThat( context.isStopped(), is( true ) );
+            assertThat( context.isSuccessful(), is( false ) );
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    @Test
+    public void twoPagesHttp500()
         throws Exception
     {
         // server recognized as S3 but 500:
