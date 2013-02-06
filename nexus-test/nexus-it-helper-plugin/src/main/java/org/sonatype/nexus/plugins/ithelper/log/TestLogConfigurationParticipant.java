@@ -36,7 +36,7 @@ public class TestLogConfigurationParticipant
     @Override
     public String getName()
     {
-        return "logback-tests.xml";
+        return "logback-test.xml";
     }
 
     @Override

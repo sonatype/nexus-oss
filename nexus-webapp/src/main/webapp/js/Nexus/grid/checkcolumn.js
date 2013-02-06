@@ -11,6 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
+/**
+ * DEPRECATED This does not seem to be working anymore, need to check whether plugins use this and then remove.
+ */
 define('Nexus/grid/checkcolumn', ['extjs', 'nexus'], function(Ext, Nexus) {
   Ext.namespace('Nexus.grid');
 

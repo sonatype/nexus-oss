@@ -19,6 +19,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.google.inject.servlet.ServletModule;
+import org.sonatype.guice.bean.locators.DefaultRankingFunction;
+import org.sonatype.guice.bean.locators.RankingFunction;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 /**
@@ -40,6 +42,13 @@ public class NexusServletModule
 
         filter("/service/local/*").through( SecurityWebFilter.class );
         filter("/content/*").through( SecurityWebFilter.class );
+
+        /*
+         * Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
+         * after components from other plugins. This makes sure the restlet1x "catch-all" filter won't kick in early and
+         * block other filters in the pipeline.
+         */
+        bind( RankingFunction.class ).toInstance( new DefaultRankingFunction( 0 ) );
     }
 
     private Map<String, String> nexusRestletServletInitParams()

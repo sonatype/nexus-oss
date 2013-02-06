@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Path;
 
@@ -41,6 +42,7 @@ import com.google.common.collect.Maps;
  *
  * @since 2.2
  */
+@Named
 @Singleton
 @Path( UIDLockResource.RESOURCE_URI )
 public class UIDLockResource

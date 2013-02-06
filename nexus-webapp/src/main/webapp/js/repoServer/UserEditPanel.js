@@ -633,7 +633,7 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
         disabled : !this.isNew,
         allowBlank : false,
         width : this.COMBO_WIDTH,
-        validator : Strings.validateId
+        validator : Nexus.util.Strings.validateId
       }, {
         xtype : 'textfield',
         fieldLabel : 'First Name',
@@ -734,7 +734,6 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
   }
 
   items.push({
-        id : 'useredit-rolemanager',
         xtype : 'rolemanager',
         name : 'roleManager',
         height : 200,
@@ -802,7 +801,7 @@ Ext.extend(Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
       },
       validationModifiers : { 'roles' :
         function(error,panel) {
-          Ext.getCmp('useredit-rolemanager').markInvalid(error.msg); 
+          panel.find('name', 'roleManager')[0].markInvalid(error.msg);
         }
       }
     });
