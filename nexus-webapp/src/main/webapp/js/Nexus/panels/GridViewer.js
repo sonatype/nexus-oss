@@ -134,21 +134,15 @@ Ext.namespace('Sonatype.panels');
           defaultValue : c.defaultValue
         });
 
-        if (c.header) {
+        if (c.header !== null && c.header !== undefined) {
           if (c.autoExpand) {
             if (!c.id) {
               c.id = Ext.id();
             }
             this.autoExpandColumn = c.id;
           }
-          columns.push({
-            header : c.header,
-            dataIndex : c.name,
-            id : c.id,
-            width : c.width,
-            align : c.align,
-            renderer : c.renderer
-          });
+          c.dataIndex = c.name;
+          columns.push(c);
         }
       }
     }
