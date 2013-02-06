@@ -583,8 +583,7 @@ public class SimplePullTest
             response.getOutputStream().write( "partialcontent".getBytes() );
             response.flushBuffer();
             // this causes noise in log (java.lang.InterruptedException: sleep interrupted) but is only way to make port
-            // get closed
-            // otherwise SocketTimeout happens (not HC4's ConnectionClosedException)
+            // get closed, otherwise SocketTimeout happens (not HC4's ConnectionClosedException)
             server.stop();
             return false;
         }
