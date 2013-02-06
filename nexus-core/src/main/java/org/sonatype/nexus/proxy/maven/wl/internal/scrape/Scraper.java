@@ -12,14 +12,13 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
-import java.io.IOException;
-
 import org.sonatype.nexus.proxy.maven.wl.discovery.Prioritized;
 
 /**
- * Scraper component, implementations should "specialise" for some remote target, like Nexus or HTTPd.
+ * Scraper component, implementations should "specialize" for some remote target, like Nexus or Apache HTTPD.
  * 
  * @author cstamas
+ * @since 2.4
  */
 public interface Scraper
     extends Prioritized
@@ -32,12 +31,10 @@ public interface Scraper
     String getId();
 
     /**
-     * Tries to scrape. Scraper should flag the {@link ScrapeContext} if it wants to stop the processing.
+     * Tries to scrape. Scraper should flag the {@link ScrapeContext} as stopped if it wants to stop the processing.
      * 
      * @param context
      * @param page
-     * @throws IOException
      */
-    void scrape( ScrapeContext context, Page page )
-        throws IOException;
+    void scrape( ScrapeContext context, Page page );
 }

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
@@ -114,8 +115,8 @@ public abstract class AbstractGeneratedIndexPageScraper
                         }
                         else
                         {
-                            throw new IOException( "Unexpected response from remote repository URL " + page.getUrl()
-                                + " : " + page.getHttpResponse().getStatusLine().toString() );
+                            // we do expect strictly 200 here
+                            throw new UnexpectedPageResponse( page.getUrl(), page.getHttpResponse().getStatusLine() );
                         }
                     }
                 }

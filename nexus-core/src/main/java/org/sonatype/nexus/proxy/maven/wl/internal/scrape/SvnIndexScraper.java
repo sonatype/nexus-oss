@@ -66,7 +66,7 @@ public class SvnIndexScraper
             {
                 final String elementHref = element.absUrl( "href" );
                 if ( "http://subversion.tigris.org/".equals( elementHref )
-                    || "http://subversion.tigris.org/".equals( elementHref ) )
+                    || "http://subversion.apache.org/".equals( elementHref ) )
                 {
                     return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
                 }

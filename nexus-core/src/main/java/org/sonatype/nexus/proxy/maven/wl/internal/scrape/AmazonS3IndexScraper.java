@@ -96,18 +96,7 @@ public class AmazonS3IndexScraper
                     context.getRemoteRepositoryRootUrl().length() - prefix.length() );
             getLogger().debug( "Retrying URL {} to scrape Amazon S3 hosted repository on remote URL {}", fixedUrl,
                 context.getRemoteRepositoryRootUrl() );
-            try
-            {
-                initialPage = Page.getPageFor( context, fixedUrl + "?prefix=" + prefix );
-            }
-            catch ( UnexpectedPageResponse e )
-            {
-                getLogger().info( "Unexpected {} response, cannot scrape response from {} :\n{}", getTargetedServer(),
-                    fixedUrl, initialPage.getDocument().outerHtml() );
-                context.stop( "Remote recognized as " + getTargetedServer()
-                    + ", but unexpected response code and response body received (see logs)." );
-                return null;
-            }
+            initialPage = Page.getPageFor( context, fixedUrl + "?prefix=" + prefix );
         }
 
         final HashSet<String> entries = new HashSet<String>();

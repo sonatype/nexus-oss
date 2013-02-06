@@ -114,9 +114,9 @@ public class AmazonS3IndexScraperTest
     {
         final Server result = Server.withPort( 0 );
         result.serve( "/release/" ).withBehaviours( new S3Headers(),
-            new Deliver( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
+            new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
         result.serve( "/" ).withBehaviours( new S3Headers(),
-            new Deliver( 200, "application/xml", ONE_PAGE_RESPONSE.getBytes( "UTF-8" ) ) );
+            new DeliverBehaviour( 200, "application/xml", ONE_PAGE_RESPONSE.getBytes( "UTF-8" ) ) );
         return result;
     }
 
@@ -127,27 +127,27 @@ public class AmazonS3IndexScraperTest
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/release/" ).withBehaviours( new S3Headers(),
-                new Deliver( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
             result.serve( "/*" ).withBehaviours( new S3Headers(),
-                new Deliver( 403, "application/xml", ACCESS_DENIED_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 403, "application/xml", ACCESS_DENIED_RESPONSE.getBytes( "UTF-8" ) ) );
             return result;
         }
         else if ( code == 404 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/release/" ).withBehaviours( new S3Headers(),
-                new Deliver( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
             result.serve( "/*" ).withBehaviours( new S3Headers(),
-                new Deliver( 404, "application/xml", NO_SUCH_KEY_RESPONSE_ROOT.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE_ROOT.getBytes( "UTF-8" ) ) );
             return result;
         }
         else if ( code == 500 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/release/" ).withBehaviours( new S3Headers(),
-                new Deliver( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
             result.serve( "/*" ).withBehaviours( new S3Headers(),
-                new Deliver( 500, "application/xml", INTERNAL_ERROR_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 500, "application/xml", INTERNAL_ERROR_RESPONSE.getBytes( "UTF-8" ) ) );
             return result;
         }
         else
@@ -165,34 +165,6 @@ public class AmazonS3IndexScraperTest
         {
             response.addHeader( "Server", "AmazonS3" );
             response.addHeader( "x-amz-request-id", "1234567890" );
-            return true;
-        }
-    }
-
-    protected static class Deliver
-        implements Behaviour
-    {
-        private final int code;
-
-        private final String bodyContentType;
-
-        private final byte[] body;
-
-        public Deliver( final int code, final String bodyContentType, final byte[] body )
-        {
-            this.code = code;
-            this.bodyContentType = bodyContentType;
-            this.body = body;
-        }
-
-        @Override
-        public boolean execute( HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx )
-            throws Exception
-        {
-            response.setStatus( code );
-            response.setContentType( bodyContentType );
-            response.setContentLength( body.length );
-            response.getOutputStream().write( body );
             return true;
         }
     }

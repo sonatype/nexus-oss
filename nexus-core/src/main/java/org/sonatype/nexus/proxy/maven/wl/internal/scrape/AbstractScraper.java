@@ -74,7 +74,6 @@ public abstract class AbstractScraper
 
     @Override
     public void scrape( final ScrapeContext context, final Page page )
-        throws IOException
     {
         final RemoteDetectionResult detectionResult = detectRemoteRepository( context, page );
         switch ( detectionResult )
@@ -82,23 +81,32 @@ public abstract class AbstractScraper
             case RECOGNIZED_SHOULD_BE_SCRAPED:
                 getLogger().debug( "Remote repository on URL={} recognized as {}, scraping it...",
                     context.getRemoteRepositoryRootUrl(), getTargetedServer() );
-                final List<String> entries = diveIn( context, page );
-                if ( !context.isStopped() )
+                try
                 {
-                    if ( entries != null )
+                    final List<String> entries = diveIn( context, page );
+                    if ( !context.isStopped() )
                     {
-                        // recognized and scraped with result
-                        final EntrySource entrySource = new ArrayListEntrySource( entries );
-                        context.stop( entrySource, "Remote recognized as " + getTargetedServer() + " (harvested "
-                            + String.valueOf( entries.size() ) + " entries, " + context.getScrapeDepth()
-                            + " levels deep)." );
+                        if ( entries != null )
+                        {
+                            // recognized and scraped with result
+                            final EntrySource entrySource = new ArrayListEntrySource( entries );
+                            context.stop( entrySource, "Remote recognized as " + getTargetedServer() + " (harvested "
+                                + String.valueOf( entries.size() ) + " entries, " + context.getScrapeDepth()
+                                + " levels deep)." );
+                        }
+                        else
+                        {
+                            // safety net (subclass should stop it here: recognized but something went wrong)
+                            context.stop( "Remote recognized as " + getTargetedServer()
+                                + ", but could not scrape it (see logs)." );
+                        }
                     }
-                    else
-                    {
-                        // safety net (subclass should stop it here: recognized but something went wrong)
-                        context.stop( "Remote recognized as " + getTargetedServer()
-                            + ", but could not scrape it (see logs)." );
-                    }
+                }
+                catch ( IOException e )
+                {
+                    // remote recognized, but IOEx happened during "dive": stop it and report scrape as unsuccessful
+                    context.stop( "Remote recognized as " + getTargetedServer() + ", but scrape failed:"
+                        + e.getMessage() );
                 }
                 break;
 
