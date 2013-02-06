@@ -16,10 +16,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
-import java.io.IOException;
+import java.net.SocketException;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Test;
+import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -68,7 +69,7 @@ public class PageTest
         }
     }
 
-    @Test( expected = IOException.class )
+    @Test( expected = UnexpectedPageResponse.class )
     public void error500IsException()
         throws Exception
     {
@@ -84,5 +85,24 @@ public class PageTest
         {
             server.stop();
         }
+    }
+
+    @Test( expected = SocketException.class )
+    public void errorConnectionRefusedException()
+        throws Exception
+    {
+        final String repoRootUrl;
+        final Server server = Server.withPort( 0 ).serve( "/*" ).withBehaviours( Behaviours.error( 500 ) );
+        server.start();
+        try
+        {
+            repoRootUrl = server.getUrl().toString() + "/foo/bar/";
+        }
+        finally
+        {
+            server.stop();
+        }
+        final ScrapeContext context = new ScrapeContext( new DefaultHttpClient(), repoRootUrl, 2 );
+        final Page page = Page.getPageFor( context, repoRootUrl );
     }
 }
