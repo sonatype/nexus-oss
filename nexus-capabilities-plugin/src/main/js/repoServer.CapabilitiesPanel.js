@@ -445,19 +445,25 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         loadMask : true,
         deferredRender : false,
         columns : [{
+              xtype : 'checkcolumn',
+              readOnly : true,
+              sortable : true,
               header : 'Enabled',
               dataIndex : 'enabled',
               width : 50,
               id : 'capabilities-enabled-col'
             }, {
+              xtype : 'checkcolumn',
+              readOnly : true,
+              sortable : true,
               header : 'Active',
               dataIndex : 'active',
               width : 50,
-              renderer:this.renderActive.createDelegate(this),
               id : 'capabilities-active-col'
             }, {
               header : 'Type',
               dataIndex : 'typeName',
+              sortable : true,
               width : 175,
               id : 'capabilities-type-col'
             }, {
@@ -1172,17 +1178,6 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
       importCapabilityPropertiesHelper : function(val, srcObj, fpanel) {
         FormFieldImporter(srcObj, fpanel, CAPABILITY_SETTINGS_PREFIX, this.customFieldTypes);
-        return val;
-      },
-
-      renderActive:function(val, cell, record) {
-
-        // get data
-        var data = record.data;
-        if(data.stateDescription){
-          // return markup
-          return '<div qtip="' + data.stateDescription +'">' + val + '</div>';
-        }
         return val;
       },
 
