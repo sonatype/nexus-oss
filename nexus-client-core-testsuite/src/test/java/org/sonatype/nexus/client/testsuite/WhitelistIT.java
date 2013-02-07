@@ -24,6 +24,12 @@ import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Whitelist;
 
+/**
+ * Will not work until 2.4 released, as it seems Sisu Maven Bridge will download the "latest" from remote, not use the
+ * build from branch.
+ * 
+ * @author cstamas
+ */
 @Ignore
 public class WhitelistIT
     extends NexusClientITSupport
