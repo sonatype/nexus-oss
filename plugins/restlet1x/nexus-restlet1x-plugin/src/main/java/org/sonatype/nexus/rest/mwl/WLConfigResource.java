@@ -120,6 +120,10 @@ public class WLConfigResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Message not recognized!", e );
         }
+        catch ( IllegalArgumentException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid or illegal configuration!", e );
+        }
         catch ( IOException e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
