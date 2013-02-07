@@ -19,7 +19,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
@@ -33,14 +32,16 @@ import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.base.Throwables;
 
+import javax.inject.Inject;
+
+import static com.google.common.base.Preconditions.checkState;
+
 public abstract class AbstractNexusTask<T>
     extends AbstractSchedulerTask<T>
     implements NexusTask<T>
 {
-
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
-    @Requirement
     private EventBus eventBus;
 
     protected AbstractNexusTask()
@@ -63,6 +64,18 @@ public abstract class AbstractNexusTask<T>
     protected AbstractNexusTask( final EventBus eventBus, final String name )
     {
         this( name );
+        this.eventBus = eventBus;
+    }
+
+    protected EventBus getEventBus()
+    {
+        checkState( eventBus != null );
+        return eventBus;
+    }
+
+    @Inject
+    public void setEventBus( final EventBus eventBus )
+    {
         this.eventBus = eventBus;
     }
 
@@ -151,7 +164,7 @@ public abstract class AbstractNexusTask<T>
 
         // fire event
         final NexusTaskEventStarted<T> startedEvent = new NexusTaskEventStarted<T>( this );
-        eventBus.post( startedEvent );
+        getEventBus().post(startedEvent);
 
         T result = null;
 
@@ -169,13 +182,13 @@ public abstract class AbstractNexusTask<T>
             {
                 getLogger().info( getLoggedMessage( "canceled", started ) );
 
-                eventBus.post( new NexusTaskEventStoppedCanceled<T>( this, startedEvent ) );
+                getEventBus().post(new NexusTaskEventStoppedCanceled<T>(this, startedEvent));
             }
             else
             {
                 getLogger().info( getLoggedMessage( "finished", started ) );
 
-                eventBus.post( new NexusTaskEventStoppedDone<T>( this, startedEvent ) );
+                getEventBus().post(new NexusTaskEventStoppedDone<T>(this, startedEvent));
             }
 
             afterRun();
@@ -191,7 +204,7 @@ public abstract class AbstractNexusTask<T>
                 getLogger().info( getLoggedMessage( "canceled", started ) );
 
                 // just return, nothing happened just task cancelled
-                eventBus.post( new NexusTaskEventStoppedCanceled<T>( this, startedEvent ) );
+                getEventBus().post(new NexusTaskEventStoppedCanceled<T>(this, startedEvent));
 
                 return null;
             }
@@ -200,7 +213,7 @@ public abstract class AbstractNexusTask<T>
                 getLogger().warn( getLoggedMessage( "failed", started ), e );
 
                 // notify that there was a failure
-                eventBus.post( new NexusTaskEventStoppedFailed<T>( this, startedEvent, e ) );
+                getEventBus().post(new NexusTaskEventStoppedFailed<T>(this, startedEvent, e));
 
                 Throwables.propagateIfInstanceOf( e, Exception.class );
                 throw Throwables.propagate( e );
@@ -226,6 +239,7 @@ public abstract class AbstractNexusTask<T>
     }
 
     protected void beforeRun()
+        throws Exception
     {
         // override if needed
     }
@@ -234,6 +248,7 @@ public abstract class AbstractNexusTask<T>
         throws Exception;
 
     protected void afterRun()
+        throws Exception
     {
         // override if needed
     }

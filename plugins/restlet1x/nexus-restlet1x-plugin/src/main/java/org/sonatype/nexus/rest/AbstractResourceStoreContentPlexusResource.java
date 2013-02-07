@@ -311,10 +311,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         ResourceStoreRequest result = new ResourceStoreRequest( resourceStorePath );
 
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Created ResourceStore request for " + result.getRequestPath() );
-        }
+        getLogger().trace( "Created ResourceStore request for {}", result.getRequestPath() );
 
         // honor the local only and remote only
         result.setRequestLocalOnly( isLocal( request, resourceStorePath ) );
