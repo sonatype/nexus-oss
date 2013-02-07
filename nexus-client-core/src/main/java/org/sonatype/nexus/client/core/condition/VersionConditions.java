@@ -23,7 +23,7 @@ import org.sonatype.nexus.client.internal.util.Template;
 
 /**
  * {@link Condition}s that matches remote Nexus version.
- *
+ * 
  * @since 2.1
  */
 public abstract class VersionConditions
@@ -45,6 +45,21 @@ public abstract class VersionConditions
      */
     private static final VersionConstraint POST_2_0_VERSIONS = parseVersionConstraint( "(2.0.99,)" );
 
+    /**
+     * Version constraint that matches all released Nexus versions beginning with version 2.2.
+     */
+    private static final VersionConstraint POST_2_1_VERSIONS = parseVersionConstraint( "(2.1.99,)" );
+
+    /**
+     * Version constraint that matches all released Nexus versions beginning with version 2.3.
+     */
+    private static final VersionConstraint POST_2_2_VERSIONS = parseVersionConstraint( "(2.2.99,)" );
+
+    /**
+     * Version constraint that matches all released Nexus versions beginning with version 2.4.
+     */
+    private static final VersionConstraint POST_2_3_VERSIONS = parseVersionConstraint( "(2.3.99,)" );
+
     // ==
 
     public static Condition anyModernVersion()
@@ -60,6 +75,21 @@ public abstract class VersionConditions
     public static Condition any21AndLaterVersion()
     {
         return new VersionCondition( POST_2_0_VERSIONS );
+    }
+
+    public static Condition any22AndLaterVersion()
+    {
+        return new VersionCondition( POST_2_1_VERSIONS );
+    }
+
+    public static Condition any23AndLaterVersion()
+    {
+        return new VersionCondition( POST_2_2_VERSIONS );
+    }
+
+    public static Condition any24AndLaterVersion()
+    {
+        return new VersionCondition( POST_2_3_VERSIONS );
     }
 
     public static Condition withVersion( final String versionRange )
@@ -90,8 +120,7 @@ public abstract class VersionConditions
         @Override
         public String explainNotSatisfied( final NexusStatus status )
         {
-            return Template.of( "(version \"%s\" contained in \"%s\")", status.getVersion(),
-                                suitableVersions ).toString();
+            return Template.of( "(version \"%s\" contained in \"%s\")", status.getVersion(), suitableVersions ).toString();
         }
     }
 
