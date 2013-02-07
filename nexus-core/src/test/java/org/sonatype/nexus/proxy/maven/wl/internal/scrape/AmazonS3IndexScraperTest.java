@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
 import java.util.List;
 import java.util.Map;
 
