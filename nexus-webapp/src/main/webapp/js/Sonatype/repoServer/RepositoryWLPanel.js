@@ -69,7 +69,6 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
           defaultConfig = {
             frame : true,
             autoScroll : true,
-            defaultAnchor : '-15',
             readOnly : true, // don't want save/cancel buttons
             url : this.resourceUrl.apply([cfg.payload.data.id])
           };
@@ -97,9 +96,9 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
         },
 
         'discovery.discoveryLastStatus' : function(value) {
+          self.discoveryStatus = value;
           var store = Sonatype.repoServer.RepositoryWLPanel.discoveryStatusStore;
-          return store.getAt(store.find('value',
-                value)).get('text');
+          return store.getAt(store.find('value', value)).get('text');
         },
 
         'publishedUrl' : function(value) {
@@ -114,6 +113,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
         xtype : 'fieldset',
         title : 'Publishing',
         name : 'publishingFieldset',
+        anchor : Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
         layout : {
           type : 'hbox',
           align : 'stretchmax'
@@ -163,6 +163,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       {
         xtype : 'fieldset',
         title : 'Discovery',
+        anchor : Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
         checkboxToggle : true,
         name : 'discoveryFieldset',
         hidden : subjectIsNotProxy,
@@ -356,6 +357,10 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       if (panel.publishedStatus === -1) {
         panel.find('xtype', 'container')[0].hide();
         panel.find('name', 'publishedTimestamp')[0].hide();
+      }
+
+      if (panel.discoveryStatus === 0) {
+        panel.find('name', 'discovery.discoveryLastRunTimestamp')[0].hide();
       }
     }
   }
