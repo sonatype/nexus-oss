@@ -29,6 +29,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryConfig;
@@ -165,7 +166,8 @@ public class WLStatusResource
     }
 
     /**
-     * Force updates WL for given proxy repository. If invoked for non-Maven proxy repository, response is Bad Request.
+     * Force updates WL for given repository. If invoked for non-Maven repository, or a Maven Group repository, response
+     * is Bad Request.
      */
     @Override
     @DELETE
@@ -173,9 +175,29 @@ public class WLStatusResource
     public void delete( final Context context, final Request request, final Response response )
         throws ResourceException
     {
-        final MavenProxyRepository mavenRepository = getMavenRepository( request, MavenProxyRepository.class );
-        getWLManager().updateWhitelist( mavenRepository );
-        // currently this happens synchronously, but it is the status that will reveal real outcome of the operation
-        response.setStatus( Status.SUCCESS_ACCEPTED );
+        try
+        {
+            // try with proxy
+            final MavenProxyRepository mavenRepository = getMavenRepository( request, MavenProxyRepository.class );
+            getWLManager().updateWhitelist( mavenRepository );
+            // we spawned a background job, so say "okay, we accepted this, but come back later for results"
+            response.setStatus( Status.SUCCESS_ACCEPTED );
+        }
+        catch ( ResourceException e )
+        {
+            if ( Status.CLIENT_ERROR_BAD_REQUEST.getCode() == e.getStatus().getCode() )
+            {
+                // try with hosted
+                final MavenHostedRepository mavenRepository = getMavenRepository( request, MavenHostedRepository.class );
+                getWLManager().updateWhitelist( mavenRepository );
+                // we spawned a background job, so say "okay, we accepted this, but come back later for results"
+                response.setStatus( Status.SUCCESS_ACCEPTED );
+            }
+            else
+            {
+                // other, like 404 Not found repo with ID
+                throw e;
+            }
+        }
     }
 }
