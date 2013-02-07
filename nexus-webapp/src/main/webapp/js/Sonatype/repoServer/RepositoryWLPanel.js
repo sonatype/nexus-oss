@@ -10,8 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define, Ext, Nexus, Sonatype*/
-Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
+/*global define, Ext, Nexus, Sonatype, NX*/
+NX.define('Sonatype.repoServer.RepositoryWLPanel', {
   extend : 'Nexus.ext.FormPanel',
   requireSuper : false,
 
@@ -49,6 +49,10 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
         ['Successful.', '1']
       ]
     })
+  },
+
+  refreshContent : function() {
+    this.loadData();
   },
 
   constructor : function(cfg) {
@@ -236,7 +240,7 @@ Ext.define('Sonatype.repoServer.RepositoryWLPanel', {
       }
     ];
 
-    Sonatype.repoServer.RepositoryWLPanel.superclass.constructor.call(this);
+    Sonatype.repoServer.RepositoryWLPanel.superclass.constructor.apply(this, arguments);
 
     this.on('actioncomplete', this.onActionComplete);
   },
