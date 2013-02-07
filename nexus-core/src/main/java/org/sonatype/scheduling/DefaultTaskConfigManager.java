@@ -251,30 +251,44 @@ public class DefaultTaskConfigManager
     public SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
     {
-        try
-        {
-            return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.class, taskType );
+        try {
+            return lookupTask(taskType);
         }
-        catch ( ComponentLookupException ignore )
-        {
-            try
-            {
-                return (SchedulerTask<?>) getPlexusContainer().lookup( NexusTask.class, taskType );
-            }
-            catch ( ComponentLookupException e )
-            {
-                // print original debug
-                this.logger.debug( "Failed to load Schedule Task: "+ taskType, e );
-                throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
-            }
+        catch (ComponentLookupException e) {
+            this.logger.debug("Failed to load Schedule Task: " + taskType, e);
+            throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
         }
     }
 
-    public <T> T createTaskInstance( Class<T> taskType )
+    private SchedulerTask<?> lookupTask(final String taskType) throws ComponentLookupException {
+        logger.debug("Looking up task for: " + taskType);
+
+        try {
+            return (SchedulerTask<?>) getPlexusContainer().lookup(SchedulerTask.class, taskType);
+        }
+        catch (ComponentLookupException ignore) {
+            return (SchedulerTask<?>) getPlexusContainer().lookup(NexusTask.class, taskType);
+        }
+    }
+
+    public <T> T createTaskInstance( final Class<T> taskType )
         throws IllegalArgumentException
     {
-        // the convention is to use the simple class name as the plexus hint
-        return (T) createTaskInstance( taskType.getSimpleName() );
+        logger.debug("Creating task: {}", taskType);
+
+        try {
+            // first try a full class name lookup (modern sisu-style)
+            return (T) lookupTask(taskType.getCanonicalName());
+        }
+        catch (ComponentLookupException e) {
+            try {
+                // fallback to old plexus hint style
+                return (T) lookupTask(taskType.getSimpleName());
+            }
+            catch (ComponentLookupException x) {
+                throw new IllegalArgumentException("Could not create task of type: " + taskType, e);
+            }
+        }
     }
 
     // ==
