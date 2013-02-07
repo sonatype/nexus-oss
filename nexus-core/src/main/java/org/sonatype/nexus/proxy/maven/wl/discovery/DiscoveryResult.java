@@ -258,7 +258,7 @@ public class DiscoveryResult<R extends MavenRepository>
     protected Outcome getLastSuccessOutcome()
     {
         final Outcome outcome = getLastOutcome();
-        if ( outcome.isSuccessful() )
+        if ( outcome != null && outcome.isSuccessful() )
         {
             return outcome;
         }

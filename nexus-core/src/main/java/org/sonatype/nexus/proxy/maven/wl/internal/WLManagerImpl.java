@@ -102,7 +102,7 @@ public class WLManagerImpl
      * Plain set holding the repository IDs of repositories being batch-updated in background. All read-write access to
      * this set must happen within synchronized block, using this instance as monitor object.
      */
-    private final HashSet<String> currentlyUpdatingRepositoryIds = new HashSet<String>();
+    private final HashSet<String> currentlyUpdatingRepositoryIds;
 
     /**
      * Plain executor for background batch-updates. This executor runs 1 periodic thread (see constructor) that performs
@@ -110,8 +110,7 @@ public class WLManagerImpl
      * repository is added). But, as background threads are bounded by presence of proxy repositories, and introduce
      * hard limit of possible max executions, it protects this instance that is basically unbounded.
      */
-    private final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "wl",
-        "WL-Updater" ), new ThreadPoolExecutor.AbortPolicy() );
+    private final ScheduledExecutorService executor;
 
     /**
      * Da constructor.
@@ -138,6 +137,12 @@ public class WLManagerImpl
         this.config = checkNotNull( config );
         this.localContentDiscoverer = checkNotNull( localContentDiscoverer );
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
+        this.currentlyUpdatingRepositoryIds = new HashSet<String>();
+        this.executor =
+            new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "wl", "WL-Updater" ),
+                new ThreadPoolExecutor.AbortPolicy() );
+
+        // schedule the "updater": wait 10 minutes for boot to calm down and then do the work hourly
         this.executor.scheduleAtFixedRate( new Runnable()
         {
             @Override
@@ -145,7 +150,9 @@ public class WLManagerImpl
             {
                 mayUpdateProxyWhitelist();
             }
-        }, TimeUnit.MINUTES.toMillis( 1 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
+        }, TimeUnit.MINUTES.toMillis( 10 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
+
+        // register event dispatcher
         this.eventDispatcher = new EventDispatcher( applicationStatusSource, this );
         this.eventBus.register( eventDispatcher );
     }
@@ -179,6 +186,8 @@ public class WLManagerImpl
                 }
                 else
                 {
+                    // mark it for noscrape if not marked yet
+                    // this is mainly important on 1st boot or newly added reposes
                     unpublish( mavenRepository );
                     updateNeededRepositories.add( mavenRepository );
                 }
@@ -247,19 +256,8 @@ public class WLManagerImpl
             }
             else
             {
-                try
-                {
-                    unpublish( mavenRepository );
-                    repositoriesToBeUpdatedAndPublished.add( mavenRepository );
-                    currentlyUpdatingRepositoryIds.add( mavenRepository.getId() );
-                }
-                catch ( IOException e )
-                {
-                    // if unpublish fails, we just handle it, and the repo will NOT
-                    // be added to repositoriesToBeUpdatedAndPublished, so we are fine
-                    getLogger().warn( "Problem during WL removal of {}",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-                }
+                repositoriesToBeUpdatedAndPublished.add( mavenRepository );
+                currentlyUpdatingRepositoryIds.add( mavenRepository.getId() );
             }
         }
         if ( !repositoriesToBeUpdatedAndPublished.isEmpty() )
@@ -282,7 +280,7 @@ public class WLManagerImpl
                             {
                                 updateAndPublishWhitelist( mavenRepository, true );
                             }
-                            catch ( IOException e )
+                            catch ( Exception e )
                             {
                                 getLogger().warn( "Problem during WL update of {}",
                                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
@@ -322,7 +320,6 @@ public class WLManagerImpl
         throws IOException
     {
         getLogger().debug( "Updating WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-        unpublish( mavenRepository );
         final EntrySource entrySource;
         if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
         {
