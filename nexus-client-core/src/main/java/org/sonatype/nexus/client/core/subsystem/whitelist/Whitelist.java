@@ -21,13 +21,16 @@ public interface Whitelist
     Status getWhitelistStatus( String mavenRepositoryId );
 
     /**
-     * Perform a forced update of the Whitelist of a Maven Proxy repository.
+     * Perform a forced update of the Whitelist of a Maven repository. This method returns immediately, but it spawns a
+     * background operation on Nexus that will perform the update and it's outcome will be reflected in status when
+     * update is done.
      * 
-     * @param mavenProxyRepositoryId the ID of the Maven Proxy repository you want update the whitelist for.
+     * @param mavenRepositoryId the ID of the Maven Repository you want update the whitelist for (see throws for what
+     *            kind of repositories this call is allowed).
      * @throws NexusClientErrorResponseException if the passed in ID is not a Maven Proxy repository.
      * @throws NexusClientNotFoundException if the passed in ID does not exists.
      */
-    void updateWhitelist( String mavenProxyRepositoryId )
+    void updateWhitelist( String mavenRepositoryId )
         throws NexusClientErrorResponseException, NexusClientNotFoundException;
 
     /**
