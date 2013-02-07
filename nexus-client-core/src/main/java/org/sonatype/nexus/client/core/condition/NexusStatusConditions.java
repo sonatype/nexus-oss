@@ -17,7 +17,7 @@ import org.sonatype.nexus.client.core.NexusStatus;
 
 /**
  * {@link Condition}s matching {@link NexusStatus}.
- *
+ * 
  * @since 2.1
  */
 public abstract class NexusStatusConditions
@@ -51,5 +51,35 @@ public abstract class NexusStatusConditions
     public static Condition any21AndLaterPro()
     {
         return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any21AndLaterVersion() );
+    }
+
+    public static Condition any22AndLater()
+    {
+        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any22AndLaterVersion() );
+    }
+
+    public static Condition any22AndLaterPro()
+    {
+        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any22AndLaterVersion() );
+    }
+
+    public static Condition any23AndLater()
+    {
+        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any23AndLaterVersion() );
+    }
+
+    public static Condition any23AndLaterPro()
+    {
+        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any23AndLaterVersion() );
+    }
+
+    public static Condition any24AndLater()
+    {
+        return LogicalConditions.and( EditionConditions.anyEdition(), VersionConditions.any24AndLaterVersion() );
+    }
+
+    public static Condition any24AndLaterPro()
+    {
+        return LogicalConditions.and( EditionConditions.anyProEdition(), VersionConditions.any24AndLaterVersion() );
     }
 }
