@@ -87,6 +87,7 @@ public abstract class AbstractGeneratedIndexPageScraper
         {
             return;
         }
+        getLogger().debug( "Processing page response from URL {}", page.getUrl() );
         final Elements elements = page.getDocument().getElementsByTag( "a" );
         final List<String> pathElements = currentNode.getPathElements();
         final String currentPath = currentNode.getPath();
@@ -102,7 +103,7 @@ public abstract class AbstractGeneratedIndexPageScraper
                 final Node<Payload> newSibling = parentOMatic.addPath( currentPath + "/" + element.text() );
                 if ( element.absUrl( "href" ).endsWith( "/" ) )
                 {
-                    // "cut" recursion preemptively
+                    // "cut" recursion preemptively to save remote fetch (and then stop recursion due to depth)
                     final int siblingDepth = currentDepth + 1;
                     if ( siblingDepth < context.getScrapeDepth() )
                     {

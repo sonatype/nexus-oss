@@ -23,6 +23,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The page fetched from remote and preprocessed by JSoup.
@@ -123,6 +125,8 @@ public class Page
 
     // ==
 
+    private static final Logger LOG = LoggerFactory.getLogger( Page.class );
+
     /**
      * Returns a page for given URL.
      * 
@@ -138,6 +142,7 @@ public class Page
         checkNotNull( url );
         // TODO: detect redirects
         final HttpGet get = new HttpGet( url );
+        LOG.debug( "Executing HTTP GET request against {}", url );
         HttpResponse response = context.getHttpClient().execute( get );
         try
         {

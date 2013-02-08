@@ -105,6 +105,8 @@ public abstract class AbstractScraper
                 catch ( IOException e )
                 {
                     // remote recognized, but IOEx happened during "dive": stop it and report scrape as unsuccessful
+                    getLogger().debug(
+                        "Remote recognized as " + getTargetedServer() + ", but scrape failed:" + e.getMessage(), e );
                     context.stop( "Remote recognized as " + getTargetedServer() + ", but scrape failed:"
                         + e.getMessage() );
                 }

@@ -126,6 +126,7 @@ public class AmazonS3IndexScraper
             return;
         }
 
+        getLogger().debug( "Processing S3 page response from URL {}", page.getUrl() );
         String markerElement = null;
         final Elements elements = page.getDocument().getElementsByTag( "Contents" );
         for ( Element element : elements )
