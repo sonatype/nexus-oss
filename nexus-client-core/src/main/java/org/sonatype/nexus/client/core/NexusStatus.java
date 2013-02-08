@@ -16,7 +16,7 @@ import java.util.Date;
 
 /**
  * Status of the remote Nexus instance.
- *
+ * 
  * @since 2.1
  */
 public class NexusStatus
@@ -80,17 +80,17 @@ public class NexusStatus
     /**
      * Flag that states if this is the first time nexus was started.
      */
-    private final boolean firstStart = false;
+    private final boolean firstStart;
 
     /**
      * Flag that states if the nexus instance has been upgraded.
      */
-    private final boolean instanceUpgraded = false;
+    private final boolean instanceUpgraded;
 
     /**
      * Flag that states if the nexus configuration has been upgraded
      */
-    private final boolean configurationUpgraded = false;
+    private final boolean configurationUpgraded;
 
     /**
      * The base url of the nexus instance.
@@ -100,7 +100,8 @@ public class NexusStatus
     public NexusStatus( final String appName, final String formattedAppName, final String version,
                         final String apiVersion, final String editionLong, final String editionShort,
                         final String state, final Date initializedAt, final Date startedAt,
-                        final Date lastConfigChange, final long lastConfigGeneration, final String baseUrl )
+                        final Date lastConfigChange, final long lastConfigGeneration, final boolean firstStart,
+                        final boolean instanceUpgraded, final boolean configurationUpgraded, final String baseUrl )
     {
         this.appName = appName;
         this.formattedAppName = formattedAppName;
@@ -113,6 +114,9 @@ public class NexusStatus
         this.startedAt = startedAt;
         this.lastConfigChange = lastConfigChange;
         this.lastConfigGeneration = lastConfigGeneration;
+        this.firstStart = firstStart;
+        this.instanceUpgraded = instanceUpgraded;
+        this.configurationUpgraded = configurationUpgraded;
         this.baseUrl = baseUrl;
     }
 
