@@ -175,6 +175,7 @@ public class Page
      * either, but in cases when target is recognized, but during scrape unexpected response is hit, something the
      * scraping chain must be stopped. See {@link AmazonS3IndexScraper} for an example.
      */
+    @SuppressWarnings( "serial" )
     public static class UnexpectedPageResponse
         extends IOException
     {

@@ -19,6 +19,7 @@ package org.sonatype.nexus.proxy.maven.wl.discovery;
  * @author cstamas
  * @since 2.4
  */
+@SuppressWarnings( "serial" )
 public class StrategyFailedException
     extends Exception
 {

@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.nexus.util.PathUtils;
 
 /**

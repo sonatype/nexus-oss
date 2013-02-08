@@ -49,6 +49,11 @@ public class RemotePrefixFileStrategy
 
     private final WLConfig config;
 
+    /**
+     * Constructor.
+     * 
+     * @param config
+     */
     @Inject
     public RemotePrefixFileStrategy( final WLConfig config )
     {

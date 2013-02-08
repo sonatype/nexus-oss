@@ -224,6 +224,11 @@ public class EventDispatcher
 
     // == handlers for item events (to maintain WL file)
 
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
     @Subscribe
     public void onRepositoryItemEventStore( final RepositoryItemEventStore evt )
     {
@@ -243,6 +248,11 @@ public class EventDispatcher
         }
     }
 
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
     @Subscribe
     public void onRepositoryItemEventCache( final RepositoryItemEventCache evt )
     {
@@ -262,6 +272,11 @@ public class EventDispatcher
         }
     }
 
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
     @Subscribe
     public void onRepositoryItemEventDelete( final RepositoryItemEventDelete evt )
     {
@@ -283,6 +298,11 @@ public class EventDispatcher
 
     // == Handler for WL initialization
 
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
     @Subscribe
     public void onNexusStartedEvent( final NexusStartedEvent evt )
     {
@@ -292,6 +312,11 @@ public class EventDispatcher
         }
     }
 
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
     @Subscribe
     public void onRepositoryRegistryEventAdd( final RepositoryRegistryEventAdd evt )
     {
@@ -304,6 +329,11 @@ public class EventDispatcher
 
     // == Handlers for Proxy remote URL changes
 
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
     @Subscribe
     public void on( final RepositoryConfigurationUpdatedEvent evt )
     {

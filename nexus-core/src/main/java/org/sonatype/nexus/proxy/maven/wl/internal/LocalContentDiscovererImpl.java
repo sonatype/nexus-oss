@@ -124,7 +124,7 @@ public class LocalContentDiscovererImpl
         return parentOMatic.getAllLeafPaths();
     }
 
-    public static class PrefixCollectorProcessor
+    protected static class PrefixCollectorProcessor
         extends AbstractWalkerProcessor
     {
         private final ParentOMatic parentOMatic;

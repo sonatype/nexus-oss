@@ -115,16 +115,31 @@ public class WLDiscoveryStatus
         return status;
     }
 
+    /**
+     * Last discovery's strategy, if last execution exists.
+     * 
+     * @return strategy ID or {@code null}.
+     */
     public String getLastDiscoveryStrategy()
     {
         return lastDiscoveryStrategy;
     }
 
+    /**
+     * Last discovery's message, if last execution exists.
+     * 
+     * @return message or {@code null}.
+     */
     public String getLastDiscoveryMessage()
     {
         return lastDiscoveryMessage;
     }
 
+    /**
+     * Last discovery's run timestamp, if last execution exists.
+     * 
+     * @return last run timestamp or -1 if not run yet.
+     */
     public long getLastDiscoveryTimestamp()
     {
         return lastDiscoveryTimestamp;

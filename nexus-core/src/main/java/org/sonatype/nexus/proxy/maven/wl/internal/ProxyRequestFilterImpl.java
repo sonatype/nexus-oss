@@ -130,6 +130,11 @@ public class ProxyRequestFilterImpl
             && repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class );
     }
 
+    /**
+     * Handler for {@link WLPublishedRepositoryEvent} event.
+     * 
+     * @param evt
+     */
     @Subscribe
     public void onWLPUblishedEvent( WLPublishedRepositoryEvent evt )
     {
@@ -140,6 +145,11 @@ public class ProxyRequestFilterImpl
         }
     }
 
+    /**
+     * Handler for {@link WLUnpublishedRepositoryEvent} event.
+     * 
+     * @param evt
+     */
     @Subscribe
     public void onWLUnpblishedEvent( WLUnpublishedRepositoryEvent evt )
     {

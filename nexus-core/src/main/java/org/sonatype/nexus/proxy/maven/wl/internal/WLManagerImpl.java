@@ -223,15 +223,13 @@ public class WLManagerImpl
         final ArrayList<MavenProxyRepository> updateNeededRepositories = new ArrayList<MavenProxyRepository>();
         for ( MavenProxyRepository mavenProxyRepository : proxies )
         {
-            final WLStatus status = getStatusFor( mavenProxyRepository );
             final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
-
             if ( config.isEnabled() )
             {
-                final long lastDiscoveryTimestamp = status.getDiscoveryStatus().getLastDiscoveryTimestamp();
+                final EntrySource entrySource = getEntrySourceFor( mavenProxyRepository );
                 // if never run before or is stale
-                if ( lastDiscoveryTimestamp < 0
-                    || ( ( System.currentTimeMillis() - lastDiscoveryTimestamp ) > config.getDiscoveryInterval() ) )
+                if ( !entrySource.exists()
+                    || ( ( System.currentTimeMillis() - entrySource.getLostModifiedTimestamp() ) > config.getDiscoveryInterval() ) )
                 {
                     updateNeededRepositories.add( mavenProxyRepository );
                 }
