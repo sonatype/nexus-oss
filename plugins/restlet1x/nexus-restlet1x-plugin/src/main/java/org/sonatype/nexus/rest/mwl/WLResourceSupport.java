@@ -21,14 +21,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.model.WLConfigMessage;
-import org.sonatype.nexus.rest.model.WLConfigMessageWrapper;
-import org.sonatype.nexus.rest.model.WLDiscoveryStatusMessage;
-import org.sonatype.nexus.rest.model.WLStatusMessage;
-import org.sonatype.nexus.rest.model.WLStatusMessageWrapper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * WL REST resource support.
@@ -55,16 +48,6 @@ public abstract class WLResourceSupport
     protected WLManager getWLManager()
     {
         return wlManager;
-    }
-
-    @Override
-    public void configureXStream( final XStream xstream )
-    {
-        xstream.processAnnotations( WLDiscoveryStatusMessage.class );
-        xstream.processAnnotations( WLStatusMessage.class );
-        xstream.processAnnotations( WLStatusMessageWrapper.class );
-        xstream.processAnnotations( WLConfigMessage.class );
-        xstream.processAnnotations( WLConfigMessageWrapper.class );
     }
 
     @Override
