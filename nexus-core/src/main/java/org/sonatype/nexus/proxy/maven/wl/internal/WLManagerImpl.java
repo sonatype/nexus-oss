@@ -309,6 +309,7 @@ public class WLManagerImpl
         }
     }
 
+    @Override
     public synchronized boolean isUpdateRunning()
     {
         return !currentlyUpdatingRepositoryIds.isEmpty();
