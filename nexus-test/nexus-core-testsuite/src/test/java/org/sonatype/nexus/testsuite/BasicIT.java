@@ -13,6 +13,7 @@
 package org.sonatype.nexus.testsuite;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -33,13 +34,14 @@ public class BasicIT
     }
 
     @Test
-    public void verifyNexusStatusReportsHealthyAndCorrect()
+    public void verifyNexusReportsAsHealthyAndCorrect()
     {
         final NexusStatus nexusStatus = client().getStatus();
 
         assertThat( nexusStatus, is( notNullValue() ) );
-        assertThat( nexusStatus.isFirstStart(), is( true ) );
-        assertThat( nexusStatus.isInstanceUpgraded(), is( false ) );
-        assertThat( nexusStatus.getVersion(), is( "1.0" ) );
+        assertThat( nexusStatus.isFirstStart(), is( true ) ); // should be true
+        assertThat( nexusStatus.isInstanceUpgraded(), is( false ) ); // should be false
+        // assertThat( nexusStatus.getVersion(), is( "1.0" ) ); // version
+        assertThat( nexusStatus.getEditionShort(), equalTo( "OSS" ) );
     }
 }
