@@ -21,16 +21,40 @@ import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResp
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
+
+import com.google.common.base.Throwables;
 
 /**
  * Scraper for remote Nexus instances that will scrape only if remote is for sure recognized as Nexus instance, and URL
  * points to a hosted repository.
+ * <p>
+ * Info: Central scrape takes around 3 minutes, and this class issues over 700 requests. This means about 4 HTTP GET
+ * requests per second (1req takes about 250ms) is made to fetch index page. If we add a fix pause of 200ms in between
+ * requests, this will "throttle" scraping, it would take around 5 minutes instead of 3 minutes for Central sized
+ * repository, that is still acceptable, but would lessen pressure on remote server. Later we can design some more
+ * smarter way to control throttling of scrape.
  * 
  * @author cstamas
  */
 public abstract class AbstractGeneratedIndexPageScraper
     extends AbstractScraper
 {
+    /**
+     * Sleep time in millis that scraping thread will sleep between processing the page response (after processing page
+     * response and before making another one following a "deeper" link to be more precise). Goal of this sleep is to
+     * "throttle" a bit the scrape speed, to not suffocate remote server by index page generations and/or prevent Nexus
+     * to be seen as DoS attacker. This throttling sleep time is 200ms by default. Modifying it is possible using System
+     * properties using key "org.sonatype.nexus.proxy.maven.wl.internal.scrape.Scraper.pageSleepTimeMillis". An example
+     * of setting sleep time to 500 ms:
+     * 
+     * <pre>
+     * org.sonatype.nexus.proxy.maven.wl.internal.scrape.Scraper.pageSleepTimeMillis = 500
+     * </pre>
+     */
+    private long pageSleepTimeMillis = SystemPropertiesHelper.getLong(
+        Scraper.class.getName() + ".pageSleepTimeMillis", 200 );
+
     protected AbstractGeneratedIndexPageScraper( final int priority, final String id )
     {
         super( priority, id );
@@ -107,6 +131,7 @@ public abstract class AbstractGeneratedIndexPageScraper
                     final int siblingDepth = currentDepth + 1;
                     if ( siblingDepth < context.getScrapeDepth() )
                     {
+                        maySleepBeforeSubsequentFetch();
                         final String newSiblingEncodedUrl =
                             getRemoteUrlForRepositoryPath( context, newSibling.getPathElements() ) + "/";
                         final Page siblingPage = Page.getPageFor( context, newSiblingEncodedUrl );
@@ -121,6 +146,21 @@ public abstract class AbstractGeneratedIndexPageScraper
                         }
                     }
                 }
+            }
+        }
+    }
+
+    protected void maySleepBeforeSubsequentFetch()
+    {
+        if ( pageSleepTimeMillis > 0 )
+        {
+            try
+            {
+                Thread.sleep( pageSleepTimeMillis );
+            }
+            catch ( InterruptedException e )
+            {
+                Throwables.propagate( e );
             }
         }
     }
