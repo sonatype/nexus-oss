@@ -18,17 +18,20 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.sonatype.nexus.client.core.NexusStatus;
+import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 
 /**
  * Most basic IT just checking is bundle alive at all.
  * 
  * @since 2.4
  */
-public class BasicIT
+@Category( Smoke.class )
+public class SmokeIT
     extends NexusCoreITSupport
 {
-    public BasicIT( final String nexusBundleCoordinates )
+    public SmokeIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
@@ -41,6 +44,7 @@ public class BasicIT
         assertThat( nexusStatus, is( notNullValue() ) );
         assertThat( nexusStatus.isFirstStart(), is( true ) ); // should be true
         assertThat( nexusStatus.isInstanceUpgraded(), is( false ) ); // should be false
+        // TODO: nexus version we are running?
         // assertThat( nexusStatus.getVersion(), is( "1.0" ) ); // version
         assertThat( nexusStatus.getEditionShort(), equalTo( "OSS" ) );
     }
