@@ -260,4 +260,25 @@ public class ConfigurableRepository
 
         return pMirrors;
     }
+
+    // ==
+
+    @Override
+    public String toString()
+    {
+        // this might be instance that is not configured yet, so be careful about getting ID
+        // getId() would NPE!
+        String repoId = "not-configured-yet";
+        final CRepositoryCoreConfiguration currentCoreConfiguration =
+            (CRepositoryCoreConfiguration) getCurrentCoreConfiguration();
+        if ( currentCoreConfiguration != null )
+        {
+            final CRepository crepository = currentCoreConfiguration.getConfiguration( false );
+            if ( crepository != null && crepository.getId() != null && crepository.getId().trim().length() > 0 )
+            {
+                repoId = crepository.getId();
+            }
+        }
+        return String.format( "%s(id=%s)", getClass().getSimpleName(), repoId );
+    }
 }
