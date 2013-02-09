@@ -65,7 +65,7 @@ public class NexusAuthenticationEventInspector
         final ClientInfo ai = nae.getClientInfo();
 
         final String msg =
-            String.format( "%s user [%s] from IP address %s", ( nae.isSuccessful() ? "Sucessfully authenticated"
+            String.format( "%s user [%s] from IP address %s", ( nae.isSuccessful() ? "Successfully authenticated"
                 : "Unable to authenticate" ), ai.getUserid(), StringUtils.defaultString( ai.getRemoteIP(), "[unknown]" ) );
 
         if ( getLogger().isDebugEnabled() )
