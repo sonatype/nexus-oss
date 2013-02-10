@@ -84,7 +84,7 @@ NX.define = function (className, data, createdFn) {
 
         // require super module if there is not already a defined class of that name for legacy support
         if (requireSuper === undefined) {
-            requireSuper = NX.obj(superName) === undefined;
+            requireSuper = !NX.isobj(superName);
         }
     }
     else {
@@ -155,6 +155,12 @@ NX.define = function (className, data, createdFn) {
 
         // Create the sub-class
         type = Ext.extend(superClass, data);
+
+        // Enrich the sub-class
+        Ext.apply(type, {
+            // Name of defined class
+            '$className': className
+        });
 
         // Enrich the sub-class prototype
         Ext.apply(type.prototype, {

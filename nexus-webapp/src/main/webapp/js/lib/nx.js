@@ -41,13 +41,34 @@ Ext.apply(NX, {
      *
      * @param path
      * @return {*}
+     * @throws Error    No object at path
      */
     obj: function (path) {
         var context = NX.global;
         Ext.each(path.split('.'), function (part) {
             context = context[part];
+            if (context === undefined) {
+                throw 'No object at path: ' + path + '; part is undefined: ' + part;
+            }
         });
         return context;
+    },
+
+    /**
+     * Check if an object exists by its global name.
+     *
+     * @param path
+     * @return {boolean}    True if it exists, false if it does not.
+     */
+    isobj: function(path) {
+        var context = NX.global;
+        Ext.each(path.split('.'), function (part) {
+            context = context[part];
+            if (context === undefined) {
+                return false; // break
+            }
+        });
+        return context !== undefined;
     },
 
     /**
