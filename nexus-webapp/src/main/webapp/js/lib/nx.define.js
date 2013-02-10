@@ -38,6 +38,7 @@ NX.Base = function (config) {
  *
  * @cfg {String} extend             Super-class name.
  * @cfg {*} statics                 Static members.
+ * @cfg {Array} mixins              Mixin class names, does not support object configuration like extjs4 ATM.
  * @cfg {*} requirejs               Array of requirejs module dependencies
  * @cfg {*} requires                Array of class names (created by Ext.define) which are dependencies.
  * @cfg {boolean} requireSuper      Flag to enable/disable automatic dependency on super-class;
@@ -57,6 +58,8 @@ NX.define = function (className, data, createdFn) {
         requireSuper,
         superClass,
         statics,
+        mixins,
+        mixin,
         requiredClasses,
         requiredModules,
         moduleName,
@@ -92,15 +95,15 @@ NX.define = function (className, data, createdFn) {
         requireSuper = false;
     }
 
-    // Extract statics
     statics = data.statics;
     delete data.statics;
 
-    // Extract singleton
+    mixins = data.mixins;
+    delete data.mixins;
+
     singleton = data.singleton;
     delete data.singleton;
 
-    // Extract xtype
     xtype = data.xtype;
     delete data.xtype;
 
@@ -115,6 +118,13 @@ NX.define = function (className, data, createdFn) {
     // Require super if enabled
     if (requireSuper === true) {
         requiredModules.push(superName.replaceAll('.', '/'));
+    }
+
+    // Require mixins
+    if (mixins !== undefined) {
+        for(i=0; i<mixins.length; i++) {
+            requiredModules.push(mixins[i].replaceAll('.', '/'));
+        }
     }
 
     // append translated dependency classes on to required modules
@@ -156,19 +166,37 @@ NX.define = function (className, data, createdFn) {
         // Create the sub-class
         type = Ext.extend(superClass, data);
 
-        // FIXME: "enrich" bits below should really be mixins
+        // Remember class name
+        type.$className = className;
+        type.prototype.$className = className;
 
-        // Enrich the sub-class
+        // Handle mixins
+        if (mixins !== undefined) {
+            for(i=0; i<mixins.length; i++) {
+                mixin = mixins[i]; // name
+                NX.log.debug('Applying mixin: ' + mixin);
+                mixin = NX.obj(mixin); // class ref
+
+                // TODO: Check if this works or not... to mixin statics (and check if extjs 4 supports it or not)
+                //Ext.applyIf(type, mixin);
+
+                Ext.applyIf(type.prototype, mixin.prototype);
+            }
+        }
+
+        // FIXME: Remove this and use a mixin instead
         Ext.apply(type, {
-            '$className': className,
+            /**
+             * @deprecated
+             */
             '$log': function(message) {
                 NX.log.debug(className + ': ' + message);
             }
         });
-
-        // Enrich the sub-class prototype
         Ext.apply(type.prototype, {
-            '$className': className,
+            /**
+             * @deprecated
+             */
             '$log': function(message) {
                 NX.log.debug(className + ': ' + message);
             }
