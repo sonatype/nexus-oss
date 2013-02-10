@@ -135,7 +135,7 @@ NX.define = function (className, data, createdFn) {
 
     define(moduleName, requiredModules, function()
     {
-        NX.log.debug('Defining class: ' + className + ' (ns: ' + nameSpace + ', super: ' + superName + ')');
+        NX.log.debug('Defining class: ' + className + ' super: ' + superName);
 
         // Create namespace if required
         if (nameSpace) {
@@ -156,20 +156,20 @@ NX.define = function (className, data, createdFn) {
         // Create the sub-class
         type = Ext.extend(superClass, data);
 
+        // FIXME: "enrich" bits below should really be mixins
+
         // Enrich the sub-class
         Ext.apply(type, {
-            // Name of defined class
-            '$className': className
+            '$className': className,
+            '$log': function(message) {
+                NX.log.debug(className + ': ' + message);
+            }
         });
 
         // Enrich the sub-class prototype
         Ext.apply(type.prototype, {
-            // Name of defined class
             '$className': className,
-
-             // Instance logger
             '$log': function(message) {
-                // FIXME: Should expose the object, not the function & wrap to add className
                 NX.log.debug(className + ': ' + message);
             }
         });
