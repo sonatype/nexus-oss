@@ -38,26 +38,25 @@ NX.log = (function () {
     }
 
     return {
+        forceDebug: false,
+
         /**
-         * @static
          * @return {boolean} True if debug is enabled.
          */
         isDebug: function () {
-            return NX.global.location.search === '?debug';
+            return this.forceDebug === true || NX.global.location.search === '?debug';
         },
 
         /**
-         * @static
          * @param msg {String} The message to log.
          */
         debug: function (msg) {
-            if (NX.log.isDebug()) {
+            if (this.isDebug()) {
                 log('DEBUG', msg);
             }
         },
 
         /**
-         * @static
          * @param msg {String} The message to log.
          */
         info: function (msg) {
@@ -65,7 +64,6 @@ NX.log = (function () {
         },
 
         /**
-         * @static
          * @param msg {String} The message to log.
          */
         warn: function (msg) {
@@ -73,7 +71,6 @@ NX.log = (function () {
         },
 
         /**
-         * @static
          * @param msg {String} The message to log.
          */
         error: function (msg) {
