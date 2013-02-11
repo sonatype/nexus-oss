@@ -17,14 +17,87 @@
  * @since 2.4
  */
 NX.define('NX.LogAwareMixin', {
+    statics: {
+        /**
+         * True to include class-names in log message (default); false to omit it.
+         *
+         * @property
+         */
+        includeName: true,
+
+        /**
+         * True to use simple class-names (default); false to use full class-names.
+         *
+         * @property
+         */
+        simpleName: true,
+
+        /**
+         * True to include level in log message (default); false to omit it.
+         *
+         * @property
+         */
+        includeLevel: true
+    },
 
     /**
-     * Log a DEBUG message.
-     *
-     * @param message
+     * @private
      */
-    logDebug: function(message) {
-        NX.log.debug(this.$className + ': ' + message);
+    logx: function (level, args) {
+        var name,
+            fn;
+
+        if (!Ext.isArray(args)) {
+            args = [args];
+        }
+
+        // maybe prepend class-name
+        if (NX.LogAwareMixin.includeName === true) {
+            name = this.$className;
+            if (NX.LogAwareMixin.simpleName === true) {
+                name = this.$simpleClassName;
+            }
+            args.unshift(name + ':');
+        }
+
+        // maybe prepend level
+        if (NX.LogAwareMixin.includeLevel === true) {
+            args.unshift('[' + level.toUpperCase() + ']');
+        }
+
+        // find the log function for the given level
+        fn = NX.log[level];
+        NX.assert(Ext.isFunction(fn), 'Invalid level: ' + level);
+
+        fn.apply(NX.log, args);
+    },
+
+    /**
+     * @protected
+     */
+    logDebug: function () {
+        this.logx('debug', arguments);
+    },
+
+    /**
+     * @protected
+     */
+    logInfo: function () {
+        this.logx('info', arguments);
+    },
+
+    /**
+     * @protected
+     */
+    logWarn: function () {
+        this.logx('warn', arguments);
+    },
+
+    /**
+     * @protected
+     */
+    logError: function () {
+        this.logx('error', arguments);
     }
 
 });

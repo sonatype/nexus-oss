@@ -48,7 +48,7 @@ NX.log = (function () {
         // FIXME: Add ExtJS 4.x compatible(ish) log() helper
         //log: function(/*[options],[message]*/) {
         //}
-    }
+    };
 
     safeProxy = function(target, name) {
         if (Ext.isDefined(target) && Ext.isFunction(target[name])) {
@@ -72,7 +72,7 @@ NX.log = (function () {
         }
 
         return Ext.emptyFn();
-    }
+    };
 
     Ext.each([
         'trace',

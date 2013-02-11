@@ -173,7 +173,9 @@ NX.define = function (className, data, createdFn) {
 
         // Remember class name
         type.$className = className;
+        type.$simpleClassName = baseClassName;
         type.prototype.$className = className;
+        type.prototype.$simpleClassName = baseClassName;
 
         // replace toString if its the default Object.toString
         if (type.prototype.toString === Object.prototype.toString) {
@@ -188,10 +190,6 @@ NX.define = function (className, data, createdFn) {
                 mixin = mixins[i]; // name
                 NX.log.debug('Applying mixin: ', mixin);
                 mixin = NX.obj(mixin); // class ref
-
-                // TODO: Check if this works or not... to mixin statics (and check if extjs 4 supports it or not)
-                //Ext.applyIf(type, mixin);
-
                 Ext.applyIf(type.prototype, mixin.prototype);
             }
         }
