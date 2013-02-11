@@ -19,6 +19,8 @@
 NX.define('NX.LogAwareMixin', {
 
     /**
+     * Log a DEBUG message.
+     *
      * @param message
      */
     logDebug: function(message) {
