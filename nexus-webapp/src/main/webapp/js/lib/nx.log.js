@@ -47,7 +47,6 @@ NX.log = (function () {
 
         // FIXME: Add ExtJS 4.x compatible(ish) log() helper
         //log: function(/*[options],[message]*/) {
-        //
         //}
     }
 
@@ -75,9 +74,9 @@ NX.log = (function () {
         return Ext.emptyFn();
     }
 
-    // Not adding 'log' here as we may want to reserve that for an Ext.log compatible method
     Ext.each([
         'trace',
+        //'log', skipping; as we may want to make an Ext.log compatible method
         'debug',
         'info',
         'warn',
@@ -96,6 +95,8 @@ NX.log = (function () {
 
     return logger;
 }());
+
+NX.log.debug('Logging initialized');
 
 // Compatibility
 Ext.ns('Nexus');

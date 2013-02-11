@@ -137,15 +137,15 @@ NX.define = function (className, data, createdFn) {
     moduleName = className.replaceAll('.', '/');
 
     if (requiredModulePaths.length !== 0) {
-        NX.log.debug('Defining module: ' + moduleName + ' depends: ' + requiredModulePaths);
+        NX.log.debug('Defining module: ', moduleName, ' depends: ', requiredModulePaths);
     }
     else {
-        NX.log.debug('Defining module: ' + moduleName);
+        NX.log.debug('Defining module: ', moduleName);
     }
 
     define(moduleName, requiredModulePaths, function()
     {
-        NX.log.debug('Defining class: ' + className + ' super: ' + superName);
+        NX.log.debug('Defining class: ', className, ' super: ', superName);
 
         // Sanity check required classes exist
         Ext.each(requiredClassNames, function(className) {
@@ -175,11 +175,18 @@ NX.define = function (className, data, createdFn) {
         type.$className = className;
         type.prototype.$className = className;
 
+        // replace toString if its the default Object.toString
+        if (type.prototype.toString === Object.prototype.toString) {
+            type.prototype.toString = function() {
+                return '[object ' + className + ']';
+            }
+        }
+
         // Handle mixins
         if (mixins !== undefined) {
             for(i=0; i<mixins.length; i++) {
                 mixin = mixins[i]; // name
-                NX.log.debug('Applying mixin: ' + mixin);
+                NX.log.debug('Applying mixin: ', mixin);
                 mixin = NX.obj(mixin); // class ref
 
                 // TODO: Check if this works or not... to mixin statics (and check if extjs 4 supports it or not)
