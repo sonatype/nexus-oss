@@ -43,10 +43,15 @@ public class YumRepositoryImpl
         this.version = version;
         if ( LOG.isDebugEnabled() )
         {
-            final String[] files = baseDir.list();
+            String[] files = null;
+            final File repodata = new File( baseDir, "repodata" );
+            if ( repodata.exists() && repodata.isDirectory() )
+            {
+                files = repodata.list();
+            }
             LOG.debug(
                 "Yum repository {}/{} available at {} contains {}",
-                repositoryId, version, baseDir.getAbsolutePath(), files == null ? "no files" : Arrays.toString( files )
+                repositoryId, version, repodata.getAbsolutePath(), files == null ? "no files" : Arrays.toString( files )
             );
         }
     }
