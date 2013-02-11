@@ -46,13 +46,9 @@ NX.define('NX.LogAwareMixin', {
      * @param {String} level
      * @param {Array} args
      */
-    logx: function (level, args) {
+    logFormat: function (level, args) {
         var name,
-            fn,
             config = NX.LogAwareMixin; // config pulled from static properties
-
-        NX.assert(NX.log.levels[level] !== undefined, 'Invalid log level: ' + level);
-        NX.assert(args.length !== 0, 'Missing log message detail');
 
         // maybe prepend class-name
         if (config.includeName === true) {
@@ -67,6 +63,24 @@ NX.define('NX.LogAwareMixin', {
         if (config.includeLevel === true) {
             args.unshift('[' + level.toUpperCase() + ']');
         }
+
+        return args;
+    },
+
+    /**
+     * @private
+     *
+     * @param {String} level
+     * @param {Array} args
+     */
+    logx: function (level, args) {
+        var fn,
+            config = NX.LogAwareMixin; // config pulled from static properties
+
+        NX.assert(NX.log.levels[level] !== undefined, 'Invalid log level: ' + level);
+        NX.assert(args.length !== 0, 'Missing log message detail');
+
+        args = this.logFormat(level, args);
 
         fn = NX.log[level];
         fn.apply(NX.log, args);
@@ -98,6 +112,20 @@ NX.define('NX.LogAwareMixin', {
      */
     logError: function () {
         this.logx('error', Array.prototype.slice.call(arguments));
+    },
+
+    /**
+     * @protected
+     */
+    logGroup: function () {
+        NX.log.group.apply(NX.log, this.logFormat('group', Array.prototype.slice.call(arguments)));
+    },
+
+    /**
+     * @protected
+     */
+    logGroupEnd: function () {
+        NX.log.groupEnd();
     }
 
 });
