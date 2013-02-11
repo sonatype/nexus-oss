@@ -13,6 +13,10 @@
 
 /* global Ext */
 
+//
+// Core String customizations require for boot lib/* to function.
+//
+
 /**
  * Add support for String.replaceAll(String,String).
  *

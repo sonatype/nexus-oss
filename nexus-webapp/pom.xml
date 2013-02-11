@@ -310,6 +310,7 @@
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <includes>
                 <include>lib/*.js</include>
+                <include>lib/classes/**/*.js</include>
               </includes>
             </configuration>
           </execution>
