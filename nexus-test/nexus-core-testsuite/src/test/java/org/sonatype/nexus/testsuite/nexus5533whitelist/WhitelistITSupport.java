@@ -18,6 +18,7 @@ import org.sonatype.nexus.testsuite.NexusCoreITSupport;
 /**
  * Support class for Whitelist Core feature (NEXUS-5472), aka "proxy404".
  * 
+ * @author cstamas
  * @since 2.4
  */
 public abstract class WhitelistITSupport
