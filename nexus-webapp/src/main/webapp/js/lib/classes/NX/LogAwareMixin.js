@@ -42,33 +42,33 @@ NX.define('NX.LogAwareMixin', {
 
     /**
      * @private
+     *
+     * @param {String} level
+     * @param {Array} args
      */
     logx: function (level, args) {
         var name,
-            fn;
+            fn,
+            config = NX.LogAwareMixin; // config pulled from static properties
 
-        if (!Ext.isArray(args)) {
-            args = [args];
-        }
+        NX.assert(NX.log.levels[level] !== undefined, 'Invalid log level: ' + level);
+        NX.assert(args.length !== 0, 'Missing log message detail');
 
         // maybe prepend class-name
-        if (NX.LogAwareMixin.includeName === true) {
+        if (config.includeName === true) {
             name = this.$className;
-            if (NX.LogAwareMixin.simpleName === true) {
+            if (config.simpleName === true) {
                 name = this.$simpleClassName;
             }
             args.unshift(name + ':');
         }
 
         // maybe prepend level
-        if (NX.LogAwareMixin.includeLevel === true) {
+        if (config.includeLevel === true) {
             args.unshift('[' + level.toUpperCase() + ']');
         }
 
-        // find the log function for the given level
         fn = NX.log[level];
-        NX.assert(Ext.isFunction(fn), 'Invalid level: ' + level);
-
         fn.apply(NX.log, args);
     },
 
@@ -76,28 +76,28 @@ NX.define('NX.LogAwareMixin', {
      * @protected
      */
     logDebug: function () {
-        this.logx('debug', arguments);
+        this.logx('debug', Array.prototype.slice.call(arguments));
     },
 
     /**
      * @protected
      */
     logInfo: function () {
-        this.logx('info', arguments);
+        this.logx('info', Array.prototype.slice.call(arguments));
     },
 
     /**
      * @protected
      */
     logWarn: function () {
-        this.logx('warn', arguments);
+        this.logx('warn', Array.prototype.slice.call(arguments));
     },
 
     /**
      * @protected
      */
     logError: function () {
-        this.logx('error', arguments);
+        this.logx('error', Array.prototype.slice.call(arguments));
     }
 
 });
