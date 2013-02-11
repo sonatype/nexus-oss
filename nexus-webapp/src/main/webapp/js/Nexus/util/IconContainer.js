@@ -30,31 +30,55 @@ NX.define('Nexus.util.IconContainer', {
      * Defined icons.
      *
      * @private
+     * @property
      */
     icons: {},
 
     /**
+     * Base-path for images.
+     *
+     * @public
+     * @property
+     */
+    basePath: undefined,
+
+    /**
+     * @constructor
+     *
      * @param config
      *
      * @cfg {string} stylePrefix    Optional icon style prefix.
      * @cfg {*} icons               At least one {name: fileName} icon configuration is required.
+     * @cfg {String} basePath       Optional base path for images.
      */
-    constructor: function(config) {
+    constructor: function (config) {
         var self = this,
-            config = config || {};
+            config = config || {},
+            icons;
 
-        self.stylePrefix = config.stylePrefix || 'nx-icons-';
+        // apply defaults to configuration
+        Ext.applyIf(config, {
+            basePath: Sonatype.config.resourcePath + '/static/icons',
+            stylePrefix: 'nx-icons-'
+        });
 
+        // verify, capture and strip out 'icons' from configuration
         NX.assert(config.icons !== undefined, 'At least one icon definition must be configured');
+        icons = config.icons;
+        delete config.icons;
 
-        Ext.iterate(config.icons, function(key, value, obj) {
+        // apply configuration
+        Ext.apply(self, config);
+
+        self.logGroup('Defining icons');
+
+        Ext.iterate(icons, function (key, value, obj) {
             self.defineIcon(key, value);
         });
 
         // TODO: Pre-load all icons into browser
 
-        // FIXME: This will recurs, something likely not correct in NX.define() which is causing this
-        //self.constructor.superclass.constructor.apply(self, arguments);
+        self.logGroupEnd();
     },
 
     /**
@@ -64,11 +88,11 @@ NX.define('Nexus.util.IconContainer', {
      *
      * @return {string}
      */
-    iconPath: function(file) {
+    iconPath: function (file) {
         if (!file.startsWith('/')) {
             file = '/' + file;
         }
-        return Sonatype.config.resourcePath + '/static/icons' + file;
+        return this.basePath + file;
     },
 
     /**
@@ -80,7 +104,7 @@ NX.define('Nexus.util.IconContainer', {
      * @param {string} fileName     Icon file name.
      * @return {*}                  Icon helper.
      */
-    defineIcon: function(name, fileName) {
+    defineIcon: function (name, fileName) {
         var self = this,
             iconPath,
             cls,
@@ -106,26 +130,36 @@ NX.define('Nexus.util.IconContainer', {
         icon = {
             /**
              * Symbolic name for icon.
+             *
+             * @type {String}
              */
             name: name,
 
             /**
              * Short icon file-name.
+             *
+             * @type {String}
              */
             fileName: fileName,
 
             /**
              * Full icon path.
+             *
+             * @type {String}
              */
             path: iconPath,
 
             /**
              * <img> representation.
+             *
+             * @type {String}
              */
             img: '<img src="' + iconPath + '">',
 
             /**
              * Icon class.
+             *
+             * @type {String}
              */
             cls: cls
         }
@@ -138,10 +172,12 @@ NX.define('Nexus.util.IconContainer', {
     /**
      * Lookup an icon by name.  If the named icon is not defined an exception will be thrown.
      *
+     * @public
+     *
      * @param name  The name of the icon.
      * @return {*}  Icon; never null/undefined.
      */
-    get: function(name) {
+    get: function (name) {
         var self = this,
             icon;
 
@@ -150,4 +186,5 @@ NX.define('Nexus.util.IconContainer', {
 
         return icon;
     }
+
 });
