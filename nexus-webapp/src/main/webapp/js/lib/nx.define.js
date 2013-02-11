@@ -52,7 +52,7 @@ NX.define = function (className, data, createdFn) {
 
     var i,
         nameSpace,
-        baseClassName,
+        simpleClassName,
         superName,
         type,
         requireSuper,
@@ -71,10 +71,10 @@ NX.define = function (className, data, createdFn) {
     i = className.lastIndexOf('.');
     if (i !== -1) {
         nameSpace = className.substring(0, i);
-        baseClassName = className.substring(i + 1);
+        simpleClassName = className.substring(i + 1);
     }
     else {
-        baseClassName = className;
+        simpleClassName = className;
     }
 
     requireSuper = data.requireSuper;
@@ -137,15 +137,15 @@ NX.define = function (className, data, createdFn) {
     moduleName = className.replaceAll('.', '/');
 
     if (requiredModulePaths.length !== 0) {
-        NX.log.debug('Defining module: ', moduleName, ' depends: ', requiredModulePaths);
+        NX.log.debug('Defining module:', moduleName, 'depends:', requiredModulePaths);
     }
     else {
-        NX.log.debug('Defining module: ', moduleName);
+        NX.log.debug('Defining module:', moduleName);
     }
 
     define(moduleName, requiredModulePaths, function()
     {
-        NX.log.debug('Defining class: ', className, ' super: ', superName);
+        NX.log.debug('Defining class:', className, 'super:', superName);
 
         // Sanity check required classes exist
         Ext.each(requiredClassNames, function(className) {
@@ -171,11 +171,11 @@ NX.define = function (className, data, createdFn) {
         // Create the sub-class
         type = Ext.extend(superClass, data);
 
-        // Remember class name
+        // Remember class name (full and simple)
         type.$className = className;
-        type.$simpleClassName = baseClassName;
+        type.$simpleClassName = simpleClassName;
         type.prototype.$className = className;
-        type.prototype.$simpleClassName = baseClassName;
+        type.prototype.$simpleClassName = simpleClassName;
 
         // replace toString if its the default Object.toString
         if (type.prototype.toString === Object.prototype.toString) {
@@ -188,29 +188,11 @@ NX.define = function (className, data, createdFn) {
         if (mixins !== undefined) {
             for(i=0; i<mixins.length; i++) {
                 mixin = mixins[i]; // name
-                NX.log.debug('Applying mixin: ', mixin);
+                NX.log.debug('Applying mixin:', mixin);
                 mixin = NX.obj(mixin); // class ref
                 Ext.applyIf(type.prototype, mixin.prototype);
             }
         }
-
-        // FIXME: Remove this and use a LogAwareMixin instead
-        Ext.apply(type, {
-            /**
-             * @deprecated
-             */
-            '$log': function(message) {
-                NX.log.debug(className + ': ' + message);
-            }
-        });
-        Ext.apply(type.prototype, {
-            /**
-             * @deprecated
-             */
-            '$log': function(message) {
-                NX.log.debug(className + ': ' + message);
-            }
-        });
 
         // Apply any static members
         if (statics !== undefined) {
@@ -228,7 +210,7 @@ NX.define = function (className, data, createdFn) {
         }
 
         // Assign to global namespace
-        NX.obj(nameSpace)[baseClassName] = type;
+        NX.obj(nameSpace)[simpleClassName] = type;
 
         // Call post-define hook
         if (createdFn !== undefined) {
