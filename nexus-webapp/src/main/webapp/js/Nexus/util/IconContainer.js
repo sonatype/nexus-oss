@@ -18,6 +18,10 @@
  * @since 2.4
  */
 NX.define('Nexus.util.IconContainer', {
+    mixins: [
+        'NX.LogAwareMixin'
+    ],
+
     requirejs: [
         'Nexus/config'
     ],
@@ -41,9 +45,7 @@ NX.define('Nexus.util.IconContainer', {
 
         self.stylePrefix = config.stylePrefix || 'nx-icons-';
 
-        if (config.icons === undefined) {
-            throw 'At least one icon definition must be configured';
-        }
+        NX.assert(config.icons !== undefined, 'At least one icon definition must be configured');
 
         Ext.iterate(config.icons, function(key, value, obj) {
             self.defineIcon(key, value);
@@ -85,15 +87,13 @@ NX.define('Nexus.util.IconContainer', {
             icon;
 
         // Puke early if icon already defined, this is likely a mistake
-        if (self.icons[name] !== undefined) {
-            throw 'Icon already defined with name: ' + name;
-        }
+        NX.assert(self.icons[name] === undefined, 'Icon already defined with name: ' + name);
 
         iconPath = self.iconPath(fileName);
 
         cls = self.stylePrefix + name;
 
-        self.$log('Defining icon: ' + name + ' (' + cls + ') = ' + iconPath);
+        self.logDebug('Defining icon:', name, 'cls:', cls, 'path:', iconPath);
 
         Ext.util.CSS.createStyleSheet(
             '.' + cls + ' { background: url(' + iconPath + ') no-repeat !important; }',
@@ -146,9 +146,7 @@ NX.define('Nexus.util.IconContainer', {
             icon;
 
         icon = self.icons[name];
-        if (icon === undefined) {
-            throw 'No icon defined for name: ' + name;
-        }
+        NX.assert(icon !== undefined, 'No icon defined for name: ' + name);
 
         return icon;
     }
