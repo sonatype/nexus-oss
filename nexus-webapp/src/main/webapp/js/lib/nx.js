@@ -33,7 +33,7 @@ Ext.apply(NX, {
         if (global !== undefined) {
             return global;
         }
-        throw 'Unable to determine global object';
+        throw new Error('Unable to determine global object');
     }()), // assign return value of function
 
     /**
@@ -48,7 +48,7 @@ Ext.apply(NX, {
         Ext.each(path.split('.'), function (part) {
             context = context[part];
             if (context === undefined) {
-                throw 'No object at path: ' + path + '; part is undefined: ' + part;
+                throw new Error('No object at path: ' + path + '; part is undefined: ' + part);
             }
         });
         return context;
@@ -86,7 +86,7 @@ Ext.apply(NX, {
                     list.push(input[i]);
                 }
                 else {
-                    throw "Invalid entry: " + input[i];
+                    throw new Error('Invalid entry: ' + input[i]);
                 }
             }
         }
@@ -94,7 +94,7 @@ Ext.apply(NX, {
             list.push(input);
         }
         else if (input !== undefined) {
-            throw "Invalid value: " + input;
+            throw new Error('Invalid value: ' + input);
         }
 
         return list;
@@ -130,7 +130,7 @@ Ext.apply(NX, {
         args = Array.prototype.slice.call(arguments);
         args.shift();
 
-        NX.log.debug('Creating instance: ' + name);
+        NX.log.debug('Creating instance:', name);
 
         // Get a reference to the class
         type = NX.obj(name);
