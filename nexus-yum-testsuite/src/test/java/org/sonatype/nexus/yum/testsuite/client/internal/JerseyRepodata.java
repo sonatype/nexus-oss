@@ -48,13 +48,12 @@ public class JerseyRepodata
     {
         try
         {
-            final String location = getLocationOfMetadata( repositoryId, metadataType );
+            final String url = ensureUrlEndsWithSlash( repositoryId );
+            final String location = getLocationOfMetadata( url, metadataType );
             if ( location != null )
             {
                 return handleResponse(
-                    getNexusClient().getClient()
-                        .resource( ensureUrlEndsWithSlash( repositoryId ) + "/" + location )
-                        .get( ClientResponse.class ),
+                    getNexusClient().getClient().resource( url + location ).get( ClientResponse.class ),
                     returnType,
                     metadataType.getCompression()
                 );
@@ -82,13 +81,12 @@ public class JerseyRepodata
     {
         try
         {
-            final String location = getLocationOfMetadata( repositoryId, metadataType );
+            final String url = getNexusClient().resolveServicePath( "yum/repos/" + repositoryId + "/" + version + "/" );
+            final String location = getLocationOfMetadata( url, metadataType );
             if ( location != null )
             {
                 return handleResponse(
-                    getNexusClient().serviceResource(
-                        "yum/repos/" + repositoryId + "/" + version + "/" + location )
-                        .get( ClientResponse.class ),
+                    getNexusClient().getClient().resource( url + location ).get( ClientResponse.class ),
                     returnType,
                     metadataType.getCompression()
                 );
@@ -126,10 +124,10 @@ public class JerseyRepodata
         }
     }
 
-    private String getLocationOfMetadata( final String repositoryId, final MetadataType metadataType )
+    private String getLocationOfMetadata( final String url, final MetadataType metadataType )
     {
         final ClientResponse clientResponse = getNexusClient().getClient()
-            .resource( ensureUrlEndsWithSlash( repositoryId ) + "repodata/repomd.xml" )
+            .resource( url + "repodata/repomd.xml" )
             .get( ClientResponse.class );
         try
         {
