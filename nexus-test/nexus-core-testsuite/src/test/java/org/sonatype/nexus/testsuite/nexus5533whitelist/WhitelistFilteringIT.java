@@ -36,6 +36,9 @@ import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
+import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyContent;
+import org.sonatype.nexus.testsuite.client.Caches;
+import org.sonatype.nexus.testsuite.client.Scheduler;
 import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -105,8 +108,10 @@ public class WhitelistFilteringIT
     }
 
     protected void nukeProxyCaches( final String proxyRepositoryId )
-        throws IOException
+        throws Exception
     {
+        // NFC
+        client().getSubsystem( Caches.class ).expireCaches( proxyRepositoryId );
         // nuke the repo cache
         try
         {
@@ -132,10 +137,19 @@ public class WhitelistFilteringIT
         {
             // ignore
         }
+        // wait for things to calm down (expireCaches happens in bg task)
+        client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
     }
 
+    // ==
+
+    /**
+     * A proxy "transitions" from not having prefixes file to having prefixes file (and not being scraped either).
+     * 
+     * @throws Exception
+     */
     @Test
-    public void filteringTest()
+    public void proxyWithoutAndWithWL()
         throws Exception
     {
         // where to put downloaded things
@@ -241,6 +255,127 @@ public class WhitelistFilteringIT
                     requests,
                     containsInAnyOrder( ORG_SOMEORG_ARTIFACT_10_POM, ORG_SOMEORG_ARTIFACT_10_POM + ".sha1",
                         ORG_SOMEORG_ARTIFACT_10_JAR, ORG_SOMEORG_ARTIFACT_10_JAR + ".sha1" ) );
+            }
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    /**
+     * A proxy "transitions" from having prefixes file to not having prefixes file (and not being scraped either).
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void proxyWithAndWithoutWL()
+        throws Exception
+    {
+        // where to put downloaded things
+        final File remoteRepoRoot = testData().resolveFile( "remote-repo" );
+        final File downloadsDir = testIndex().getDirectory( "downloads" );
+
+        // bring up remote server using Jetty
+        final PathRecorder recorder = new PathRecorder();
+        final PrefixesFile prefixesFile = new PrefixesFile();
+        // now set the prefixes file that contains /org/someorg prefix only, and repeat
+        prefixesFile.setContent( Files.toString( testData().resolveFile( "someorg-prefixes.txt" ),
+            Charset.forName( "UTF-8" ) ) );
+        final Server server =
+            Server.withPort( 0 ).serve( "/*" ).withBehaviours( recorder, prefixesFile, Behaviours.get( remoteRepoRoot ) ).start();
+        // create the proxy
+        final MavenProxyRepository proxyRepository =
+            repositories().create( MavenProxyRepository.class, repositoryIdForTest( "someorgProxy1" ) ).asProxyOf(
+                server.getUrl().toExternalForm() ).doNotDownloadRemoteIndexes().save();
+        try
+        {
+            // clear recorder
+            recorder.clear();
+            // repeat the test with slightly different expectations
+            {
+                // check that newly added proxy is publishing whitelist
+                assertThat( whitelist().getWhitelistStatus( proxyRepository.id() ).getPublishedStatus(),
+                    equalTo( Outcome.SUCCEEDED ) );
+
+                // nuke the repo cache
+                nukeProxyCaches( proxyRepository.id() );
+                // and because we have WL, we cant fetch whatever we want (com and org)
+                // only WL-enlisted of these will go remotely
+                fetchAndAssert( downloadsDir, proxyRepository.id(), COM_SOMEORG_ARTIFACT_10_POM, false );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), COM_SOMEORG_ARTIFACT_10_JAR, false );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), ORG_SOMEORG_ARTIFACT_10_POM, true );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), ORG_SOMEORG_ARTIFACT_10_JAR, true );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), FLUKE_ARTIFACT_POM, false );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), FLUKE_ARTIFACT_JAR, false );
+
+                // GET /org/someorg/artifact/1.0/artifact-1.0.jar.sha1,
+                // GET /org/someorg/artifact/1.0/artifact-1.0.jar,
+                // GET /org/someorg/artifact/1.0/artifact-1.0.pom.sha1,
+                // GET /org/someorg/artifact/1.0/artifact-1.0.pom,
+                final List<String> requests = recorder.getPathsForVerb( "GET" );
+                assertThat( requests.size(), is( 4 ) );
+                assertThat(
+                    requests,
+                    containsInAnyOrder( ORG_SOMEORG_ARTIFACT_10_POM, ORG_SOMEORG_ARTIFACT_10_POM + ".sha1",
+                        ORG_SOMEORG_ARTIFACT_10_JAR, ORG_SOMEORG_ARTIFACT_10_JAR + ".sha1" ) );
+            }
+
+            // now loose the prefixes file
+            prefixesFile.setContent( null );
+
+            // update the WL of proxy repo to have new prefixes file picked up
+            whitelist().updateWhitelist( proxyRepository.id() );
+
+            // wait for update to finish since it's async op, client above returned immediately
+            // but update happens in a separate thread. Still this should be quick operation as prefix file is used
+            Status proxyStatus = whitelist().getWhitelistStatus( proxyRepository.id() );
+            // sit and wait for remote discovery (or the timeout Junit @Rule will kill us)
+            while ( proxyStatus.getPublishedStatus() != Outcome.FAILED )
+            {
+                Thread.sleep( 10000 );
+                proxyStatus = whitelist().getWhitelistStatus( proxyRepository.id() );
+            }
+
+            // clear recorder
+            recorder.clear();
+            // remote repo lives without prefix file
+            {
+                // check that newly added proxy is not publishing whitelist
+                assertThat( whitelist().getWhitelistStatus( proxyRepository.id() ).getPublishedStatus(),
+                    equalTo( Outcome.FAILED ) );
+
+                // nuke the repo cache
+                nukeProxyCaches( proxyRepository.id() );
+                // and because no WL, we can fetch whatever we want (com and org)
+                // all these will go remotely
+                fetchAndAssert( downloadsDir, proxyRepository.id(), COM_SOMEORG_ARTIFACT_10_POM, true );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), COM_SOMEORG_ARTIFACT_10_JAR, true );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), ORG_SOMEORG_ARTIFACT_10_POM, true );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), ORG_SOMEORG_ARTIFACT_10_JAR, true );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), FLUKE_ARTIFACT_POM, false );
+                fetchAndAssert( downloadsDir, proxyRepository.id(), FLUKE_ARTIFACT_JAR, false );
+
+                // note: sha1 is asked for existing files only
+                // GET /hu/fluke/artifact/1.0/artifact-1.0.jar,
+                // GET /hu/fluke/artifact/1.0/artifact-1.0.pom,
+                // GET /org/someorg/artifact/1.0/artifact-1.0.jar.sha1,
+                // GET /org/someorg/artifact/1.0/artifact-1.0.jar,
+                // GET /org/someorg/artifact/1.0/artifact-1.0.pom.sha1,
+                // GET /org/someorg/artifact/1.0/artifact-1.0.pom,
+                // GET /com/someorg/artifact/1.0/artifact-1.0.jar.sha1,
+                // GET /com/someorg/artifact/1.0/artifact-1.0.jar,
+                // GET /com/someorg/artifact/1.0/artifact-1.0.pom.sha1,
+                // GET /com/someorg/artifact/1.0/artifact-1.0.pom,
+                final List<String> requests = recorder.getPathsForVerb( "GET" );
+                assertThat( requests.size(), is( 10 ) );
+                assertThat(
+                    requests,
+                    containsInAnyOrder( COM_SOMEORG_ARTIFACT_10_POM, COM_SOMEORG_ARTIFACT_10_POM + ".sha1",
+                        COM_SOMEORG_ARTIFACT_10_JAR, COM_SOMEORG_ARTIFACT_10_JAR + ".sha1",
+                        ORG_SOMEORG_ARTIFACT_10_POM, ORG_SOMEORG_ARTIFACT_10_POM + ".sha1",
+                        ORG_SOMEORG_ARTIFACT_10_JAR, ORG_SOMEORG_ARTIFACT_10_JAR + ".sha1", FLUKE_ARTIFACT_POM,
+                        FLUKE_ARTIFACT_JAR ) );
             }
         }
         finally
