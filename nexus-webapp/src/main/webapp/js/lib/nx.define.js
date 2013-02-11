@@ -39,7 +39,7 @@ NX.Base = function (config) {
  * @cfg {String} extend             Super-class name.
  * @cfg {*} statics                 Static members.
  * @cfg {Array} mixins              Mixin class names, does not support object configuration like extjs4 ATM.
- * @cfg {*} requirejs               Array of requirejs module dependencies
+ * @cfg {*} requirejs               Array of requirejs module dependencies, custom... defs not extjs4 compatible.
  * @cfg {*} requires                Array of class names (created by Ext.define) which are dependencies.
  * @cfg {boolean} requireSuper      Flag to enable/disable automatic dependency on super-class;
  *                                  Tries to auto-detect but just inc-ase you can enable/disable it.
@@ -60,8 +60,8 @@ NX.define = function (className, data, createdFn) {
         statics,
         mixins,
         mixin,
-        requiredClasses,
-        requiredModules,
+        requiredClassNames,
+        requiredModulePaths,
         moduleName,
         singleton,
         xtype,
@@ -108,44 +108,49 @@ NX.define = function (className, data, createdFn) {
     delete data.xtype;
 
     // Extract requirejs dependencies
-    requiredModules = NX.arrayify(data.requirejs);
+    requiredModulePaths = NX.arrayify(data.requirejs);
     delete data.requirejs;
 
     // Extract class dependencies (which were defined using Ext.define)
-    requiredClasses = NX.arrayify(data.requires);
+    requiredClassNames = NX.arrayify(data.requires);
     delete data.requires;
 
     // Require super if enabled
     if (requireSuper === true) {
-        requiredModules.push(superName.replaceAll('.', '/'));
+        requiredClassNames.push(superName);
     }
 
     // Require mixins
     if (mixins !== undefined) {
         for(i=0; i<mixins.length; i++) {
-            requiredModules.push(mixins[i].replaceAll('.', '/'));
+            requiredClassNames.push(mixins[i]);
         }
     }
 
     // append translated dependency classes on to required modules
-    for (i=0; i < requiredClasses.length; i++) {
-        tmp = requiredClasses[i].replaceAll('.', '/');
-        requiredModules.push(tmp);
+    for (i=0; i < requiredClassNames.length; i++) {
+        tmp = requiredClassNames[i].replaceAll('.', '/');
+        requiredModulePaths.push(tmp);
     }
 
     // Translate class name into module name
     moduleName = className.replaceAll('.', '/');
 
-    if (requiredModules.length !== 0) {
-        NX.log.debug('Defining module: ' + moduleName + ' depends: ' + requiredModules);
+    if (requiredModulePaths.length !== 0) {
+        NX.log.debug('Defining module: ' + moduleName + ' depends: ' + requiredModulePaths);
     }
     else {
         NX.log.debug('Defining module: ' + moduleName);
     }
 
-    define(moduleName, requiredModules, function()
+    define(moduleName, requiredModulePaths, function()
     {
         NX.log.debug('Defining class: ' + className + ' super: ' + superName);
+
+        // Sanity check required classes exist
+        Ext.each(requiredClassNames, function(className) {
+            NX.assert(NX.isobj(className), 'Missing required class: ' + className);
+        });
 
         // Create namespace if required
         if (nameSpace) {
