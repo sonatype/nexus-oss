@@ -189,7 +189,7 @@ NX.define = function (className, data, createdFn) {
             }
         }
 
-        // FIXME: Remove this and use a mixin instead
+        // FIXME: Remove this and use a LogAwareMixin instead
         Ext.apply(type, {
             /**
              * @deprecated
