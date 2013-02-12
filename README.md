@@ -83,7 +83,7 @@ to open the capabilities configuration tab.
 Next step is creating a new *Yum: Generate Metadata* capability for one of your hosted repositories.
 Click *Add* and create one for the 3rd party repository for example:
 ![Configure-3rd-Party-Repo][17]
-As you see we also configured some optional aliases to provide separate versioned repository for different stages.
+As you see we also configured some optional aliases to provide separate versioned repository for different stages (see [Staging RPMs in Nexus OSS](#staging-rpms-in-nexus-oss)).
 After saving the settings each uploaded RPM to the 3rd party repository (see [Getting Started](#getting-started)) causes Nexus to rebuild the yum metadata immediately.
 
 ### Configure Group Repositories
