@@ -36,7 +36,6 @@ import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
-import org.sonatype.nexus.client.internal.rest.jersey.subsystem.JerseyContent;
 import org.sonatype.nexus.testsuite.client.Caches;
 import org.sonatype.nexus.testsuite.client.Scheduler;
 import org.sonatype.sisu.litmus.testsupport.group.Smoke;
