@@ -36,6 +36,7 @@ NX.log = (function () {
         levels: {
             trace:  false,
             debug:  false,
+            group:  false,
             info:   true,
             warn:   true,
             error:  true
@@ -78,6 +79,7 @@ NX.log = (function () {
         'trace',
         //'log', skipping; as we may want to make an Ext.log compatible method
         'debug',
+        'group',
         'info',
         'warn',
         'error'
@@ -86,8 +88,6 @@ NX.log = (function () {
     });
 
     Ext.each([
-        'dir',
-        'group',
         'groupEnd'
     ], function (name) {
         logger[name] = safeProxy(console, name);
