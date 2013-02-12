@@ -141,8 +141,8 @@ public class YumITSupport
     protected void waitForNexusToSettleDown()
         throws Exception
     {
-        client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
         client().getSubsystem( Events.class ).waitForCalmPeriod();
+        client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
     }
 
 }
