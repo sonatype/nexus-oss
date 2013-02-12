@@ -160,6 +160,7 @@ NX.define = function (className, data, createdFn) {
         // Get a reference to the super-class
         superClass = NX.obj(superName);
 
+        // FIXME: This isn't quite right, for classes which have no ctor and should use supers
         // When no constructor given in configuration (its always there due to picking upt from Object.prototype), use a synthetic version
         if (data.constructor === Object.prototype.constructor) {
             data.constructor = function () {
