@@ -14,19 +14,24 @@ package org.sonatype.nexus.plugins.bcprov.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.security.Security;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.inject.EagerSingleton;
-import org.sonatype.nexus.plugins.bcprov.BCManager;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 
 /**
- * Guava {@link EventBus} handler that listens for Nexus events and performs BC provider registration/removal with using
- * {@link BCManager}.
+ * Guava {@link EventBus} handler that listens for Nexus events and performs BC provider registration/removal. This
+ * component is marked as {@code EagerSingleton} to be created (and hence to have registration happen) as early as
+ * possible, even before any wiring happens in plugins.
  * 
  * @author cstamas
  * @since 2.4
@@ -35,30 +40,46 @@ import com.google.common.eventbus.Subscribe;
 @EagerSingleton
 public class BCPluginEventHandler
 {
-    private final BCManager bcManager;
+    private final Logger logger;
+
+    private final boolean uninstallBouncyCastleProvider;
 
     /**
      * Default constructor.
      * 
-     * @param bcManager the {@link BCManager} instance.
      * @param eventBus the {@link EventBus} to register with.
      */
     @Inject
-    public BCPluginEventHandler( final BCManager bcManager, final EventBus eventBus )
+    public BCPluginEventHandler( final EventBus eventBus )
     {
-        this.bcManager = checkNotNull( bcManager );
+        checkNotNull( eventBus );
+        this.logger = LoggerFactory.getLogger( getClass() );
+        // register BC and nag if already installed
+        uninstallBouncyCastleProvider = Security.addProvider( new BouncyCastleProvider() ) != -1;
+        if ( !uninstallBouncyCastleProvider )
+        {
+            logger.info( "BC provider is already registered wih JCE by another party. This might lead to problems if registered version is not the one expected by Nexus!" );
+        }
         eventBus.register( this );
-        bcManager.registerProvider();
     }
 
     /**
-     * {@link NexusStoppedEvent} handler: unregisters BC provider.
+     * {@link NexusStoppedEvent} handler: unregisters BC provider if needed (if it was registered by us, not by some 3rd
+     * party).
      * 
      * @param e the event (not used)
      */
     @Subscribe
     public void onNexusStoppedEvent( final NexusStoppedEvent e )
     {
-        bcManager.unregisterProvider();
+        if ( uninstallBouncyCastleProvider )
+        {
+            logger.info( "Removing BC Provider from JCE..." );
+            Security.removeProvider( BouncyCastleProvider.PROVIDER_NAME );
+        }
+        else
+        {
+            logger.info( "Not removing BC Provider from JCE as it was registered by some other party..." );
+        }
     }
 }

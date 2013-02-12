@@ -28,7 +28,7 @@
 
   <properties>
     <nexus.plugin.name>Nexus BouncyCastle Provider Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Provides Bouncy Castle JARs and registers it as a JCE provider.</nexus.plugin.description>
+    <nexus.plugin.description>Provides Bouncy Castle JARs and registers it as a JCE provider. Also provides goodies crypto.</nexus.plugin.description>
     
     <bouncycastle.version>1.47</bouncycastle.version>
     <sisu-goodies.version>1.5.1</sisu-goodies.version>
