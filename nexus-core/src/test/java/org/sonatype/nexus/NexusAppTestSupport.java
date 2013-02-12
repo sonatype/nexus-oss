@@ -36,12 +36,17 @@ public abstract class NexusAppTestSupport
     {
         return true;
     }
+    
+    protected boolean enableWLFeature()
+    {
+        return false;
+    }
 
     @Override
     protected void setUp()
         throws Exception
     {
-        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.FALSE.toString() );
+        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.valueOf( enableWLFeature() ).toString() );
         super.setUp();
 
         nexusScheduler = lookup( NexusScheduler.class );

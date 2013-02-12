@@ -102,7 +102,7 @@ public class WLMaintenanceTest
     }
 
     @Override
-    protected boolean shouldWLEventDispatcherBeActive()
+    protected boolean enableWLFeature()
     {
         return true;
     }
@@ -161,8 +161,6 @@ public class WLMaintenanceTest
     public void smoke()
         throws Exception
     {
-        waitForWLBackgroundUpdates();
-
         final MavenHostedRepository mavenRepository =
             getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenHostedRepository.class );
 

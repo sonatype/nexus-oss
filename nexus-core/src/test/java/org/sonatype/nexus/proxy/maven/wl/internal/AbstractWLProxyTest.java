@@ -25,7 +25,6 @@ public abstract class AbstractWLProxyTest
     public void setUp()
         throws Exception
     {
-        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.valueOf( shouldWLEventDispatcherBeActive() ).toString() );
         super.setUp();
         waitForWLBackgroundUpdates();
     }
@@ -34,17 +33,11 @@ public abstract class AbstractWLProxyTest
     public void tearDown()
         throws Exception
     {
-        if ( !shouldWLEventDispatcherBeActive() )
+        if ( !enableWLFeature() )
         {
             lookup( WLManager.class ).shutdown();
         }
         super.tearDown();
-        System.clearProperty( EventDispatcher.ACTIVE_KEY );
-    }
-
-    protected boolean shouldWLEventDispatcherBeActive()
-    {
-        return false;
     }
 
     protected void waitForWLBackgroundUpdates()

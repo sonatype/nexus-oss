@@ -173,7 +173,7 @@ public class WLUpdatePropagationTest
     }
 
     @Override
-    protected boolean shouldWLEventDispatcherBeActive()
+    protected boolean enableWLFeature()
     {
         return true;
     }
