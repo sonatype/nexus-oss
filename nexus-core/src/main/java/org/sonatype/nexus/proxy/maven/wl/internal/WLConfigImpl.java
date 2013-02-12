@@ -35,6 +35,20 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 public class WLConfigImpl
     implements WLConfig
 {
+    /**
+     * System property key that is used to read up boolean controlling is WL feature active or not. Main use case is to
+     * disable this in "legacy" UTs and ITs, but might serve too as troubleshooting in some cases. Event dispatcher is
+     * active by default, to deactivate it, specify a system property like this:
+     * 
+     * <pre>
+     * org.sonatype.nexus.proxy.maven.wl.WLConfig.featureActive = false
+     * </pre>
+     * 
+     * Note: This does NOT deactivate the Feature itself, moreover, having value with this key set to {@code false} will
+     * cause problems on UI. Using system property with this key should be restricted to tests only.
+     */
+    public static final String FEATURE_ACTIVE_KEY = WLConfig.class.getName() + ".featureActive";
+
     private static final String LOCAL_NO_SCRAPE_FLAG_PATH = "/.meta/noscrape.txt";
 
     private static final String LOCAL_PREFIX_FILE_PATH = "/.meta/prefixes.txt";
@@ -53,6 +67,32 @@ public class WLConfigImpl
 
     private static final int WL_MATCHING_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
         + ".wlMatchingDepth", REMOTE_SCRAPE_DEPTH );
+
+    private final boolean featureActive;
+
+    /**
+     * Default constructor.
+     */
+    public WLConfigImpl()
+    {
+        this( SystemPropertiesHelper.getBoolean( FEATURE_ACTIVE_KEY, true ) );
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param featureActive
+     */
+    public WLConfigImpl( final boolean featureActive )
+    {
+        this.featureActive = featureActive;
+    }
+
+    @Override
+    public boolean isFeatureActive()
+    {
+        return featureActive;
+    }
 
     @Override
     public String getLocalNoScrapeFlagPath()

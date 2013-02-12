@@ -28,12 +28,12 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 public interface WLManager
 {
     /**
-     * Initializes all WLs (used at boot).
+     * Startup. This method should not be invoked by any code (maybe except in UTs).
      */
-    void initializeAllWhitelists();
-    
+    void startup();
+
     /**
-     * Stops WL manager (used at stop).
+     * Shutdown. This method should not be invoked by any code (maybe except in UTs).
      */
     void shutdown();
 

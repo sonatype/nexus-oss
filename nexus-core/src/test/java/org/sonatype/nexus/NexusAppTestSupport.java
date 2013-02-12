@@ -18,9 +18,14 @@ import java.util.Map;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
-import org.sonatype.nexus.proxy.maven.wl.internal.EventDispatcher;
+import org.sonatype.nexus.proxy.maven.wl.WLConfig;
+import org.sonatype.nexus.proxy.maven.wl.internal.WLConfigImpl;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
+
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
 public abstract class NexusAppTestSupport
     extends NexusProxyTestSupport
@@ -36,7 +41,21 @@ public abstract class NexusAppTestSupport
     {
         return true;
     }
-    
+
+    @Override
+    protected Module[] getTestCustomModules()
+    {
+        final Module[] modules = super.getTestCustomModules();
+        return ObjectArrays.concat( modules, new Module()
+        {
+            @Override
+            public void configure( final Binder binder )
+            {
+                binder.bind( WLConfig.class ).toInstance( new WLConfigImpl( enableWLFeature() ) );
+            }
+        } );
+    }
+
     protected boolean enableWLFeature()
     {
         return false;
@@ -46,7 +65,6 @@ public abstract class NexusAppTestSupport
     protected void setUp()
         throws Exception
     {
-        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.valueOf( enableWLFeature() ).toString() );
         super.setUp();
 
         nexusScheduler = lookup( NexusScheduler.class );
@@ -64,7 +82,6 @@ public abstract class NexusAppTestSupport
     {
         waitForTasksToStop();
         super.tearDown();
-        System.clearProperty( EventDispatcher.ACTIVE_KEY );
     }
 
     protected void shutDownSecurity()
@@ -145,7 +162,7 @@ public abstract class NexusAppTestSupport
             for ( ScheduledTask<?> task : taskList )
             {
                 System.out.println( task.getName() + " with id " + task.getId() + " is in state "
-                                        + task.getTaskState().toString() );
+                    + task.getTaskState().toString() );
             }
         }
     }

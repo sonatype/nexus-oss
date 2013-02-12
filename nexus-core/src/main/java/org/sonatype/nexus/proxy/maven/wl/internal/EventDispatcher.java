@@ -18,12 +18,9 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.RequestContext;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -40,7 +37,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -59,20 +55,7 @@ import com.google.common.eventbus.Subscribe;
  */
 public class EventDispatcher
 {
-    /**
-     * System properties key that is used to read up boolean controlling is WL event dispatcher active or not. Main use
-     * case is to disable this in "legacy" ITs, but might serve too as troubleshooting in some cases. Event dispatcher
-     * is active by default, to deactivate it, specify a system property like this:
-     * 
-     * <pre>
-     * org.sonatype.nexus.proxy.maven.wl.internal.EventDispatcher.active = false
-     * </pre>
-     */
-    public static final String ACTIVE_KEY = EventDispatcher.class.getName() + ".active";
-
     private final Logger logger;
-
-    private final ApplicationStatusSource applicationStatusSource;
 
     private final WLManager wlManager;
 
@@ -81,15 +64,14 @@ public class EventDispatcher
     /**
      * Da constructor.
      * 
-     * @param applicationStatusSource
      * @param wlManager
+     * @param active
      */
-    public EventDispatcher( final ApplicationStatusSource applicationStatusSource, final WLManager wlManager )
+    public EventDispatcher( final WLManager wlManager, final boolean active )
     {
         this.logger = LoggerFactory.getLogger( getClass() );
-        this.applicationStatusSource = checkNotNull( applicationStatusSource );
         this.wlManager = checkNotNull( wlManager );
-        this.active = SystemPropertiesHelper.getBoolean( ACTIVE_KEY, true );
+        this.active = active;
     }
 
     protected Logger getLogger()
@@ -98,16 +80,6 @@ public class EventDispatcher
     }
 
     // actual work is done here
-
-    protected void handleNexusStarted()
-    {
-        wlManager.initializeAllWhitelists();
-    }
-
-    protected void handleNexusStopped()
-    {
-        wlManager.shutdown();
-    }
 
     protected void handleRepositoryAdded( final MavenRepository mavenRepository )
     {
@@ -190,26 +162,20 @@ public class EventDispatcher
 
     // == Filters
 
-    protected boolean isRequestContextMarked( final RequestContext context )
-    {
-        return context.containsKey( WLManager.class.getName() );
-    }
-
     protected boolean isActive()
     {
         return active;
     }
 
-    protected boolean isActiveAndStarted()
+    protected boolean isRequestContextMarked( final RequestContext context )
     {
-        // we handle repository events only if this is Active and after nexus is started
-        return isActive() && applicationStatusSource.getSystemStatus().isNexusStarted();
+        return context.containsKey( WLManager.class.getName() );
     }
 
     protected boolean isRepositoryHandled( final Repository repository )
     {
         // we handle repository events after this isActiveAndStarted, and only for repository that are Maven reposes
-        return isActiveAndStarted() && repository != null
+        return isActive() && repository != null
             && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class );
     }
 
@@ -311,36 +277,6 @@ public class EventDispatcher
     }
 
     // == Handler for WL initialization
-
-    /**
-     * Event handler.
-     * 
-     * @param evt
-     */
-    @Subscribe
-    @AllowConcurrentEvents
-    public void onNexusStartedEvent( final NexusStartedEvent evt )
-    {
-        if ( isActive() )
-        {
-            handleNexusStarted();
-        }
-    }
-
-    /**
-     * Event handler.
-     * 
-     * @param evt
-     */
-    @Subscribe
-    @AllowConcurrentEvents
-    public void onNexusStoppedEvent( final NexusStoppedEvent evt )
-    {
-        if ( isActive() )
-        {
-            handleNexusStopped();
-        }
-    }
 
     /**
      * Event handler.

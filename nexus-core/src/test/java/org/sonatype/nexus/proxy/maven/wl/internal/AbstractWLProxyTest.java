@@ -33,10 +33,6 @@ public abstract class AbstractWLProxyTest
     public void tearDown()
         throws Exception
     {
-        if ( !enableWLFeature() )
-        {
-            lookup( WLManager.class ).shutdown();
-        }
         super.tearDown();
     }
 

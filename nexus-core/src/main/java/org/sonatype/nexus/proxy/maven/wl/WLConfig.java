@@ -23,6 +23,16 @@ import java.util.List;
 public interface WLConfig
 {
     /**
+     * Returns {@code true} if feature is instance-wide active, {@code false} otherwise. This method is needed for UT
+     * and IT workaround, and maybe as some problem avoidance in production environment. As this feature interferes a
+     * lot (background threads, async nature, OOM on no proper cleanup), this is the recommended way to perform tests
+     * that does not care or not aware of this new core feature..
+     * 
+     * @return {@code true} if feature is active.
+     */
+    boolean isFeatureActive();
+
+    /**
      * Returns the "no scrape" file path used for flagging a repository to not be scraped.
      * 
      * @return the no scrape file path.

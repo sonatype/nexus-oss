@@ -38,7 +38,7 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.proxy.maven.wl.internal.EventDispatcher;
+import org.sonatype.nexus.proxy.maven.wl.internal.WLConfigImpl;
 
 /**
  * The simplified Nexus booter class, that boots Nexus (the IT test subject) in completely same way as it boots in
@@ -163,7 +163,7 @@ public class Jetty8NexusBooter
         // In either case, IT working with WL should explicitly enable it.
         // As "legacy" ITs are coming anyway from pre-WL era, they will have WL disabled ALWAYS
         // To write IT covering WL you'd use anyway the "new" IT infrastructure instead of this.
-        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.FALSE.toString() );
+        System.setProperty( WLConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString() );
 
         // ---------------
 

@@ -40,7 +40,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.maven.wl.internal.EventDispatcher;
+import org.sonatype.nexus.proxy.maven.wl.WLConfig;
+import org.sonatype.nexus.proxy.maven.wl.internal.WLConfigImpl;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
@@ -52,6 +53,7 @@ import org.sonatype.tests.http.server.fluent.Proxy;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.Record;
 
+import com.google.inject.Binder;
 import com.google.inject.Module;
 
 /**
@@ -72,7 +74,14 @@ public class RequestFlagsTest
     @Override
     protected Module[] getTestCustomModules()
     {
-        return new Module[] { new SecurityModule() };
+        return new Module[] { new SecurityModule(), new Module()
+        {
+            @Override
+            public void configure( Binder binder )
+            {
+                binder.bind( WLConfig.class ).toInstance( new WLConfigImpl( false ) );
+            }
+        } };
     }
 
     private Server server;
@@ -89,9 +98,6 @@ public class RequestFlagsTest
     public void prepare()
         throws Exception
     {
-        // disable WL
-        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.FALSE.toString() );
-        
         HttpServletResponse resp;
 
         recordedRequestsBehaviour = new Record();
@@ -115,7 +121,6 @@ public class RequestFlagsTest
     public void cleanup()
         throws Exception
     {
-        System.clearProperty( EventDispatcher.ACTIVE_KEY );
         server.stop();
     }
 

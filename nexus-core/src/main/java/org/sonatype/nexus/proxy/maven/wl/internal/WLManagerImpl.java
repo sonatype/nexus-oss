@@ -32,6 +32,8 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -71,6 +73,7 @@ import org.sonatype.nexus.util.task.executor.Statistics;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Default implementation.
@@ -86,7 +89,7 @@ public class WLManagerImpl
 {
     private final EventBus eventBus;
 
-    final ApplicationStatusSource applicationStatusSource;
+    private final ApplicationStatusSource applicationStatusSource;
 
     private final ApplicationConfiguration applicationConfiguration;
 
@@ -143,7 +146,17 @@ public class WLManagerImpl
             new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "wl", "WL-Updater" ),
                 new ThreadPoolExecutor.AbortPolicy() );
         this.constrainedExecutor = new ConstrainedExecutorImpl( executor );
+        // register event dispatcher
+        this.eventDispatcher = new EventDispatcher( this, config.isFeatureActive() );
+    }
 
+    @Override
+    public void startup()
+    {
+        final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
+        initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
+        initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
+        initializeWhitelist( initableRepositories.toArray( new MavenRepository[initableRepositories.size()] ) );
         // schedule the "updater": wait 10 minutes for boot to calm down and then do the work hourly
         this.executor.scheduleAtFixedRate( new Runnable()
         {
@@ -153,24 +166,15 @@ public class WLManagerImpl
                 mayUpdateProxyWhitelist();
             }
         }, TimeUnit.MINUTES.toMillis( 10 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
-
-        // register event dispatcher
-        this.eventDispatcher = new EventDispatcher( applicationStatusSource, this );
-        this.eventBus.register( eventDispatcher );
-    }
-
-    @Override
-    public void initializeAllWhitelists()
-    {
-        final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
-        initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
-        initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
-        initializeWhitelist( initableRepositories.toArray( new MavenRepository[initableRepositories.size()] ) );
+        // register event dispatcher, to start receiveing events
+        eventBus.register( eventDispatcher );
     }
 
     @Override
     public void shutdown()
     {
+        eventBus.unregister( eventDispatcher );
+        eventBus.unregister( this );
         executor.shutdown();
         try
         {
@@ -725,5 +729,29 @@ public class WLManagerImpl
         return evt.getRepository().getRepositoryKind().isFacetAvailable( MavenRepository.class )
             && evt.getItem() instanceof StorageFileItem
             && config.getLocalPrefixFilePath().equals( evt.getItem().getPath() );
+    }
+
+    // ==
+
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
+    @Subscribe
+    public void onNexusStartedEvent( final NexusStartedEvent evt )
+    {
+        startup();
+    }
+
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
+    @Subscribe
+    public void onNexusStoppedEvent( final NexusStoppedEvent evt )
+    {
+        shutdown();
     }
 }
