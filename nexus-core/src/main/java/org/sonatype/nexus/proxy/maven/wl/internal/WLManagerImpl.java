@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -66,6 +66,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.NexusThreadFactory;
+import org.sonatype.nexus.util.task.Cancelable;
+import org.sonatype.nexus.util.task.LoggingProgressListener;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
@@ -99,10 +101,10 @@ public class WLManagerImpl
     private final EventDispatcher eventDispatcher;
 
     /**
-     * Plain set holding the repository IDs of repositories being batch-updated in background. All read-write access to
-     * this set must happen within synchronized block, using this instance as monitor object.
+     * Plain map holding the repository IDs of repositories being batch-updated in background as keys. All read-write
+     * access to this set must happen within synchronized block, using this instance as monitor object.
      */
-    private final HashSet<String> currentlyUpdatingRepositoryIds;
+    private final HashMap<String, Cancelable> currentlyUpdatingRepositories;
 
     /**
      * Plain executor for background batch-updates. This executor runs 1 periodic thread (see constructor) that performs
@@ -137,7 +139,7 @@ public class WLManagerImpl
         this.config = checkNotNull( config );
         this.localContentDiscoverer = checkNotNull( localContentDiscoverer );
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
-        this.currentlyUpdatingRepositoryIds = new HashSet<String>();
+        this.currentlyUpdatingRepositories = new HashMap<String, Cancelable>();
         this.executor =
             new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "wl", "WL-Updater" ),
                 new ThreadPoolExecutor.AbortPolicy() );
@@ -244,10 +246,21 @@ public class WLManagerImpl
     @Override
     public synchronized void updateWhitelist( final MavenRepository... mavenRepositories )
     {
+        doUpdateWhitelist( false, mavenRepositories );
+    }
+
+    @Override
+    public synchronized void forceUpdateWhitelist( final MavenRepository... mavenRepositories )
+    {
+        doUpdateWhitelist( true, mavenRepositories );
+    }
+
+    protected synchronized void doUpdateWhitelist( final boolean forced, final MavenRepository... mavenRepositories )
+    {
         final ArrayList<MavenRepository> repositoriesToBeUpdatedAndPublished = new ArrayList<MavenRepository>();
         for ( MavenRepository mavenRepository : mavenRepositories )
         {
-            if ( currentlyUpdatingRepositoryIds.contains( mavenRepository.getId() ) )
+            if ( currentlyUpdatingRepositories.containsKey( mavenRepository.getId() ) )
             {
                 getLogger().info( "Repository {} is already updating WL, skipping it.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
@@ -255,64 +268,30 @@ public class WLManagerImpl
             else
             {
                 repositoriesToBeUpdatedAndPublished.add( mavenRepository );
-                currentlyUpdatingRepositoryIds.add( mavenRepository.getId() );
+                currentlyUpdatingRepositories.put( mavenRepository.getId(), null );
             }
         }
         if ( !repositoriesToBeUpdatedAndPublished.isEmpty() )
         {
-            final Runnable job = new Runnable()
+            final List<WLUpdateRepositoryRunnable> jobs = new ArrayList<WLUpdateRepositoryRunnable>();
+            for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
             {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
-                        {
-                            if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
-                            {
-                                getLogger().warn( "Nexus stopped during background WL updates, bailing out." );
-                                break;
-                            }
-                            try
-                            {
-                                updateAndPublishWhitelist( mavenRepository, true );
-                            }
-                            catch ( Exception e )
-                            {
-                                getLogger().warn( "Problem during WL update of {}",
-                                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-                                try
-                                {
-                                    unpublish( mavenRepository );
-                                }
-                                catch ( IOException ioe )
-                                {
-                                    // silently
-                                }
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        synchronized ( WLManagerImpl.this )
-                        {
-                            for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
-                            {
-                                currentlyUpdatingRepositoryIds.remove( mavenRepository.getId() );
-                            }
-                        }
-                    }
-                }
-            };
+                jobs.add( new WLUpdateRepositoryRunnable( null, this, mavenRepository ) );
+            }
+            final WLUpdateRunnable job =
+                new WLUpdateRunnable( new LoggingProgressListener( getLogger() ), applicationStatusSource, jobs );
             executor.execute( job );
         }
     }
 
-    @Override
-    public synchronized boolean isUpdateRunning()
+    protected synchronized void updateDoneCallback( final MavenRepository mavenRepository )
     {
-        return !currentlyUpdatingRepositoryIds.isEmpty();
+        currentlyUpdatingRepositories.remove( mavenRepository.getId() );
+    }
+
+    protected synchronized boolean isUpdateRunning()
+    {
+        return !currentlyUpdatingRepositories.isEmpty();
     }
 
     protected void updateAndPublishWhitelist( final MavenRepository mavenRepository, final boolean notify )

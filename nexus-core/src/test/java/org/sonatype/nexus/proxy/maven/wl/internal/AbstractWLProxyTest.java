@@ -32,7 +32,8 @@ public abstract class AbstractWLProxyTest
     protected void waitForWLBackgroundUpdates()
         throws Exception
     {
-        final WLManager wm = lookup( WLManager.class );
+        // TODO: A hack, I don't want to expose this over component contract iface
+        final WLManagerImpl wm = (WLManagerImpl) lookup( WLManager.class );
         while ( wm.isUpdateRunning() )
         {
             Thread.sleep( 500 );

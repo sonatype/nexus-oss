@@ -52,6 +52,15 @@ public interface WLManager
     void updateWhitelist( MavenRepository... mavenRepositories );
 
     /**
+     * Executes an update of WL for given repositories. In case of {@link MavenProxyRepository} instance, it might not
+     * do anything, depends is configuration returned by {@link #getRemoteDiscoveryConfig(MavenProxyRepository)} for it
+     * enabled or not. This method invocation will spawn the updates in background, and return immediately.
+     * 
+     * @param mavenRepositories
+     */
+    void forceUpdateWhitelist( MavenRepository... mavenRepositories );
+
+    /**
      * Returns the WL status for given repository.
      * 
      * @param mavenRepository
@@ -166,14 +175,4 @@ public interface WLManager
      * @return {@code true} if item event is about WL file.
      */
     boolean isEventAboutWLFile( final RepositoryItemEvent evt );
-
-    // ==
-
-    /**
-     * Returns {@code true} if background update jobs are running. If no job runs currently, it returns {@code false}.
-     * This method is meant merely as help in tests, as at runtime you'd not need this.
-     * 
-     * @return {@code true} if background jobs for updates are running.
-     */
-    boolean isUpdateRunning();
 }

@@ -115,7 +115,7 @@ public class EventDispatcher
         }
     }
 
-    protected void handleRepositoryModified( final MavenRepository mavenRepository )
+    protected void handleRepositoryModified( final MavenRepository mavenRepository, final boolean force )
     {
         wlManager.updateWhitelist( mavenRepository );
     }
@@ -337,10 +337,10 @@ public class EventDispatcher
     @Subscribe
     public void on( final RepositoryConfigurationUpdatedEvent evt )
     {
-        if ( isRepositoryHandled( evt.getRepository() ) && ( evt.isLocalUrlChanged() || evt.isRemoteUrlChanged() ) )
+        if ( isRepositoryHandled( evt.getRepository() ) && evt.isRemoteUrlChanged() )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
-            handleRepositoryModified( mavenRepository );
+            handleRepositoryModified( mavenRepository, true );
         }
     }
 
@@ -358,7 +358,7 @@ public class EventDispatcher
         if ( isRepositoryHandled( evt.getRepository() ) )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
-            handleRepositoryModified( mavenRepository );
+            handleRepositoryModified( mavenRepository, false );
         }
     }
 
@@ -380,7 +380,7 @@ public class EventDispatcher
                 final MavenGroupRepository mavenGroupRepository = repository.adaptToFacet( MavenGroupRepository.class );
                 if ( mavenGroupRepository != null && isRepositoryHandled( mavenGroupRepository ) )
                 {
-                    handleRepositoryModified( mavenGroupRepository );
+                    handleRepositoryModified( mavenGroupRepository, false );
                 }
             }
         }
