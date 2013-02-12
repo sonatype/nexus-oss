@@ -202,7 +202,7 @@ public class RpmListWriter
         {
             outputStream.close();
         }
-        LOG.debug( "Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListFile );
+        LOG.debug( "Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListOutputFile );
     }
 
     @SuppressWarnings( "unchecked" )
