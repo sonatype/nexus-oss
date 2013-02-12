@@ -74,4 +74,28 @@ public class GenerateMetadataIT
         final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
         assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
     }
+
+    @Test
+    public void removeDirWithRpm()
+        throws Exception
+    {
+        final Repository repository = createYumEnabledRepository( repositoryIdForTest() );
+
+        content().upload(
+            repositoryLocation( repository.id(), "test/test-artifact/0.0.1/test-artifact-0.0.1.rpm" ),
+            testData().resolveFile( "/rpms/test-artifact-1.2.3-1.noarch.rpm" )
+        );
+
+        waitForNexusToSettleDown();
+
+        content().delete(
+            repositoryLocation( repository.id(), "test/test-artifact/0.0.1" )
+        );
+
+        waitForNexusToSettleDown();
+
+        final String primaryXml = repodata().getMetadata( repository.id(), PRIMARY_XML, String.class );
+        assertThat( primaryXml, not( containsString( "test-artifact" ) ) );
+    }
+
 }
