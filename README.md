@@ -23,13 +23,13 @@ Yum metadata, so that RedHat-compatible system can use Nexus as software reposit
 1. [History](#history)
 1. [Features](#features)
 1. [Requirements](#requirements)
-1. [Help & Issues](#help--issues)
 1. [Installation](#installation)
 1. [Configuration](#configuration)
 1. [Getting Started](#getting-started)
 	1. [Deploy Java Web Application via RPM](#deploy-java-web-application-via-rpm)
 	1. [Staging RPMs in Nexus Professional](#staging-rpms-in-nexus-professional)
 	1. [Staging RPMs in Nexus OSS](#staging-rpms-in-nexus-oss)
+1. [Help & Issues](#help--issues)
 1. [How to Build](#how-to-build)
 
 
@@ -68,62 +68,41 @@ The Nexus Yum Plugin uses the command line "createrepo" utility to build yum rep
 
 If your Centos/Redhat/Fedora system does not have this command you can install it by running "yum install createrepo" as root.
 
-## Help & Issues
-
-Ask for help at our [Google Group][7] or [create a new issue][8].
-
 ## Installation
 
-From version 2.3 on the plugin is automatically bundled together with Nexus and Nexus Pro.
+From Nexus version 2.3 on the plugin is bundled together with Nexus OSS and Nexus Pro.
 
 ## Configuration
 
-Here, you'll find everything about configuring Nexus Yum Plugin.
+Since Nexus 2.3 you can configure Yum metadata capabilities for dedicated repositories. Click on
+![Configure-Capabilities][16]
+to open the capabilities configuration tab.
+
+### Configure Hosted Yum Repositories
+
+Next step is creating a new *Yum: Generate Metadata* capability for one of your hosted repositories.
+Click *Add* and create one for the 3rd party repository for example:
+![Configure-3rd-Party-Repo][17]
+As you see we also configured some optional aliases to provide separate versioned repository for different stages.
+After saving the settings each uploaded RPM to the 3rd party repository (see [Getting Started](#getting-started)) causes Nexus to rebuild the yum metadata immediately.
+
+### Configure Group Repositories
+
+Similar to single repositories Nexus group repositories can be configured to merge the yum metadata
+of their member repositories. Click *Add* and create a new *Yum: Merge Metadata* capability for one group repository:
+![Config-GroupRepository][18]
 
 ### Location
 
 The configuration of the Nexus Yum Plugin can be found in *yum.xml* in the same directory as *nexus.xml* :
+
 	$NEXUS_WORK_DIR/conf/yum.xml
-Default:
+
+default:
+
 	~/sonatype-work/nexus/conf/yum.xml
 
-### Example
-
-Example *yum.xml*:
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-  <!-- timeout for requests for a filtered (versionized) repository -->
-  <repositoryCreationTimeout>150</repositoryCreationTimeout><!-- in seconds -->
-  
-  <!-- enables or disables the creation of a repository of repositories -->
-  <repositoryOfRepositoryVersionsActive>true</repositoryOfRepositoryVersionsActive>
-  
-  <!-- enables or disables of delete rpm events via nexus -->
-  <deleteProcessing>true</deleteProcessing>
-  
-  <!-- delay after which the rebuild of a repository is triggered in which one or more rpms got deleted -->
-  <delayAfterDeletion>10</delayAfterDeletion><!-- in seconds -->
-  
-  <!-- configured aliases -->
-  <aliasMappings>
-    <aliasMapping>
-      <repoId>releases</repoId>
-      <alias>trunk</alias>
-      <version>5.1.15-2</version>
-    </aliasMapping>
-    <aliasMapping>
-      <repoId>releases</repoId>
-      <alias>production</alias>
-      <version>5.1.15-1</version>
-    </aliasMapping>
-  </aliasMappings>
-</configuration>
-```
-
-In Nexus 2.3, you will have to add a new capability for each repository hosting RPMs.
-
-Go to *Nexus Administration --> Capabilities --> Add* and choose the *Yum: Generate Metadata* type. In case you have a repository group for multiple RPM hosting repositories, you need to merge the metadata from these repositories. For this you will choose the *Yum: Merge Metadata* type.
+but shouldn't be edited directly.
 
 ## Getting Started
 
@@ -351,6 +330,10 @@ and run _sudo yum update_ on your _production_ machine.
 Version aliases let you create versionized views on your Maven RPM repositories, which is useful your RPM staging, but
 don't let you stage your whole bunch of artifacts like RPMs, JARs, WARs, Docs, etc. together. For this you need _Nexus Professional_.
 
+## Help & Issues
+
+Ask for help at our [Google Group][7] or [create a new issue][8].
+
 ## How to build
 
 The build process is based on [Apache Maven 3][3]. You must have [createrepo][10] installed in order to execute all 
@@ -375,5 +358,8 @@ to run all tests and create a plugin bundle.
 [13]: http://www.sonatype.com/books/nexus-book/reference/staging-sect-intro.html
 [14]: http://www.sonatype.com/books/nexus-book/reference/staging-sect-prepare-nexus.html
 [15]: http://linux.die.net/man/1/mergerepo
+[16]: https://raw.github.com/sonatype/nexus-yum-plugin/master/docs/images/Config-NexusCapabilities.png
+[17]: https://raw.github.com/sonatype/nexus-yum-plugin/master/docs/images/Config-3rdPartyCapability.png
+[18]: https://raw.github.com/sonatype/nexus-yum-plugin/master/docs/images/Config-GroupRepo.png
 
 
