@@ -20,6 +20,8 @@ import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
+import org.sonatype.nexus.client.core.subsystem.whitelist.DiscoveryConfiguration;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
 import org.sonatype.sisu.litmus.testsupport.group.Smoke;
@@ -62,5 +64,34 @@ public class WhitelistSmokeIT
         assertThat( centralStatus.getDiscoveryStatus(), is( notNullValue() ) );
         // undecided, since still scraping and this is the first run of remote discovery
         assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.UNDECIDED ) );
+
+        // get configuration for central and check for sane values (actually, they should be defaults).
+        {
+            final DiscoveryConfiguration centralConfiguration = whitelist().getDiscoveryConfigurationFor( "central" );
+            assertThat( centralConfiguration, is( notNullValue() ) );
+            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
+            assertThat( centralConfiguration.getIntervalHours(), equalTo( 24 ) );
+            // checked ok, set interval to 12h
+            centralConfiguration.setIntervalHours( 12 );
+            whitelist().setDiscoveryConfigurationFor( "central", centralConfiguration );
+        }
+        {
+            final DiscoveryConfiguration centralConfiguration = whitelist().getDiscoveryConfigurationFor( "central" );
+            assertThat( centralConfiguration, is( notNullValue() ) );
+            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
+            assertThat( centralConfiguration.getIntervalHours(), equalTo( 12 ) );
+        }
+
+        // for non proxy repositories config is undefined, response should be 400
+        try
+        {
+            final DiscoveryConfiguration releasesConfiguration = whitelist().getDiscoveryConfigurationFor( "releases" );
+            assertThat( "Request should fail with HTTP 400 and being converted to NexusClientBadRequestException",
+                false );
+        }
+        catch ( NexusClientBadRequestException e )
+        {
+            // good
+        }
     }
 }
