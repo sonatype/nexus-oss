@@ -23,12 +23,12 @@
     <version>2.4-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-bouncycastle-plugin</artifactId>
+  <artifactId>nexus-crypto-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus BouncyCastle Provider Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Provides Bouncy Castle JARs and registers it as a JCE provider. Also provides goodies crypto.</nexus.plugin.description>
+    <nexus.plugin.name>Nexus Crypto Services Provider Plugin</nexus.plugin.name>
+    <nexus.plugin.description>Provides Bouncy Castle JARs and registers it as a JCE provider and provides crypto goodies.</nexus.plugin.description>
     
     <bouncycastle.version>1.47</bouncycastle.version>
     <sisu-goodies.version>1.5.1</sisu-goodies.version>
