@@ -218,21 +218,29 @@ public class RemoteContentDiscovererImplTest
     public void smoke1()
         throws Exception
     {
-        final WLManager wm = lookup( WLManager.class );
+        try
         {
-            final EntrySource proxy1EntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
-                    MavenRepository.class ) );
-            final EntrySource proxy2EntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
-                    MavenRepository.class ) );
-            final EntrySource groupEntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
-                    MavenRepository.class ) );
+            final WLManager wm = lookup( WLManager.class );
+            {
+                final EntrySource proxy1EntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                        MavenRepository.class ) );
+                final EntrySource proxy2EntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
+                        MavenRepository.class ) );
+                final EntrySource groupEntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                        MavenRepository.class ) );
 
-            assertThat( "Proxy1 should not have ES", !proxy1EntrySource.exists() ); // we serve 404
-            assertThat( "Proxy2 should not have ES", !proxy2EntrySource.exists() ); // we serve 404
-            assertThat( "Group cannot have ES", !groupEntrySource.exists() ); // as proxy member does not have WL
+                assertThat( "Proxy1 should not have ES", !proxy1EntrySource.exists() ); // we serve 404
+                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.exists() ); // we serve 404
+                assertThat( "Group cannot have ES", !groupEntrySource.exists() ); // as proxy member does not have WL
+            }
+        }
+        finally
+        {
+            server1.stop();
+            server2.stop();
         }
     }
 
@@ -240,30 +248,38 @@ public class RemoteContentDiscovererImplTest
     public void smoke2()
         throws Exception
     {
-        final int server1port = server1.getPort();
-        server1.stop();
-        server1 =
-            Server.withPort( server1port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
-                Behaviours.content( prefixFile1( true ) ) );
-        server1.start();
-
-        final WLManager wm = lookup( WLManager.class );
-        wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ) );
-        waitForWLBackgroundUpdates();
+        try
         {
-            final EntrySource proxy1EntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
-                    MavenRepository.class ) );
-            final EntrySource proxy2EntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
-                    MavenRepository.class ) );
-            final EntrySource groupEntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
-                    MavenRepository.class ) );
+            final int server1port = server1.getPort();
+            server1.stop();
+            server1 =
+                Server.withPort( server1port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
+                    Behaviours.content( prefixFile1( true ) ) );
+            server1.start();
 
-            assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
-            assertThat( "Proxy2 should not have ES", !proxy2EntrySource.exists() ); // we serve 404
-            assertThat( "Group cannot have ES", !groupEntrySource.exists() ); // as proxy member does not have WL
+            final WLManager wm = lookup( WLManager.class );
+            wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ) );
+            waitForWLBackgroundUpdates();
+            {
+                final EntrySource proxy1EntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                        MavenRepository.class ) );
+                final EntrySource proxy2EntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
+                        MavenRepository.class ) );
+                final EntrySource groupEntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                        MavenRepository.class ) );
+
+                assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
+                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.exists() ); // we serve 404
+                assertThat( "Group cannot have ES", !groupEntrySource.exists() ); // as proxy member does not have WL
+            }
+        }
+        finally
+        {
+            server1.stop();
+            server2.stop();
         }
     }
 
@@ -271,46 +287,55 @@ public class RemoteContentDiscovererImplTest
     public void smoke3()
         throws Exception
     {
-        final int server1port = server1.getPort();
-        server1.stop();
-        server1 =
-            Server.withPort( server1port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
-                Behaviours.content( prefixFile1( true ) ) );
-        server1.start();
-
-        final int server2port = server2.getPort();
-        server2.stop();
-        server2 =
-            Server.withPort( server2port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
-                Behaviours.content( prefixFile2( true ) ) );
-        server2.start();
-
-        final WLManager wm = lookup( WLManager.class );
-        wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ),
-            getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID, MavenRepository.class ) );
-        waitForWLBackgroundUpdates();
+        try
         {
-            final EntrySource proxy1EntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
-                    MavenRepository.class ) );
-            final EntrySource proxy2EntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
-                    MavenRepository.class ) );
-            final EntrySource groupEntrySource =
-                wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
-                    MavenRepository.class ) );
+            final int server1port = server1.getPort();
+            server1.stop();
+            server1 =
+                Server.withPort( server1port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
+                    Behaviours.content( prefixFile1( true ) ) );
+            server1.start();
 
-            assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
-            assertThat( "Proxy2 should have ES", proxy2EntrySource.exists() ); // we served prefix file
-            assertThat( "Group should have ES", groupEntrySource.exists() ); // both proxies have it
+            final int server2port = server2.getPort();
+            server2.stop();
+            server2 =
+                Server.withPort( server2port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
+                    Behaviours.content( prefixFile2( true ) ) );
+            server2.start();
 
-            // GROUP wl must have 4 entries: 1 from hosted (/com/sonatype) + 3 from proxied prefix file
-            final List<String> groupEntries = groupEntrySource.readEntries();
-            assertThat( groupEntries.size(), equalTo( 4 ) );
-            assertThat( groupEntries, hasItem( "/com/sonatype" ) );
-            assertThat( groupEntries, hasItem( "/org/sonatype" ) );
-            assertThat( groupEntries, hasItem( "/org/apache/maven" ) );
-            assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+            final WLManager wm = lookup( WLManager.class );
+            wm.updateWhitelist(
+                getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ),
+                getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID, MavenRepository.class ) );
+            waitForWLBackgroundUpdates();
+            {
+                final EntrySource proxy1EntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                        MavenRepository.class ) );
+                final EntrySource proxy2EntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
+                        MavenRepository.class ) );
+                final EntrySource groupEntrySource =
+                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                        MavenRepository.class ) );
+
+                assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
+                assertThat( "Proxy2 should have ES", proxy2EntrySource.exists() ); // we served prefix file
+                assertThat( "Group should have ES", groupEntrySource.exists() ); // both proxies have it
+
+                // GROUP wl must have 4 entries: 1 from hosted (/com/sonatype) + 3 from proxied prefix file
+                final List<String> groupEntries = groupEntrySource.readEntries();
+                assertThat( groupEntries.size(), equalTo( 4 ) );
+                assertThat( groupEntries, hasItem( "/com/sonatype" ) );
+                assertThat( groupEntries, hasItem( "/org/sonatype" ) );
+                assertThat( groupEntries, hasItem( "/org/apache/maven" ) );
+                assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+            }
+        }
+        finally
+        {
+            server1.stop();
+            server2.stop();
         }
     }
 }

@@ -101,6 +101,12 @@ public class WLMaintenanceTest
         };
     }
 
+    @Override
+    protected boolean shouldWLEventDispatcherBeActive()
+    {
+        return true;
+    }
+
     protected WLManager wlManager;
 
     @Before
@@ -155,6 +161,8 @@ public class WLMaintenanceTest
     public void smoke()
         throws Exception
     {
+        waitForWLBackgroundUpdates();
+
         final MavenHostedRepository mavenRepository =
             getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenHostedRepository.class );
 

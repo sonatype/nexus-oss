@@ -16,10 +16,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.util.task.CancelableRunnableSupport;
 import org.sonatype.nexus.util.task.ProgressListener;
-import org.sonatype.nexus.util.task.RunnableSupport;
 
 /**
  * Job that performs WL update and publishing of one single {@link MavenRepository}.
@@ -28,8 +29,10 @@ import org.sonatype.nexus.util.task.RunnableSupport;
  * @since 2.4
  */
 public class WLUpdateRepositoryRunnable
-    extends RunnableSupport
+    extends CancelableRunnableSupport
 {
+    private final ApplicationStatusSource applicationStatusSource;
+
     private final WLManagerImpl wlManager;
 
     private final MavenRepository mavenRepository;
@@ -38,13 +41,16 @@ public class WLUpdateRepositoryRunnable
      * Constructor.
      * 
      * @param progressListener
+     * @param applicationStatusSource
      * @param wlManager
      * @param mavenRepository
      */
-    public WLUpdateRepositoryRunnable( final ProgressListener progressListener, final WLManagerImpl wlManager,
-                                       final MavenRepository mavenRepository )
+    public WLUpdateRepositoryRunnable( final ProgressListener progressListener,
+                                       final ApplicationStatusSource applicationStatusSource,
+                                       final WLManagerImpl wlManager, final MavenRepository mavenRepository )
     {
-        super( progressListener );
+        super( progressListener, mavenRepository.getId() + " WL-updater" );
+        this.applicationStatusSource = checkNotNull( applicationStatusSource );
         this.wlManager = checkNotNull( wlManager );
         this.mavenRepository = checkNotNull( mavenRepository );
     }
@@ -52,6 +58,11 @@ public class WLUpdateRepositoryRunnable
     @Override
     protected void doRun()
     {
+        if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
+        {
+            getLogger().warn( "Nexus stopped during background WL updates, bailing out." );
+            return;
+        }
         try
         {
             wlManager.updateAndPublishWhitelist( mavenRepository, true );
@@ -68,10 +79,6 @@ public class WLUpdateRepositoryRunnable
             {
                 // silently
             }
-        }
-        finally
-        {
-            wlManager.updateDoneCallback( mavenRepository );
         }
     }
 }

@@ -14,7 +14,8 @@ package org.sonatype.nexus.util.task;
 
 /**
  * {@link ProgressListener} implementation that wraps another {@link ProgressListener} within. The wrapped
- * {@link ProgressListener} might be {@code null} too, in which case this instance would simply do nothing.
+ * {@link ProgressListener} might be {@code null} too, in which case this instance would simply do nothing. The "extra"
+ * this class adds, is checking interruption on method calls.
  * 
  * @author cstamas
  * @since 2.4

@@ -25,8 +25,26 @@ public abstract class AbstractWLProxyTest
     public void setUp()
         throws Exception
     {
+        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.valueOf( shouldWLEventDispatcherBeActive() ).toString() );
         super.setUp();
         waitForWLBackgroundUpdates();
+    }
+
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        if ( !shouldWLEventDispatcherBeActive() )
+        {
+            lookup( WLManager.class ).shutdown();
+        }
+        super.tearDown();
+        System.clearProperty( EventDispatcher.ACTIVE_KEY );
+    }
+
+    protected boolean shouldWLEventDispatcherBeActive()
+    {
+        return false;
     }
 
     protected void waitForWLBackgroundUpdates()
@@ -34,7 +52,7 @@ public abstract class AbstractWLProxyTest
     {
         // TODO: A hack, I don't want to expose this over component contract iface
         final WLManagerImpl wm = (WLManagerImpl) lookup( WLManager.class );
-        while ( wm.isUpdateRunning() )
+        while ( wm.isUpdateWhitelistJobRunning() )
         {
             Thread.sleep( 500 );
         }

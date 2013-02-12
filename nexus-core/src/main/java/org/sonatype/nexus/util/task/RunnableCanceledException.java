@@ -13,39 +13,24 @@
 package org.sonatype.nexus.util.task;
 
 /**
- * Runtime exception thrown in cases when task thread is interrupted or canceled. Semantical meaning is almost same as
- * {@link InterruptedException} meaning, except this one is unchecked exception and carries information about
- * cancellation state.
+ * Runtime exception thrown in cases when runnable task is canceled. Semantical meaning is almost same as Java's
+ * {@link InterruptedException} meaning, except this one is unchecked exception and is thrown only when
+ * {@link Cancelable} is canceled.
  * 
  * @author cstamas
  * @since 2.4
  */
 @SuppressWarnings( "serial" )
-public class TaskInterruptedException
+public class RunnableCanceledException
     extends RuntimeException
 {
-    private final boolean canceled;
-
     /**
      * Constructor.
      * 
      * @param message the interruption message.
-     * @param canceled {@code true} if interruption reason is cancelation.
      */
-    public TaskInterruptedException( final String message, final boolean canceled )
+    public RunnableCanceledException( final String message )
     {
         super( message );
-        this.canceled = canceled;
-    }
-
-    /**
-     * Returns {@code true} if interruption reason was cancellation. In other case, {@link Thread#interrupt()} is the
-     * reason of the interruption.
-     * 
-     * @return {@code true} if interruption reason was cancellation, {@code false} otherwise.
-     */
-    public boolean isCanceled()
-    {
-        return canceled;
     }
 }

@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -32,7 +31,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -66,8 +64,10 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.NexusThreadFactory;
-import org.sonatype.nexus.util.task.Cancelable;
 import org.sonatype.nexus.util.task.LoggingProgressListener;
+import org.sonatype.nexus.util.task.executor.ConstrainedExecutor;
+import org.sonatype.nexus.util.task.executor.ConstrainedExecutorImpl;
+import org.sonatype.nexus.util.task.executor.Statistics;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
@@ -101,18 +101,18 @@ public class WLManagerImpl
     private final EventDispatcher eventDispatcher;
 
     /**
-     * Plain map holding the repository IDs of repositories being batch-updated in background as keys. All read-write
-     * access to this set must happen within synchronized block, using this instance as monitor object.
-     */
-    private final HashMap<String, Cancelable> currentlyUpdatingRepositories;
-
-    /**
      * Plain executor for background batch-updates. This executor runs 1 periodic thread (see constructor) that performs
      * periodic remote WL update, but also executes background "force" updates (initiated by user over REST or when
      * repository is added). But, as background threads are bounded by presence of proxy repositories, and introduce
      * hard limit of possible max executions, it protects this instance that is basically unbounded.
      */
     private final ScheduledExecutorService executor;
+
+    /**
+     * Executor used to execute update jobs. It is constrained in a way that no two update jobs will run against one
+     * repository.
+     */
+    private final ConstrainedExecutor constrainedExecutor;
 
     /**
      * Da constructor.
@@ -139,10 +139,10 @@ public class WLManagerImpl
         this.config = checkNotNull( config );
         this.localContentDiscoverer = checkNotNull( localContentDiscoverer );
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
-        this.currentlyUpdatingRepositories = new HashMap<String, Cancelable>();
         this.executor =
             new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "wl", "WL-Updater" ),
                 new ThreadPoolExecutor.AbortPolicy() );
+        this.constrainedExecutor = new ConstrainedExecutorImpl( executor );
 
         // schedule the "updater": wait 10 minutes for boot to calm down and then do the work hourly
         this.executor.scheduleAtFixedRate( new Runnable()
@@ -166,6 +166,20 @@ public class WLManagerImpl
         initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
         initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
         initializeWhitelist( initableRepositories.toArray( new MavenRepository[initableRepositories.size()] ) );
+    }
+
+    @Override
+    public void shutdown()
+    {
+        executor.shutdown();
+        try
+        {
+            executor.awaitTermination( 60L, TimeUnit.SECONDS );
+        }
+        catch ( InterruptedException e )
+        {
+            getLogger().debug( "Could not cleanly shut down.", e );
+        }
     }
 
     @Override
@@ -244,54 +258,48 @@ public class WLManagerImpl
     }
 
     @Override
-    public synchronized void updateWhitelist( final MavenRepository... mavenRepositories )
+    public void updateWhitelist( final MavenRepository... mavenRepositories )
     {
         doUpdateWhitelist( false, mavenRepositories );
     }
 
     @Override
-    public synchronized void forceUpdateWhitelist( final MavenRepository... mavenRepositories )
+    public void forceUpdateWhitelist( final MavenRepository... mavenRepositories )
     {
         doUpdateWhitelist( true, mavenRepositories );
     }
 
-    protected synchronized void doUpdateWhitelist( final boolean forced, final MavenRepository... mavenRepositories )
+    protected void doUpdateWhitelist( final boolean forced, final MavenRepository... mavenRepositories )
     {
         final ArrayList<MavenRepository> repositoriesToBeUpdatedAndPublished = new ArrayList<MavenRepository>();
         for ( MavenRepository mavenRepository : mavenRepositories )
         {
-            if ( currentlyUpdatingRepositories.containsKey( mavenRepository.getId() ) )
-            {
-                getLogger().info( "Repository {} is already updating WL, skipping it.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-            }
-            else
-            {
-                repositoriesToBeUpdatedAndPublished.add( mavenRepository );
-                currentlyUpdatingRepositories.put( mavenRepository.getId(), null );
-            }
+            repositoriesToBeUpdatedAndPublished.add( mavenRepository );
         }
         if ( !repositoriesToBeUpdatedAndPublished.isEmpty() )
         {
-            final List<WLUpdateRepositoryRunnable> jobs = new ArrayList<WLUpdateRepositoryRunnable>();
             for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
             {
-                jobs.add( new WLUpdateRepositoryRunnable( null, this, mavenRepository ) );
+                final WLUpdateRepositoryRunnable updateRepositoryJob =
+                    new WLUpdateRepositoryRunnable( new LoggingProgressListener( getLogger() ),
+                        applicationStatusSource, this, mavenRepository );
+                if ( forced )
+                {
+                    constrainedExecutor.mustExecute( mavenRepository.getId(), updateRepositoryJob );
+                }
+                else
+                {
+                    constrainedExecutor.mayExecute( mavenRepository.getId(), updateRepositoryJob );
+                }
             }
-            final WLUpdateRunnable job =
-                new WLUpdateRunnable( new LoggingProgressListener( getLogger() ), applicationStatusSource, jobs );
-            executor.execute( job );
         }
     }
 
-    protected synchronized void updateDoneCallback( final MavenRepository mavenRepository )
+    protected boolean isUpdateWhitelistJobRunning()
     {
-        currentlyUpdatingRepositories.remove( mavenRepository.getId() );
-    }
-
-    protected synchronized boolean isUpdateRunning()
-    {
-        return !currentlyUpdatingRepositories.isEmpty();
+        final Statistics statistics = constrainedExecutor.getStatistics();
+        getLogger().debug( "Running update jobs for {}.", statistics.getCurrentlyRunningJobKeys() );
+        return !statistics.getCurrentlyRunningJobKeys().isEmpty();
     }
 
     protected void updateAndPublishWhitelist( final MavenRepository mavenRepository, final boolean notify )
@@ -710,20 +718,6 @@ public class WLManagerImpl
     }
 
     // ==
-
-    private final static String MARKER_KEY = AbstractFileEntrySource.class.getName();
-
-    @Override
-    public void markRequestContext( RequestContext ctx )
-    {
-        ctx.put( MARKER_KEY, Boolean.TRUE );
-    }
-
-    @Override
-    public boolean isRequestContextMarked( RequestContext ctx )
-    {
-        return ctx.containsKey( MARKER_KEY );
-    }
 
     @Override
     public boolean isEventAboutWLFile( RepositoryItemEvent evt )

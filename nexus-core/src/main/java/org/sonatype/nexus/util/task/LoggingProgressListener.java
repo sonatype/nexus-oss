@@ -32,7 +32,7 @@ public class LoggingProgressListener
     {
         private final String name;
 
-        private final int total;
+        private int total;
 
         private int current;
 

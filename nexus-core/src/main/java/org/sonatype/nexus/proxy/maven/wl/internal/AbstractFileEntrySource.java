@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -37,8 +38,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 public abstract class AbstractFileEntrySource
     implements EntrySource
 {
-    private final static String MARKER_KEY = AbstractFileEntrySource.class.getName();
-
     private final MavenRepository mavenRepository;
 
     private final String path;
@@ -140,7 +139,7 @@ public abstract class AbstractFileEntrySource
             final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
             request.setRequestLocalOnly( true );
             request.setRequestGroupLocalOnly( true );
-            request.getRequestContext().put( MARKER_KEY, Boolean.TRUE );
+            request.getRequestContext().put( WLManager.class.getName(), Boolean.TRUE );
             @SuppressWarnings( "deprecation" )
             final StorageItem item = getMavenRepository().retrieveItem( true, request );
             if ( item instanceof StorageFileItem )
@@ -170,7 +169,7 @@ public abstract class AbstractFileEntrySource
         final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
         request.setRequestLocalOnly( true );
         request.setRequestGroupLocalOnly( true );
-        request.getRequestContext().put( MARKER_KEY, Boolean.TRUE );
+        request.getRequestContext().put( WLManager.class.getName(), Boolean.TRUE );
         final DefaultStorageFileItem file =
             new DefaultStorageFileItem( getMavenRepository(), request, true, true, content );
         try
@@ -193,7 +192,7 @@ public abstract class AbstractFileEntrySource
         final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
         request.setRequestLocalOnly( true );
         request.setRequestGroupLocalOnly( true );
-        request.getRequestContext().put( MARKER_KEY, Boolean.TRUE );
+        request.getRequestContext().put( WLManager.class.getName(), Boolean.TRUE );
         try
         {
             getMavenRepository().deleteItemWithChecksums( true, request );

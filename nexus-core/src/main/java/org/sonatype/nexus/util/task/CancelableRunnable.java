@@ -13,33 +13,13 @@
 package org.sonatype.nexus.util.task;
 
 /**
- * Helper class for {@link Cancelable}.
+ * A {@link Runnable} that is {@link Cancelable}.
  * 
  * @author cstamas
  * @since 2.4
  */
-public class CancelableSupport
-    implements Cancelable
+public interface CancelableRunnable
+    extends Runnable, Cancelable
 {
-    private volatile boolean canceled;
 
-    /**
-     * Default constructor.
-     */
-    public CancelableSupport()
-    {
-        this.canceled = false;
-    }
-
-    @Override
-    public boolean isCanceled()
-    {
-        return canceled;
-    }
-
-    @Override
-    public void cancel()
-    {
-        canceled = true;
-    }
 }

@@ -14,7 +14,6 @@ package org.sonatype.nexus.proxy.maven.wl;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -32,6 +31,11 @@ public interface WLManager
      * Initializes all WLs (used at boot).
      */
     void initializeAllWhitelists();
+    
+    /**
+     * Stops WL manager (used at stop).
+     */
+    void shutdown();
 
     /**
      * Initializes WL of given repository (used on repo add).
@@ -150,22 +154,6 @@ public interface WLManager
         throws IOException;
 
     // ==
-
-    /**
-     * Marks the request context, that will propagate thru events. All events marked as this will emit events with
-     * having the mark in the context.
-     * 
-     * @param ctx
-     */
-    void markRequestContext( RequestContext ctx );
-
-    /**
-     * Checks whether the passed in context is marked.
-     * 
-     * @param ctx
-     * @return {@code true} if the item event is caused by WL subsystem.
-     */
-    boolean isRequestContextMarked( RequestContext ctx );
 
     /**
      * Checks whether the passed in item event is about WL file. In other words, is event originating from a

@@ -12,31 +12,46 @@
  */
 package org.sonatype.nexus.util.task;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Throwables;
 
 /**
- * Support class for {@link Cancelable} implementations of {@link Runnable} interfaces.
+ * Support class for implementations of {@link Runnable} interfaces. This class just adds support for
+ * {@link ProgressListener} and names the runnable, but does not add cancelation support. Usable with plain Executors
+ * too and other {@link Runnable} accepting components.
  * 
  * @author cstamas
  * @since 2.4
  */
 public abstract class RunnableSupport
-    implements Runnable, Cancelable
+    implements Runnable
 {
     private final Logger logger;
 
     private final ProgressListenerWrapper progressListenerWrapper;
 
-    private final CancelableSupport cancelableSupport;
+    private final String name;
 
-    protected RunnableSupport( final ProgressListener progressListener )
+    protected RunnableSupport( final String name )
     {
+        this( null, name );
+    }
+
+    protected RunnableSupport( final ProgressListener progressListener, final String name )
+    {
+        checkArgument( name != null && name.trim().length() > 0 );
         this.logger = LoggerFactory.getLogger( getClass() );
         this.progressListenerWrapper = new ProgressListenerWrapper( progressListener );
-        this.cancelableSupport = new CancelableSupport();
+        this.name = name;
+    }
+
+    protected String getName()
+    {
+        return name;
     }
 
     protected Logger getLogger()
@@ -49,53 +64,27 @@ public abstract class RunnableSupport
         return progressListenerWrapper;
     }
 
-    protected void checkInterruption()
-    {
-        TaskUtil.checkInterruption( cancelableSupport );
-    }
-
     @Override
-    public boolean isCanceled()
+    public void run()
     {
-        return cancelableSupport.isCanceled();
-    }
-
-    @Override
-    public void cancel()
-    {
-        cancelableSupport.cancel();
-    }
-
-    @Override
-    public final void run()
-    {
-        if ( isCanceled() )
-        {
-            getLogger().debug( "Canceled before running, bailing out." );
-            return;
-        }
-        final Cancelable old = TaskUtil.getCurrentCancelable();
         try
         {
-            TaskUtil.setCurrentCancelable( cancelableSupport );
-            getLogger().debug( "Running..." );
+            getLogger().debug( "{} running...", getName() );
             doRun();
-            getLogger().debug( "Done..." );
+            getLogger().debug( "{} done...", getName() );
         }
-        catch ( TaskInterruptedException e )
+        catch ( InterruptedException e )
         {
-            getLogger().info( "Interrupted: {}", e.getMessage() );
+            getLogger().warn( "{} interrupted:", getName(), e );
+            Throwables.propagate( e );
         }
         catch ( Exception e )
         {
-            getLogger().warn( "Failed:", e );
+            getLogger().warn( "{} failed:", getName(), e );
             Throwables.propagate( e );
-        }
-        finally
-        {
-            TaskUtil.setCurrentCancelable( old );
         }
     }
 
-    protected abstract void doRun();
+    protected abstract void doRun()
+        throws Exception;
 }

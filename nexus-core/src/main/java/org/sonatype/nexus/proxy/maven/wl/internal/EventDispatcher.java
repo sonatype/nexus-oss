@@ -21,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -40,6 +42,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -101,6 +104,11 @@ public class EventDispatcher
         wlManager.initializeAllWhitelists();
     }
 
+    protected void handleNexusStopped()
+    {
+        wlManager.shutdown();
+    }
+
     protected void handleRepositoryAdded( final MavenRepository mavenRepository )
     {
         try
@@ -115,9 +123,9 @@ public class EventDispatcher
         }
     }
 
-    protected void handleRepositoryModified( final MavenRepository mavenRepository, final boolean force )
+    protected void handleRepositoryModified( final MavenRepository mavenRepository )
     {
-        wlManager.updateWhitelist( mavenRepository );
+        wlManager.forceUpdateWhitelist( mavenRepository );
     }
 
     protected void handlePrefixFileUpdate( final RepositoryItemEvent evt )
@@ -182,6 +190,11 @@ public class EventDispatcher
 
     // == Filters
 
+    protected boolean isRequestContextMarked( final RequestContext context )
+    {
+        return context.containsKey( WLManager.class.getName() );
+    }
+
     protected boolean isActive()
     {
         return active;
@@ -203,16 +216,14 @@ public class EventDispatcher
     protected boolean isPrefixFileEvent( final RepositoryItemEvent evt )
     {
         // is not fired as side effect of Publisher publishing this
-        return isRepositoryHandled( evt.getRepository() )
-            && !wlManager.isRequestContextMarked( evt.getItem().getItemContext() )
+        return isRepositoryHandled( evt.getRepository() ) && !isRequestContextMarked( evt.getItem().getItemContext() )
             && wlManager.isEventAboutWLFile( evt );
     }
 
     protected boolean isPlainItemEvent( final RepositoryItemEvent evt )
     {
         // is not fired as side effect of Publisher publishing this
-        return isRepositoryHandled( evt.getRepository() )
-            && !wlManager.isRequestContextMarked( evt.getItem().getItemContext() )
+        return isRepositoryHandled( evt.getRepository() ) && !isRequestContextMarked( evt.getItem().getItemContext() )
             && !evt.getItem().getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class );
     }
 
@@ -230,6 +241,7 @@ public class EventDispatcher
      * @param evt
      */
     @Subscribe
+    @AllowConcurrentEvents
     public void onRepositoryItemEventStore( final RepositoryItemEventStore evt )
     {
         if ( isPrefixFileEvent( evt ) )
@@ -254,6 +266,7 @@ public class EventDispatcher
      * @param evt
      */
     @Subscribe
+    @AllowConcurrentEvents
     public void onRepositoryItemEventCache( final RepositoryItemEventCache evt )
     {
         if ( isPrefixFileEvent( evt ) )
@@ -278,6 +291,7 @@ public class EventDispatcher
      * @param evt
      */
     @Subscribe
+    @AllowConcurrentEvents
     public void onRepositoryItemEventDelete( final RepositoryItemEventDelete evt )
     {
         if ( isPrefixFileEvent( evt ) )
@@ -304,6 +318,7 @@ public class EventDispatcher
      * @param evt
      */
     @Subscribe
+    @AllowConcurrentEvents
     public void onNexusStartedEvent( final NexusStartedEvent evt )
     {
         if ( isActive() )
@@ -318,6 +333,22 @@ public class EventDispatcher
      * @param evt
      */
     @Subscribe
+    @AllowConcurrentEvents
+    public void onNexusStoppedEvent( final NexusStoppedEvent evt )
+    {
+        if ( isActive() )
+        {
+            handleNexusStopped();
+        }
+    }
+
+    /**
+     * Event handler.
+     * 
+     * @param evt
+     */
+    @Subscribe
+    @AllowConcurrentEvents
     public void onRepositoryRegistryEventAdd( final RepositoryRegistryEventAdd evt )
     {
         if ( isRepositoryHandled( evt.getRepository() ) )
@@ -335,12 +366,13 @@ public class EventDispatcher
      * @param evt
      */
     @Subscribe
+    @AllowConcurrentEvents
     public void on( final RepositoryConfigurationUpdatedEvent evt )
     {
         if ( isRepositoryHandled( evt.getRepository() ) && evt.isRemoteUrlChanged() )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
-            handleRepositoryModified( mavenRepository, true );
+            handleRepositoryModified( mavenRepository );
         }
     }
 
@@ -353,12 +385,13 @@ public class EventDispatcher
      * @param evt
      */
     // @Subscribe
+    // @AllowConcurrentEvents
     public void onRepositoryGroupMembersChangedEvent( final RepositoryGroupMembersChangedEvent evt )
     {
         if ( isRepositoryHandled( evt.getRepository() ) )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
-            handleRepositoryModified( mavenRepository, false );
+            handleRepositoryModified( mavenRepository );
         }
     }
 
@@ -370,6 +403,7 @@ public class EventDispatcher
      * @param evt
      */
     @Subscribe
+    @AllowConcurrentEvents
     public void onConfigurationChangeEvent( final ConfigurationChangeEvent evt )
     {
         for ( Configurable configurable : evt.getChanges() )
@@ -380,7 +414,7 @@ public class EventDispatcher
                 final MavenGroupRepository mavenGroupRepository = repository.adaptToFacet( MavenGroupRepository.class );
                 if ( mavenGroupRepository != null && isRepositoryHandled( mavenGroupRepository ) )
                 {
-                    handleRepositoryModified( mavenGroupRepository, false );
+                    handleRepositoryModified( mavenGroupRepository );
                 }
             }
         }

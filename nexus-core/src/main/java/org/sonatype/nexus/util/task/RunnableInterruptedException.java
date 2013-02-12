@@ -13,33 +13,23 @@
 package org.sonatype.nexus.util.task;
 
 /**
- * Helper class for {@link Cancelable}.
+ * Runtime exception thrown in cases when runnable task's running thread is interrupted. Semantical meaning is almost
+ * same as {@link InterruptedException} meaning, except this one is unchecked exception.
  * 
  * @author cstamas
  * @since 2.4
  */
-public class CancelableSupport
-    implements Cancelable
+@SuppressWarnings( "serial" )
+public class RunnableInterruptedException
+    extends RuntimeException
 {
-    private volatile boolean canceled;
-
     /**
-     * Default constructor.
+     * Constructor.
+     * 
+     * @param message the interruption message.
      */
-    public CancelableSupport()
+    public RunnableInterruptedException( final String message )
     {
-        this.canceled = false;
-    }
-
-    @Override
-    public boolean isCanceled()
-    {
-        return canceled;
-    }
-
-    @Override
-    public void cancel()
-    {
-        canceled = true;
+        super( message );
     }
 }

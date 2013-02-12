@@ -18,6 +18,7 @@ import java.util.Map;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
+import org.sonatype.nexus.proxy.maven.wl.internal.EventDispatcher;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -40,6 +41,7 @@ public abstract class NexusAppTestSupport
     protected void setUp()
         throws Exception
     {
+        System.setProperty( EventDispatcher.ACTIVE_KEY, Boolean.FALSE.toString() );
         super.setUp();
 
         nexusScheduler = lookup( NexusScheduler.class );
@@ -56,8 +58,8 @@ public abstract class NexusAppTestSupport
         throws Exception
     {
         waitForTasksToStop();
-
         super.tearDown();
+        System.clearProperty( EventDispatcher.ACTIVE_KEY );
     }
 
     protected void shutDownSecurity()

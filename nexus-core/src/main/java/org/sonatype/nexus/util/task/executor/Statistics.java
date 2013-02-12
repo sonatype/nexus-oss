@@ -10,36 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.task;
+package org.sonatype.nexus.util.task.executor;
+
+import java.util.Set;
+
+import org.sonatype.nexus.util.task.CancelableRunnable;
 
 /**
- * Helper class for {@link Cancelable}.
+ * Simple statistics for {@link ConstrainedExecutor}.
  * 
  * @author cstamas
  * @since 2.4
  */
-public class CancelableSupport
-    implements Cancelable
+public class Statistics
 {
-    private volatile boolean canceled;
+    private final Set<String> currentlyRunningJobKeys;
 
     /**
-     * Default constructor.
+     * Constructor.
+     * 
+     * @param currentlyRunningJobKeys
      */
-    public CancelableSupport()
+    public Statistics( final Set<String> currentlyRunningJobKeys )
     {
-        this.canceled = false;
+        this.currentlyRunningJobKeys = currentlyRunningJobKeys;
     }
 
-    @Override
-    public boolean isCanceled()
+    /**
+     * THe set of currently executing (scheduled or running, but not canceled and still running)
+     * {@link CancelableRunnable} command keys.
+     * 
+     * @return the job keys that are scheduled or running (without canceled ones).
+     */
+    public Set<String> getCurrentlyRunningJobKeys()
     {
-        return canceled;
-    }
-
-    @Override
-    public void cancel()
-    {
-        canceled = true;
+        return currentlyRunningJobKeys;
     }
 }

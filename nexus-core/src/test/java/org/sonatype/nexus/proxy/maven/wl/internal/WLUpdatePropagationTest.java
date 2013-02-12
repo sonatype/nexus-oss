@@ -172,6 +172,12 @@ public class WLUpdatePropagationTest
         };
     }
 
+    @Override
+    protected boolean shouldWLEventDispatcherBeActive()
+    {
+        return true;
+    }
+
     protected String prefixFile1( boolean withComments )
     {
         final StringWriter sw = new StringWriter();

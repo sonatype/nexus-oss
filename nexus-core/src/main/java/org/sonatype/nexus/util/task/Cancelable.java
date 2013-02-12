@@ -21,9 +21,7 @@ package org.sonatype.nexus.util.task;
 public interface Cancelable
 {
     /**
-     * Returns {@code true} if canceled and resets the cancellation status of it, {@code false} otherwise. Subsequent
-     * invocation of this method will return {@code false}. In essence, it behaves similarly as
-     * {@link Thread#interrupted()} method.
+     * Returns {@code true} if canceled, {@code false} otherwise.
      * 
      * @return {@code true} if canceled, {@code false} otherwise.
      */

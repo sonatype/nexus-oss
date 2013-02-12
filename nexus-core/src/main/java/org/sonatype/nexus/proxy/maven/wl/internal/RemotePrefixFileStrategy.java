@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
+import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
@@ -112,6 +113,7 @@ public class RemotePrefixFileStrategy
         throws IOException
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
+        request.getRequestContext().put( WLManager.class.getName(), Boolean.TRUE );
         request.setRequestRemoteOnly( true );
         mavenProxyRepository.removeFromNotFoundCache( request );
         try
