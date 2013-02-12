@@ -197,12 +197,15 @@ public class RpmListWriter
                     ".foo/.bar.rpm/to-avoid-an-empty-rpm-list-file/that-would-cause-createrepo-to-scan-the-whole-repo.rpm",
                     outputStream );
             }
+            else
+            {
+                LOG.debug( "Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListOutputFile );
+            }
         }
         finally
         {
             outputStream.close();
         }
-        LOG.debug( "Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListOutputFile );
     }
 
     @SuppressWarnings( "unchecked" )
