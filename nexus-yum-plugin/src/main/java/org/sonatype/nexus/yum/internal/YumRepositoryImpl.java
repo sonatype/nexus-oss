@@ -13,7 +13,10 @@
 package org.sonatype.nexus.yum.internal;
 
 import java.io.File;
+import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.yum.YumRepository;
 
 /**
@@ -22,6 +25,8 @@ import org.sonatype.nexus.yum.YumRepository;
 public class YumRepositoryImpl
     implements YumRepository
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( YumRepositoryImpl.class );
 
     private final File baseDir;
 
@@ -36,6 +41,19 @@ public class YumRepositoryImpl
         this.baseDir = baseDir;
         this.id = repositoryId;
         this.version = version;
+        if ( LOG.isDebugEnabled() )
+        {
+            String[] files = null;
+            final File repodata = new File( baseDir, "repodata" );
+            if ( repodata.exists() && repodata.isDirectory() )
+            {
+                files = repodata.list();
+            }
+            LOG.debug(
+                "Yum repository {}/{} available at {} contains {}",
+                repositoryId, version, repodata.getAbsolutePath(), files == null ? "no files" : Arrays.toString( files )
+            );
+        }
     }
 
     public File getBaseDir()

@@ -68,7 +68,7 @@ public class YumITSupport
     {
         return configuration
             .setLogPattern( "%d{HH:mm:ss.SSS} %-5level - %msg%n" )
-            .setLogLevel( "org.sonatype.nexus.repository.yum", "DEBUG" )
+            .setLogLevel( "org.sonatype.nexus.yum", "DEBUG" )
             .setLogLevel( "org.sonatype.nexus.plugins.capabilities", "DEBUG" )
             .addPlugins(
                 artifactResolver().resolvePluginFromDependencyManagement(

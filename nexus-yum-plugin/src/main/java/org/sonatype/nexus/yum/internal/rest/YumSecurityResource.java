@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.yum.internal.rest;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
@@ -20,6 +21,7 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
 /**
  * @since 3.0
  */
+@Named
 @Singleton
 public class YumSecurityResource
     extends AbstractStaticSecurityResource
