@@ -69,6 +69,17 @@ public class ConstrainedExecutorImpl
     }
 
     @Override
+    public synchronized void cancelAllJobs()
+    {
+        for ( CancelableRunnable command : currentlyRunningCanncelableRunnables.values() )
+        {
+            command.cancel();
+        }
+        currentlyRunningCanncelableRunnables.clear();
+        currentlyRunningSemamphores.clear();
+    }
+
+    @Override
     public synchronized boolean mayExecute( final String key, final CancelableRunnable command )
     {
         checkNotNull( key );

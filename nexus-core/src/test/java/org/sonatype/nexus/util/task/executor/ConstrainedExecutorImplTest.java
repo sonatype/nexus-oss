@@ -151,6 +151,68 @@ public class ConstrainedExecutorImplTest
         assertThat( ci.getStatistics().getCurrentlyRunningJobKeys(), is( empty() ) );
     }
 
+    @Test
+    public void cancellAll()
+        throws Exception
+    {
+        final ConstrainedExecutor ci = new ConstrainedExecutorImpl( Executors.newFixedThreadPool( 5 ) );
+
+        final TestWorker tw1 = new TestWorker( "1", 50000 );
+        final TestWorker tw2 = new TestWorker( "2", 50000 );
+        final TestWorker tw3 = new TestWorker( "3", 50000 );
+        final TestWorker tw4 = new TestWorker( "4", 50000 );
+        final TestWorker tw5 = new TestWorker( "5", 50000 );
+
+        assertThat( ci.mayExecute( "foo1", tw1 ), equalTo( true ) );
+        assertThat( ci.mayExecute( "foo2", tw2 ), equalTo( true ) );
+        assertThat( ci.mayExecute( "foo3", tw3 ), equalTo( true ) );
+        assertThat( ci.mayExecute( "foo4", tw4 ), equalTo( true ) );
+        assertThat( ci.mayExecute( "foo5", tw5 ), equalTo( true ) );
+
+        // give time to executor to start them
+        Thread.sleep( 1000 );
+
+        ci.cancelAllJobs();
+
+        tw1.waitForExecuted();
+        tw2.waitForExecuted();
+        tw3.waitForExecuted();
+        tw4.waitForExecuted();
+        tw5.waitForExecuted();
+
+        // was canceled when running
+        assertThat( tw1.isJobDone(), equalTo( false ) );
+        assertThat( tw1.isExecuting(), equalTo( false ) );
+        assertThat( tw1.isExecuted(), equalTo( true ) );
+        assertThat( tw1.isCanceled(), equalTo( true ) );
+
+        // was canceled when running
+        assertThat( tw2.isJobDone(), equalTo( false ) );
+        assertThat( tw2.isExecuting(), equalTo( false ) );
+        assertThat( tw2.isExecuted(), equalTo( true ) );
+        assertThat( tw2.isCanceled(), equalTo( true ) );
+
+        // was canceled when running
+        assertThat( tw3.isJobDone(), equalTo( false ) );
+        assertThat( tw3.isExecuting(), equalTo( false ) );
+        assertThat( tw3.isExecuted(), equalTo( true ) );
+        assertThat( tw3.isCanceled(), equalTo( true ) );
+
+        // was canceled when running
+        assertThat( tw4.isJobDone(), equalTo( false ) );
+        assertThat( tw4.isExecuting(), equalTo( false ) );
+        assertThat( tw4.isExecuted(), equalTo( true ) );
+        assertThat( tw4.isCanceled(), equalTo( true ) );
+
+        // was not canceled and did it
+        assertThat( tw5.isJobDone(), equalTo( false ) );
+        assertThat( tw5.isExecuting(), equalTo( false ) );
+        assertThat( tw5.isExecuted(), equalTo( true ) );
+        assertThat( tw5.isCanceled(), equalTo( true ) );
+
+        assertThat( ci.getStatistics().getCurrentlyRunningJobKeys(), is( empty() ) );
+    }
+
     // ==
 
     private static class TestWorker
@@ -190,7 +252,7 @@ public class ConstrainedExecutorImplTest
         public void waitForExecuted()
             throws InterruptedException
         {
-            while ( !isCanceled() && !isExecuted() )
+            while ( !isExecuted() )
             {
                 Thread.sleep( 500 );
             }
@@ -200,9 +262,9 @@ public class ConstrainedExecutorImplTest
         protected void doRun()
             throws Exception
         {
-            executing = true;
             try
             {
+                executing = true;
                 // the work loop
                 for ( int i = 0; i < cycles; i++ )
                 {

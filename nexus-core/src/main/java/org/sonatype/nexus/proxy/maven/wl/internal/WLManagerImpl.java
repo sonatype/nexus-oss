@@ -176,6 +176,7 @@ public class WLManagerImpl
     {
         eventBus.unregister( eventDispatcher );
         executor.shutdown();
+        constrainedExecutor.cancelAllJobs();
         try
         {
             executor.awaitTermination( 60L, TimeUnit.SECONDS );

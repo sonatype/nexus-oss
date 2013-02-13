@@ -31,6 +31,11 @@ public interface ConstrainedExecutor
     Statistics getStatistics();
 
     /**
+     * Cancels all executing jobs. This method call does not wait for all jobs to terminate, it will return immediately.
+     */
+    void cancelAllJobs();
+
+    /**
      * Schedules a command for execution, or, if a command with given key already runs, will simply "forget" (do
      * nothing) with passed in command instance.
      * 
