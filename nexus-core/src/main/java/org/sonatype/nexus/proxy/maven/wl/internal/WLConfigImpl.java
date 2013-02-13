@@ -36,16 +36,19 @@ public class WLConfigImpl
     implements WLConfig
 {
     /**
-     * System property key that is used to read up boolean controlling is WL feature active or not. Main use case is to
-     * disable this in "legacy" UTs and ITs, but might serve too as troubleshooting in some cases. Event dispatcher is
-     * active by default, to deactivate it, specify a system property like this:
+     * System property key that is used to read up boolean value controlling is WL feature active or not. Main use case
+     * is to disable this in "legacy" UTs and ITs, but might serve too as troubleshooting in some cases. Event
+     * dispatcher is active by default, to deactivate it, specify a system property like this:
      * 
      * <pre>
      * org.sonatype.nexus.proxy.maven.wl.WLConfig.featureActive = false
      * </pre>
      * 
-     * Note: This does NOT deactivate the Feature itself, moreover, having value with this key set to {@code false} will
-     * cause problems on UI. Using system property with this key should be restricted to tests only.
+     * Note: This does NOT REMOVE the Feature itself! The feature will be still present and working but remote content
+     * discovery will be completely disabled, hence, all the proxies and groups having proxies as members will simply be
+     * marked for noscrape. Also, since no WL will be published, no "proxy optimization" will happen either. If neglect
+     * the noscape, Nexus will work as it was working before 2.4 release. Using system property with this key should be
+     * restricted to tests or some troubleshooting only.
      */
     public static final String FEATURE_ACTIVE_KEY = WLConfig.class.getName() + ".featureActive";
 

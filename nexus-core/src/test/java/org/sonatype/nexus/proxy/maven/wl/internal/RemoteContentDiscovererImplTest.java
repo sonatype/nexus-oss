@@ -184,6 +184,12 @@ public class RemoteContentDiscovererImplTest
         };
     }
 
+    @Override
+    protected boolean enableWLFeature()
+    {
+        return true;
+    }
+
     protected String prefixFile1( boolean withComments )
     {
         final StringWriter sw = new StringWriter();

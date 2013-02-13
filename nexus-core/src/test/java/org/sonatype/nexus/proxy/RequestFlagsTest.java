@@ -79,6 +79,7 @@ public class RequestFlagsTest
             @Override
             public void configure( Binder binder )
             {
+                // this test will load default config, so disable WL feature to not scrape Central in this UT
                 binder.bind( WLConfig.class ).toInstance( new WLConfigImpl( false ) );
             }
         } };

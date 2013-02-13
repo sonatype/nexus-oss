@@ -148,6 +148,7 @@ public class WLManagerImpl
         this.constrainedExecutor = new ConstrainedExecutorImpl( executor );
         // register event dispatcher
         this.eventDispatcher = new EventDispatcher( this, config.isFeatureActive() );
+        this.eventBus.register( this );
     }
 
     @Override
@@ -174,7 +175,6 @@ public class WLManagerImpl
     public void shutdown()
     {
         eventBus.unregister( eventDispatcher );
-        eventBus.unregister( this );
         executor.shutdown();
         try
         {
@@ -527,7 +527,7 @@ public class WLManagerImpl
             (AbstractMavenRepositoryConfiguration) mavenProxyRepository.getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration(
                 false );
 
-        return new WLDiscoveryConfig( configuration.isWLDiscoveryEnabled(), configuration.getWLDiscoveryInterval() );
+        return new WLDiscoveryConfig( config.isFeatureActive() && configuration.isWLDiscoveryEnabled(), configuration.getWLDiscoveryInterval() );
     }
 
     @Override
