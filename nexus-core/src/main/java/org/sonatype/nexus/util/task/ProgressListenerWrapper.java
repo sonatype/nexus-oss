@@ -38,7 +38,7 @@ public class ProgressListenerWrapper
     @Override
     public void beginTask( final String name, final int workAmount )
     {
-        TaskUtil.checkInterruption();
+        CancelableUtil.checkInterruption();
         if ( wrapped != null )
         {
             wrapped.beginTask( name, workAmount );
@@ -48,7 +48,7 @@ public class ProgressListenerWrapper
     @Override
     public void working( final String message, final int workAmountDelta )
     {
-        TaskUtil.checkInterruption();
+        CancelableUtil.checkInterruption();
         if ( wrapped != null )
         {
             wrapped.working( message, workAmountDelta );
@@ -58,7 +58,7 @@ public class ProgressListenerWrapper
     @Override
     public void endTask( final String message )
     {
-        TaskUtil.checkInterruption();
+        CancelableUtil.checkInterruption();
         if ( wrapped != null )
         {
             wrapped.endTask( message );

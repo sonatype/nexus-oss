@@ -41,7 +41,8 @@ public interface ConstrainedExecutor
     boolean mayExecute( String key, CancelableRunnable command );
 
     /**
-     * Schedules a command for execution. If command with given key already runs, it will cancel it, and replace them.
+     * Schedules a command for execution. If command with given key already runs, it will cancel it, and replace it with
+     * new instance passed in parameter.
      * 
      * @param key
      * @param command

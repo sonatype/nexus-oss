@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.util.task.CancelableUtil;
 
 import com.google.common.base.Throwables;
 
@@ -111,6 +112,8 @@ public abstract class AbstractGeneratedIndexPageScraper
         {
             return;
         }
+        // cancelation
+        CancelableUtil.checkInterruption();
         getLogger().debug( "Processing page response from URL {}", page.getUrl() );
         final Elements elements = page.getDocument().getElementsByTag( "a" );
         final List<String> pathElements = currentNode.getPathElements();

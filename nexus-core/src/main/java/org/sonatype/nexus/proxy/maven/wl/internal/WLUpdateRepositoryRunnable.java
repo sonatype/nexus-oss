@@ -18,9 +18,10 @@ import java.io.IOException;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.task.CancelableRunnableSupport;
 import org.sonatype.nexus.util.task.ProgressListener;
+
+import com.google.common.base.Throwables;
 
 /**
  * Job that performs WL update and publishing of one single {@link MavenRepository}.
@@ -69,8 +70,6 @@ public class WLUpdateRepositoryRunnable
         }
         catch ( Exception e )
         {
-            getLogger().warn( "Problem during WL update of {}",
-                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
             try
             {
                 wlManager.unpublish( mavenRepository );
@@ -79,6 +78,8 @@ public class WLUpdateRepositoryRunnable
             {
                 // silently
             }
+            // propagate original exception
+            Throwables.propagate( e );
         }
     }
 }

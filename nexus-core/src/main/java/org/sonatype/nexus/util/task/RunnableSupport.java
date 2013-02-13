@@ -67,21 +67,34 @@ public abstract class RunnableSupport
     @Override
     public void run()
     {
+        final ProgressListener oldProgressListener = ProgressListenerUtil.getCurrentProgressListener();
         try
         {
-            getLogger().debug( "{} running...", getName() );
+            ProgressListenerUtil.setCurrentProgressListener( getProgressListener() );
+            getLogger().info( "{} running...", getName() );
             doRun();
-            getLogger().debug( "{} done...", getName() );
+            getLogger().info( "{} done...", getName() );
         }
         catch ( InterruptedException e )
         {
-            getLogger().warn( "{} interrupted:", getName(), e );
-            Throwables.propagate( e );
+            getLogger().info( "{} interrupted: {}", getName(), e.getMessage() );
+        }
+        catch ( RunnableInterruptedException e )
+        {
+            getLogger().info( "{} interrupted: {}", getName(), e.getMessage() );
+        }
+        catch ( RunnableCanceledException e )
+        {
+            getLogger().info( "{} canceled: {}", getName(), e.getMessage() );
         }
         catch ( Exception e )
         {
             getLogger().warn( "{} failed:", getName(), e );
             Throwables.propagate( e );
+        }
+        finally
+        {
+            ProgressListenerUtil.setCurrentProgressListener( oldProgressListener );
         }
     }
 

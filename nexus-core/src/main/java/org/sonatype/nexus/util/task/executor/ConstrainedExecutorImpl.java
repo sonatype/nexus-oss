@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import org.sonatype.nexus.util.task.CancelableRunnable;
@@ -47,10 +46,9 @@ public class ConstrainedExecutorImpl
     private final HashMap<String, CancelableRunnableWrapper> currentlyRunningCanncelableRunnables;
 
     /**
-     * Plain map holding the repository IDs of repositories being batch-updated in background as keys. All read-write
-     * access to this set must happen within synchronized block, using this instance as monitor object.
+     * Plain map holding the key semaphores for all keys that has scheduled jobs.
      */
-    private final ConcurrentHashMap<String, Semaphore> currentlyRunningSemamphores;
+    private final HashMap<String, Semaphore> currentlyRunningSemamphores;
 
     /**
      * Constructor.
@@ -61,7 +59,7 @@ public class ConstrainedExecutorImpl
     {
         this.executor = checkNotNull( executor );
         this.currentlyRunningCanncelableRunnables = new HashMap<String, CancelableRunnableWrapper>();
-        this.currentlyRunningSemamphores = new ConcurrentHashMap<String, Semaphore>();
+        this.currentlyRunningSemamphores = new HashMap<String, Semaphore>();
     }
 
     @Override
@@ -80,7 +78,8 @@ public class ConstrainedExecutorImpl
         {
             return false;
         }
-        final CancelableRunnableWrapper wrappedCommand = new CancelableRunnableWrapper( this, key, command );
+        final CancelableRunnableWrapper wrappedCommand =
+            new CancelableRunnableWrapper( this, key, getSemaphore( key ), command );
         currentlyRunningCanncelableRunnables.put( key, wrappedCommand );
         executor.execute( wrappedCommand );
         return true;
@@ -96,7 +95,8 @@ public class ConstrainedExecutorImpl
         {
             oldCommand.cancel();
         }
-        final CancelableRunnableWrapper wrappedCommand = new CancelableRunnableWrapper( this, key, command );
+        final CancelableRunnableWrapper wrappedCommand =
+            new CancelableRunnableWrapper( this, key, getSemaphore( key ), command );
         currentlyRunningCanncelableRunnables.put( key, wrappedCommand );
         executor.execute( wrappedCommand );
         return oldCommand != null;
@@ -106,24 +106,17 @@ public class ConstrainedExecutorImpl
 
     protected Semaphore getSemaphore( final String key )
     {
-        Semaphore semaphore = currentlyRunningSemamphores.get( key );
-        if ( semaphore == null )
+        if ( !currentlyRunningSemamphores.containsKey( key ) )
         {
-            final Semaphore newSemaphore = new Semaphore( 1 );
-            semaphore = currentlyRunningSemamphores.putIfAbsent( key, newSemaphore );
-            if ( semaphore == null )
-            {
-                semaphore = newSemaphore;
-            }
+            currentlyRunningSemamphores.put( key, new Semaphore( 1 ) );
         }
-        return semaphore;
+        return currentlyRunningSemamphores.get( key );
     }
 
     protected void cancelableStarting( final CancelableRunnableWrapper wrappedCommand )
         throws InterruptedException
     {
-        final Semaphore actualSemaphore = getSemaphore( wrappedCommand.getKey() );
-        actualSemaphore.acquire();
+        // nop
     }
 
     protected synchronized void cancelableStopping( final CancelableRunnableWrapper wrappedCommand )
@@ -131,9 +124,8 @@ public class ConstrainedExecutorImpl
         if ( !wrappedCommand.isCanceled() )
         {
             currentlyRunningCanncelableRunnables.remove( wrappedCommand.getKey() );
+            currentlyRunningSemamphores.remove( wrappedCommand.getKey() );
         }
-        final Semaphore actualSemaphore = getSemaphore( wrappedCommand.getKey() );
-        actualSemaphore.release();
     }
 
     // ==
@@ -145,15 +137,18 @@ public class ConstrainedExecutorImpl
 
         private final String key;
 
+        private final Semaphore semaphore;
+
         private final CancelableRunnable runnable;
 
         private final CancelableSupport cancelableSupport;
 
         public CancelableRunnableWrapper( final ConstrainedExecutorImpl host, final String key,
-                                          final CancelableRunnable runnable )
+                                          final Semaphore semaphore, final CancelableRunnable runnable )
         {
             this.host = checkNotNull( host );
             this.key = checkNotNull( key );
+            this.semaphore = checkNotNull( semaphore );
             this.runnable = checkNotNull( runnable );
             this.cancelableSupport = new CancelableSupport();
         }
@@ -173,6 +168,7 @@ public class ConstrainedExecutorImpl
         {
             try
             {
+                semaphore.acquire();
                 host.cancelableStarting( this );
                 try
                 {
@@ -186,6 +182,11 @@ public class ConstrainedExecutorImpl
             catch ( InterruptedException e )
             {
                 //
+            }
+            finally
+            {
+                host.cancelableStopping( this );
+                semaphore.release();
             }
         }
 

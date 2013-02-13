@@ -12,16 +12,14 @@
  */
 package org.sonatype.nexus.util.task;
 
-import com.google.common.base.Throwables;
-
 /**
  * Support class for {@link Cancelable} implementations of {@link Runnable} interfaces. Extends {@link RunnableSupport}
  * by adding cancelation support. To properly detect cancelation, implementor should use {@link #isCanceled()} or
  * {@link #checkInterruption()} (throws {@link RunnableCanceledException} and {@link RunnableInterruptedException}
  * runtime exceptions that you might or might not handle). For code that is buried under layers of third party or legacy
- * code, {@link TaskUtil#checkInterruption()} should be used, just called on regular basis (ie. within a cycle). Usable
- * with plain Executors too and other {@link Runnable} accepting components, as long as you preserve this instance and
- * cancel it "manually" for example:
+ * code, {@link CancelableUtil#checkInterruption()} should be used, just called on regular basis (ie. within a cycle).
+ * Usable with plain Executors too and other {@link Runnable} accepting components, as long as you preserve this
+ * instance and cancel it "manually" for example:
  * 
  * <pre>
  *   final Executor executor = ...
@@ -54,7 +52,7 @@ public abstract class CancelableRunnableSupport
     protected void checkInterruption()
         throws RunnableCanceledException, RunnableInterruptedException
     {
-        TaskUtil.checkInterruption( cancelableSupport );
+        CancelableUtil.checkInterruption( cancelableSupport );
     }
 
     @Override
@@ -77,37 +75,15 @@ public abstract class CancelableRunnableSupport
             getLogger().debug( "{} canceled before running, bailing out.", getName() );
             return;
         }
-        final Cancelable oldCancelable = TaskUtil.getCurrentCancelable();
+        final Cancelable oldCancelable = CancelableUtil.getCurrentCancelable();
         try
         {
-            TaskUtil.setCurrentCancelable( cancelableSupport );
-            getLogger().debug( "{} running...", getName() );
-            doRun();
-            getLogger().debug( "{} done...", getName() );
-        }
-        catch ( RunnableCanceledException e )
-        {
-            getLogger().debug( "{} canceled: {}", getName(), e.getMessage() );
-        }
-        catch ( RunnableInterruptedException e )
-        {
-            getLogger().debug( "{} interrupted: {}", getName(), e.getMessage() );
-        }
-        catch ( InterruptedException e )
-        {
-            getLogger().debug( "{} interrupted: {}", getName(), e.getMessage() );
-        }
-        catch ( Exception e )
-        {
-            getLogger().warn( "{} failed:", getName(), e );
-            Throwables.propagate( e );
+            CancelableUtil.setCurrentCancelable( cancelableSupport );
+            super.run();
         }
         finally
         {
-            TaskUtil.setCurrentCancelable( oldCancelable );
+            CancelableUtil.setCurrentCancelable( oldCancelable );
         }
     }
-
-    protected abstract void doRun()
-        throws Exception;
 }

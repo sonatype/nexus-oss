@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sonatype.nexus.util.PathUtils;
+import org.sonatype.nexus.util.task.CancelableUtil;
 
 /**
  * Scraper for remote AmazonS3 hosted repositories.
@@ -109,6 +110,9 @@ public class AmazonS3IndexScraper
                            final Set<String> entries )
         throws IOException
     {
+        // cancelation
+        CancelableUtil.checkInterruption();
+
         // response should be 200 OK, if not, give up
         if ( page.getHttpResponse().getStatusLine().getStatusCode() != 200 )
         {
@@ -156,6 +160,9 @@ public class AmazonS3IndexScraper
 
         if ( isTruncated( page ) )
         {
+            // cancelation
+            CancelableUtil.checkInterruption();
+
             final ArrayList<String> queryParams = new ArrayList<String>();
             if ( prefix != null )
             {

@@ -15,13 +15,13 @@ package org.sonatype.nexus.util.task;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Collection of static methods allowing to use {@link ProgressListener} and track cancellation or interruption state in
+ * Collection of static methods allowing to use {@link Cancelable} and track cancellation or interruption state in
  * less intrusive way than passing it deep into caller hierarchy.
  * 
  * @author cstamas
  * @since 2.4
  */
-public class TaskUtil
+public class CancelableUtil
 {
     /**
      * Thread local variable holding the current {@link Cancelable} of the given (current) {@link Thread}.
@@ -38,14 +38,14 @@ public class TaskUtil
     /**
      * Static helper class, do not instantiate it.
      */
-    private TaskUtil()
+    private CancelableUtil()
     {
         // no instances of this please
     }
 
     /**
      * Protected method that is meant to register current thread's {@link Cancelable} instance. See
-     * {@link RunnableSupport}.
+     * {@link CancelableRunnableSupport}.
      * 
      * @param cancelable
      */
