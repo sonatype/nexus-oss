@@ -45,7 +45,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       fields : ['text', 'value'],
       data : [
         ['Unsuccessful.', '-1'],
-        ['Working...', '0'],
+        ['In Progress.', '0'],
         ['Successful.', '1']
       ]
     })
