@@ -97,7 +97,7 @@ public class HttpClientManagerTest
         when( globalRemoteStorageContext.getRemoteProxySettings() ).thenReturn( new DefaultRemoteProxySettings() );
         when( applicationConfiguration.getGlobalRemoteStorageContext() ).thenReturn( globalRemoteStorageContext );
 
-        hc4Provider = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller );
+        hc4Provider = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null );
 
         when( proxyRepository.getId() ).thenReturn( "central" );
         when( response.getStatusLine() ).thenReturn( statusLine );

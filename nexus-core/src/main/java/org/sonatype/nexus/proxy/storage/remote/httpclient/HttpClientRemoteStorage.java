@@ -38,6 +38,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.cookie.DateParseException;
 import org.apache.http.impl.cookie.DateUtils;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
@@ -115,6 +116,11 @@ public class HttpClientRemoteStorage
      * Created items while retrieving, can be written.
      */
     private static final boolean CAN_WRITE = true;
+
+    /**
+     * Http context key of repository making a request.
+     */
+    public static final String HTTP_CTX_KEY_REPOSITORY_ID = PROVIDER_STRING + ".repositoryId";
 
     private final QueryStringBuilder queryStringBuilder;
 
@@ -486,7 +492,10 @@ public class HttpClientRemoteStorage
         HttpResponse httpResponse = null;
         try
         {
-            httpResponse = httpClient.execute( httpRequest );
+            final BasicHttpContext httpContext = new BasicHttpContext();
+            httpContext.setAttribute( HTTP_CTX_KEY_REPOSITORY_ID, repository.getId()  );
+
+            httpResponse = httpClient.execute( httpRequest, httpContext );
             final int statusCode = httpResponse.getStatusLine().getStatusCode();
 
             final Header httpServerHeader = httpResponse.getFirstHeader( "server" );

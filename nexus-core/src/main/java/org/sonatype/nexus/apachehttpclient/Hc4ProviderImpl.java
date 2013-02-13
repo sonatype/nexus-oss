@@ -35,6 +35,7 @@ import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.ClientConnectionOperator;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -64,6 +65,8 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -168,6 +171,8 @@ public class Hc4ProviderImpl
      */
     private final PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
+    private final List<ClientConnectionOperatorSelector> selectors;
+
     /**
      * Constructor.
      *
@@ -180,11 +185,13 @@ public class Hc4ProviderImpl
     public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
         final UserAgentBuilder userAgentBuilder,
         final EventBus eventBus,
-        final PoolingClientConnectionManagerMBeanInstaller jmxInstaller )
+        final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
+        final List<ClientConnectionOperatorSelector> selectors )
     {
         this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
         this.userAgentBuilder = Preconditions.checkNotNull( userAgentBuilder );
         this.jmxInstaller = Preconditions.checkNotNull( jmxInstaller );
+        this.selectors = selectors == null ? Lists.<ClientConnectionOperatorSelector>newArrayList() : selectors;
         this.sharedConnectionManager = createClientConnectionManager();
         this.evictingThread = new EvictingThread( sharedConnectionManager, getConnectionPoolIdleTime() );
         this.evictingThread.start();
@@ -401,7 +408,15 @@ public class Hc4ProviderImpl
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register( new Scheme( "http", 80, PlainSocketFactory.getSocketFactory() ) );
         schemeRegistry.register( new Scheme( "https", 443, SSLSocketFactory.getSocketFactory() ) );
-        final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager( schemeRegistry );
+
+        final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager( schemeRegistry )
+        {
+            @Override
+            protected ClientConnectionOperator createConnectionOperator( final SchemeRegistry defaultSchemeRegistry )
+            {
+                return new Hc4ClientConnectionOperator( defaultSchemeRegistry, selectors );
+            }
+        };
 
         final int maxConnectionCount = getConnectionPoolMaxSize();
         final int perRouteConnectionCount = Math.min( getConnectionPoolSize(), maxConnectionCount );
