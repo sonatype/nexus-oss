@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.util.task;
 
-
 /**
  * Collection of static methods allowing to use {@link ProgressListener} and use it in less intrusive way than passing
  * it deep into caller hierarchy.
@@ -53,10 +52,13 @@ public class ProgressListenerUtil
         CURRENT.set( new ProgressListenerWrapper( progressListener ) );
     }
 
+    // ==
+
     /**
-     * Returns thread's current {@link Cancelable} instance, never returns {@code null}.
+     * Returns thread's current {@link ProgressListener} instance, never returns {@code null}. Meant to be used by code
+     * doing the work and wanting to mark that progress on tasks's {@link ProgressListener}.
      * 
-     * @return the {@link Cancelable} instance, never {@code null}.
+     * @return the {@link ProgressListener} instance, never {@code null}.
      */
     public static ProgressListener getCurrentProgressListener()
     {
