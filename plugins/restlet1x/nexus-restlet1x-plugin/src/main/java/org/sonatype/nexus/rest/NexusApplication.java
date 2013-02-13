@@ -14,6 +14,7 @@ package org.sonatype.nexus.rest;
 
 import java.util.List;
 
+import org.apache.shiro.util.AntPathMatcher;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
@@ -228,11 +229,9 @@ public class NexusApplication
         this.protectedPathManager.addProtectedResource( "/content"
             + contentResource.getResourceProtection().getPathPattern(), "noSessionCreation,"
             + contentResource.getResourceProtection().getFilterExpression() );
-
-        // protecting service resources with "wall" permission
-        this.protectedPathManager.addProtectedResource( "/service/local/**",
-            "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
     }
+    
+    private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();
 
     @Override
     protected void handlePlexusResourceSecurity( PlexusResource resource )
@@ -242,6 +241,15 @@ public class NexusApplication
         if ( descriptor == null )
         {
             return;
+        }
+
+        // sanity check: path protection descriptor path and resource URI must align
+        if ( !shiroAntPathMatcher.match( descriptor.getPathPattern(), resource.getResourceUri() ) )
+        {
+            throw new IllegalStateException( String.format(
+                "Plexus resource %s would attach to URI=%s but protect path=%s that does not matches URI!",
+                resource.getClass().getName(), resource.getResourceUri(),
+                descriptor.getPathPattern() ) );
         }
 
         String filterExpression = descriptor.getFilterExpression();
