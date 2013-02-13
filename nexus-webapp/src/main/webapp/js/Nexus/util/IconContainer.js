@@ -30,7 +30,6 @@ NX.define('Nexus.util.IconContainer', {
      * Defined icons.
      *
      * @private
-     * @property
      */
     icons: {},
 
@@ -100,12 +99,13 @@ NX.define('Nexus.util.IconContainer', {
      *
      * @private
      *
-     * @param {string} name         Icon alias.
-     * @param {string} fileName     Icon file name.
+     * @param {string} name         Icon name.
+     * @param {string} fileName     Icon file name (or @alias).
      * @return {*}                  Icon helper.
      */
     defineIcon: function (name, fileName) {
         var self = this,
+            alias,
             iconPath,
             cls,
             icon;
@@ -113,55 +113,66 @@ NX.define('Nexus.util.IconContainer', {
         // Puke early if icon already defined, this is likely a mistake
         NX.assert(self.icons[name] === undefined, 'Icon already defined with name: ' + name);
 
-        iconPath = self.iconPath(fileName);
+        // If fileName is an alias, then resolve it
+        if (fileName.startsWith('@')) {
+            alias = fileName.substring(1, fileName.length);
+            icon = self.icons[alias];
+            NX.assert(icon !== undefined, 'Invalid alias; No icon defined with name: ' + alias);
 
-        cls = self.stylePrefix + name;
+            self.logDebug('Defining icon:', name, 'aliased to:', alias);
+        }
+        else {
+            // else define a new icon
+            iconPath = self.iconPath(fileName);
 
-        self.logDebug('Defining icon:', name, 'cls:', cls, 'path:', iconPath);
+            cls = self.stylePrefix + name;
 
-        Ext.util.CSS.createStyleSheet(
-            '.' + cls + ' { background: url(' + iconPath + ') no-repeat !important; }',
-            cls // use class as id
-        );
+            self.logDebug('Defining icon:', name, 'cls:', cls, 'path:', iconPath);
 
-        /**
-         * Icon.
-         */
-        icon = {
-            /**
-             * Symbolic name for icon.
-             *
-             * @type {String}
-             */
-            name: name,
-
-            /**
-             * Short icon file-name.
-             *
-             * @type {String}
-             */
-            fileName: fileName,
+            Ext.util.CSS.createStyleSheet(
+                '.' + cls + ' { background: url(' + iconPath + ') no-repeat !important; }',
+                cls // use class as id
+            );
 
             /**
-             * Full icon path.
-             *
-             * @type {String}
+             * Icon.
              */
-            path: iconPath,
+            icon = {
+                /**
+                 * Symbolic name for icon.
+                 *
+                 * @type {String}
+                 */
+                name: name,
 
-            /**
-             * <img> representation.
-             *
-             * @type {String}
-             */
-            img: '<img src="' + iconPath + '">',
+                /**
+                 * Short icon file-name.
+                 *
+                 * @type {String}
+                 */
+                fileName: fileName,
 
-            /**
-             * Icon class.
-             *
-             * @type {String}
-             */
-            cls: cls
+                /**
+                 * Full icon path.
+                 *
+                 * @type {String}
+                 */
+                path: iconPath,
+
+                /**
+                 * HTML <img> representation.
+                 *
+                 * @type {String}
+                 */
+                img: '<img src="' + iconPath + '">',
+
+                /**
+                 * Icon CSS class.
+                 *
+                 * @type {String}
+                 */
+                cls: cls
+            }
         }
 
         self.icons[name] = icon;
