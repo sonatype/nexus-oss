@@ -77,7 +77,7 @@ public class RemotePrefixFileStrategy
             {
                 getLogger().debug( "Remote prefix on {} at path {} found!",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
-                long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000;
+                long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000L;
                 if ( prefixFileAgeInDays < 1 )
                 {
                     return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
