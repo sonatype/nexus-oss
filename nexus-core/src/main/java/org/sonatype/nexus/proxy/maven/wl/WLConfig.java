@@ -73,4 +73,12 @@ public interface WLConfig
      * @return the depth of the scrape.
      */
     int getLocalScrapeDepth();
+
+    /**
+     * Returns the maximum allowed entry count for prefix files. Files having more than allowed count of entries will be
+     * refused to be loaded up. Note: Central prefix file has around 6000 entries.
+     * 
+     * @return the maximum allowed prefix file entry count.
+     */
+    int getPrefixFileMaxEntriesCount();
 }

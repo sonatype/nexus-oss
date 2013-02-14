@@ -98,7 +98,7 @@ public class RemotePrefixFileStrategy
     protected EntrySource createEntrySource( final MavenProxyRepository mavenProxyRepository, final String path )
         throws IOException
     {
-        return new FileEntrySource( mavenProxyRepository, path );
+        return new FileEntrySource( mavenProxyRepository, path, config.getPrefixFileMaxEntriesCount() );
     }
 
     protected StorageFileItem retrieveFromRemoteIfExists( final MavenProxyRepository mavenProxyRepository,

@@ -603,7 +603,7 @@ public class WLManagerImpl
     @Override
     public FileEntrySource getEntrySourceFor( final MavenRepository mavenRepository )
     {
-        return new FileEntrySource( mavenRepository, config.getLocalPrefixFilePath() );
+        return new FileEntrySource( mavenRepository, config.getLocalPrefixFilePath(), config.getPrefixFileMaxEntriesCount() );
     }
 
     // ==
@@ -676,7 +676,7 @@ public class WLManagerImpl
         // and here we are cleaning them)
         for ( String path : config.getRemotePrefixFilePaths() )
         {
-            new FileEntrySource( mavenRepository, path ).delete();
+            new FileEntrySource( mavenRepository, path, config.getPrefixFileMaxEntriesCount() ).delete();
         }
 
         // set noscrape flag

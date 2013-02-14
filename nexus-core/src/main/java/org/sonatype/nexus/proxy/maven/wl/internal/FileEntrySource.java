@@ -54,12 +54,14 @@ public class FileEntrySource
      * 
      * @param mavenRepository
      * @param path
+     * @param prefixFileMaxEntryCount
      */
-    protected FileEntrySource( final MavenRepository mavenRepository, final String path )
+    protected FileEntrySource( final MavenRepository mavenRepository, final String path,
+                               final int prefixFileMaxEntryCount )
     {
         this.mavenRepository = checkNotNull( mavenRepository );
         this.path = checkNotNull( path );
-        this.entrySourceMarshaller = new PrefixesFileMarshaller();
+        this.entrySourceMarshaller = new PrefixesFileMarshaller( prefixFileMaxEntryCount );
     }
 
     /**

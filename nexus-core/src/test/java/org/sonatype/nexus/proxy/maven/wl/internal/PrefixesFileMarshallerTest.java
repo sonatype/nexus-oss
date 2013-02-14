@@ -30,7 +30,7 @@ import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 public class PrefixesFileMarshallerTest
 {
     // is state-less, no need for @Before
-    final PrefixesFileMarshaller m = new PrefixesFileMarshaller();
+    final PrefixesFileMarshaller m = new PrefixesFileMarshaller( 1000 );
 
     final Charset UTF8 = Charset.forName( "UTF-8" );
 

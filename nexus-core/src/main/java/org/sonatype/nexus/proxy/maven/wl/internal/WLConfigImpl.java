@@ -68,6 +68,9 @@ public class WLConfigImpl
     private static final int LOCAL_SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
         + ".localScrapeDepth", 2 );
 
+    private static final int PREFIX_FILE_MAX_ENTRY_COUNT = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
+        + ".prefixFileMaxEntryCount", 10000 );
+
     private final boolean featureActive;
 
     /**
@@ -146,5 +149,11 @@ public class WLConfigImpl
     public int getLocalScrapeDepth()
     {
         return LOCAL_SCRAPE_DEPTH;
+    }
+
+    @Override
+    public int getPrefixFileMaxEntriesCount()
+    {
+        return PREFIX_FILE_MAX_ENTRY_COUNT;
     }
 }
