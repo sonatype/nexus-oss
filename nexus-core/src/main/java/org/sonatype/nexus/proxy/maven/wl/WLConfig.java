@@ -73,11 +73,4 @@ public interface WLConfig
      * @return the depth of the scrape.
      */
     int getLocalScrapeDepth();
-
-    /**
-     * Returns the depth (directory depth) that whitelist matching is used to perform matches.
-     * 
-     * @return the whitelist matching depth.
-     */
-    int getWLMatchingDepth();
 }

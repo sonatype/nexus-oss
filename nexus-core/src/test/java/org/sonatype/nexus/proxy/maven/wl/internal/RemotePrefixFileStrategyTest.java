@@ -25,7 +25,11 @@ import java.net.ServerSocket;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -51,6 +55,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -230,7 +235,7 @@ public class RemotePrefixFileStrategyTest
     }
 
     @Test
-    public void discoverGzPrefixFile()
+    public void discoverGzContentEncodingPrefixFile()
         throws Exception
     {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -240,9 +245,16 @@ public class RemotePrefixFileStrategyTest
         gos.close();
 
         server.stop();
-        server =
-            Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt.gz" ).withBehaviours(
-                Behaviours.content( bos.toByteArray() ) ).start();
+        server = Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt" ).withBehaviours( new Behaviour()
+        {
+            @Override
+            public boolean execute( HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx )
+                throws Exception
+            {
+                response.setHeader( "Content-Encoding", "gzip" );
+                return true;
+            }
+        }, Behaviours.content( bos.toByteArray() ) ).start();
         try
         {
             final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );

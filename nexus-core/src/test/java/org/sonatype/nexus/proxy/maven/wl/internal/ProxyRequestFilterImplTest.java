@@ -26,7 +26,6 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
-import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -48,8 +47,6 @@ public class ProxyRequestFilterImplTest
 
     @Mock
     private MavenProxyRepository mavenProxyRepository;
-
-    private WLConfig config = new WLConfigImpl();
 
     @Before
     public void prepare()
@@ -73,7 +70,7 @@ public class ProxyRequestFilterImplTest
     {
         // no WL exists at all, we must pass all
         final ProxyRequestFilterImpl filter =
-            new ProxyRequestFilterImpl( eventBus, applicationStatusSource, config, wlManager );
+            new ProxyRequestFilterImpl( eventBus, applicationStatusSource, wlManager );
 
         doTestAllowed( filter, "/some/path/and/file/at/the/end.txt", true );
         doTestAllowed( filter, "/foo/bar", true );
@@ -89,7 +86,7 @@ public class ProxyRequestFilterImplTest
 
         // WL will be built, not every request should be allowed
         final ProxyRequestFilterImpl filter =
-            new ProxyRequestFilterImpl( eventBus, applicationStatusSource, config, wlManager );
+            new ProxyRequestFilterImpl( eventBus, applicationStatusSource, wlManager );
 
         // ping (this would happen on event)
         filter.buildWhitelistFor( mavenProxyRepository );

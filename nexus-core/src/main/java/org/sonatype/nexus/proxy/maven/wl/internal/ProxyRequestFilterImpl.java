@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
-import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.events.WLPublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.wl.events.WLUnpublishedRepositoryEvent;
@@ -49,8 +48,6 @@ public class ProxyRequestFilterImpl
 {
     private final ApplicationStatusSource applicationStatusSource;
 
-    private final WLConfig config;
-
     private final WLManager wlManager;
 
     /**
@@ -58,16 +55,14 @@ public class ProxyRequestFilterImpl
      * 
      * @param eventBus
      * @param applicationStatusSource
-     * @param config
      * @param wlManager
      */
     @Inject
     public ProxyRequestFilterImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
-                                   final WLConfig config, final WLManager wlManager )
+                                   final WLManager wlManager )
     {
         checkNotNull( eventBus );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
-        this.config = checkNotNull( config );
         this.wlManager = checkNotNull( wlManager );
         eventBus.register( this );
     }
@@ -85,9 +80,13 @@ public class ProxyRequestFilterImpl
                 // flag the request as rejected
                 resourceStoreRequest.getRequestContext().put( WLManager.REQUEST_REJECTED_FLAG_KEY, Boolean.TRUE );
             }
+            return allowed;
         }
-        // no WL for a proxy it does not publishes it
-        return true;
+        else
+        {
+            // no WL for a proxy it does not publishes it
+            return true;
+        }
     }
 
     // ==
@@ -111,8 +110,7 @@ public class ProxyRequestFilterImpl
             final EntrySource entrySource = wlManager.getEntrySourceFor( mavenProxyRepository );
             if ( entrySource.exists() )
             {
-                final PathMatcher whitelist =
-                    new PathMatcherImpl( entrySource.readEntries(), config.getWLMatchingDepth() );
+                final PathMatcher whitelist = new PathMatcherImpl( entrySource.readEntries(), Integer.MAX_VALUE );
                 whitelists.put( mavenProxyRepository.getId(), whitelist );
             }
             else

@@ -68,9 +68,6 @@ public class WLConfigImpl
     private static final int LOCAL_SCRAPE_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
         + ".localScrapeDepth", 2 );
 
-    private static final int WL_MATCHING_DEPTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
-        + ".wlMatchingDepth", REMOTE_SCRAPE_DEPTH );
-
     private final boolean featureActive;
 
     /**
@@ -149,11 +146,5 @@ public class WLConfigImpl
     public int getLocalScrapeDepth()
     {
         return LOCAL_SCRAPE_DEPTH;
-    }
-
-    @Override
-    public int getWLMatchingDepth()
-    {
-        return WL_MATCHING_DEPTH;
     }
 }
