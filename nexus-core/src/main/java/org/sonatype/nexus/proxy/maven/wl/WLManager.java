@@ -50,12 +50,13 @@ public interface WLManager
     void shutdown();
 
     /**
-     * Initializes WL of given repository (used on repo add).
+     * Initializes WL of given repository (used on repository addition and on boot when called with all defined
+     * repository during boot up).
      * 
-     * @param mavenRepositories
+     * @param mavenRepository
      * @throws IOException
      */
-    void initializeWhitelist( MavenRepository... mavenRepositories )
+    void initializeWhitelist( MavenRepository mavenRepository )
         throws IOException;
 
     /**

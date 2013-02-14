@@ -158,7 +158,10 @@ public class WLManagerImpl
         final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
         initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
         initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
-        initializeWhitelist( initableRepositories.toArray( new MavenRepository[initableRepositories.size()] ) );
+        for ( MavenRepository mavenRepository : initableRepositories )
+        {
+            initializeWhitelist( mavenRepository );
+        }
         // schedule the "updater": wait 10 minutes for boot to calm down and then do the work hourly
         this.executor.scheduleAtFixedRate( new Runnable()
         {
@@ -189,52 +192,41 @@ public class WLManagerImpl
     }
 
     @Override
-    public void initializeWhitelist( final MavenRepository... mavenRepositories )
+    public void initializeWhitelist( final MavenRepository mavenRepository )
     {
-        final ArrayList<MavenRepository> updateNeededRepositories = new ArrayList<MavenRepository>();
-        for ( MavenRepository mavenRepository : mavenRepositories )
+        getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        final EntrySource entrySource = getEntrySourceFor( mavenRepository );
+        try
         {
-            getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-            final EntrySource entrySource = getEntrySourceFor( mavenRepository );
-            try
+            if ( entrySource.exists() )
             {
-                if ( entrySource.exists() )
-                {
-                    // good, we assume is up to date, which should be unless user tampered with it
-                    // in that case, just delete it + update and should be fixed.
-                    publish( mavenRepository, entrySource );
-                    getLogger().info( "Existing WL of {} initialized.",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
-                else
-                {
-                    // mark it for noscrape if not marked yet
-                    // this is mainly important on 1st boot or newly added reposes
-                    unpublish( mavenRepository );
-                    updateNeededRepositories.add( mavenRepository );
-                    getLogger().info( "Updating WL of {}, it does not exists yet.",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
+                // good, we assume is up to date, which should be unless user tampered with it
+                // in that case, just delete it + update and should be fixed.
+                publish( mavenRepository, entrySource );
+                getLogger().info( "Existing WL of {} initialized.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
-            catch ( IOException e )
+            else
             {
-                getLogger().warn( "Problem during WL update of {}",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-                try
-                {
-                    unpublish( mavenRepository );
-                }
-                catch ( IOException ioe )
-                {
-                    // silently
-                }
+                // mark it for noscrape if not marked yet
+                // this is mainly important on 1st boot or newly added reposes
+                unpublish( mavenRepository );
+                updateWhitelist( mavenRepository );
+                getLogger().info( "Updating WL of {}, it does not exists yet.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
         }
-        if ( !updateNeededRepositories.isEmpty() )
+        catch ( IOException e )
         {
-            for ( MavenRepository mavenRepository : updateNeededRepositories )
+            getLogger().warn( "Problem during WL update of {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
+            try
             {
-                updateWhitelist( mavenRepository );
+                unpublish( mavenRepository );
+            }
+            catch ( IOException ioe )
+            {
+                // silently
             }
         }
     }
