@@ -64,6 +64,7 @@ import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import com.google.common.collect.Lists;
 
 public abstract class AbstractCargoIT
     extends TestSupport
@@ -94,12 +95,12 @@ public abstract class AbstractCargoIT
         {
             fixPlexusProperties();
             changeStartupLoggingToDebug();
-    
+
             WAR war = new WAR( getWarFile().getAbsolutePath() );
             war.setContext( "nexus" );
-            
+
             File configHome = new File( "target/conatiner-configs", getContainer() ).getAbsoluteFile();
-    
+
             ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
             LocalConfiguration configuration =
                 (LocalConfiguration) configurationFactory.createConfiguration( getContainer(), ContainerType.INSTALLED,
@@ -112,7 +113,7 @@ public abstract class AbstractCargoIT
                                                                                          ContainerType.INSTALLED,
                                                                                          configuration );
             container.setHome( getContainerLocation().getAbsolutePath() );
-    
+
             container.setTimeout( 5 * 60 * 1000 );// 5 minutes
             container.start();
         }
@@ -174,7 +175,7 @@ public abstract class AbstractCargoIT
 
     /**
      * Customize the work dir per IT by mucking with the nexus-work-dir property
-     * 
+     *
      * @throws Exception
      */
     private void fixPlexusProperties()
@@ -315,10 +316,14 @@ public abstract class AbstractCargoIT
             assertThat( "Should have been DEBUG level logging so there should have been DEBUG in log",
                 downloadedLogStr, containsString( "DEBUG" ) );
 
-            downloadedLogStr = downloadedLogStr.replace(
-                "org.sonatype.nexus.error.reporting.DefaultErrorReportingManager",
-                ""
-            );
+            List<String> falsePositives = Lists.newArrayList();
+            falsePositives.add( "org/sonatype/nexus/rest/error/reporting/ErrorReportingPlexusResource" );
+            falsePositives.add( "org.sonatype.nexus.rest.error.reporting.ErrorReportingPlexusResource" );
+            falsePositives.add( "org.sonatype.nexus.error.reporting.DefaultErrorReportingManager" );
+
+            for (String fp : falsePositives){
+                downloadedLogStr = downloadedLogStr.replace(fp, "");
+            }
 
             assertThat( downloadedLogStr, not( containsString( "error" ) ) );
             assertThat( downloadedLogStr, not( containsString( "exception" ) ) );
