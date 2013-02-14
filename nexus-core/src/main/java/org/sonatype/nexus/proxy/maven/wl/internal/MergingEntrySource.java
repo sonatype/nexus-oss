@@ -20,8 +20,7 @@ import java.util.List;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 
 /**
- * Entry source that merges multiple {@link EntrySource}s into one. It retains "correctness" of the result, by watching
- * "least specific" to win (and most specific removed) in result list.
+ * Entry source that merges multiple {@link EntrySource}s into one.
  * 
  * @author cstamas
  */
