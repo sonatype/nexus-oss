@@ -603,7 +603,8 @@ public class WLManagerImpl
     @Override
     public FileEntrySource getEntrySourceFor( final MavenRepository mavenRepository )
     {
-        return new FileEntrySource( mavenRepository, config.getLocalPrefixFilePath(), config.getPrefixFileMaxEntriesCount() );
+        return new FileEntrySource( mavenRepository, config.getLocalPrefixFilePath(),
+            config.getPrefixFileMaxEntriesCount() );
     }
 
     // ==
@@ -728,7 +729,7 @@ public class WLManagerImpl
                 true, true, new StringContentLocator( "noscrape" ) );
         try
         {
-            mavenRepository.storeItemWithChecksums( true, file );
+            mavenRepository.storeItem( true, file );
         }
         catch ( UnsupportedStorageOperationException e )
         {
@@ -748,7 +749,7 @@ public class WLManagerImpl
         request.setRequestGroupLocalOnly( true );
         try
         {
-            mavenRepository.deleteItemWithChecksums( true, request );
+            mavenRepository.deleteItem( true, request );
         }
         catch ( ItemNotFoundException e )
         {

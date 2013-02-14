@@ -207,7 +207,7 @@ public class FileEntrySource
             new DefaultStorageFileItem( getMavenRepository(), request, true, true, content );
         try
         {
-            getMavenRepository().storeItemWithChecksums( true, file );
+            getMavenRepository().storeItem( true, file );
         }
         catch ( UnsupportedStorageOperationException e )
         {
@@ -228,7 +228,7 @@ public class FileEntrySource
         request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
         try
         {
-            getMavenRepository().deleteItemWithChecksums( true, request );
+            getMavenRepository().deleteItem( true, request );
         }
         catch ( ItemNotFoundException e )
         {

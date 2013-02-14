@@ -182,7 +182,7 @@ public class PropfileDiscoveryStatusSource
             new DefaultStorageFileItem( getMavenProxyRepository(), request, true, true, content );
         try
         {
-            getMavenProxyRepository().storeItemWithChecksums( true, file );
+            getMavenProxyRepository().storeItem( true, file );
         }
         catch ( UnsupportedStorageOperationException e )
         {
