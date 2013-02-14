@@ -149,7 +149,7 @@ public class RemoteScrapeStrategy
             {
                 final HttpHead head = new HttpHead( flagRemoteUrl );
                 response = httpClient.execute( head );
-                if ( response.getStatusLine().getStatusCode() > 199 && response.getStatusLine().getStatusCode() < 299 )
+                if ( response.getStatusLine().getStatusCode() > 199 && response.getStatusLine().getStatusCode() < 300 )
                 {
                     return true;
                 }
