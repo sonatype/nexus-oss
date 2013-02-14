@@ -131,49 +131,32 @@ public class DefaultNexusItemAuthorizer
         return perms;
     }
 
-    protected boolean isPermitted( final List<String> perms )
-    {
-        if ( securitySystem.isSecurityEnabled() )
-        {
-            // Get the current user
-            final Subject subject = securitySystem.getSubject();
-            if ( subject != null ) // TODO: isn't this missing? "&& subject.isAuthenticated()"
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Checking isPermitted() with perms: " + perms.toString() );
-                }
-                // And finally check each of the target permissions and see if the user
-                // has access, all it takes is one
-                for ( String perm : perms )
-                {
-                    if ( subject.isPermitted( perm ) )
-                    {
-                        // TODO: we should remember/cache these decisions per-thread
-                        // and not re-evaluate it always from Security
-                        return true;
-                    }
-                }
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Subject is authenticated, but has none of the needed permissions, rejecting." );
-                }
-                return false;
-            }
-            else
-            {
-                // security is enabled, but we have nobody authenticated? Fail!
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Subject is not authenticated, rejecting." );
-                }
-                return false;
-            }
-        }
-        else
-        {
-            // security is disabled, simply say YES
+    protected boolean isPermitted(final List<String> perms) {
+        // If security is disabled, then anything is permitted
+        if (!securitySystem.isSecurityEnabled()) {
             return true;
         }
+
+        Subject subject = securitySystem.getSubject();
+        getLogger().debug("Subject: {}", subject);
+
+        if (subject == null) {
+            // TODO: isn't this missing? "&& subject.isAuthenticated()"
+            // FIXME: ^^^ no it isn't could be required too, non-null should be enough for us here
+            getLogger().debug("Subject is not authenticated; rejecting");
+            return false;
+        }
+
+        getLogger().debug("Checking if subject '{}' has one of these permissions: {}", subject.getPrincipal(), perms);
+        for (String perm : perms) {
+            if (subject.isPermitted(perm)) {
+                // TODO: we should remember/cache these decisions per-thread and not re-evaluate it always from Security
+                getLogger().debug("Subject '{}' has permission: {}; allowing", subject.getPrincipal(), perm);
+                return true;
+            }
+        }
+
+        getLogger().debug("Subject '{}' is missing required permissions; rejecting", subject.getPrincipal());
+        return false;
     }
 }
