@@ -79,7 +79,12 @@ public class ProxyRequestFilterImpl
         final PathMatcher whitelist = getWhitelistFor( mavenProxyRepository );
         if ( whitelist != null )
         {
-            return whitelist.matches( resourceStoreRequest.getRequestPath() );
+            final boolean allowed = whitelist.matches( resourceStoreRequest.getRequestPath() );
+            if ( !allowed )
+            {
+                // flag the request as rejected
+                resourceStoreRequest.getRequestContext().put( WLManager.REQUEST_REJECTED_FLAG_KEY, Boolean.TRUE );
+            }
         }
         // no WL for a proxy it does not publishes it
         return true;

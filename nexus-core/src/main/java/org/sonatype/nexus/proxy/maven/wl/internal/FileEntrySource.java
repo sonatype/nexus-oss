@@ -12,15 +12,26 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.WritableEntrySource;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * {@link WritableEntrySource} implementation that is backed by a {@link StorageFileItem} in a {@link MavenRepository}.
@@ -30,18 +41,96 @@ import org.sonatype.nexus.proxy.maven.wl.WritableEntrySource;
  * @since 2.4
  */
 public class FileEntrySource
-    extends AbstractFileEntrySource
     implements WritableEntrySource
 {
+    private final MavenRepository mavenRepository;
+
+    private final String path;
+
+    private final EntrySourceMarshaller entrySourceMarshaller;
+
     /**
      * Constructor.
      * 
      * @param mavenRepository
      * @param path
      */
-    public FileEntrySource( final MavenRepository mavenRepository, final String path )
+    protected FileEntrySource( final MavenRepository mavenRepository, final String path )
     {
-        super( mavenRepository, path, new PrefixesFileMarshaller() );
+        this.mavenRepository = checkNotNull( mavenRepository );
+        this.path = checkNotNull( path );
+        this.entrySourceMarshaller = new PrefixesFileMarshaller();
+    }
+
+    /**
+     * Returns the repository path that is used to store {@link StorageFileItem} backing this entry source instance.
+     * 
+     * @return the path of the backing file.
+     */
+    public String getFilePath()
+    {
+        return path;
+    }
+
+    /**
+     * Returns the {@link MavenRepository} instance that is used to store {@link StorageFileItem} backing this entry
+     * source instance.
+     * 
+     * @return the repository of the backing file.
+     */
+    public MavenRepository getMavenRepository()
+    {
+        return mavenRepository;
+    }
+
+    protected EntrySourceMarshaller getEntrySourceMarshaller()
+    {
+        return entrySourceMarshaller;
+    }
+
+    @Override
+    public boolean exists()
+    {
+        try
+        {
+            return getFileItem() != null;
+        }
+        catch ( IOException e )
+        {
+            // bam
+        }
+        return false;
+    }
+
+    @Override
+    public long getLostModifiedTimestamp()
+    {
+        try
+        {
+            final StorageFileItem file = getFileItem();
+            if ( file != null )
+            {
+                return file.getModified();
+            }
+        }
+        catch ( IOException e )
+        {
+            // bum
+        }
+        return -1;
+    }
+
+    @Override
+    public List<String> readEntries()
+        throws IOException
+    {
+        final StorageFileItem file = getFileItem();
+        if ( file == null )
+        {
+            return null;
+        }
+        final EntrySource entrySource = getEntrySourceMarshaller().read( file.getInputStream() );
+        return entrySource.readEntries();
     }
 
     @Override
@@ -63,5 +152,93 @@ public class FileEntrySource
         throws IOException
     {
         deleteFileItem();
+    }
+
+    // ==
+
+    protected boolean equals( final FileEntrySource prefixesEntrySource )
+    {
+        return getMavenRepository().getId().equals( prefixesEntrySource.getMavenRepository().getId() )
+            && getFilePath().equals( prefixesEntrySource.getFilePath() );
+    }
+
+    protected StorageFileItem getFileItem()
+        throws IOException
+    {
+        try
+        {
+            final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
+            request.setRequestLocalOnly( true );
+            request.setRequestGroupLocalOnly( true );
+            request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
+            @SuppressWarnings( "deprecation" )
+            final StorageItem item = getMavenRepository().retrieveItem( true, request );
+            if ( item instanceof StorageFileItem )
+            {
+                return (StorageFileItem) item;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch ( IllegalOperationException e )
+        {
+            // eh?
+            return null;
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // not present
+            return null;
+        }
+    }
+
+    protected void putFileItem( final ContentLocator content )
+        throws IOException
+    {
+        final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
+        request.setRequestLocalOnly( true );
+        request.setRequestGroupLocalOnly( true );
+        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
+        final DefaultStorageFileItem file =
+            new DefaultStorageFileItem( getMavenRepository(), request, true, true, content );
+        try
+        {
+            getMavenRepository().storeItemWithChecksums( true, file );
+        }
+        catch ( UnsupportedStorageOperationException e )
+        {
+            // eh?
+        }
+        catch ( IllegalOperationException e )
+        {
+            // eh?
+        }
+    }
+
+    protected void deleteFileItem()
+        throws IOException
+    {
+        final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
+        request.setRequestLocalOnly( true );
+        request.setRequestGroupLocalOnly( true );
+        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
+        try
+        {
+            getMavenRepository().deleteItemWithChecksums( true, request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore
+        }
+        catch ( UnsupportedStorageOperationException e )
+        {
+            // eh?
+        }
+        catch ( IllegalOperationException e )
+        {
+            // ignore
+        }
     }
 }

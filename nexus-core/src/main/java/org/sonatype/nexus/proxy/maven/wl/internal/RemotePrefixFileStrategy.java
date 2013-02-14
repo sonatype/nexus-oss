@@ -98,14 +98,7 @@ public class RemotePrefixFileStrategy
     protected EntrySource createEntrySource( final MavenProxyRepository mavenProxyRepository, final String path )
         throws IOException
     {
-        if ( path.endsWith( ".gz" ) )
-        {
-            return new FileGzEntrySource( mavenProxyRepository, path );
-        }
-        else
-        {
-            return new FileEntrySource( mavenProxyRepository, path );
-        }
+        return new FileEntrySource( mavenProxyRepository, path );
     }
 
     protected StorageFileItem retrieveFromRemoteIfExists( final MavenProxyRepository mavenProxyRepository,
@@ -113,7 +106,7 @@ public class RemotePrefixFileStrategy
         throws IOException
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
-        request.getRequestContext().put( WLManager.class.getName(), Boolean.TRUE );
+        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
         request.setRequestRemoteOnly( true );
         mavenProxyRepository.removeFromNotFoundCache( request );
         try

@@ -14,6 +14,7 @@ package org.sonatype.nexus.proxy.maven.wl;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -27,6 +28,17 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
  */
 public interface WLManager
 {
+    /**
+     * Ket that is put into {@link ResourceStoreRequest}'s context for prefix file related operations, to mark that the
+     * file operation is initiated by WL feature.
+     */
+    String WL_INITIATED_FILE_OPERATION = WLManager.class.getName() + ".fileOperation";
+
+    /**
+     * Key that is put into {@link ResourceStoreRequest}'s context when {@link ProxyRequestFilter} rejects a request.
+     */
+    String REQUEST_REJECTED_FLAG_KEY = WLManager.class.getName() + ".requestRejected";
+
     /**
      * Startup. This method should not be invoked by any code (maybe except in UTs).
      */

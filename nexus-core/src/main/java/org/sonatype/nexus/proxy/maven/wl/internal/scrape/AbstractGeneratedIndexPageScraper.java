@@ -102,7 +102,15 @@ public abstract class AbstractGeneratedIndexPageScraper
         // we use the great and all-mighty ParentOMatic
         final ParentOMatic parentOMatic = new ParentOMatic();
         diveIn( context, page, 0, parentOMatic, parentOMatic.getRoot() );
-        // TODO: cases like central, that would allow to be scraped with 0 results
+        // Special case: scraped with 0 entry, we consider this as an error
+        // Remote repo empty? Why are you proxying it? Or worse, some scrape
+        // exotic index page and we end up with 0 entries by mistake?
+        if ( parentOMatic.getRoot().isLeaf() )
+        {
+            context.stop( "Remote recognized as " + getTargetedServer()
+                + ", but scraped 0 entries. This is considered a failure." );
+            return null;
+        }
         final List<String> entries = parentOMatic.getAllLeafPaths();
         return entries;
     }

@@ -129,16 +129,11 @@ public class WLConfigImpl
     {
         final ArrayList<String> result = new ArrayList<String>();
         result.add( LOCAL_PREFIX_FILE_PATH );
-        result.add( LOCAL_PREFIX_FILE_PATH + ".gz" );
         for ( String extra : EXTRA_REMOTE_PREFIX_FILE_PATHS )
         {
             if ( extra != null && extra.trim().length() > 0 )
             {
                 result.add( extra );
-                if ( !extra.endsWith( ".gz" ) )
-                {
-                    result.add( extra + ".gz" );
-                }
             }
         }
         return result;

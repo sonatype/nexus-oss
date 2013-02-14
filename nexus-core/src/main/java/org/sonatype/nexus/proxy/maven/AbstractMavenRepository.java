@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
+import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -541,5 +542,24 @@ public abstract class AbstractMavenRepository
         {
             // huh?
         }
+    }
+
+    /**
+     * Beside original behavior, only add to NFC when it's not WL that rejected remote access.
+     * 
+     * @since 2.4
+     */
+    @Override
+    protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
+    {
+        boolean shouldAddToNFC = super.shouldAddToNotFoundCache( request );
+        if ( shouldAddToNFC && request.getRequestContext().containsKey( WLManager.REQUEST_REJECTED_FLAG_KEY ) )
+        {
+            // TODO: should we un-flag the request?
+            shouldAddToNFC = false;
+            getLogger().debug( "Maven proxy repository {} WL rejected this request, not adding path {} to NFC.",
+                RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() );
+        }
+        return shouldAddToNFC;
     }
 }
