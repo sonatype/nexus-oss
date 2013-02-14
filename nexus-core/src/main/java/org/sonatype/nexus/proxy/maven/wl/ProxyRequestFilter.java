@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.wl;
 
-import org.sonatype.nexus.proxy.IllegalOperationException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 
@@ -36,9 +34,6 @@ public interface ProxyRequestFilter
      * @param resourceStoreRequest
      * @return {@code true} if request is allowed against remote storage of given maven repository, {@code false}
      *         otherwise.
-     * @throws IllegalOperationException
-     * @throws ItemNotFoundException
      */
-    boolean allowed( MavenProxyRepository mavenProxyRepository, ResourceStoreRequest resourceStoreRequest )
-        throws IllegalOperationException, ItemNotFoundException;
+    boolean allowed( MavenProxyRepository mavenProxyRepository, ResourceStoreRequest resourceStoreRequest );
 }
