@@ -46,7 +46,6 @@ public class AmazonS3IndexScraper
         super( 4000, ID ); // 4th by popularity
     }
 
-    @Override
     protected String getTargetedServer()
     {
         return "Amazon S3";
@@ -61,15 +60,18 @@ public class AmazonS3IndexScraper
             if ( isAccessDeniedResponse( page ) )
             {
                 // Code 403, S3 bucket is not publicly accessible, nothing we can do
-                return RemoteDetectionResult.RECOGNIZED_SHOULD_NOT_BE_SCRAPED;
+                return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_NOT_BE_SCRAPED,
+                    getTargetedServer(), "Bucket is not publicly accessible." );
             }
             else
             {
                 // whatever we have (200 or 404), we know this is S3 and want to try
-                return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED,
+                    getTargetedServer(), "Should be scraped." );
             }
         }
-        return RemoteDetectionResult.UNRECOGNIZED;
+        return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(), "Remote is not "
+            + getTargetedServer() );
     }
 
     @Override

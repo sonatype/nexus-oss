@@ -61,6 +61,8 @@ public abstract class AbstractGeneratedIndexPageScraper
         super( priority, id );
     }
 
+    protected abstract String getTargetedServer();
+
     @Override
     protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
@@ -81,14 +83,16 @@ public abstract class AbstractGeneratedIndexPageScraper
                     if ( templateParentLink.text().equals( element.text() )
                         && templateParentLink.absUrl( "href" ).equals( element.absUrl( "href" ) ) )
                     {
-                        return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                        return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED,
+                            getTargetedServer(), "Remote is a generated index page of " + getTargetedServer() );
                     }
                 }
             }
         }
 
         // um, we were not totally positive, this might be some web server with index page similar to Nexus one
-        return RemoteDetectionResult.UNRECOGNIZED;
+        return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(),
+            "Remote is not a generated index page of " + getTargetedServer() );
     }
 
     @Override

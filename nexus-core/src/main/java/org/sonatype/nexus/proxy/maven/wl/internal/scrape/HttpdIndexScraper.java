@@ -57,17 +57,19 @@ public class HttpdIndexScraper
     protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
         final RemoteDetectionResult result = super.detectRemoteRepository( context, page );
-        if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
+        if ( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED == result.getRemoteDetectionOutcome() )
         {
             final Elements addressElements = page.getDocument().getElementsByTag( "address" );
             if ( !addressElements.isEmpty() && addressElements.get( 0 ).text().startsWith( "Apache" ) )
             {
                 if ( page.hasHeaderAndStartsWith( "Server", "Apache/" ) )
                 {
-                    return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                    return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED,
+                        getTargetedServer(), "Should be scraped." );
                 }
             }
         }
-        return RemoteDetectionResult.UNRECOGNIZED;
+        return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(),
+            "Remote is not a generated index page of " + getTargetedServer() );
     }
 }

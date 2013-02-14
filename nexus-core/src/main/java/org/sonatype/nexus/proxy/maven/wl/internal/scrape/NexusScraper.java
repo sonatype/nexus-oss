@@ -60,7 +60,7 @@ public class NexusScraper
     protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
         final RemoteDetectionResult result = super.detectRemoteRepository( context, page );
-        if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
+        if ( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED == result.getRemoteDetectionOutcome() )
         {
             try
             {
@@ -77,15 +77,35 @@ public class NexusScraper
                     // only groups has this element
                     final Elements memberRepositories =
                         repoMetadataPage.getDocument().getElementsByTag( "memberRepositories" );
-                    if ( !url.isEmpty() && localUrl.isEmpty() && memberRepositories.isEmpty() )
+
+                    // sanity check, all of them must have "url" tag
+                    if ( !url.isEmpty() )
                     {
-                        // we are sure it is a nexus hosted repo
-                        return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
-                    }
-                    else
-                    {
-                        // is a proxy or a group, do not scrape
-                        return RemoteDetectionResult.RECOGNIZED_SHOULD_NOT_BE_SCRAPED;
+                        if ( localUrl.isEmpty() && memberRepositories.isEmpty() )
+                        {
+                            // we are sure it is a nexus hosted repo
+                            return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED,
+                                getTargetedServer(), "Remote is a hosted repository." );
+                        }
+                        else if ( !localUrl.isEmpty() && memberRepositories.isEmpty() )
+                        {
+                            // is a proxy, do not scrape
+                            return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_NOT_BE_SCRAPED,
+                                getTargetedServer(), "Remote is a proxy repository." );
+                        }
+                        else if ( localUrl.isEmpty() && !memberRepositories.isEmpty() )
+                        {
+                            // is a group, do not scrape
+                            return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_NOT_BE_SCRAPED,
+                                getTargetedServer(), "Remote is a group repository." );
+                        }
+                        else
+                        {
+                            // this is a failsafe branch, as should never happen (unless repo md is broken?, only one of
+                            // those two might exists)
+                            return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_NOT_BE_SCRAPED,
+                                getTargetedServer(), "Remote is not a hosted repository." );
+                        }
                     }
                 }
             }
@@ -96,6 +116,7 @@ public class NexusScraper
             }
         }
         // um, we were not totally positive, this might be some web server with index page similar to Nexus one
-        return RemoteDetectionResult.UNRECOGNIZED;
+        return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(),
+            "Remote is not a generated index page of " + getTargetedServer() );
     }
 }

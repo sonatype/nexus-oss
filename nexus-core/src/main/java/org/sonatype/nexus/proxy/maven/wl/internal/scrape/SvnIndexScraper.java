@@ -57,7 +57,7 @@ public class SvnIndexScraper
     protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
         final RemoteDetectionResult result = super.detectRemoteRepository( context, page );
-        if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
+        if ( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED == result.getRemoteDetectionOutcome() )
         {
             // ensure there is an "a" tag with href pointing to either "http://subversion.tigris.org/" or
             // "http://subversion.apache.org/"
@@ -68,10 +68,12 @@ public class SvnIndexScraper
                 if ( "http://subversion.tigris.org/".equals( elementHref )
                     || "http://subversion.apache.org/".equals( elementHref ) )
                 {
-                    return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                    return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED,
+                        getTargetedServer(), "Should be scraped." );
                 }
             }
         }
-        return RemoteDetectionResult.UNRECOGNIZED;
+        return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(),
+            "Remote is not a generated index page of " + getTargetedServer() );
     }
 }

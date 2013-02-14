@@ -57,15 +57,17 @@ public class NginxIndexScraper
     protected RemoteDetectionResult detectRemoteRepository( final ScrapeContext context, final Page page )
     {
         final RemoteDetectionResult result = super.detectRemoteRepository( context, page );
-        if ( RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED == result )
+        if ( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED == result.getRemoteDetectionOutcome() )
         {
             final Header serverHeader = page.getHttpResponse().getFirstHeader( "Server" );
             if ( serverHeader != null && serverHeader.getValue() != null
                 && serverHeader.getValue().startsWith( "nginx/" ) )
             {
-                return RemoteDetectionResult.RECOGNIZED_SHOULD_BE_SCRAPED;
+                return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED,
+                    getTargetedServer(), "Should be scraped." );
             }
         }
-        return RemoteDetectionResult.UNRECOGNIZED;
+        return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(),
+            "Remote is not a generated index page of " + getTargetedServer() );
     }
 }
