@@ -47,22 +47,26 @@ public interface WLManager
         throws IOException;
 
     /**
-     * Executes an update of WL for given repositories. In case of {@link MavenProxyRepository} instance, it might not
-     * do anything, depends is configuration returned by {@link #getRemoteDiscoveryConfig(MavenProxyRepository)} for it
-     * enabled or not. This method invocation will spawn the updates in background, and return immediately.
+     * Executes an update of WL for given repository. In case of {@link MavenProxyRepository} instance, it might not do
+     * anything, depending is configuration returned by {@link #getRemoteDiscoveryConfig(MavenProxyRepository)} for it
+     * enabled or not. This method invocation will spawn the update in background, and return immediately.
      * 
-     * @param mavenRepositories
+     * @param mavenRepository
+     * @return {@code true} if the update job was actually spawned, or {@code false} if not since one is already running
+     *         for same repository. Still, will the spawned background job actually update or not depends on
+     *         aforementioned configuration.
      */
-    void updateWhitelist( MavenRepository... mavenRepositories );
+    boolean updateWhitelist( MavenRepository mavenRepository );
 
     /**
-     * Executes an update of WL for given repositories. In case of {@link MavenProxyRepository} instance, it might not
-     * do anything, depends is configuration returned by {@link #getRemoteDiscoveryConfig(MavenProxyRepository)} for it
-     * enabled or not. This method invocation will spawn the updates in background, and return immediately.
+     * Executes an update of WL for given repository. In case of {@link MavenProxyRepository} instance, it might not do
+     * anything, depending is configuration returned by {@link #getRemoteDiscoveryConfig(MavenProxyRepository)} for it
+     * enabled or not. This method invocation will always spawn the update in background, and return immediately. Also,
+     * this method will cancel any currently running updates on same repository.
      * 
-     * @param mavenRepositories
+     * @param mavenRepository
      */
-    void forceUpdateWhitelist( MavenRepository... mavenRepositories );
+    void forceUpdateWhitelist( MavenRepository mavenRepository );
 
     /**
      * Returns the WL status for given repository.

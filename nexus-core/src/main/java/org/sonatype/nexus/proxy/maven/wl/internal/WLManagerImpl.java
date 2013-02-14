@@ -62,6 +62,7 @@ import org.sonatype.nexus.proxy.maven.wl.events.WLPublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.wl.events.WLUnpublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
@@ -211,6 +212,8 @@ public class WLManagerImpl
                     // this is mainly important on 1st boot or newly added reposes
                     unpublish( mavenRepository );
                     updateNeededRepositories.add( mavenRepository );
+                    getLogger().info( "Updating WL of {}, it does not exists yet.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 }
             }
             catch ( IOException e )
@@ -229,7 +232,10 @@ public class WLManagerImpl
         }
         if ( !updateNeededRepositories.isEmpty() )
         {
-            updateWhitelist( updateNeededRepositories.toArray( new MavenRepository[updateNeededRepositories.size()] ) );
+            for ( MavenRepository mavenRepository : updateNeededRepositories )
+            {
+                updateWhitelist( mavenRepository );
+            }
         }
     }
 
@@ -252,51 +258,79 @@ public class WLManagerImpl
                 if ( !entrySource.exists()
                     || ( ( System.currentTimeMillis() - entrySource.getLostModifiedTimestamp() ) > config.getDiscoveryInterval() ) )
                 {
+                    if ( !entrySource.exists() )
+                    {
+                        getLogger().debug( "Proxy repository {} has never been discovered before, updating it.",
+                            RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                    }
+                    else
+                    {
+                        getLogger().debug( "Proxy repository {} has needs remote discovery update, updating it.",
+                            RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                    }
                     updateNeededRepositories.add( mavenProxyRepository );
                 }
+            }
+            else
+            {
+                getLogger().debug( "Proxy repository {} has remote discovery disabled, not updating it.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             }
         }
         if ( !updateNeededRepositories.isEmpty() )
         {
-            updateWhitelist( updateNeededRepositories.toArray( new MavenProxyRepository[updateNeededRepositories.size()] ) );
-        }
-    }
-
-    @Override
-    public void updateWhitelist( final MavenRepository... mavenRepositories )
-    {
-        doUpdateWhitelist( false, mavenRepositories );
-    }
-
-    @Override
-    public void forceUpdateWhitelist( final MavenRepository... mavenRepositories )
-    {
-        doUpdateWhitelist( true, mavenRepositories );
-    }
-
-    protected void doUpdateWhitelist( final boolean forced, final MavenRepository... mavenRepositories )
-    {
-        final ArrayList<MavenRepository> repositoriesToBeUpdatedAndPublished = new ArrayList<MavenRepository>();
-        for ( MavenRepository mavenRepository : mavenRepositories )
-        {
-            repositoriesToBeUpdatedAndPublished.add( mavenRepository );
-        }
-        if ( !repositoriesToBeUpdatedAndPublished.isEmpty() )
-        {
-            for ( MavenRepository mavenRepository : repositoriesToBeUpdatedAndPublished )
+            for ( MavenProxyRepository mavenProxyRepository : updateNeededRepositories )
             {
-                final WLUpdateRepositoryRunnable updateRepositoryJob =
-                    new WLUpdateRepositoryRunnable( new LoggingProgressListener( getLogger() ),
-                        applicationStatusSource, this, mavenRepository );
-                if ( forced )
+                final boolean updateSpawned = updateWhitelist( mavenProxyRepository );
+                if ( !updateSpawned )
                 {
-                    constrainedExecutor.mustExecute( mavenRepository.getId(), updateRepositoryJob );
-                }
-                else
-                {
-                    constrainedExecutor.mayExecute( mavenRepository.getId(), updateRepositoryJob );
+                    // this means that either remote discovery takes too long or user might pressed Force discovery
+                    // on UI for moments before this call kicked in. Anyway, warn the user in logs
+                    getLogger().info(
+                        "Proxy repository's {} periodic remote discovery not spawned, as there is already an ongoing job doing it. Consider raising the update interval for it.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 }
             }
+        }
+        else
+        {
+            getLogger().debug( "No proxy repository needs WL update (all are up to date or disabled)." );
+        }
+    }
+
+    @Override
+    public boolean updateWhitelist( final MavenRepository mavenRepository )
+    {
+        return doUpdateWhitelist( false, mavenRepository );
+    }
+
+    @Override
+    public void forceUpdateWhitelist( final MavenRepository mavenRepository )
+    {
+        doUpdateWhitelist( true, mavenRepository );
+    }
+
+    protected boolean doUpdateWhitelist( final boolean forced, final MavenRepository mavenRepository )
+    {
+        final WLUpdateRepositoryRunnable updateRepositoryJob =
+            new WLUpdateRepositoryRunnable( new LoggingProgressListener( getLogger() ), applicationStatusSource, this,
+                mavenRepository );
+        if ( forced )
+        {
+            final boolean canceledPreviousJob =
+                constrainedExecutor.mustExecute( mavenRepository.getId(), updateRepositoryJob );
+            if ( canceledPreviousJob )
+            {
+                // this is okay, as forced happens rarely, currently only when proxy repo changes remoteURL
+                // (reconfiguration happens)
+                getLogger().info( "Forced WL update on {} canceled currently running one.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+            }
+            return true;
+        }
+        else
+        {
+            return constrainedExecutor.mayExecute( mavenRepository.getId(), updateRepositoryJob );
         }
     }
 
@@ -353,6 +387,13 @@ public class WLManagerImpl
     protected EntrySource updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository, final boolean notify )
         throws IOException
     {
+        final ProxyMode proxyMode = mavenProxyRepository.getProxyMode();
+        if ( proxyMode == null || !proxyMode.shouldProxy() )
+        {
+            getLogger().debug( "Proxy repository {} is in ProxyMode={}, not updating WL.",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+            return null;
+        }
         EntrySource entrySource = null;
         final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
         if ( config.isEnabled() )
@@ -528,7 +569,8 @@ public class WLManagerImpl
             (AbstractMavenRepositoryConfiguration) mavenProxyRepository.getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration(
                 false );
 
-        return new WLDiscoveryConfig( config.isFeatureActive() && configuration.isWLDiscoveryEnabled(), configuration.getWLDiscoveryInterval() );
+        return new WLDiscoveryConfig( config.isFeatureActive() && configuration.isWLDiscoveryEnabled(),
+            configuration.getWLDiscoveryInterval() );
     }
 
     @Override

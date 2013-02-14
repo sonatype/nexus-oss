@@ -16,7 +16,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -26,20 +25,15 @@ import java.util.List;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
-import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
@@ -48,7 +42,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
-import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -310,9 +303,8 @@ public class RemoteContentDiscovererImplTest
             server2.start();
 
             final WLManager wm = lookup( WLManager.class );
-            wm.updateWhitelist(
-                getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ),
-                getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID, MavenRepository.class ) );
+            wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ) );
+            wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID, MavenRepository.class ) );
             waitForWLBackgroundUpdates();
             {
                 final EntrySource proxy1EntrySource =
