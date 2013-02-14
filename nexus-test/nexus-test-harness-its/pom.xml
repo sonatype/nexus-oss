@@ -425,30 +425,6 @@
     </profile>
 
     <profile>
-      <id>ahc-provider</id>
-      <activation>
-        <property>
-          <name>rrs</name>
-          <value>async-http-client</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables combine.children="append">
-                <nexus.default.http.provider>async-http-client</nexus.default.http.provider>
-                <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>hc4-provider</id>
       <activation>
         <property>
