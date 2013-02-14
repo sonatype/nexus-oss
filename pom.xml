@@ -180,7 +180,7 @@
     <plexus-security.version>3.0.2-SNAPSHOT</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
-    <goodies.version>1.5.1</goodies.version>
+    <goodies.version>1.6-SNAPSHOT</goodies.version>
 
     <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -1067,8 +1067,8 @@
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.0.0-SNAPSHOT</version>
           <configuration>
-            <!-- 
-               yuicompressor warns when code is not in a shape that's optimized for minifying. 
+            <!--
+               yuicompressor warns when code is not in a shape that's optimized for minifying.
                ATM this only pollutes the log (~9400 warnings)
             -->
             <jswarn>false</jswarn>
