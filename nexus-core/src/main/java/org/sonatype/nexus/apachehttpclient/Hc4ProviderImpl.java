@@ -65,8 +65,6 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -171,8 +169,6 @@ public class Hc4ProviderImpl
      */
     private final PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
-    private final List<ClientConnectionOperatorSelector> selectors;
-
     /**
      * Constructor.
      *
@@ -191,8 +187,7 @@ public class Hc4ProviderImpl
         this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
         this.userAgentBuilder = Preconditions.checkNotNull( userAgentBuilder );
         this.jmxInstaller = Preconditions.checkNotNull( jmxInstaller );
-        this.selectors = selectors == null ? Lists.<ClientConnectionOperatorSelector>newArrayList() : selectors;
-        this.sharedConnectionManager = createClientConnectionManager();
+        this.sharedConnectionManager = createClientConnectionManager( selectors );
         this.evictingThread = new EvictingThread( sharedConnectionManager, getConnectionPoolIdleTime() );
         this.evictingThread.start();
         this.eventBus = Preconditions.checkNotNull( eventBus );
@@ -402,7 +397,8 @@ public class Hc4ProviderImpl
         return params;
     }
 
-    protected PoolingClientConnectionManager createClientConnectionManager()
+    protected PoolingClientConnectionManager createClientConnectionManager(
+        final List<ClientConnectionOperatorSelector> selectors )
         throws IllegalStateException
     {
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
