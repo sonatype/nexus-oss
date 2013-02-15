@@ -26,6 +26,12 @@ import org.apache.http.protocol.HttpContext;
 import com.google.common.base.Preconditions;
 
 /**
+ * An {@link ClientConnectionOperator} that delegates operations to an {@link ClientConnectionOperator} selected via
+ * {@link ClientConnectionOperatorSelector}. If no selector available (contributed by a plugin) it will act as default
+ * in http client.
+ *
+ * The selected operator is the first non null operator returned by iterating the provided list of selectors.
+ *
  * @since 2.4
  */
 public class Hc4ClientConnectionOperator
@@ -57,7 +63,7 @@ public class Hc4ClientConnectionOperator
                                 final HttpParams params )
         throws IOException
     {
-        getOperator( target, context, params ).openConnection( conn, target, local, context, params );
+        selectOperator( target, context, params ).openConnection( conn, target, local, context, params );
     }
 
     @Override
@@ -67,12 +73,12 @@ public class Hc4ClientConnectionOperator
                                         final HttpParams params )
         throws IOException
     {
-        getOperator( target, context, params ).updateSecureConnection( conn, target, context, params );
+        selectOperator( target, context, params ).updateSecureConnection( conn, target, context, params );
     }
 
-    private ClientConnectionOperator getOperator( final HttpHost host,
-                                                  final HttpContext context,
-                                                  final HttpParams params )
+    private ClientConnectionOperator selectOperator( final HttpHost host,
+                                                     final HttpContext context,
+                                                     final HttpParams params )
     {
         for ( final ClientConnectionOperatorSelector selector : schemeRegistrySelectors )
         {

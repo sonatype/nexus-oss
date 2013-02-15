@@ -18,11 +18,24 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
 /**
+ * A strategy for {@link ClientConnectionOperator} selection based on http host, http context and http parameters.
+ * <p/>
+ * If selector does not return an operator, other eventual selectors will be used. If none of them returns an operator,
+ * a default operator will be used.
+ *
  * @since 2.4
  */
 public interface ClientConnectionOperatorSelector
 {
 
+    /**
+     * Selects an operator based on http host, http context and http parameters.
+     *
+     * @param host    http host (not null)
+     * @param context http context (not null)
+     * @param params  http parameters (not null)
+     * @return an operator or null if selector cannot determine one based on provided parameters
+     */
     ClientConnectionOperator get( HttpHost host, HttpContext context, HttpParams params );
 
 }
