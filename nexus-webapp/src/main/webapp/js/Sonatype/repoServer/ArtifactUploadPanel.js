@@ -15,7 +15,7 @@
 //define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, Sonatype) {
 NX.define('Sonatype.repoServer.ArtifactUploadPanel', {
   extend : 'Ext.FormPanel',
-  requirejs : 'Sonatype/all',
+  requirejs : ['Sonatype/all'],
 
   constructor : function(cfg) {
     Ext.apply(this, cfg || {});

@@ -11,8 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/* global Ext */
-
+/*global Ext */
 //
 // Core String customizations require for boot lib/* to function.
 //
@@ -69,4 +68,3 @@ Ext.applyIf(String.prototype, {
         return this.slice(-str.length) === str;
     }
 });
-

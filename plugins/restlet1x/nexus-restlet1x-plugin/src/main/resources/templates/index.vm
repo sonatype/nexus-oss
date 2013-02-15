@@ -35,73 +35,85 @@
 
 ##  <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
-        var require = {
-            baseUrl : 'js',
-            urlArgs : "cache=$nexusVersion"
-        };
     </script>
 
 
   #if ($debug)
       <script src="ext-3.4.0/adapter/ext/ext-base-debug.js" type="text/javascript" charset="utf-8"></script>
       <script src="ext-3.4.0/ext-all-debug.js" type="text/javascript" charset="utf-8"></script>
-      <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>
       ## omit sonatype-all.js to pick up single file modules
   #else
       ## load aggregated/minified files
       <script src="ext-3.4.0/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
       <script src="ext-3.4.0/ext-all.js" type="text/javascript" charset="utf-8"></script>
-      <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>
       <script src="js/$buildQualifier/sonatype-all.js" type="text/javascript" charset="utf-8"></script>
   #end
 
+    <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>
+
 
     <script type="text/javascript" charset="utf-8">
+        requirejs.config({
+            baseUrl : 'js',
+            urlArgs : "cache=$nexusVersion"
+        });
 
-        requirejs(['require', 'extjs', 'Nexus/ui', 'Sonatype/all'], function(require, Ext, Nexus, Sonatype) {
-            var
-                    all = ${pluginJsFiles.size()},
-                    loaded = 0;
-
-            function init() {
-                loaded += 1;
-
-                if (loaded < all) {
-                    return;
-                }
-
-                var alreadyDone = false;
+        var initUI = function(files) {
+            requirejs(['require', 'extjs', 'Nexus/ui', 'Sonatype/all'], function(require, Ext, Nexus, Sonatype) {
+                var
+                        all = files.length;
+                        loaded = 0;
 
                 function init() {
-                    if (!Ext.isReady || alreadyDone) {
+                    loaded += 1;
+
+                    if (loaded < all) {
                         return;
                     }
-                    alreadyDone = true;
 
-                    Nexus.Log.debug('Initializing UI...');
-                    Sonatype.init();
-                    Sonatype.view.init();
-                    Nexus.Log.debug('Loading Nexus Status...');
-                    Sonatype.utils.loadNexusStatus();
-                };
+                    var alreadyDone = false;
 
-                Nexus.Log.debug('Loaded plugins');
-                Ext.onReady(init);
-                init();
-            }
+                    function init() {
+                        if (!Ext.isReady || alreadyDone) {
+                            return;
+                        }
+                        alreadyDone = true;
 
-            function errorCallback(error) {
-                if (Nexus.error !== undefined) {
-                    Nexus.error.handle([new Error(error.requireType + ': ' + error.requireModules)]);
-                } else if (console !== undefined) {
-                    console.log(new Error(error.requireType + ': ' + error.requireModules));
+                        Nexus.Log.debug('Initializing UI...');
+                        Sonatype.init();
+                        Sonatype.view.init();
+                        Nexus.Log.debug('Loading Nexus Status...');
+                        Sonatype.utils.loadNexusStatus();
+                    };
+
+                    Nexus.Log.debug('Loaded plugins');
+                    Ext.onReady(init);
+                    init();
                 }
-                init();
-            }
+
+                function errorCallback(error) {
+                    if (Nexus.error !== undefined) {
+                        Nexus.error.handle([new Error(error.requireType + ': ' + error.requireModules)]);
+                    } else if (console !== undefined) {
+                        console.log(new Error(error.requireType + ': ' + error.requireModules));
+                    }
+                    init();
+                }
+
+                Ext.each(files, function(js){
+                    require([ js ], init, errorCallback);
+                });
+            });
+        }
+
+        var pluginFiles = [];
 
         #foreach( $js in $pluginJsFiles )
-            require([ '$js' ], init, errorCallback);
+        pluginFiles.push('$js');
         #end
+
+        requirejs(['NX/bootstrap'], function() {
+            initUI(pluginFiles);
         });
     </script>
 
