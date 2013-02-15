@@ -23,13 +23,12 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.conn.DefaultClientConnectionOperator;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
-import com.google.common.base.Preconditions;
 
 /**
  * An {@link ClientConnectionOperator} that delegates operations to an {@link ClientConnectionOperator} selected via
  * {@link ClientConnectionOperatorSelector}. If no selector available (contributed by a plugin) it will act as default
  * in http client.
- *
+ * <p/>
  * The selected operator is the first non null operator returned by iterating the provided list of selectors.
  *
  * @since 2.4
@@ -38,14 +37,14 @@ public class Hc4ClientConnectionOperator
     implements ClientConnectionOperator
 {
 
-    private final List<ClientConnectionOperatorSelector> schemeRegistrySelectors;
+    private final List<ClientConnectionOperatorSelector> selectors;
 
     private final DefaultClientConnectionOperator defaultOperator;
 
     public Hc4ClientConnectionOperator( final SchemeRegistry defaultSchemeRegistry,
                                         final List<ClientConnectionOperatorSelector> selectors )
     {
-        this.schemeRegistrySelectors = Preconditions.checkNotNull( selectors );
+        this.selectors = selectors;
         defaultOperator = new DefaultClientConnectionOperator( defaultSchemeRegistry );
     }
 
@@ -80,12 +79,15 @@ public class Hc4ClientConnectionOperator
                                                      final HttpContext context,
                                                      final HttpParams params )
     {
-        for ( final ClientConnectionOperatorSelector selector : schemeRegistrySelectors )
+        if ( selectors != null )
         {
-            final ClientConnectionOperator operator = selector.get( host, context, params );
-            if ( operator != null )
+            for ( final ClientConnectionOperatorSelector selector : selectors )
             {
-                return operator;
+                final ClientConnectionOperator operator = selector.get( host, context, params );
+                if ( operator != null )
+                {
+                    return operator;
+                }
             }
         }
         return defaultOperator;
