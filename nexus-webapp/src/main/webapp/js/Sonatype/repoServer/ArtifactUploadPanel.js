@@ -16,6 +16,7 @@
 NX.define('Sonatype.repoServer.ArtifactUploadPanel', {
   extend : 'Ext.FormPanel',
   requirejs : ['Sonatype/all'],
+  mixins : ['Nexus.LogAwareMixin'],
 
   constructor : function(cfg) {
     Ext.apply(this, cfg || {});
@@ -968,6 +969,8 @@ NX.define('Sonatype.repoServer.ArtifactUploadPanel', {
             }
           }
         } else {
+          this.logDebug('Upload failed: ' + response.responseText);
+
           this.gavResponse = null;
 
           if (endIndexOfErrorMsg > indexOfMsgContent) {

@@ -14,7 +14,5 @@
 define('NX/bootstrap', [
   'NX/base',
   'NX/define',
-  'NX/log',
-  'NX/LegacyLogMixin',
-  'NX/LogAwareMixin'
+  'NX/log'
 ]);
