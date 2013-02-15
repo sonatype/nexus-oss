@@ -326,12 +326,12 @@
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <includes>
                 <!-- some order required here -->
+                <include>lib/require-*.js</include>
                 <include>lib/string.js</include>
                 <include>lib/nx.js</include>
                 <include>lib/nx.assert.js</include>
                 <include>lib/nx.log.js</include>
                 <include>lib/nx.define.js</include>
-                <include>lib/require-*.js</include>
                 <include>lib/classes/**/*.js</include>
               </includes>
             </configuration>
