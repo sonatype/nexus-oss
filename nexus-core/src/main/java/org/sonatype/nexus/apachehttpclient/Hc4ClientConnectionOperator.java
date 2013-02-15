@@ -57,7 +57,7 @@ public class Hc4ClientConnectionOperator
                                 final HttpParams params )
         throws IOException
     {
-        getOperator( context ).openConnection( conn, target, local, context, params );
+        getOperator( target, context, params ).openConnection( conn, target, local, context, params );
     }
 
     @Override
@@ -67,14 +67,16 @@ public class Hc4ClientConnectionOperator
                                         final HttpParams params )
         throws IOException
     {
-        getOperator( context ).updateSecureConnection( conn, target, context, params );
+        getOperator( target, context, params ).updateSecureConnection( conn, target, context, params );
     }
 
-    private ClientConnectionOperator getOperator( final HttpContext context )
+    private ClientConnectionOperator getOperator( final HttpHost host,
+                                                  final HttpContext context,
+                                                  final HttpParams params )
     {
         for ( final ClientConnectionOperatorSelector selector : schemeRegistrySelectors )
         {
-            final ClientConnectionOperator operator = selector.get( context );
+            final ClientConnectionOperator operator = selector.get( host, context, params );
             if ( operator != null )
             {
                 return operator;

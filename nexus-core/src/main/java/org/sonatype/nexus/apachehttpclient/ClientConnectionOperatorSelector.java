@@ -12,8 +12,9 @@
  */
 package org.sonatype.nexus.apachehttpclient;
 
+import org.apache.http.HttpHost;
 import org.apache.http.conn.ClientConnectionOperator;
-import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
 /**
@@ -22,6 +23,6 @@ import org.apache.http.protocol.HttpContext;
 public interface ClientConnectionOperatorSelector
 {
 
-    ClientConnectionOperator get( HttpContext context );
+    ClientConnectionOperator get( HttpHost host, HttpContext context, HttpParams params );
 
 }
