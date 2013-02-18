@@ -11,9 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global define*/
-define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, Sonatype) {
-  Sonatype.repoServer.ArtifactUploadPanel = function(cfg) {
+/*global NX, Sonatype, Ext*/
+//define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, Sonatype) {
+NX.define('Sonatype.repoServer.ArtifactUploadPanel', {
+  extend : 'Ext.FormPanel',
+  requirejs : 'Sonatype/all',
+
+  constructor : function(cfg) {
     Ext.apply(this, cfg || {});
 
     var
@@ -36,18 +40,18 @@ define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, So
     this.fileInput = null;
     this.pomInput = null;
 
-    this.uploadModeTitle = this.uploadModeTitle ? this.uploadModeTitle : 'Select GAV Definition Source';
-    this.uploadModeLabel = this.uploadModeLabel ? this.uploadModeLabel : 'GAV Definition';
-    this.uploadModeStore = this.uploadModeStore ? this.uploadModeStore : new Ext.data.SimpleStore({
+    this.uploadModeTitle = this.uploadModeTitle || 'Select GAV Definition Source';
+    this.uploadModeLabel = this.uploadModeLabel || 'GAV Definition';
+    this.uploadModeStore = this.uploadModeStore || new Ext.data.SimpleStore({
       fields : ['value', 'display'],
       data : [
         ['pom', 'From POM'],
         ['gav', 'GAV Parameters']
       ]
     });
-    this.uploadModeHt = this.uploadModeHt ? this.uploadModeHt : ht.gavDefinition;
-    this.uploadModeExplanation = this.uploadModeExplanation ? this.uploadModeExplanation
-          : 'Select a source for the GAV definition. GAV can be specified either manually or from a POM file. These settings will be applied to all artifacts specified below.'
+    this.uploadModeHt = this.uploadModeHt || ht.gavDefinition;
+    this.uploadModeExplanation = this.uploadModeExplanation ||
+          'Select a source for the GAV definition. GAV can be specified either manually or from a POM file. These settings will be applied to all artifacts specified below.';
 
     this.extraItems = this.extraItems || {};
 
@@ -468,531 +472,529 @@ define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, So
         }
       ]
     });
-  };
+  },
 
-  Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
-    clearInvalid : function() {
-      var tree = this.find('name', 'artifact-list')[0];
-      if (tree.invalid) {
-        // remove error messaging
-        tree.getEl().child('.x-panel-body').setStyle({
-          'background-color' : '#FFFFFF',
-          border : '1px solid #B5B8C8'
-        });
-        Ext.form.Field.msgFx.normal.hide(tree.errorEl, tree);
-      }
-    },
-    markTreeInvalid : function(errortext) {
-      var
-            tree = this.find('name', 'artifact-list')[0],
-            elp = tree.getEl();
-
-      if (!tree.errorEl) {
-        tree.errorEl = elp.createChild({
-          cls : 'x-form-invalid-msg'
-        });
-        tree.errorEl.setWidth(elp.getWidth(true)); // note removed -20 like
-        // on form fields
-      }
-      tree.invalid = true;
-      var oldErrorText = tree.invalidText;
-      if (errortext) {
-        tree.invalidText = errortext;
-      }
-      tree.errorEl.update(tree.invalidText);
-      tree.invalidText = oldErrorText;
-      elp.child('.x-panel-body').setStyle({
-        'background-color' : '#fee',
-        border : '1px solid #dd7870'
+  clearInvalid : function() {
+    var tree = this.find('name', 'artifact-list')[0];
+    if (tree.invalid) {
+      // remove error messaging
+      tree.getEl().child('.x-panel-body').setStyle({
+        'background-color' : '#FFFFFF',
+        border : '1px solid #B5B8C8'
       });
-      Ext.form.Field.msgFx.normal.show(tree.errorEl, tree);
-    },
-    resetFields : function() {
-      this.gavResponse = null;
-      // reset the artifact panels
-      var
-            filenameField = this.find('name', 'filenameField')[0],
-            classifierField = this.find('name', 'classifier')[0],
-            extensionField = this.find('name', 'extension')[0],
-            addArtifactBtn = this.find('id', 'add-button')[0],
-            g = this.find('name', 'g')[0],
-            a = this.find('name', 'a')[0],
-            v = this.find('name', 'v')[0],
-            autoGuess = this.find('name', 'autoguess')[0],
-            pomField = this.find('name', 'pomnameField')[0],
-            desc = this.find('name', 'description')[0];
+      Ext.form.Field.msgFx.normal.hide(tree.errorEl, tree);
+    }
+  },
+  markTreeInvalid : function(errortext) {
+    var
+          tree = this.find('name', 'artifact-list')[0],
+          elp = tree.getEl();
 
-      filenameField.reset();
-      classifierField.reset();
-      extensionField.reset();
-      addArtifactBtn.setDisabled(true);
+    if (!tree.errorEl) {
+      tree.errorEl = elp.createChild({
+        cls : 'x-form-invalid-msg'
+      });
+      tree.errorEl.setWidth(elp.getWidth(true)); // note removed -20 like
+      // on form fields
+    }
+    tree.invalid = true;
+    var oldErrorText = tree.invalidText;
+    if (errortext) {
+      tree.invalidText = errortext;
+    }
+    tree.errorEl.update(tree.invalidText);
+    tree.invalidText = oldErrorText;
+    elp.child('.x-panel-body').setStyle({
+      'background-color' : '#fee',
+      border : '1px solid #dd7870'
+    });
+    Ext.form.Field.msgFx.normal.show(tree.errorEl, tree);
+  },
+  resetFields : function() {
+    this.gavResponse = null;
+    // reset the artifact panels
+    var
+          filenameField = this.find('name', 'filenameField')[0],
+          classifierField = this.find('name', 'classifier')[0],
+          extensionField = this.find('name', 'extension')[0],
+          addArtifactBtn = this.find('id', 'add-button')[0],
+          g = this.find('name', 'g')[0],
+          a = this.find('name', 'a')[0],
+          v = this.find('name', 'v')[0],
+          autoGuess = this.find('name', 'autoguess')[0],
+          pomField = this.find('name', 'pomnameField')[0],
+          desc = this.find('name', 'description')[0];
 
-      // clear the artifacts fields
-      this.removeAllArtifacts();
+    filenameField.reset();
+    classifierField.reset();
+    extensionField.reset();
+    addArtifactBtn.setDisabled(true);
 
-      // reset the gav panel
-      g.reset();
-      a.reset();
-      v.reset();
-      autoGuess.reset();
+    // clear the artifacts fields
+    this.removeAllArtifacts();
 
-      // the pom panel
-      pomField.reset();
-      this.pomInput = null;
-      this.fileInput = null;
+    // reset the gav panel
+    g.reset();
+    a.reset();
+    v.reset();
+    autoGuess.reset();
 
-      if (desc) {
-        desc.reset();
+    // the pom panel
+    pomField.reset();
+    this.pomInput = null;
+    this.fileInput = null;
+
+    if (desc) {
+      desc.reset();
+    }
+  },
+
+  artifactWithClassifierAndExtensionExists : function(classifier, extension) {
+    var
+          i, currClassifier, currExtension,
+          treePanel = this.find('name', 'artifact-list')[0];
+    for (i = 0; i < treePanel.root.childNodes.length; i++) {
+      currClassifier = treePanel.root.childNodes[i].attributes.payload.classifier;
+      currExtension = treePanel.root.childNodes[i].attributes.payload.extension;
+
+      if (classifier === currClassifier && extension === currExtension) {
+        return true;
       }
-    },
+    }
+    return false;
+  },
 
-    artifactWithClassifierAndExtensionExists : function(classifier, extension) {
-      var
-            i, currClassifier, currExtension,
-            treePanel = this.find('name', 'artifact-list')[0];
-      for (i = 0; i < treePanel.root.childNodes.length; i++) {
-        currClassifier = treePanel.root.childNodes[i].attributes.payload.classifier;
-        currExtension = treePanel.root.childNodes[i].attributes.payload.extension;
+  addArtifact : function() {
+    var
+          treePanel = this.find('name', 'artifact-list')[0],
+          filenameField = this.find('name', 'filenameField')[0],
+          classifierField = this.find('name', 'classifier')[0],
+          extensionField = this.find('name', 'extension')[0],
+          classifier = classifierField.getValue(),
+          extension = extensionField.getValue(),
+          nodeText = filenameField.getValue();
 
-        if (classifier === currClassifier && extension === currExtension) {
-          return true;
-        }
-      }
-      return false;
-    },
+    if (this.artifactWithClassifierAndExtensionExists(classifier, extension)) {
+      Ext.Msg.show({
+        title : 'Classifier and Extension Taken',
+        msg : "Every artifact must have a unique classifier and extension. The specified classifier and extension is already taken.",
+        buttons : Ext.Msg.OK,
+        icon : Ext.MessageBox.WARNING
+      });
+      return;
+    }
+    if (!Ext.isEmpty(classifier)) {
+      nodeText += ' c:' + classifier;
+    }
+    if (!Ext.isEmpty(extension)) {
+      nodeText += ' e:' + extension;
+    }
 
-    addArtifact : function() {
-      var
-            treePanel = this.find('name', 'artifact-list')[0],
-            filenameField = this.find('name', 'filenameField')[0],
-            classifierField = this.find('name', 'classifier')[0],
-            extensionField = this.find('name', 'extension')[0],
-            classifier = classifierField.getValue(),
-            extension = extensionField.getValue(),
-            nodeText = filenameField.getValue();
-
-      if (this.artifactWithClassifierAndExtensionExists(classifier, extension)) {
-        Ext.Msg.show({
-          title : 'Classifier and Extension Taken',
-          msg : "Every artifact must have a unique classifier and extension. The specified classifier and extension is already taken.",
-          buttons : Ext.Msg.OK,
-          icon : Ext.MessageBox.WARNING
-        });
-        return;
-      }
-      if (!Ext.isEmpty(classifier)) {
-        nodeText += ' c:' + classifier;
-      }
-      if (!Ext.isEmpty(extension)) {
-        nodeText += ' e:' + extension;
-      }
-
-      if (this.fileInput) {
-        treePanel.root.appendChild(new Ext.tree.TreeNode({
+    if (this.fileInput) {
+      treePanel.root.appendChild(new Ext.tree.TreeNode({
+        id : filenameField.getValue(),
+        text : nodeText,
+        payload : {
           id : filenameField.getValue(),
-          text : nodeText,
-          payload : {
-            id : filenameField.getValue(),
-            filename : filenameField.getValue(),
-            fileInput : this.fileInput,
-            classifier : classifier,
-            extension : extension
-          },
-          allowChildren : false,
-          draggable : false,
-          leaf : true,
-          icon : Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
-        }));
-      }
-      filenameField.setValue('');
-      classifierField.setValue('');
-      extensionField.setValue('');
-      this.fileInput = null;
-      this.find('id', 'add-button')[0].setDisabled(true);
-    },
-    removeArtifact : function() {
-      var treePanel = this.find('name', 'artifact-list')[0];
+          filename : filenameField.getValue(),
+          fileInput : this.fileInput,
+          classifier : classifier,
+          extension : extension
+        },
+        allowChildren : false,
+        draggable : false,
+        leaf : true,
+        icon : Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
+      }));
+    }
+    filenameField.setValue('');
+    classifierField.setValue('');
+    extensionField.setValue('');
+    this.fileInput = null;
+    this.find('id', 'add-button')[0].setDisabled(true);
+  },
+  removeArtifact : function() {
+    var treePanel = this.find('name', 'artifact-list')[0];
 
-      var selectedNode = treePanel.getSelectionModel().getSelectedNode();
-      if (selectedNode) {
-        treePanel.root.removeChild(selectedNode);
-      }
-    },
-    removeAllArtifacts : function() {
-      var
-            treePanel = this.find('name', 'artifact-list')[0],
-            treeRoot = treePanel.root;
+    var selectedNode = treePanel.getSelectionModel().getSelectedNode();
+    if (selectedNode) {
+      treePanel.root.removeChild(selectedNode);
+    }
+  },
+  removeAllArtifacts : function() {
+    var
+          treePanel = this.find('name', 'artifact-list')[0],
+          treeRoot = treePanel.root;
 
-      while (treeRoot.lastChild) {
-        treeRoot.removeChild(treeRoot.lastChild);
-      }
-    },
-    updateFilename : function(uploadPanel, filename) {
-      var
-            filenameField = uploadPanel.find('name', 'filenameField')[0],
-            g = '', a = '', v = '', c = '', p = '', e = '';
+    while (treeRoot.lastChild) {
+      treeRoot.removeChild(treeRoot.lastChild);
+    }
+  },
+  updateFilename : function(uploadPanel, filename) {
+    var
+          filenameField = uploadPanel.find('name', 'filenameField')[0],
+          g = '', a = '', v = '', c = '', p = '', e = '';
 
-      if (filename) {
-        filenameField.setValue(filename);
-      }
-      else {
-        filename = filenameField.getValue();
-        if (!filename) {
-          return;
-        }
-      }
-
-      var cardPanel = uploadPanel.find('id', 'gav-definition-card-panel')[0];
-
-      // match extension to guess the packaging
-      var extensionIndex = filename.lastIndexOf('.');
-      if (extensionIndex > 0) {
-        p = filename.substring(extensionIndex + 1);
-        e = filename.substring(extensionIndex + 1);
-        filename = filename.substring(0, extensionIndex);
-
-        if (e == 'asc') {
-          var primaryExtensionIndex = filename.substring(0, extensionIndex).lastIndexOf('.');
-          var primaryExtension = '';
-          if (primaryExtensionIndex >= 0) {
-            primaryExtension = filename.substring(primaryExtensionIndex + 1);
-          }
-
-          if (/^[a-z]*$/.test(primaryExtension)) {
-            e = primaryExtension + '.' + e;
-            filename = filename.substring(0, primaryExtensionIndex);
-          }
-        }
-      }
-
-      // match the path to guess the group
-      if (filename.indexOf('\\') >= 0) {
-        filename = filename.replace(/\\/g, '\/');
-      }
-      var slashIndex = filename.lastIndexOf('/');
-      if (slashIndex) {
-        var g = filename.substring(0, slashIndex);
-
-        filename = filename.substring(slashIndex + 1);
-      }
-
-      // separate the artifact name and version
-      var versionIndex = filename.search(/\-[\d]/);
-      if (versionIndex == -1) {
-        versionIndex = filename.search(/-LATEST-/i);
-        if (versionIndex == -1) {
-          versionIndex = filename.search(/-CURRENT-/i);
-        }
-      }
-      if (versionIndex >= 0) {
-        a = filename.substring(0, versionIndex).toLowerCase();
-
-        // guess the version
-        filename = filename.substring(versionIndex + 1);
-        var classifierIndex = filename.lastIndexOf('-');
-        if (classifierIndex >= 0) {
-          var classifier = filename.substring(classifierIndex + 1);
-          if (classifier && !(/^SNAPSHOT$/i.test(classifier) || /^\d/.test(classifier) || /^LATEST$/i.test(classifier)
-                || /^CURRENT$/i.test(classifier))) {
-            c = classifier;
-            filename = filename.substring(0, classifierIndex);
-            // dont guess packaging when there is a classifier
-            p = '';
-            extensionIndex = c.indexOf('.');
-            if (extensionIndex >= 0) {
-              e = c.substring(extensionIndex + 1) + '.' + e;
-              c = c.substring(0, extensionIndex);
-            }
-          }
-        }
-        v = filename;
-
-        if (g) {
-          // if group ends with version and artifact name, strip those parts
-          // (useful if uploading from a local maven repo)
-          var i = g.search(new RegExp('\/' + v + '$'));
-          if (i > -1) {
-            g = g.substring(0, i);
-          }
-          i = g.search(new RegExp('\/' + a + '$'));
-          if (i > -1) {
-            g = g.substring(0, i);
-          }
-
-          // strip extra path parts, leave only com.* or org.* or net.* or the
-          // last element
-          var i = g.lastIndexOf('/com/');
-          if (i == -1) {
-            i = g.lastIndexOf('/org/');
-            if (i == -1) {
-              i = g.lastIndexOf('/net/');
-              if (i == -1) {
-                i = g.lastIndexOf('/');
-              }
-            }
-          }
-          g = g.substring(i + 1).replace(/\//g, '.').toLowerCase();
-        }
-      }
-      else {
-        g = '';
-      }
-
-      if (cardPanel.find('name', 'autoguess')[0].checked) {
-        var groupField = cardPanel.find('name', 'g')[0];
-        if (Ext.isEmpty(groupField.getValue())) {
-          groupField.setRawValue(g);
-        }
-        var artifactField = cardPanel.find('name', 'a')[0];
-        if (Ext.isEmpty(artifactField.getValue())) {
-          artifactField.setRawValue(a);
-        }
-        var versionField = cardPanel.find('name', 'v')[0];
-        if (Ext.isEmpty(versionField.getValue())) {
-          versionField.setRawValue(v);
-        }
-        var packagingField = cardPanel.find('name', 'p')[0];
-        if (Ext.isEmpty(packagingField.getValue())) {
-          packagingField.setRawValue(p);
-        }
-      }
-      uploadPanel.find('name', 'classifier')[0].setRawValue(c);
-      uploadPanel.find('name', 'extension')[0].setRawValue(e);
-      if (!a) {
-        uploadPanel.form.clearInvalid();
-      }
-      uploadPanel.find('id', 'add-button')[0].setDisabled(false);
-    },
-    updatePomFilename : function(uploadPanel, filename) {
-      var filenameField = uploadPanel.find('name', 'pomnameField')[0];
-      if (filename) {
-        filenameField.setValue(filename);
-      }
-      else {
-        if (!(filename = filenameField.getValue())) {
-          return;
-        }
-      }
-    },
-    gavDefinitionSelectHandler : function(combo, record, index) {
-      var gavDefinitionPanel = this.findById('gav-definition-card-panel');
-      // First disable all the items currently on screen, so they wont be
-      // validated/submitted etc
-      gavDefinitionPanel.getLayout().activeItem.items.each(function(item) {
-        if (item.xtype != 'browsebutton') {
-          item.disable();
-        }
-      });
-      this.clearInvalid();
-      // Then find the proper card to activate (based upon the selected
-      // schedule type)
-      if (record.data.value == 'pom') {
-        gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(1));
-      }
-      else if (record.data.value == 'gav') {
-        gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(2));
-      }
-      else {
-        gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(0));
-      }
-      // Then enable the fields in that card
-      gavDefinitionPanel.getLayout().activeItem.items.each(function(item) {
-        if (item.xtype != 'browsebutton') {
-          item.enable();
-          if (item.readOnly) {
-            item.getEl().dom.readOnly = true;
-          }
-        }
-        else {
-          item.setClipSize();
-        }
-      });
-      this.doLayout();
-    },
-    uploadArtifacts : function() {
-      var tree = this.find('name', 'artifact-list')[0];
-      if (!tree.validate.call(this)) {
-        this.markTreeInvalid(null);
-      }
-      else if (this.form.isValid()) {
-        this.doUpload();
-      }
-    },
-    doUpload : function() {
-      var treePanel = this.find('name', 'artifact-list')[0];
-      var hasArtifacts = treePanel.root.childNodes != null && treePanel.root.childNodes.length > 0;
-      if (this.pomInput == null && !hasArtifacts) {
-        Sonatype.MessageBox.show({
-          title : 'No Artifacts Selected',
-          msg : 'The Artifacts list must contain at least one artifact to upload (or a POM file must be selected).',
-          buttons : Sonatype.MessageBox.OK,
-          icon : Sonatype.MessageBox.ERROR
-        });
+    if (filename) {
+      filenameField.setValue(filename);
+    }
+    else {
+      filename = filenameField.getValue();
+      if (!filename) {
         return;
       }
+    }
 
-      Sonatype.MessageBox.wait('Uploading ...');
+    var cardPanel = uploadPanel.find('id', 'gav-definition-card-panel')[0];
 
-      if (hasArtifacts) {
-        this.currentChildNode = 0;
-        this.createUploadForm(treePanel, treePanel.root.childNodes[this.currentChildNode].attributes.payload.fileInput,
-              treePanel.root.childNodes[this.currentChildNode].attributes.payload.classifier,
-              treePanel.root.childNodes[this.currentChildNode].attributes.payload.extension,
-              this.currentChildNode == (treePanel.root.childNodes.length - 1));
+    // match extension to guess the packaging
+    var extensionIndex = filename.lastIndexOf('.');
+    if (extensionIndex > 0) {
+      p = filename.substring(extensionIndex + 1);
+      e = filename.substring(extensionIndex + 1);
+      filename = filename.substring(0, extensionIndex);
+
+      if (e === 'asc') {
+        var primaryExtensionIndex = filename.substring(0, extensionIndex).lastIndexOf('.');
+        var primaryExtension = '';
+        if (primaryExtensionIndex >= 0) {
+          primaryExtension = filename.substring(primaryExtensionIndex + 1);
+        }
+
+        if (/^[a-z]*$/.test(primaryExtension)) {
+          e = primaryExtension + '.' + e;
+          filename = filename.substring(0, primaryExtensionIndex);
+        }
       }
-      else if (this.pomInput != null) {
-        this.createUploadForm(treePanel, null, null, null, true);
-      }
-    },
-    createUploadForm : function(treePanel, fileInput, classifier, extension, lastItem) {
-      var repoId = this.payload.id;
-      repoId = repoId.substring(repoId.lastIndexOf('/') + 1);
-      var pomMode = this.find('name', 'gavDefinition')[0].getValue() == 'pom';
+    }
 
-      if (this.gavResponse) {
-        pomMode = false;
-        this.form.findField('g').setValue(this.gavResponse.groupId);
-        this.form.findField('a').setValue(this.gavResponse.artifactId);
-        this.form.findField('v').setValue(this.gavResponse.version);
-        this.form.findField('p').setValue(this.gavResponse.packaging);
-      }
+    // match the path to guess the group
+    if (filename.indexOf('\\') >= 0) {
+      filename = filename.replace(/\\/g, '\/');
+    }
+    var slashIndex = filename.lastIndexOf('/');
+    if (slashIndex) {
+      g = filename.substring(0, slashIndex);
 
-      var repoTag = {
+      filename = filename.substring(slashIndex + 1);
+    }
+
+    // separate the artifact name and version
+    var versionIndex = filename.search(/\-[\d]/);
+    if (versionIndex === -1) {
+      versionIndex = filename.search(/-LATEST-/i);
+      if (versionIndex === -1) {
+        versionIndex = filename.search(/-CURRENT-/i);
+      }
+    }
+    if (versionIndex >= 0) {
+      a = filename.substring(0, versionIndex).toLowerCase();
+
+      // guess the version
+      filename = filename.substring(versionIndex + 1);
+      var classifierIndex = filename.lastIndexOf('-');
+      if (classifierIndex >= 0) {
+        var classifier = filename.substring(classifierIndex + 1);
+        if (classifier && !(/^SNAPSHOT$/i.test(classifier) || /^\d/.test(classifier)
+              || /^LATEST$/i.test(classifier)
+              || /^CURRENT$/i.test(classifier))) {
+          c = classifier;
+          filename = filename.substring(0, classifierIndex);
+          // dont guess packaging when there is a classifier
+          p = '';
+          extensionIndex = c.indexOf('.');
+          if (extensionIndex >= 0) {
+            e = c.substring(extensionIndex + 1) + '.' + e;
+            c = c.substring(0, extensionIndex);
+          }
+        }
+      }
+      v = filename;
+
+      if (g) {
+        // if group ends with version and artifact name, strip those parts
+        // (useful if uploading from a local maven repo)
+        var i = g.search(new RegExp('\/' + v + '$'));
+        if (i > -1) {
+          g = g.substring(0, i);
+        }
+        i = g.search(new RegExp('\/' + a + '$'));
+        if (i > -1) {
+          g = g.substring(0, i);
+        }
+
+        // strip extra path parts, leave only com.* or org.* or net.* or the
+        // last element
+        i = g.lastIndexOf('/com/');
+        if (i === -1) {
+          i = g.lastIndexOf('/org/');
+          if (i === -1) {
+            i = g.lastIndexOf('/net/');
+            if (i === -1) {
+              i = g.lastIndexOf('/');
+            }
+          }
+        }
+        g = g.substring(i + 1).replace(/\//g, '.').toLowerCase();
+      }
+    }
+    else {
+      g = '';
+    }
+
+    if (cardPanel.find('name', 'autoguess')[0].checked) {
+      var groupField = cardPanel.find('name', 'g')[0];
+      if (Ext.isEmpty(groupField.getValue())) {
+        groupField.setRawValue(g);
+      }
+      var artifactField = cardPanel.find('name', 'a')[0];
+      if (Ext.isEmpty(artifactField.getValue())) {
+        artifactField.setRawValue(a);
+      }
+      var versionField = cardPanel.find('name', 'v')[0];
+      if (Ext.isEmpty(versionField.getValue())) {
+        versionField.setRawValue(v);
+      }
+      var packagingField = cardPanel.find('name', 'p')[0];
+      if (Ext.isEmpty(packagingField.getValue())) {
+        packagingField.setRawValue(p);
+      }
+    }
+    uploadPanel.find('name', 'classifier')[0].setRawValue(c);
+    uploadPanel.find('name', 'extension')[0].setRawValue(e);
+    if (!a) {
+      uploadPanel.form.clearInvalid();
+    }
+    uploadPanel.find('id', 'add-button')[0].setDisabled(false);
+  },
+  updatePomFilename : function(uploadPanel, filename) {
+    var filenameField = uploadPanel.find('name', 'pomnameField')[0];
+    if (filename) {
+      filenameField.setValue(filename);
+    }
+  },
+  gavDefinitionSelectHandler : function(combo, record, index) {
+    var gavDefinitionPanel = this.findById('gav-definition-card-panel');
+    // First disable all the items currently on screen, so they wont be
+    // validated/submitted etc
+    gavDefinitionPanel.getLayout().activeItem.items.each(function(item) {
+      if (item.xtype !== 'browsebutton') {
+        item.disable();
+      }
+    });
+    this.clearInvalid();
+    // Then find the proper card to activate (based upon the selected
+    // schedule type)
+    if (record.data.value === 'pom') {
+      gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(1));
+    }
+    else if (record.data.value === 'gav') {
+      gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(2));
+    }
+    else {
+      gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(0));
+    }
+    // Then enable the fields in that card
+    gavDefinitionPanel.getLayout().activeItem.items.each(function(item) {
+      if (item.xtype !== 'browsebutton') {
+        item.enable();
+        if (item.readOnly) {
+          item.getEl().dom.readOnly = true;
+        }
+      }
+      else {
+        item.setClipSize();
+      }
+    });
+    this.doLayout();
+  },
+  uploadArtifacts : function() {
+    var tree = this.find('name', 'artifact-list')[0];
+    if (!tree.validate.call(this)) {
+      this.markTreeInvalid(null);
+    }
+    else if (this.form.isValid()) {
+      this.doUpload();
+    }
+  },
+  doUpload : function() {
+    var treePanel = this.find('name', 'artifact-list')[0];
+    var hasArtifacts = treePanel.root.childNodes && treePanel.root.childNodes.length > 0;
+    if (!this.pomInput && !hasArtifacts) {
+      Sonatype.MessageBox.show({
+        title : 'No Artifacts Selected',
+        msg : 'The Artifacts list must contain at least one artifact to upload (or a POM file must be selected).',
+        buttons : Sonatype.MessageBox.OK,
+        icon : Sonatype.MessageBox.ERROR
+      });
+      return;
+    }
+
+    Sonatype.MessageBox.wait('Uploading ...');
+
+    if (hasArtifacts) {
+      // FIXME this.currentChildNode is always 0 here? side effect?
+      this.currentChildNode = 0;
+      this.createUploadForm(treePanel,
+            treePanel.root.childNodes[this.currentChildNode].attributes.payload.fileInput,
+            treePanel.root.childNodes[this.currentChildNode].attributes.payload.classifier,
+            treePanel.root.childNodes[this.currentChildNode].attributes.payload.extension,
+            this.currentChildNode === (treePanel.root.childNodes.length - 1));
+    }
+    else if (this.pomInput) {
+      this.createUploadForm(treePanel, null, null, null, true);
+    }
+  },
+  createUploadForm : function(treePanel, fileInput, classifier, extension, lastItem) {
+    var repoId = this.payload.id;
+    repoId = repoId.substring(repoId.lastIndexOf('/') + 1);
+    var pomMode = this.find('name', 'gavDefinition')[0].getValue() === 'pom';
+
+    if (this.gavResponse) {
+      pomMode = false;
+      this.form.findField('g').setValue(this.gavResponse.groupId);
+      this.form.findField('a').setValue(this.gavResponse.artifactId);
+      this.form.findField('v').setValue(this.gavResponse.version);
+      this.form.findField('p').setValue(this.gavResponse.packaging);
+    }
+
+    var repoTag = {
+      tag : 'input',
+      type : 'hidden',
+      name : 'r',
+      value : repoId
+    };
+
+    var tmpForm = Ext.getBody().createChild({
+      tag : 'form',
+      cls : 'x-hidden',
+      id : Ext.id(),
+      children : pomMode ? [repoTag, {
         tag : 'input',
         type : 'hidden',
-        name : 'r',
-        value : repoId
-      };
+        name : 'hasPom',
+        value : 'true'
+      }, {
+        tag : 'input',
+        type : 'hidden',
+        name : 'c',
+        value : classifier
+      }, {
+        tag : 'input',
+        type : 'hidden',
+        name : 'e',
+        value : extension
+      }] : [repoTag, {
+        tag : 'input',
+        type : 'hidden',
+        name : 'g',
+        value : this.form.findField('g').getValue()
+      }, {
+        tag : 'input',
+        type : 'hidden',
+        name : 'a',
+        value : this.form.findField('a').getValue()
+      }, {
+        tag : 'input',
+        type : 'hidden',
+        name : 'v',
+        value : this.form.findField('v').getValue()
+      }, {
+        tag : 'input',
+        type : 'hidden',
+        name : 'p',
+        value : this.form.findField('p').getValue()
+      }, {
+        tag : 'input',
+        type : 'hidden',
+        name : 'c',
+        value : classifier
+      }, {
+        tag : 'input',
+        type : 'hidden',
+        name : 'e',
+        value : extension
+      }]
+    });
 
-      var tmpForm = Ext.getBody().createChild({
-        tag : 'form',
-        cls : 'x-hidden',
-        id : Ext.id(),
-        children : pomMode ? [repoTag, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'hasPom',
-          value : 'true'
-        }, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'c',
-          value : classifier
-        }, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'e',
-          value : extension
-        }] : [repoTag, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'g',
-          value : this.form.findField('g').getValue()
-        }, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'a',
-          value : this.form.findField('a').getValue()
-        }, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'v',
-          value : this.form.findField('v').getValue()
-        }, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'p',
-          value : this.form.findField('p').getValue()
-        }, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'c',
-          value : classifier
-        }, {
-          tag : 'input',
-          type : 'hidden',
-          name : 'e',
-          value : extension
-        }]
-      });
-
-      if (pomMode) {
-        this.pomInput.appendTo(tmpForm);
-      }
-      if (fileInput) {
-        fileInput.appendTo(tmpForm);
-      }
-
-      Ext.Ajax.request({
-        url : Sonatype.config.repos.urls.upload,
-        form : tmpForm,
-        isUpload : true,
-        cbPassThru : {
-          treePanel : treePanel
-        },
-        callback : function(options, success, response) {
-          tmpForm.remove();
-
-          // This is a hack to get around the fact that upload submit
-          // always returns
-          // success = true
-          var
-                indexOfErrorMsg = response.responseText.toLowerCase().indexOf('<error>'),
-                endIndexOfErrorMsg = response.responseText.toLowerCase().indexOf('</error>'),
-                msg = 'Artifact upload failed.<br />',
-                indexOfMsgContent = indexOfErrorMsg + 7,
-                treePanel = options.cbPassThru.treePanel;
-
-          if (indexOfErrorMsg === -1) {
-            // get the json response and set the gavResponse
-            this.gavResponse = Ext.decode(response.responseText);
-
-            if (lastItem) {
-              Sonatype.MessageBox.show({
-                title : 'Upload Complete',
-                msg : 'Artifact upload finished successfully',
-                buttons : Sonatype.MessageBox.OK,
-                icon : Sonatype.MessageBox.INFO
-              });
-              this.resetFields();
-            }
-            else {
-              this.currentChildNode += 1;
-              if (this.currentChildNode < treePanel.root.childNodes.length) {
-                this.createUploadForm(treePanel,
-                      treePanel.root.childNodes[this.currentChildNode].attributes.payload.fileInput,
-                      treePanel.root.childNodes[this.currentChildNode].attributes.payload.classifier,
-                      treePanel.root.childNodes[this.currentChildNode].attributes.payload.extension,
-                      this.currentChildNode === treePanel.root.childNodes.length - 1);
-              }
-            }
-          } else {
-            this.gavResponse = null;
-
-            if (endIndexOfErrorMsg > indexOfMsgContent) {
-              msg += response.responseText.substring(indexOfMsgContent, endIndexOfErrorMsg);
-            }
-            else {
-              msg += 'Check Nexus logs for more information.';
-            }
-            Sonatype.MessageBox.show({
-              title : 'Upload Failed',
-              msg : msg,
-              buttons : Sonatype.MessageBox.OK,
-              icon : Sonatype.MessageBox.ERROR
-            });
-          }
-        },
-        scope : this
-      });
+    if (pomMode) {
+      this.pomInput.appendTo(tmpForm);
     }
-  });
+    if (fileInput) {
+      fileInput.appendTo(tmpForm);
+    }
+
+    Ext.Ajax.request({
+      url : Sonatype.config.repos.urls.upload,
+      form : tmpForm,
+      isUpload : true,
+      cbPassThru : {
+        treePanel : treePanel
+      },
+      callback : function(options, success, response) {
+        tmpForm.remove();
+
+        // This is a hack to get around the fact that upload submit
+        // always returns
+        // success = true
+        var
+              indexOfErrorMsg = response.responseText.toLowerCase().indexOf('<error>'),
+              endIndexOfErrorMsg = response.responseText.toLowerCase().indexOf('</error>'),
+              msg = 'Artifact upload failed.<br />',
+              indexOfMsgContent = indexOfErrorMsg + 7,
+              treePanel = options.cbPassThru.treePanel;
+
+        if (indexOfErrorMsg === -1) {
+          // get the json response and set the gavResponse
+          this.gavResponse = Ext.decode(response.responseText);
+
+          if (lastItem) {
+            Sonatype.MessageBox.show({
+              title : 'Upload Complete',
+              msg : 'Artifact upload finished successfully',
+              buttons : Sonatype.MessageBox.OK,
+              icon : Sonatype.MessageBox.INFO
+            });
+            this.resetFields();
+          }
+          else {
+            this.currentChildNode += 1;
+            if (this.currentChildNode < treePanel.root.childNodes.length) {
+              this.createUploadForm(treePanel,
+                    treePanel.root.childNodes[this.currentChildNode].attributes.payload.fileInput,
+                    treePanel.root.childNodes[this.currentChildNode].attributes.payload.classifier,
+                    treePanel.root.childNodes[this.currentChildNode].attributes.payload.extension,
+                    this.currentChildNode === treePanel.root.childNodes.length - 1);
+            }
+          }
+        } else {
+          this.gavResponse = null;
+
+          if (endIndexOfErrorMsg > indexOfMsgContent) {
+            msg += response.responseText.substring(indexOfMsgContent, endIndexOfErrorMsg);
+          }
+          else {
+            msg += 'Check Nexus logs for more information.';
+          }
+          Sonatype.MessageBox.show({
+            title : 'Upload Failed',
+            msg : msg,
+            buttons : Sonatype.MessageBox.OK,
+            icon : Sonatype.MessageBox.ERROR
+          });
+        }
+      },
+      scope : this
+    });
+  }
+}, function() {
 
   Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
     var sp = Sonatype.lib.Permissions;
 
     if (rec.data.resourceURI && rec.data.userManaged && sp.checkPermission('nexus:artifact', sp.CREATE)
-          && rec.data.repoType === 'hosted' && rec.data.repoPolicy && rec.data.repoPolicy.toUpperCase() === 'RELEASE') {
+          && rec.data.repoType === 'hosted' && rec.data.repoPolicy && rec.data.repoPolicy.toUpperCase()
+          === 'RELEASE') {
 
       Ext.Ajax.request({
         url : rec.data.resourceURI,
@@ -1001,7 +1003,8 @@ define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, So
           if (success) {
             var statusResp = Ext.decode(response.responseText);
             if (statusResp.data) {
-              if (statusResp.data.writePolicy == 'ALLOW_WRITE' || statusResp.data.writePolicy == 'ALLOW_WRITE_ONCE') {
+              if (statusResp.data.writePolicy === 'ALLOW_WRITE' || statusResp.data.writePolicy
+                    === 'ALLOW_WRITE_ONCE') {
                 var uploadPanel = new Sonatype.repoServer.ArtifactUploadPanel({
                   payload : rec,
                   name : 'upload'
@@ -1024,8 +1027,8 @@ define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, So
                   // another hack to make the whole browse button
                   // clickable
                   if (!p.browseButtonsUpdated) {
-                    var b = p.find('xtype', 'browsebutton');
-                    for (var i = 0; i < b.length; i++) {
+                    var i, b = p.find('xtype', 'browsebutton');
+                    for (i = 0; i < b.length; i++) {
                       b[i].setClipSize();
                     }
                     p.browseButtonsUpdated = true;
@@ -1044,7 +1047,8 @@ define('repoServer/FileUploadPanel', ['extjs', 'Sonatype/all'], function(Ext, So
                   items : [
                     {
                       border : false,
-                      html : '<div class="little-padding">' + 'Artifact deployment is disabled for ' + rec.data.name
+                      html : '<div class="little-padding">' + 'Artifact deployment is disabled for '
+                            + rec.data.name
                             + '.<br /><br />' + 'You can enable it in the "Access Settings" section of the '
                             + 'repository configuration.</div>'
                     }
