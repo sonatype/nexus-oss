@@ -44,26 +44,39 @@ public class WhitelistSmokeIT
     public void smokeIt()
         throws Exception
     {
-        // public
-        final Status publicStatus = whitelist().getWhitelistStatus( "public" );
-        // public cannot be published, since Central is member and scrape in underway
-        assertThat( publicStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
+        waitForWLDiscoveryOutcome( "central" );
 
-        // releases
-        final Status releasesStatus = whitelist().getWhitelistStatus( "releases" );
-        // central is not published, is being scraped
-        assertThat( releasesStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
-        // is hosted, discovery status must be null
-        assertThat( releasesStatus.getDiscoveryStatus(), is( nullValue() ) );
+        // See https://issues.sonatype.org/browse/CENTRAL-515
+        // As of Feb 15 2013 Central has prefix file published,
+        // and it means that Nexus on boot immediately gets WL lists populated
+        // for Central, and hence, for Public group also.
 
-        // central
-        final Status centralStatus = whitelist().getWhitelistStatus( "central" );
-        // central is not published, is being scraped
-        assertThat( centralStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
-        // is proxy, discovery status must not be null
-        assertThat( centralStatus.getDiscoveryStatus(), is( notNullValue() ) );
-        // undecided, since still scraping and this is the first run of remote discovery
-        assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.UNDECIDED ) );
+        {
+            // public
+            final Status publicStatus = whitelist().getWhitelistStatus( "public" );
+            // public cannot be published, since Central is member and scrape in underway
+            assertThat( publicStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+        }
+
+        {
+            // releases
+            final Status releasesStatus = whitelist().getWhitelistStatus( "releases" );
+            // releases is published, is hosted
+            assertThat( releasesStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+            // is hosted, discovery status must be null
+            assertThat( releasesStatus.getDiscoveryStatus(), is( nullValue() ) );
+        }
+
+        {
+            // central
+            final Status centralStatus = whitelist().getWhitelistStatus( "central" );
+            // central is published, it got prefix file
+            assertThat( centralStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+            // is proxy, discovery status must not be null
+            assertThat( centralStatus.getDiscoveryStatus(), is( notNullValue() ) );
+            // succeeded, since not scrapin anymore but getting prefix file
+            assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.SUCCEEDED ) );
+        }
 
         // get configuration for central and check for sane values (actually, they should be defaults).
         {

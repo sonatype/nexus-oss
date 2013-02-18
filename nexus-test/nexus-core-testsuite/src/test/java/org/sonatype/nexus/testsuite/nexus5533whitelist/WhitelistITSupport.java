@@ -12,7 +12,9 @@
  */
 package org.sonatype.nexus.testsuite.nexus5533whitelist;
 
+import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Whitelist;
+import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
 import org.sonatype.nexus.testsuite.NexusCoreITSupport;
 
 /**
@@ -37,5 +39,30 @@ public abstract class WhitelistITSupport
     public Whitelist whitelist()
     {
         return client().getSubsystem( Whitelist.class );
+    }
+
+    /**
+     * Waits for a remote discovery outcome. The passed in repository ID must correspond to a Maven2 proxy repository,
+     * otherwise {@link IllegalArgumentException} is thrown.
+     * 
+     * @param proxyRepositoryId
+     * @throws IllegalArgumentException if repository ID is not a maven2 proxy.
+     * @throws InterruptedException
+     */
+    public void waitForWLDiscoveryOutcome( final String proxyRepositoryId )
+        throws IllegalArgumentException, InterruptedException
+    {
+        // status
+        Status status = whitelist().getWhitelistStatus( proxyRepositoryId );
+        if ( status.getDiscoveryStatus() == null )
+        {
+            throw new IllegalArgumentException( "Repository with ID=" + proxyRepositoryId
+                + " is not a Maven2 proxy repository!" );
+        }
+        while ( status.getDiscoveryStatus().getDiscoveryLastStatus() == Outcome.UNDECIDED )
+        {
+            Thread.sleep( 1000 );
+            status = whitelist().getWhitelistStatus( proxyRepositoryId );
+        }
     }
 }
