@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-define('repoServer/Documentation', ['extjs', 'sonatype'], function(Ext, Sonatype) {
-  var repoServer = Ext.namespace('Sonatype.repoServer');
+/*global NX, Ext, Sonatype*/
+NX.define('Sonatype.repoServer.Documentation', {
+  extend : 'Ext.Panel',
+  requirejs : ['extjs', 'sonatype'],
 
-  repoServer.Documentation = function(cfg) {
+  constructor : function(cfg) {
     Ext.apply(this, cfg || {});
 
     Sonatype.repoServer.Documentation.superclass.constructor.call(this,
@@ -32,9 +33,8 @@ define('repoServer/Documentation', ['extjs', 'sonatype'], function(Ext, Sonatype
               }
             ]
           });
-  };
+  },
 
-  Ext.extend(repoServer.Documentation, Ext.Panel, {
     getHelpText : function() {
       return '<div class="little-padding">'
             + 'Sonatype Nexus&trade; '
@@ -48,8 +48,6 @@ define('repoServer/Documentation', ['extjs', 'sonatype'], function(Ext, Sonatype
             + '<br><a href="http://links.sonatype.com/products/nexus/oss/release-notes" target="_new">Release Notes</a>'
             + '</div>';
     }
-  });
 
-  return repoServer.Documentation;
 });
 
