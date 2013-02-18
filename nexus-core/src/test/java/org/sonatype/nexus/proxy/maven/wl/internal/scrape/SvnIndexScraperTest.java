@@ -201,8 +201,8 @@ public class SvnIndexScraperTest
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( true ) );
-            assertThat( context.getEntrySource(), notNullValue() );
-            final List<String> entries = context.getEntrySource().readEntries();
+            assertThat( context.getPrefixSource(), notNullValue() );
+            final List<String> entries = context.getPrefixSource().readEntries();
             assertThat( entries, notNullValue() );
             assertThat( entries.size(), equalTo( 2 ) );
             assertThat( entries, contains( "/com/foo", "/com/bar" ) );
@@ -299,8 +299,8 @@ public class SvnIndexScraperTest
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( true ) );
-            assertThat( context.getEntrySource(), notNullValue() );
-            final List<String> entries = context.getEntrySource().readEntries();
+            assertThat( context.getPrefixSource(), notNullValue() );
+            final List<String> entries = context.getPrefixSource().readEntries();
             assertThat( entries, notNullValue() );
             assertThat( entries.size(), equalTo( 2 ) );
             assertThat( entries, contains( "/com/foo", "/com/bar" ) );

@@ -41,7 +41,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -149,7 +149,7 @@ public class LocalContentDiscovererImplTest
             assertThat( result.isSuccessful(), is( true ) );
             assertThat( result.getLastResult().getStrategyId(), equalTo( "local" ) );
             assertThat( result.getLastResult().getMessage(), notNullValue() );
-            final EntrySource entrySource = result.getEntrySource();
+            final PrefixSource entrySource = result.getPrefixSource();
             assertThat(
                 entrySource.readEntries(),
                 hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
@@ -167,7 +167,7 @@ public class LocalContentDiscovererImplTest
             assertThat( result.isSuccessful(), is( true ) );
             assertThat( result.getLastResult().getStrategyId(), equalTo( "local" ) );
             assertThat( result.getLastResult().getMessage(), notNullValue() );
-            final EntrySource entrySource = result.getEntrySource();
+            final PrefixSource entrySource = result.getPrefixSource();
             assertThat(
                 entrySource.readEntries(),
                 hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
@@ -184,7 +184,7 @@ public class LocalContentDiscovererImplTest
             assertThat( result.isSuccessful(), is( true ) );
             assertThat( result.getLastResult().getStrategyId(), equalTo( "local" ) );
             assertThat( result.getLastResult().getMessage(), notNullValue() );
-            final EntrySource entrySource = result.getEntrySource();
+            final PrefixSource entrySource = result.getPrefixSource();
             assertThat(
                 entrySource.readEntries(),
                 hasItems( "/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",

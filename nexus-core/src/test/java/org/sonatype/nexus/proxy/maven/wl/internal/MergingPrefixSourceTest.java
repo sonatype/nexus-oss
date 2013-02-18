@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 
-public class MergingEntrySourceTest
+public class MergingPrefixSourceTest
 {
     private final String[] PREFIXES = { "org", "com", "net", "hu", "ca" };
 
@@ -50,11 +50,11 @@ public class MergingEntrySourceTest
     public void smoke()
         throws IOException
     {
-        final EntrySource es1 = new ArrayListEntrySource( Arrays.asList( "/a/b/c" ) );
-        final EntrySource es2 = new ArrayListEntrySource( Arrays.asList( "/a/b" ) );
-        final EntrySource es3 = new ArrayListEntrySource( Arrays.asList( "/a/b/c/d/e" ) );
+        final PrefixSource es1 = new ArrayListPrefixSource( Arrays.asList( "/a/b/c" ) );
+        final PrefixSource es2 = new ArrayListPrefixSource( Arrays.asList( "/a/b" ) );
+        final PrefixSource es3 = new ArrayListPrefixSource( Arrays.asList( "/a/b/c/d/e" ) );
 
-        final MergingEntrySource m = new MergingEntrySource( Arrays.asList( es1, es2, es3 ) );
+        final MergingPrefixSource m = new MergingPrefixSource( Arrays.asList( es1, es2, es3 ) );
 
         final List<String> mergedEntries = m.readEntries();
         assertThat( mergedEntries.size(), is( 3 ) );

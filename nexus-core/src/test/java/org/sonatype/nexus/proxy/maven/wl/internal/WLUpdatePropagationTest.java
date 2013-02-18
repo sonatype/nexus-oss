@@ -43,7 +43,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -214,14 +214,14 @@ public class WLUpdatePropagationTest
             try
             {
                 server.start();
-                final EntrySource hostedEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( HOSTED_REPO_ID,
+                final PrefixSource hostedEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( HOSTED_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource proxyEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
+                final PrefixSource proxyEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource groupEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                final PrefixSource groupEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
                 assertThat( "Hosted should have ES", hostedEntrySource.exists() );
@@ -248,14 +248,14 @@ public class WLUpdatePropagationTest
                 wm.updateWhitelist( mavenProxyRepository );
                 waitForWLBackgroundUpdates();
 
-                final EntrySource hostedEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( HOSTED_REPO_ID,
+                final PrefixSource hostedEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( HOSTED_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource proxyEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
+                final PrefixSource proxyEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource groupEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                final PrefixSource groupEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
                 assertThat( "Hosted should have ES", hostedEntrySource.exists() );

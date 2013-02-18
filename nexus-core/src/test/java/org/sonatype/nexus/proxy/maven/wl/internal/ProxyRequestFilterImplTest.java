@@ -25,7 +25,7 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -80,8 +80,8 @@ public class ProxyRequestFilterImplTest
     @Test
     public void withWl()
     {
-        final EntrySource entrySource = new ArrayListEntrySource( Arrays.asList( "/org/apache", "/org/sonatype" ) );
-        Mockito.when( wlManager.getEntrySourceFor( Mockito.any( MavenProxyRepository.class ) ) ).thenReturn(
+        final PrefixSource entrySource = new ArrayListPrefixSource( Arrays.asList( "/org/apache", "/org/sonatype" ) );
+        Mockito.when( wlManager.getPrefixSourceFor( Mockito.any( MavenProxyRepository.class ) ) ).thenReturn(
             entrySource );
 
         // WL will be built, not every request should be allowed

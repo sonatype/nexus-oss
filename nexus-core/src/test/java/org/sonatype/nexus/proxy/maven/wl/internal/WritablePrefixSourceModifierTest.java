@@ -24,25 +24,25 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
-import org.sonatype.nexus.proxy.maven.wl.WritableEntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
+import org.sonatype.nexus.proxy.maven.wl.WritablePrefixSource;
 
-public class WritableEntrySourceModifierImplTest
+public class WritablePrefixSourceModifierTest
 {
     protected final String[] entries1 = new String[] { "/org/sonatype", "/org/apache" };
 
     protected final String[] entries2 = new String[] { "/org/sonatype/nexus", "/org/apache/maven" };
 
-    private WritableEntrySource writableEntrySource;
+    private WritablePrefixSource writableEntrySource;
 
-    private WritableEntrySourceModifierImpl wesm;
+    private WritablePrefixSourceModifier wesm;
 
     @Before
     public void prepare()
         throws IOException
     {
-        writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries1 ) );
-        wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 2 );
+        writableEntrySource = new WritableArrayListPrefixSource( Arrays.asList( entries1 ) );
+        wesm = new WritablePrefixSourceModifier( writableEntrySource, 2 );
     }
 
     @Test
@@ -146,8 +146,8 @@ public class WritableEntrySourceModifierImplTest
         throws IOException
     {
         // Note: using entries2 that has 3 depth entries
-        writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries2 ) );
-        wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 3 );
+        writableEntrySource = new WritableArrayListPrefixSource( Arrays.asList( entries2 ) );
+        wesm = new WritablePrefixSourceModifier( writableEntrySource, 3 );
 
         assertThat( "WL would be changed", wesm.revokeEntries( "/org/sonatype" ) ); // child is in list
         assertThat( "Changes were added", wesm.hasChanges() );
@@ -175,8 +175,8 @@ public class WritableEntrySourceModifierImplTest
     public void edgeCase1()
         throws IOException
     {
-        writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries1 ) );
-        wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 2 );
+        writableEntrySource = new WritableArrayListPrefixSource( Arrays.asList( entries1 ) );
+        wesm = new WritablePrefixSourceModifier( writableEntrySource, 2 );
 
         assertThat( "WL would not be changed", !wesm.revokeEntries( "/org/sonatype/nexus" ) ); // parent is in list
         assertThat( "No changes added yet", !wesm.hasChanges() );
@@ -202,8 +202,8 @@ public class WritableEntrySourceModifierImplTest
     public void edgeCase2()
         throws IOException
     {
-        writableEntrySource = new WritableArrayListEntrySource( Arrays.asList( entries2 ) );
-        wesm = new WritableEntrySourceModifierImpl( writableEntrySource, 2 );
+        writableEntrySource = new WritableArrayListPrefixSource( Arrays.asList( entries2 ) );
+        wesm = new WritablePrefixSourceModifier( writableEntrySource, 2 );
 
         assertThat( "WL is changed", wesm.revokeEntries( "/org/sonatype" ) ); // child is in list
         assertThat( "Changes were added", wesm.hasChanges() );
@@ -227,8 +227,8 @@ public class WritableEntrySourceModifierImplTest
 
     // ==
 
-    public static class WritableArrayListEntrySource
-        implements WritableEntrySource
+    public static class WritableArrayListPrefixSource
+        implements WritablePrefixSource
     {
         private List<String> entries;
 
@@ -239,7 +239,7 @@ public class WritableEntrySourceModifierImplTest
          * 
          * @param entries list of entries, might not be {@code null}
          */
-        public WritableArrayListEntrySource( final List<String> entries )
+        public WritableArrayListPrefixSource( final List<String> entries )
         {
             this( entries, System.currentTimeMillis() );
         }
@@ -250,7 +250,7 @@ public class WritableEntrySourceModifierImplTest
          * @param entries list of entries, might not be {@code null}.
          * @param created the timestamp this instance should report.
          */
-        public WritableArrayListEntrySource( final List<String> entries, final long created )
+        public WritableArrayListPrefixSource( final List<String> entries, final long created )
         {
             this.entries = entries;
             this.created = entries != null ? created : -1;
@@ -276,7 +276,7 @@ public class WritableEntrySourceModifierImplTest
         }
 
         @Override
-        public void writeEntries( EntrySource entrySource )
+        public void writeEntries( PrefixSource entrySource )
             throws IOException
         {
             this.entries = entrySource.readEntries();

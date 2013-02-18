@@ -40,7 +40,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -119,7 +119,7 @@ public class WLMaintenanceTest
     protected List<String> getEntriesOf( final MavenRepository mavenRepository )
         throws IOException
     {
-        final EntrySource entrySource = wlManager.getEntrySourceFor( mavenRepository );
+        final PrefixSource entrySource = wlManager.getPrefixSourceFor( mavenRepository );
         final ArrayList<String> result = new ArrayList<String>( entrySource.readEntries() );
         Collections.sort( result );
         return result;

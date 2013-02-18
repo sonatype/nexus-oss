@@ -25,12 +25,12 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 
 import org.junit.Test;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 
-public class PrefixesFileMarshallerTest
+public class TextFilePrefixSourceMarshallerTest
 {
     // is state-less, no need for @Before
-    final PrefixesFileMarshaller m = new PrefixesFileMarshaller( 1000 );
+    final TextFilePrefixSourceMarshaller m = new TextFilePrefixSourceMarshaller( 1000 );
 
     final Charset UTF8 = Charset.forName( "UTF-8" );
 
@@ -109,7 +109,7 @@ public class PrefixesFileMarshallerTest
     {
         final StringBuilder sb = new StringBuilder();
 
-        for ( String header : PrefixesFileMarshaller.HEADERS )
+        for ( String header : TextFilePrefixSourceMarshaller.HEADERS )
         {
             sb.append( header ).append( "\n" );
         }
@@ -121,7 +121,7 @@ public class PrefixesFileMarshallerTest
     public void roundtrip()
         throws IOException
     {
-        final EntrySource readEntrySource = m.read( new ByteArrayInputStream( prefixFile1( true ).getBytes( UTF8 ) ) );
+        final PrefixSource readEntrySource = m.read( new ByteArrayInputStream( prefixFile1( true ).getBytes( UTF8 ) ) );
         assertThat( readEntrySource.exists(), is( true ) );
         assertThat( readEntrySource.readEntries().size(), is( 3 ) );
 
@@ -138,7 +138,7 @@ public class PrefixesFileMarshallerTest
         throws IOException
     {
         // prefixFile2 is "find created" like, see CENTRAL-515
-        final EntrySource readEntrySource = m.read( new ByteArrayInputStream( prefixFile2( true ).getBytes( UTF8 ) ) );
+        final PrefixSource readEntrySource = m.read( new ByteArrayInputStream( prefixFile2( true ).getBytes( UTF8 ) ) );
         assertThat( readEntrySource.exists(), is( true ) );
         assertThat( readEntrySource.readEntries().size(), is( 3 ) );
 
@@ -158,7 +158,7 @@ public class PrefixesFileMarshallerTest
         throws IOException
     {
         // prefixFile2 is "find created" like, see CENTRAL-515
-        final EntrySource readEntrySource = m.read( new ByteArrayInputStream( prefixFile3( true ).getBytes( UTF8 ) ) );
+        final PrefixSource readEntrySource = m.read( new ByteArrayInputStream( prefixFile3( true ).getBytes( UTF8 ) ) );
         assertThat( readEntrySource.exists(), is( true ) );
         assertThat( readEntrySource.readEntries().size(), is( 1 ) );
 
@@ -178,7 +178,7 @@ public class PrefixesFileMarshallerTest
         throws IOException
     {
         // prefixFile2 is "find created" like, see CENTRAL-515
-        final EntrySource readEntrySource =
+        final PrefixSource readEntrySource =
             m.read( new ByteArrayInputStream( prefixFile4( true, false ).getBytes( UTF8 ) ) );
         assertThat( readEntrySource.exists(), is( true ) );
         assertThat( readEntrySource.readEntries().size(), is( 3 ) );

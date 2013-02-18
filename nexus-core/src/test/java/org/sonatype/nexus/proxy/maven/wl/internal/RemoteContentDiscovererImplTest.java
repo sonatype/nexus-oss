@@ -40,7 +40,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -221,14 +221,14 @@ public class RemoteContentDiscovererImplTest
         {
             final WLManager wm = lookup( WLManager.class );
             {
-                final EntrySource proxy1EntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                final PrefixSource proxy1EntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource proxy2EntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
+                final PrefixSource proxy2EntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource groupEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                final PrefixSource groupEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
                 assertThat( "Proxy1 should not have ES", !proxy1EntrySource.exists() ); // we serve 404
@@ -260,14 +260,14 @@ public class RemoteContentDiscovererImplTest
             wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ) );
             waitForWLBackgroundUpdates();
             {
-                final EntrySource proxy1EntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                final PrefixSource proxy1EntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource proxy2EntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
+                final PrefixSource proxy2EntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource groupEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                final PrefixSource groupEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
                 assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
@@ -307,14 +307,14 @@ public class RemoteContentDiscovererImplTest
             wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID, MavenRepository.class ) );
             waitForWLBackgroundUpdates();
             {
-                final EntrySource proxy1EntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                final PrefixSource proxy1EntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource proxy2EntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
+                final PrefixSource proxy2EntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
                         MavenRepository.class ) );
-                final EntrySource groupEntrySource =
-                    wm.getEntrySourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                final PrefixSource groupEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                         MavenRepository.class ) );
 
                 assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file

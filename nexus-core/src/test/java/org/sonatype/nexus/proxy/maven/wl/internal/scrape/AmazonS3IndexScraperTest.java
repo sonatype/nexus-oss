@@ -192,8 +192,8 @@ public class AmazonS3IndexScraperTest
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( true ) );
-            assertThat( context.getEntrySource(), notNullValue() );
-            final List<String> entries = context.getEntrySource().readEntries();
+            assertThat( context.getPrefixSource(), notNullValue() );
+            final List<String> entries = context.getPrefixSource().readEntries();
             assertThat( entries, notNullValue() );
             assertThat( entries.size(), equalTo( 1 ) );
             assertThat( entries, contains( "/release/foo" ) );
@@ -309,8 +309,8 @@ public class AmazonS3IndexScraperTest
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
             assertThat( context.isSuccessful(), is( true ) );
-            assertThat( context.getEntrySource(), notNullValue() );
-            final List<String> entries = context.getEntrySource().readEntries();
+            assertThat( context.getPrefixSource(), notNullValue() );
+            final List<String> entries = context.getPrefixSource().readEntries();
             assertThat( entries, notNullValue() );
             assertThat( entries.size(), equalTo( 2 ) );
             assertThat( entries, contains( "/foo/bar", "/foo/baz" ) );
@@ -415,7 +415,7 @@ public class AmazonS3IndexScraperTest
 
         if ( context.isSuccessful() )
         {
-            System.out.println( context.getEntrySource().readEntries() );
+            System.out.println( context.getPrefixSource().readEntries() );
         }
         else
         {
