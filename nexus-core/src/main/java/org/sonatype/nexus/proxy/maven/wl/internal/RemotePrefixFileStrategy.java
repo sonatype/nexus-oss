@@ -111,6 +111,7 @@ public class RemotePrefixFileStrategy
         mavenProxyRepository.removeFromNotFoundCache( request );
         try
         {
+            @SuppressWarnings( "deprecation" )
             final StorageItem item = mavenProxyRepository.retrieveItem( true, request );
             if ( item instanceof StorageFileItem )
             {

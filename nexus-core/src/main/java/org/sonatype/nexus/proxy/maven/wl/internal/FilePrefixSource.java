@@ -219,6 +219,7 @@ public class FilePrefixSource
         }
     }
 
+    @SuppressWarnings( "deprecation" )
     protected void deleteFileItem()
         throws IOException
     {
