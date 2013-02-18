@@ -17,8 +17,6 @@ define('repoServer',
     'Nexus/repository/AbstractRepoPanel',
     'Nexus/repository/ArtifactContainer',
     'repoServer/FeedViewPanel',
-    'repoServer/LogEditPanel',
-    'repoServer/LogsViewPanel',
     'repoServer/Maven2InformationPanel',
     'repoServer/MirrorConfigPanel',
     'repoServer/PrivilegeEditPanel',
@@ -42,6 +40,8 @@ define('repoServer',
     'Sonatype/repoServer/referenceData',
     'Sonatype/repoServer/RepositoryGroupEditor',
     'Sonatype/repoServer/HelpAboutPanel',
+    'Sonatype/repoServer/LogEditPanel',
+    'Sonatype/repoServer/LogsViewPanel',
     'Sonatype/repoServer/ArtifactUploadPanel'
   ], function() {
 
