@@ -10,128 +10,117 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-
-define('Nexus/panels/AutoTabPanel',['extjs', 'sonatype'], function(Ext, Sonatype){
-Ext.namespace('Sonatype.panels');
+/*global Ext, Sonatype, Nexus, NX*/
 
 /*
  * A helper panel creating a tabbed container inside itself if more than one
  * component is added.
  */
-Sonatype.panels.AutoTabPanel = function(cfg) {
-  var
-        config = cfg || {},
-        defaultConfig = {
-          layout : 'card',
-          activeItem : 0,
-          deferredRender : false,
-          autoScroll : false,
-          frame : false,
-          border : false,
-          activeTab : 0,
-          hideMode : 'offsets',
-          tools : [
-            {
-              id : 'refresh',
-              qtip : 'Refresh data',
-              hidden : true,
-              handler : function(evt, toolEl, panel) {
-                var active;
-                if (panel.tabPanel) {
-                  active = panel.tabPanel.getActiveTab();
-                } else {
-                  active = panel.getComponent(0);
-                }
-                if (active && active.refreshContent) {
-                  active.refreshContent();
-                }
-              }
-            }
-          ]
-        };
-  Ext.apply(this, config, defaultConfig);
-  Sonatype.panels.AutoTabPanel.superclass.constructor.call(this, {
-        collapseMode : 'mini'
-      });
-};
+NX.define('Nexus.panels.AutoTabPanel', {
+  extend : 'Ext.Panel',
 
-Ext.extend(Sonatype.panels.AutoTabPanel, Ext.Panel, {
-      add : function(c) {
-        if (this.items && this.items.length > 0)
-        {
-          if (!this.tabPanel)
-          {
-            this.initTabPanel();
-          }
-
-          if (!c.title && c.tabTitle)
-          {
-            c.title = c.tabTitle;
-          }
-          return this.tabPanel.add(c);
-        }
-        else
-        {
-          return Sonatype.panels.AutoTabPanel.superclass.add.call(this, c);
-        }
-      },
-      insert : function(index, c) {
-        if (this.items && this.items.length > 0)
-        {
-          if (!this.tabPanel)
-          {
-            this.initTabPanel();
-          }
-
-          if (!c.title && c.tabTitle)
-          {
-            c.title = c.tabTitle;
-          }
-          return this.tabPanel.insert(index, c);
-        }
-        else
-        {
-          return Sonatype.panels.AutoTabPanel.superclass.insert.call(this, index, c);
-        }
-      },
-      initTabPanel : function() {
-        var first = this.getComponent(0);
-        this.remove(first, false);
-        first.setTitle(first.tabTitle);
-
-        this.tabPanel = new Ext.TabPanel({
-              activeItem : this.activeTab === -1 ? null : this.activeTab,
-              deferredRender : false,
-              enableTabScroll : true,
-              autoScroll : false,
-              frame : false,
-              border : false,
-              layoutOnTabChange : true,
-              items : [first],
-              hideMode : 'offsets',
-              listeners : {
-                tabchange : function(panel, tab) {
-                  var tool = this.tools && this.tools.refresh;
-                  if ( tool ) {
-                    if ( tab.refreshContent ) {
-                      tool.show();
-                    } else {
-                      tool.hide();
-                    }
+  constructor : function(cfg) {
+    var
+          config = cfg || {},
+          defaultConfig = {
+            layout : 'card',
+            activeItem : 0,
+            deferredRender : false,
+            autoScroll : false,
+            frame : false,
+            border : false,
+            activeTab : 0,
+            hideMode : 'offsets',
+            tools : [
+              {
+                id : 'refresh',
+                qtip : 'Refresh data',
+                hidden : true,
+                handler : function(evt, toolEl, panel) {
+                  var active;
+                  if (panel.tabPanel) {
+                    active = panel.tabPanel.getActiveTab();
+                  } else {
+                    active = panel.getComponent(0);
                   }
-                },
-                scope : this
+                  if (active && active.refreshContent) {
+                    active.refreshContent();
+                  }
+                }
               }
-            });
+            ]
+          };
+    Ext.apply(this, config, defaultConfig);
+    Sonatype.panels.AutoTabPanel.superclass.constructor.call(this, {
+      collapseMode : 'mini'
+    });
+  },
 
-        Sonatype.panels.AutoTabPanel.superclass.add.call(this, this.tabPanel);
-        if (this.getLayout() && this.getLayout().setActiveItem)
-        {
-          this.getLayout().setActiveItem(this.tabPanel);
-        }
+  add : function(c) {
+    if (this.items && this.items.length > 0) {
+      if (!this.tabPanel) {
+        this.initTabPanel();
+      }
+
+      if (!c.title && c.tabTitle) {
+        c.title = c.tabTitle;
+      }
+      return this.tabPanel.add(c);
+    }
+    else {
+      return Sonatype.panels.AutoTabPanel.superclass.add.call(this, c);
+    }
+  },
+  insert : function(index, c) {
+    if (this.items && this.items.length > 0) {
+      if (!this.tabPanel) {
+        this.initTabPanel();
+      }
+
+      if (!c.title && c.tabTitle) {
+        c.title = c.tabTitle;
+      }
+      return this.tabPanel.insert(index, c);
+    }
+    else {
+      return Sonatype.panels.AutoTabPanel.superclass.insert.call(this, index, c);
+    }
+  },
+  initTabPanel : function() {
+    var first = this.getComponent(0);
+    this.remove(first, false);
+    first.setTitle(first.tabTitle);
+
+    this.tabPanel = new Ext.TabPanel({
+      activeItem : this.activeTab === -1 ? null : this.activeTab,
+      deferredRender : false,
+      enableTabScroll : true,
+      autoScroll : false,
+      frame : false,
+      border : false,
+      layoutOnTabChange : true,
+      items : [first],
+      hideMode : 'offsets',
+      listeners : {
+        tabchange : function(panel, tab) {
+          var tool = this.tools && this.tools.refresh;
+          if (tool) {
+            if (tab.refreshContent) {
+              tool.show();
+            } else {
+              tool.hide();
+            }
+          }
+        },
+        scope : this
       }
     });
 
-  return Sonatype.panels.AutoTabPanel;
+    Sonatype.panels.AutoTabPanel.superclass.add.call(this, this.tabPanel);
+    if (this.getLayout() && this.getLayout().setActiveItem) {
+      this.getLayout().setActiveItem(this.tabPanel);
+    }
+  }
+}, function() {
+  Ext.ns('Sonatype.panels').AutoTabPanel = Nexus.panels.AutoTabPanel;
 });
