@@ -32,10 +32,12 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
@@ -52,7 +54,6 @@ import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus.PStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLStatus;
-import org.sonatype.nexus.proxy.maven.wl.WritablePrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult.Outcome;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
@@ -602,32 +603,52 @@ public class WLManagerImpl
 
     // ==
 
+    @Override
     public boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, String... entries )
         throws IOException
     {
-        final WritablePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
-        final WritablePrefixSourceModifier wesm =
-            new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
-        wesm.offerEntries( entries );
-        if ( wesm.apply() )
+        final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
+        final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
+        lock.lock( Action.update );
+        try
         {
-            publish( mavenHostedRepository, prefixSource );
-            return true;
+            final WritablePrefixSourceModifier wesm =
+                new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
+            wesm.offerEntries( entries );
+            if ( wesm.apply() )
+            {
+                publish( mavenHostedRepository, prefixSource );
+                return true;
+            }
+        }
+        finally
+        {
+            lock.unlock();
         }
         return false;
     }
 
+    @Override
     public boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, String... entries )
         throws IOException
     {
-        final WritablePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
-        final WritablePrefixSourceModifier wesm =
-            new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
-        wesm.revokeEntries( entries );
-        if ( wesm.apply() )
+        final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
+        final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
+        lock.lock( Action.update );
+        try
         {
-            publish( mavenHostedRepository, prefixSource );
-            return true;
+            final WritablePrefixSourceModifier wesm =
+                new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
+            wesm.revokeEntries( entries );
+            if ( wesm.apply() )
+            {
+                publish( mavenHostedRepository, prefixSource );
+                return true;
+            }
+        }
+        finally
+        {
+            lock.unlock();
         }
         return false;
     }

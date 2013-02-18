@@ -18,13 +18,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -32,6 +36,8 @@ import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.WritablePrefixSource;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+
+import com.google.common.base.Throwables;
 
 /**
  * {@link WritablePrefixSource} implementation that is backed by a {@link StorageFileItem} in a {@link MavenRepository}.
@@ -85,6 +91,17 @@ public class FilePrefixSource
         return mavenRepository;
     }
 
+    /**
+     * Returns the UID that points to the (existent or nonexistent) file that is (or will be) used to back this
+     * {@link PrefixSource}.
+     * 
+     * @return the {@link RepositoryItemUid} of this file item backed {@link PrefixSource}.
+     */
+    public RepositoryItemUid getRepositoryItemUid()
+    {
+        return getMavenRepository().createUid( getFilePath() );
+    }
+
     protected TextFilePrefixSourceMarshaller getPrefixSourceMarshaller()
     {
         return prefixSourceMarshaller;
@@ -95,7 +112,15 @@ public class FilePrefixSource
     {
         try
         {
-            return getFileItem() != null;
+            return doReadProtected( new Callable<Boolean>()
+            {
+                @Override
+                public Boolean call()
+                    throws Exception
+                {
+                    return getFileItem() != null;
+                }
+            } );
         }
         catch ( IOException e )
         {
@@ -109,30 +134,50 @@ public class FilePrefixSource
     {
         try
         {
-            final StorageFileItem file = getFileItem();
-            if ( file != null )
+            return doReadProtected( new Callable<Long>()
             {
-                return file.getModified();
-            }
+                @Override
+                public Long call()
+                    throws Exception
+                {
+                    final StorageFileItem file = getFileItem();
+                    if ( file != null )
+                    {
+                        return file.getModified();
+                    }
+                    else
+                    {
+                        return -1L;
+                    }
+                }
+            } );
         }
         catch ( IOException e )
         {
             // bum
         }
-        return -1;
+        return -1L;
     }
 
     @Override
     public List<String> readEntries()
         throws IOException
     {
-        final StorageFileItem file = getFileItem();
-        if ( file == null )
+        return doReadProtected( new Callable<List<String>>()
         {
-            return null;
-        }
-        final PrefixSource prefixSource = getPrefixSourceMarshaller().read( file.getInputStream() );
-        return prefixSource.readEntries();
+            @Override
+            public List<String> call()
+                throws Exception
+            {
+                final StorageFileItem file = getFileItem();
+                if ( file == null )
+                {
+                    return null;
+                }
+                final PrefixSource prefixSource = getPrefixSourceMarshaller().read( file.getInputStream() );
+                return prefixSource.readEntries();
+            }
+        } );
     }
 
     @Override
@@ -157,6 +202,33 @@ public class FilePrefixSource
     }
 
     // ==
+
+    protected <R> R doReadProtected( final Callable<R> callable )
+        throws IOException
+    {
+        final RepositoryItemUidLock lock = getRepositoryItemUid().getLock();
+        lock.lock( Action.read );
+        try
+        {
+            try
+            {
+                return callable.call();
+            }
+            catch ( IOException e )
+            {
+                throw e;
+            }
+            catch ( Exception e )
+            {
+                Throwables.propagate( e );
+            }
+        }
+        finally
+        {
+            lock.unlock();
+        }
+        return null; // to make compiler happy. but is unreachable
+    }
 
     protected boolean equals( final FilePrefixSource prefixesEntrySource )
     {
