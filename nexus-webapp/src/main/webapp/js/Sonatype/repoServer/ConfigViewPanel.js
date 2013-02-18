@@ -11,12 +11,12 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/*global Ext, Sonatype*/
+/*global Ext, NX, Sonatype*/
 
 /*
  * View Nexus serer XML configuration file
  */
-Ext.define('Sonatype.repoServer.ConfigViewPanel', {
+NX.define('Sonatype.repoServer.ConfigViewPanel', {
   requirejs : ['Sonatype/all', 'Nexus/config'],
 
   extend : 'Ext.form.FormPanel',
