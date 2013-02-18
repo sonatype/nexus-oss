@@ -400,7 +400,7 @@ public class WLManagerImpl
                 getLogger().debug( "{} remote discovery unsuccessful.",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             }
-            final DiscoveryStatusSource discoveryStatusSource =
+            final PropfileDiscoveryStatusSource discoveryStatusSource =
                 new PropfileDiscoveryStatusSource( mavenProxyRepository );
             final Outcome lastOutcome = discoveryResult.getLastResult();
             discoveryStatusSource.write( new WLDiscoveryStatus( lastOutcome.isSuccessful() ? DStatus.SUCCESSFUL
@@ -414,7 +414,8 @@ public class WLManagerImpl
         return prefixSource;
     }
 
-    protected PrefixSource updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository, final boolean notify )
+    protected PrefixSource updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository,
+                                                  final boolean notify )
         throws IOException
     {
         PrefixSource prefixSource = null;
@@ -443,7 +444,8 @@ public class WLManagerImpl
         {
             if ( member.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
             {
-                final PrefixSource memberEntrySource = getPrefixSourceFor( member.adaptToFacet( MavenRepository.class ) );
+                final PrefixSource memberEntrySource =
+                    getPrefixSourceFor( member.adaptToFacet( MavenRepository.class ) );
                 if ( !memberEntrySource.exists() )
                 {
                     getLogger().debug( "{} group's member {} does not have WL published.",
@@ -530,7 +532,7 @@ public class WLManagerImpl
             }
             else
             {
-                final DiscoveryStatusSource discoveryStatusSource =
+                final PropfileDiscoveryStatusSource discoveryStatusSource =
                     new PropfileDiscoveryStatusSource( mavenProxyRepository );
                 if ( !discoveryStatusSource.exists() )
                 {
@@ -732,6 +734,7 @@ public class WLManagerImpl
         }
     }
 
+    @SuppressWarnings( "deprecation" )
     protected void removeNoscrapeFlag( final MavenRepository mavenRepository )
         throws IOException
     {

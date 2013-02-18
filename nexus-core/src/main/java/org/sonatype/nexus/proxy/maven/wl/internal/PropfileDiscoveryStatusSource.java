@@ -36,13 +36,13 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import com.google.common.io.Closeables;
 
 /**
- * Simple implementation of {@link DiscoveryStatusSource} that uses {@link Properties} file, and stores it in
- * {@link MavenProxyRepository} local storage.
+ * Utility class to persist discovery results. This is a simple implementation that uses {@link Properties} file, and
+ * stores it in {@link MavenProxyRepository}'s local storage.
  * 
  * @author cstamas
+ * @since 2.4
  */
 public class PropfileDiscoveryStatusSource
-    implements DiscoveryStatusSource
 {
     private static final String DISCOVERY_STATUS_FILE_PATH = "/.meta/discovery-status.txt";
 
@@ -66,7 +66,11 @@ public class PropfileDiscoveryStatusSource
         this.mavenProxyRepository = checkNotNull( mavenProxyRepository );
     }
 
-    @Override
+    /**
+     * Returns {@code true} if "last" results exists, or {@code false} if never run discovery yet.
+     * 
+     * @return {@code true} if "last" results exists, or {@code false} if never run discovery yet.
+     */
     public boolean exists()
     {
         try
@@ -80,7 +84,12 @@ public class PropfileDiscoveryStatusSource
         return false;
     }
 
-    @Override
+    /**
+     * Reads up the last discovery status.
+     * 
+     * @return last discovery status.
+     * @throws IOException
+     */
     public WLDiscoveryStatus read()
         throws IOException
     {
@@ -111,7 +120,12 @@ public class PropfileDiscoveryStatusSource
         }
     }
 
-    @Override
+    /**
+     * Persists last discovery status.
+     * 
+     * @param discoveryStatus
+     * @throws IOException
+     */
     public void write( final WLDiscoveryStatus discoveryStatus )
         throws IOException
     {
@@ -127,7 +141,11 @@ public class PropfileDiscoveryStatusSource
         putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
     }
 
-    @Override
+    /**
+     * Deletes last discovery status.
+     * 
+     * @throws IOException
+     */
     public void delete()
         throws IOException
     {

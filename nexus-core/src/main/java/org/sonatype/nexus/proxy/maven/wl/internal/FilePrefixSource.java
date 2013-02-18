@@ -47,7 +47,7 @@ public class FilePrefixSource
 
     private final String path;
 
-    private final PrefixSourceMarshaller prefixSourceMarshaller;
+    private final TextFilePrefixSourceMarshaller prefixSourceMarshaller;
 
     /**
      * Constructor.
@@ -85,7 +85,7 @@ public class FilePrefixSource
         return mavenRepository;
     }
 
-    protected PrefixSourceMarshaller getPrefixSourceMarshaller()
+    protected TextFilePrefixSourceMarshaller getPrefixSourceMarshaller()
     {
         return prefixSourceMarshaller;
     }
