@@ -332,6 +332,19 @@
             </configuration>
           </execution>
           <execution>
+            <id>js-nx</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/js/nx-all.js</output>
+              <sourceDirectory>src/main/webapp/js</sourceDirectory>
+              <includes>
+                <include>NX/**/*.js</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
             <id>js</id>
             <goals>
               <goal>aggregate</goal>
@@ -341,6 +354,7 @@
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <excludes>
                 <exclude>lib/*.js</exclude>
+                <exclude>NX/**/*.js</exclude>
               </excludes>
               <includes>
                 <include>**/*.js</include>

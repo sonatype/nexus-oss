@@ -33,20 +33,14 @@
   <link rel="stylesheet" href="ext-3.4.0/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="style/$buildQualifier/sonatype-all.css" type="text/css" media="screen" title="no title" charset="utf-8">
 
-##  <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
-    <script type="text/javascript">
-    </script>
-
 
   #if ($debug)
       <script src="ext-3.4.0/adapter/ext/ext-base-debug.js" type="text/javascript" charset="utf-8"></script>
       <script src="ext-3.4.0/ext-all-debug.js" type="text/javascript" charset="utf-8"></script>
-      ## omit sonatype-all.js to pick up single file modules
   #else
       ## load aggregated/minified files
       <script src="ext-3.4.0/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
       <script src="ext-3.4.0/ext-all.js" type="text/javascript" charset="utf-8"></script>
-      <script src="js/$buildQualifier/sonatype-all.js" type="text/javascript" charset="utf-8"></script>
   #end
 
     <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>
@@ -58,8 +52,8 @@
             urlArgs : "cache=$nexusVersion"
         });
 
-        var initUI = function(files) {
-            requirejs(['require', 'extjs', 'Nexus/ui', 'Sonatype/all'], function(require, Ext, Nexus, Sonatype) {
+        var initUI = function(require, files) {
+            require(['require', 'extjs', 'Nexus/ui', 'Sonatype/all'], function(require, Ext, Nexus, Sonatype) {
                 var
                         all = files.length;
                         loaded = 0;
@@ -106,14 +100,35 @@
             });
         }
 
-        var pluginFiles = [];
+        var dependencies = [];
 
         #foreach( $js in $pluginJsFiles )
-        pluginFiles.push('$js');
+        dependencies.push('$js');
         #end
 
-        requirejs(['NX/bootstrap'], function() {
-            initUI(pluginFiles);
+        #*
+        Because we use requirejs modules that install stuff into global namespace (... NX.define ...) and use those
+        things *outside of an r.js module* (... NX.define defines r.js modules ...) we have to "layer" our loading here.
+
+        First NX for NX.define et al, then preload sonatype-all.js (cannot load it earlier b/c
+        NX.define is not in place), then require the actual modules contained in sonatype-all.js.
+        Plugin loading is done in initUI(...), *after core UI is initialized* (again, global names that need to be
+        in place first).
+        *#
+        requirejs(['require',
+            #if (!$debug)
+                'js/$buildQualifier/nx-all.js'
+            #end
+        ], function(require) {
+            require(['require', 'NX/bootstrap'], function(require) {
+                require(['require',
+                    #if (!$debug)
+                        'js/$buildQualifier/sonatype-all.js'
+                    #end
+                ], function(require) {
+                    initUI(require, dependencies);
+                })
+            });
         });
     </script>
 
