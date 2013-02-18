@@ -1180,11 +1180,13 @@ public abstract class AbstractNexusIntegrationTest
         return nexusBaseDir;
     }
 
+    @Deprecated
     public String getTestRepositoryId()
     {
         return testRepositoryId;
     }
 
+    @Deprecated
     public void setTestRepositoryId( String repoId )
     {
         this.testRepositoryId = repoId;
