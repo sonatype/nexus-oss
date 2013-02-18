@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.http.client.HttpClient;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 
 /**
  * Request for scraping.
@@ -32,7 +32,7 @@ public class ScrapeContext
 
     private boolean stopped;
 
-    private EntrySource entrySource;
+    private PrefixSource prefixSource;
 
     private String message;
 
@@ -54,13 +54,13 @@ public class ScrapeContext
     /**
      * Marks the context to be stopped, with successful outcome (when scraping succeeded).
      * 
-     * @param entrySource
+     * @param prefixSource
      * @param message
      */
-    public void stop( final EntrySource entrySource, final String message )
+    public void stop( final PrefixSource prefixSource, final String message )
     {
         this.stopped = true;
-        this.entrySource = checkNotNull( entrySource );
+        this.prefixSource = checkNotNull( prefixSource );
         this.message = checkNotNull( message );
     }
 
@@ -73,7 +73,7 @@ public class ScrapeContext
     public void stop( final String message )
     {
         this.stopped = true;
-        this.entrySource = null;
+        this.prefixSource = null;
         this.message = checkNotNull( message );
     }
 
@@ -94,17 +94,17 @@ public class ScrapeContext
      */
     public boolean isSuccessful()
     {
-        return isStopped() && entrySource != null;
+        return isStopped() && prefixSource != null;
     }
 
     /**
-     * The {@link EntrySource} if scraping succeeded.
+     * The {@link PrefixSource} if scraping succeeded.
      * 
      * @return scraped entries or {@code null}.
      */
-    public EntrySource getEntrySource()
+    public PrefixSource getPrefixSource()
     {
-        return entrySource;
+        return prefixSource;
     }
 
     /**

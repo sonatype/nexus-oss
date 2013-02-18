@@ -21,9 +21,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
 import org.sonatype.nexus.proxy.maven.wl.internal.AbstractPrioritized;
-import org.sonatype.nexus.proxy.maven.wl.internal.ArrayListEntrySource;
+import org.sonatype.nexus.proxy.maven.wl.internal.ArrayListPrefixSource;
 import org.sonatype.nexus.util.PathUtils;
 
 import com.google.common.base.Function;
@@ -148,8 +147,8 @@ public abstract class AbstractScraper
                         if ( entries != null )
                         {
                             // recognized and scraped with result
-                            final EntrySource entrySource = new ArrayListEntrySource( entries );
-                            context.stop( entrySource,
+                            final ArrayListPrefixSource prefixSource = new ArrayListPrefixSource( entries );
+                            context.stop( prefixSource,
                                 "Remote recognized as " + detectionResult.getRemoteDetectedServer() + " (harvested "
                                     + String.valueOf( entries.size() ) + " entries, " + context.getScrapeDepth()
                                     + " levels deep)." );

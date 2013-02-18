@@ -17,35 +17,35 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 
 /**
- * Entry source that merges multiple {@link EntrySource}s into one.
+ * Prefix source that merges multiple {@link PrefixSource}s into one.
  * 
  * @author cstamas
  */
-public class MergingEntrySource
-    extends ArrayListEntrySource
+public class MergingPrefixSource
+    extends ArrayListPrefixSource
 {
     /**
      * Constructor.
      * 
-     * @param entrySources entry sources that you want to have merged.
+     * @param prefixSources prefix sources that you want to have merged.
      * @throws IOException
      */
-    public MergingEntrySource( final List<EntrySource> entrySources )
+    public MergingPrefixSource( final List<PrefixSource> prefixSources )
         throws IOException
     {
-        super( mergeEntries( entrySources ) );
+        super( mergeEntries( prefixSources ) );
     }
 
-    protected static List<String> mergeEntries( final List<EntrySource> entrySources )
+    protected static List<String> mergeEntries( final List<PrefixSource> prefixSources )
         throws IOException
     {
         final LinkedHashSet<String> result = new LinkedHashSet<String>();
-        for ( final EntrySource entrySource : entrySources )
+        for ( final PrefixSource prefixSource : prefixSources )
         {
-            result.addAll( entrySource.readEntries() );
+            result.addAll( prefixSource.readEntries() );
         }
         return new ArrayList<String>( result );
     }

@@ -169,7 +169,7 @@ public class EventDispatcher
 
     protected boolean isRequestContextMarked( final RequestContext context )
     {
-        return context.containsKey( WLManager.WL_INITIATED_FILE_OPERATION );
+        return context.containsKey( WLManager.WL_INITIATED_FILE_OPERATION_FLAG_KEY );
     }
 
     protected boolean isRepositoryHandled( final Repository repository )

@@ -19,16 +19,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 
 /**
- * {@link EntrySource} implementation backed by {@link ArrayList}.
+ * {@link PrefixSource} implementation backed by {@link ArrayList}.
  * 
  * @author cstamas
  * @since 2.4
  */
-public class ArrayListEntrySource
-    implements EntrySource
+public class ArrayListPrefixSource
+    implements PrefixSource
 {
     private final List<String> entries;
 
@@ -39,7 +39,7 @@ public class ArrayListEntrySource
      * 
      * @param entries list of entries, might not be {@code null}
      */
-    public ArrayListEntrySource( final List<String> entries )
+    public ArrayListPrefixSource( final List<String> entries )
     {
         this( entries, System.currentTimeMillis() );
     }
@@ -50,7 +50,7 @@ public class ArrayListEntrySource
      * @param entries list of entries, might not be {@code null}.
      * @param created the timestamp this instance should report.
      */
-    public ArrayListEntrySource( final List<String> entries, final long created )
+    public ArrayListPrefixSource( final List<String> entries, final long created )
     {
         this.entries = Collections.unmodifiableList( checkNotNull( entries ) );
         this.created = created;

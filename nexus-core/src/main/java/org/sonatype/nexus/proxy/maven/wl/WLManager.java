@@ -29,15 +29,15 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 public interface WLManager
 {
     /**
-     * Ket that is put into {@link ResourceStoreRequest}'s context for prefix file related operations, to mark that the
+     * Key that is put into {@link ResourceStoreRequest}'s context for prefix file related operations, to mark that the
      * file operation is initiated by WL feature.
      */
-    String WL_INITIATED_FILE_OPERATION = WLManager.class.getName() + ".fileOperation";
+    String WL_INITIATED_FILE_OPERATION_FLAG_KEY = WLManager.class.getName() + ".fileOperation";
 
     /**
      * Key that is put into {@link ResourceStoreRequest}'s context when {@link ProxyRequestFilter} rejects a request.
      */
-    String REQUEST_REJECTED_FLAG_KEY = WLManager.class.getName() + ".requestRejected";
+    String WL_REQUEST_REJECTED_FLAG_KEY = WLManager.class.getName() + ".requestRejected";
 
     /**
      * Startup. This method should not be invoked by any code (maybe except in UTs).
@@ -134,26 +134,26 @@ public interface WLManager
         throws IOException;
 
     /**
-     * Returns {@link EntrySource} for given {@link MavenRepository}.For the existence of the WL in question (if you
-     * want to read it), check {@link EntrySource#exists()} method! Never returns {@code null}.
+     * Returns {@link PrefixSource} for given {@link MavenRepository}.For the existence of the WL in question (if you
+     * want to read it), check {@link PrefixSource#exists()} method! Never returns {@code null}.
      * 
      * @param mavenRepository
-     * @return the {@link EntrySource} for given repository.
+     * @return the {@link PrefixSource} for given repository.
      */
-    EntrySource getEntrySourceFor( MavenRepository mavenRepository );
+    PrefixSource getPrefixSourceFor( MavenRepository mavenRepository );
 
     /**
-     * Publishes the passed in {@link EntrySource} into the given {@link MavenRepository}.
+     * Publishes the passed in {@link PrefixSource} into the given {@link MavenRepository}.
      * 
      * @param mavenRepository
-     * @param entrySource
+     * @param prefixSource
      * @throws IOException
      */
-    void publish( MavenRepository mavenRepository, EntrySource entrySource )
+    void publish( MavenRepository mavenRepository, PrefixSource prefixSource )
         throws IOException;
 
     /**
-     * Republishes the same {@link EntrySource} that already exists in repository.
+     * Republishes the same {@link PrefixSource} that already exists in repository.
      * 
      * @param mavenRepository
      * @throws IOException

@@ -16,13 +16,13 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Entry source main purpose is to serve/read-up WL entries. It might be backed (or sourced) from multiple things, like
+ * Prefix source main purpose is to serve/read-up WL prefix entries. It might be backed (or sourced) from multiple things, like
  * file or even a plain array of strings.
  * 
  * @author cstamas
  * @since 2.4
  */
-public interface EntrySource
+public interface PrefixSource
 {
     /**
      * Returns {@code true} if this entry source exists, hence, is readable.

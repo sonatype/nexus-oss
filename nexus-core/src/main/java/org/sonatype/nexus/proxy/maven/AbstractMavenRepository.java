@@ -553,7 +553,7 @@ public abstract class AbstractMavenRepository
     protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
     {
         boolean shouldAddToNFC = super.shouldAddToNotFoundCache( request );
-        if ( shouldAddToNFC && request.getRequestContext().containsKey( WLManager.REQUEST_REJECTED_FLAG_KEY ) )
+        if ( shouldAddToNFC && request.getRequestContext().containsKey( WLManager.WL_REQUEST_REJECTED_FLAG_KEY ) )
         {
             // TODO: should we un-flag the request?
             shouldAddToNFC = false;

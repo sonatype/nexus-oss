@@ -74,7 +74,7 @@ public class RemoteContentDiscovererImpl
             {
                 final StrategyResult strategyResult = strategy.discover( mavenProxyRepository );
                 discoveryResult.recordSuccess( strategy.getId(), strategyResult.getMessage(),
-                    strategyResult.getEntrySource() );
+                    strategyResult.getPrefixSource() );
             }
             catch ( StrategyFailedException e )
             {

@@ -109,7 +109,7 @@ public class RemoteScrapeStrategy
                     {
                         getLogger().debug( "Remote scraping {} with Scraper {} succeeded.",
                             RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
-                        return new StrategyResult( context.getMessage(), context.getEntrySource() );
+                        return new StrategyResult( context.getMessage(), context.getPrefixSource() );
                     }
                     else
                     {

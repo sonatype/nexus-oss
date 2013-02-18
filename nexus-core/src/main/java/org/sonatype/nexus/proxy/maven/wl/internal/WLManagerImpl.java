@@ -43,7 +43,7 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryStatus;
@@ -52,8 +52,7 @@ import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus.PStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLStatus;
-import org.sonatype.nexus.proxy.maven.wl.WritableEntrySource;
-import org.sonatype.nexus.proxy.maven.wl.WritableEntrySourceModifier;
+import org.sonatype.nexus.proxy.maven.wl.WritablePrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult.Outcome;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
@@ -195,14 +194,14 @@ public class WLManagerImpl
     public void initializeWhitelist( final MavenRepository mavenRepository )
     {
         getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-        final EntrySource entrySource = getEntrySourceFor( mavenRepository );
+        final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
         try
         {
-            if ( entrySource.exists() )
+            if ( prefixSource.exists() )
             {
                 // good, we assume is up to date, which should be unless user tampered with it
                 // in that case, just delete it + update and should be fixed.
-                publish( mavenRepository, entrySource );
+                publish( mavenRepository, prefixSource );
                 getLogger().info( "Existing WL of {} initialized.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
@@ -245,12 +244,12 @@ public class WLManagerImpl
             final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
             if ( config.isEnabled() )
             {
-                final EntrySource entrySource = getEntrySourceFor( mavenProxyRepository );
+                final PrefixSource prefixSource = getPrefixSourceFor( mavenProxyRepository );
                 // if never run before or is stale
-                if ( !entrySource.exists()
-                    || ( ( System.currentTimeMillis() - entrySource.getLostModifiedTimestamp() ) > config.getDiscoveryInterval() ) )
+                if ( !prefixSource.exists()
+                    || ( ( System.currentTimeMillis() - prefixSource.getLostModifiedTimestamp() ) > config.getDiscoveryInterval() ) )
                 {
-                    if ( !entrySource.exists() )
+                    if ( !prefixSource.exists() )
                     {
                         getLogger().debug( "Proxy repository {} has never been discovered before, updating it.",
                             RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
@@ -337,18 +336,18 @@ public class WLManagerImpl
         throws IOException
     {
         getLogger().debug( "Updating WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-        final EntrySource entrySource;
+        final PrefixSource prefixSource;
         if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
         {
-            entrySource = updateGroupWhitelist( mavenRepository.adaptToFacet( MavenGroupRepository.class ), notify );
+            prefixSource = updateGroupWhitelist( mavenRepository.adaptToFacet( MavenGroupRepository.class ), notify );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
-            entrySource = updateProxyWhitelist( mavenRepository.adaptToFacet( MavenProxyRepository.class ), notify );
+            prefixSource = updateProxyWhitelist( mavenRepository.adaptToFacet( MavenProxyRepository.class ), notify );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
-            entrySource = updateHostedWhitelist( mavenRepository.adaptToFacet( MavenHostedRepository.class ), notify );
+            prefixSource = updateHostedWhitelist( mavenRepository.adaptToFacet( MavenHostedRepository.class ), notify );
         }
         else
         {
@@ -356,14 +355,14 @@ public class WLManagerImpl
                 RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ) );
             return;
         }
-        if ( entrySource != null )
+        if ( prefixSource != null )
         {
             if ( notify )
             {
                 getLogger().info( "Updated and published WL of {}.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
-            publish( mavenRepository, entrySource );
+            publish( mavenRepository, prefixSource );
         }
         else
         {
@@ -376,7 +375,7 @@ public class WLManagerImpl
         }
     }
 
-    protected EntrySource updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository, final boolean notify )
+    protected PrefixSource updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository, final boolean notify )
         throws IOException
     {
         final ProxyMode proxyMode = mavenProxyRepository.getProxyMode();
@@ -386,7 +385,7 @@ public class WLManagerImpl
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             return null;
         }
-        EntrySource entrySource = null;
+        PrefixSource prefixSource = null;
         final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
         if ( config.isEnabled() )
         {
@@ -394,7 +393,7 @@ public class WLManagerImpl
                 remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository );
             if ( discoveryResult.isSuccessful() )
             {
-                entrySource = discoveryResult.getEntrySource();
+                prefixSource = discoveryResult.getPrefixSource();
             }
             else
             {
@@ -412,39 +411,39 @@ public class WLManagerImpl
             getLogger().info( "{} remote discovery disabled.",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         }
-        return entrySource;
+        return prefixSource;
     }
 
-    protected EntrySource updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository, final boolean notify )
+    protected PrefixSource updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository, final boolean notify )
         throws IOException
     {
-        EntrySource entrySource = null;
+        PrefixSource prefixSource = null;
         final DiscoveryResult<MavenHostedRepository> discoveryResult =
             localContentDiscoverer.discoverLocalContent( mavenHostedRepository );
         if ( discoveryResult.isSuccessful() )
         {
-            entrySource = discoveryResult.getEntrySource();
+            prefixSource = discoveryResult.getPrefixSource();
         }
         else
         {
             getLogger().debug( "{} local discovery unsuccessful.",
                 RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
         }
-        return entrySource;
+        return prefixSource;
     }
 
-    protected EntrySource updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository, final boolean notify )
+    protected PrefixSource updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository, final boolean notify )
         throws IOException
     {
-        EntrySource entrySource = null;
+        PrefixSource prefixSource = null;
         // save merged WL into group's local storage (if all members has WL)
         boolean allMembersHaveWLPublished = true;
-        final ArrayList<EntrySource> memberEntrySources = new ArrayList<EntrySource>();
+        final ArrayList<PrefixSource> memberEntrySources = new ArrayList<PrefixSource>();
         for ( Repository member : mavenGroupRepository.getMemberRepositories() )
         {
             if ( member.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
             {
-                final EntrySource memberEntrySource = getEntrySourceFor( member.adaptToFacet( MavenRepository.class ) );
+                final PrefixSource memberEntrySource = getPrefixSourceFor( member.adaptToFacet( MavenRepository.class ) );
                 if ( !memberEntrySource.exists() )
                 {
                     getLogger().debug( "{} group's member {} does not have WL published.",
@@ -461,9 +460,9 @@ public class WLManagerImpl
         }
         if ( allMembersHaveWLPublished )
         {
-            entrySource = new MergingEntrySource( memberEntrySources );
+            prefixSource = new MergingPrefixSource( memberEntrySources );
         }
-        return entrySource;
+        return prefixSource;
     }
 
     // ==
@@ -487,7 +486,7 @@ public class WLManagerImpl
         WLDiscoveryStatus discoveryStatus = null;
 
         // publish status
-        final FileEntrySource publishedEntrySource = getEntrySourceFor( mavenRepository );
+        final FilePrefixSource publishedEntrySource = getPrefixSourceFor( mavenRepository );
         if ( !publishedEntrySource.exists() )
         {
             final String message;
@@ -593,9 +592,9 @@ public class WLManagerImpl
     }
 
     @Override
-    public FileEntrySource getEntrySourceFor( final MavenRepository mavenRepository )
+    public FilePrefixSource getPrefixSourceFor( final MavenRepository mavenRepository )
     {
-        return new FileEntrySource( mavenRepository, config.getLocalPrefixFilePath(),
+        return new FilePrefixSource( mavenRepository, config.getLocalPrefixFilePath(),
             config.getPrefixFileMaxEntriesCount() );
     }
 
@@ -604,13 +603,13 @@ public class WLManagerImpl
     public boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, String... entries )
         throws IOException
     {
-        final WritableEntrySource entrySource = getEntrySourceFor( mavenHostedRepository );
-        final WritableEntrySourceModifier wesm =
-            new WritableEntrySourceModifierImpl( entrySource, config.getLocalScrapeDepth() );
+        final WritablePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
+        final WritablePrefixSourceModifier wesm =
+            new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
         wesm.offerEntries( entries );
         if ( wesm.apply() )
         {
-            publish( mavenHostedRepository, entrySource );
+            publish( mavenHostedRepository, prefixSource );
             return true;
         }
         return false;
@@ -619,13 +618,13 @@ public class WLManagerImpl
     public boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, String... entries )
         throws IOException
     {
-        final WritableEntrySource entrySource = getEntrySourceFor( mavenHostedRepository );
-        final WritableEntrySourceModifier wesm =
-            new WritableEntrySourceModifierImpl( entrySource, config.getLocalScrapeDepth() );
+        final WritablePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
+        final WritablePrefixSourceModifier wesm =
+            new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
         wesm.revokeEntries( entries );
         if ( wesm.apply() )
         {
-            publish( mavenHostedRepository, entrySource );
+            publish( mavenHostedRepository, prefixSource );
             return true;
         }
         return false;
@@ -634,12 +633,12 @@ public class WLManagerImpl
     // ==
 
     @Override
-    public void publish( final MavenRepository mavenRepository, final EntrySource entrySource )
+    public void publish( final MavenRepository mavenRepository, final PrefixSource prefixSource )
         throws IOException
     {
         // publish prefix file
-        final FileEntrySource prefixesFile = getEntrySourceFor( mavenRepository );
-        prefixesFile.writeEntries( entrySource );
+        final FilePrefixSource prefixesFile = getPrefixSourceFor( mavenRepository );
+        prefixesFile.writeEntries( prefixSource );
 
         // unset noscrape flag
         removeNoscrapeFlag( mavenRepository );
@@ -655,7 +654,7 @@ public class WLManagerImpl
     public void republish( final MavenRepository mavenRepository )
         throws IOException
     {
-        publish( mavenRepository, getEntrySourceFor( mavenRepository ) );
+        publish( mavenRepository, getPrefixSourceFor( mavenRepository ) );
     }
 
     @Override
@@ -663,13 +662,13 @@ public class WLManagerImpl
         throws IOException
     {
         // delete (if any) published files, even those that user might manually put there
-        getEntrySourceFor( mavenRepository ).delete();
+        getPrefixSourceFor( mavenRepository ).delete();
 
         // TODO: We do this due to RemotePrefixFileStrategy, but this is now scattered (that one may write these file,
         // and here we are cleaning them)
         for ( String path : config.getRemotePrefixFilePaths() )
         {
-            new FileEntrySource( mavenRepository, path, config.getPrefixFileMaxEntriesCount() ).delete();
+            new FilePrefixSource( mavenRepository, path, config.getPrefixFileMaxEntriesCount() ).delete();
         }
 
         // set noscrape flag

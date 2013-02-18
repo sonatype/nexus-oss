@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
@@ -95,10 +95,10 @@ public class RemotePrefixFileStrategy
 
     // ==
 
-    protected EntrySource createEntrySource( final MavenProxyRepository mavenProxyRepository, final String path )
+    protected PrefixSource createEntrySource( final MavenProxyRepository mavenProxyRepository, final String path )
         throws IOException
     {
-        return new FileEntrySource( mavenProxyRepository, path, config.getPrefixFileMaxEntriesCount() );
+        return new FilePrefixSource( mavenProxyRepository, path, config.getPrefixFileMaxEntriesCount() );
     }
 
     protected StorageFileItem retrieveFromRemoteIfExists( final MavenProxyRepository mavenProxyRepository,
@@ -106,7 +106,7 @@ public class RemotePrefixFileStrategy
         throws IOException
     {
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
-        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
+        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
         request.setRequestRemoteOnly( true );
         mavenProxyRepository.removeFromNotFoundCache( request );
         try

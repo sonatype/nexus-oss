@@ -10,35 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.wl;
+package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 
 /**
- * A writable {@link EntrySource} implementation. Writable entry source has capabilities to write and delete next to
- * existing methods.
+ * Marshals entries into raw streams and other way around.
  * 
  * @author cstamas
  * @since 2.4
  */
-public interface WritableEntrySource
-    extends EntrySource
+public interface PrefixSourceMarshaller
 {
     /**
-     * Writes entry instances read from passed in {@link EntrySource} into this entry source.
+     * Marshalls the entry source into the output stream.
      * 
-     * @param entrySource
+     * @param prefixSource
+     * @param outputStream
      * @throws IOException
      */
-    void writeEntries( EntrySource entrySource )
+    void write( PrefixSource prefixSource, OutputStream outputStream )
         throws IOException;
 
     /**
-     * Deletes this entry source. After return from this method (and having no exception), the {@link #exists()} method
-     * returns {@code true}.
+     * Unmarshalls the entry source from input stream.
      * 
+     * @param inputStream
+     * @return prefix source
      * @throws IOException
      */
-    void delete()
+    PrefixSource read( InputStream inputStream )
         throws IOException;
 }

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 
 /**
  * Carries the results of a discovery.
@@ -150,7 +150,7 @@ public class DiscoveryResult<R extends MavenRepository>
 
     private final List<Outcome> outcomes;
 
-    private EntrySource entrySource;
+    private PrefixSource prefixSource;
 
     /**
      * Constructor.
@@ -161,7 +161,7 @@ public class DiscoveryResult<R extends MavenRepository>
     {
         this.mavenRepository = checkNotNull( mavenRepository );
         this.outcomes = new ArrayList<Outcome>();
-        this.entrySource = null;
+        this.prefixSource = null;
     }
 
     /**
@@ -195,13 +195,13 @@ public class DiscoveryResult<R extends MavenRepository>
     }
 
     /**
-     * Returns the {@link EntrySource} that was provided by successful strategy.
+     * Returns the {@link PrefixSource} that was provided by successful strategy.
      * 
      * @return entry source built by successful strategy.
      */
-    public EntrySource getEntrySource()
+    public PrefixSource getPrefixSource()
     {
-        return entrySource;
+        return prefixSource;
     }
 
     /**
@@ -210,18 +210,18 @@ public class DiscoveryResult<R extends MavenRepository>
      * 
      * @param usedStrategyId
      * @param message
-     * @param entrySource
+     * @param prefixSource
      */
-    public void recordSuccess( final String usedStrategyId, final String message, final EntrySource entrySource )
+    public void recordSuccess( final String usedStrategyId, final String message, final PrefixSource prefixSource )
     {
         if ( !isSuccessful() )
         {
             checkNotNull( usedStrategyId );
             checkNotNull( message );
-            checkNotNull( entrySource );
+            checkNotNull( prefixSource );
             final OutcomeImpl success = new OutcomeImpl( usedStrategyId, message );
             this.outcomes.add( success );
-            this.entrySource = entrySource;
+            this.prefixSource = prefixSource;
         }
     }
 

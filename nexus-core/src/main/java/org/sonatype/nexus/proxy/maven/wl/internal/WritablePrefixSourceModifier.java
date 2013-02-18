@@ -21,19 +21,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.proxy.maven.wl.WritableEntrySource;
-import org.sonatype.nexus.proxy.maven.wl.WritableEntrySourceModifier;
+import org.sonatype.nexus.proxy.maven.wl.WritablePrefixSource;
 
 /**
- * Default implementation of {@link WritableEntrySourceModifier} that collects changes in memory, and flushes it at once
- * when {@link #apply()} method is invoked.
+ * A modifier for {@link WritablePrefixSource}, that makes you able to "edit" it by adding and removing entries from it.
+ * It performs entry source changes only when needed (entries added or removed does modify WL), and defers saving of
+ * modified WL until you invoke {@link #apply()}.
  * 
  * @author cstamas
+ * @since 2.4
  */
-public class WritableEntrySourceModifierImpl
-    implements WritableEntrySourceModifier
+public class WritablePrefixSourceModifier
 {
-    private final WritableEntrySource writableEntrySource;
+    private final WritablePrefixSource writablePrefixSource;
 
     private final int maxDepth;
 
@@ -41,29 +41,35 @@ public class WritableEntrySourceModifierImpl
 
     private final List<String> toBeRemoved;
 
-    private List<String> entrySourceEntries;
+    private List<String> prefixSourceEntries;
 
     private PathMatcher whitelistMatcher;
 
     /**
      * Constructor.
      * 
-     * @param writableEntrySource
+     * @param writablePrefixSource
      * @param maxDepth
      * @throws IOException
      */
-    public WritableEntrySourceModifierImpl( final WritableEntrySource writableEntrySource, final int maxDepth )
+    public WritablePrefixSourceModifier( final WritablePrefixSource writablePrefixSource, final int maxDepth )
         throws IOException
     {
         checkArgument( maxDepth >= 2 );
-        this.writableEntrySource = checkNotNull( writableEntrySource );
+        this.writablePrefixSource = checkNotNull( writablePrefixSource );
         this.maxDepth = maxDepth;
         this.toBeAdded = new ArrayList<String>();
         this.toBeRemoved = new ArrayList<String>();
-        reset( writableEntrySource.readEntries() );
+        reset( writablePrefixSource.readEntries() );
     }
 
-    @Override
+    /**
+     * Adds entries to {@link WritablePrefixSource} being modified. Returns {@code true} if the invocation actually did
+     * change the WL. Changes are cached, entry source is not modified until you invoke {@link #apply()} method.
+     * 
+     * @param entries
+     * @return {@code true} if the invocation actually did change the WL.
+     */
     public boolean offerEntries( final String... entries )
     {
         boolean modified = false;
@@ -79,7 +85,13 @@ public class WritableEntrySourceModifierImpl
         return modified;
     }
 
-    @Override
+    /**
+     * Removes entries from {@link WritablePrefixSource} being modified. Returns {@code true} if the invocation actually
+     * did change the WL. Changes are cached, entry source is not modified until you invoke {@link #apply()} method.
+     * 
+     * @param entries
+     * @return {@code true} if the invocation actually did change the WL.
+     */
     public boolean revokeEntries( final String... entries )
     {
         boolean modified = false;
@@ -88,7 +100,7 @@ public class WritableEntrySourceModifierImpl
             final String normalizedEntry = pathFrom( elementsOf( entry ) );
             if ( whitelistMatcher.contains( normalizedEntry ) && !toBeRemoved.contains( normalizedEntry ) )
             {
-                for ( String whitelistEntry : entrySourceEntries )
+                for ( String whitelistEntry : prefixSourceEntries )
                 {
                     if ( whitelistEntry.startsWith( normalizedEntry ) )
                     {
@@ -101,36 +113,53 @@ public class WritableEntrySourceModifierImpl
         return modified;
     }
 
-    @Override
+    /**
+     * Returns {@code true} if this modifier has cached changes.
+     * 
+     * @return {@code true} if this modifier has cached changes.
+     */
     public boolean hasChanges()
     {
         return !toBeRemoved.isEmpty() || !toBeAdded.isEmpty();
     }
 
-    @Override
+    /**
+     * Applies cached changes to backing {@link WritablePrefixSource}. After returning from this method, backing
+     * {@link WritablePrefixSource} is modified (if there were cached changes). Returns {@code true} if there were
+     * cached changes, and hence, the backing entry source did change.
+     * 
+     * @return {@code true} if there were cached changes and entry source was modified.
+     * @throws IOException
+     */
     public boolean apply()
         throws IOException
     {
         if ( hasChanges() )
         {
-            final ArrayList<String> entries = new ArrayList<String>( writableEntrySource.readEntries() );
+            final ArrayList<String> entries = new ArrayList<String>( writablePrefixSource.readEntries() );
             entries.removeAll( toBeRemoved );
             entries.addAll( toBeAdded );
-            final ArrayListEntrySource newEntries = new ArrayListEntrySource( entries );
-            writableEntrySource.writeEntries( newEntries );
+            final ArrayListPrefixSource newEntries = new ArrayListPrefixSource( entries );
+            writablePrefixSource.writeEntries( newEntries );
             reset( newEntries.readEntries() );
             return true;
         }
         return false;
     }
 
-    @Override
+    /**
+     * Resets this instance, by purging all the cached changes and reloads backing {@link WritablePrefixSource} that
+     * remained unchanged. Returns {@code true} if there were cached changes.
+     * 
+     * @return {@code true} if there were cached changes.
+     * @throws IOException
+     */
     public boolean reset()
         throws IOException
     {
         if ( hasChanges() )
         {
-            reset( writableEntrySource.readEntries() );
+            reset( writablePrefixSource.readEntries() );
             return true;
         }
         return false;
@@ -142,7 +171,7 @@ public class WritableEntrySourceModifierImpl
     {
         this.toBeAdded.clear();
         this.toBeRemoved.clear();
-        this.entrySourceEntries = entries;
+        this.prefixSourceEntries = entries;
         this.whitelistMatcher = new PathMatcherImpl( entries );
     }
 }

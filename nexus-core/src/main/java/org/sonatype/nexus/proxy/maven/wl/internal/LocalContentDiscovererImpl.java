@@ -89,11 +89,11 @@ public class LocalContentDiscovererImpl
             {
                 // tree is basically empty, so make the list too
                 discoveryResult.recordSuccess( ID, "Repository crawled successfully (is empty)",
-                    new ArrayListEntrySource( Collections.<String> emptyList() ) );
+                    new ArrayListPrefixSource( Collections.<String> emptyList() ) );
             }
             else
             {
-                discoveryResult.recordSuccess( ID, "Repository crawled successfully", new ArrayListEntrySource(
+                discoveryResult.recordSuccess( ID, "Repository crawled successfully", new ArrayListPrefixSource(
                     getAllLeafPaths( parentOMatic, config.getLocalScrapeDepth() ) ) );
             }
         }

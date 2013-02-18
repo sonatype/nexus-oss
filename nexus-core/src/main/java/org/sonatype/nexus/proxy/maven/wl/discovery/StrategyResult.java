@@ -14,7 +14,7 @@ package org.sonatype.nexus.proxy.maven.wl.discovery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 
 /**
  * The result of a strategy discovery.
@@ -25,18 +25,18 @@ public class StrategyResult
 {
     private final String message;
 
-    private final EntrySource entrySource;
+    private final PrefixSource prefixSource;
 
     /**
      * Constructor.
      * 
      * @param message
-     * @param entrySource
+     * @param prefixSource
      */
-    public StrategyResult( final String message, final EntrySource entrySource )
+    public StrategyResult( final String message, final PrefixSource prefixSource )
     {
         this.message = checkNotNull( message );
-        this.entrySource = checkNotNull( entrySource );
+        this.prefixSource = checkNotNull( prefixSource );
     }
 
     /**
@@ -50,12 +50,12 @@ public class StrategyResult
     }
 
     /**
-     * Returns the entry source, as a result of discovery.
+     * Returns the prefix source, as a result of discovery.
      * 
      * @return entry source discovered by strategy.
      */
-    public EntrySource getEntrySource()
+    public PrefixSource getPrefixSource()
     {
-        return entrySource;
+        return prefixSource;
     }
 }

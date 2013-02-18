@@ -15,12 +15,12 @@ package org.sonatype.nexus.proxy.maven.wl.events;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 
 /**
  * Event fired when a {@link MavenRepository} publishes it's WL. The WL is carried along with this event in form of
- * {@link EntrySource} but you can also use {@link WLManager} to get repository entry source, as it is already available
+ * {@link PrefixSource} but you can also use {@link WLManager} to get repository entry source, as it is already available
  * in the moment you process this event.
  * 
  * @author cstamas
@@ -29,27 +29,27 @@ import org.sonatype.nexus.proxy.maven.wl.WLManager;
 public class WLPublishedRepositoryEvent
     extends AbstractWLRepositoryEvent
 {
-    private final EntrySource entrySource;
+    private final PrefixSource prefixSource;
 
     /**
      * Constructor.
      * 
      * @param mavenRepository the repository published it's WL.
-     * @param entrySource the WL in form of {@link EntrySource}.
+     * @param prefixSource the WL in form of {@link PrefixSource}.
      */
-    public WLPublishedRepositoryEvent( final MavenRepository mavenRepository, final EntrySource entrySource )
+    public WLPublishedRepositoryEvent( final MavenRepository mavenRepository, final PrefixSource prefixSource )
     {
         super( mavenRepository );
-        this.entrySource = checkNotNull( entrySource );
+        this.prefixSource = checkNotNull( prefixSource );
     }
 
     /**
-     * The {@link EntrySource} that gives access to published entries.
+     * The {@link PrefixSource} that gives access to published entries.
      * 
      * @return the entry source.
      */
-    public EntrySource getEntrySource()
+    public PrefixSource getPrefixSource()
     {
-        return entrySource;
+        return prefixSource;
     }
 }

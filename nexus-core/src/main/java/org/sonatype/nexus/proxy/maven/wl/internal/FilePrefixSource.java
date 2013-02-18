@@ -28,26 +28,26 @@ import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
-import org.sonatype.nexus.proxy.maven.wl.WritableEntrySource;
+import org.sonatype.nexus.proxy.maven.wl.WritablePrefixSource;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
- * {@link WritableEntrySource} implementation that is backed by a {@link StorageFileItem} in a {@link MavenRepository}.
- * Also serves as "the main" WL source. This is the only implementation of the {@link WritableEntrySource}.
+ * {@link WritablePrefixSource} implementation that is backed by a {@link StorageFileItem} in a {@link MavenRepository}.
+ * Also serves as "the main" WL source. This is the only implementation of the {@link WritablePrefixSource}.
  * 
  * @author cstamas
  * @since 2.4
  */
-public class FileEntrySource
-    implements WritableEntrySource
+public class FilePrefixSource
+    implements WritablePrefixSource
 {
     private final MavenRepository mavenRepository;
 
     private final String path;
 
-    private final EntrySourceMarshaller entrySourceMarshaller;
+    private final PrefixSourceMarshaller prefixSourceMarshaller;
 
     /**
      * Constructor.
@@ -56,12 +56,12 @@ public class FileEntrySource
      * @param path
      * @param prefixFileMaxEntryCount
      */
-    protected FileEntrySource( final MavenRepository mavenRepository, final String path,
-                               final int prefixFileMaxEntryCount )
+    protected FilePrefixSource( final MavenRepository mavenRepository, final String path,
+                                final int prefixFileMaxEntryCount )
     {
         this.mavenRepository = checkNotNull( mavenRepository );
         this.path = checkNotNull( path );
-        this.entrySourceMarshaller = new PrefixesFileMarshaller( prefixFileMaxEntryCount );
+        this.prefixSourceMarshaller = new TextFilePrefixSourceMarshaller( prefixFileMaxEntryCount );
     }
 
     /**
@@ -85,9 +85,9 @@ public class FileEntrySource
         return mavenRepository;
     }
 
-    protected EntrySourceMarshaller getEntrySourceMarshaller()
+    protected PrefixSourceMarshaller getPrefixSourceMarshaller()
     {
-        return entrySourceMarshaller;
+        return prefixSourceMarshaller;
     }
 
     @Override
@@ -131,21 +131,21 @@ public class FileEntrySource
         {
             return null;
         }
-        final EntrySource entrySource = getEntrySourceMarshaller().read( file.getInputStream() );
-        return entrySource.readEntries();
+        final PrefixSource prefixSource = getPrefixSourceMarshaller().read( file.getInputStream() );
+        return prefixSource.readEntries();
     }
 
     @Override
-    public void writeEntries( final EntrySource entrySource )
+    public void writeEntries( final PrefixSource prefixSource )
         throws IOException
     {
-        if ( entrySource instanceof FileEntrySource && equals( (FileEntrySource) entrySource ) )
+        if ( prefixSource instanceof FilePrefixSource && equals( (FilePrefixSource) prefixSource ) )
         {
             // we would read and then write to the same file, don't do it
             return;
         }
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        getEntrySourceMarshaller().write( entrySource, bos );
+        getPrefixSourceMarshaller().write( prefixSource, bos );
         putFileItem( new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/plain" ) );
     }
 
@@ -158,7 +158,7 @@ public class FileEntrySource
 
     // ==
 
-    protected boolean equals( final FileEntrySource prefixesEntrySource )
+    protected boolean equals( final FilePrefixSource prefixesEntrySource )
     {
         return getMavenRepository().getId().equals( prefixesEntrySource.getMavenRepository().getId() )
             && getFilePath().equals( prefixesEntrySource.getFilePath() );
@@ -172,7 +172,7 @@ public class FileEntrySource
             final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
             request.setRequestLocalOnly( true );
             request.setRequestGroupLocalOnly( true );
-            request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
+            request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
             @SuppressWarnings( "deprecation" )
             final StorageItem item = getMavenRepository().retrieveItem( true, request );
             if ( item instanceof StorageFileItem )
@@ -202,7 +202,7 @@ public class FileEntrySource
         final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
         request.setRequestLocalOnly( true );
         request.setRequestGroupLocalOnly( true );
-        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
+        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
         final DefaultStorageFileItem file =
             new DefaultStorageFileItem( getMavenRepository(), request, true, true, content );
         try
@@ -225,7 +225,7 @@ public class FileEntrySource
         final ResourceStoreRequest request = new ResourceStoreRequest( getFilePath() );
         request.setRequestLocalOnly( true );
         request.setRequestGroupLocalOnly( true );
-        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION, Boolean.TRUE );
+        request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
         try
         {
             getMavenRepository().deleteItem( true, request );

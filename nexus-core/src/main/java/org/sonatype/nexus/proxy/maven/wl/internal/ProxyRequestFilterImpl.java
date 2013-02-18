@@ -25,7 +25,7 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.maven.wl.EntrySource;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.events.WLPublishedRepositoryEvent;
@@ -78,7 +78,7 @@ public class ProxyRequestFilterImpl
             if ( !allowed )
             {
                 // flag the request as rejected
-                resourceStoreRequest.getRequestContext().put( WLManager.REQUEST_REJECTED_FLAG_KEY, Boolean.TRUE );
+                resourceStoreRequest.getRequestContext().put( WLManager.WL_REQUEST_REJECTED_FLAG_KEY, Boolean.TRUE );
             }
             return allowed;
         }
@@ -107,10 +107,10 @@ public class ProxyRequestFilterImpl
     {
         try
         {
-            final EntrySource entrySource = wlManager.getEntrySourceFor( mavenProxyRepository );
-            if ( entrySource.exists() )
+            final PrefixSource prefixSource = wlManager.getPrefixSourceFor( mavenProxyRepository );
+            if ( prefixSource.exists() )
             {
-                final PathMatcher whitelist = new PathMatcherImpl( entrySource.readEntries(), Integer.MAX_VALUE );
+                final PathMatcher whitelist = new PathMatcherImpl( prefixSource.readEntries(), Integer.MAX_VALUE );
                 whitelists.put( mavenProxyRepository.getId(), whitelist );
             }
             else
