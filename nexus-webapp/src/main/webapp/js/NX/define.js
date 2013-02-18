@@ -204,13 +204,15 @@ define('NX/define', ['NX/base', 'NX/assert', 'NX/log'], function() {
               Ext.reg(xtype, type);
           }
 
+
           // When singleton; type becomes new instance
           if (singleton !== undefined) {
-              type = NX.create(type);
+              NX.obj(nameSpace)[simpleClassName] = new type();
+          } else {
+              // Assign to global namespace
+              NX.obj(nameSpace)[simpleClassName] = type;
           }
 
-          // Assign to global namespace
-          NX.obj(nameSpace)[simpleClassName] = type;
 
           // Call post-define hook
           if (createdFn !== undefined) {
