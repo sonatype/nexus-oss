@@ -31,6 +31,7 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -241,6 +242,7 @@ public abstract class AbstractProxyTestEnvironment
     public void tearDown()
         throws Exception
     {
+        eventBus.post( new NexusStoppedEvent( null ) );
         getEnvironmentBuilder().stopService();
 
         super.tearDown();
