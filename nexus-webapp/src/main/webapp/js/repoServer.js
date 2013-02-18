@@ -24,7 +24,6 @@ define('repoServer',
     'repoServer/Maven2InformationPanel',
     'repoServer/MirrorConfigPanel',
     'repoServer/PrivilegeEditPanel',
-    'repoServer/referenceData',
     'repoServer/RepoEditPanel',
     'repoServer/RepoMaintPanel',
     'repoServer/RepositoryBrowserContainer',
@@ -42,6 +41,7 @@ define('repoServer',
     'Sonatype/repoServer/Documentation',
     'Sonatype/repoServer/UserEditPanel',
     'Sonatype/repoServer/UserMappingEditor',
+    'Sonatype/repoServer/referenceData',
     'Sonatype/repoServer/ArtifactUploadPanel'
   ], function() {
 
