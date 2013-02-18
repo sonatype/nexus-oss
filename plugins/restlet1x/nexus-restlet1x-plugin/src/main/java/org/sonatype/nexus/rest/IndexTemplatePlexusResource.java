@@ -17,17 +17,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.google.common.collect.Lists;
 import org.apache.velocity.VelocityContext;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -43,6 +40,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
+import org.sonatype.nexus.plugins.rest.RequireJsContributor;
 import org.sonatype.nexus.plugins.restlet1x.BuildNumberService;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
@@ -67,13 +65,16 @@ public class IndexTemplatePlexusResource
 
     private BuildNumberService buildNumberService;
 
+    private Set<RequireJsContributor> rJsContributors;
+
     String templateFilename;
 
     @Inject
     public IndexTemplatePlexusResource( final Map<String, NexusIndexHtmlCustomizer> bundles, final Nexus nexus,
                                         final ReferenceFactory referenceFactory,
                                         final @Named("${index.template.file:-templates/index.vm}") String templateFilename,
-                                        final Velocity velocity, final BuildNumberService buildNumberService )
+                                        final Velocity velocity, final BuildNumberService buildNumberService,
+                                        final Set<RequireJsContributor> rJsContributors)
     {
         this();
 
@@ -83,6 +84,7 @@ public class IndexTemplatePlexusResource
         this.templateFilename = templateFilename;
         this.velocity = velocity;
         this.buildNumberService = buildNumberService;
+        this.rJsContributors = rJsContributors;
     }
 
     public IndexTemplatePlexusResource()
@@ -158,6 +160,8 @@ public class IndexTemplatePlexusResource
 
         List<String> pluginJsFiles = new ArrayList<String>();
 
+
+
         for ( String key : bundles.keySet() )
         {
             pluginContext = new HashMap<String, Object>( topContext );
@@ -218,7 +222,16 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "pluginJsFiles", pluginJsFiles );
 
         final String query = request.getResourceRef().getQuery();
-        templatingContext.put( "debug", (query != null && query.contains( "debug" )) );
+        final boolean debugMode = query != null && query.contains( "debug" );
+        templatingContext.put( "debug", debugMode );
+
+        List<RequireJsContributor.RequireJsContribution> contributions = Lists.newArrayList();
+        List<String> preloadUrls = Lists.newArrayList();
+        for ( RequireJsContributor rJs : rJsContributors)
+        {
+            contributions.add( rJs.contribute( debugMode ) );
+        }
+        templatingContext.put( "rJsContributions", contributions );
 
         templatingContext.put( "buildQualifier", buildNumberService.getBuildNumber() );
 
