@@ -16,7 +16,9 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 
 /**
- * Component making the decision should the request be allowed to result in remote storage request or not.
+ * Component making the decision about the request in a Maven2 proxy repository, should it be allowed to result in
+ * remote storage request or not (if not present in local cache). In other words, is it "expected" that artifact
+ * corresponding to incoming request exists remotely, or not.
  * 
  * @author cstamas
  * @since 2.4
