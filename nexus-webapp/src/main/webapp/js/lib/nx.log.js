@@ -21,66 +21,82 @@ Ext.ns('NX');
  * @singleton
  */
 NX.log = (function () {
-    var log = Ext.emptyFn;
+    var logger, safeProxy, levelAwareProxy;
 
-    // FIXME: Can probably expose the console object more directly w/fallback adapter?
+    // FIXME: Really would like a better/more-powerful logging API here
+    // FIXME: Including the ability to remote back to the server to capture UI events
+    //
+    // http://log4javascript.org/index.html
+    // http://www.gscottolson.com/blackbirdjs
+    // http://log4js.berlios.de
 
-    // reference the console as 'log' if it exists
-    try {
-        if (typeof(console) === "object" && console.log !== undefined) {
-            log = function (level, msg) {
-                console.log(level + ' ' + msg);
-            };
+    logger = {
+        enabled: true,
+
+        levels: {
+            trace:  false,
+            debug:  false,
+            group:  false,
+            info:   true,
+            warn:   true,
+            error:  true
+        },
+
+        isEnabled: function(level) {
+            return this.enabled && (this.levels[level] || NX.global.location.search === '?debug');
         }
-    }
-    catch (e) {
-        // ignore, use emptyFn
-    }
 
-    return {
-        /**
-         * @static
-         * @return {boolean} True if debug is enabled.
-         */
-        isDebug: function () {
-            return NX.global.location.search === '?debug';
-        },
-
-        /**
-         * @static
-         * @param msg {String} The message to log.
-         */
-        debug: function (msg) {
-            if (NX.log.isDebug()) {
-                log('DEBUG', msg);
-            }
-        },
-
-        /**
-         * @static
-         * @param msg {String} The message to log.
-         */
-        info: function (msg) {
-            log('INFO', msg);
-        },
-
-        /**
-         * @static
-         * @param msg {String} The message to log.
-         */
-        warn: function (msg) {
-            log('WARN', msg);
-        },
-
-        /**
-         * @static
-         * @param msg {String} The message to log.
-         */
-        error: function (msg) {
-            log('ERROR', msg);
-        }
+        // FIXME: Add ExtJS 4.x compatible(ish) log() helper
+        //log: function(/*[options],[message]*/) {
+        //}
     };
+
+    safeProxy = function(target, name) {
+        if (Ext.isDefined(target) && Ext.isFunction(target[name])) {
+            return function() {
+                if (logger.enabled) {
+                    target[name].apply(target, arguments);
+                }
+            }
+        }
+
+        return Ext.emptyFn();
+    };
+
+    levelAwareProxy = function(target, name) {
+        if (Ext.isDefined(target) && Ext.isFunction(target[name])) {
+            return function() {
+                if (logger.isEnabled(name)) {
+                    target[name].apply(target, arguments);
+                }
+            }
+        }
+
+        return Ext.emptyFn();
+    };
+
+    Ext.each([
+        'trace',
+        //'log', skipping; as we may want to make an Ext.log compatible method
+        'debug',
+        'group',
+        'info',
+        'warn',
+        'error'
+    ], function (name) {
+        logger[name] = levelAwareProxy(console, name);
+    });
+
+    Ext.each([
+        'groupEnd'
+    ], function (name) {
+        logger[name] = safeProxy(console, name);
+    });
+
+    return logger;
 }());
+
+NX.log.debug('Logging initialized');
 
 // Compatibility
 Ext.ns('Nexus');

@@ -309,7 +309,14 @@
               <output>${project.build.outputDirectory}/js/sonatype-lib.js</output>
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <includes>
-                <include>lib/*.js</include>
+                <!-- some order required here -->
+                <include>lib/string.js</include>
+                <include>lib/nx.js</include>
+                <include>lib/nx.assert.js</include>
+                <include>lib/nx.log.js</include>
+                <include>lib/nx.define.js</include>
+                <include>lib/require-*.js</include>
+                <include>lib/classes/**/*.js</include>
               </includes>
             </configuration>
           </execution>

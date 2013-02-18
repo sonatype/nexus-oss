@@ -38,7 +38,8 @@ NX.Base = function (config) {
  *
  * @cfg {String} extend             Super-class name.
  * @cfg {*} statics                 Static members.
- * @cfg {*} requirejs               Array of requirejs module dependencies
+ * @cfg {Array} mixins              Mixin class names, does not support object configuration like extjs4 ATM.
+ * @cfg {*} requirejs               Array of requirejs module dependencies, custom... defs not extjs4 compatible.
  * @cfg {*} requires                Array of class names (created by Ext.define) which are dependencies.
  * @cfg {boolean} requireSuper      Flag to enable/disable automatic dependency on super-class;
  *                                  Tries to auto-detect but just inc-ase you can enable/disable it.
@@ -51,14 +52,16 @@ NX.define = function (className, data, createdFn) {
 
     var i,
         nameSpace,
-        baseClassName,
+        simpleClassName,
         superName,
         type,
         requireSuper,
         superClass,
         statics,
-        requiredClasses,
-        requiredModules,
+        mixins,
+        mixin,
+        requiredClassNames,
+        requiredModulePaths,
         moduleName,
         singleton,
         xtype,
@@ -68,10 +71,10 @@ NX.define = function (className, data, createdFn) {
     i = className.lastIndexOf('.');
     if (i !== -1) {
         nameSpace = className.substring(0, i);
-        baseClassName = className.substring(i + 1);
+        simpleClassName = className.substring(i + 1);
     }
     else {
-        baseClassName = className;
+        simpleClassName = className;
     }
 
     requireSuper = data.requireSuper;
@@ -84,7 +87,7 @@ NX.define = function (className, data, createdFn) {
 
         // require super module if there is not already a defined class of that name for legacy support
         if (requireSuper === undefined) {
-            requireSuper = NX.obj(superName) === undefined;
+            requireSuper = !NX.isobj(superName);
         }
     }
     else {
@@ -92,50 +95,62 @@ NX.define = function (className, data, createdFn) {
         requireSuper = false;
     }
 
-    // Extract statics
     statics = data.statics;
     delete data.statics;
 
-    // Extract singleton
+    mixins = data.mixins;
+    delete data.mixins;
+
     singleton = data.singleton;
     delete data.singleton;
 
-    // Extract xtype
     xtype = data.xtype;
     delete data.xtype;
 
     // Extract requirejs dependencies
-    requiredModules = NX.arrayify(data.requirejs);
+    requiredModulePaths = NX.arrayify(data.requirejs);
     delete data.requirejs;
 
     // Extract class dependencies (which were defined using Ext.define)
-    requiredClasses = NX.arrayify(data.requires);
+    requiredClassNames = NX.arrayify(data.requires);
     delete data.requires;
 
     // Require super if enabled
     if (requireSuper === true) {
-        requiredModules.push(superName.replaceAll('.', '/'));
+        requiredClassNames.push(superName);
+    }
+
+    // Require mixins
+    if (mixins !== undefined) {
+        for(i=0; i<mixins.length; i++) {
+            requiredClassNames.push(mixins[i]);
+        }
     }
 
     // append translated dependency classes on to required modules
-    for (i=0; i < requiredClasses.length; i++) {
-        tmp = requiredClasses[i].replaceAll('.', '/');
-        requiredModules.push(tmp);
+    for (i=0; i < requiredClassNames.length; i++) {
+        tmp = requiredClassNames[i].replaceAll('.', '/');
+        requiredModulePaths.push(tmp);
     }
 
     // Translate class name into module name
     moduleName = className.replaceAll('.', '/');
 
-    if (requiredModules.length !== 0) {
-        NX.log.debug('Defining module: ' + moduleName + ' depends: ' + requiredModules);
+    if (requiredModulePaths.length !== 0) {
+        NX.log.debug('Defining module:', moduleName, 'depends:', requiredModulePaths);
     }
     else {
-        NX.log.debug('Defining module: ' + moduleName);
+        NX.log.debug('Defining module:', moduleName);
     }
 
-    define(moduleName, requiredModules, function()
+    define(moduleName, requiredModulePaths, function()
     {
-        NX.log.debug('Defining class: ' + className + ' (ns: ' + nameSpace + ', super: ' + superName + ')');
+        NX.log.debug('Defining class:', className, 'super:', superName);
+
+        // Sanity check required classes exist
+        Ext.each(requiredClassNames, function(className) {
+            NX.assert(NX.isobj(className), 'Missing required class: ' + className);
+        });
 
         // Create namespace if required
         if (nameSpace) {
@@ -145,28 +160,38 @@ NX.define = function (className, data, createdFn) {
         // Get a reference to the super-class
         superClass = NX.obj(superName);
 
-        // When no constructor given in configuration (its always there due to picking upt from Object.prototype), use a synthetic version
+        // When no constructor given in configuration (its always there due to picking up from Object.prototype), use a synthetic version
         if (data.constructor === Object.prototype.constructor) {
             data.constructor = function () {
-                // Just call superclass constructor
-                this.constructor.superclass.constructor.apply(this, arguments);
+                superClass.prototype.constructor.apply(this, arguments);
             };
         }
 
         // Create the sub-class
         type = Ext.extend(superClass, data);
 
-        // Enrich the sub-class prototype
-        Ext.apply(type.prototype, {
-            // Name of defined class
-            '$className': className,
+        // Remember class name (full and simple)
+        type.$className = className;
+        type.$simpleClassName = simpleClassName;
+        type.prototype.$className = className;
+        type.prototype.$simpleClassName = simpleClassName;
 
-             // Instance logger
-            '$log': function(message) {
-                // FIXME: Should expose the object, not the function & wrap to add className
-                NX.log.debug(className + ': ' + message);
+        // replace toString if its the default Object.toString
+        if (type.prototype.toString === Object.prototype.toString) {
+            type.prototype.toString = function() {
+                return '[object ' + className + ']';
             }
-        });
+        }
+
+        // Handle mixins
+        if (mixins !== undefined) {
+            for(i=0; i<mixins.length; i++) {
+                mixin = mixins[i]; // name
+                NX.log.debug('Applying mixin:', mixin);
+                mixin = NX.obj(mixin); // class ref
+                Ext.applyIf(type.prototype, mixin.prototype);
+            }
+        }
 
         // Apply any static members
         if (statics !== undefined) {
@@ -184,7 +209,7 @@ NX.define = function (className, data, createdFn) {
         }
 
         // Assign to global namespace
-        NX.obj(nameSpace)[baseClassName] = type;
+        NX.obj(nameSpace)[simpleClassName] = type;
 
         // Call post-define hook
         if (createdFn !== undefined) {

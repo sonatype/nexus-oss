@@ -13,15 +13,18 @@
 
 package org.sonatype.nexus.plugins.rest;
 
-import com.google.common.collect.Lists;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
+
+import com.google.common.collect.Lists;
 
 /**
  * Helper to build HTML snippets for use in {@link NexusIndexHtmlCustomizer} implementations.
@@ -100,16 +103,44 @@ public class IndexHtmlSnippetBuilder
     }
 
     /**
+     * Attempt to detect timestamp of the file referenced by the path. If the path is resolved from a jar, the jar
+     * timestamp is used. If the path is resolved from filesystem directly, as is the case for exploded plugins for
+     * example, the file timestamp is used. If the path is resolved from other sources or cannot be resolved, current
+     * timestamp is used.
+     */
+    private long getTimestamp(String path) {
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        URL url = owner.getClass().getResource(path);
+        if (url != null) {
+            if ("file".equalsIgnoreCase(url.getProtocol())) {
+                return new File(url.getFile()).lastModified();
+            }
+            String resolvedPath = url.toExternalForm();
+            if (resolvedPath.toLowerCase().startsWith("jar:file:")) {
+                resolvedPath = resolvedPath.substring("jar:file:".length());
+                resolvedPath = resolvedPath.substring(0, resolvedPath.length() - path.length() - 1);
+                File file = new File(resolvedPath);
+                if (file.exists()) {
+                    return file.lastModified();
+                }
+            }
+        }
+        return System.currentTimeMillis();
+    }
+
+    /**
      * Return a string suitable for use as suffix to a plain-URL to enforce version/caching semantics.
      */
-    private String getUrlSuffix() {
+    private String getUrlSuffix(String path) {
         String version = detectVersion();
         if (version == null) {
             return "";
         }
         else if (version.endsWith("SNAPSHOT")) {
             // append timestamp for SNAPSHOT versions to help sort out cache problems
-            return String.format("?v=%s&t=%s", version, System.currentTimeMillis());
+            return String.format("?v=%s&t=%s", version, getTimestamp(path));
         }
         else {
             return "?v=" + version;
@@ -118,15 +149,14 @@ public class IndexHtmlSnippetBuilder
 
     public String build() {
         StringBuilder buff = new StringBuilder();
-        String suffix = getUrlSuffix();
 
         for (String style : styleRefs) {
-            buff.append(String.format("<link rel='stylesheet' href='%s%s' type='text/css' media='screen' charset='%s'/>", style, suffix, encoding));
+            buff.append(String.format("<link rel='stylesheet' href='%s%s' type='text/css' media='screen' charset='%s'/>", style, getUrlSuffix(style), encoding));
             buff.append("\n");
         }
 
         for (String script : scriptRefs) {
-            buff.append(String.format("<script src='%s%s' type='text/javascript' charset='%s'></script>", script, suffix, encoding));
+            buff.append(String.format("<script src='%s%s' type='text/javascript' charset='%s'></script>", script, getUrlSuffix(script), encoding));
             buff.append("\n");
         }
 

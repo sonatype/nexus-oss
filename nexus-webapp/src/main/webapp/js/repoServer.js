@@ -19,7 +19,6 @@ define('repoServer',
     'repoServer/ConfigViewPanel',
     'repoServer/Documentation',
     'repoServer/FeedViewPanel',
-    'repoServer/FileUploadPanel',
     'repoServer/GroupsEditPanel',
     'repoServer/helpAbout',
     'repoServer/LogEditPanel',
@@ -41,6 +40,7 @@ define('repoServer',
     'repoServer/UserEditPanel',
     'repoServer/UserPrivilegeBrowserPanel',
     'Sonatype/repoServer/ServerEditPanel', 
+    'Sonatype/repoServer/ArtifactUploadPanel',
     'Sonatype/repoServer/RepositoryWLPanel'
   ], function() {
 
