@@ -116,6 +116,10 @@ public abstract class AbstractNexusIntegrationTest
 
     public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
 
+    /**
+     * FIXME: should not need/require this test-instance state here.
+     */
+    @Deprecated
     public String testRepositoryId;
 
     public static String nexusBaseDir;
