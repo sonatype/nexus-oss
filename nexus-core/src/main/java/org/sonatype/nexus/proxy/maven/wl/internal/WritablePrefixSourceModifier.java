@@ -172,6 +172,6 @@ public class WritablePrefixSourceModifier
         this.toBeAdded.clear();
         this.toBeRemoved.clear();
         this.prefixSourceEntries = entries;
-        this.whitelistMatcher = new PathMatcherImpl( entries );
+        this.whitelistMatcher = new PathMatcher( entries );
     }
 }

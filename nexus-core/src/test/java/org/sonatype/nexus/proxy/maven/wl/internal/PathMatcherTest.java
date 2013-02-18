@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class PathMatcherImplTest
+public class PathMatcherTest
 {
     protected List<String> entries1 = Arrays.asList( "/org/sonatype", "/com/sonatype/nexus",
         "/biz/sonatype/nexus/plugins", "/archetype-metadata.xml" );
@@ -30,7 +30,7 @@ public class PathMatcherImplTest
     @Test
     public void smoke()
     {
-        final PathMatcherImpl wl = new PathMatcherImpl( entries1, 2 );
+        final PathMatcher wl = new PathMatcher( entries1, 2 );
 
         assertThat( "Should not match!", !wl.matches( "/org" ) );
         assertThat( "Should not match!", !wl.matches( "/archetype" ) );
@@ -82,9 +82,9 @@ public class PathMatcherImplTest
     @Test
     public void testMaxDepth()
     {
-        final PathMatcherImpl wl1 = new PathMatcherImpl( entries2, 2 );
-        final PathMatcherImpl wl2 = new PathMatcherImpl( entries2, 3 );
-        final PathMatcherImpl wl3 = new PathMatcherImpl( entries2, 4 );
+        final PathMatcher wl1 = new PathMatcher( entries2, 2 );
+        final PathMatcher wl2 = new PathMatcher( entries2, 3 );
+        final PathMatcher wl3 = new PathMatcher( entries2, 4 );
 
         // wl1 is 2 deep, so whatever is on level 3+ is neglected
         check( wl1, "/A/1/X/3/4/5/6/7/8/9/0", true );
@@ -156,7 +156,7 @@ public class PathMatcherImplTest
     @Test
     public void testLeastSpecificWinsMaxDepth3()
     {
-        final PathMatcherImpl wl = new PathMatcherImpl( Arrays.asList( "/a/b/c", "/a/b/c/d/e", "/a/b" ), 3 );
+        final PathMatcher wl = new PathMatcher( Arrays.asList( "/a/b/c", "/a/b/c/d/e", "/a/b" ), 3 );
         check( wl, "/a/b/c/d/e", true );
         check( wl, "/a/b/c/d", true );
         check( wl, "/a/b/c", true );
@@ -170,7 +170,7 @@ public class PathMatcherImplTest
     @Test
     public void testLeastSpecificWinsMaxDepth2()
     {
-        final PathMatcherImpl wl = new PathMatcherImpl( Arrays.asList( "/a/b/c", "/a/b/c/d/e", "/a/b" ), 2 );
+        final PathMatcher wl = new PathMatcher( Arrays.asList( "/a/b/c", "/a/b/c/d/e", "/a/b" ), 2 );
         check( wl, "/a/b/c/d/e", true );
         check( wl, "/a/b/c/d", true );
         check( wl, "/a/b/c", true );
@@ -186,7 +186,7 @@ public class PathMatcherImplTest
     @Test
     public void testLeastSpecificWinsMaxDepth2EntriesLongerThenDepth()
     {
-        final PathMatcherImpl wl = new PathMatcherImpl( Arrays.asList( "/a/b/c/d/e", "/a/b/c/d/e/f", "/a/b/c" ), 2 );
+        final PathMatcher wl = new PathMatcher( Arrays.asList( "/a/b/c/d/e", "/a/b/c/d/e/f", "/a/b/c" ), 2 );
         check( wl, "/a/b/c/d/e", true );
         check( wl, "/a/b/c/d", true );
         check( wl, "/a/b/c", true );

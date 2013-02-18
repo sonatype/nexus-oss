@@ -110,7 +110,7 @@ public class ProxyRequestFilterImpl
             final PrefixSource prefixSource = wlManager.getPrefixSourceFor( mavenProxyRepository );
             if ( prefixSource.exists() )
             {
-                final PathMatcher whitelist = new PathMatcherImpl( prefixSource.readEntries(), Integer.MAX_VALUE );
+                final PathMatcher whitelist = new PathMatcher( prefixSource.readEntries(), Integer.MAX_VALUE );
                 whitelists.put( mavenProxyRepository.getId(), whitelist );
             }
             else
