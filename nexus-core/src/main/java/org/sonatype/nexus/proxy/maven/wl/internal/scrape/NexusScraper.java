@@ -110,6 +110,12 @@ public class NexusScraper
                                 getTargetedServer(), "Remote is not a hosted repository." );
                         }
                     }
+                    else if ( !url.isEmpty() && !layout.isEmpty() && !"maven2".equals( layout.get( 0 ).text() ) )
+                    {
+                        // is not a maven2 repository/layout, do not scrape
+                        return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_NOT_BE_SCRAPED,
+                            getTargetedServer(), "Remote is not a Maven2 repository." );
+                    }
                 }
             }
             catch ( IOException e )

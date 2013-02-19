@@ -113,9 +113,9 @@ public class AmazonS3IndexScraperTest
     {
         final Server result = Server.withPort( 0 );
         result.serve( "/release/" ).withBehaviours( new S3Headers(),
-            new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
+            new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
         result.serve( "/" ).withBehaviours( new S3Headers(),
-            new DeliverBehaviour( 200, "application/xml", ONE_PAGE_RESPONSE.getBytes( "UTF-8" ) ) );
+            new DeliverBehaviour( 200, "application/xml", ONE_PAGE_RESPONSE ) );
         return result;
     }
 
@@ -126,27 +126,27 @@ public class AmazonS3IndexScraperTest
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/release/" ).withBehaviours( new S3Headers(),
-                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
             result.serve( "/*" ).withBehaviours( new S3Headers(),
-                new DeliverBehaviour( 403, "application/xml", ACCESS_DENIED_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 403, "application/xml", ACCESS_DENIED_RESPONSE ) );
             return result;
         }
         else if ( code == 404 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/release/" ).withBehaviours( new S3Headers(),
-                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
             result.serve( "/*" ).withBehaviours( new S3Headers(),
-                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE_ROOT.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE_ROOT ) );
             return result;
         }
         else if ( code == 500 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/release/" ).withBehaviours( new S3Headers(),
-                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "application/xml", NO_SUCH_KEY_RESPONSE ) );
             result.serve( "/*" ).withBehaviours( new S3Headers(),
-                new DeliverBehaviour( 500, "application/xml", INTERNAL_ERROR_RESPONSE.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 500, "application/xml", INTERNAL_ERROR_RESPONSE ) );
             return result;
         }
         else

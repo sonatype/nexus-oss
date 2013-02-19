@@ -99,34 +99,34 @@ public class SvnIndexScraperTest
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/trunk/somerepo/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", ROOT_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", ROOT_BODY ) );
             result.serve( "/trunk/somerepo/com/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", COM_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", COM_BODY ) );
             result.serve( "/trunk/somerepo/com/foo/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", COM_FOO_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", COM_FOO_BODY ) );
             result.serve( "/trunk/somerepo/com/bar/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", COM_BAR_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", COM_BAR_BODY ) );
             return result;
         }
         else if ( code == 403 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/*" ).withBehaviours(
-                new DeliverBehaviour( 403, "text/html", "<h1>Access denied</h1>".getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 403, "text/html", "<h1>Access denied</h1>" ) );
             return result;
         }
         else if ( code == 404 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/*" ).withBehaviours(
-                new DeliverBehaviour( 404, "text/html", "<h1>Not found</h1>".getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "text/html", "<h1>Not found</h1>" ) );
             return result;
         }
         else if ( code == 500 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/*" ).withBehaviours(
-                new DeliverBehaviour( 500, "text/html", "<h1>Ooops!</h1>".getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 500, "text/html", "<h1>Ooops!</h1>" ) );
             return result;
         }
         else
@@ -142,40 +142,40 @@ public class SvnIndexScraperTest
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/trunk/somerepo/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", ROOT_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", ROOT_BODY ) );
             result.serve( "/trunk/somerepo/com/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", COM_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", COM_BODY ) );
             result.serve( "/trunk/somerepo/com/foo/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", COM_FOO_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", COM_FOO_BODY ) );
             result.serve( "/trunk/somerepo/com/bar/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", COM_BAR_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", COM_BAR_BODY ) );
             return result;
         }
         else if ( code == 403 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/trunk/somerepo/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", ROOT_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", ROOT_BODY ) );
             result.serve( "/trunk/somerepo/com/" ).withBehaviours(
-                new DeliverBehaviour( 403, "text/html", "<h1>Access denied</h1>".getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 403, "text/html", "<h1>Access denied</h1>" ) );
             return result;
         }
         else if ( code == 404 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/trunk/somerepo/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", ROOT_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", ROOT_BODY ) );
             result.serve( "/trunk/somerepo/com/" ).withBehaviours(
-                new DeliverBehaviour( 404, "text/html", "<h1>Not found</h1>".getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 404, "text/html", "<h1>Not found</h1>" ) );
             return result;
         }
         else if ( code == 500 )
         {
             final Server result = Server.withPort( 0 );
             result.serve( "/trunk/somerepo/" ).withBehaviours(
-                new DeliverBehaviour( 200, "text/html", ROOT_BODY.getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 200, "text/html", ROOT_BODY ) );
             result.serve( "/trunk/somerepo/com/" ).withBehaviours(
-                new DeliverBehaviour( 500, "text/html", "<h1>Ooops!</h1>".getBytes( "UTF-8" ) ) );
+                new DeliverBehaviour( 500, "text/html", "<h1>Ooops!</h1>" ) );
             return result;
         }
         else
