@@ -130,15 +130,15 @@
         Plugin loading is done in initUI(...), *after core UI is initialized* (again, global names that need to be
         in place first).
         *#
-        requirejs(['require',
+        requirejs(['require'
             #if (!$debug)
-                'js/$buildQualifier/nx-all.js'
+                , 'js/$buildQualifier/nx-all.js'
             #end
         ], function(require) {
             require(['require', 'NX/bootstrap'], function(require) {
-                require(['require',
+                require(['require'
                     #if (!$debug)
-                        'js/$buildQualifier/sonatype-all.js'
+                        , 'js/$buildQualifier/sonatype-all.js'
                     #end
                 ], function(require) {
                     initUI(require, dependencies);
