@@ -70,16 +70,19 @@ public class NexusScraper
                     Page.getPageFor( context, context.getRemoteRepositoryRootUrl() + ".meta/repository-metadata.xml" );
                 if ( page.getHttpResponse().getStatusLine().getStatusCode() == 200 )
                 {
-                    // sanity: all nexus repo MD has this element
+                    // sanity: all nexus repo MD has these elements (see below)
                     final Elements url = repoMetadataPage.getDocument().getElementsByTag( "url" );
+                    final Elements layout = repoMetadataPage.getDocument().getElementsByTag( "layout" );
                     // only proxies has this element
                     final Elements localUrl = repoMetadataPage.getDocument().getElementsByTag( "localUrl" );
                     // only groups has this element
                     final Elements memberRepositories =
                         repoMetadataPage.getDocument().getElementsByTag( "memberRepositories" );
 
-                    // sanity check, all of them must have "url" tag
-                    if ( !url.isEmpty() )
+                    // sanity checks:
+                    // all of them must have "url" tag
+                    // all of the must have "layout" tag with value "maven2"
+                    if ( !url.isEmpty() && !layout.isEmpty() && "maven2".equals( layout.get( 0 ).text() ) )
                     {
                         if ( localUrl.isEmpty() && memberRepositories.isEmpty() )
                         {
