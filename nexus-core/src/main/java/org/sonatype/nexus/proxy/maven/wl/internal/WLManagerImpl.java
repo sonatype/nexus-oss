@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryConfig;
@@ -64,6 +65,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.NexusThreadFactory;
@@ -160,7 +162,10 @@ public class WLManagerImpl
         initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
         for ( MavenRepository mavenRepository : initableRepositories )
         {
-            initializeWhitelist( mavenRepository );
+            if ( Maven2ContentClass.ID.equals( mavenRepository.getRepositoryContentClass().getId() ) )
+            {
+                initializeWhitelist( mavenRepository );
+            }
         }
         // schedule the "updater": wait 10 minutes for boot to calm down and then do the work hourly
         this.executor.scheduleAtFixedRate( new Runnable()
@@ -493,24 +498,39 @@ public class WLManagerImpl
         if ( !publishedEntrySource.exists() )
         {
             final String message;
-            if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
+            if ( Maven2ContentClass.ID.equals( mavenRepository.getRepositoryContentClass().getId() ) )
             {
-                message = "Publishing not possible, as not all members have whitelist published.";
-            }
-            else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
-            {
-                if ( remoteDiscoveryEnabled )
+                if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
                 {
-                    message = "Unable to discover remote content.";
+                    message = "Publishing not possible, as not all members have whitelist published.";
+                }
+                else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+                {
+                    if ( remoteDiscoveryEnabled )
+                    {
+                        message = "Unable to discover remote content."; // or in progress!
+                    }
+                    else
+                    {
+                        message = "Remote discovery not enabled.";
+                    }
+                }
+                else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
+                {
+                    message = "Check Nexus logs for more details."; // hosted reposes must be discovered always
+                }
+                else if ( mavenRepository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+                {
+                    message = "Unsupported repository type (only hosted, proxy and groups are supported).";
                 }
                 else
                 {
-                    message = "Remote discovery not enabled.";
+                    message = "Check Nexus logs for more details.";
                 }
             }
             else
             {
-                message = "Check Nexus logs for more details.";
+                message = "Unsupported repository format (only Maven2 format is supported).";
             }
             publishingStatus = new WLPublishingStatus( PStatus.NOT_PUBLISHED, message, -1, null );
         }

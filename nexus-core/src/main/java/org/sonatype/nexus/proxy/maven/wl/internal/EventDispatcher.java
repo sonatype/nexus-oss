@@ -34,8 +34,10 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -174,9 +176,11 @@ public class EventDispatcher
 
     protected boolean isRepositoryHandled( final Repository repository )
     {
-        // we handle repository events after this isActiveAndStarted, and only for repository that are Maven reposes
+        // we handle repository events after this isActiveAndStarted, and only for non-shadow repository that are Maven2 reposes
         return isActive() && repository != null
-            && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class );
+            && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
+            && !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
+            && Maven2ContentClass.ID.equals( repository.getRepositoryContentClass().getId() );
     }
 
     protected boolean isPrefixFileEvent( final RepositoryItemEvent evt )
