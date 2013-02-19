@@ -65,7 +65,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
 
     var
           self = this,
-          subjectIsNotProxy = cfg.payload.data.repoType !== 'proxy',
+          subjectIsNotM2Proxy = cfg.payload.data.repoType !== 'proxy' || cfg.payload.data.format !== 'maven2',
           defaultConfig = {
             frame : true,
             autoScroll : true,
@@ -166,7 +166,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
         anchor : Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
         checkboxToggle : true,
         name : 'discoveryFieldset',
-        hidden : subjectIsNotProxy,
+        hidden : subjectIsNotM2Proxy,
         listeners : {
           expand : function() {
             this.enableDiscoveryHandler(true);
@@ -372,7 +372,10 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
     // (GridViewer convention for new records: id starts with 'new_')
     newRecord = rec.id && rec.id.indexOf('new_') === 0;
 
-    if (!newRecord &&
+    maven2FormatRepo = rec.data.format === 'maven2';
+	notShadowType = rec.data.repoType !== 'virtual';
+
+    if (!newRecord && maven2FormatRepo && notShadowType &&
           ( sp.checkPermission('nexus:repositories', sp.CREATE) || sp.checkPermission('nexus:repositories', sp.DELETE) || sp.checkPermission('nexus:repositories', sp.EDIT) )) {
       cardPanel.add(new Sonatype.repoServer.RepositoryWLPanel({
         tabTitle : 'Whitelist',
