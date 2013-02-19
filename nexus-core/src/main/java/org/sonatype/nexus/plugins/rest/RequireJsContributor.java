@@ -37,6 +37,9 @@ public interface RequireJsContributor
      * module name: "Nexus/plugin/bootstrap"
      *
      * where plugin-all.js contains require.js module definitions (e.g. `define("Nexus/plugin/bootstrap", ["Nexus/plugin/dep1"], function() {}` ).
+     *
+     * @since 2.4
+     * @see RequireJsContributionBuilder
      */
     public static class RequireJsContribution {
 
@@ -44,6 +47,9 @@ public interface RequireJsContributor
 
         private String module;
 
+        /**
+         * @see RequireJsContributionBuilder
+         */
         public RequireJsContribution( final String module, final List<String> dependencies )
         {
             this.dependencies = dependencies;
