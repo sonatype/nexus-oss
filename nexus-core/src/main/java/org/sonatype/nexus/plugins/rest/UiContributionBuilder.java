@@ -17,28 +17,28 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 /**
- * Builder for require.js contributions used to drive plugin UI.
+ * Builder for contributions used to activate plugin UI.
  *
- * @see RequireJsContributor
+ * @see UiContributor
  * @since 2.4
  */
-public class RequireJsContributionBuilder
-    extends UiSnippetBuilder<RequireJsContributor.RequireJsContribution>
+public class UiContributionBuilder
+    extends AbstractUiContributionBuilder<UiContributor.UiContribution>
 {
 
     private String module;
 
     private List<String> dependencies = Lists.newLinkedList();
 
-    public RequireJsContributionBuilder( final Object owner, final String groupId, final String artifactId )
+    public UiContributionBuilder( final Object owner, final String groupId, final String artifactId )
     {
         super( owner, groupId, artifactId );
     }
 
     /**
-     * Sets the main module name to use.
+     * Sets the entry point to use.
      */
-    public RequireJsContributionBuilder module( String module )
+    public UiContributionBuilder boot( String module )
     {
         this.module = module;
         return this;
@@ -47,7 +47,7 @@ public class RequireJsContributionBuilder
     /**
      * Adds a dependency.
      */
-    public RequireJsContributionBuilder dependency( String dependency )
+    public UiContributionBuilder withDependency( String dependency )
     {
         dependencies.add( dependency );
         return this;
@@ -56,14 +56,14 @@ public class RequireJsContributionBuilder
     /**
      * Adds the default location for a compressed plugin js file: /static/js/$artifactId-all.js
      */
-    public RequireJsContributionBuilder defaultAggregateDependency()
+    public UiContributionBuilder withDefaultAggregateDependency()
     {
-        return dependency( getDefaultPath( "js" ) );
+        return withDependency( getDefaultPath( "js" ) );
     }
 
     @Override
-    public RequireJsContributor.RequireJsContribution build()
+    public UiContributor.UiContribution build()
     {
-        return new RequireJsContributor.RequireJsContribution( module, dependencies );
+        return new UiContributor.UiContribution( module, dependencies );
     }
 }

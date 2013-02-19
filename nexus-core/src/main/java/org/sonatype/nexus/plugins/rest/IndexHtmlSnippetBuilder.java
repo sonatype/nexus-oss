@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
  * @since 2.4
  */
 public class IndexHtmlSnippetBuilder
-    extends UiSnippetBuilder<String>
+    extends AbstractUiContributionBuilder<String>
 {
 
     private final List<String> styleRefs = Lists.newArrayList();

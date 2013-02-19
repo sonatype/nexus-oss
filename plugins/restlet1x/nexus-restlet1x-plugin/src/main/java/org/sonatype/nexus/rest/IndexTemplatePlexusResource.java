@@ -40,7 +40,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
-import org.sonatype.nexus.plugins.rest.RequireJsContributor;
+import org.sonatype.nexus.plugins.rest.UiContributor;
 import org.sonatype.nexus.plugins.restlet1x.BuildNumberService;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
@@ -65,7 +65,7 @@ public class IndexTemplatePlexusResource
 
     private BuildNumberService buildNumberService;
 
-    private Set<RequireJsContributor> rJsContributors;
+    private Set<UiContributor> rJsContributors;
 
     String templateFilename;
 
@@ -74,7 +74,7 @@ public class IndexTemplatePlexusResource
                                         final ReferenceFactory referenceFactory,
                                         final @Named("${index.template.file:-templates/index.vm}") String templateFilename,
                                         final Velocity velocity, final BuildNumberService buildNumberService,
-                                        final Set<RequireJsContributor> rJsContributors)
+                                        final Set<UiContributor> uiContributors)
     {
         this();
 
@@ -84,7 +84,7 @@ public class IndexTemplatePlexusResource
         this.templateFilename = templateFilename;
         this.velocity = velocity;
         this.buildNumberService = buildNumberService;
-        this.rJsContributors = rJsContributors;
+        this.rJsContributors = uiContributors;
     }
 
     public IndexTemplatePlexusResource()
@@ -225,9 +225,9 @@ public class IndexTemplatePlexusResource
         final boolean debugMode = query != null && query.contains( "debug" );
         templatingContext.put( "debug", debugMode );
 
-        List<RequireJsContributor.RequireJsContribution> contributions = Lists.newArrayList();
+        List<UiContributor.UiContribution> contributions = Lists.newArrayList();
         List<String> preloadUrls = Lists.newArrayList();
-        for ( RequireJsContributor rJs : rJsContributors)
+        for ( UiContributor rJs : rJsContributors)
         {
             contributions.add( rJs.contribute( debugMode ) );
         }

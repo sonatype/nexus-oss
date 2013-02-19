@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @since 2.4
  */
-public interface RequireJsContributor
+public interface UiContributor
 {
 
     /**
@@ -27,10 +27,10 @@ public interface RequireJsContributor
      * @param debug true if debug code should be delivered; false otherwise.
      * @return An object containing information about what to load for the UI.
      */
-    RequireJsContribution contribute(boolean debug);
+    UiContribution contribute(boolean debug);
 
     /**
-     * Contains dependencies to load and the base module to require, for example:
+     * Contains dependencies to load and the base module to use, for example:
      *
      * dependencies: ["js/static/plugin-all.js"]
      *
@@ -39,25 +39,26 @@ public interface RequireJsContributor
      * where plugin-all.js contains require.js module definitions (e.g. `define("Nexus/plugin/bootstrap", ["Nexus/plugin/dep1"], function() {}` ).
      *
      * @since 2.4
-     * @see RequireJsContributionBuilder
+     * @see UiContributionBuilder
      */
-    public static class RequireJsContribution {
+    public static class UiContribution
+    {
 
         private List<String> dependencies;
 
         private String module;
 
         /**
-         * @see RequireJsContributionBuilder
+         * @see UiContributionBuilder
          */
-        public RequireJsContribution( final String module, final List<String> dependencies )
+        public UiContribution( final String module, final List<String> dependencies )
         {
             this.dependencies = dependencies;
             this.module = module;
         }
 
         /**
-         * The require.js dependencies to load before the module defined by {@link #getModule()} is required.
+         * The dependencies to load before the module defined by {@link #getModule()} is required.
          * May be any valid require.js dependency name (url, module name, plugin)
          *
          * @return the list of dependencies to load.
@@ -67,7 +68,7 @@ public interface RequireJsContributor
         }
 
         /**
-         * The module that is used to initialize the plugin. Must be a valid require.js module name.
+         * The module that is used to initialize the plugin.
          * @return the module name.
          */
         public String getModule() {
