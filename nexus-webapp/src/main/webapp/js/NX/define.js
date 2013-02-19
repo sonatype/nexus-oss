@@ -206,12 +206,13 @@ define('NX/define', ['NX/base', 'NX/assert', 'NX/log'], function() {
 
 
           // When singleton; type becomes new instance
+          // NOTE: `type` is passed into the creation callback function later on, so the variable must hold the actual instance for singletons
           if (singleton !== undefined) {
-              NX.obj(nameSpace)[simpleClassName] = new type();
-          } else {
-              // Assign to global namespace
-              NX.obj(nameSpace)[simpleClassName] = type;
+              type = new type();
           }
+
+          // Assign to global namespace
+          NX.obj(nameSpace)[simpleClassName] = type;
 
 
           // Call post-define hook
