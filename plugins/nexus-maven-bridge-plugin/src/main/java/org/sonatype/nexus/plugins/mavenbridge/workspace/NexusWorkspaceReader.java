@@ -122,7 +122,7 @@ public class NexusWorkspaceReader
             }
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
 }
