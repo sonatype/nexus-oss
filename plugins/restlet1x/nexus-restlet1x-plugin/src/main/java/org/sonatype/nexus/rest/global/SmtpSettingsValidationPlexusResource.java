@@ -75,7 +75,7 @@ public class SmtpSettingsValidationPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/global_settings/*", "authcBasic,perms[nexus:settings]" );
+        return new PathProtectionDescriptor( "/check_smtp_settings", "authcBasic,perms[nexus:settings]" );
     }
 
     /**
