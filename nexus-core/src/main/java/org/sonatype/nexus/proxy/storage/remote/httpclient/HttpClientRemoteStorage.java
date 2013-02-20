@@ -120,7 +120,7 @@ public class HttpClientRemoteStorage
     /**
      * Http context key of repository making a request.
      */
-    public static final String HTTP_CTX_KEY_REPOSITORY_ID = PROVIDER_STRING + ".repositoryId";
+    public static final String HTTP_CTX_KEY_REPOSITORY = PROVIDER_STRING + ".repository";
 
     private final QueryStringBuilder queryStringBuilder;
 
@@ -493,7 +493,7 @@ public class HttpClientRemoteStorage
         try
         {
             final BasicHttpContext httpContext = new BasicHttpContext();
-            httpContext.setAttribute( HTTP_CTX_KEY_REPOSITORY_ID, repository.getId()  );
+            httpContext.setAttribute( HTTP_CTX_KEY_REPOSITORY, repository );
 
             httpResponse = httpClient.execute( httpRequest, httpContext );
             final int statusCode = httpResponse.getStatusLine().getStatusCode();
