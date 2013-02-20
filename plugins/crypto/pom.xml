@@ -27,11 +27,10 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-    <nexus.plugin.name>Nexus Crypto Services Provider Plugin</nexus.plugin.name>
-    <nexus.plugin.description>Provides Bouncy Castle JARs and registers it as a JCE provider and provides crypto goodies.</nexus.plugin.description>
-    
-    <bouncycastle.version>1.47</bouncycastle.version>
-    <sisu-goodies.version>1.5.1</sisu-goodies.version>
+     <pluginName>Nexus Crypto Services Provider Plugin</pluginName>
+     <pluginDescription>Provides Bouncy Castle JCE provider and provides crypto goodies.</pluginDescription>
+     <bouncycastle.version>1.47</bouncycastle.version>
+     <sisu-goodies.version>1.5.1</sisu-goodies.version>
   </properties>
 
   <dependencies>
