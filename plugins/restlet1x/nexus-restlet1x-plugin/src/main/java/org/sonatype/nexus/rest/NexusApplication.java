@@ -265,8 +265,7 @@ public class NexusApplication
     @Override
     protected void attach( Router router, boolean strict, PlexusResource resource )
     {
-        attach( router, strict, resource.getResourceUri(), new NexusPlexusResourceFinder( getContext(), resource ) );
-
         handlePlexusResourceSecurity( resource );
+        attach( router, strict, resource.getResourceUri(), new NexusPlexusResourceFinder( getContext(), resource ) );
     }
 }
