@@ -333,9 +333,8 @@ public class PlexusRestletApplicationBridge
 
     protected void attach( Router router, boolean strict, PlexusResource resource )
     {
-        attach( router, strict, resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
-
         handlePlexusResourceSecurity( resource );
+        attach( router, strict, resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
     }
 
     protected void handlePlexusResourceSecurity( PlexusResource resource )
