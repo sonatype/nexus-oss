@@ -42,6 +42,7 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.rest.model.WLDiscoveryStatusMessage;
 import org.sonatype.nexus.rest.model.WLStatusMessage;
 import org.sonatype.nexus.rest.model.WLStatusMessageWrapper;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.google.common.primitives.Ints;
@@ -76,6 +77,12 @@ public class WLStatusResource
     public String getResourceUri()
     {
         return RESOURCE_URI;
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repositories/*/wl", "authcBasic,perms[nexus:repositories]" );
     }
 
     @Override

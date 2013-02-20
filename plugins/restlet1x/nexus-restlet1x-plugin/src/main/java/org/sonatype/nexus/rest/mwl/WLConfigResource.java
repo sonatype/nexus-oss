@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryConfig;
 import org.sonatype.nexus.rest.model.WLConfigMessage;
 import org.sonatype.nexus.rest.model.WLConfigMessageWrapper;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.google.common.primitives.Ints;
@@ -64,6 +65,12 @@ public class WLConfigResource
     public String getResourceUri()
     {
         return RESOURCE_URI;
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repositories/*/wl/config", "authcBasic,perms[nexus:repositories]" );
     }
 
     /**

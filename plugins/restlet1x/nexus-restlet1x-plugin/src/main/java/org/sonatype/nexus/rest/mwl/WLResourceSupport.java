@@ -23,7 +23,6 @@ import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * WL REST resource support.
@@ -50,12 +49,6 @@ public abstract class WLResourceSupport
     protected WLManager getWLManager()
     {
         return wlManager;
-    }
-
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( "/repositories/*", "authcBasic,perms[nexus:repositories]" );
     }
 
     /**
