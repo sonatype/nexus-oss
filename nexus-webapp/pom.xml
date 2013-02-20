@@ -84,6 +84,15 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-crypto-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-h2-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
@@ -206,6 +215,13 @@
             <configuration>
               <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/plugin-repository</outputDirectory>
               <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-crypto-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </artifactItem>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-h2-plugin</artifactId>

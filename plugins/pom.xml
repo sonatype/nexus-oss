@@ -45,6 +45,7 @@
         <module>siesta</module>
         <module>restlet1x</module>
         <module>indexer</module>
+        <module>crypto</module>
         <module>ldap</module>
         <module>nexus-timeline-plugin</module>
         <module>nexus-lvo-plugin</module>
