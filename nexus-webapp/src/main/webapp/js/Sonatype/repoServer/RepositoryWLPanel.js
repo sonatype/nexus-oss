@@ -366,14 +366,14 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
   }
 }, function() {
   Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
-    var sp = Sonatype.lib.Permissions, newRecord;
+    var sp = Sonatype.lib.Permissions, newRecord, maven2FormatRepo, notShadowType;
 
     // Check whether record is new or received from Nexus
     // (GridViewer convention for new records: id starts with 'new_')
     newRecord = rec.id && rec.id.indexOf('new_') === 0;
 
     maven2FormatRepo = rec.data.format === 'maven2';
-	notShadowType = rec.data.repoType !== 'virtual';
+    notShadowType = rec.data.repoType !== 'virtual';
 
     if (!newRecord && maven2FormatRepo && notShadowType &&
           ( sp.checkPermission('nexus:repositories', sp.CREATE) || sp.checkPermission('nexus:repositories', sp.DELETE) || sp.checkPermission('nexus:repositories', sp.EDIT) )) {
