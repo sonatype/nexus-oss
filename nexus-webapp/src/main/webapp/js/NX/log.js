@@ -52,49 +52,25 @@ define('NX/log', ['NX/base'], function() {
           //}
       };
 
-      function safeProxy(target, name) {
-          var log;
-          if (Ext.isDefined(target)) {
-            if (Ext.isFunction(target[name])) {
-              log = function() {
-                  if (log.enabled) {
-                      target[name].apply(target, arguments);
-                  }
-              };
-            } else if (Ext.isDefined(target[name])) {
-              log = function() {
-                if (logger.enabled) {
-                  // "IE mode", pretty messed up
-                  var args = [];
-                  Ext.each(arguments, function(item) {
-                    args.push(item);
-                  });
-                  target[name](args.join(' '));
-                }
-              };
-            } else if (Ext.isDefined(target.log)) {
-              log = safeProxy(target, 'log');
-            } else {
-              log = Ext.emptyFn;
-            }
-          }
-
-          return log;
-      }
-
-      function levelAwareProxy(target, name) {
+      /**
+       * @private
+       * @param target {Object} The logging implementation
+       * @param name {String} The logger to use
+       * @param isLoggerEnabled {Function} A function that returns true when the logger for target/name is enabled, false otherwise.
+       * @return {Function} The logger.
+       */
+      function createLogger(target, name, isLoggerEnabled) {
         var log;
         if (Ext.isDefined(target)) {
-          if (Ext.isFunction(target[name])) {
+          if (Ext.isFunction(target[name])) { // most browser have proper console.log, console.debug, ... as functions
             log = function() {
-              if (logger.isEnabled(name)) {
+              if (isLoggerEnabled()) {
                 target[name].apply(target, arguments);
               }
             };
-          } else if (Ext.isDefined(target[name])) {
+          } else if (Ext.isDefined(target[name])) { // IE9: console.log is reported as an object, not a function, and does not have #apply
             log = function() {
-              if (logger.isEnabled(name)) {
-                // "IE mode", pretty messed up
+              if (isLoggerEnabled()) {
                 var args = [];
                 Ext.each(arguments, function(item) {
                   args.push(item);
@@ -102,14 +78,25 @@ define('NX/log', ['NX/base'], function() {
                 target[name](args.join(' '));
               }
             };
-          } else if (Ext.isDefined(target.log)) {
-            log = levelAwareProxy(target, 'log');
-          } else {
+          } else if (Ext.isDefined(target.log)) { // if e.g. console.debug is not available, use console.log
+            log = createLogger(target, 'log', isLoggerEnabled);
+          } else { // nothing we can do, don't log.
             log = Ext.emptyFn;
           }
         }
-
         return log;
+      }
+
+      function safeProxy(target, name) {
+        return createLogger(target, name, function() {
+          return logger.enabled;
+        });
+      }
+
+      function levelAwareProxy(target, name) {
+        return createLogger(target, name, function() {
+          return logger.isEnabled(name);
+        });
       }
 
       Ext.each([
