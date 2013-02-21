@@ -106,20 +106,20 @@ public class WhitelistInitialSanityIT
             final LineNumberReader lnr = new LineNumberReader( new InputStreamReader( entityStream, "UTF-8" ) );
             boolean hasAbbot = false;
             boolean hasComApple = false;
-            boolean hasOrg = false;
+            boolean hasOrgSonatype = false;
             String currentLine = lnr.readLine();
             while ( currentLine != null )
             {
                 hasAbbot = hasAbbot || "/abbot".equals( currentLine );
                 hasComApple = hasComApple || "/com/apple".equals( currentLine );
-                hasOrg = hasOrg || "/org".equals( currentLine );
+                hasOrgSonatype = hasOrgSonatype || "/org/sonatype".equals( currentLine );
                 currentLine = lnr.readLine();
             }
 
             // check is this what we think should be
             assertThat( "Line /abbot is missing?", hasAbbot );
             assertThat( "Line /com/apple is missing?", hasComApple );
-            assertThat( "Line /org is missing?", hasOrg );
+            assertThat( "Line /org/sonatype is missing?", hasOrgSonatype );
 
             // count lines
             lnr.skip( Long.MAX_VALUE );
