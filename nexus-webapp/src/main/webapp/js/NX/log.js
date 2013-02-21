@@ -22,7 +22,7 @@ define('NX/log', ['NX/base'], function() {
    * @singleton
    */
   NX.log = (function () {
-      var logger, safeProxy, levelAwareProxy;
+      var logger;
 
       // FIXME: Really would like a better/more-powerful logging API here
       // FIXME: Including the ability to remote back to the server to capture UI events
@@ -52,29 +52,65 @@ define('NX/log', ['NX/base'], function() {
           //}
       };
 
-      safeProxy = function(target, name) {
-          if (Ext.isDefined(target) && Ext.isFunction(target[name])) {
-              return function() {
-                  if (logger.enabled) {
+      function safeProxy(target, name) {
+          var log;
+          if (Ext.isDefined(target)) {
+            if (Ext.isFunction(target[name])) {
+              log = function() {
+                  if (log.enabled) {
                       target[name].apply(target, arguments);
                   }
               };
+            } else if (Ext.isDefined(target[name])) {
+              log = function() {
+                if (logger.enabled) {
+                  // "IE mode", pretty messed up
+                  var args = [];
+                  Ext.each(arguments, function(item) {
+                    args.push(item);
+                  });
+                  target[name](args.join(' '));
+                }
+              };
+            } else if (Ext.isDefined(target.log)) {
+              log = safeProxy(target, 'log');
+            } else {
+              log = Ext.emptyFn;
+            }
           }
 
-          return Ext.emptyFn();
-      };
+          return log;
+      }
 
-      levelAwareProxy = function(target, name) {
-          if (Ext.isDefined(target) && Ext.isFunction(target[name])) {
-              return function() {
-                  if (logger.isEnabled(name)) {
-                      target[name].apply(target, arguments);
-                  }
+      function levelAwareProxy(target, name) {
+        var log;
+        if (Ext.isDefined(target)) {
+          if (Ext.isFunction(target[name])) {
+            log = function() {
+              if (logger.isEnabled(name)) {
+                target[name].apply(target, arguments);
               }
+            };
+          } else if (Ext.isDefined(target[name])) {
+            log = function() {
+              if (logger.isEnabled(name)) {
+                // "IE mode", pretty messed up
+                var args = [];
+                Ext.each(arguments, function(item) {
+                  args.push(item);
+                });
+                target[name](args.join(' '));
+              }
+            };
+          } else if (Ext.isDefined(target.log)) {
+            log = levelAwareProxy(target, 'log');
+          } else {
+            log = Ext.emptyFn;
           }
+        }
 
-          return Ext.emptyFn();
-      };
+        return log;
+      }
 
       Ext.each([
           'trace',
