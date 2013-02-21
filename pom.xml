@@ -1178,7 +1178,7 @@
               <!-- we have target pattern in this format because of target package in nexus-core modules -->
               <exclude>**/nexus*/target/**</exclude>
               <exclude>**/ldap-common/target/**</exclude>
-              <exclude>**/h2/target/**</exclude>
+              <exclude>plugin*/**/target/**</exclude>
               <exclude>**/ext-3.4.1/**</exclude>
               <exclude>**/js/filetree/**</exclude>
               <exclude>**/editarea_0_8_2/**</exclude>
