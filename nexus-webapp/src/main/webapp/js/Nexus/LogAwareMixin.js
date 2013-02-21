@@ -11,12 +11,15 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
+/*global define,NX, Nexus*/
+
 /**
  * Mixin to make classes logging aware.
  *
  * @since 2.4
  */
-NX.define('NX.LogAwareMixin', {
+NX.define('Nexus.LogAwareMixin', {
+
     statics: {
         /**
          * True to include class-names in log message (default); false to omit it.
@@ -48,7 +51,7 @@ NX.define('NX.LogAwareMixin', {
      */
     logFormat: function (level, args) {
         var name,
-            config = NX.LogAwareMixin; // config pulled from static properties
+            config = Nexus.LogAwareMixin; // config pulled from static properties
 
         // maybe prepend class-name
         if (config.includeName === true) {
@@ -74,8 +77,7 @@ NX.define('NX.LogAwareMixin', {
      * @param {Array} args
      */
     logx: function (level, args) {
-        var fn,
-            config = NX.LogAwareMixin; // config pulled from static properties
+        var fn;
 
         NX.assert(NX.log.levels[level] !== undefined, 'Invalid log level: ' + level);
         NX.assert(args.length !== 0, 'Missing log message detail');

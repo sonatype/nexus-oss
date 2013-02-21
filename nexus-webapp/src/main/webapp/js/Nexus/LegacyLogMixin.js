@@ -10,20 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global NX*/
 
 /**
  * Legacy $log() mixin.
  *
  * @since 2.4
  */
-NX.define('NX.LegacyLogMixin', {
-
-    /**
-     * @deprecated
-     */
-    '$log': function(message) {
-        NX.log.debug(this.$className + ': ' + message);
-        NX.log.warn('[DEPRECATED]', this.$className + '.$log() is deprecated; use NX.LogAwareMixin instead');
-    }
-
+NX.define('Nexus.LegacyLogMixin', {
+  /**
+   * @deprecated
+   */
+  '$log': function(message) {
+    NX.log.debug(this.$className + ': ' + message);
+    NX.log.warn('[DEPRECATED]', this.$className + '.$log() is deprecated; use NX.LogAwareMixin instead');
+  }
 });

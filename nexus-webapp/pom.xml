@@ -327,12 +327,20 @@
               <includes>
                 <!-- some order required here -->
                 <include>lib/string.js</include>
-                <include>lib/nx.js</include>
-                <include>lib/nx.assert.js</include>
-                <include>lib/nx.log.js</include>
-                <include>lib/nx.define.js</include>
                 <include>lib/require-*.js</include>
-                <include>lib/classes/**/*.js</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>js-nx</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/js/nx-all.js</output>
+              <sourceDirectory>src/main/webapp/js</sourceDirectory>
+              <includes>
+                <include>NX/**/*.js</include>
               </includes>
             </configuration>
           </execution>
@@ -346,6 +354,7 @@
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <excludes>
                 <exclude>lib/*.js</exclude>
+                <exclude>NX/**/*.js</exclude>
               </excludes>
               <includes>
                 <include>**/*.js</include>

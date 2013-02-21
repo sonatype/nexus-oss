@@ -10,43 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-/*global Ext,NX */
-
-Ext.ns('NX');
-
-/**
- * Exception thrown when assertion is triggered.
- *
- * @param message
- * @constructor
- *
- * @since 2.4
- */
-function AssertError(message) {
-    this.name = 'AssertError';
-    this.message = message || 'Assertion failure';
-}
-AssertError.prototype = new Error();
-AssertError.prototype.constructor = AssertError;
-
-/**
- * Assertion helpers.
- */
-Ext.apply(NX, {
-
-    /**
-     * Assert a condition.  When the condition expression is false and exception is thrown.
-     *
-     * @param expression    Condition expression
-     * @param message       Exception message
-     *
-     * @since 2.4
-     */
-    assert: function (expression, message) {
-        if (!expression) {
-            throw new AssertError(message);
-        }
-    }
-
-});
+/*global define*/
+define('NX/bootstrap', [
+  'NX/base',
+  'NX/define',
+  'NX/log'
+]);
