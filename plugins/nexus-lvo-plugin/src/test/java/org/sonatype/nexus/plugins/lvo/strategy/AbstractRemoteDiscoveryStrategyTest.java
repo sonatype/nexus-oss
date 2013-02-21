@@ -102,7 +102,7 @@ public class AbstractRemoteDiscoveryStrategyTest
 
     private AbstractRemoteDiscoveryStrategy create()
     {
-        final Hc4Provider provider = new Hc4ProviderImpl( cfg, userAgentBuilder, eventBus, jmxInstaller );
+        final Hc4Provider provider = new Hc4ProviderImpl( cfg, userAgentBuilder, eventBus, jmxInstaller, null );
         return new AbstractRemoteDiscoveryStrategy( provider )
         {
             @Override

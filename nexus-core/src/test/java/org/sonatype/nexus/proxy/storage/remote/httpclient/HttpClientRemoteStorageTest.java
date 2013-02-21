@@ -174,7 +174,8 @@ public class HttpClientRemoteStorageTest
             hc4Provider =
                 new Hc4ProviderImpl( applicationConfiguration, mock( UserAgentBuilder.class ),
                     mock( EventBus.class ),
-                    mock( PoolingClientConnectionManagerMBeanInstaller.class ) );
+                    mock( PoolingClientConnectionManagerMBeanInstaller.class ),
+                    null );
 
             // the RRS instance we test
             final HttpClientRemoteStorage underTest =
