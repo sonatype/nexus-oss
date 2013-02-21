@@ -52,7 +52,7 @@ define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init'], function(E
       servicePath : servicePath,
       // @deprecated use contextPath
       resourcePath : contextPath,
-      extPath : contextPath + '/ext-3.4.0',
+      extPath : contextPath + '/ext-3.4.1',
       contentPath : contentPath,
       cssPath : '/styles',
       jsPath : '/js',
