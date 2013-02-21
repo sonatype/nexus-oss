@@ -101,11 +101,11 @@ public class LocalContentDiscovererImpl
         {
             if ( e.getWalkerContext().getStopCause() != null )
             {
-                discoveryResult.recordFailure( ID, e.getWalkerContext().getStopCause() );
+                discoveryResult.recordError( ID, e.getWalkerContext().getStopCause() );
             }
             else
             {
-                discoveryResult.recordFailure( ID, e );
+                discoveryResult.recordError( ID, e );
             }
         }
         return discoveryResult;

@@ -51,12 +51,18 @@ public class WLDiscoveryStatus
         /**
          * Remote discovery enabled and was unsuccessful.
          */
-        FAILED;
+        UNSUCCESSFUL,
 
         /**
-         * Returns {@code true} if this discovery status represents a case when it's enabled.
+         * Remote discovery enabled and failed (due to some error).
+         */
+        ERROR;
+
+        /**
+         * Returns {@code true} if this discovery status represents a case when proxy remote discovery is enabled (by
+         * configuration).
          * 
-         * @return {@code true} if this is any of the enabled ones.
+         * @return {@code true} if proxy who's status is this has remote discovery enabled.
          */
         public boolean isEnabled()
         {

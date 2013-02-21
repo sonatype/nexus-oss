@@ -157,26 +157,45 @@ public class WLManagerImpl
     @Override
     public void startup()
     {
-        final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
-        initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
-        initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
-        for ( MavenRepository mavenRepository : initableRepositories )
+        // init WLs of repositories on boot, but only hosted needs immediate update
+        // while proxies - if their WL does not exists, like on 1st boot -- will get
+        // inited only and not updated (will be marked for noscrape). Their update will
+        // be commenced a bit later, due to timing issues in Pro + Secure Central, where
+        // RemoteRepositoryStorage for it is not yet ready (is getting prepped for same this
+        // event: NexusStartedEvent).
+        // All this is important for 1st boot only, as on subsequent boot WLs will be alredy
+        // present.
         {
-            if ( Maven2ContentClass.ID.equals( mavenRepository.getRepositoryContentClass().getId() ) )
+            final ArrayList<MavenRepository> initableRepositories = new ArrayList<MavenRepository>();
+            initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenHostedRepository.class ) );
+            initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
+            for ( MavenRepository mavenRepository : initableRepositories )
             {
-                initializeWhitelist( mavenRepository );
+                if ( Maven2ContentClass.ID.equals( mavenRepository.getRepositoryContentClass().getId() ) )
+                {
+                    if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+                    {
+                        // TODO: make this false if proxy repo WL update needs to be deferred
+                        initializeWhitelist( true, mavenRepository );
+                    }
+                    else
+                    {
+                        initializeWhitelist( true, mavenRepository );
+                    }
+                }
             }
         }
-        // schedule the "updater": wait 10 minutes for boot to calm down and then do the work hourly
+        // schedule the "updater" that ping hourly the mayUpdateProxyWhitelist method
+        // but wait 1 minute for boot to calm down and then start
         this.executor.scheduleAtFixedRate( new Runnable()
         {
             @Override
             public void run()
             {
-                mayUpdateProxyWhitelist();
+                mayUpdateAllProxyWhitelists();
             }
-        }, TimeUnit.MINUTES.toMillis( 10 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
-        // register event dispatcher, to start receiveing events
+        }, TimeUnit.MINUTES.toMillis( 1 ), TimeUnit.HOURS.toMillis( 1 ), TimeUnit.MILLISECONDS );
+        // register event dispatcher, to start receiving events
         eventBus.register( eventDispatcher );
     }
 
@@ -199,6 +218,11 @@ public class WLManagerImpl
     @Override
     public void initializeWhitelist( final MavenRepository mavenRepository )
     {
+        initializeWhitelist( true, mavenRepository );
+    }
+
+    protected void initializeWhitelist( final boolean doUpdateIfNeeded, final MavenRepository mavenRepository )
+    {
         getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
         final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
         try
@@ -216,9 +240,17 @@ public class WLManagerImpl
                 // mark it for noscrape if not marked yet
                 // this is mainly important on 1st boot or newly added reposes
                 unpublish( mavenRepository );
-                updateWhitelist( mavenRepository );
-                getLogger().info( "Updating WL of {}, it does not exists yet.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                if ( doUpdateIfNeeded )
+                {
+                    updateWhitelist( mavenRepository );
+                    getLogger().info( "Updating WL of {}, it does not exists yet.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                }
+                else
+                {
+                    getLogger().info( "WL of {} not exists yet, marked for noscrape.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+                }
             }
         }
         catch ( IOException e )
@@ -240,44 +272,53 @@ public class WLManagerImpl
      * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of WL update period in
      * hours too), and will perform WL update only on those proxy repositories that needs it.
      */
-    protected void mayUpdateProxyWhitelist()
+    protected void mayUpdateAllProxyWhitelists()
     {
-        final List<MavenProxyRepository> proxies =
+        final List<MavenProxyRepository> mavenProxyRepositories =
             repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class );
-        final ArrayList<MavenProxyRepository> updateNeededRepositories = new ArrayList<MavenProxyRepository>();
-        for ( MavenProxyRepository mavenProxyRepository : proxies )
+        for ( MavenProxyRepository mavenProxyRepository : mavenProxyRepositories )
         {
-            final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
-            if ( config.isEnabled() )
-            {
-                final PrefixSource prefixSource = getPrefixSourceFor( mavenProxyRepository );
-                // if never run before or is stale
-                if ( !prefixSource.exists()
-                    || ( ( System.currentTimeMillis() - prefixSource.getLostModifiedTimestamp() ) > config.getDiscoveryInterval() ) )
-                {
-                    if ( !prefixSource.exists() )
-                    {
-                        getLogger().debug( "Proxy repository {} has never been discovered before, updating it.",
-                            RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
-                    }
-                    else
-                    {
-                        getLogger().debug( "Proxy repository {} has needs remote discovery update, updating it.",
-                            RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
-                    }
-                    updateNeededRepositories.add( mavenProxyRepository );
-                }
-            }
-            else
-            {
-                getLogger().debug( "Proxy repository {} has remote discovery disabled, not updating it.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
-            }
+            mayUpdateProxyWhitelist( mavenProxyRepository );
         }
-        if ( !updateNeededRepositories.isEmpty() )
+    }
+
+    /**
+     * Method meant to be invoked on regular periods (like hourly, as we defined "resolution" of WL update period in
+     * hours too), and will perform WL update on proxy repository only if needed (WL is stale, or does not exists).
+     * 
+     * @param mavenProxyRepository
+     * @return {@code true} if update has been spawned, {@code false} if no update needed (WL is up to date or remote
+     *         discovery is disable for repository).
+     */
+    protected boolean mayUpdateProxyWhitelist( final MavenProxyRepository mavenProxyRepository )
+    {
+        final WLDiscoveryStatus discoveryStatus = getStatusFor( mavenProxyRepository ).getDiscoveryStatus();
+        if ( discoveryStatus.getStatus().isEnabled() )
         {
-            for ( MavenProxyRepository mavenProxyRepository : updateNeededRepositories )
+            // only update if any of these below are true:
+            // status is ENABLED (never ran before)
+            // status is ERROR (hit an error during last discovery)
+            // status is SUCCESSFUL or UNSUCCESFUL and WL update period is here
+            final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
+            if ( discoveryStatus.getStatus() == DStatus.ENABLED
+                || discoveryStatus.getStatus() == DStatus.ERROR
+                || ( ( System.currentTimeMillis() - discoveryStatus.getLastDiscoveryTimestamp() ) > config.getDiscoveryInterval() ) )
             {
+                if ( discoveryStatus.getStatus() == DStatus.ENABLED )
+                {
+                    getLogger().debug( "Proxy repository {} has never been discovered before, updating it.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                }
+                else if ( discoveryStatus.getStatus() == DStatus.ERROR )
+                {
+                    getLogger().debug( "Proxy repository {} previous discovery hit an error, updating it.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                }
+                else
+                {
+                    getLogger().debug( "Proxy repository {} needs periodic remote discovery update, updating it.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                }
                 final boolean updateSpawned = updateWhitelist( mavenProxyRepository );
                 if ( !updateSpawned )
                 {
@@ -287,12 +328,15 @@ public class WLManagerImpl
                         "Proxy repository's {} periodic remote discovery not spawned, as there is already an ongoing job doing it. Consider raising the update interval for it.",
                         RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 }
+                return updateSpawned;
             }
         }
         else
         {
-            getLogger().debug( "No proxy repository needs WL update (all are up to date or disabled)." );
+            getLogger().debug( "Proxy repository {} has remote discovery disabled, not updating it.",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         }
+        return false;
     }
 
     @Override
@@ -409,8 +453,27 @@ public class WLManagerImpl
             final PropfileDiscoveryStatusSource discoveryStatusSource =
                 new PropfileDiscoveryStatusSource( mavenProxyRepository );
             final Outcome lastOutcome = discoveryResult.getLastResult();
-            discoveryStatusSource.write( new WLDiscoveryStatus( lastOutcome.isSuccessful() ? DStatus.SUCCESSFUL
-                : DStatus.FAILED, lastOutcome.getStrategyId(), lastOutcome.getMessage(), System.currentTimeMillis() ) );
+
+            final DStatus status;
+            if ( lastOutcome.isSuccessful() )
+            {
+                status = DStatus.SUCCESSFUL;
+            }
+            else
+            {
+                if ( lastOutcome.getThrowable() == null )
+                {
+                    status = DStatus.UNSUCCESSFUL;
+                }
+                else
+                {
+                    status = DStatus.ERROR;
+                }
+            }
+            final WLDiscoveryStatus discoveryStatus =
+                new WLDiscoveryStatus( status, lastOutcome.getStrategyId(), lastOutcome.getMessage(),
+                    System.currentTimeMillis() );
+            discoveryStatusSource.write( discoveryStatus );
         }
         else
         {

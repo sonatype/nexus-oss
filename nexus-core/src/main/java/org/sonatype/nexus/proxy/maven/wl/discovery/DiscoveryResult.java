@@ -84,28 +84,6 @@ public class DiscoveryResult<R extends MavenRepository>
         }
 
         /**
-         * Success constructor.
-         * 
-         * @param strategyId
-         * @param message
-         */
-        OutcomeImpl( final String strategyId, final String message )
-        {
-            this( strategyId, true, message, null );
-        }
-
-        /**
-         * Failure constructor.
-         * 
-         * @param strategyId
-         * @param throwable
-         */
-        OutcomeImpl( final String strategyId, final Throwable throwable )
-        {
-            this( strategyId, false, throwable.getMessage(), throwable );
-        }
-
-        /**
          * Returns the ID of the {@link RemoteStrategy} that this outcome belongs to.
          * 
          * @return the strategy ID, never {@code null}.
@@ -219,7 +197,7 @@ public class DiscoveryResult<R extends MavenRepository>
             checkNotNull( usedStrategyId );
             checkNotNull( message );
             checkNotNull( prefixSource );
-            final OutcomeImpl success = new OutcomeImpl( usedStrategyId, message );
+            final OutcomeImpl success = new OutcomeImpl( usedStrategyId, true, message, null );
             this.outcomes.add( success );
             this.prefixSource = prefixSource;
         }
@@ -227,18 +205,36 @@ public class DiscoveryResult<R extends MavenRepository>
 
     /**
      * Records a failure on behalf of a strategy, if this has not yet recorded a success, in which case this method will
-     * do nothing.
+     * do nothing. A failure simply means "this strategy failed to get remote WL".
      * 
      * @param usedStrategyId
-     * @param failureCause
+     * @param message
      */
-    public void recordFailure( final String usedStrategyId, final Throwable failureCause )
+    public void recordFailure( final String usedStrategyId, final String message )
     {
         if ( !isSuccessful() )
         {
             checkNotNull( usedStrategyId );
-            checkNotNull( failureCause );
-            final OutcomeImpl failure = new OutcomeImpl( usedStrategyId, failureCause );
+            checkNotNull( message );
+            final OutcomeImpl failure = new OutcomeImpl( usedStrategyId, false, message, null );
+            this.outcomes.add( failure );
+        }
+    }
+
+    /**
+     * Records an error on behalf of a strategy, if this has not yet recorded a success, in which case this method will
+     * do nothing.
+     * 
+     * @param usedStrategyId
+     * @param errorCause
+     */
+    public void recordError( final String usedStrategyId, final Throwable errorCause )
+    {
+        if ( !isSuccessful() )
+        {
+            checkNotNull( usedStrategyId );
+            checkNotNull( errorCause );
+            final OutcomeImpl failure = new OutcomeImpl( usedStrategyId, false, errorCause.getMessage(), errorCause );
             this.outcomes.add( failure );
         }
     }

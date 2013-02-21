@@ -14,7 +14,6 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +59,6 @@ public class RemoteContentDiscovererImpl
 
     @Override
     public DiscoveryResult<MavenProxyRepository> discoverRemoteContent( final MavenProxyRepository mavenProxyRepository )
-        throws IOException
     {
         final ArrayList<RemoteStrategy> appliedStrategies = new ArrayList<RemoteStrategy>( remoteStrategies );
         Collections.sort( appliedStrategies, new PriorityOrderingComparator<RemoteStrategy>() );
@@ -78,7 +76,12 @@ public class RemoteContentDiscovererImpl
             }
             catch ( StrategyFailedException e )
             {
-                discoveryResult.recordFailure( strategy.getId(), e );
+                discoveryResult.recordFailure( strategy.getId(), e.getMessage() );
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn( "Remote strategy {} error:", strategy.getClass().getName(), e );
+                discoveryResult.recordError( strategy.getId(), e );
             }
 
             if ( discoveryResult.isSuccessful() )

@@ -77,7 +77,7 @@ public class RemoteScrapeStrategy
 
     @Override
     public StrategyResult discover( final MavenProxyRepository mavenProxyRepository )
-        throws StrategyFailedException
+        throws StrategyFailedException, IOException
     {
         getLogger().debug( "Remote scrape on {} tried",
             RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
@@ -91,50 +91,44 @@ public class RemoteScrapeStrategy
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             throw new StrategyFailedException( "Remote forbids scraping, is flagged as \"no-scrape\"." );
         }
-        try
+        final ScrapeContext context =
+            new ScrapeContext( httpClient, remoteRepositoryRootUrl, config.getRemoteScrapeDepth() );
+        final Page rootPage = Page.getPageFor( context, remoteRepositoryRootUrl );
+        final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
+        Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
+        for ( Scraper scraper : appliedScrapers )
         {
-            final ScrapeContext context =
-                new ScrapeContext( httpClient, remoteRepositoryRootUrl, config.getRemoteScrapeDepth() );
-            final Page rootPage = Page.getPageFor( context, remoteRepositoryRootUrl );
-            final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
-            Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
-            for ( Scraper scraper : appliedScrapers )
+            getLogger().debug( "Remote scraping {} with Scraper {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
+            scraper.scrape( context, rootPage );
+            if ( context.isStopped() )
             {
-                getLogger().debug( "Remote scraping {} with Scraper {}",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
-                scraper.scrape( context, rootPage );
-                if ( context.isStopped() )
+                if ( context.isSuccessful() )
                 {
-                    if ( context.isSuccessful() )
-                    {
-                        getLogger().debug( "Remote scraping {} with Scraper {} succeeded.",
-                            RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
-                        return new StrategyResult( context.getMessage(), context.getPrefixSource() );
-                    }
-                    else
-                    {
-                        getLogger().debug( "Remote scraping {} with Scraper {} stopped execution.",
-                            RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
-                        throw new StrategyFailedException( context.getMessage() );
-                    }
+                    getLogger().debug( "Remote scraping {} with Scraper {} succeeded.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
+                    return new StrategyResult( context.getMessage(), context.getPrefixSource() );
                 }
-                getLogger().debug( "Remote scraping {} with Scraper {} skipped.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
+                else
+                {
+                    getLogger().debug( "Remote scraping {} with Scraper {} stopped execution.",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
+                    throw new StrategyFailedException( context.getMessage() );
+                }
             }
+            getLogger().debug( "Remote scraping {} with Scraper {} skipped.",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), scraper.getId() );
+        }
 
-            getLogger().debug( "Not possible remote scrape of {}, no scraper succeeded.",
-                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
-            throw new StrategyFailedException( "No scraper was able to scrape remote (or remote prevents scraping)." );
-        }
-        catch ( IOException e )
-        {
-            throw new StrategyFailedException( e.getMessage(), e );
-        }
+        getLogger().debug( "Not possible remote scrape of {}, no scraper succeeded.",
+            RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+        throw new StrategyFailedException( "No scraper was able to scrape remote (or remote prevents scraping)." );
     }
 
     // ==
 
     protected boolean isMarkedForNoScrape( final HttpClient httpClient, final String remoteRepositoryRootUrl )
+        throws IOException
     {
         final List<String> noscrapeFlags = config.getRemoteNoScrapeFlagPaths();
         for ( String noscrapeFlag : noscrapeFlags )
@@ -153,11 +147,6 @@ public class RemoteScrapeStrategy
                 {
                     return true;
                 }
-            }
-            catch ( IOException e )
-            {
-                // ahem, let's skip over this
-                // remote should TELL not TRY TO TELL do not scrape me
             }
             finally
             {

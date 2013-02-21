@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.discovery;
 
-import java.io.IOException;
-
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 
 /**
@@ -30,8 +28,6 @@ public interface RemoteContentDiscoverer
      * 
      * @param mavenProxyRepository to discover remote content.
      * @return the result of discovery,
-     * @throws IOException in case of IO problem.
      */
-    DiscoveryResult<MavenProxyRepository> discoverRemoteContent( MavenProxyRepository mavenProxyRepository )
-        throws IOException;
+    DiscoveryResult<MavenProxyRepository> discoverRemoteContent( MavenProxyRepository mavenProxyRepository );
 }

@@ -46,7 +46,7 @@ public class PropfileDiscoveryStatusSource
 {
     private static final String DISCOVERY_STATUS_FILE_PATH = "/.meta/discovery-status.txt";
 
-    private static final String LAST_DISCOVERY_SUCCESS_KEY = "lastDiscoverySuccess";
+    private static final String LAST_DISCOVERY_STATUS_KEY = "lastDiscoveryStatus";
 
     private static final String LAST_DISCOVERY_STRATEGY_KEY = "lastDiscoveryStrategy";
 
@@ -104,15 +104,24 @@ public class PropfileDiscoveryStatusSource
         try
         {
             props.load( inputStream );
-            final boolean lastDiscoverySuccess =
-                Boolean.parseBoolean( props.getProperty( LAST_DISCOVERY_SUCCESS_KEY, Boolean.FALSE.toString() ) );
+            final DStatus lastDiscoveryStatus = DStatus.valueOf( props.getProperty( LAST_DISCOVERY_STATUS_KEY ) );
             final String lastDiscoveryStrategy = props.getProperty( LAST_DISCOVERY_STRATEGY_KEY, "unknown" );
             final String lastDiscoveryMessage = props.getProperty( LAST_DISCOVERY_MESSAGE_KEY, "" );
             final long lastDiscoveryTimestamp =
                 Long.parseLong( props.getProperty( LAST_DISCOVERY_TIMESTAMP_KEY, Long.toString( -1L ) ) );
 
-            return new WLDiscoveryStatus( lastDiscoverySuccess ? DStatus.SUCCESSFUL : DStatus.FAILED,
-                lastDiscoveryStrategy, lastDiscoveryMessage, lastDiscoveryTimestamp );
+            return new WLDiscoveryStatus( lastDiscoveryStatus, lastDiscoveryStrategy, lastDiscoveryMessage,
+                lastDiscoveryTimestamp );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            deleteFileItem();
+            return null;
+        }
+        catch ( NullPointerException e )
+        {
+            deleteFileItem();
+            return null;
         }
         finally
         {
@@ -131,7 +140,7 @@ public class PropfileDiscoveryStatusSource
     {
         checkNotNull( discoveryStatus );
         final Properties props = new Properties();
-        props.put( LAST_DISCOVERY_SUCCESS_KEY, Boolean.toString( DStatus.SUCCESSFUL == discoveryStatus.getStatus() ) );
+        props.put( LAST_DISCOVERY_STATUS_KEY, discoveryStatus.getStatus().name() );
         props.put( LAST_DISCOVERY_STRATEGY_KEY, discoveryStatus.getLastDiscoveryStrategy() );
         props.put( LAST_DISCOVERY_MESSAGE_KEY, discoveryStatus.getLastDiscoveryMessage() );
         props.put( LAST_DISCOVERY_TIMESTAMP_KEY, Long.toString( discoveryStatus.getLastDiscoveryTimestamp() ) );
