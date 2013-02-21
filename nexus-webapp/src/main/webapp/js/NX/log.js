@@ -22,7 +22,7 @@ define('NX/log', ['NX/base'], function() {
    * @singleton
    */
   NX.log = (function () {
-      var logger, safeProxy, levelAwareProxy;
+      var logger;
 
       // FIXME: Really would like a better/more-powerful logging API here
       // FIXME: Including the ability to remote back to the server to capture UI events
@@ -52,29 +52,52 @@ define('NX/log', ['NX/base'], function() {
           //}
       };
 
-      safeProxy = function(target, name) {
-          if (Ext.isDefined(target) && Ext.isFunction(target[name])) {
-              return function() {
-                  if (logger.enabled) {
-                      target[name].apply(target, arguments);
-                  }
-              };
-          }
-
-          return Ext.emptyFn();
-      };
-
-      levelAwareProxy = function(target, name) {
-          if (Ext.isDefined(target) && Ext.isFunction(target[name])) {
-              return function() {
-                  if (logger.isEnabled(name)) {
-                      target[name].apply(target, arguments);
-                  }
+      /**
+       * @private
+       * @param target {Object} The logging implementation
+       * @param name {String} The logger to use
+       * @param isLoggerEnabled {Function} A function that returns true when the logger for target/name is enabled, false otherwise.
+       * @return {Function} The logger.
+       */
+      function createLogger(target, name, isLoggerEnabled) {
+        var log;
+        if (Ext.isDefined(target)) {
+          if (Ext.isFunction(target[name])) { // most browser have proper console.log, console.debug, ... as functions
+            log = function() {
+              if (isLoggerEnabled()) {
+                target[name].apply(target, arguments);
               }
+            };
+          } else if (Ext.isDefined(target[name])) { // IE9: console.log is reported as an object, not a function, and does not have #apply
+            log = function() {
+              if (isLoggerEnabled()) {
+                var args = [];
+                Ext.each(arguments, function(item) {
+                  args.push(item);
+                });
+                target[name](args.join(' '));
+              }
+            };
+          } else if (Ext.isDefined(target.log)) { // if e.g. console.debug is not available, use console.log
+            log = createLogger(target, 'log', isLoggerEnabled);
+          } else { // nothing we can do, don't log.
+            log = Ext.emptyFn;
           }
+        }
+        return log;
+      }
 
-          return Ext.emptyFn();
-      };
+      function safeProxy(target, name) {
+        return createLogger(target, name, function() {
+          return logger.enabled;
+        });
+      }
+
+      function levelAwareProxy(target, name) {
+        return createLogger(target, name, function() {
+          return logger.isEnabled(name);
+        });
+      }
 
       Ext.each([
           'trace',
