@@ -19,6 +19,8 @@
 NX.define('Nexus.panels.AutoTabPanel', {
   extend : 'Ext.Panel',
 
+  requirejs : ['Sonatype/view'],
+
   constructor : function(cfg) {
     var
           config = cfg || {},
