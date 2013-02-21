@@ -63,6 +63,12 @@
       <artifactId>xstream</artifactId>
     </dependency>
 
+    <!-- Required for date handling in XStream -->
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
+
     <!-- Version (for now all of Aether API/UTIL) -->
     <dependency>
       <groupId>org.sonatype.aether</groupId>
