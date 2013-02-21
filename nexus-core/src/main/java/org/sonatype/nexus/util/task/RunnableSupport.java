@@ -71,9 +71,9 @@ public abstract class RunnableSupport
         try
         {
             ProgressListenerUtil.setCurrentProgressListener( getProgressListener() );
-            getLogger().info( "{} running...", getName() );
+            getLogger().debug( "{} running...", getName() );
             doRun();
-            getLogger().info( "{} done...", getName() );
+            getLogger().debug( "{} done...", getName() );
         }
         catch ( InterruptedException e )
         {
