@@ -326,13 +326,21 @@
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <includes>
                 <!-- some order required here -->
-                <include>lib/require-*.js</include>
                 <include>lib/string.js</include>
-                <include>lib/nx.js</include>
-                <include>lib/nx.assert.js</include>
-                <include>lib/nx.log.js</include>
-                <include>lib/nx.define.js</include>
-                <include>lib/classes/**/*.js</include>
+                <include>lib/require-*.js</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>js-nx</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/js/nx-all.js</output>
+              <sourceDirectory>src/main/webapp/js</sourceDirectory>
+              <includes>
+                <include>NX/**/*.js</include>
               </includes>
             </configuration>
           </execution>
@@ -346,6 +354,7 @@
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <excludes>
                 <exclude>lib/*.js</exclude>
+                <exclude>NX/**/*.js</exclude>
               </excludes>
               <includes>
                 <include>**/*.js</include>
@@ -414,13 +423,13 @@
         <configuration>
           <warSourceIncludes>
             *,
-            ext-3.4.0/adapter/ext/ext-base-debug.js,
-            ext-3.4.0/ext-all-debug.js,
-            ext-3.4.0/adapter/ext/ext-base.js,
-            ext-3.4.0/ext-all.js,
-            ext-3.4.0/resources/css/ext-all.css,
-            ext-3.4.0/resources/css/xtheme-gray.css,
-            ext-3.4.0/resources/images/**,
+            ext-3.4.1/adapter/ext/ext-base-debug.js,
+            ext-3.4.1/ext-all-debug.js,
+            ext-3.4.1/adapter/ext/ext-base.js,
+            ext-3.4.1/ext-all.js,
+            ext-3.4.1/resources/css/ext-all.css,
+            ext-3.4.1/resources/css/xtheme-gray.css,
+            ext-3.4.1/resources/images/**,
             images/**,
             WEB-INF/*,
             style/sonatype-all.css

@@ -19,7 +19,7 @@
  */
 NX.define('Nexus.util.IconContainer', {
     mixins: [
-        'NX.LogAwareMixin'
+        'Nexus.LogAwareMixin'
     ],
 
     requirejs: [

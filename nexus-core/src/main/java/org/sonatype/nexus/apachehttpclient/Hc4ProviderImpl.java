@@ -35,6 +35,7 @@ import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.ClientConnectionOperator;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -180,12 +181,13 @@ public class Hc4ProviderImpl
     public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
         final UserAgentBuilder userAgentBuilder,
         final EventBus eventBus,
-        final PoolingClientConnectionManagerMBeanInstaller jmxInstaller )
+        final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
+        final List<ClientConnectionOperatorSelector> selectors )
     {
         this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
         this.userAgentBuilder = Preconditions.checkNotNull( userAgentBuilder );
         this.jmxInstaller = Preconditions.checkNotNull( jmxInstaller );
-        this.sharedConnectionManager = createClientConnectionManager();
+        this.sharedConnectionManager = createClientConnectionManager( selectors );
         this.evictingThread = new EvictingThread( sharedConnectionManager, getConnectionPoolIdleTime() );
         this.evictingThread.start();
         this.eventBus = Preconditions.checkNotNull( eventBus );
@@ -395,13 +397,22 @@ public class Hc4ProviderImpl
         return params;
     }
 
-    protected PoolingClientConnectionManager createClientConnectionManager()
+    protected PoolingClientConnectionManager createClientConnectionManager(
+        final List<ClientConnectionOperatorSelector> selectors )
         throws IllegalStateException
     {
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register( new Scheme( "http", 80, PlainSocketFactory.getSocketFactory() ) );
         schemeRegistry.register( new Scheme( "https", 443, SSLSocketFactory.getSocketFactory() ) );
-        final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager( schemeRegistry );
+
+        final PoolingClientConnectionManager connManager = new PoolingClientConnectionManager( schemeRegistry )
+        {
+            @Override
+            protected ClientConnectionOperator createConnectionOperator( final SchemeRegistry defaultSchemeRegistry )
+            {
+                return new Hc4ClientConnectionOperator( defaultSchemeRegistry, selectors );
+            }
+        };
 
         final int maxConnectionCount = getConnectionPoolMaxSize();
         final int perRouteConnectionCount = Math.min( getConnectionPoolSize(), maxConnectionCount );
