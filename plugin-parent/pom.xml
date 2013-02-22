@@ -94,6 +94,16 @@
       </dependency>
 
       <!--
+      Required for plugins which use BouncyCastle/JCE/goodies-crypto.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-crypto-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
       Required for plugins which use the maven-bridge.
       -->
       <dependency>
@@ -110,6 +120,15 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-restlet1x-plugin</artifactId>
         <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      HACK: Exposed here for a lack of a better way to manage.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-crypto-plugin</artifactId>
         <version>${nexus.version}</version>
       </dependency>
 

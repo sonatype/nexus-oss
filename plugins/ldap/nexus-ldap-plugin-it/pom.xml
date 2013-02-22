@@ -37,6 +37,11 @@
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-crypto-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
