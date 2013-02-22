@@ -19,24 +19,34 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 import core.NexusCoreITSupport;
 
 /**
  * Most basic IT just checking is bundle alive at all.
- *
+ * 
  * @since 2.4
  */
 @Category( Smoke.class )
 public class SmokeIT
     extends NexusCoreITSupport
 {
+    /**
+     * Constructor.
+     * 
+     * @param nexusBundleCoordinates
+     */
     public SmokeIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
 
+    /**
+     * Test that only verifies that Nexus reports itself (the status resource actually, used by {@link NexusClient}) as
+     * expected.
+     */
     @Test
     public void verifyNexusReportsAsHealthyAndCorrect()
     {

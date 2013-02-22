@@ -28,18 +28,32 @@ import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 
 /**
  * Simple smoke IT for Whitelist REST being responsive and is reporting the expected statuses.
- *
+ * 
  * @author cstamas
  */
 @Category( Smoke.class )
 public class WhitelistSmokeIT
     extends WhitelistITSupport
 {
+    /**
+     * Constructor.
+     * 
+     * @param nexusBundleCoordinates
+     */
     public WhitelistSmokeIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
 
+    /**
+     * This "smoke" test does not do much. It only checks WL statuses for some repositories and asserts that responses
+     * are what they should be (after 1st boot of Nexus). Also, (default) configuration is checked too, like
+     * "proxies has discovery enabled by default" and "proxy discovery period is 12h by default". Finally, it just
+     * "sanity checks" the WL resources/client behaviour when asked for non-proxy configuration (should be simply
+     * rejected by 400 Bad Request).
+     * 
+     * @throws Exception
+     */
     @Test
     public void smokeIt()
         throws Exception

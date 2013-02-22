@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,11 +47,12 @@ import org.sonatype.tests.http.server.fluent.Server;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
+import com.google.common.primitives.Ints;
 
 /**
  * Simple "smoke" IT that tests does proxy404 does it's job or not, by detecting what remote requests was made with and
  * without WL built.
- *
+ * 
  * @author cstamas
  */
 @Category( Smoke.class )
@@ -75,10 +77,18 @@ public class WhitelistFilteringIT
 
     private static final String FLUKE_ARTIFACT_JAR = "/hu/fluke/artifact/1.0/artifact-1.0.jar";
 
-    // we will timeout after 15 minutes, just as a safety net
+    /**
+     * This is a safety net, to have JUnit kill this test if it locks for any reason (remote scrape or such). This rule
+     * will kill this test after 15 minutes.
+     */
     @Rule
-    public Timeout timeout = new Timeout( 900000 );
+    public Timeout timeout = new Timeout( Ints.checkedCast( TimeUnit.MINUTES.toMillis( 15L ) ) );
 
+    /**
+     * Constructor.
+     * 
+     * @param nexusBundleCoordinates
+     */
     public WhitelistFilteringIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
@@ -143,8 +153,12 @@ public class WhitelistFilteringIT
     // ==
 
     /**
-     * A proxy "transitions" from not having prefixes file to having prefixes file (and not being scraped either).
-     *
+     * A proxy "transitions" from not having prefixes file to having prefixes file (and not being scraped either). The
+     * test does two passes of requests. In first pass (without WL), the proxy will forward all the requests to it's
+     * remote target (pre-WL behaviour of Nexus). Once repository transitions into a state of having WL, with nuked
+     * proxy caches same set of requests is repeated. This time, it is validated that only whitelisted requests are
+     * forwared to remote target.
+     * 
      * @throws Exception
      */
     @Test
@@ -263,8 +277,13 @@ public class WhitelistFilteringIT
     }
 
     /**
-     * A proxy "transitions" from having prefixes file to not having prefixes file (and not being scraped either).
-     *
+     * A proxy "transitions" from having prefixes file to not having prefixes file (and not being scraped either). The
+     * test does two passes of requests. In first pass (with WL), the proxy will forward only whitelisted requests to
+     * it's remote target. Then repository transitions into a state of not having WL (like remote prefix file removed
+     * and will not be scraped as test Jetty does not have index file), with nuked proxy caches same set of requests is
+     * repeated. This time, it is validated that all requests are forwared to remote target (pre-WL behaviour of Nexus).
+     * Simply put, proxy repository falls back to pre-WL (pre-2.4) behavior.
+     * 
      * @throws Exception
      */
     @Test

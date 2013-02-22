@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -36,7 +37,9 @@ import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
 import org.sonatype.sisu.litmus.testsupport.group.External;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
+import com.google.common.io.InputSupplier;
 
 /**
  * This IT will just boot up nexus, wait for WL to be discovered (only for Central, with default config), and then
@@ -47,10 +50,10 @@ import com.google.common.io.Closeables;
  * IT scraping Central for real! On my Mac (cstamas), this IT runs for 210seconds, hence, is marked as Slow.
  * <P>
  * Not anymore, as prefix file is deployed to central.
- *
+ * 
  * @author cstamas
  */
-@Category( {Slow.class, External.class} )
+@Category( { Slow.class, External.class } )
 public class WhitelistInitialSanityIT
     extends WhitelistITSupport
 {
@@ -71,6 +74,14 @@ public class WhitelistInitialSanityIT
             "org.sonatype.nexus.proxy.maven.wl.internal.scrape.Scraper.pageSleepTimeMillis", "50" );
     }
 
+    /**
+     * Testing initial boot of Nexus with WL feature. Asserting that Central (and hence Public group, that has Central
+     * and only one proxy member) has WL published, since Central discovery succeeded. Then it fetches the Central
+     * published prefix file (from Nexus), and performs some sanity checks against it. Finally, we assert that Nexus
+     * publishes (proxies) the remote prefix file in unchanged way, it does not mangle it or rewrite any parts of it.
+     * 
+     * @throws Exception
+     */
     @Test
     public void initialScrape()
         throws Exception
@@ -95,13 +106,8 @@ public class WhitelistInitialSanityIT
         // undecided, since still scraping and this is the first run of remote discovery
         assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.SUCCEEDED ) );
 
-        // let's verify it
-        final HttpClient httpClient = new DefaultHttpClient();
-        final HttpGet get = new HttpGet( centralStatus.getPublishedUrl() );
-        final HttpResponse httpResponse = httpClient.execute( get );
-        assertThat( httpResponse.getStatusLine().getStatusCode(), equalTo( 200 ) );
-        assertThat( httpResponse.getEntity(), is( notNullValue() ) );
-        final InputStream entityStream = httpResponse.getEntity().getContent();
+        // let's check some sanity (just blindly check that some expected entries are present)
+        final InputStream entityStream = getPrefixFileFrom( centralStatus.getPublishedUrl() );
         try
         {
             final LineNumberReader lnr = new LineNumberReader( new InputStreamReader( entityStream, "UTF-8" ) );
@@ -134,6 +140,57 @@ public class WhitelistInitialSanityIT
         finally
         {
             Closeables.closeQuietly( entityStream );
+        }
+
+        // let's verify that Nexus did not modify the prefix file got from Central (req: Nexus must publish prefix file
+        // as-is, as it was received from remote). both should be equal on byte level.
+        final InputStream nexusPrefixFile = getPrefixFileFrom( centralStatus.getPublishedUrl() );
+        final InputStream centralPrefixFile = getPrefixFileFrom( "http://repo1.maven.org/maven2/.meta/prefixes.txt" );
+        try
+        {
+            ByteStreams.equal( new InputSupplier<InputStream>()
+            {
+                @Override
+                public InputStream getInput()
+                    throws IOException
+                {
+                    return nexusPrefixFile;
+                }
+            }, new InputSupplier<InputStream>()
+            {
+                @Override
+                public InputStream getInput()
+                    throws IOException
+                {
+                    return centralPrefixFile;
+                }
+            } );
+        }
+        finally
+        {
+            Closeables.closeQuietly( nexusPrefixFile );
+            Closeables.closeQuietly( centralPrefixFile );
+        }
+    }
+
+    protected InputStream getPrefixFileFrom( final String url )
+        throws IOException
+    {
+        InputStream entityStream = null;
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final HttpGet get = new HttpGet( url );
+            final HttpResponse httpResponse = httpClient.execute( get );
+            assertThat( httpResponse.getStatusLine().getStatusCode(), equalTo( 200 ) );
+            assertThat( httpResponse.getEntity(), is( notNullValue() ) );
+            entityStream = httpResponse.getEntity().getContent();
+            return entityStream;
+        }
+        catch ( IOException e )
+        {
+            Closeables.closeQuietly( entityStream );
+            throw e;
         }
     }
 }
