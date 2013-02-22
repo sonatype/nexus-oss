@@ -14,7 +14,7 @@
 define('Nexus/ext',
       [
         'Nexus/ext/feedgrid',
-        'Nexus/ext/formpanel',
+        'Nexus/ext/FormPanel',
         'Nexus/ext/TextEntryList',
         'Nexus/ext/linkbutton',
         'Nexus/ext/twinpanelcontroller'

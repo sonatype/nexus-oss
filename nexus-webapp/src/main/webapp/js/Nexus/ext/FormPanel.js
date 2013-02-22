@@ -12,7 +12,7 @@
  */
 /*global define*/
 
-define('Nexus/ext/formpanel',['extjs', 'sonatype', 'nexus', 'Nexus/messagebox'], function(Ext, Sonatype, Nexus, mbox) {
+define('Nexus/ext/FormPanel',['extjs', 'sonatype', 'nexus', 'Nexus/messagebox'], function(Ext, Sonatype, Nexus, mbox) {
 
 Ext.namespace('Nexus.ext');
 
@@ -116,7 +116,7 @@ Ext.extend(Nexus.ext.FormPanel, Ext.FormPanel, {
     this.isNew = false;
     if (this.payload)
     {
-      if (this.payload.id.substring(0, 4) === 'new_')
+      if (this.payload.id && this.payload.id.substring(0, 4) === 'new_')
       {
         this.isNew = true;
       }

@@ -12,7 +12,7 @@
  */
 
 /*global Ext, Sonatype, Nexus*/
-define('Nexus/profile/Summary',['extjs', 'Nexus/profile/UserProfile', 'Nexus/ext/formpanel', 'Nexus/config'], function(Ext, profile){
+define('Nexus/profile/Summary',['extjs', 'Nexus/profile/UserProfile', 'Nexus/ext/FormPanel', 'Nexus/config'], function(Ext, profile){
 
 Ext.namespace('Nexus.profile');
 Nexus.profile.Summary = function(config) {
