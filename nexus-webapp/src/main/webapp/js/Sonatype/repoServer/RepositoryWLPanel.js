@@ -13,7 +13,6 @@
 /*global define, Ext, Nexus, Sonatype, NX*/
 NX.define('Sonatype.repoServer.RepositoryWLPanel', {
   extend : 'Nexus.ext.FormPanel',
-  requireSuper : false,
 
   requirejs : ['Nexus/config'],
 
