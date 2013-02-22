@@ -17,7 +17,7 @@
  *
  * The container automatically creates CSS styles for icons and installs them into the browser when loading.
  *
- * A simple example of an icon container with a since icon, and how to reference the icon.
+ * A simple example of an icon container with a single icon, and how to reference the icon.
  *
  *      @example
  *      var myIcons = NX.create('Nexus.util.IconContainer', {
