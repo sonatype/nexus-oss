@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite;
+package core;
 
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
@@ -31,7 +31,7 @@ import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 /**
  * Support for Core integration tests.
- * 
+ *
  * @since 2.4
  */
 @NexusStartAndStopStrategy( EACH_TEST )
@@ -59,7 +59,7 @@ public abstract class NexusCoreITSupport
 
     /**
      * Creates unique name with given prefix.
-     * 
+     *
      * @param prefix
      * @return a unique name.
      */
@@ -70,7 +70,7 @@ public abstract class NexusCoreITSupport
 
     /**
      * Returns {@link Repositories} client subsystem.
-     * 
+     *
      * @return client for repositories.
      */
     public Repositories repositories()
@@ -80,7 +80,7 @@ public abstract class NexusCoreITSupport
 
     /**
      * Returns {@link Content} client subsystem.
-     * 
+     *
      * @return client for content.
      */
     public Content content()

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.nexus5533whitelist;
+package core.whitelist;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -33,6 +33,7 @@ import org.junit.rules.Timeout;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
+import org.sonatype.sisu.litmus.testsupport.group.External;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import com.google.common.io.Closeables;
@@ -46,10 +47,10 @@ import com.google.common.io.Closeables;
  * IT scraping Central for real! On my Mac (cstamas), this IT runs for 210seconds, hence, is marked as Slow.
  * <P>
  * Not anymore, as prefix file is deployed to central.
- * 
+ *
  * @author cstamas
  */
-@Category( Slow.class )
+@Category( {Slow.class, External.class} )
 public class WhitelistInitialSanityIT
     extends WhitelistITSupport
 {
