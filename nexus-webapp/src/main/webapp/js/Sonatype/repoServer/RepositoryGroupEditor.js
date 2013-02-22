@@ -16,9 +16,8 @@
  */
 NX.define('Sonatype.repoServer.RepositoryGroupEditor', {
         extend : 'Nexus.ext.FormPanel',
-        requireSuper : false,
 
-        requirejs : ['Sonatype/all', 'Nexus/ext/formpanel'],
+        requirejs : ['Sonatype/all'],
 
         constructor : function(config) {
           var

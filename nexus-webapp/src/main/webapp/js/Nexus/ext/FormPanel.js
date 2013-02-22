@@ -12,7 +12,7 @@
  */
 /*global define*/
 
-define('Nexus/ext/formpanel',['extjs', 'sonatype', 'nexus', 'Nexus/messagebox'], function(Ext, Sonatype, Nexus, mbox) {
+define('Nexus/ext/FormPanel',['extjs', 'sonatype', 'nexus', 'Nexus/messagebox'], function(Ext, Sonatype, Nexus, mbox) {
 
 Ext.namespace('Nexus.ext');
 

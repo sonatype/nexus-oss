@@ -312,7 +312,7 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
       applyBookmark : function(bookmark) {
         this.updatingBookmark = true;
 
-        if (typeof this.groupStore.lastOptions !== 'object')
+        if (!this.groupStore.lastOptions)
         {
           this.groupStore.on('load', function(store, recs, options) {
                 this.selectBookmarkedItem(bookmark);
