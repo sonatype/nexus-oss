@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.nexus5533whitelist;
+package core.whitelist;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -28,7 +28,7 @@ import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 
 /**
  * Simple smoke IT for Whitelist REST being responsive and is reporting the expected statuses.
- * 
+ *
  * @author cstamas
  */
 @Category( Smoke.class )

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.nexus5533whitelist;
+package core.whitelist;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -50,7 +50,7 @@ import com.google.common.io.Files;
 /**
  * Simple "smoke" IT that tests does proxy404 does it's job or not, by detecting what remote requests was made with and
  * without WL built.
- * 
+ *
  * @author cstamas
  */
 @Category( Smoke.class )
@@ -144,7 +144,7 @@ public class WhitelistFilteringIT
 
     /**
      * A proxy "transitions" from not having prefixes file to having prefixes file (and not being scraped either).
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -264,7 +264,7 @@ public class WhitelistFilteringIT
 
     /**
      * A proxy "transitions" from having prefixes file to not having prefixes file (and not being scraped either).
-     * 
+     *
      * @throws Exception
      */
     @Test
