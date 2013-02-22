@@ -380,6 +380,8 @@ public abstract class AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
+    // FIXME: This is crazy: String privilege, String... privs
+
     protected void addPrivilege( String userId, String privilege, String... privs )
         throws IOException
     {

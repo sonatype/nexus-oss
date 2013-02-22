@@ -85,7 +85,7 @@ NX.define('Sonatype.repoServer.UserMappingEditor', {
             scope : this
           }
         },
-        onTriggerClick : this.loadUserId.createDelegate(this),
+        onTriggerClick : this.loadUserId.createDelegate(this)
       };
     } else {
       useridField = {
