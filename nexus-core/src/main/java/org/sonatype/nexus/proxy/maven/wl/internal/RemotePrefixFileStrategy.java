@@ -78,15 +78,23 @@ public class RemotePrefixFileStrategy
                 getLogger().debug( "Remote prefix on {} at path {} found!",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
                 long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000L;
-                if ( prefixFileAgeInDays < 1 )
+                final PrefixSource prefixSource = createPrefixSource( mavenProxyRepository, path );
+                if ( prefixSource != null )
                 {
-                    return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
-                        createEntrySource( mavenProxyRepository, path ) );
+                    if ( prefixFileAgeInDays < 1 )
+                    {
+                        return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
+                            prefixSource );
+                    }
+                    else
+                    {
+                        return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
+                            + " days old), using it.", prefixSource );
+                    }
                 }
                 else
                 {
-                    return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
-                        + " days old), using it.", createEntrySource( mavenProxyRepository, path ) );
+                    getLogger().info( "Prefix file retrieved from {} is corrupt, skipping it.", item.getRemoteUrl() );
                 }
             }
         }
@@ -95,10 +103,18 @@ public class RemotePrefixFileStrategy
 
     // ==
 
-    protected PrefixSource createEntrySource( final MavenProxyRepository mavenProxyRepository, final String path )
+    protected PrefixSource createPrefixSource( final MavenProxyRepository mavenProxyRepository, final String path )
         throws IOException
     {
-        return new FilePrefixSource( mavenProxyRepository, path, config.getPrefixFileMaxEntriesCount() );
+        final FilePrefixSource result = new FilePrefixSource( mavenProxyRepository, path, config );
+        if ( result.readable() )
+        {
+            return result;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     protected StorageFileItem retrieveFromRemoteIfExists( final MavenProxyRepository mavenProxyRepository,

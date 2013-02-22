@@ -69,7 +69,13 @@ public class WLConfigImpl
         + ".localScrapeDepth", 2 );
 
     private static final int PREFIX_FILE_MAX_ENTRY_COUNT = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
-        + ".prefixFileMaxEntryCount", 10000 );
+        + ".prefixFileMaxEntryCount", 10000 ); // 10000 lines
+
+    private static final int PREFIX_FILE_MAX_LINE_LENGTH = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
+        + ".prefixFileMaxLineLength", 250 ); // 250 chars
+
+    private static final int PREFIX_FILE_MAX_SIZE = SystemPropertiesHelper.getInteger( WLConfig.class.getName()
+        + ".prefixFileMaxSize", 100000 ); // 100 KB
 
     private final boolean featureActive;
 
@@ -156,4 +162,15 @@ public class WLConfigImpl
     {
         return PREFIX_FILE_MAX_ENTRY_COUNT;
     }
+    @Override
+    public int getPrefixFileMaxLineLength()
+    {
+        return PREFIX_FILE_MAX_LINE_LENGTH;
+    }
+    @Override
+    public int getPrefixFileMaxSize()
+    {
+        return PREFIX_FILE_MAX_SIZE;
+    }
+
 }

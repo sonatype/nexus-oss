@@ -16,6 +16,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,14 +25,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import org.junit.Test;
-import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
+import org.mockito.Mock;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class TextFilePrefixSourceMarshallerTest
+    extends TestSupport
 {
+    @Mock
+    StorageFileItem storageFileItem;
+
     // is state-less, no need for @Before
-    final TextFilePrefixSourceMarshaller m = new TextFilePrefixSourceMarshaller( 1000 );
+    final TextFilePrefixSourceMarshaller m = new TextFilePrefixSourceMarshaller( new WLConfigImpl() );
 
     final Charset UTF8 = Charset.forName( "UTF-8" );
 
@@ -121,12 +130,14 @@ public class TextFilePrefixSourceMarshallerTest
     public void roundtrip()
         throws IOException
     {
-        final PrefixSource readEntrySource = m.read( new ByteArrayInputStream( prefixFile1( true ).getBytes( UTF8 ) ) );
-        assertThat( readEntrySource.exists(), is( true ) );
-        assertThat( readEntrySource.readEntries().size(), is( 3 ) );
+        when( storageFileItem.getInputStream() ).thenReturn(
+            new ByteArrayInputStream( prefixFile1( true ).getBytes( UTF8 ) ) );
+        final List<String> entries = m.read( storageFileItem );
+        assertThat( entries, is( notNullValue() ) );
+        assertThat( entries.size(), is( 3 ) );
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        m.write( readEntrySource, outputStream );
+        m.write( entries, outputStream );
         assertThat( outputStream.size(), greaterThan( 15 ) );
 
         final String output = new String( outputStream.toByteArray(), UTF8 );
@@ -138,12 +149,14 @@ public class TextFilePrefixSourceMarshallerTest
         throws IOException
     {
         // prefixFile2 is "find created" like, see CENTRAL-515
-        final PrefixSource readEntrySource = m.read( new ByteArrayInputStream( prefixFile2( true ).getBytes( UTF8 ) ) );
-        assertThat( readEntrySource.exists(), is( true ) );
-        assertThat( readEntrySource.readEntries().size(), is( 3 ) );
+        when( storageFileItem.getInputStream() ).thenReturn(
+            new ByteArrayInputStream( prefixFile2( true ).getBytes( UTF8 ) ) );
+        final List<String> entries = m.read( storageFileItem );
+        assertThat( entries, is( notNullValue() ) );
+        assertThat( entries.size(), is( 3 ) );
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        m.write( readEntrySource, outputStream );
+        m.write( entries, outputStream );
         assertThat( outputStream.size(), greaterThan( 15 ) );
 
         final String output = new String( outputStream.toByteArray(), UTF8 );
@@ -158,12 +171,14 @@ public class TextFilePrefixSourceMarshallerTest
         throws IOException
     {
         // prefixFile2 is "find created" like, see CENTRAL-515
-        final PrefixSource readEntrySource = m.read( new ByteArrayInputStream( prefixFile3( true ).getBytes( UTF8 ) ) );
-        assertThat( readEntrySource.exists(), is( true ) );
-        assertThat( readEntrySource.readEntries().size(), is( 1 ) );
+        when( storageFileItem.getInputStream() ).thenReturn(
+            new ByteArrayInputStream( prefixFile3( true ).getBytes( UTF8 ) ) );
+        final List<String> entries = m.read( storageFileItem );
+        assertThat( entries, is( notNullValue() ) );
+        assertThat( entries.size(), is( 1 ) );
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        m.write( readEntrySource, outputStream );
+        m.write( entries, outputStream );
         assertThat( outputStream.size(), greaterThan( 1 ) );
 
         final String output = new String( outputStream.toByteArray(), UTF8 );
@@ -178,13 +193,14 @@ public class TextFilePrefixSourceMarshallerTest
         throws IOException
     {
         // prefixFile2 is "find created" like, see CENTRAL-515
-        final PrefixSource readEntrySource =
-            m.read( new ByteArrayInputStream( prefixFile4( true, false ).getBytes( UTF8 ) ) );
-        assertThat( readEntrySource.exists(), is( true ) );
-        assertThat( readEntrySource.readEntries().size(), is( 3 ) );
+        when( storageFileItem.getInputStream() ).thenReturn(
+            new ByteArrayInputStream( prefixFile4( true, false ).getBytes( UTF8 ) ) );
+        final List<String> entries = m.read( storageFileItem );
+        assertThat( entries, is( notNullValue() ) );
+        assertThat( entries.size(), is( 3 ) );
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        m.write( readEntrySource, outputStream );
+        m.write( entries, outputStream );
         assertThat( outputStream.size(), greaterThan( 1 ) );
 
         final String output = new String( outputStream.toByteArray(), UTF8 );

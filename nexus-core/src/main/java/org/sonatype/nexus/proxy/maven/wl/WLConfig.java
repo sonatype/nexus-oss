@@ -81,4 +81,20 @@ public interface WLConfig
      * @return the maximum allowed prefix file entry count.
      */
     int getPrefixFileMaxEntriesCount();
+
+    /**
+     * Returns the maximum allowed line length for prefix file line (entry). Files having more than allowed line length
+     * will be refused to be loaded up.
+     * 
+     * @return the maximum allowed prefix file entry length.
+     */
+    public int getPrefixFileMaxLineLength();
+
+    /**
+     * Returns the maximum allowed file size for prefix file (in bytes). File being bigger than allowed file size will
+     * be refused to be loaded up.
+     * 
+     * @return the maximum allowed file size for prefix file, in bytes.
+     */
+    public int getPrefixFileMaxSize();
 }

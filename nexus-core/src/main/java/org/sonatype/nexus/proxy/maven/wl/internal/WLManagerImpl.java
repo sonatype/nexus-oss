@@ -680,8 +680,7 @@ public class WLManagerImpl
     @Override
     public FilePrefixSource getPrefixSourceFor( final MavenRepository mavenRepository )
     {
-        return new FilePrefixSource( mavenRepository, config.getLocalPrefixFilePath(),
-            config.getPrefixFileMaxEntriesCount() );
+        return new FilePrefixSource( mavenRepository, config.getLocalPrefixFilePath(), config );
     }
 
     // ==
@@ -774,7 +773,7 @@ public class WLManagerImpl
         // and here we are cleaning them)
         for ( String path : config.getRemotePrefixFilePaths() )
         {
-            new FilePrefixSource( mavenRepository, path, config.getPrefixFileMaxEntriesCount() ).delete();
+            new FilePrefixSource( mavenRepository, path, config ).delete();
         }
 
         // set noscrape flag
