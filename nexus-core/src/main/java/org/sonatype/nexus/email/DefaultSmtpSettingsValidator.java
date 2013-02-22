@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.email;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.EmailerConfiguration;
@@ -22,6 +24,7 @@ import org.sonatype.micromailer.MailRequestStatus;
 import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import com.google.common.base.Throwables;
 
 /**
  * @author velo
@@ -34,21 +37,32 @@ public class DefaultSmtpSettingsValidator
     @Requirement
     private EMailer emailer;
 
+    @Requirement
+    private PlexusContainer plexus;
+
     private static final String NEXUS_MAIL_ID = "Nexus";
 
     public boolean sendSmtpConfigurationTest( CSmtpConfiguration smtp, String email )
         throws EmailerException
     {
-        EmailerConfiguration config = new EmailerConfiguration();
-        config.setDebug( smtp.isDebugMode() );
-        config.setMailHost( smtp.getHostname() );
-        config.setMailPort( smtp.getPort() );
-        config.setPassword( smtp.getPassword() );
-        config.setSsl( smtp.isSslEnabled() );
-        config.setTls( smtp.isTlsEnabled() );
-        config.setUsername( smtp.getUsername() );
+        try
+        {
+            EmailerConfiguration config = plexus.lookup( NexusEmailerConfiguration.class );
+            config.setDebug( smtp.isDebugMode() );
+            config.setMailHost( smtp.getHostname() );
+            config.setMailPort( smtp.getPort() );
+            config.setPassword( smtp.getPassword() );
+            config.setSsl( smtp.isSslEnabled() );
+            config.setTls( smtp.isTlsEnabled() );
+            config.setUsername( smtp.getUsername() );
 
-        emailer.configure( config );
+            emailer.configure( config );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // should not happen
+            throw Throwables.propagate( e );
+        }
 
         MailRequest request = new MailRequest( NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
         request.setFrom( new Address( smtp.getSystemEmailAddress(), "Nexus Repository Manager" ) );
