@@ -216,7 +216,7 @@ NX.define('Nexus.util.IconContainer', {
             }
             else {
                 // if no default configuration, then the default icon an alias to the last variant defined
-                self.defineIcon(name, '@' + lastIconName);
+                self.defineIcon(name, '@' + lastIcon.name);
             }
         }
     },
