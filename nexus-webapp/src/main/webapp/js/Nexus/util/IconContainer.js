@@ -164,6 +164,18 @@ NX.define('Nexus.util.IconContainer', {
     },
 
     /**
+     * Returns the icon name of a variant.
+     *
+     * @private
+     *
+     * @return {String}
+     */
+    variantName: function(name, variant) {
+        // TODO: Do we want this or maybe name + '_' + variant ?
+        return name + variant;
+    },
+
+    /**
      * Load icons from configuration.
      *
      * @private
@@ -187,7 +199,7 @@ NX.define('Nexus.util.IconContainer', {
             // define icons for each variant, remember last icon name we created for default
             var lastIcon;
             Ext.iterate(config, function(key, value) {
-                lastIcon = self.defineIcon(name + key, value, name);
+                lastIcon = self.defineIcon(self.variantName(name, key), value, name);
             });
 
             // complain if there were no variants configured
@@ -195,14 +207,15 @@ NX.define('Nexus.util.IconContainer', {
 
             // handle default icon
             if (defaultIconFileName !== undefined) {
-                // if the fileName starts with '^' then its a back reference to a variant
+                // if the fileName starts with '^' then its an alias back reference to a variant
                 if (defaultIconFileName.startsWith('^')) {
-                    defaultIconFileName = '@' + name + defaultIconFileName.substring(1);
+                    defaultIconFileName = '@' + self.variantName(name, defaultIconFileName.substring(1));
                 }
+                // otherwise could be a filePath or alias too
                 self.defineIcon(name, defaultIconFileName);
             }
             else {
-                // if no default configuration, then the default icon is the last icon defined
+                // if no default configuration, then the default icon an alias to the last variant defined
                 self.defineIcon(name, '@' + lastIconName);
             }
         }
