@@ -13,7 +13,73 @@
 /*global NX, Ext, Nexus*/
 
 /**
- * Support for icon containers.
+ * Support for icon containers.  An icon container is a helper to manage image/icon resources used by an application.
+ *
+ * The container automatically creates CSS styles for icons and installs them into the browser when loading.
+ *
+ * A simple example of an icon container with a since icon, and how to reference the icon.
+ *
+ *      @example
+ *      var myIcons = NX.create('Nexus.util.IconContainer', {
+ *          icons: {
+ *              hello:  'hello.png'
+ *          }
+ *      });
+ *
+ *      // returns an icon object
+ *      var icon = myIcons.get('hello);
+ *
+ *      // the name of the CSS class of the icon
+ *      var cssClass = icon.cls;
+ *
+ *      // renders a <img> html snippet for the icon
+ *      var imgHtml = icon.img;
+ *
+ * Icons can reference other icons, this helps avoid loading duplicate assents into the browser, and still allows
+ * for flexible icon naming.  This allows applications to define meaningful names, and then manage which asset
+ * belongs to that name inside of the icon container:
+ *
+ *      @example
+ *      var myIcons = NX.create('Nexus.util.IconContainer', {
+ *          icons: {
+ *              rulePassed:         'tick.png',
+ *              event_rulesPassed:  '@rulePassed',
+ *              event_rulePassed:   '@rulePassed'
+ *             }
+ *      });
+ *
+ * Here 'event_rulesPassed' and 'event_rulePassed' are aliases to the 'rulePassed' icon.  Only 1 img/css asset for 'rulePassed'
+ * is installed into the browser.
+ *
+ * For icons which might have many different sizes, and icon definition can be configured to know about different variants:
+ *
+ *      @example
+ *      var myIcons = NX.create('Nexus.util.IconContainer', {
+ *          icons: {
+ *              rulePassed: {
+ *                  x16:    'tick.png',
+ *                  x32:    'tick-32x32.png',
+ *                  _:      '^x16'
+ *              },
+ *              event_rulesPassed:   '@rulePassed',
+ *              event_rulePassed:    '@rulePassed'
+ *             }
+ *      });
+ *
+ * This defines 5 icons, and 2 img+css (the assets loaded into the browser).
+ *
+ * The first bits for rulePassed define 2 icons 'rulePassedx16' and 'rulePassedx32' pointing at tick.png and tick-32x32.png respectively.
+ * The special _ key is the default which will be used to set the 'rulePassed' icon.
+ * The special syntax here with '^x16' means that he default icon is really the 'x16' variant and
+ * ATM this only works for the default '_' variant.
+ *
+ * Icon objects have a variant() method which can be used to access a variant:
+ *
+ *      @example
+ *      var icon = MyIcons.get('rulePassed');
+ *      var bigger = icon.variant('x32');
+ *
+ * If the variant does not exist then it returns the same icon.
  *
  * @since 2.4
  */
@@ -36,8 +102,11 @@ NX.define('Nexus.util.IconContainer', {
     /**
      * Base-path for images.
      *
+     * This defaults to the base resource path of Nexus + '/static/icons'.
+     *
      * @public
      * @property
+     * @type {String}
      */
     basePath: undefined,
 
