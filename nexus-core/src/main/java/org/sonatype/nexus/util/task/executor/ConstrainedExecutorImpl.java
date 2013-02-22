@@ -24,7 +24,7 @@ import org.sonatype.nexus.util.task.CancelableSupport;
 /**
  * Default implementation of Executor that adds a thin layer around {@link java.util.concurrent.Executor} that is passed
  * in from constructor.
- * 
+ *
  * @author cstamas
  * @since 2.4
  */
@@ -43,40 +43,40 @@ public class ConstrainedExecutorImpl
      * Plain map holding the repository IDs of repositories being batch-updated in background as keys. All read-write
      * access to this set must happen within synchronized block, using this instance as monitor object.
      */
-    private final HashMap<String, CancelableRunnableWrapper> currentlyRunningCanncelableRunnables;
+    private final HashMap<String, CancelableRunnableWrapper> currentlyRunningCancelableRunnables;
 
     /**
      * Plain map holding the key semaphores for all keys that has scheduled jobs.
      */
-    private final HashMap<String, Semaphore> currentlyRunningSemamphores;
+    private final HashMap<String, Semaphore> currentlyRunningSemaphores;
 
     /**
      * Constructor.
-     * 
+     *
      * @param executor
      */
     public ConstrainedExecutorImpl( final java.util.concurrent.Executor executor )
     {
         this.executor = checkNotNull( executor );
-        this.currentlyRunningCanncelableRunnables = new HashMap<String, CancelableRunnableWrapper>();
-        this.currentlyRunningSemamphores = new HashMap<String, Semaphore>();
+        this.currentlyRunningCancelableRunnables = new HashMap<String, CancelableRunnableWrapper>();
+        this.currentlyRunningSemaphores = new HashMap<String, Semaphore>();
     }
 
     @Override
     public synchronized Statistics getStatistics()
     {
-        return new Statistics( new HashSet<String>( currentlyRunningCanncelableRunnables.keySet() ) );
+        return new Statistics( new HashSet<String>( currentlyRunningCancelableRunnables.keySet() ) );
     }
 
     @Override
     public synchronized void cancelAllJobs()
     {
-        for ( CancelableRunnable command : currentlyRunningCanncelableRunnables.values() )
+        for ( CancelableRunnable command : currentlyRunningCancelableRunnables.values() )
         {
             command.cancel();
         }
-        currentlyRunningCanncelableRunnables.clear();
-        currentlyRunningSemamphores.clear();
+        currentlyRunningCancelableRunnables.clear();
+        currentlyRunningSemaphores.clear();
     }
 
     @Override
@@ -84,14 +84,14 @@ public class ConstrainedExecutorImpl
     {
         checkNotNull( key );
         checkNotNull( command );
-        final CancelableRunnableWrapper oldCommand = currentlyRunningCanncelableRunnables.get( key );
+        final CancelableRunnableWrapper oldCommand = currentlyRunningCancelableRunnables.get( key );
         if ( oldCommand != null )
         {
             return false;
         }
         final CancelableRunnableWrapper wrappedCommand =
             new CancelableRunnableWrapper( this, key, getSemaphore( key ), command );
-        currentlyRunningCanncelableRunnables.put( key, wrappedCommand );
+        currentlyRunningCancelableRunnables.put( key, wrappedCommand );
         executor.execute( wrappedCommand );
         return true;
     }
@@ -101,14 +101,14 @@ public class ConstrainedExecutorImpl
     {
         checkNotNull( key );
         checkNotNull( command );
-        final CancelableRunnableWrapper oldCommand = currentlyRunningCanncelableRunnables.get( key );
+        final CancelableRunnableWrapper oldCommand = currentlyRunningCancelableRunnables.get( key );
         if ( oldCommand != null )
         {
             oldCommand.cancel();
         }
         final CancelableRunnableWrapper wrappedCommand =
             new CancelableRunnableWrapper( this, key, getSemaphore( key ), command );
-        currentlyRunningCanncelableRunnables.put( key, wrappedCommand );
+        currentlyRunningCancelableRunnables.put( key, wrappedCommand );
         executor.execute( wrappedCommand );
         return oldCommand != null;
     }
@@ -117,11 +117,11 @@ public class ConstrainedExecutorImpl
 
     protected Semaphore getSemaphore( final String key )
     {
-        if ( !currentlyRunningSemamphores.containsKey( key ) )
+        if ( !currentlyRunningSemaphores.containsKey( key ) )
         {
-            currentlyRunningSemamphores.put( key, new Semaphore( 1 ) );
+            currentlyRunningSemaphores.put( key, new Semaphore( 1 ) );
         }
-        return currentlyRunningSemamphores.get( key );
+        return currentlyRunningSemaphores.get( key );
     }
 
     protected void cancelableStarting( final CancelableRunnableWrapper wrappedCommand )
@@ -134,8 +134,8 @@ public class ConstrainedExecutorImpl
     {
         if ( !wrappedCommand.isCanceled() )
         {
-            currentlyRunningCanncelableRunnables.remove( wrappedCommand.getKey() );
-            currentlyRunningSemamphores.remove( wrappedCommand.getKey() );
+            currentlyRunningCancelableRunnables.remove( wrappedCommand.getKey() );
+            currentlyRunningSemaphores.remove( wrappedCommand.getKey() );
         }
     }
 
