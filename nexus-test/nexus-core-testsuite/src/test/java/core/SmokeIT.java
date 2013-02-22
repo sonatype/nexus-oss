@@ -19,10 +19,11 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.sisu.litmus.testsupport.group.Smoke;
-import core.NexusCoreITSupport;
 
 /**
  * Most basic IT just checking is bundle alive at all.
@@ -51,12 +52,15 @@ public class SmokeIT
     public void verifyNexusReportsAsHealthyAndCorrect()
     {
         final NexusStatus nexusStatus = client().getStatus();
-
         assertThat( nexusStatus, is( notNullValue() ) );
         assertThat( nexusStatus.isFirstStart(), is( true ) ); // should be true
         assertThat( nexusStatus.isInstanceUpgraded(), is( false ) ); // should be false
-        // TODO: nexus version we are running?
-        // assertThat( nexusStatus.getVersion(), is( "1.0" ) ); // version
+        // TODO: Need a generic way to detect the version of the bundle being runned.
+        // This below would work with parametrized coordinates, but does not work with "normal" use
+        // when DM is used as I have no version it seems, and it's known only in the moment of
+        // resolving Nexus GA, but it's seems it's not stored/exposed anywhere.
+        // final Artifact nexusBundleArtifact = new DefaultArtifact( nexusBundleCoordinates );
+        // assertThat( nexusStatus.getVersion(), is( nexus().getConfiguration(). nexusBundleArtifact.getBaseVersion() ) ); // version
         assertThat( nexusStatus.getEditionShort(), equalTo( "OSS" ) );
     }
 }
