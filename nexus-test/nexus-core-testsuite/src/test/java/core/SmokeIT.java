@@ -19,8 +19,6 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.nexus.client.core.NexusClient;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.sisu.litmus.testsupport.group.Smoke;

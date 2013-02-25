@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.Timeout;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.subsystem.whitelist.DiscoveryConfiguration;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
@@ -30,12 +31,13 @@ import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
 import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 
 /**
- * Simple smoke IT for Whitelist REST being responsive and is reporting the expected statuses.
+ * Simple smoke IT for Whitelist REST being responsive and is reporting the expected statuses when the feature is
+ * DISABLED!
  * 
  * @author cstamas
  */
 @Category( Smoke.class )
-public class WhitelistSmokeIT
+public class WhitelistDisabledSmokeIT
     extends WhitelistITSupport
 {
     // we will timeout after 15 minutes, just as a safety net
@@ -47,9 +49,17 @@ public class WhitelistSmokeIT
      * 
      * @param nexusBundleCoordinates
      */
-    public WhitelistSmokeIT( final String nexusBundleCoordinates )
+    public WhitelistDisabledSmokeIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
+    }
+
+    @Override
+    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
+    {
+        // setting the system property to DISABLE feature
+        return super.configureNexus( configuration ).setSystemProperty(
+            "org.sonatype.nexus.proxy.maven.wl.WLConfig.featureActive", Boolean.FALSE.toString() );
     }
 
     @Before
@@ -64,7 +74,7 @@ public class WhitelistSmokeIT
     {
         // public
         final Status publicStatus = whitelist().getWhitelistStatus( "public" );
-        assertThat( publicStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+        assertThat( publicStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
     }
 
     @Test
@@ -81,9 +91,9 @@ public class WhitelistSmokeIT
     {
         // central
         final Status centralStatus = whitelist().getWhitelistStatus( "central" );
-        assertThat( centralStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+        assertThat( centralStatus.getPublishedStatus(), equalTo( Outcome.FAILED ) );
         assertThat( centralStatus.getDiscoveryStatus(), is( notNullValue() ) );
-        assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.SUCCEEDED ) );
+        assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.UNDECIDED ) );
     }
 
     @Test
@@ -93,17 +103,18 @@ public class WhitelistSmokeIT
         {
             final DiscoveryConfiguration centralConfiguration = whitelist().getDiscoveryConfigurationFor( "central" );
             assertThat( centralConfiguration, is( notNullValue() ) );
-            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
+            assertThat( centralConfiguration.isEnabled(), equalTo( false ) );
             assertThat( centralConfiguration.getIntervalHours(), equalTo( 24 ) );
-            // checked ok, set interval to 12h
+            // checked ok, set interval to 12h, and enable it
             centralConfiguration.setIntervalHours( 12 );
+            centralConfiguration.setEnabled( true );
             whitelist().setDiscoveryConfigurationFor( "central", centralConfiguration );
         }
-        // verify is set
+        // verify is set, but feature remains disabled
         {
             final DiscoveryConfiguration centralConfiguration = whitelist().getDiscoveryConfigurationFor( "central" );
             assertThat( centralConfiguration, is( notNullValue() ) );
-            assertThat( centralConfiguration.isEnabled(), equalTo( true ) );
+            assertThat( centralConfiguration.isEnabled(), equalTo( false ) );
             assertThat( centralConfiguration.getIntervalHours(), equalTo( 12 ) );
         }
     }

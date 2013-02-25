@@ -27,6 +27,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -54,14 +55,14 @@ import com.google.common.io.InputSupplier;
  * @author cstamas
  */
 @Category( { Slow.class, External.class } )
-public class WhitelistInitialSanityIT
+public class WhitelistSanityIT
     extends WhitelistITSupport
 {
     // we will timeout after 15 minutes, just as a safety net
     @Rule
     public Timeout timeout = new Timeout( 900000 );
 
-    public WhitelistInitialSanityIT( final String nexusBundleCoordinates )
+    public WhitelistSanityIT( final String nexusBundleCoordinates )
     {
         super( nexusBundleCoordinates );
     }
@@ -75,35 +76,55 @@ public class WhitelistInitialSanityIT
     }
 
     /**
+     * Fetches prefix file from given URL.
+     * 
+     * @param url
+     * @return
+     * @throws IOException
+     */
+    protected InputStream getPrefixFileFrom( final String url )
+        throws IOException
+    {
+        InputStream entityStream = null;
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final HttpGet get = new HttpGet( url );
+            final HttpResponse httpResponse = httpClient.execute( get );
+            assertThat( httpResponse.getStatusLine().getStatusCode(), equalTo( 200 ) );
+            assertThat( httpResponse.getEntity(), is( notNullValue() ) );
+            entityStream = httpResponse.getEntity().getContent();
+            return entityStream;
+        }
+        catch ( IOException e )
+        {
+            Closeables.closeQuietly( entityStream );
+            throw e;
+        }
+    }
+
+    @Before
+    public void waitForWLDiscoveryOutcome()
+        throws Exception
+    {
+        waitForWLDiscoveryOutcome( "central" );
+    }
+
+    /**
      * Testing initial boot of Nexus with WL feature. Asserting that Central (and hence Public group, that has Central
-     * and only one proxy member) has WL published, since Central discovery succeeded. Then it fetches the Central
-     * published prefix file (from Nexus), and performs some sanity checks against it. Finally, we assert that Nexus
-     * publishes (proxies) the remote prefix file in unchanged way, it does not mangle it or rewrite any parts of it.
+     * and only one proxy member) has WL published, since Central discovery succeeded.
      * 
      * @throws Exception
      */
     @Test
-    public void initialScrape()
+    public void whitelistLooksSane()
         throws Exception
     {
-        waitForWLDiscoveryOutcome( "central" );
-
-        {
-            // public
-            Status publicStatus = whitelist().getWhitelistStatus( "public" );
-            // public cannot be published, since Central is member and scrape will take longer
-            assertThat( publicStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
-        }
-
         // central
         Status centralStatus = whitelist().getWhitelistStatus( "central" );
-        // central is not published, is being scraped
         assertThat( centralStatus.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
-        // central gave us URL of the published whitelist too
         assertThat( centralStatus.getPublishedUrl(), is( notNullValue() ) );
-        // is proxy, discovery status must not be null
         assertThat( centralStatus.getDiscoveryStatus(), is( notNullValue() ) );
-        // undecided, since still scraping and this is the first run of remote discovery
         assertThat( centralStatus.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.SUCCEEDED ) );
 
         // let's check some sanity (just blindly check that some expected entries are present)
@@ -142,6 +163,20 @@ public class WhitelistInitialSanityIT
             Closeables.closeQuietly( entityStream );
         }
 
+    }
+
+    /**
+     * Fetches and compares prefix file from Nx and the "original" from Central and compares the two: they must be
+     * binary equal, Nexus must not modify the content at all.
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void prefixFileIsUnchanged()
+        throws IOException
+    {
+        // central
+        final Status centralStatus = whitelist().getWhitelistStatus( "central" );
         // let's verify that Nexus did not modify the prefix file got from Central (req: Nexus must publish prefix file
         // as-is, as it was received from remote). both should be equal on byte level.
         final InputStream nexusPrefixFile = getPrefixFileFrom( centralStatus.getPublishedUrl() );
@@ -170,27 +205,6 @@ public class WhitelistInitialSanityIT
         {
             Closeables.closeQuietly( nexusPrefixFile );
             Closeables.closeQuietly( centralPrefixFile );
-        }
-    }
-
-    protected InputStream getPrefixFileFrom( final String url )
-        throws IOException
-    {
-        InputStream entityStream = null;
-        try
-        {
-            final HttpClient httpClient = new DefaultHttpClient();
-            final HttpGet get = new HttpGet( url );
-            final HttpResponse httpResponse = httpClient.execute( get );
-            assertThat( httpResponse.getStatusLine().getStatusCode(), equalTo( 200 ) );
-            assertThat( httpResponse.getEntity(), is( notNullValue() ) );
-            entityStream = httpResponse.getEntity().getContent();
-            return entityStream;
-        }
-        catch ( IOException e )
-        {
-            Closeables.closeQuietly( entityStream );
-            throw e;
         }
     }
 }

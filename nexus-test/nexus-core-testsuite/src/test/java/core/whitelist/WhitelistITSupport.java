@@ -19,7 +19,7 @@ import core.NexusCoreITSupport;
 
 /**
  * Support class for Whitelist Core feature (NEXUS-5472), aka "proxy404".
- *
+ * 
  * @author cstamas
  * @since 2.4
  */
@@ -33,7 +33,7 @@ public abstract class WhitelistITSupport
 
     /**
      * Returns {@link Whitelist} client subsystem.
-     *
+     * 
      * @return client for whitelist.
      */
     public Whitelist whitelist()
@@ -44,7 +44,7 @@ public abstract class WhitelistITSupport
     /**
      * Waits for a remote discovery outcome. The passed in repository ID must correspond to a Maven2 proxy repository,
      * otherwise {@link IllegalArgumentException} is thrown.
-     *
+     * 
      * @param proxyRepositoryId
      * @throws IllegalArgumentException if repository ID is not a maven2 proxy.
      * @throws InterruptedException
@@ -59,7 +59,8 @@ public abstract class WhitelistITSupport
             throw new IllegalArgumentException( "Repository with ID=" + proxyRepositoryId
                 + " is not a Maven2 proxy repository!" );
         }
-        while ( status.getDiscoveryStatus().getDiscoveryLastStatus() == Outcome.UNDECIDED )
+        while ( status.getDiscoveryStatus().isDiscoveryEnabled()
+            && status.getDiscoveryStatus().getDiscoveryLastStatus() == Outcome.UNDECIDED )
         {
             Thread.sleep( 1000 );
             status = whitelist().getWhitelistStatus( proxyRepositoryId );
