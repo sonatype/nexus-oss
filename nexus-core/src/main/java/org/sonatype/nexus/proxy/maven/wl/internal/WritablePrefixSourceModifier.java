@@ -70,7 +70,7 @@ public class WritablePrefixSourceModifier
      * @param entry
      * @return {@code true} if the invocation actually did change the WL.
      */
-    public boolean offerEntries( final String entry )
+    public boolean offerEntry( final String entry )
     {
         boolean modified = false;
         final String normalizedEntry = pathFrom( elementsOf( entry ), maxDepth );
@@ -89,7 +89,7 @@ public class WritablePrefixSourceModifier
      * @param entry
      * @return {@code true} if the invocation actually did change the WL.
      */
-    public boolean revokeEntries( final String entry )
+    public boolean revokeEntry( final String entry )
     {
         boolean modified = false;
         final String normalizedEntry = pathFrom( elementsOf( entry ) );

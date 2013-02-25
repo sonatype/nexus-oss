@@ -118,7 +118,7 @@ public interface WLManager
      * @return {@code true} if WL was changed, {@code false} otherwise.
      * @throws IOException in case of some IO problem.
      */
-    boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, String entry )
+    boolean offerWLEntry( final MavenHostedRepository mavenHostedRepository, String entry )
         throws IOException;
 
     /**
@@ -130,7 +130,7 @@ public interface WLManager
      * @return {@code true} if WL was changed, {@code false} otherwise.
      * @throws IOException in case of some IO problem.
      */
-    boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, String entry )
+    boolean revokeWLEntry( final MavenHostedRepository mavenHostedRepository, String entry )
         throws IOException;
 
     /**

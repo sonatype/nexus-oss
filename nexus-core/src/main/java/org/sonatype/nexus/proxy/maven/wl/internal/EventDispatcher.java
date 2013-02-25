@@ -132,11 +132,11 @@ public class EventDispatcher
         }
     }
 
-    protected void offerPaths( final MavenHostedRepository mavenHostedRepository, String path )
+    protected void offerPath( final MavenHostedRepository mavenHostedRepository, String path )
     {
         try
         {
-            wlManager.offerWLEntries( mavenHostedRepository, path );
+            wlManager.offerWLEntry( mavenHostedRepository, path );
         }
         catch ( IOException e )
         {
@@ -147,11 +147,11 @@ public class EventDispatcher
         }
     }
 
-    protected void revokePaths( final MavenHostedRepository mavenHostedRepository, String path )
+    protected void revokePath( final MavenHostedRepository mavenHostedRepository, String path )
     {
         try
         {
-            wlManager.revokeWLEntries( mavenHostedRepository, path );
+            wlManager.revokeWLEntry( mavenHostedRepository, path );
         }
         catch ( IOException e )
         {
@@ -226,7 +226,7 @@ public class EventDispatcher
                 evt.getRepository().adaptToFacet( MavenHostedRepository.class );
             if ( mavenHostedRepository != null )
             {
-                offerPaths( mavenHostedRepository, evt.getItem().getPath() );
+                offerPath( mavenHostedRepository, evt.getItem().getPath() );
             }
         }
     }
@@ -251,7 +251,7 @@ public class EventDispatcher
                 evt.getRepository().adaptToFacet( MavenHostedRepository.class );
             if ( mavenHostedRepository != null )
             {
-                offerPaths( mavenHostedRepository, evt.getItem().getPath() );
+                offerPath( mavenHostedRepository, evt.getItem().getPath() );
             }
         }
     }
@@ -276,7 +276,7 @@ public class EventDispatcher
                 evt.getRepository().adaptToFacet( MavenHostedRepository.class );
             if ( mavenHostedRepository != null )
             {
-                revokePaths( mavenHostedRepository, evt.getItem().getPath() );
+                revokePath( mavenHostedRepository, evt.getItem().getPath() );
             }
         }
     }

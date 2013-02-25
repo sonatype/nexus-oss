@@ -679,7 +679,7 @@ public class WLManagerImpl
     // ==
 
     @Override
-    public boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, final String entry )
+    public boolean offerWLEntry( final MavenHostedRepository mavenHostedRepository, final String entry )
         throws IOException
     {
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
@@ -689,7 +689,7 @@ public class WLManagerImpl
         {
             final WritablePrefixSourceModifier wesm =
                 new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
-            wesm.offerEntries( entry );
+            wesm.offerEntry( entry );
             if ( wesm.hasChanges() )
             {
                 boolean changed = false;
@@ -697,7 +697,7 @@ public class WLManagerImpl
                 try
                 {
                     wesm.reset();
-                    wesm.offerEntries( entry );
+                    wesm.offerEntry( entry );
                     changed = wesm.apply();
                     if ( changed )
                     {
@@ -719,7 +719,7 @@ public class WLManagerImpl
     }
 
     @Override
-    public boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, final String entry )
+    public boolean revokeWLEntry( final MavenHostedRepository mavenHostedRepository, final String entry )
         throws IOException
     {
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
@@ -729,7 +729,7 @@ public class WLManagerImpl
         {
             final WritablePrefixSourceModifier wesm =
                 new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
-            wesm.revokeEntries( entry );
+            wesm.revokeEntry( entry );
             if ( wesm.hasChanges() )
             {
                 boolean changed = false;
@@ -737,7 +737,7 @@ public class WLManagerImpl
                 try
                 {
                     wesm.reset();
-                    wesm.revokeEntries( entry );
+                    wesm.revokeEntry( entry );
                     changed = wesm.apply();
                     if ( changed )
                     {
