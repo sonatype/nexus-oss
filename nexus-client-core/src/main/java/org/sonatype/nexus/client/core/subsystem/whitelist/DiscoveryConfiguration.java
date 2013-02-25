@@ -75,7 +75,7 @@ public class DiscoveryConfiguration
      */
     public void setIntervalHours( int intervalHours )
     {
-        checkArgument( intervalHours >= 1 );
+        checkArgument( intervalHours >= 1, "Only positive number allowed but we got " + intervalHours );
         this.intervalHours = intervalHours;
     }
 }
