@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.email;
 
-import org.codehaus.plexus.PlexusContainer;
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.micromailer.Address;
@@ -32,7 +32,6 @@ import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguration;
-import com.google.common.base.Throwables;
 
 @Component( role = NexusEmailer.class )
 public class DefaultNexusEmailer
@@ -58,8 +57,8 @@ public class DefaultNexusEmailer
     @Requirement
     private EMailer eMailer;
 
-    @Requirement
-    private PlexusContainer plexus;
+    @Requirement( role = SmtpSessionParametersCustomizer.class )
+    private List<SmtpSessionParametersCustomizer> customizers;
 
     // ==
     
@@ -165,27 +164,19 @@ public class DefaultNexusEmailer
         
         configureEmailer();
     }
-    
+
     private synchronized void configureEmailer()
     {
-        try
-        {
-            EmailerConfiguration config = plexus.lookup( NexusEmailerConfiguration.class );
-            config.setDebug( isSMTPDebug() );
-            config.setMailHost( getSMTPHostname() );
-            config.setMailPort( getSMTPPort() );
-            config.setSsl( isSMTPSslEnabled() );
-            config.setTls( isSMTPTlsEnabled() );
-            config.setUsername( getSMTPUsername() );
-            config.setPassword( getSMTPPassword() );
+        final EmailerConfiguration config = new NexusEmailerConfiguration( customizers );
+        config.setDebug( isSMTPDebug() );
+        config.setMailHost( getSMTPHostname() );
+        config.setMailPort( getSMTPPort() );
+        config.setSsl( isSMTPSslEnabled() );
+        config.setTls( isSMTPTlsEnabled() );
+        config.setUsername( getSMTPUsername() );
+        config.setPassword( getSMTPPassword() );
 
-            eMailer.configure( config );
-        }
-        catch ( ComponentLookupException e )
-        {
-            // should not happen
-            throw Throwables.propagate( e );
-        }
+        eMailer.configure( config );
     }
     
     // ==
