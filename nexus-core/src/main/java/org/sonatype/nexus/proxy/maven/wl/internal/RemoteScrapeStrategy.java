@@ -15,6 +15,8 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -81,10 +83,29 @@ public class RemoteScrapeStrategy
     {
         getLogger().debug( "Remote scrape on {} tried",
             RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+        // check does a proxy have a valid URL at all
+        final String remoteRepositoryRootUrl = mavenProxyRepository.getRemoteUrl();
+        boolean isValidHttpUrl;
+        try
+        {
+            final URL remoteUrl = new URL( remoteRepositoryRootUrl );
+            isValidHttpUrl =
+                "http".equalsIgnoreCase( remoteUrl.getProtocol() )
+                    || "https".equalsIgnoreCase( remoteUrl.getProtocol() );
+        }
+        catch ( MalformedURLException e )
+        {
+            isValidHttpUrl = false;
+        }
+        // if not HTTP URL, we cannot scrape it (at least not using HttpClient4x)
+        if ( !isValidHttpUrl )
+        {
+            throw new StrategyFailedException( "Remote have no valid HTTP/HTTPS URL, not scraping it." );
+        }
+
         // get client configured in same way as proxy is using it
         final HttpClient httpClient =
             httpClientManager.create( mavenProxyRepository, mavenProxyRepository.getRemoteStorageContext() );
-        final String remoteRepositoryRootUrl = mavenProxyRepository.getRemoteUrl();
         if ( isMarkedForNoScrape( httpClient, remoteRepositoryRootUrl ) )
         {
             getLogger().debug( "Remote {} marked as no-scrape, giving up.",
