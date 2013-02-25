@@ -107,14 +107,16 @@ public class RemotePrefixFileStrategy
         throws IOException
     {
         final FilePrefixSource result = new FilePrefixSource( mavenProxyRepository, path, config );
-        if ( result.readable() )
+        try
         {
-            return result;
+            result.readEntries();
         }
-        else
+        catch ( InvalidInputException e )
         {
+            result.delete();
             return null;
         }
+        return result;
     }
 
     protected StorageFileItem retrieveFromRemoteIfExists( final MavenProxyRepository mavenProxyRepository,

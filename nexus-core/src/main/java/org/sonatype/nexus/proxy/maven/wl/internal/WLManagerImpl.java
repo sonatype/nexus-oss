@@ -736,7 +736,15 @@ public class WLManagerImpl
     {
         // publish prefix file
         final FilePrefixSource prefixesFile = getPrefixSourceFor( mavenRepository );
-        prefixesFile.writeEntries( prefixSource );
+        try
+        {
+            prefixesFile.writeEntries( prefixSource );
+        }
+        catch ( InvalidInputException e )
+        {
+            unpublish( mavenRepository );
+            throw e;
+        }
 
         // unset noscrape flag
         removeNoscrapeFlag( mavenRepository );

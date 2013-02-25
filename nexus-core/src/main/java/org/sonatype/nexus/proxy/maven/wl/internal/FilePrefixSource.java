@@ -36,7 +36,6 @@ import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.WritablePrefixSource;
-import org.sonatype.nexus.proxy.maven.wl.internal.TextFilePrefixSourceMarshaller.InvalidInputException;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 import com.google.common.base.Throwables;
@@ -175,14 +174,7 @@ public class FilePrefixSource
                 {
                     return null;
                 }
-                try
-                {
-                    return getPrefixSourceMarshaller().read( file );
-                }
-                catch ( InvalidInputException e )
-                {
-                    return null;
-                }
+                return getPrefixSourceMarshaller().read( file );
             }
         } );
     }
@@ -206,45 +198,6 @@ public class FilePrefixSource
         throws IOException
     {
         deleteFileItem();
-    }
-
-    /**
-     * Preflights the prefix file and checks is it readable. This method always returns {@code false} if method
-     * {@link #exists()} returns {@code false}. If this method returns {@code false} while {@link #exists()} returns
-     * {@code true}, it means that file is either corrupted (most likely), or some other spurious IO problem prevents it
-     * from being read up.
-     * 
-     * @return {@code true} if prefix file is readable.
-     * @throws IOException if reading of the file was prevented by some IO problem (FS perms or such).
-     */
-    public boolean readable()
-        throws IOException
-    {
-        return doReadProtected( new Callable<Boolean>()
-        {
-            @Override
-            public Boolean call()
-                throws IOException
-            {
-                final StorageFileItem file = getFileItem();
-                if ( file == null )
-                {
-                    return false;
-                }
-                if ( !file.isReadable() )
-                {
-                    return false;
-                }
-                try
-                {
-                    return getPrefixSourceMarshaller().read( file ) != null;
-                }
-                catch ( InvalidInputException e )
-                {
-                    return false;
-                }
-            }
-        } );
     }
 
     // ==
