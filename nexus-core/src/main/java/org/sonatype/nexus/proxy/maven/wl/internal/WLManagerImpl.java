@@ -661,14 +661,7 @@ public class WLManagerImpl
 
         final boolean enabledChanged = configuration.isWLDiscoveryEnabled() != config.isEnabled();
         configuration.setWLDiscoveryEnabled( config.isEnabled() );
-        if ( config.isEnabled() )
-        {
-            configuration.setWLDiscoveryInterval( config.getDiscoveryInterval() );
-        }
-        else
-        {
-            configuration.setWLDiscoveryInterval( -1 );
-        }
+        configuration.setWLDiscoveryInterval( config.getDiscoveryInterval() );
         applicationConfiguration.saveConfiguration();
 
         if ( enabledChanged )

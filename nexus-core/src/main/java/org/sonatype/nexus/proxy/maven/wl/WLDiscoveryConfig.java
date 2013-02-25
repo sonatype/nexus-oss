@@ -34,16 +34,9 @@ public class WLDiscoveryConfig
      */
     public WLDiscoveryConfig( final boolean enabled, final long discoveryInterval )
     {
+        checkArgument( discoveryInterval > 0, "Discovery interval must be strictly positive, greater than 0!" );
         this.enabled = enabled;
-        if ( enabled )
-        {
-            checkArgument( discoveryInterval > 0, "Discovery interval must be strictly positive, greater than 0!" );
-            this.discoveryInterval = discoveryInterval;
-        }
-        else
-        {
-            this.discoveryInterval = -1;
-        }
+        this.discoveryInterval = discoveryInterval;
     }
 
     /**
