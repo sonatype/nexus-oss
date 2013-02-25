@@ -86,16 +86,8 @@ public class WLConfigResource
         final MavenProxyRepository mavenProxyRepository = getMavenRepository( request, MavenProxyRepository.class );
         final WLDiscoveryConfig config = getWLManager().getRemoteDiscoveryConfig( mavenProxyRepository );
         final WLConfigMessage payload = new WLConfigMessage();
-        if ( config.isEnabled() )
-        {
-            payload.setDiscoveryEnabled( true );
-            payload.setDiscoveryIntervalHours( Ints.saturatedCast( TimeUnit.MILLISECONDS.toHours( config.getDiscoveryInterval() ) ) );
-        }
-        else
-        {
-            payload.setDiscoveryEnabled( false );
-            payload.setDiscoveryIntervalHours( -1 );
-        }
+        payload.setDiscoveryEnabled( config.isEnabled() );
+        payload.setDiscoveryIntervalHours( Ints.saturatedCast( TimeUnit.MILLISECONDS.toHours( config.getDiscoveryInterval() ) ) );
         final WLConfigMessageWrapper responseNessage = new WLConfigMessageWrapper();
         responseNessage.setData( payload );
         return responseNessage;
@@ -116,10 +108,8 @@ public class WLConfigResource
             final MavenProxyRepository mavenProxyRepository = getMavenRepository( request, MavenProxyRepository.class );
             final WLConfigMessageWrapper wrapper = WLConfigMessageWrapper.class.cast( payload );
             final WLDiscoveryConfig config =
-                new WLDiscoveryConfig(
-                    wrapper.getData().isDiscoveryEnabled(),
-                    wrapper.getData().isDiscoveryEnabled() ? TimeUnit.HOURS.toMillis( wrapper.getData().getDiscoveryIntervalHours() )
-                        : -1L );
+                new WLDiscoveryConfig( wrapper.getData().isDiscoveryEnabled(),
+                    TimeUnit.HOURS.toMillis( wrapper.getData().getDiscoveryIntervalHours() ) );
             getWLManager().setRemoteDiscoveryConfig( mavenProxyRepository, config );
             return wrapper;
         }
