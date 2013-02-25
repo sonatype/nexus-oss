@@ -64,49 +64,43 @@ public class WritablePrefixSourceModifier
     }
 
     /**
-     * Adds entries to {@link WritablePrefixSource} being modified. Returns {@code true} if the invocation actually did
+     * Adds entry to {@link WritablePrefixSource} being modified. Returns {@code true} if the invocation actually did
      * change the WL. Changes are cached, entry source is not modified until you invoke {@link #apply()} method.
      * 
-     * @param entries
+     * @param entry
      * @return {@code true} if the invocation actually did change the WL.
      */
-    public boolean offerEntries( final String... entries )
+    public boolean offerEntries( final String entry )
     {
         boolean modified = false;
-        for ( String entry : entries )
+        final String normalizedEntry = pathFrom( elementsOf( entry ), maxDepth );
+        if ( !whitelistMatcher.matches( normalizedEntry ) && !toBeAdded.contains( normalizedEntry ) )
         {
-            final String normalizedEntry = pathFrom( elementsOf( entry ), maxDepth );
-            if ( !whitelistMatcher.matches( normalizedEntry ) && !toBeAdded.contains( normalizedEntry ) )
-            {
-                toBeAdded.add( normalizedEntry );
-                modified = true;
-            }
+            toBeAdded.add( normalizedEntry );
+            modified = true;
         }
         return modified;
     }
 
     /**
-     * Removes entries from {@link WritablePrefixSource} being modified. Returns {@code true} if the invocation actually
+     * Removes entry from {@link WritablePrefixSource} being modified. Returns {@code true} if the invocation actually
      * did change the WL. Changes are cached, entry source is not modified until you invoke {@link #apply()} method.
      * 
-     * @param entries
+     * @param entry
      * @return {@code true} if the invocation actually did change the WL.
      */
-    public boolean revokeEntries( final String... entries )
+    public boolean revokeEntries( final String entry )
     {
         boolean modified = false;
-        for ( String entry : entries )
+        final String normalizedEntry = pathFrom( elementsOf( entry ) );
+        if ( whitelistMatcher.contains( normalizedEntry ) && !toBeRemoved.contains( normalizedEntry ) )
         {
-            final String normalizedEntry = pathFrom( elementsOf( entry ) );
-            if ( whitelistMatcher.contains( normalizedEntry ) && !toBeRemoved.contains( normalizedEntry ) )
+            for ( String whitelistEntry : prefixSourceEntries )
             {
-                for ( String whitelistEntry : prefixSourceEntries )
+                if ( whitelistEntry.startsWith( normalizedEntry ) )
                 {
-                    if ( whitelistEntry.startsWith( normalizedEntry ) )
-                    {
-                        toBeRemoved.add( normalizedEntry );
-                        modified = true;
-                    }
+                    toBeRemoved.add( normalizedEntry );
+                    modified = true;
                 }
             }
         }

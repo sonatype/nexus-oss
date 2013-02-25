@@ -679,7 +679,7 @@ public class WLManagerImpl
     // ==
 
     @Override
-    public boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, String... entries )
+    public boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, String entry )
         throws IOException
     {
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
@@ -689,7 +689,7 @@ public class WLManagerImpl
         {
             final WritablePrefixSourceModifier wesm =
                 new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
-            wesm.offerEntries( entries );
+            wesm.offerEntries( entry );
             if ( wesm.apply() )
             {
                 publish( mavenHostedRepository, prefixSource );
@@ -704,7 +704,7 @@ public class WLManagerImpl
     }
 
     @Override
-    public boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, String... entries )
+    public boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, String entry )
         throws IOException
     {
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
@@ -714,7 +714,7 @@ public class WLManagerImpl
         {
             final WritablePrefixSourceModifier wesm =
                 new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
-            wesm.revokeEntries( entries );
+            wesm.revokeEntries( entry );
             if ( wesm.apply() )
             {
                 publish( mavenHostedRepository, prefixSource );

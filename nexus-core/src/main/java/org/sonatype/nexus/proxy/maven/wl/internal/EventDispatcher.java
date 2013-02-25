@@ -132,33 +132,33 @@ public class EventDispatcher
         }
     }
 
-    protected void offerPaths( final MavenHostedRepository mavenHostedRepository, String... paths )
+    protected void offerPaths( final MavenHostedRepository mavenHostedRepository, String path )
     {
         try
         {
-            wlManager.offerWLEntries( mavenHostedRepository, paths );
+            wlManager.offerWLEntries( mavenHostedRepository, path );
         }
         catch ( IOException e )
         {
             getLogger().warn(
                 "Problem while maintaining WL for hosted repository "
                     + RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository )
-                    + ", unable to remove paths: " + paths, e );
+                    + ", unable to remove path: " + path, e );
         }
     }
 
-    protected void revokePaths( final MavenHostedRepository mavenHostedRepository, String... paths )
+    protected void revokePaths( final MavenHostedRepository mavenHostedRepository, String path )
     {
         try
         {
-            wlManager.revokeWLEntries( mavenHostedRepository, paths );
+            wlManager.revokeWLEntries( mavenHostedRepository, path );
         }
         catch ( IOException e )
         {
             getLogger().warn(
                 "Problem while maintaining WL for hosted repository "
                     + RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository )
-                    + ", unable to remove paths: " + paths, e );
+                    + ", unable to remove path: " + path, e );
         }
     }
 
@@ -176,7 +176,8 @@ public class EventDispatcher
 
     protected boolean isRepositoryHandled( final Repository repository )
     {
-        // we handle repository events after this isActiveAndStarted, and only for non-shadow repository that are Maven2 reposes
+        // we handle repository events after this isActiveAndStarted, and only for non-shadow repository that are Maven2
+        // reposes
         return isActive() && repository != null
             && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
             && !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )

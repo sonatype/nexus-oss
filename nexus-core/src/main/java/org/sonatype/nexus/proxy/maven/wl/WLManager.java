@@ -114,11 +114,11 @@ public interface WLManager
      * repository if needed. If WL modified, returns {@code true}.
      * 
      * @param mavenHostedRepository the hosted repository to which WL we offer entries.
-     * @param entries the entries offered.
+     * @param entry the entry offered.
      * @return {@code true} if WL was changed, {@code false} otherwise.
      * @throws IOException in case of some IO problem.
      */
-    boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, String... entries )
+    boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, String entry )
         throws IOException;
 
     /**
@@ -126,11 +126,11 @@ public interface WLManager
      * repository if needed. If WL modified, returns {@code true}.
      * 
      * @param mavenHostedRepository the hosted repository from which WL we revoke entries.
-     * @param entries the entries revoked.
+     * @param entry the entry revoked.
      * @return {@code true} if WL was changed, {@code false} otherwise.
      * @throws IOException in case of some IO problem.
      */
-    boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, String... entries )
+    boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, String entry )
         throws IOException;
 
     /**
