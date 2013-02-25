@@ -13,7 +13,73 @@
 /*global NX, Ext, Nexus*/
 
 /**
- * Support for icon containers.
+ * Support for icon containers.  An icon container is a helper to manage image/icon resources used by an application.
+ *
+ * The container automatically creates CSS styles for icons and installs them into the browser when loading.
+ *
+ * A simple example of an icon container with a single icon, and how to reference the icon.
+ *
+ *      @example
+ *      var myIcons = NX.create('Nexus.util.IconContainer', {
+ *          icons: {
+ *              hello:  'hello.png'
+ *          }
+ *      });
+ *
+ *      // returns an icon object
+ *      var icon = myIcons.get('hello);
+ *
+ *      // the name of the CSS class of the icon
+ *      var cssClass = icon.cls;
+ *
+ *      // renders a <img> html snippet for the icon
+ *      var imgHtml = icon.img;
+ *
+ * Icons can reference other icons, this helps avoid loading duplicate assents into the browser, and still allows
+ * for flexible icon naming.  This allows applications to define meaningful names, and then manage which asset
+ * belongs to that name inside of the icon container:
+ *
+ *      @example
+ *      var myIcons = NX.create('Nexus.util.IconContainer', {
+ *          icons: {
+ *              rulePassed:         'tick.png',
+ *              event_rulesPassed:  '@rulePassed',
+ *              event_rulePassed:   '@rulePassed'
+ *             }
+ *      });
+ *
+ * Here 'event_rulesPassed' and 'event_rulePassed' are aliases to the 'rulePassed' icon.  Only 1 img/css asset for 'rulePassed'
+ * is installed into the browser.
+ *
+ * For icons which might have many different sizes, and icon definition can be configured to know about different variants:
+ *
+ *      @example
+ *      var myIcons = NX.create('Nexus.util.IconContainer', {
+ *          icons: {
+ *              rulePassed: {
+ *                  x16:    'tick.png',
+ *                  x32:    'tick-32x32.png',
+ *                  _:      '^x16'
+ *              },
+ *              event_rulesPassed:   '@rulePassed',
+ *              event_rulePassed:    '@rulePassed'
+ *             }
+ *      });
+ *
+ * This defines 5 icons, and 2 img+css (the assets loaded into the browser).
+ *
+ * The first bits for rulePassed define 2 icons 'rulePassedx16' and 'rulePassedx32' pointing at tick.png and tick-32x32.png respectively.
+ * The special _ key is the default which will be used to set the 'rulePassed' icon.
+ * The special syntax here with '^x16' means that he default icon is really the 'x16' variant and
+ * ATM this only works for the default '_' variant.
+ *
+ * Icon objects have a variant() method which can be used to access a variant:
+ *
+ *      @example
+ *      var icon = MyIcons.get('rulePassed');
+ *      var bigger = icon.variant('x32');
+ *
+ * If the variant does not exist then it returns the same icon.
  *
  * @since 2.4
  */
@@ -36,8 +102,11 @@ NX.define('Nexus.util.IconContainer', {
     /**
      * Base-path for images.
      *
+     * This defaults to the base resource path of Nexus + '/static/icons'.
+     *
      * @public
      * @property
+     * @type {String}
      */
     basePath: undefined,
 
@@ -69,10 +138,10 @@ NX.define('Nexus.util.IconContainer', {
         // apply configuration
         Ext.apply(self, config);
 
-        self.logGroup('Defining icons');
+        self.logGroup('Loading icons');
 
         Ext.iterate(icons, function (key, value, obj) {
-            self.defineIcon(key, value);
+            self.loadIcon(key, value);
         });
 
         // TODO: Pre-load all icons into browser
@@ -95,20 +164,81 @@ NX.define('Nexus.util.IconContainer', {
     },
 
     /**
-     * Define an icon.
+     * Returns the icon name of a variant.
+     *
+     * @private
+     *
+     * @return {String}
+     */
+    variantName: function(name, variant) {
+        // TODO: Do we want this or maybe name + '_' + variant ?
+        return name + variant;
+    },
+
+    /**
+     * Load icons from configuration.
+     *
+     * @private
+     *
+     * @param {String} name     Icon name.
+     * @param {*} config        String fileName/alias or object for icon with variants.
+     */
+    loadIcon: function(name, config) {
+        var self = this;
+
+        // if config is a string, then its a simple fileName/alias just define it
+        if (Ext.isString(config)) {
+            self.defineIcon(name, config);
+        }
+        // else its a complex icon definition with variants
+        else if (Ext.isObject(config)) {
+            // strip off the default icon configuration.
+            var defaultIconFileName = config._;
+            delete config._;
+
+            // define icons for each variant, remember last icon name we created for default
+            var lastIcon;
+            Ext.iterate(config, function(key, value) {
+                lastIcon = self.defineIcon(self.variantName(name, key), value, name);
+            });
+
+            // complain if there were no variants configured
+            NX.assert(lastIcon !== undefined, 'No icon variants defined');
+
+            // handle default icon
+            if (defaultIconFileName !== undefined) {
+                // if the fileName starts with '^' then its an alias back reference to a variant
+                if (defaultIconFileName.startsWith('^')) {
+                    defaultIconFileName = '@' + self.variantName(name, defaultIconFileName.substring(1));
+                }
+                // otherwise could be a filePath or alias too
+                self.defineIcon(name, defaultIconFileName);
+            }
+            else {
+                // if no default configuration, then the default icon an alias to the last variant defined
+                self.defineIcon(name, '@' + lastIcon.name);
+            }
+        }
+    },
+
+    /**
+     * Define an icon from a fileName (or @alias).
      *
      * @private
      *
      * @param {string} name         Icon name.
      * @param {string} fileName     Icon file name (or @alias).
+     * @param {string} [baseName]   Base icon name when used with variants.
      * @return {*}                  Icon helper.
      */
-    defineIcon: function (name, fileName) {
+    defineIcon: function (name, fileName, baseName) {
         var self = this,
             alias,
             iconPath,
             cls,
             icon;
+
+        // TODO: fileName, really a config, if a string, is this below, if an object is variant icon container
 
         // Puke early if icon already defined, this is likely a mistake
         NX.assert(self.icons[name] === undefined, 'Icon already defined with name: ' + name);
@@ -129,6 +259,7 @@ NX.define('Nexus.util.IconContainer', {
 
             self.logDebug('Defining icon:', name, 'cls:', cls, 'path:', iconPath);
 
+            // install stylesheet for icon
             Ext.util.CSS.createStyleSheet(
                 '.' + cls + ' { background: url(' + iconPath + ') no-repeat !important; }',
                 cls // use class as id
@@ -144,6 +275,13 @@ NX.define('Nexus.util.IconContainer', {
                  * @type {String}
                  */
                 name: name,
+
+                /**
+                 * The base symbolic name for an icon with variants.
+                 *
+                 * @type {String}
+                 */
+                baseName: baseName,
 
                 /**
                  * Short icon file-name.
@@ -171,7 +309,32 @@ NX.define('Nexus.util.IconContainer', {
                  *
                  * @type {String}
                  */
-                cls: cls
+                cls: cls,
+
+                /**
+                 * Return an icon variant, or the same icon if the variant does not exist.
+                 *
+                 * @param {String} variantName
+                 * @return {*} Icon; never null
+                 */
+                variant: function(variantName) {
+                    // if baseName is not set, then we have no variants configured, return same icon
+                    if (baseName === undefined) {
+                        self.logWarn('Icon has no variants:', name);
+                        return this;
+                    }
+
+                    // else look for a variant
+                    var icon = self.find(baseName, variantName);
+                    if (icon !== undefined) {
+                        return icon;
+                    }
+
+                    self.logWarn('No such icon variant:', variantName, 'for icon:', baseName);
+
+                    // still nothing, return same icon
+                    return this;
+                }
             }
         }
 
@@ -181,19 +344,44 @@ NX.define('Nexus.util.IconContainer', {
     },
 
     /**
+     * Lookup an icon by name.
+     *
+     * @public
+     *
+     * @param name      The name of the icon.
+     * @param variant   Optional icon variant name.
+     * @return {*}      Icon; or null
+     */
+    find: function (name, variant) {
+        var self = this;
+
+        if (variant !== undefined) {
+            // TODO: Probably should verify that variant is a string, as that is what we expect ATM
+            name = name + variant;
+        }
+
+        return self.icons[name];
+    },
+
+    /**
      * Lookup an icon by name.  If the named icon is not defined an exception will be thrown.
      *
      * @public
      *
-     * @param name  The name of the icon.
-     * @return {*}  Icon; never null/undefined.
+     * @param name      The name of the icon.
+     * @param variant   Optional icon variant name.
+     * @return {*}      Icon; never null/undefined.
      */
-    get: function (name) {
+    get: function (name, variant) {
         var self = this,
-            icon;
+            icon = self.find(name, variant);
 
-        icon = self.icons[name];
-        NX.assert(icon !== undefined, 'No icon defined for name: ' + name);
+        if (variant !== undefined) {
+            NX.assert(icon !== undefined, 'No icon defined for name: ' + name + ' variant: ' + variant);
+        }
+        else {
+            NX.assert(icon !== undefined, 'No icon defined for name: ' + name);
+        }
 
         return icon;
     }
