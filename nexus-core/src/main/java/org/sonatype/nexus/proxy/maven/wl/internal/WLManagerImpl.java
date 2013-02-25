@@ -679,21 +679,36 @@ public class WLManagerImpl
     // ==
 
     @Override
-    public boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, String entry )
+    public boolean offerWLEntries( final MavenHostedRepository mavenHostedRepository, final String entry )
         throws IOException
     {
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
         final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
-        lock.lock( Action.update );
+        lock.lock( Action.read );
         try
         {
             final WritablePrefixSourceModifier wesm =
                 new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
             wesm.offerEntries( entry );
-            if ( wesm.apply() )
+            if ( wesm.hasChanges() )
             {
-                publish( mavenHostedRepository, prefixSource );
-                return true;
+                boolean changed = false;
+                lock.lock( Action.update );
+                try
+                {
+                    wesm.reset();
+                    wesm.offerEntries( entry );
+                    changed = wesm.apply();
+                    if ( changed )
+                    {
+                        publish( mavenHostedRepository, prefixSource );
+                    }
+                }
+                finally
+                {
+                    lock.unlock();
+                }
+                return changed;
             }
         }
         finally
@@ -704,21 +719,36 @@ public class WLManagerImpl
     }
 
     @Override
-    public boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, String entry )
+    public boolean revokeWLEntries( final MavenHostedRepository mavenHostedRepository, final String entry )
         throws IOException
     {
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
         final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
-        lock.lock( Action.update );
+        lock.lock( Action.read );
         try
         {
             final WritablePrefixSourceModifier wesm =
                 new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
             wesm.revokeEntries( entry );
-            if ( wesm.apply() )
+            if ( wesm.hasChanges() )
             {
-                publish( mavenHostedRepository, prefixSource );
-                return true;
+                boolean changed = false;
+                lock.lock( Action.update );
+                try
+                {
+                    wesm.reset();
+                    wesm.revokeEntries( entry );
+                    changed = wesm.apply();
+                    if ( changed )
+                    {
+                        publish( mavenHostedRepository, prefixSource );
+                    }
+                }
+                finally
+                {
+                    lock.unlock();
+                }
+                return changed;
             }
         }
         finally
