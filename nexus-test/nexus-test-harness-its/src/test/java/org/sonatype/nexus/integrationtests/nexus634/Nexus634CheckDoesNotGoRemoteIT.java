@@ -15,12 +15,10 @@ package org.sonatype.nexus.integrationtests.nexus634;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.jetty.server.Server;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.BlockingServer;

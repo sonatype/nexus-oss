@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.util.concurrent.TimeUnit;
+
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
 
@@ -21,7 +23,7 @@ public abstract class AbstractMavenRepositoryConfiguration
     public static final String REPOSITORY_POLICY = "repositoryPolicy";
 
     public static final String CHECKSUM_POLICY = "checksumPolicy";
-    
+
     public static final String ARTIFACT_MAX_AGE = "artifactMaxAge";
 
     public static final String METADATA_MAX_AGE = "metadataMaxAge";
@@ -29,6 +31,10 @@ public abstract class AbstractMavenRepositoryConfiguration
     public static final String DOWNLOAD_REMOTE_INDEX = "downloadRemoteIndex";
 
     public static final String CLEANSE_REPOSITORY_METADATA = "cleanseRepositoryMetadata";
+
+    public static final String WL_DISCOVERY_ENABLED = "wlDiscoveryEnabled";
+
+    public static final String WL_DISCOVERY_INTERVAL = "wlDiscoveryInterval";
 
     public AbstractMavenRepositoryConfiguration( Xpp3Dom configuration )
     {
@@ -38,7 +44,7 @@ public abstract class AbstractMavenRepositoryConfiguration
     public RepositoryPolicy getRepositoryPolicy()
     {
         return RepositoryPolicy.valueOf( getNodeValue( getRootNode(), REPOSITORY_POLICY,
-                                                       RepositoryPolicy.RELEASE.toString() ).toUpperCase() );
+            RepositoryPolicy.RELEASE.toString() ).toUpperCase() );
     }
 
     public void setRepositoryPolicy( RepositoryPolicy policy )
@@ -55,7 +61,7 @@ public abstract class AbstractMavenRepositoryConfiguration
     {
         setNodeValue( getRootNode(), CHECKSUM_POLICY, policy.toString() );
     }
-    
+
     public int getArtifactMaxAge()
     {
         return Integer.parseInt( getNodeValue( getRootNode(), ARTIFACT_MAX_AGE, "1440" ) );
@@ -88,12 +94,32 @@ public abstract class AbstractMavenRepositoryConfiguration
 
     public boolean isCleanseRepositoryMetadata()
     {
-        return Boolean
-            .parseBoolean( getNodeValue( getRootNode(), CLEANSE_REPOSITORY_METADATA, Boolean.FALSE.toString() ) );
+        return Boolean.parseBoolean( getNodeValue( getRootNode(), CLEANSE_REPOSITORY_METADATA, Boolean.FALSE.toString() ) );
     }
 
     public void setCleanseRepositoryMetadata( boolean val )
     {
         setNodeValue( getRootNode(), CLEANSE_REPOSITORY_METADATA, Boolean.toString( val ) );
+    }
+
+    public boolean isWLDiscoveryEnabled()
+    {
+        return Boolean.parseBoolean( getNodeValue( getRootNode(), WL_DISCOVERY_ENABLED, Boolean.TRUE.toString() ) );
+    }
+
+    public void setWLDiscoveryEnabled( boolean val )
+    {
+        setNodeValue( getRootNode(), WL_DISCOVERY_ENABLED, Boolean.toString( val ) );
+    }
+
+    public long getWLDiscoveryInterval()
+    {
+        return Long.parseLong( getNodeValue( getRootNode(), WL_DISCOVERY_INTERVAL,
+            String.valueOf( TimeUnit.HOURS.toMillis( 24 ) ) ) );
+    }
+
+    public void setWLDiscoveryInterval( long val )
+    {
+        setNodeValue( getRootNode(), WL_DISCOVERY_INTERVAL, String.valueOf( val ) );
     }
 }

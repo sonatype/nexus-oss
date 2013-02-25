@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.util.Node;
+import org.sonatype.nexus.util.PathUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -54,19 +55,11 @@ public class ParentOMatic
 {
     public static class Payload
     {
-        private final String path;
-
         private boolean marked;
 
-        public Payload( String path )
+        public Payload()
         {
-            this.path = Preconditions.checkNotNull( path );
             this.marked = false;
-        }
-
-        public String getPath()
-        {
-            return path;
         }
 
         public boolean isMarked()
@@ -85,7 +78,11 @@ public class ParentOMatic
      * consumption. They have no need to stay in memory, since the result will not need them anyway, will not be
      * returned by {@link #getMarkedPaths()}.
      */
-    private final boolean optimizeTreeSize;
+    private final boolean keepMarkedNodesOnly;
+
+    private final boolean applyRuleA;
+
+    private final boolean applyRuleB;
 
     /**
      * The root node.
@@ -100,11 +97,17 @@ public class ParentOMatic
         this( true );
     }
 
-    public ParentOMatic( final boolean optimizeTreeSize )
+    public ParentOMatic( final boolean keepMarkedNodesOnly )
     {
-        super();
-        this.optimizeTreeSize = optimizeTreeSize;
-        this.ROOT = new Node<Payload>( null, "ROOT", new Payload( "/" ) );
+        this( keepMarkedNodesOnly, true, true );
+    }
+
+    public ParentOMatic( final boolean keepMarkedNodesOnly, final boolean applyRuleA, final boolean applyRuleB )
+    {
+        this.keepMarkedNodesOnly = keepMarkedNodesOnly;
+        this.applyRuleA = applyRuleA;
+        this.applyRuleB = applyRuleB;
+        this.ROOT = new Node<Payload>( null, "/", new Payload() );
     }
 
     /**
@@ -129,16 +132,19 @@ public class ParentOMatic
     {
         final Node<Payload> currentNode = addPath( path, false );
 
-        // unmark children if any
-        applyRecursively( currentNode, new Function<Node<Payload>, Node<Payload>>()
+        // rule A: unmark children if any
+        if ( applyRuleA )
         {
-            @Override
-            public Node<Payload> apply( Node<Payload> input )
+            applyRecursively( currentNode, new Function<Node<Payload>, Node<Payload>>()
             {
-                input.getPayload().setMarked( false );
-                return input;
-            }
-        } );
+                @Override
+                public Node<Payload> apply( Node<Payload> input )
+                {
+                    input.getPayload().setMarked( false );
+                    return input;
+                }
+            } );
+        }
 
         currentNode.getPayload().setMarked( true );
 
@@ -146,7 +152,7 @@ public class ParentOMatic
         final Node<Payload> flippedNode = reorganizeForRecursion( currentNode );
 
         // optimize tree size if asked for
-        if ( optimizeTreeSize )
+        if ( keepMarkedNodesOnly )
         {
             optimizeTreeSize( flippedNode );
         }
@@ -168,13 +174,116 @@ public class ParentOMatic
             {
                 if ( input.getPayload().isMarked() )
                 {
-                    markedPaths.add( input.getPayload().getPath() );
+                    markedPaths.add( input.getPath() );
                 }
                 return null;
             }
         };
         applyRecursively( ROOT, markedCollector );
         return markedPaths;
+    }
+
+    /**
+     * Returns the list of all leaf paths.
+     * 
+     * @return
+     * @since 2.4
+     */
+    public List<String> getAllLeafPaths()
+    {
+        // doing scanning
+        final ArrayList<String> paths = new ArrayList<String>();
+        final Function<Node<Payload>, Node<Payload>> markedCollector = new Function<Node<Payload>, Node<Payload>>()
+        {
+            @Override
+            public Node<Payload> apply( Node<Payload> input )
+            {
+                if ( input.isLeaf() )
+                {
+                    paths.add( input.getPath() );
+                }
+                return null;
+            }
+        };
+        applyRecursively( ROOT, markedCollector );
+        return paths;
+    }
+
+    /**
+     * Returns the list of all path.
+     * 
+     * @return
+     * @since 2.4
+     */
+    public List<String> getAllPaths()
+    {
+        // doing scanning
+        final ArrayList<String> paths = new ArrayList<String>();
+        final Function<Node<Payload>, Node<Payload>> markedCollector = new Function<Node<Payload>, Node<Payload>>()
+        {
+            @Override
+            public Node<Payload> apply( Node<Payload> input )
+            {
+                paths.add( input.getPath() );
+                return null;
+            }
+        };
+        applyRecursively( ROOT, markedCollector );
+        return paths;
+    }
+
+    /**
+     * Cuts down tree to given maxDepth. After this method returns, this instance guarantees that there is no path
+     * deeper than passed in maxDepth (shallower than it might exists!).
+     * 
+     * @param maxDepth
+     */
+    public void cutNodesDeeperThan( final int maxDepth )
+    {
+        applyRecursively( getRoot(), new Function<Node<Payload>, Node<Payload>>()
+        {
+            @Override
+            public Node<Payload> apply( Node<Payload> input )
+            {
+                if ( input.getDepth() == maxDepth )
+                {
+                    // simply "cut off" children if any
+                    for ( Node<Payload> child : input.getChildren() )
+                    {
+                        input.removeChild( child );
+                    }
+                }
+                return null;
+            }
+        } );
+    }
+
+    // ==
+
+    /**
+     * Returns tree ROOT node.
+     * 
+     * @return
+     */
+    public Node<Payload> getRoot()
+    {
+        return ROOT;
+    }
+
+    /**
+     * Applies function recursively from the given node.
+     * 
+     * @param fromNode
+     * @param modifier
+     */
+    public void applyRecursively( final Node<Payload> fromNode, final Function<Node<Payload>, Node<Payload>> modifier )
+    {
+        modifier.apply( fromNode );
+
+        for ( Node<Payload> child : fromNode.getChildren() )
+        {
+            applyRecursively( child, modifier );
+        }
     }
 
     // ==
@@ -195,7 +304,7 @@ public class ParentOMatic
     {
         sb.append( Strings.repeat( "  ", depth ) );
         sb.append( node.getLabel() );
-        sb.append( " (" ).append( node.getPayload().getPath() ).append( ")" );
+        sb.append( " (" ).append( node.getPath() ).append( ")" );
         if ( node.getPayload().isMarked() )
         {
             sb.append( "*" );
@@ -223,7 +332,7 @@ public class ParentOMatic
 
             if ( node == null )
             {
-                currentNode = currentNode.addChild( pathElem, new Payload( getPathElementsAsPath( actualPathElems ) ) );
+                currentNode = currentNode.addChild( pathElem, new Payload() );
             }
             else
             {
@@ -248,14 +357,14 @@ public class ParentOMatic
     protected Node<Payload> reorganizeForRecursion( final Node<Payload> changedNode )
     {
         // rule a: if parent is marked already, do not mark the child
-        if ( isParentMarked( changedNode ) )
+        if ( applyRuleA && isParentMarked( changedNode ) )
         {
             changedNode.getPayload().setMarked( false );
             return changedNode.getParent();
         }
 
         // rule b: if this parent's all children are marked, mark parent, unmark children
-        if ( isParentAllChildMarkedForRuleB( changedNode ) )
+        if ( applyRuleB && isParentAllChildMarkedForRuleB( changedNode ) )
         {
             changedNode.getParent().getPayload().setMarked( true );
             for ( Node<Payload> child : changedNode.getParent().getChildren() )
@@ -280,22 +389,6 @@ public class ParentOMatic
         for ( Node<Payload> child : changedNode.getChildren() )
         {
             changedNode.removeChild( child );
-        }
-    }
-
-    /**
-     * Applies function recursively from the given node.
-     * 
-     * @param fromNode
-     * @param modifier
-     */
-    protected void applyRecursively( final Node<Payload> fromNode, final Function<Node<Payload>, Node<Payload>> modifier )
-    {
-        modifier.apply( fromNode );
-
-        for ( Node<Payload> child : fromNode.getChildren() )
-        {
-            applyRecursively( child, modifier );
         }
     }
 
@@ -364,22 +457,6 @@ public class ParentOMatic
     }
 
     /**
-     * Builds a path from path elements list.
-     * 
-     * @param pathElems
-     * @return
-     */
-    protected String getPathElementsAsPath( final List<String> pathElems )
-    {
-        final StringBuilder sb = new StringBuilder( "/" );
-        for ( String elem : pathElems )
-        {
-            sb.append( elem ).append( "/" );
-        }
-        return sb.toString();
-    }
-
-    /**
      * Builds a path elements list from passed in path.
      * 
      * @param path
@@ -387,17 +464,6 @@ public class ParentOMatic
      */
     protected List<String> getPathElements( final String path )
     {
-        final List<String> result = Lists.newArrayList();
-        final String[] elems = path.split( "/" );
-
-        for ( String elem : elems )
-        {
-            if ( !Strings.isNullOrEmpty( elem ) )
-            {
-                result.add( elem );
-            }
-        }
-
-        return result;
+        return PathUtils.elementsOf( path );
     }
 }

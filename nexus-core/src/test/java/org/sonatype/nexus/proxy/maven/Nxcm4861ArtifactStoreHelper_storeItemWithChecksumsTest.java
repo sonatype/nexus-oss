@@ -47,12 +47,11 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.sisu.litmus.testsupport.mock.MockitoRule;
 
 /**
- * UT for NXCM-4861: {@link ArtifactStoreHelper#storeItemWithChecksums(boolean, org.sonatype.nexus.proxy.item.AbstractStorageItem)}
- * was in some cases causing proxying to kick in (after store item was retrieved from remote -- only in case of procurement reposes
- * but still wrong). 
- * 
- * Despite extending {@link AbstractProxyTestEnvironment} it actually uses
- * a hosted repo only, and using spy determines actually happened invocations. 
+ * UT for NXCM-4861:
+ * {@link ArtifactStoreHelper#storeItemWithChecksums(boolean, org.sonatype.nexus.proxy.item.AbstractStorageItem)} was in
+ * some cases causing proxying to kick in (after store item was retrieved from remote -- only in case of procurement
+ * reposes but still wrong). Despite extending {@link AbstractProxyTestEnvironment} it actually uses a hosted repo only,
+ * and using spy determines actually happened invocations.
  */
 public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
     extends AbstractProxyTestEnvironment
@@ -81,9 +80,7 @@ public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
 
             @Override
             public void buildEnvironment( AbstractProxyTestEnvironment env )
-                throws ConfigurationException,
-                IOException,
-                ComponentLookupException
+                throws ConfigurationException, IOException, ComponentLookupException
             {
                 final PlexusContainer container = env.getPlexusContainer();
                 // ading one hosted only
@@ -95,8 +92,7 @@ public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
                 repoConf.setLocalStorage( new CLocalStorage() );
                 repoConf.getLocalStorage().setProvider( "file" );
                 repoConf.getLocalStorage().setUrl(
-                    env.getApplicationConfiguration().getWorkingDirectory(
-                        "proxy/store/inhouse" ).toURI().toURL().toString() );
+                    env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/inhouse" ).toURI().toURL().toString() );
                 Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
                 repoConf.setExternalConfiguration( exRepo );
                 M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
@@ -115,21 +111,23 @@ public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
         final MavenRepository realMavenRepository =
             getRepositoryRegistry().getRepositoryWithFacet( REPO_ID, MavenRepository.class );
         final MavenRepository mavenRepository = Mockito.spy( realMavenRepository );
+        // why? There is no related change, but it works on master?
+        Mockito.when( mavenRepository.getArtifactStoreHelper() ).thenReturn( new ArtifactStoreHelper( mavenRepository ) );
 
         // invoke storeWithChecksums
         final String PATH = "/group/artifact/1.0/artifact-1.0.jar";
         final ResourceStoreRequest request = new ResourceStoreRequest( PATH );
         mavenRepository.storeItemWithChecksums( request, new ByteArrayInputStream( "some fluke content".getBytes() ),
-                                                null );
+            null );
 
         // verify side effects (storage changes)
         assertThat( "Artifact should be stored",
-                    mavenRepository.getLocalStorage().containsItem( mavenRepository, new ResourceStoreRequest( PATH ) ),
-                    is( true ) );
-        assertThat( "Artifact checksum should be stored",
-                    mavenRepository.getLocalStorage().containsItem( mavenRepository,
-                                                                    new ResourceStoreRequest( PATH + ".sha1" ) ),
-                    is( true ) );
+            mavenRepository.getLocalStorage().containsItem( mavenRepository, new ResourceStoreRequest( PATH ) ),
+            is( true ) );
+        assertThat(
+            "Artifact checksum should be stored",
+            mavenRepository.getLocalStorage().containsItem( mavenRepository, new ResourceStoreRequest( PATH + ".sha1" ) ),
+            is( true ) );
 
         // verify params
         final ArgumentCaptor<ResourceStoreRequest> ac = ArgumentCaptor.forClass( ResourceStoreRequest.class );
@@ -138,7 +136,6 @@ public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
         // we need to have exactly one retrieve invocation
         assertThat( "We must have one retrieve happened!", ac.getAllValues().size(), equalTo( 1 ) );
         // and that one must be localOnly
-        assertThat( "Request " + ac.getValue() + " should be localOnly!", ac.getValue().isRequestLocalOnly(),
-                    is( true ) );
+        assertThat( "Request " + ac.getValue() + " should be localOnly!", ac.getValue().isRequestLocalOnly(), is( true ) );
     }
 }

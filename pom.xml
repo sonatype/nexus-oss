@@ -959,6 +959,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-support</artifactId>
+        <version>2.4-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-utils</artifactId>
         <version>2.4-SNAPSHOT</version>
       </dependency>

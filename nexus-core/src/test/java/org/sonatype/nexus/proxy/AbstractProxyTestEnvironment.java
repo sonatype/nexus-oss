@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -244,7 +245,6 @@ public abstract class AbstractProxyTestEnvironment
     {
         eventBus.post( new NexusStoppedEvent( null ) );
         getEnvironmentBuilder().stopService();
-
         super.tearDown();
     }
 

@@ -1165,6 +1165,12 @@ public abstract class AbstractProxyRepository
         }
     }
 
+    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException
+    {
+        return !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
+    }
+
     protected StorageItem doRetrieveItem0( ResourceStoreRequest request, AbstractStorageItem localItem )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
@@ -1172,7 +1178,7 @@ public abstract class AbstractProxyRepository
         AbstractStorageItem remoteItem = null;
 
         // proxyMode and request.localOnly decides 1st
-        boolean shouldProxy = !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
+        boolean shouldProxy = shouldTryRemote( request );
 
         if ( shouldProxy )
         {

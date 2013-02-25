@@ -35,8 +35,11 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
+import org.sonatype.nexus.proxy.maven.wl.ProxyRequestFilter;
+import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -45,6 +48,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
@@ -68,6 +72,9 @@ public abstract class AbstractMavenRepository
      */
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
+
+    @Requirement
+    protected ProxyRequestFilter proxyRequestFilter;
 
     private MutableProxyRepositoryKind repositoryKind;
 
@@ -127,6 +134,11 @@ public abstract class AbstractMavenRepository
     public ArtifactPackagingMapper getArtifactPackagingMapper()
     {
         return artifactPackagingMapper;
+    }
+
+    protected ProxyRequestFilter getProxyRequestFilter()
+    {
+        return proxyRequestFilter;
     }
 
     /**
@@ -396,6 +408,30 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
+    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException
+    {
+        final boolean shouldTryRemote = super.shouldTryRemote( request );
+        if ( !shouldTryRemote )
+        {
+            return false;
+        }
+        // apply WLFilter to "normal" requests only, not hidden (which is meta or plain hidden)
+        final RepositoryItemUid uid = createUid( request.getRequestPath() );
+        if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
+        {
+            final boolean whitelistMatched = getProxyRequestFilter().allowed( this, request );
+            if ( !whitelistMatched )
+            {
+                getLogger().debug( "WL filter rejected remote request for path {} in {}.", request.getRequestPath(),
+                    RepositoryStringUtils.getHumanizedNameString( this ) );
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public void storeItem( boolean fromTask, StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
@@ -506,5 +542,24 @@ public abstract class AbstractMavenRepository
         {
             // huh?
         }
+    }
+
+    /**
+     * Beside original behavior, only add to NFC when it's not WL that rejected remote access.
+     * 
+     * @since 2.4
+     */
+    @Override
+    protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
+    {
+        boolean shouldAddToNFC = super.shouldAddToNotFoundCache( request );
+        if ( shouldAddToNFC && request.getRequestContext().containsKey( WLManager.WL_REQUEST_REJECTED_FLAG_KEY ) )
+        {
+            // TODO: should we un-flag the request?
+            shouldAddToNFC = false;
+            getLogger().debug( "Maven proxy repository {} WL rejected this request, not adding path {} to NFC.",
+                RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() );
+        }
+        return shouldAddToNFC;
     }
 }
