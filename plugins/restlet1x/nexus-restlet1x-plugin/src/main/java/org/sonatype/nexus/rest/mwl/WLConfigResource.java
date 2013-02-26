@@ -106,10 +106,17 @@ public class WLConfigResource
         try
         {
             final MavenProxyRepository mavenProxyRepository = getMavenRepository( request, MavenProxyRepository.class );
+            final WLDiscoveryConfig oldConfig = getWLManager().getRemoteDiscoveryConfig( mavenProxyRepository );
             final WLConfigMessageWrapper wrapper = WLConfigMessageWrapper.class.cast( payload );
+            // NEXUS-5567 related and some other cases (like scripting and sending partial message to enable/disable only).
+            // The error range of the interval value is (>0) since it's defined in hours, and 0 or negative value would be
+            // undefined. But still, due to unmarshalling, the field in the bean would be 0 (or is -1 like in NEXUS-5567).
+            // Hence, if non valid value sent, we use the "old" value to keep it.
             final WLDiscoveryConfig config =
-                new WLDiscoveryConfig( wrapper.getData().isDiscoveryEnabled(),
-                    TimeUnit.HOURS.toMillis( wrapper.getData().getDiscoveryIntervalHours() ) );
+                new WLDiscoveryConfig(
+                    wrapper.getData().isDiscoveryEnabled(),
+                    wrapper.getData().getDiscoveryIntervalHours() > 0 ? TimeUnit.HOURS.toMillis( wrapper.getData().getDiscoveryIntervalHours() )
+                        : oldConfig.getDiscoveryInterval() );
             getWLManager().setRemoteDiscoveryConfig( mavenProxyRepository, config );
             return wrapper;
         }
