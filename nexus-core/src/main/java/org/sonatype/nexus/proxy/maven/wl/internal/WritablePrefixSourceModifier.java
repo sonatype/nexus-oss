@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.wl.WritablePrefixSource;
 
 /**
@@ -46,7 +48,12 @@ public class WritablePrefixSourceModifier
     private PathMatcher whitelistMatcher;
 
     /**
-     * Constructor.
+     * Constructor. The {@link WritablePrefixSource} must been ensured some way that the content exists and will not get
+     * modified and/or get deleted. Usually, if backed by {@link StorageFileItem} like {@link FilePrefixSource}, you'd
+     * want to lock the file at least for {@link Action#read}. If these conditions are not met or assured, use of this
+     * class will lead to {@link NullPointerException} and other problems. If the {@link WritablePrefixSource} you
+     * operate against is not shared (across multiple threads, is accessed in single thread only), this can be
+     * neglected.
      * 
      * @param writablePrefixSource
      * @param maxDepth

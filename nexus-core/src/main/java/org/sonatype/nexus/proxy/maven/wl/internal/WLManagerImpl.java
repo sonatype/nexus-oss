@@ -63,6 +63,7 @@ import org.sonatype.nexus.proxy.maven.wl.events.WLPublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.wl.events.WLUnpublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -428,11 +429,18 @@ public class WLManagerImpl
     protected PrefixSource updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository, final boolean notify )
         throws IOException
     {
+        final LocalStatus localStatus = mavenProxyRepository.getLocalStatus();
+        if ( !localStatus.shouldServiceRequest() )
+        {
+            getLogger().debug( "Proxy repository {} is out of service, not updating WL.",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+            return null;
+        }
         final ProxyMode proxyMode = mavenProxyRepository.getProxyMode();
-        if ( proxyMode == null || !proxyMode.shouldProxy() )
+        if ( !proxyMode.shouldProxy() )
         {
             getLogger().debug( "Proxy repository {} is in ProxyMode={}, not updating WL.",
-                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), proxyMode );
             return null;
         }
         PrefixSource prefixSource = null;
@@ -487,6 +495,13 @@ public class WLManagerImpl
                                                   final boolean notify )
         throws IOException
     {
+        final LocalStatus localStatus = mavenHostedRepository.getLocalStatus();
+        if ( !localStatus.shouldServiceRequest() )
+        {
+            getLogger().debug( "Hosted repository {} is out of service, not updating WL.",
+                RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
+            return null;
+        }
         PrefixSource prefixSource = null;
         final DiscoveryResult<MavenHostedRepository> discoveryResult =
             localContentDiscoverer.discoverLocalContent( mavenHostedRepository );
@@ -505,6 +520,13 @@ public class WLManagerImpl
     protected PrefixSource updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository, final boolean notify )
         throws IOException
     {
+        final LocalStatus localStatus = mavenGroupRepository.getLocalStatus();
+        if ( !localStatus.shouldServiceRequest() )
+        {
+            getLogger().debug( "Group repository {} is out of service, not updating WL.",
+                RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ) );
+            return null;
+        }
         PrefixSource prefixSource = null;
         // save merged WL into group's local storage (if all members has WL)
         boolean allMembersHaveWLPublished = true;
@@ -687,6 +709,10 @@ public class WLManagerImpl
         lock.lock( Action.read );
         try
         {
+            if ( !prefixSource.exists() )
+            {
+                return false;
+            }
             final WritablePrefixSourceModifier wesm =
                 new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
             wesm.offerEntry( entry );
@@ -727,6 +753,10 @@ public class WLManagerImpl
         lock.lock( Action.read );
         try
         {
+            if ( !prefixSource.exists() )
+            {
+                return false;
+            }
             final WritablePrefixSourceModifier wesm =
                 new WritablePrefixSourceModifier( prefixSource, config.getLocalScrapeDepth() );
             wesm.revokeEntry( entry );

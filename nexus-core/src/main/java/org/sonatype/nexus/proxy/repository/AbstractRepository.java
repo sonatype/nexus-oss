@@ -1258,10 +1258,7 @@ public abstract class AbstractRepository
     /**
      * Check conditions, such as availability, permissions, etc.
      *
-<<<<<<< HEAD
      * @param request the request
-=======
->>>>>>> refs/heads/master
      * @return false, if the request should not be processed with response appropriate for current method, or true is
      *         execution should continue as usual.
      * @throws RepositoryNotAvailableException the repository not available exception
