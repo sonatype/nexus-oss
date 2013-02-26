@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -107,7 +108,8 @@ public class EventDispatcher
         final MavenRepository mavenRepository = (MavenRepository) evt.getRepository();
         try
         {
-            wlManager.republish( mavenRepository );
+            final PrefixSource prefixSource = wlManager.getPrefixSourceFor( mavenRepository );
+            wlManager.publish( mavenRepository, prefixSource );
         }
         catch ( IOException e )
         {

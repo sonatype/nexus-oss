@@ -153,15 +153,6 @@ public interface WLManager
         throws IOException;
 
     /**
-     * Republishes the same {@link PrefixSource} that already exists in repository.
-     * 
-     * @param mavenRepository
-     * @throws IOException
-     */
-    void republish( MavenRepository mavenRepository )
-        throws IOException;
-
-    /**
      * Unpublishes (removes if published before) the entries, and marks {@link MavenRepository} as "noscrape".
      * 
      * @param mavenRepository

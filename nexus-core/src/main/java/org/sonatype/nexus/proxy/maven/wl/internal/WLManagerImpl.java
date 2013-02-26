@@ -787,13 +787,6 @@ public class WLManagerImpl
     }
 
     @Override
-    public void republish( final MavenRepository mavenRepository )
-        throws IOException
-    {
-        publish( mavenRepository, getPrefixSourceFor( mavenRepository ) );
-    }
-
-    @Override
     public void unpublish( final MavenRepository mavenRepository )
         throws IOException
     {
