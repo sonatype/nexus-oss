@@ -328,6 +328,7 @@
                 <!-- some order required here -->
                 <include>lib/string.js</include>
                 <include>lib/require-*.js</include>
+                <include>lib/requirejs-css-plugin-*.js</include>
               </includes>
             </configuration>
           </execution>

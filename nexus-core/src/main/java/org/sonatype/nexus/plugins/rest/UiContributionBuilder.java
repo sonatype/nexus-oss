@@ -54,16 +54,39 @@ public class UiContributionBuilder
     }
 
     /**
-     * Adds the default location for a compressed plugin js file: /static/js/$artifactId-all.js
+     * Adds the default location for a compressed plugin js file: static/js/$artifactId-all.js
      */
     public UiContributionBuilder withDefaultAggregateDependency()
     {
         return withDependency( getDefaultPath( "js" ) );
     }
 
+    /**
+     * Adds the default css dependency if it is available: static/js/$artifactId-all.css
+     *
+     */
+    public UiContributionBuilder withDefaultCssDependency()
+    {
+        final String path = getDefaultPath( "css" );
+        if ( owner.getClass().getClassLoader().getResource( path ) != null ) {
+            // TODO: needs '..' prepended because requirejs is using 'nexus/js' as base path... pending file reorganization
+            return withDependency( "css!../" + path );
+        }
+
+        return this;
+    }
+
     @Override
     public UiContributor.UiContribution build()
     {
+        return build( false );
+    }
+
+    public UiContributor.UiContribution build( boolean debug )
+    {
+        if ( !debug && dependencies.isEmpty() ) {
+            withDefaultAggregateDependency().withDefaultCssDependency();
+        }
         return new UiContributor.UiContribution( module, dependencies );
     }
 }
