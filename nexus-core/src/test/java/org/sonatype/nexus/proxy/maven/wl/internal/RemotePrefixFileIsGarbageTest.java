@@ -190,16 +190,6 @@ public class RemotePrefixFileIsGarbageTest
         return tmpFile;
     }
 
-    protected File createBigFile()
-        throws IOException
-    {
-        final File tmpFile = createTempFile( "prefix", "jar" );
-        final RandomAccessFile rf = new RandomAccessFile( tmpFile, "rw" );
-        rf.setLength( 150 * 1024 * 1024 ); // 150 KB
-        rf.close();
-        return tmpFile;
-    }
-
     @Test( expected = InvalidInputException.class )
     public void discoverNonAsciiButRussianPrefixFile()
         throws Exception
@@ -291,7 +281,7 @@ public class RemotePrefixFileIsGarbageTest
         server.stop();
         server =
             Server.withPort( remoteServerPort ).serve( "/.meta/prefixes.txt" ).withBehaviours(
-                Behaviours.file( createBigFile() ) ).start();
+                new GenerateRandomBehaviour( 150 * 1024 ) ).start();
         try
         {
             final RemoteStrategy subject = lookup( RemoteStrategy.class, RemotePrefixFileStrategy.ID );
