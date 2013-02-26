@@ -1200,6 +1200,7 @@
               <exclude>**/atlassian-ide-plugin.xml</exclude>
               <exclude>nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
               <exclude>nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
+              <exclude>nexus-webapp/src/main/webapp/js/lib/**</exclude>
             </excludes>
           </configuration>
         </plugin>
