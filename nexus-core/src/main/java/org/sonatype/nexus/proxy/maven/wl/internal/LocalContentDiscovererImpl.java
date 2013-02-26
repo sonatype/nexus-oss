@@ -37,6 +37,7 @@ import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.nexus.util.task.CancelableUtil;
 
 /**
  * Default {@link LocalContentDiscoverer} implementation.
@@ -143,6 +144,8 @@ public class LocalContentDiscovererImpl
         public void processItem( final WalkerContext context, final StorageItem item )
             throws Exception
         {
+            // cancelation
+            CancelableUtil.checkInterruption();
             if ( item instanceof StorageFileItem )
             {
                 parentOMatic.addPath( item.getPath() );

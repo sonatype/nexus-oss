@@ -36,6 +36,14 @@ public interface ConstrainedExecutor
     void cancelAllJobs();
 
     /**
+     * Returns {@code true} if there is a {@link CancelableRunnable} running with given key.
+     * 
+     * @param key
+     * @return {@code true} if there is active task running with given key.
+     */
+    boolean hasRunningWithKey( String key );
+
+    /**
      * Schedules a command for execution, or, if a command with given key already runs, will simply "forget" (do
      * nothing) with passed in command instance.
      * 

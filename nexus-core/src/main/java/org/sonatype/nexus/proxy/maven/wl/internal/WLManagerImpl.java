@@ -704,6 +704,11 @@ public class WLManagerImpl
     public boolean offerWLEntry( final MavenHostedRepository mavenHostedRepository, final String entry )
         throws IOException
     {
+        if ( constrainedExecutor.hasRunningWithKey( mavenHostedRepository.getId() ) )
+        {
+            forceUpdateWhitelist( mavenHostedRepository );
+            return true;
+        }
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
         final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
         lock.lock( Action.read );
@@ -748,6 +753,11 @@ public class WLManagerImpl
     public boolean revokeWLEntry( final MavenHostedRepository mavenHostedRepository, final String entry )
         throws IOException
     {
+        if ( constrainedExecutor.hasRunningWithKey( mavenHostedRepository.getId() ) )
+        {
+            forceUpdateWhitelist( mavenHostedRepository );
+            return true;
+        }
         final FilePrefixSource prefixSource = getPrefixSourceFor( mavenHostedRepository );
         final RepositoryItemUidLock lock = prefixSource.getRepositoryItemUid().getLock();
         lock.lock( Action.read );

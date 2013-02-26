@@ -172,6 +172,10 @@ public class ConstrainedExecutorImplTest
         // give time to executor to start them
         Thread.sleep( 1000 );
 
+        assertThat( ci.hasRunningWithKey( "foo1" ), is( true ) );
+        assertThat( ci.hasRunningWithKey( "foo3" ), is( true ) );
+        assertThat( ci.hasRunningWithKey( "fooX" ), is( false ) );
+
         ci.cancelAllJobs();
 
         tw1.waitForExecuted();

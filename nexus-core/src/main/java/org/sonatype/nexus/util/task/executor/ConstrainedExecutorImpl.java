@@ -24,7 +24,7 @@ import org.sonatype.nexus.util.task.CancelableSupport;
 /**
  * Default implementation of Executor that adds a thin layer around {@link java.util.concurrent.Executor} that is passed
  * in from constructor.
- *
+ * 
  * @author cstamas
  * @since 2.4
  */
@@ -52,7 +52,7 @@ public class ConstrainedExecutorImpl
 
     /**
      * Constructor.
-     *
+     * 
      * @param executor
      */
     public ConstrainedExecutorImpl( final java.util.concurrent.Executor executor )
@@ -77,6 +77,12 @@ public class ConstrainedExecutorImpl
         }
         currentlyRunningCancelableRunnables.clear();
         currentlyRunningSemaphores.clear();
+    }
+
+    @Override
+    public synchronized boolean hasRunningWithKey( String key )
+    {
+        return currentlyRunningCancelableRunnables.containsKey( key );
     }
 
     @Override
@@ -122,12 +128,6 @@ public class ConstrainedExecutorImpl
             currentlyRunningSemaphores.put( key, new Semaphore( 1 ) );
         }
         return currentlyRunningSemaphores.get( key );
-    }
-
-    protected void cancelableStarting( final CancelableRunnableWrapper wrappedCommand )
-        throws InterruptedException
-    {
-        // nop
     }
 
     protected synchronized void cancelableStopping( final CancelableRunnableWrapper wrappedCommand )
@@ -180,7 +180,10 @@ public class ConstrainedExecutorImpl
             try
             {
                 semaphore.acquire();
-                host.cancelableStarting( this );
+                if ( isCanceled() )
+                {
+                    return;
+                }
                 try
                 {
                     runnable.run();
@@ -196,7 +199,6 @@ public class ConstrainedExecutorImpl
             }
             finally
             {
-                host.cancelableStopping( this );
                 semaphore.release();
             }
         }
