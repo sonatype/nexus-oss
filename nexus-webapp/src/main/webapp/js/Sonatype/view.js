@@ -87,7 +87,7 @@ Sonatype.view = {
 
               if (suppressed.indexOf(response.status) < 0)
               {
-                Sonatype.utils.connectionError(response, null, null, options);
+                Sonatype.utils.connectionError(response, options.defaultErrorMessage, null, options, true);
               }
             },
             scope : this
