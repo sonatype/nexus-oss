@@ -85,6 +85,25 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
             }
           });
     },
+
+    /**
+     * Show a message box with content according to the response.
+     *
+     * If the login window is visible, this method will look at the X-Nexus-Reason error
+     * and offer a password change if that header content is 'expired'.
+     *
+     * Used options:
+     * # options.decodeErrorResponse: Try to parse the responseText as a JSON error response, or a HTML error page.
+     * # options.hideErrorStatus: If a message could be taken out of the responseText, HTTP status code and reason will
+     *                            not be included in the message.
+     *
+     * @param response The response object of the request.
+     * @param message The message to show.
+     * @param offerRestart Whether to offer a reload of the UI.
+     * @param options The options object of the request.
+     * @param showResponseText Show the plain responseText for 'Bad Request' errors.
+     *
+     */
     connectionError : function(response, message, offerRestart, options, showResponseText) {
       // prime options object if necessary
       options = options || {};
