@@ -114,7 +114,7 @@ public class RemotePrefixFileStrategy
         catch ( InvalidInputException e )
         {
             result.delete();
-            return null;
+            throw e;
         }
         return result;
     }

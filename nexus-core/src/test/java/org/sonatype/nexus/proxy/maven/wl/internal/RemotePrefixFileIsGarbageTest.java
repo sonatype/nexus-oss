@@ -200,7 +200,7 @@ public class RemotePrefixFileIsGarbageTest
         return tmpFile;
     }
 
-    @Test( expected = StrategyFailedException.class )
+    @Test( expected = InvalidInputException.class )
     public void discoverNonAsciiButRussianPrefixFile()
         throws Exception
     {
@@ -221,7 +221,7 @@ public class RemotePrefixFileIsGarbageTest
         }
     }
 
-    @Test( expected = StrategyFailedException.class )
+    @Test( expected = InvalidInputException.class )
     public void discoverNonAsciiButHungarianPrefixFile()
         throws Exception
     {
@@ -242,7 +242,7 @@ public class RemotePrefixFileIsGarbageTest
         }
     }
 
-    @Test( expected = StrategyFailedException.class )
+    @Test( expected = InvalidInputException.class )
     public void discoverLongLinesPrefixFile()
         throws Exception
     {
@@ -263,7 +263,7 @@ public class RemotePrefixFileIsGarbageTest
         }
     }
 
-    @Test( expected = StrategyFailedException.class )
+    @Test( expected = InvalidInputException.class )
     public void discoverBinaryGarbagePrefixFile()
         throws Exception
     {
@@ -284,7 +284,7 @@ public class RemotePrefixFileIsGarbageTest
         }
     }
 
-    @Test( expected = StrategyFailedException.class )
+    @Test( expected = InvalidInputException.class )
     public void discoverBigPrefixFile()
         throws Exception
     {

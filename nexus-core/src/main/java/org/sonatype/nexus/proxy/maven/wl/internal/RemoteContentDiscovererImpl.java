@@ -82,9 +82,11 @@ public class RemoteContentDiscovererImpl
             }
             catch ( InvalidInputException e )
             {
-                getLogger().info( "Remote strategy {} detected invalid input, results discarded: {}", strategy.getId(),
-                    e.getMessage() );
-                discoveryResult.recordFailure( strategy.getId(), e.getMessage() );
+                final String message =
+                    "Remote strategy " + strategy.getId() + " detected invalid input, results discarded: "
+                        + e.getMessage();
+                getLogger().info( message );
+                discoveryResult.recordFailure( strategy.getId(), message );
                 break;
             }
             catch ( Exception e )

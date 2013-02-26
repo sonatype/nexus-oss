@@ -13,6 +13,7 @@
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 
@@ -42,10 +43,13 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.wl.WLStatus;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
+
+import com.google.common.base.Strings;
 
 public class RemoteContentDiscovererImplTest
     extends AbstractWLProxyTest
@@ -214,7 +218,7 @@ public class RemoteContentDiscovererImplTest
     }
 
     @Test
-    public void smoke1()
+    public void noPrefixFilesServed()
         throws Exception
     {
         try
@@ -244,7 +248,7 @@ public class RemoteContentDiscovererImplTest
     }
 
     @Test
-    public void smoke2()
+    public void oneOutOfTwoPrefixFilesServed()
         throws Exception
     {
         try
@@ -283,7 +287,7 @@ public class RemoteContentDiscovererImplTest
     }
 
     @Test
-    public void smoke3()
+    public void twoOutOfTwoPrefixFilesServed()
         throws Exception
     {
         try
@@ -328,6 +332,65 @@ public class RemoteContentDiscovererImplTest
                 assertThat( groupEntries, hasItem( "/org/sonatype" ) );
                 assertThat( groupEntries, hasItem( "/org/apache/maven" ) );
                 assertThat( groupEntries, hasItem( "/eu/flatwhite" ) );
+            }
+        }
+        finally
+        {
+            server1.stop();
+            server2.stop();
+        }
+    }
+
+    @Test
+    public void oneInvalidAndOneValidOutOfTwoPrefixFilesServed()
+        throws Exception
+    {
+        try
+        {
+            final int server1port = server1.getPort();
+            server1.stop();
+            server1 =
+                Server.withPort( server1port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
+                    Behaviours.content( prefixFile1( true ) ) );
+            server1.start();
+
+            final int server2port = server2.getPort();
+            server2.stop();
+            server2 =
+                Server.withPort( server2port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
+                    Behaviours.content( Strings.repeat( "/12345677890", 25 ) ) );
+            server2.start();
+
+            final WLManager wm = lookup( WLManager.class );
+            wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ) );
+            wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID, MavenRepository.class ) );
+            waitForWLBackgroundUpdates();
+            {
+                final PrefixSource proxy1EntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                        MavenRepository.class ) );
+                final PrefixSource proxy2EntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
+                        MavenRepository.class ) );
+                final PrefixSource groupEntrySource =
+                    wm.getPrefixSourceFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
+                        MavenRepository.class ) );
+
+                assertThat( "Proxy1 should have ES", proxy1EntrySource.exists() ); // we served prefix file
+                assertThat( "Proxy2 should not have ES", !proxy2EntrySource.exists() ); // we served invalid prefix file
+                assertThat( "Group should not have ES", !groupEntrySource.exists() ); // both proxies have it
+
+                final WLStatus status =
+                    wm.getStatusFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY2_REPO_ID,
+                        MavenRepository.class ) );
+                final String message = status.getDiscoveryStatus().getLastDiscoveryMessage();
+                // Text should be:
+                // "Remote strategy prefix-file detected invalid input," 
+                // "results discarded: Prefix file contains line longer" 
+                // "than allowed (250 characters), refusing to load the file."
+                assertThat( message, containsString( "strategy prefix-file" ) );
+                assertThat( message, containsString( "longer than allowed" ) );
+                assertThat( message, containsString( "refusing" ) );
             }
         }
         finally
