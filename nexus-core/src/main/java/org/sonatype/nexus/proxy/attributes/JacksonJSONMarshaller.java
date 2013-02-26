@@ -12,15 +12,15 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
+import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.type.TypeReference;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 
@@ -61,8 +61,17 @@ public class JacksonJSONMarshaller
                 } );
             return new DefaultAttributes( attributesMap );
         }
-        catch ( JsonParseException e )
+        catch ( JsonProcessingException e )
         {
+            throw new InvalidInputException( "Persisted attribute malformed!", e );
+        }
+        catch ( CharConversionException e )
+        {
+            // see NEXUS-5505
+            // we trigger invalid input, and the attribute file (or actual Finder file)
+            // will be removed from attribute storage. Since we use same name for content 
+            // and attribute files, this is most we can do here. Downside is that 
+            // Finder preferences for given folder are lost.
             throw new InvalidInputException( "Persisted attribute malformed!", e );
         }
     }
