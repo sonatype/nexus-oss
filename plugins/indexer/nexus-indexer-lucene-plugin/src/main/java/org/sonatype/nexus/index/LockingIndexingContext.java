@@ -15,6 +15,7 @@ package org.sonatype.nexus.index;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.memory.MemoryIndex;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.maven.index.artifact.GavCalculator;
@@ -42,7 +44,12 @@ class LockingIndexingContext
 
     private boolean closed;
 
-    private static IndexingContext EMPTY_CTX;
+    private static final IndexSearcher EMPTY_SEARCHER;
+
+    static
+    {
+        EMPTY_SEARCHER = new MemoryIndex().createSearcher();
+    }
 
     public LockingIndexingContext( IndexingContext context, Lock lock )
     {
@@ -123,7 +130,15 @@ class LockingIndexingContext
     public int getSize()
         throws IOException
     {
-        return context.getSize();
+        lock.lock();
+        try
+        {
+            return !isClosed() ? context.getSize() : 0;
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -131,7 +146,7 @@ class LockingIndexingContext
         throws IOException
     {
         lock.lock();
-        return ( isClosed() ? EMPTY_CTX : context ).acquireIndexSearcher();
+        return !isClosed() ? context.acquireIndexSearcher() : EMPTY_SEARCHER;
     }
 
     @Override
@@ -140,7 +155,10 @@ class LockingIndexingContext
     {
         try
         {
-            ( isClosed() ? EMPTY_CTX : context ).releaseIndexSearcher( s );
+            if ( !isClosed() )
+            {
+                context.releaseIndexSearcher( s );
+            }
         }
         finally
         {
@@ -263,7 +281,15 @@ class LockingIndexingContext
     public Set<String> getAllGroups()
         throws IOException
     {
-        return context.getAllGroups();
+        lock.lock();
+        try
+        {
+            return !isClosed() ? context.getAllGroups() : Collections.<String> emptySet();
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -277,7 +303,15 @@ class LockingIndexingContext
     public Set<String> getRootGroups()
         throws IOException
     {
-        return context.getRootGroups();
+        lock.lock();
+        try
+        {
+            return !isClosed()? context.getRootGroups(): Collections.<String>emptySet();
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
