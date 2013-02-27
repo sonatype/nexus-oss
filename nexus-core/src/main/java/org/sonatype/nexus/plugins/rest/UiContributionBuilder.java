@@ -65,11 +65,12 @@ public class UiContributionBuilder
     /**
      * Adds the default css dependency if it is available: static/js/$artifactId-all.css
      */
-    private void maybeAddDefaultCssDependency() {
-        final String path = getDefaultPath( "css", true );
-        if ( owner.getClass().getClassLoader().getResource( path ) != null ) {
-            // TODO: needs '..' prepended because requirejs is using 'nexus/js' as base path... pending file reorganization
-            withDependency( "css!../" + path );
+    private void maybeAddDefaultCssDependency()
+    {
+        final String path = getDefaultPath( "css", false );
+        if ( owner.getClass().getClassLoader().getResource( path ) != null )
+        {
+            withDependency( "css!" + path + getCacheBuster( path ) );
         }
     }
 
