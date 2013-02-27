@@ -49,13 +49,13 @@
     <script type="text/javascript" charset="utf-8">
         requirejs.config({
             baseUrl : 'js',
-            urlArgs : "cache=$nexusVersion"
+            urlArgs : "nexusVersion=$nexusVersion"
         });
 
         var initUI = function(require, files) {
             require(['require', 'extjs', 'Nexus/ui', 'Sonatype/all'], function(require, Ext, Nexus, Sonatype) {
                 var
-                        all = files.length;
+                        all = files.length + ${rJsContributions.size()};
                         loaded = 0;
 
                 function init() {
@@ -98,10 +98,8 @@
                     require([ js ], init, errorCallback);
                 });
 
-
                 ## for each r.js enabled plugin...
                 #foreach($rJs in $rJsContributions)
-                    /* $rJs */
                     var deps = ['require'];
                     ## ... construct preload/dependency array
                     #foreach($dependency in $rJs.getDependencies())
@@ -109,7 +107,7 @@
                     #end
                     ## ... and require the bootstrap module with the dependencies
                     require(deps, function(require) {
-                        require(['$rJs.getModule()'])
+                        require(['$rJs.getModule()'], init, errorCallback);
                     });
                 #end
             });
