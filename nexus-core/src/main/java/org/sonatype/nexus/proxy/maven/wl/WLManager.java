@@ -31,14 +31,26 @@ public interface WLManager
 {
     /**
      * Key that is put into {@link ResourceStoreRequest}'s context for prefix file related operations, to mark that the
-     * file operation is initiated by WL feature.
+     * file operation is initiated by WL feature. Only the presence (or no presence) of this key is used for flagging,
+     * the value mapped under this key is irrelevant.
      */
     String WL_INITIATED_FILE_OPERATION_FLAG_KEY = WLManager.class.getName() + ".fileOperation";
 
     /**
      * Key that is put into {@link ResourceStoreRequest}'s context when {@link ProxyRequestFilter} rejects a request.
+     * Only the presence (or no presence) of this key is used for flagging, the value mapped under this key is
+     * irrelevant.
      */
     String WL_REQUEST_REJECTED_FLAG_KEY = WLManager.class.getName() + ".requestRejected";
+
+    /**
+     * Key that when put into {@link ResourceStoreRequest}'s context, the given request becomes a
+     * "not a filtering subject". WL's {@link ProxyRequestFilter} will not interfere with that request, it will be not
+     * subject for filtering. It should be used sparingly, only in cases when you know that WL might interfere with your
+     * request, usually because of stale WL. Only the presence (or no presence) of this key is used for flagging, the
+     * value mapped under this key is irrelevant.
+     */
+    String WL_REQUEST_NFS_FLAG_KEY = WLManager.class.getName() + ".requestNfs";
 
     /**
      * Startup. This method should not be invoked by any code (maybe except in UTs).

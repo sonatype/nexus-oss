@@ -420,12 +420,16 @@ public abstract class AbstractMavenRepository
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         if ( !uid.getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
-            final boolean whitelistMatched = getProxyRequestFilter().allowed( this, request );
-            if ( !whitelistMatched )
+            // but filter it only if request is not marked as NFS
+            if ( !request.getRequestContext().containsKey( WLManager.WL_REQUEST_NFS_FLAG_KEY ) )
             {
-                getLogger().debug( "WL filter rejected remote request for path {} in {}.", request.getRequestPath(),
-                    RepositoryStringUtils.getHumanizedNameString( this ) );
-                return false;
+                final boolean whitelistMatched = getProxyRequestFilter().allowed( this, request );
+                if ( !whitelistMatched )
+                {
+                    getLogger().debug( "WL filter rejected remote request for path {} in {}.",
+                        request.getRequestPath(), RepositoryStringUtils.getHumanizedNameString( this ) );
+                    return false;
+                }
             }
         }
         return true;
