@@ -124,6 +124,9 @@ NX.define('Nexus.util.IconContainer', {
             config = config || {},
             icons;
 
+        // if we don't do that, all instances will use the same object from this prototype
+        self.icons = {};
+
         // apply defaults to configuration
         Ext.applyIf(config, {
             basePath: Sonatype.config.resourcePath + '/static/icons',
