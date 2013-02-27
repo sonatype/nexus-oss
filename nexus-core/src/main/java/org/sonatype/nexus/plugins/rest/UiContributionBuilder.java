@@ -86,7 +86,14 @@ public class UiContributionBuilder
 
     public UiContributionBuilder setDefaultModule()
     {
-        return boot( artifactId + "-boot" );
+        final String module = artifactId + "-boot";
+
+        if ( owner.getClass().getClassLoader().getResource( module + ".js" ) != null )
+        {
+            return boot( module );
+        }
+
+        return this;
     }
 
     @Override
@@ -98,7 +105,7 @@ public class UiContributionBuilder
     /**
      *
      * If no module is set, the builder will use "artifactId-boot" as a default
-     * module name.
+     * module name, if "artifactId-boot.js" is available.
      *
      * If no dependencies are set, the builder will add the default CSS dependency,
      * if it is available by Classloader resource lookup.
