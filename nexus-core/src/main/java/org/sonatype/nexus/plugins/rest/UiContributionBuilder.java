@@ -83,6 +83,11 @@ public class UiContributionBuilder
         return this;
     }
 
+    public UiContributionBuilder setDefaultModule()
+    {
+        return boot( artifactId + "-boot" );
+    }
+
     @Override
     public UiContributor.UiContribution build()
     {
@@ -93,6 +98,10 @@ public class UiContributionBuilder
     {
         // always add css dependency, also needed when debug is requested
         maybeAddDefaultCssDependency();
+        if ( module == null )
+        {
+            setDefaultModule();
+        }
 
         if ( !debug && dependencies.isEmpty() ) {
             withDefaultAggregateDependency();
