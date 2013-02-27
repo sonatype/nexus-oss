@@ -124,11 +124,22 @@ public abstract class AbstractUiContributionBuilder<T>
      * Returns the default relative url for the given extension.
      *
      * @param extension The file extension.
+     * @param bust Whether to append cachebuster parameters
      * @return A relative url of the form "static/$extension/$artifactId-all.$extension".
      */
-    protected String getDefaultPath( final String extension )
+    public String getDefaultPath( final String extension, final boolean bust )
     {
-        return String.format("static/%s/%s-all.%s", extension, artifactId, extension );
+        final String path = String.format( "static/%s/%s-all.%s", extension, artifactId, extension );
+        if ( bust )
+        {
+            return path + getCacheBuster( path );
+        }
+        return path;
+    }
+
+    public String getDefaultPath( final String extension )
+    {
+        return getDefaultPath( extension, true );
     }
 
     public abstract T build();

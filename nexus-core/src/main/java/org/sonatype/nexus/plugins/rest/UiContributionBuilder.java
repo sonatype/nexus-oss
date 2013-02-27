@@ -58,21 +58,27 @@ public class UiContributionBuilder
      */
     public UiContributionBuilder withDefaultAggregateDependency()
     {
-        return withDependency( getDefaultPath( "js" ) );
+        final String js = getDefaultPath( "js", true );
+        return withDependency( js );
     }
 
     /**
      * Adds the default css dependency if it is available: static/js/$artifactId-all.css
-     *
+     */
+    private void maybeAddDefaultCssDependency() {
+        final String path = getDefaultPath( "css", true );
+        if ( owner.getClass().getClassLoader().getResource( path ) != null ) {
+            // TODO: needs '..' prepended because requirejs is using 'nexus/js' as base path... pending file reorganization
+            withDependency( "css!../" + path );
+        }
+    }
+
+    /**
+     * Adds the default css dependency if it is available: static/js/$artifactId-all.css
      */
     public UiContributionBuilder withDefaultCssDependency()
     {
-        final String path = getDefaultPath( "css" );
-        if ( owner.getClass().getClassLoader().getResource( path ) != null ) {
-            // TODO: needs '..' prepended because requirejs is using 'nexus/js' as base path... pending file reorganization
-            return withDependency( "css!../" + path );
-        }
-
+        maybeAddDefaultCssDependency();
         return this;
     }
 
@@ -84,9 +90,13 @@ public class UiContributionBuilder
 
     public UiContributor.UiContribution build( boolean debug )
     {
+        // always add css dependency, also needed when debug is requested
+        maybeAddDefaultCssDependency();
+
         if ( !debug && dependencies.isEmpty() ) {
-            withDefaultAggregateDependency().withDefaultCssDependency();
+            withDefaultAggregateDependency();
         }
+
         return new UiContributor.UiContribution( module, dependencies );
     }
 }
