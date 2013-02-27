@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.maven.wl.discovery;
 
+import java.util.List;
+
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 
 /**
@@ -24,10 +26,20 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 public interface RemoteContentDiscoverer
 {
     /**
-     * Performs the discovery and returns the results.
+     * Performs the discovery using all available {@link RemoteStrategy} in sorted order, and returns the results.
      * 
      * @param mavenProxyRepository to discover remote content.
      * @return the result of discovery,
      */
     DiscoveryResult<MavenProxyRepository> discoverRemoteContent( MavenProxyRepository mavenProxyRepository );
+
+    /**
+     * Performs the discovery using the passed in {@link RemoteStrategy} as ordered in list, and returns the results.
+     * 
+     * @param mavenProxyRepository to discover remote content.
+     * @param remoteStrategies the remote strategies to use for discovery, must not be {@code null}.
+     * @return the result of discovery,
+     */
+    DiscoveryResult<MavenProxyRepository> discoverRemoteContent( MavenProxyRepository mavenProxyRepository,
+                                                                 final List<RemoteStrategy> remoteStrategies );
 }

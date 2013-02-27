@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -59,6 +60,7 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.wl.discovery.DiscoveryResult.Outcome;
 import org.sonatype.nexus.proxy.maven.wl.discovery.LocalContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
+import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.events.WLPublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.wl.events.WLUnpublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -105,6 +107,8 @@ public class WLManagerImpl
 
     private final RemoteContentDiscoverer remoteContentDiscoverer;
 
+    private final RemoteStrategy quickRemoteStrategy;
+
     private final EventDispatcher eventDispatcher;
 
     /**
@@ -131,13 +135,15 @@ public class WLManagerImpl
      * @param config
      * @param localContentDiscoverer
      * @param remoteContentDiscoverer
+     * @param quickRemoteStrategy
      */
     @Inject
     public WLManagerImpl( final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
                           final ApplicationConfiguration applicationConfiguration,
                           final RepositoryRegistry repositoryRegistry, final WLConfig config,
                           final LocalContentDiscoverer localContentDiscoverer,
-                          final RemoteContentDiscoverer remoteContentDiscoverer )
+                          final RemoteContentDiscoverer remoteContentDiscoverer,
+                          @Named( RemotePrefixFileStrategy.ID ) final RemoteStrategy quickRemoteStrategy )
     {
         this.eventBus = checkNotNull( eventBus );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
@@ -146,6 +152,7 @@ public class WLManagerImpl
         this.config = checkNotNull( config );
         this.localContentDiscoverer = checkNotNull( localContentDiscoverer );
         this.remoteContentDiscoverer = checkNotNull( remoteContentDiscoverer );
+        this.quickRemoteStrategy = checkNotNull( quickRemoteStrategy );
         this.executor =
             new ScheduledThreadPoolExecutor( 5, new NexusThreadFactory( "wl", "WL-Updater" ),
                 new ThreadPoolExecutor.AbortPolicy() );
@@ -347,9 +354,47 @@ public class WLManagerImpl
     }
 
     @Override
-    public void forceUpdateWhitelist( final MavenRepository mavenRepository )
+    public boolean forceUpdateWhitelist( final MavenRepository mavenRepository )
     {
-        doUpdateWhitelist( true, mavenRepository );
+        return doUpdateWhitelist( true, mavenRepository );
+    }
+
+    @Override
+    public void forceProxyQuickUpdateWhitelist( final MavenProxyRepository mavenProxyRepository )
+    {
+        try
+        {
+            getLogger().debug( "Quick updating WL of {}.",
+                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+            constrainedExecutor.cancelRunningWithKey( mavenProxyRepository.getId() );
+            final PrefixSource prefixSource =
+                updateProxyWhitelist( mavenProxyRepository, Collections.singletonList( quickRemoteStrategy ) );
+            if ( prefixSource != null )
+            {
+                getLogger().info( "Updated and published WL of {}.",
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                publish( mavenProxyRepository, prefixSource );
+            }
+            else
+            {
+                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+                unpublish( mavenProxyRepository );
+            }
+        }
+        catch ( final Exception e )
+        {
+            try
+            {
+                unpublish( mavenProxyRepository );
+            }
+            catch ( IOException ioe )
+            {
+                // silently
+            }
+            // propagate original exception
+            Throwables.propagate( e );
+        }
     }
 
     protected boolean doUpdateWhitelist( final boolean forced, final MavenRepository mavenRepository )
@@ -368,7 +413,7 @@ public class WLManagerImpl
                 getLogger().info( "Forced WL update on {} canceled currently running one.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
-            return true;
+            return canceledPreviousJob;
         }
         else
         {
@@ -390,15 +435,15 @@ public class WLManagerImpl
         final PrefixSource prefixSource;
         if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
         {
-            prefixSource = updateGroupWhitelist( mavenRepository.adaptToFacet( MavenGroupRepository.class ), notify );
+            prefixSource = updateGroupWhitelist( mavenRepository.adaptToFacet( MavenGroupRepository.class ) );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
-            prefixSource = updateProxyWhitelist( mavenRepository.adaptToFacet( MavenProxyRepository.class ), notify );
+            prefixSource = updateProxyWhitelist( mavenRepository.adaptToFacet( MavenProxyRepository.class ), null );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
-            prefixSource = updateHostedWhitelist( mavenRepository.adaptToFacet( MavenHostedRepository.class ), notify );
+            prefixSource = updateHostedWhitelist( mavenRepository.adaptToFacet( MavenHostedRepository.class ) );
         }
         else
         {
@@ -426,7 +471,8 @@ public class WLManagerImpl
         }
     }
 
-    protected PrefixSource updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository, final boolean notify )
+    protected PrefixSource updateProxyWhitelist( final MavenProxyRepository mavenProxyRepository,
+                                                 final List<RemoteStrategy> remoteStrategies )
         throws IOException
     {
         final LocalStatus localStatus = mavenProxyRepository.getLocalStatus();
@@ -447,8 +493,17 @@ public class WLManagerImpl
         final WLDiscoveryConfig config = getRemoteDiscoveryConfig( mavenProxyRepository );
         if ( config.isEnabled() )
         {
-            final DiscoveryResult<MavenProxyRepository> discoveryResult =
-                remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository );
+            final DiscoveryResult<MavenProxyRepository> discoveryResult;
+            if ( null == remoteStrategies )
+            {
+                discoveryResult = remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository );
+            }
+            else
+            {
+                discoveryResult =
+                    remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository, remoteStrategies );
+            }
+
             if ( discoveryResult.isSuccessful() )
             {
                 prefixSource = discoveryResult.getPrefixSource();
@@ -491,8 +546,7 @@ public class WLManagerImpl
         return prefixSource;
     }
 
-    protected PrefixSource updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository,
-                                                  final boolean notify )
+    protected PrefixSource updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository )
         throws IOException
     {
         final LocalStatus localStatus = mavenHostedRepository.getLocalStatus();
@@ -517,7 +571,7 @@ public class WLManagerImpl
         return prefixSource;
     }
 
-    protected PrefixSource updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository, final boolean notify )
+    protected PrefixSource updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository )
         throws IOException
     {
         final LocalStatus localStatus = mavenGroupRepository.getLocalStatus();

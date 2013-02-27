@@ -62,11 +62,18 @@ public class RemoteContentDiscovererImpl
     @Override
     public DiscoveryResult<MavenProxyRepository> discoverRemoteContent( final MavenProxyRepository mavenProxyRepository )
     {
-        final DiscoveryResult<MavenProxyRepository> discoveryResult =
-            new DiscoveryResult<MavenProxyRepository>( mavenProxyRepository );
         final ArrayList<RemoteStrategy> appliedStrategies = new ArrayList<RemoteStrategy>( remoteStrategies );
         Collections.sort( appliedStrategies, new PriorityOrderingComparator<RemoteStrategy>() );
-        for ( RemoteStrategy strategy : appliedStrategies )
+        return discoverRemoteContent( mavenProxyRepository, appliedStrategies );
+    }
+
+    @Override
+    public DiscoveryResult<MavenProxyRepository> discoverRemoteContent( final MavenProxyRepository mavenProxyRepository,
+                                                                        final List<RemoteStrategy> remoteStrategies )
+    {
+        final DiscoveryResult<MavenProxyRepository> discoveryResult =
+            new DiscoveryResult<MavenProxyRepository>( mavenProxyRepository );
+        for ( RemoteStrategy strategy : remoteStrategies )
         {
             getLogger().debug( "Discovery of {} with strategy {} attempted",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );

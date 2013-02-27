@@ -19,6 +19,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
 /**
  * WL Manager component.
@@ -78,8 +79,20 @@ public interface WLManager
      * this method will cancel any currently running updates on same repository.
      * 
      * @param mavenRepository
+     * @return {@code true} if another already running update was cancelled to execute this forced update.
      */
-    void forceUpdateWhitelist( MavenRepository mavenRepository );
+    boolean forceUpdateWhitelist( MavenRepository mavenRepository );
+
+    /**
+     * Special version of update of WL for given Maven2 proxy repository. This method will execute <b>synchronously</b>
+     * and doing "quick" update only (will never scrape, only will try prefix file fetch from remote). Usable in special
+     * cases when you know remote should have prefix file published, and you are interested in results immediately (or
+     * at least ASAP). Still, consider that this method does remote access (using {@link RemoteRepositoryStorage} of the
+     * given repository), hence, might have longer runtime (network latency, remote server load and such).
+     * 
+     * @param mavenProxyRepository
+     */
+    void forceProxyQuickUpdateWhitelist( MavenProxyRepository mavenProxyRepository );
 
     /**
      * Returns the WL status for given repository.

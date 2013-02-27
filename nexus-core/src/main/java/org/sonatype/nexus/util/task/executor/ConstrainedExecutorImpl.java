@@ -82,7 +82,20 @@ public class ConstrainedExecutorImpl
     @Override
     public synchronized boolean hasRunningWithKey( String key )
     {
+        checkNotNull( key );
         return currentlyRunningCancelableRunnables.containsKey( key );
+    }
+
+    @Override
+    public synchronized boolean cancelRunningWithKey( String key )
+    {
+        checkNotNull( key );
+        final CancelableRunnableWrapper oldCommand = currentlyRunningCancelableRunnables.get( key );
+        if ( oldCommand != null )
+        {
+            oldCommand.cancel();
+        }
+        return oldCommand != null;
     }
 
     @Override
@@ -107,16 +120,12 @@ public class ConstrainedExecutorImpl
     {
         checkNotNull( key );
         checkNotNull( command );
-        final CancelableRunnableWrapper oldCommand = currentlyRunningCancelableRunnables.get( key );
-        if ( oldCommand != null )
-        {
-            oldCommand.cancel();
-        }
+        final boolean canceledOldJob = cancelRunningWithKey( key );
         final CancelableRunnableWrapper wrappedCommand =
             new CancelableRunnableWrapper( this, key, getSemaphore( key ), command );
         currentlyRunningCancelableRunnables.put( key, wrappedCommand );
         executor.execute( wrappedCommand );
-        return oldCommand != null;
+        return canceledOldJob;
     }
 
     // ==
