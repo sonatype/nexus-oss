@@ -36,7 +36,8 @@ public class UiContributionBuilder
     }
 
     /**
-     * Sets the entry point to use.
+     * Sets the entry point to use. If no module is set, the builder will use "artifactId-boot" as a default
+     * module name.
      */
     public UiContributionBuilder boot( String module )
     {
@@ -94,6 +95,17 @@ public class UiContributionBuilder
         return build( false );
     }
 
+    /**
+     *
+     * If no module is set, the builder will use "artifactId-boot" as a default
+     * module name.
+     *
+     * If no dependencies are set, the builder will add the default CSS dependency,
+     * if it is available by Classloader resource lookup.
+     *
+     * If no dependencies are set, the builder will add the default JS dependency,
+     * unless the debug parameter is set to true.
+     */
     public UiContributor.UiContribution build( boolean debug )
     {
         if ( module == null )
