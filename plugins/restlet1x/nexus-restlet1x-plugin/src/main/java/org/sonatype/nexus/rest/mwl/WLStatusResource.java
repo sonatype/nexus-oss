@@ -112,7 +112,7 @@ public class WLStatusResource
         if ( PStatus.PUBLISHED == pstatus.getStatus() )
         {
             payload.setPublishedTimestamp( pstatus.getLastPublishedTimestamp() );
-            if ( pstatus.getLastPublishedFilePath() != null )
+            if ( mavenRepository.isExposed() && pstatus.getLastPublishedFilePath() != null )
             {
                 final String repositoryUrl = repositoryURLBuilder.getExposedRepositoryContentUrl( mavenRepository );
                 if ( repositoryUrl != null )
