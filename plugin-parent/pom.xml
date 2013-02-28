@@ -319,7 +319,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>1.0.0-SNAPSHOT</version>
+          <version>1.0.0</version>
           <configuration>
             <!-- 
                yuicompressor warns when code is not in a shape that's optimized for minifying. 
