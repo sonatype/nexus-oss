@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,6 +35,8 @@ import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.api.Behaviour;
@@ -98,6 +101,9 @@ public class AmazonS3IndexScraperTest
             + "<StorageClass>STANDARD</StorageClass>"//
             + "</Contents>"//
             + "</ListBucketResult>";
+
+    @Mock
+    private MavenProxyRepository mavenProxyRepository;
 
     private AmazonS3IndexScraper s3scraper;
 
@@ -187,7 +193,8 @@ public class AmazonS3IndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -216,7 +223,8 @@ public class AmazonS3IndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -245,7 +253,8 @@ public class AmazonS3IndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -275,7 +284,8 @@ public class AmazonS3IndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -304,7 +314,8 @@ public class AmazonS3IndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/release/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -333,7 +344,8 @@ public class AmazonS3IndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/release/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -357,7 +369,8 @@ public class AmazonS3IndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/release/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -381,7 +394,8 @@ public class AmazonS3IndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/release/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -409,7 +423,8 @@ public class AmazonS3IndexScraperTest
         final HttpGet get = new HttpGet( remoteUrl );
         final HttpResponse response = httpClient.execute( get );
         final Document document = Jsoup.parse( response.getEntity().getContent(), null, remoteUrl );
-        final ScrapeContext context = new ScrapeContext( httpClient, remoteUrl, 2 );
+        when( mavenProxyRepository.getRemoteUrl() ).thenReturn( remoteUrl );
+        final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
         final Page page = new Page( remoteUrl, response, document );
         s3scraper.scrape( context, page );
 

@@ -106,14 +106,14 @@ public class RemoteScrapeStrategy
         // get client configured in same way as proxy is using it
         final HttpClient httpClient =
             httpClientManager.create( mavenProxyRepository, mavenProxyRepository.getRemoteStorageContext() );
-        if ( isMarkedForNoScrape( httpClient, remoteRepositoryRootUrl ) )
+        final ScrapeContext context =
+            new ScrapeContext( mavenProxyRepository, httpClient, config.getRemoteScrapeDepth() );
+        if ( isMarkedForNoScrape( context ) )
         {
             getLogger().debug( "Remote {} marked as no-scrape, giving up.",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             throw new StrategyFailedException( "Remote forbids scraping, is flagged as \"no-scrape\"." );
         }
-        final ScrapeContext context =
-            new ScrapeContext( httpClient, remoteRepositoryRootUrl, config.getRemoteScrapeDepth() );
         final Page rootPage = Page.getPageFor( context, remoteRepositoryRootUrl );
         final ArrayList<Scraper> appliedScrapers = new ArrayList<Scraper>( scrapers );
         Collections.sort( appliedScrapers, new PriorityOrderingComparator<Scraper>() );
@@ -148,7 +148,7 @@ public class RemoteScrapeStrategy
 
     // ==
 
-    protected boolean isMarkedForNoScrape( final HttpClient httpClient, final String remoteRepositoryRootUrl )
+    protected boolean isMarkedForNoScrape( final ScrapeContext context )
         throws IOException
     {
         final List<String> noscrapeFlags = config.getRemoteNoScrapeFlagPaths();
@@ -158,12 +158,12 @@ public class RemoteScrapeStrategy
             {
                 noscrapeFlag = noscrapeFlag.substring( 1 );
             }
-            final String flagRemoteUrl = remoteRepositoryRootUrl + noscrapeFlag;
+            final String flagRemoteUrl = context.getRemoteRepositoryRootUrl() + noscrapeFlag;
             HttpResponse response = null;
             try
             {
                 final HttpHead head = new HttpHead( flagRemoteUrl );
-                response = httpClient.execute( head );
+                response = context.executeHttpRequest( head );
                 if ( response.getStatusLine().getStatusCode() > 199 && response.getStatusLine().getStatusCode() < 300 )
                 {
                     return true;

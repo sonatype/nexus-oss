@@ -14,8 +14,16 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.protocol.BasicHttpContext;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
+import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 
 /**
  * Request for scraping.
@@ -24,9 +32,11 @@ import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
  */
 public class ScrapeContext
 {
-    private final HttpClient httpClient;
-
+    private final MavenProxyRepository remoteRepository;
+    
     private final String remoteRepositoryRootUrl;
+
+    private final HttpClient httpClient;
 
     private final int scrapeDepth;
 
@@ -39,14 +49,16 @@ public class ScrapeContext
     /**
      * Constructor, none of the parameters might be {@code null}.
      * 
+     * @param remoteRepository
      * @param httpClient
-     * @param remoteRepositoryRootUrl
      * @param scrapeDepth
      */
-    public ScrapeContext( final HttpClient httpClient, final String remoteRepositoryRootUrl, final int scrapeDepth )
+    public ScrapeContext( final MavenProxyRepository remoteRepository, final HttpClient httpClient,
+                          final int scrapeDepth )
     {
+        this.remoteRepository = checkNotNull( remoteRepository );
+        this.remoteRepositoryRootUrl = checkNotNull( remoteRepository.getRemoteUrl() );
         this.httpClient = checkNotNull( httpClient );
-        this.remoteRepositoryRootUrl = checkNotNull( remoteRepositoryRootUrl );
         this.scrapeDepth = checkNotNull( scrapeDepth );
         this.stopped = false;
     }
@@ -120,13 +132,19 @@ public class ScrapeContext
     // ==
 
     /**
-     * Returns the {@link HttpClient} to use for remote requests.
+     * Executes a {@link HttpUriRequest} on behalf of this context.
      * 
-     * @return the HTTP client.
+     * @param httpRequest
+     * @return the {@link HttpResponse} of the request.
+     * @throws ClientProtocolException
+     * @throws IOException
      */
-    public HttpClient getHttpClient()
+    public HttpResponse executeHttpRequest( final HttpUriRequest httpRequest )
+        throws ClientProtocolException, IOException
     {
-        return httpClient;
+        final BasicHttpContext httpContext = new BasicHttpContext();
+        httpContext.setAttribute( HttpClientRemoteStorage.HTTP_CTX_KEY_REPOSITORY, remoteRepository );
+        return httpClient.execute( httpRequest, httpContext );
     }
 
     /**

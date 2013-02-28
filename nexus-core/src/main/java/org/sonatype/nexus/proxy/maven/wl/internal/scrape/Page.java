@@ -143,7 +143,7 @@ public class Page
         // TODO: detect redirects
         final HttpGet get = new HttpGet( url );
         LOG.debug( "Executing HTTP GET request against {}", url );
-        HttpResponse response = context.getHttpClient().execute( get );
+        final HttpResponse response = context.executeHttpRequest( get );
         try
         {
             if ( response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 499 )

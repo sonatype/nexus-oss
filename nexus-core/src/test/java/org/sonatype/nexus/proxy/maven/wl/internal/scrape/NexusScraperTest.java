@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,8 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.sisu.goodies.common.FormatTemplate;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
@@ -202,10 +205,8 @@ public class NexusScraperTest
         HOSTED, PROXY, GROUP, SHADOW;
     }
 
-    protected String _filterPort( int port, String body )
-    {
-        return body.replace( "", String.valueOf( port ) );
-    }
+    @Mock
+    private MavenProxyRepository mavenProxyRepository;
 
     protected String getRepositoryMetadataXml( final RemoteType remoteType )
     {
@@ -395,7 +396,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -422,7 +424,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -445,7 +448,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -468,7 +472,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -491,7 +496,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( false ) );
@@ -513,7 +519,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( false ) );
@@ -535,7 +542,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( false ) );
@@ -562,7 +570,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -589,7 +598,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -611,7 +621,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -633,7 +644,8 @@ public class NexusScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/nexus/content/repositories/central/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );

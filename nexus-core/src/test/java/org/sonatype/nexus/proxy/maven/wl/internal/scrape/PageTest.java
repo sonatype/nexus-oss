@@ -15,17 +15,25 @@ package org.sonatype.nexus.proxy.maven.wl.internal.scrape;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.when;
 
 import java.net.SocketException;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
 public class PageTest
+    extends TestSupport
 {
+    @Mock
+    private MavenProxyRepository mavenProxyRepository;
+
     @Test
     public void simpleCase()
         throws Exception
@@ -36,7 +44,8 @@ public class PageTest
         try
         {
             final String repoRootUrl = server.getUrl().toString() + "/foo/bar/";
-            final ScrapeContext context = new ScrapeContext( new DefaultHttpClient(), repoRootUrl, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRootUrl );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, new DefaultHttpClient(), 2 );
             final Page page = Page.getPageFor( context, repoRootUrl );
             assertThat( page.getUrl(), equalTo( repoRootUrl ) );
             assertThat( page.getHttpResponse().getStatusLine().getStatusCode(), equalTo( 200 ) );
@@ -57,7 +66,8 @@ public class PageTest
         try
         {
             final String repoRootUrl = server.getUrl().toString() + "/foo/bar/";
-            final ScrapeContext context = new ScrapeContext( new DefaultHttpClient(), repoRootUrl, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRootUrl );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, new DefaultHttpClient(), 2 );
             final Page page = Page.getPageFor( context, repoRootUrl );
             assertThat( page.getUrl(), equalTo( repoRootUrl ) );
             assertThat( page.getHttpResponse().getStatusLine().getStatusCode(), equalTo( 404 ) );
@@ -78,7 +88,8 @@ public class PageTest
         try
         {
             final String repoRootUrl = server.getUrl().toString() + "/foo/bar/";
-            final ScrapeContext context = new ScrapeContext( new DefaultHttpClient(), repoRootUrl, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRootUrl );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, new DefaultHttpClient(), 2 );
             final Page page = Page.getPageFor( context, repoRootUrl );
         }
         finally
@@ -102,7 +113,8 @@ public class PageTest
         {
             server.stop();
         }
-        final ScrapeContext context = new ScrapeContext( new DefaultHttpClient(), repoRootUrl, 2 );
+        when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRootUrl );
+        final ScrapeContext context = new ScrapeContext( mavenProxyRepository, new DefaultHttpClient(), 2 );
         final Page page = Page.getPageFor( context, repoRootUrl );
     }
 }

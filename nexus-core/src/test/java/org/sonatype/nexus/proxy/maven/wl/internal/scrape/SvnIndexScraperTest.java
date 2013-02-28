@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.internal.scrape.Page.UnexpectedPageResponse;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Server;
@@ -78,6 +81,9 @@ public class SvnIndexScraperTest
             + " <hr noshade><em><a href=\"http://code.google.com/\">Google Code</a> powered by <a href=\"http://subversion.apache.org/\">Subversion</a></em>\n"
             + "</body></html>";
 
+    @Mock
+    private MavenProxyRepository mavenProxyRepository;
+    
     private SvnIndexScraper svnScraper;
 
     @Before
@@ -196,7 +202,8 @@ public class SvnIndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/trunk/somerepo/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -223,7 +230,8 @@ public class SvnIndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/trunk/somerepo/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( false ) );
@@ -245,7 +253,8 @@ public class SvnIndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/trunk/somerepo/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( false ) );
@@ -267,7 +276,8 @@ public class SvnIndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/trunk/somerepo/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( false ) );
@@ -294,7 +304,8 @@ public class SvnIndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/trunk/somerepo/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -321,7 +332,8 @@ public class SvnIndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/trunk/somerepo/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -343,7 +355,8 @@ public class SvnIndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/trunk/somerepo/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
@@ -365,7 +378,8 @@ public class SvnIndexScraperTest
         {
             final HttpClient httpClient = new DefaultHttpClient();
             final String repoRoot = server.getUrl().toString() + "/trunk/somerepo/";
-            final ScrapeContext context = new ScrapeContext( httpClient, repoRoot, 2 );
+            when( mavenProxyRepository.getRemoteUrl() ).thenReturn( repoRoot );
+            final ScrapeContext context = new ScrapeContext( mavenProxyRepository, httpClient, 2 );
             final Page page = Page.getPageFor( context, repoRoot );
             getScraper().scrape( context, page );
             assertThat( context.isStopped(), is( true ) );
