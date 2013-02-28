@@ -44,6 +44,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
@@ -116,11 +117,6 @@ public class HttpClientRemoteStorage
      * Created items while retrieving, can be written.
      */
     private static final boolean CAN_WRITE = true;
-
-    /**
-     * Http context key of repository making a request.
-     */
-    public static final String HTTP_CTX_KEY_REPOSITORY = PROVIDER_STRING + ".repository";
 
     private final QueryStringBuilder queryStringBuilder;
 
@@ -493,7 +489,7 @@ public class HttpClientRemoteStorage
         try
         {
             final BasicHttpContext httpContext = new BasicHttpContext();
-            httpContext.setAttribute( HTTP_CTX_KEY_REPOSITORY, repository );
+            httpContext.setAttribute( Hc4Provider.HTTP_CTX_KEY_REPOSITORY, repository );
 
             httpResponse = httpClient.execute( httpRequest, httpContext );
             final int statusCode = httpResponse.getStatusLine().getStatusCode();

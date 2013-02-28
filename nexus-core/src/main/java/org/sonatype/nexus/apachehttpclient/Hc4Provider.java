@@ -13,7 +13,9 @@
 package org.sonatype.nexus.apachehttpclient;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -25,6 +27,19 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
  */
 public interface Hc4Provider
 {
+    /**
+     * HTTP context key of repository making a request. To be used with
+     * {@link HttpClient#execute(HttpUriRequest, HttpContext)} method. Example code snippet:
+     * 
+     * <pre>
+     * final HttpGet get = new HttpGet( proxyRepository.getRemoteUrl() );
+     * final BasicHttpContext httpContext = new BasicHttpContext();
+     * httpContext.setAttribute( HTTP_CTX_KEY_REPOSITORY, proxyRepository );
+     * final HttpResponse httpResponse = httpClient.execute( httpRequest, httpContext );
+     * </pre>
+     */
+    String HTTP_CTX_KEY_REPOSITORY = Hc4Provider.class.getName() + ".repository";
+
     /**
      * Returns a new pre-configured instance of Apache HttpClient4x. This call will assemble a new instance of client
      * per every invocation. Created instances should be kept only during request execution, and should not be kept for

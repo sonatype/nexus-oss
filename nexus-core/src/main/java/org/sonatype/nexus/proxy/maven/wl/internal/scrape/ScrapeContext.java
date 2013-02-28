@@ -21,9 +21,9 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.protocol.BasicHttpContext;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
-import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 
 /**
  * Request for scraping.
@@ -143,7 +143,7 @@ public class ScrapeContext
         throws ClientProtocolException, IOException
     {
         final BasicHttpContext httpContext = new BasicHttpContext();
-        httpContext.setAttribute( HttpClientRemoteStorage.HTTP_CTX_KEY_REPOSITORY, remoteRepository );
+        httpContext.setAttribute( Hc4Provider.HTTP_CTX_KEY_REPOSITORY, remoteRepository );
         return httpClient.execute( httpRequest, httpContext );
     }
 
