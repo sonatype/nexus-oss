@@ -28,15 +28,18 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public interface Hc4Provider
 {
     /**
-     * HTTP context key of repository making a request. To be used with
-     * {@link HttpClient#execute(HttpUriRequest, HttpContext)} method. Example code snippet:
+     * HTTP context key of (usually proxy) repository on who's behalf request is made. To be used with
+     * {@link HttpClient#execute(HttpUriRequest, HttpContext)} method of {@link HttpClient} instance got from this
+     * provider. Example code snippet:
      * 
      * <pre>
-     * final HttpGet get = new HttpGet( proxyRepository.getRemoteUrl() );
+     * final HttpGet httpRequest = new HttpGet( proxyRepository.getRemoteUrl() );
      * final BasicHttpContext httpContext = new BasicHttpContext();
      * httpContext.setAttribute( HTTP_CTX_KEY_REPOSITORY, proxyRepository );
      * final HttpResponse httpResponse = httpClient.execute( httpRequest, httpContext );
      * </pre>
+     * 
+     * @since 2.4
      */
     String HTTP_CTX_KEY_REPOSITORY = Hc4Provider.class.getName() + ".repository";
 

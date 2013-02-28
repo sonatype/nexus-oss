@@ -69,7 +69,7 @@ import com.google.common.eventbus.Subscribe;
 
 /**
  * Default implementation of {@link Hc4Provider}.
- *
+ * 
  * @author cstamas
  * @since 2.2
  */
@@ -127,8 +127,8 @@ public class Hc4ProviderImpl
     private static final long CONNECTION_POOL_TIMEOUT_DEFAULT = TimeUnit.SECONDS.toMillis( 30 );
 
     /**
-     * Key for customizing default (and max) keep alive duration when remote server does not state anything,
-     * or states some unreal high value. Value is milliseconds.
+     * Key for customizing default (and max) keep alive duration when remote server does not state anything, or states
+     * some unreal high value. Value is milliseconds.
      */
     private static final String KEEP_ALIVE_MAX_DURATION_KEY = "nexus.apacheHttpClient4x.keepAliveMaxDuration";
 
@@ -171,18 +171,18 @@ public class Hc4ProviderImpl
 
     /**
      * Constructor.
-     *
-     * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}.
-     * @param userAgentBuilder         UA builder component.
-     * @param eventBus                 the event multicaster
-     * @param jmxInstaller             installer to expose pool information over JMX.
+     * 
+     * @param applicationConfiguration the Nexus {@link ApplicationConfiguration}, must not be {@code null}.
+     * @param userAgentBuilder UA builder component, must not be {@code null}.
+     * @param eventBus the event bus, must not be {@code null}.
+     * @param jmxInstaller installer to expose pool information over JMX, must not be {@code null}.
+     * @param selectors list of {@link ClientConnectionOperatorSelector}, might be {@code null}.
      */
     @Inject
     public Hc4ProviderImpl( final ApplicationConfiguration applicationConfiguration,
-        final UserAgentBuilder userAgentBuilder,
-        final EventBus eventBus,
-        final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
-        final List<ClientConnectionOperatorSelector> selectors )
+                            final UserAgentBuilder userAgentBuilder, final EventBus eventBus,
+                            final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
+                            final List<ClientConnectionOperatorSelector> selectors )
     {
         this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
         this.userAgentBuilder = Preconditions.checkNotNull( userAgentBuilder );
@@ -203,7 +203,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool max size.
-     *
+     * 
      * @return pool max size
      */
     protected int getConnectionPoolMaxSize()
@@ -213,7 +213,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool size per route.
-     *
+     * 
      * @return pool per route size
      */
     protected int getConnectionPoolSize()
@@ -223,7 +223,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the connection pool idle (idle as unused but pooled) time in milliseconds.
-     *
+     * 
      * @return idle time in milliseconds.
      */
     protected long getConnectionPoolIdleTime()
@@ -233,7 +233,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the pool timeout in milliseconds.
-     *
+     * 
      * @return pool timeout in milliseconds.
      */
     protected long getConnectionPoolTimeout()
@@ -243,7 +243,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the maximum Keep-Alive duration in milliseconds.
-     *
+     * 
      * @return default Keep-Alive duration in milliseconds.
      */
     protected long getKeepAliveMaxDuration()
@@ -253,7 +253,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the connection timeout in milliseconds. The timeout until connection is established.
-     *
+     * 
      * @param context
      * @return the connection timeout in milliseconds.
      */
@@ -272,7 +272,7 @@ public class Hc4ProviderImpl
 
     /**
      * Returns the SO_SOCKET timeout in milliseconds. The timeout for waiting for data on established connection.
-     *
+     * 
      * @param context
      * @return the SO_SOCKET timeout in milliseconds.
      */
@@ -367,7 +367,7 @@ public class Hc4ProviderImpl
     }
 
     protected DefaultHttpClient createHttpClient( final RemoteStorageContext context,
-        final ClientConnectionManager clientConnectionManager )
+                                                  final ClientConnectionManager clientConnectionManager )
     {
         final DefaultHttpClient httpClient =
             new DefaultHttpClientImpl( clientConnectionManager, createHttpParams( context ) );
@@ -375,8 +375,7 @@ public class Hc4ProviderImpl
         configureProxy( httpClient, context.getRemoteProxySettings() );
         // obey the given retries count and apply it to client.
         final int retries =
-            context.getRemoteConnectionSettings() != null
-                ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
+            context.getRemoteConnectionSettings() != null ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
                 : 0;
         httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( retries, false ) );
         httpClient.setKeepAliveStrategy( new NexusConnectionKeepAliveStrategy( getKeepAliveMaxDuration() ) );
@@ -397,8 +396,7 @@ public class Hc4ProviderImpl
         return params;
     }
 
-    protected PoolingClientConnectionManager createClientConnectionManager(
-        final List<ClientConnectionOperatorSelector> selectors )
+    protected PoolingClientConnectionManager createClientConnectionManager( final List<ClientConnectionOperatorSelector> selectors )
         throws IllegalStateException
     {
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
@@ -426,7 +424,7 @@ public class Hc4ProviderImpl
     // ==
 
     protected void configureAuthentication( final DefaultHttpClient httpClient, final RemoteAuthenticationSettings ras,
-        final HttpHost proxyHost )
+                                            final HttpHost proxyHost )
     {
         if ( ras != null )
         {
@@ -451,15 +449,14 @@ public class Hc4ProviderImpl
                 authorisationPreference.add( 0, AuthPolicy.NTLM );
                 getLogger().info( "... {} authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain() );
                 credentials =
-                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(),
-                                       nras.getNtlmDomain() );
+                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain() );
             }
             else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
             {
                 final UsernamePasswordRemoteAuthenticationSettings uras =
                     (UsernamePasswordRemoteAuthenticationSettings) ras;
                 getLogger().info( "... {} authentication setup for remote storage with username '{}'", authScope,
-                                  uras.getUsername() );
+                    uras.getUsername() );
                 credentials = new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() );
             }
 
