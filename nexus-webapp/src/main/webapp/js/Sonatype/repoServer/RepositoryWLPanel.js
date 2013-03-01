@@ -51,7 +51,14 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
   },
 
   refreshContent : function() {
-    this.loadData();
+    var self = this;
+
+    self.actionMask = new Ext.LoadMask(self.el, {
+      msg : 'Loading...',
+      removeMask : true
+    });
+    self.actionMask.show();
+    self.loadData();
   },
 
   constructor : function(cfg) {
@@ -277,7 +284,8 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
     var
           self = this,
           mask = new Ext.LoadMask(this.el, {
-            msg : 'Disabling discovery...'
+            msg : 'Disabling discovery...',
+            removeMask : true
           });
     mask.show();
     Ext.Ajax.request({
@@ -290,8 +298,8 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
         }
       },
       callback : function() {
+        self.actionMask = mask;
         this.loadData();
-        mask.hide();
       },
       scope : this
     });
@@ -305,9 +313,11 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       interval = 24;
     }
 
-    var mask = new Ext.LoadMask(this.el, {
-      msg : 'Updating discovery...'
-    });
+    var
+          self = this,
+          mask = new Ext.LoadMask(this.el, {
+            msg : 'Updating discovery...'
+          });
     mask.show();
     Ext.Ajax.request({
       method : 'PUT',
@@ -319,10 +329,9 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
         }
       },
       callback : function() {
-        this.loadData();
-        mask.hide();
-      },
-      scope : this
+        self.actionMask = mask;
+        self.loadData();
+      }
     });
   },
 
@@ -330,27 +339,30 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
     var
           self = this,
           mask = new Ext.LoadMask(this.el, {
-      msg : 'Forcing discovery...'
-    });
+            msg : 'Forcing discovery...',
+            removeMask : true
+          });
 
     mask.show();
     Ext.Ajax.request({
       method : 'DELETE',
       url : this.resourceUrl.apply([this.payload.data.id]),
       callback : function() {
+        self.actionMask = mask;
         self.loadData();
-        mask.hide();
       },
       scope : this
     });
   },
   onActionComplete : function(form, action) {
+    var
+          self = this,
+          panel = action.options.fpanel,
+          tstampField = panel.find('name', 'discovery.discoveryLastRunTimestamp')[0];
+
     if (action.type === 'sonatypeLoad') {
       // @note: this is a work around to get proper use of the isDirty()
       // function of this field
-      var
-            panel = action.options.fpanel,
-            tstampField = panel.find('name', 'discovery.discoveryLastRunTimestamp')[0];
 
       if (panel.find('name', 'discovery.discoveryEnabled')[0].getValue() === 'true') {
         panel.find('name', 'discoveryFieldset')[0].expand();
@@ -370,6 +382,11 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       } else {
         tstampField.show();
       }
+    }
+
+    if ( self.actionMask !== undefined ) {
+      self.actionMask.hide();
+      self.actionMask = undefined;
     }
   }
 }, function() {
