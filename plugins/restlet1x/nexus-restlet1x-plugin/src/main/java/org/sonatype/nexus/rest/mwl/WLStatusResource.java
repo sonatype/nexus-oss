@@ -190,6 +190,10 @@ public class WLStatusResource
             // we spawned a background job, so say "okay, we accepted this, but come back later for results"
             response.setStatus( Status.SUCCESS_ACCEPTED );
         }
+        catch ( IllegalStateException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e );
+        }
         catch ( ResourceException e )
         {
             if ( Status.CLIENT_ERROR_BAD_REQUEST.getCode() == e.getStatus().getCode() )

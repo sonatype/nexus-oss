@@ -81,8 +81,11 @@ public interface WLManager
      * @return {@code true} if the update job was actually spawned, or {@code false} if not since one is already running
      *         for same repository. Still, will the spawned background job actually update or not depends on
      *         aforementioned configuration.
+     * @throws IllegalStateException when the passed in repository is for some reason not in state to be updated (out of
+     *             service, or in case of proxy, it's proxyMode does not allow remote access and such).
      */
-    boolean updateWhitelist( MavenRepository mavenRepository );
+    boolean updateWhitelist( MavenRepository mavenRepository )
+        throws IllegalStateException;
 
     /**
      * Executes an update of WL for given repository. In case of {@link MavenProxyRepository} instance, it might not do
@@ -92,8 +95,11 @@ public interface WLManager
      * 
      * @param mavenRepository
      * @return {@code true} if another already running update was cancelled to execute this forced update.
+     * @throws IllegalStateException when the passed in repository is for some reason not in state to be updated (out of
+     *             service, or in case of proxy, it's proxyMode does not allow remote access and such).
      */
-    boolean forceUpdateWhitelist( MavenRepository mavenRepository );
+    boolean forceUpdateWhitelist( MavenRepository mavenRepository )
+        throws IllegalStateException;
 
     /**
      * Special version of update of WL for given Maven2 proxy repository. This method will execute <b>synchronously</b>
@@ -103,8 +109,20 @@ public interface WLManager
      * given repository), hence, might have longer runtime (network latency, remote server load and such).
      * 
      * @param mavenProxyRepository
+     * @throws IllegalStateException when the passed in repository is for some reason not in state to be updated (out of
+     *             service, or in case of proxy, it's proxyMode does not allow remote access and such).
      */
-    void forceProxyQuickUpdateWhitelist( MavenProxyRepository mavenProxyRepository );
+    void forceProxyQuickUpdateWhitelist( MavenProxyRepository mavenProxyRepository )
+        throws IllegalStateException;
+
+    /**
+     * Queries is the given {@link MavenRepository} supported by WL feature (as not all Maven2 nor all
+     * {@link MavenRepository} implementations are supported! We exclude Maven1 layout and Maven2 shadow repositories).
+     * 
+     * @param mavenRepository
+     * @return {@code true} if WL feature is supported for given repository instance.
+     */
+    boolean isMavenRepositorySupported( final MavenRepository mavenRepository );
 
     /**
      * Returns the WL status for given repository.

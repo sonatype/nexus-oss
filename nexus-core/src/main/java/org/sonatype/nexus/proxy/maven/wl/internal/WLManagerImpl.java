@@ -46,6 +46,7 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLConfig;
@@ -179,7 +180,7 @@ public class WLManagerImpl
             initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
             for ( MavenRepository mavenRepository : initableRepositories )
             {
-                if ( Maven2ContentClass.ID.equals( mavenRepository.getRepositoryContentClass().getId() ) )
+                if ( isMavenRepositorySupported( mavenRepository ) )
                 {
                     if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
                     {
@@ -286,7 +287,15 @@ public class WLManagerImpl
             repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class );
         for ( MavenProxyRepository mavenProxyRepository : mavenProxyRepositories )
         {
-            mayUpdateProxyWhitelist( mavenProxyRepository );
+            try
+            {
+                mayUpdateProxyWhitelist( mavenProxyRepository );
+            }
+            catch ( IllegalStateException e )
+            {
+                // just neglect it and continue, this one might be auto blocked if proxy or put out of service
+                getLogger().trace( "Proxy repository {} is not in state to be updated", mavenProxyRepository.getId() );
+            }
         }
     }
 
@@ -297,8 +306,10 @@ public class WLManagerImpl
      * @param mavenProxyRepository
      * @return {@code true} if update has been spawned, {@code false} if no update needed (WL is up to date or remote
      *         discovery is disable for repository).
+     * @throws IllegalStateException see {@link #updateWhitelist(MavenRepository)}.
      */
     protected boolean mayUpdateProxyWhitelist( final MavenProxyRepository mavenProxyRepository )
+        throws IllegalStateException
     {
         final WLDiscoveryStatus discoveryStatus = getStatusFor( mavenProxyRepository ).getDiscoveryStatus();
         if ( discoveryStatus.getStatus().isEnabled() )
@@ -349,19 +360,23 @@ public class WLManagerImpl
 
     @Override
     public boolean updateWhitelist( final MavenRepository mavenRepository )
+        throws IllegalStateException
     {
         return doUpdateWhitelist( false, mavenRepository );
     }
 
     @Override
     public boolean forceUpdateWhitelist( final MavenRepository mavenRepository )
+        throws IllegalStateException
     {
         return doUpdateWhitelist( true, mavenRepository );
     }
 
     @Override
     public void forceProxyQuickUpdateWhitelist( final MavenProxyRepository mavenProxyRepository )
+        throws IllegalStateException
     {
+        checkUpdateConditions( mavenProxyRepository );
         try
         {
             getLogger().debug( "Quick updating WL of {}.",
@@ -397,8 +412,67 @@ public class WLManagerImpl
         }
     }
 
-    protected boolean doUpdateWhitelist( final boolean forced, final MavenRepository mavenRepository )
+    @Override
+    public boolean isMavenRepositorySupported( final MavenRepository mavenRepository )
+        throws IllegalStateException
     {
+        final MavenShadowRepository mavenShadowRepository = mavenRepository.adaptToFacet( MavenShadowRepository.class );
+        if ( mavenShadowRepository != null )
+        {
+            return false; // shadows unsupported
+        }
+        if ( !Maven2ContentClass.ID.equals( mavenRepository.getRepositoryContentClass().getId() ) )
+        {
+            return false; // maven2 layout support only, no maven1 support
+        }
+        return true;
+    }
+
+    protected boolean isMavenRepositoryUpdateable( final MavenRepository mavenRepository )
+        throws IllegalStateException
+    {
+        if ( !isMavenRepositorySupported( mavenRepository ) )
+        {
+            return false;
+        }
+        final LocalStatus localStatus = mavenRepository.getLocalStatus();
+        if ( !localStatus.shouldServiceRequest() )
+        {
+            return false; // out of service
+        }
+        final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
+        if ( mavenProxyRepository != null )
+        {
+            final ProxyMode proxyMode = mavenProxyRepository.getProxyMode();
+            if ( !proxyMode.shouldProxy() )
+            {
+                return false; // proxy mode != ALLOW
+            }
+        }
+        return true;
+    }
+
+    protected void checkUpdateConditions( final MavenRepository mavenRepository )
+        throws IllegalStateException
+    {
+        if ( !isMavenRepositorySupported( mavenRepository ) )
+        {
+            throw new IllegalStateException( "Maven repository "
+                + RepositoryStringUtils.getHumanizedNameString( mavenRepository )
+                + " not supported by WL feature (only Maven2 hosted, proxy and group repositories are supported)." );
+        }
+        if ( isMavenRepositoryUpdateable( mavenRepository ) )
+        {
+            throw new IllegalStateException( "Maven repository "
+                + RepositoryStringUtils.getHumanizedNameString( mavenRepository )
+                + " not in state to be updated (either out of service or if proxy, remote access not allowed)." );
+        }
+    }
+
+    protected boolean doUpdateWhitelist( final boolean forced, final MavenRepository mavenRepository )
+        throws IllegalStateException
+    {
+        checkUpdateConditions( mavenRepository );
         final WLUpdateRepositoryRunnable updateRepositoryJob =
             new WLUpdateRepositoryRunnable( new LoggingProgressListener( getLogger() ), applicationStatusSource, this,
                 mavenRepository );
@@ -475,18 +549,11 @@ public class WLManagerImpl
                                                  final List<RemoteStrategy> remoteStrategies )
         throws IOException
     {
-        final LocalStatus localStatus = mavenProxyRepository.getLocalStatus();
-        if ( !localStatus.shouldServiceRequest() )
+        if ( !isMavenRepositoryUpdateable( mavenProxyRepository ) )
         {
-            getLogger().debug( "Proxy repository {} is out of service, not updating WL.",
+            getLogger().debug(
+                "Proxy repository {} is not updateable (is out of service or proxying is not enabled on it), not updating WL.",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
-            return null;
-        }
-        final ProxyMode proxyMode = mavenProxyRepository.getProxyMode();
-        if ( !proxyMode.shouldProxy() )
-        {
-            getLogger().debug( "Proxy repository {} is in ProxyMode={}, not updating WL.",
-                RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), proxyMode );
             return null;
         }
         PrefixSource prefixSource = null;
@@ -549,8 +616,7 @@ public class WLManagerImpl
     protected PrefixSource updateHostedWhitelist( final MavenHostedRepository mavenHostedRepository )
         throws IOException
     {
-        final LocalStatus localStatus = mavenHostedRepository.getLocalStatus();
-        if ( !localStatus.shouldServiceRequest() )
+        if ( !isMavenRepositoryUpdateable( mavenHostedRepository ) )
         {
             getLogger().debug( "Hosted repository {} is out of service, not updating WL.",
                 RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
@@ -574,8 +640,7 @@ public class WLManagerImpl
     protected PrefixSource updateGroupWhitelist( final MavenGroupRepository mavenGroupRepository )
         throws IOException
     {
-        final LocalStatus localStatus = mavenGroupRepository.getLocalStatus();
-        if ( !localStatus.shouldServiceRequest() )
+        if ( !isMavenRepositoryUpdateable( mavenGroupRepository ) )
         {
             getLogger().debug( "Group repository {} is out of service, not updating WL.",
                 RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ) );
@@ -637,7 +702,7 @@ public class WLManagerImpl
         if ( !publishedEntrySource.exists() )
         {
             final String message;
-            if ( Maven2ContentClass.ID.equals( mavenRepository.getRepositoryContentClass().getId() ) )
+            if ( isMavenRepositorySupported( mavenRepository ) )
             {
                 if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
                 {

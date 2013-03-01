@@ -18,10 +18,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 
 /**
@@ -70,15 +68,10 @@ public abstract class WLResourceSupport
             final T mavenRepository = repository.adaptToFacet( clazz );
             if ( mavenRepository != null )
             {
-                if ( !Maven2ContentClass.ID.equals( mavenRepository.getRepositoryContentClass().getId() ) )
+                if ( !wlManager.isMavenRepositorySupported( mavenRepository ) )
                 {
                     throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID=\""
-                        + repositoryId + "\" does not have the required format (maven2)." );
-                }
-                if ( mavenRepository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
-                {
-                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID=\""
-                        + repositoryId + "\" is not a required type (hosted, proxy or group)." );
+                        + repositoryId + "\" unsupported!" );
                 }
                 return mavenRepository;
             }
