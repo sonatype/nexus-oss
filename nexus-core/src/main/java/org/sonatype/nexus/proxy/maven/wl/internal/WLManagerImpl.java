@@ -647,7 +647,7 @@ public class WLManagerImpl
                 {
                     if ( remoteDiscoveryEnabled )
                     {
-                        message = "Unable to discover remote content."; // or in progress!
+                        message = "Discovery in progress or unable to discover remote content (see discovery status).";
                     }
                     else
                     {
@@ -689,6 +689,11 @@ public class WLManagerImpl
             if ( !remoteDiscoveryEnabled )
             {
                 discoveryStatus = new WLDiscoveryStatus( DStatus.DISABLED );
+            }
+            else if ( constrainedExecutor.hasRunningWithKey( mavenProxyRepository.getId() ) )
+            {
+                // still running or never run yet
+                discoveryStatus = new WLDiscoveryStatus( DStatus.ENABLED );
             }
             else
             {
