@@ -372,16 +372,10 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       panel.submitDiscoverySetting = true;
 
       // FIXME this does not change the height of the fieldset
-      if (panel.publishedStatus === -1) {
-        panel.find('xtype', 'container')[0].hide();
-        panel.find('name', 'publishedTimestamp')[0].hide();
-      }
+      panel.find('xtype', 'container')[0].setVisible(panel.publishedStatus !== -1);
+      panel.find('name', 'publishedTimestamp')[0].setVisible(panel.publishedStatus !== -1);
 
-      if (panel.discoveryStatus === 0) {
-        tstampField.hide();
-      } else {
-        tstampField.show();
-      }
+      tstampField.setVisible(panel.discoveryStatus !== 0);
     }
 
     if ( self.actionMask !== undefined ) {
