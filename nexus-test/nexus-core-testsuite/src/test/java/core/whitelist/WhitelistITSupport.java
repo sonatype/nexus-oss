@@ -12,9 +12,24 @@
  */
 package core.whitelist;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Whitelist;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
+
+import com.google.common.io.Closeables;
+
 import core.NexusCoreITSupport;
 
 /**
@@ -66,4 +81,56 @@ public abstract class WhitelistITSupport
             status = whitelist().getWhitelistStatus( proxyRepositoryId );
         }
     }
+
+    /**
+     * Does HTTP GET against given URL.
+     * 
+     * @param url
+     * @return
+     * @throws IOException
+     */
+    protected HttpResponse executeGet( final String url )
+        throws IOException
+    {
+        InputStream entityStream = null;
+        try
+        {
+            final HttpClient httpClient = new DefaultHttpClient();
+            final HttpGet get = new HttpGet( url );
+            final HttpResponse httpResponse = httpClient.execute( get );
+            return httpResponse;
+        }
+        catch ( IOException e )
+        {
+            Closeables.closeQuietly( entityStream );
+            throw e;
+        }
+    }
+
+    /**
+     * Fetches file from given URL.
+     * 
+     * @param url
+     * @return
+     * @throws IOException
+     */
+    protected InputStream getPrefixFileFrom( final String url )
+        throws IOException
+    {
+        InputStream entityStream = null;
+        try
+        {
+            final HttpResponse httpResponse = executeGet( url );
+            assertThat( httpResponse.getStatusLine().getStatusCode(), equalTo( 200 ) );
+            assertThat( httpResponse.getEntity(), is( notNullValue() ) );
+            entityStream = httpResponse.getEntity().getContent();
+            return entityStream;
+        }
+        catch ( IOException e )
+        {
+            Closeables.closeQuietly( entityStream );
+            throw e;
+        }
+    }
+
 }

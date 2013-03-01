@@ -23,10 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,34 +69,6 @@ public class WhitelistSanityIT
         // we lessen the throttling as otherwise this test would run even longer
         return super.configureNexus( configuration ).setSystemProperty(
             "org.sonatype.nexus.proxy.maven.wl.internal.scrape.Scraper.pageSleepTimeMillis", "50" );
-    }
-
-    /**
-     * Fetches prefix file from given URL.
-     * 
-     * @param url
-     * @return
-     * @throws IOException
-     */
-    protected InputStream getPrefixFileFrom( final String url )
-        throws IOException
-    {
-        InputStream entityStream = null;
-        try
-        {
-            final HttpClient httpClient = new DefaultHttpClient();
-            final HttpGet get = new HttpGet( url );
-            final HttpResponse httpResponse = httpClient.execute( get );
-            assertThat( httpResponse.getStatusLine().getStatusCode(), equalTo( 200 ) );
-            assertThat( httpResponse.getEntity(), is( notNullValue() ) );
-            entityStream = httpResponse.getEntity().getContent();
-            return entityStream;
-        }
-        catch ( IOException e )
-        {
-            Closeables.closeQuietly( entityStream );
-            throw e;
-        }
     }
 
     @Before
