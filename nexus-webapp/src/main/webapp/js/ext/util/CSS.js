@@ -15,8 +15,7 @@ define('ext/util/CSS', ['extjs'], function(Ext) {
   var origFn = Ext.util.CSS.createStyleSheet;
   Ext.util.CSS.createStyleSheet = function(cssText, id) {
     // HACK
-    // IE9 is apparently doing "the right thing" in some circumstances. If original function fails,
-    // retry with the generic approach.
+    // IE9 is apparently doing "the right thing", so original function would fail with it's exception for Ext.isIE
     if (Ext.isIE9) {
       // COPYPASTED FROM EXTJS 3.4.1
       var ss, head = document.getElementsByTagName("head")[0], rules = document.createElement("style");
