@@ -64,20 +64,20 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
 
     var
           self = this,
+          payload = cfg.payload,
           subjectIsNotM2Proxy = cfg.payload.data.repoType !== 'proxy' || cfg.payload.data.format !== 'maven2',
           defaultConfig = {
             frame : true,
             autoScroll : true,
             readOnly : true, // don't want save/cancel buttons
-            url : this.resourceUrl.apply([cfg.payload.data.id])
+            url : self.resourceUrl.apply([cfg.payload.data.id])
           };
 
-    var payload = cfg.payload;
 
-    this.payload = {
+    self.payload = {
       data : {
         id : cfg.payload.data.id,
-        resourceURI : this.resourceUrl.apply([cfg.payload.data.id])
+        resourceURI : self.resourceUrl.apply([cfg.payload.data.id])
       }
     };
 
@@ -86,7 +86,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
 
     Ext.apply(this, cfg, defaultConfig);
 
-    this.dataModifiers = {
+    self.dataModifiers = {
       load : {
         'publishedStatus' : function(value) {
           self.publishedStatus = value;
@@ -107,7 +107,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       }
     };
 
-    this.items = [
+    self.items = [
       {
         xtype : 'fieldset',
         title : 'Publishing',
@@ -222,7 +222,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
             triggerAction : 'all',
             typeAhead : true,
             listeners : {
-              select : function(combo, record, index) {
+              select : function(combo) {
                 this.enableDiscovery(parseInt(combo.getValue(), 10));
               },
               scope : this
@@ -240,9 +240,9 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       }
     ];
 
-    Sonatype.repoServer.RepositoryWLPanel.superclass.constructor.apply(this, arguments);
+    Sonatype.repoServer.RepositoryWLPanel.superclass.constructor.apply(self, arguments);
 
-    this.on('actioncomplete', this.onActionComplete);
+    self.on('actioncomplete', self.onActionComplete);
   },
 
   enableDiscoveryHandler : function(checked) {
