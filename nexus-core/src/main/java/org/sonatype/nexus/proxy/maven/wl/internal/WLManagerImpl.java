@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.nio.channels.IllegalSelectorException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -236,7 +235,7 @@ public class WLManagerImpl
                 // good, we assume is up to date, which should be unless user tampered with it
                 // in that case, just delete it + update and should be fixed.
                 publish( mavenRepository, prefixSource );
-                getLogger().info( "Existing WL of {} initialized.",
+                getLogger().info( "Existing white-list of {} initialized.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
             else
@@ -247,19 +246,19 @@ public class WLManagerImpl
                 if ( doUpdateIfNeeded )
                 {
                     updateWhitelist( mavenRepository );
-                    getLogger().info( "Updating WL of {}, it does not exists yet.",
+                    getLogger().info( "Updating white-list of {}, it does not exists yet.",
                         RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 }
                 else
                 {
-                    getLogger().info( "WL of {} not exists yet, marked for noscrape.",
+                    getLogger().info( "White-list of {} not exists yet, marked for noscrape.",
                         RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 }
             }
         }
         catch ( Exception e )
         {
-            getLogger().warn( "Problem during WL update of {}",
+            getLogger().warn( "Problem during white-list update of {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
             try
             {
@@ -347,7 +346,8 @@ public class WLManagerImpl
         }
         else
         {
-            getLogger().debug( "Proxy repository {} has remote discovery disabled, not updating it.",
+            getLogger().info(
+                "Proxy repository {} white-list update requested, but it's remote discovery is disabled, not updating it.",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         }
         return false;
@@ -381,13 +381,13 @@ public class WLManagerImpl
                 updateProxyWhitelist( mavenProxyRepository, Collections.singletonList( quickRemoteStrategy ) );
             if ( prefixSource != null )
             {
-                getLogger().info( "Updated and published WL of {}.",
+                getLogger().info( "Updated and published white-list of {}.",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 publish( mavenProxyRepository, prefixSource );
             }
             else
             {
-                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
+                getLogger().info( "Unpublished white-list of {} (and is marked for noscrape).",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 unpublish( mavenProxyRepository );
             }
@@ -479,7 +479,7 @@ public class WLManagerImpl
             {
                 // this is okay, as forced happens rarely, currently only when proxy repo changes remoteURL
                 // (reconfiguration happens)
-                getLogger().info( "Forced WL update on {} canceled currently running one.",
+                getLogger().debug( "Forced white-list update on {} canceled currently running discovery.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
             return canceledPreviousJob;
@@ -516,7 +516,7 @@ public class WLManagerImpl
         }
         else
         {
-            getLogger().info( "Repository {} not supported by WL, not updating it.",
+            getLogger().info( "Repository {} not supported by white-list feature, not updating it.",
                 RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ) );
             return;
         }
@@ -524,7 +524,7 @@ public class WLManagerImpl
         {
             if ( notify )
             {
-                getLogger().info( "Updated and published WL of {}.",
+                getLogger().info( "Updated and published white-list of {}.",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
             publish( mavenRepository, prefixSource );
@@ -533,7 +533,7 @@ public class WLManagerImpl
         {
             if ( notify )
             {
-                getLogger().info( "Unpublished WL of {} (and is marked for noscrape).",
+                getLogger().info( "Unpublished white-list of {} (and is marked for noscrape).",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
             unpublish( mavenRepository );
