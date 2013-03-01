@@ -126,6 +126,17 @@ public class RemotePrefixFileStrategy
         final ResourceStoreRequest request = new ResourceStoreRequest( path );
         request.getRequestContext().put( WLManager.WL_INITIATED_FILE_OPERATION_FLAG_KEY, Boolean.TRUE );
         request.setRequestRemoteOnly( true );
+
+        // check for remote presence, as fetching with setRequestRemoteOnly has a side effect of
+        // DELETING the file from local cache if not present remotely. In this case, prefix
+        // file (on default location) obviously originates from scrape, so we should not delete it.
+        final boolean presentRemotely =
+            mavenProxyRepository.getRemoteStorage().containsItem( mavenProxyRepository, request );
+        if ( !presentRemotely )
+        {
+            return null;
+        }
+
         mavenProxyRepository.removeFromNotFoundCache( request );
         try
         {
