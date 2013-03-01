@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.Timeout;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
+import org.sonatype.nexus.client.core.subsystem.repository.ProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.whitelist.DiscoveryConfiguration;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
@@ -124,5 +125,33 @@ public class WhitelistSmokeIT
     public void checkCentralM1ShadowHasNoDiscoveryConfiguration()
     {
         final DiscoveryConfiguration releasesConfiguration = whitelist().getDiscoveryConfigurationFor( "central-m1" );
+    }
+
+    @Test( expected = NexusClientBadRequestException.class )
+    public void checkDiscoveryOnOutOfServiceRepository()
+    {
+        try
+        {
+            repositories().get( "central" ).putOutOfService().save();
+            whitelist().updateWhitelist( "central" );
+        }
+        finally
+        {
+            repositories().get( "central" ).putInService().save();
+        }
+    }
+
+    @Test( expected = NexusClientBadRequestException.class )
+    public void checkDiscoveryOnBlockedProxyRepository()
+    {
+        try
+        {
+            repositories().get( ProxyRepository.class, "central" ).block().save();
+            whitelist().updateWhitelist( "central" );
+        }
+        finally
+        {
+            repositories().get( ProxyRepository.class, "central" ).unblock().save();
+        }
     }
 }
