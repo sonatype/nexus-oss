@@ -26,6 +26,7 @@ import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
+
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -45,48 +46,124 @@ public class JerseyContent
         super( nexusClient );
     }
 
+    protected String toUri( final Location location, final Directive directive )
+    {
+        String uri = CONTENT_PREFIX + location.toContentPath();
+        if ( directive != null )
+        {
+            switch ( directive )
+            {
+                case LOCAL_ONLY:
+                    uri += "?isLocal";
+                    break;
+                case REMOTE_ONLY:
+                    uri += "?isRemote";
+                    break;
+                case GROUP_ONLY:
+                    uri += "?asGroupOnly";
+                    break;
+                case AS_EXPIRED:
+                    uri += "?asExpired";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return uri;
+    }
+
+    @Override
+    public boolean exists( final Location location )
+    {
+        return exists( toUri( location, null ) );
+    }
+
+    @Override
+    public boolean existsWith( final Location location, final Directive directive )
+    {
+        return exists( toUri( location, directive ) );
+    }
+
+    protected boolean exists( final String uri )
+    {
+        try
+        {
+            final ClientResponse response = getNexusClient().uri( uri ).head();
+            if ( !ClientResponse.Status.OK.equals( response.getClientResponseStatus() ) )
+            {
+                if ( ClientResponse.Status.NOT_FOUND.equals( response.getClientResponseStatus() ) )
+                {
+                    return false;
+                }
+
+                throw getNexusClient().convert( new ContextAwareUniformInterfaceException( response )
+                {
+                    @Override
+                    public String getMessage( final int status )
+                    {
+                        if ( status == Response.Status.NOT_FOUND.getStatusCode() )
+                        {
+                            return String.format( "Inexistent path: %s", uri );
+                        }
+                        return null;
+                    }
+                } );
+            }
+            return true;
+        }
+        catch ( ClientHandlerException e )
+        {
+            throw getNexusClient().convert( e );
+        }
+    }
+
     @Override
     public void download( final Location location, final File target )
+        throws IOException
+    {
+        download( toUri( location, null ), target );
+    }
+
+    @Override
+    public void downloadWith( final Location location, final Directive directive, final File target )
+        throws IOException
+    {
+        download( toUri( location, directive ), target );
+    }
+
+    protected void download( final String uri, final File target )
         throws IOException
     {
         if ( !target.exists() )
         {
             final File targetDir = target.getParentFile();
-            checkState(
-                ( targetDir.exists() || targetDir.mkdirs() ) && targetDir.isDirectory(),
-                "Directory '%s' does not exist and could not be created", targetDir.getAbsolutePath()
-            );
+            checkState( ( targetDir.exists() || targetDir.mkdirs() ) && targetDir.isDirectory(),
+                "Directory '%s' does not exist and could not be created", targetDir.getAbsolutePath() );
         }
         else
         {
-            checkState(
-                target.isFile() && target.canWrite(),
-                "File '%s' is not a file or could not be written", target.getAbsolutePath()
-            );
+            checkState( target.isFile() && target.canWrite(), "File '%s' is not a file or could not be written",
+                target.getAbsolutePath() );
         }
 
         try
         {
-            final ClientResponse response = getNexusClient()
-                .uri( CONTENT_PREFIX + location.toContentPath() )
-                .get( ClientResponse.class );
+            final ClientResponse response = getNexusClient().uri( uri ).get( ClientResponse.class );
 
-            if(!ClientResponse.Status.OK.equals( response.getClientResponseStatus() ))
+            if ( !ClientResponse.Status.OK.equals( response.getClientResponseStatus() ) )
             {
-                throw getNexusClient().convert(
-                    new ContextAwareUniformInterfaceException( response )
+                throw getNexusClient().convert( new ContextAwareUniformInterfaceException( response )
+                {
+                    @Override
+                    public String getMessage( final int status )
                     {
-                        @Override
-                        public String getMessage( final int status )
+                        if ( status == Response.Status.NOT_FOUND.getStatusCode() )
                         {
-                            if ( status == Response.Status.NOT_FOUND.getStatusCode() )
-                            {
-                                return String.format( "Inexistent path: %s", location );
-                            }
-                            return null;
+                            return String.format( "Inexistent path: %s", uri );
                         }
+                        return null;
                     }
-                );
+                } );
             }
 
             FileOutputStream fos = null;
@@ -113,26 +190,22 @@ public class JerseyContent
     {
         try
         {
-            getNexusClient()
-                .uri( CONTENT_PREFIX + location.toContentPath() )
-                .put( target );
+            getNexusClient().uri( CONTENT_PREFIX + location.toContentPath() ).put( target );
         }
         catch ( UniformInterfaceException e )
         {
-            throw getNexusClient().convert(
-                new ContextAwareUniformInterfaceException( e.getResponse() )
+            throw getNexusClient().convert( new ContextAwareUniformInterfaceException( e.getResponse() )
+            {
+                @Override
+                public String getMessage( final int status )
                 {
-                    @Override
-                    public String getMessage( final int status )
+                    if ( status == Response.Status.NOT_FOUND.getStatusCode() )
                     {
-                        if ( status == Response.Status.NOT_FOUND.getStatusCode() )
-                        {
-                            return String.format( "Inexistent path: %s", location );
-                        }
-                        return null;
+                        return String.format( "Inexistent path: %s", location );
                     }
+                    return null;
                 }
-            );
+            } );
         }
         catch ( ClientHandlerException e )
         {
@@ -146,26 +219,22 @@ public class JerseyContent
     {
         try
         {
-            getNexusClient()
-                .uri( CONTENT_PREFIX + location.toContentPath() )
-                .delete();
+            getNexusClient().uri( CONTENT_PREFIX + location.toContentPath() ).delete();
         }
         catch ( UniformInterfaceException e )
         {
-            throw getNexusClient().convert(
-                new ContextAwareUniformInterfaceException( e.getResponse() )
+            throw getNexusClient().convert( new ContextAwareUniformInterfaceException( e.getResponse() )
+            {
+                @Override
+                public String getMessage( final int status )
                 {
-                    @Override
-                    public String getMessage( final int status )
+                    if ( status == Response.Status.NOT_FOUND.getStatusCode() )
                     {
-                        if ( status == Response.Status.NOT_FOUND.getStatusCode() )
-                        {
-                            return String.format( "Inexistent path: %s", location );
-                        }
-                        return null;
+                        return String.format( "Inexistent path: %s", location );
                     }
+                    return null;
                 }
-            );
+            } );
         }
         catch ( ClientHandlerException e )
         {
