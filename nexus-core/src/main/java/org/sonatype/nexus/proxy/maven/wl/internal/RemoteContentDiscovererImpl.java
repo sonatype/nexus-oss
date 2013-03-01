@@ -30,8 +30,6 @@ import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.wl.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.wl.discovery.StrategyResult;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
@@ -77,26 +75,6 @@ public class RemoteContentDiscovererImpl
         {
             getLogger().debug( "Discovery of {} with strategy {} attempted",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );
-            final LocalStatus localStatus = mavenProxyRepository.getLocalStatus();
-            if ( !localStatus.shouldServiceRequest() )
-            {
-                final String message =
-                    "Proxy repository " + RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository )
-                        + " is out of service, not doing remote discovery.";
-                getLogger().info( message );
-                discoveryResult.recordError( strategy.getId(), new IllegalStateException( message ) );
-                return discoveryResult;
-            }
-            final ProxyMode proxyMode = mavenProxyRepository.getProxyMode();
-            if ( !proxyMode.shouldProxy() )
-            {
-                final String message =
-                    "Proxy repository " + RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository )
-                        + " is in ProxyMode=" + proxyMode + ", not doing remote discovery.";
-                getLogger().info( message );
-                discoveryResult.recordError( strategy.getId(), new IllegalStateException( message ) );
-                return discoveryResult;
-            }
             try
             {
                 final StrategyResult strategyResult = strategy.discover( mavenProxyRepository );
