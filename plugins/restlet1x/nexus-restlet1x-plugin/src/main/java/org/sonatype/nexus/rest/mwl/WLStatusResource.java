@@ -45,6 +45,7 @@ import org.sonatype.nexus.rest.model.WLStatusMessageWrapper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 
 /**
@@ -138,6 +139,8 @@ public class WLStatusResource
             if ( DStatus.DISABLED == status.getDiscoveryStatus().getStatus() )
             {
                 discoveryPayload.setDiscoveryEnabled( false );
+                discoveryPayload.setDiscoveryLastStrategy( "" );
+                discoveryPayload.setDiscoveryLastMessage( "" );
             }
             else
             {
@@ -147,6 +150,8 @@ public class WLStatusResource
                 discoveryPayload.setDiscoveryEnabled( true );
                 discoveryPayload.setDiscoveryIntervalHours( Ints.saturatedCast( TimeUnit.MILLISECONDS.toHours( config.getDiscoveryInterval() ) ) );
                 discoveryPayload.setDiscoveryLastStatus( 0 );
+                discoveryPayload.setDiscoveryLastStrategy( "" );
+                discoveryPayload.setDiscoveryLastMessage( "" );
 
                 // if we have it run at all
                 if ( DStatus.ENABLED.ordinal() < status.getDiscoveryStatus().getStatus().ordinal() )
@@ -160,8 +165,8 @@ public class WLStatusResource
                         discoveryPayload.setDiscoveryLastStatus( -1 );
                     }
                     // last- messages
-                    discoveryPayload.setDiscoveryLastStrategy( dstatus.getLastDiscoveryStrategy() );
-                    discoveryPayload.setDiscoveryLastMessage( dstatus.getLastDiscoveryMessage() );
+                    discoveryPayload.setDiscoveryLastStrategy( Strings.nullToEmpty( dstatus.getLastDiscoveryStrategy() ) );
+                    discoveryPayload.setDiscoveryLastMessage( Strings.nullToEmpty( dstatus.getLastDiscoveryMessage() ) );
                     discoveryPayload.setDiscoveryLastRunTimestamp( dstatus.getLastDiscoveryTimestamp() );
                 }
             }
