@@ -79,6 +79,7 @@ import org.sonatype.nexus.util.task.executor.ConstrainedExecutorImpl;
 import org.sonatype.nexus.util.task.executor.Statistics;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.Subscribe;
 
@@ -701,7 +702,24 @@ public class WLManagerImpl
             {
                 if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenGroupRepository.class ) )
                 {
-                    message = "Publishing not possible, as not all members have whitelist published.";
+                    final MavenGroupRepository mavenGroupRepository =
+                        mavenRepository.adaptToFacet( MavenGroupRepository.class );
+                    final List<String> membersWithoutWhitelists = new ArrayList<String>();
+                    for ( Repository member : mavenGroupRepository.getMemberRepositories() )
+                    {
+                        final MavenRepository memberMavenRepository = member.adaptToFacet( MavenRepository.class );
+                        if ( null != memberMavenRepository )
+                        {
+                            final PrefixSource ps = getPrefixSourceFor( memberMavenRepository );
+                            if ( !ps.exists() )
+                            {
+                                membersWithoutWhitelists.add( memberMavenRepository.getName() );
+                            }
+                        }
+                    }
+                    message =
+                        "Publishing not possible, as following members have not published it: "
+                            + Joiner.on( ", " ).join( membersWithoutWhitelists );
                 }
                 else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
                 {
