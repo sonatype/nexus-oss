@@ -137,26 +137,38 @@ public class DefaultNexusItemAuthorizer
             return true;
         }
 
+        boolean trace = getLogger().isTraceEnabled();
+
         Subject subject = securitySystem.getSubject();
-        getLogger().debug("Subject: {}", subject);
+
+        if (trace) {
+            getLogger().trace("Subject: {}", subject);
+        }
 
         if (subject == null) {
-            // TODO: isn't this missing? "&& subject.isAuthenticated()"
-            // FIXME: ^^^ no it isn't could be required too, non-null should be enough for us here
-            getLogger().debug("Subject is not authenticated; rejecting");
+            if (trace) {
+                getLogger().trace("Subject is not authenticated; rejecting");
+            }
             return false;
         }
 
-        getLogger().debug("Checking if subject '{}' has one of these permissions: {}", subject.getPrincipal(), perms);
+        if (trace) {
+            getLogger().trace("Checking if subject '{}' has one of these permissions: {}", subject.getPrincipal(), perms);
+        }
         for (String perm : perms) {
             if (subject.isPermitted(perm)) {
                 // TODO: we should remember/cache these decisions per-thread and not re-evaluate it always from Security
-                getLogger().debug("Subject '{}' has permission: {}; allowing", subject.getPrincipal(), perm);
+                if (trace) {
+                    getLogger().trace("Subject '{}' has permission: {}; allowing", subject.getPrincipal(), perm);
+                }
                 return true;
             }
         }
 
-        getLogger().debug("Subject '{}' is missing required permissions; rejecting", subject.getPrincipal());
+        if (trace) {
+            getLogger().trace("Subject '{}' is missing required permissions; rejecting", subject.getPrincipal());
+        }
+
         return false;
     }
 }
