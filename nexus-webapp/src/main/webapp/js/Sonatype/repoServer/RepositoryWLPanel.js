@@ -158,6 +158,7 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
               {
                 xtype : 'link-button',
                 text : 'Show prefix file',
+                name : 'prefix-link',
                 handler : function() {
                   window.open(self.whitelistUrl, '_blank');
                 }
@@ -376,6 +377,8 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       panel.find('name', 'publishedTimestamp')[0].setVisible(panel.publishedStatus !== -1);
 
       tstampField.setVisible(panel.discoveryStatus !== 0);
+
+      panel.find('name', 'prefix-link')[0].setVisible(self.whitelistUrl !== undefined);
     }
 
     if ( self.actionMask !== undefined ) {
