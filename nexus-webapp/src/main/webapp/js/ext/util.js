@@ -12,7 +12,10 @@
  */
 /*global define*/
 define('ext/util',
-      [ 'ext/util/event' ],
+      [
+        'ext/util/event',
+        'ext/util/CSS'
+      ],
       function(Ext) {
         return Ext;
       });
