@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.maven.wl.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.nio.channels.IllegalSelectorException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -182,15 +183,7 @@ public class WLManagerImpl
             {
                 if ( isMavenRepositorySupported( mavenRepository ) )
                 {
-                    if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
-                    {
-                        // TODO: make this false if proxy repo WL update needs to be deferred
-                        initializeWhitelist( true, mavenRepository );
-                    }
-                    else
-                    {
-                        initializeWhitelist( true, mavenRepository );
-                    }
+                    initializeWhitelist( true, mavenRepository );
                 }
             }
         }
@@ -226,11 +219,13 @@ public class WLManagerImpl
 
     @Override
     public void initializeWhitelist( final MavenRepository mavenRepository )
+        throws IllegalStateException
     {
         initializeWhitelist( true, mavenRepository );
     }
 
     protected void initializeWhitelist( final boolean doUpdateIfNeeded, final MavenRepository mavenRepository )
+        throws IllegalStateException
     {
         getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
         final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
@@ -262,7 +257,7 @@ public class WLManagerImpl
                 }
             }
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
             getLogger().warn( "Problem during WL update of {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
@@ -461,7 +456,7 @@ public class WLManagerImpl
                 + RepositoryStringUtils.getHumanizedNameString( mavenRepository )
                 + " not supported by WL feature (only Maven2 hosted, proxy and group repositories are supported)." );
         }
-        if ( isMavenRepositoryUpdateable( mavenRepository ) )
+        if ( !isMavenRepositoryUpdateable( mavenRepository ) )
         {
             throw new IllegalStateException( "Maven repository "
                 + RepositoryStringUtils.getHumanizedNameString( mavenRepository )
