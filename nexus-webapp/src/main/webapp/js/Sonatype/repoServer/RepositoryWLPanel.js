@@ -326,15 +326,19 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
     });
   },
 
-  forceRemoteDiscoveryHandler : function(button, event) {
-    var mask = new Ext.LoadMask(this.el, {
+  forceRemoteDiscoveryHandler : function() {
+    var
+          self = this,
+          mask = new Ext.LoadMask(this.el, {
       msg : 'Forcing discovery...'
     });
+
     mask.show();
     Ext.Ajax.request({
       method : 'DELETE',
       url : this.resourceUrl.apply([this.payload.data.id]),
       callback : function() {
+        self.loadData();
         mask.hide();
       },
       scope : this
@@ -344,7 +348,10 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
     if (action.type === 'sonatypeLoad') {
       // @note: this is a work around to get proper use of the isDirty()
       // function of this field
-      var panel = action.options.fpanel;
+      var
+            panel = action.options.fpanel,
+            tstampField = panel.find('name', 'discovery.discoveryLastRunTimestamp')[0];
+
       if (panel.find('name', 'discovery.discoveryEnabled')[0].getValue() === 'true') {
         panel.find('name', 'discoveryFieldset')[0].expand();
       } else {
@@ -359,7 +366,9 @@ NX.define('Sonatype.repoServer.RepositoryWLPanel', {
       }
 
       if (panel.discoveryStatus === 0) {
-        panel.find('name', 'discovery.discoveryLastRunTimestamp')[0].hide();
+        tstampField.hide();
+      } else {
+        tstampField.show();
       }
     }
   }
