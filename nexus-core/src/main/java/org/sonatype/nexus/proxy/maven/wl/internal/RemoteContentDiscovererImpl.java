@@ -98,7 +98,7 @@ public class RemoteContentDiscovererImpl
             }
             catch ( Exception e )
             {
-                getLogger().warn( "Remote strategy {} error:", strategy.getId(), e );
+                getLogger().warn( "Remote strategy {} error: {}", strategy.getId(), e.getMessage() );
                 discoveryResult.recordError( strategy.getId(), e );
             }
 
