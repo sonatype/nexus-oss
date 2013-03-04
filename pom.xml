@@ -36,7 +36,7 @@
   </scm>
 
   <properties>
-    <restlet.version>1.1.6-SONATYPE-5348-V7</restlet.version>
+    <restlet.version>1.1.6-SONATYPE-5348-V8</restlet.version>
   </properties>
 
   <dependencies>
