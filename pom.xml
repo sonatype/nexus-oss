@@ -26,7 +26,7 @@
   <groupId>org.sonatype.plexus</groupId>
   <artifactId>plexus-restlet-bridge</artifactId>
 
-  <version>1.25</version>
+  <version>1.26-SNAPSHOT</version>
 
   <scm>
     <url>https://github.com/sonatype/sisu-restlet-bridge</url>
