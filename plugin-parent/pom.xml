@@ -285,7 +285,7 @@
         <plugin>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.0</version>
           <extensions>true</extensions>
         </plugin>
 
