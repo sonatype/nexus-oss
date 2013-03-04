@@ -180,7 +180,7 @@
     <plexus-security.version>3.0.2-SNAPSHOT</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
-    <goodies.version>1.6-SNAPSHOT</goodies.version>
+    <goodies.version>1.6</goodies.version>
 
     <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
