@@ -178,9 +178,9 @@ public class EventDispatcher
 
     protected boolean isRepositoryHandled( final Repository repository )
     {
-        // we handle repository events after this isActiveAndStarted, and only for non-shadow repository that are Maven2
-        // reposes
-        return isActive() && repository != null
+        // we handle repository events after this isActive, is not out of service, and only for non-shadow repository
+        // that are Maven2 reposes
+        return isActive() && repository != null && repository.getLocalStatus().shouldServiceRequest()
             && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
             && !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
             && Maven2ContentClass.ID.equals( repository.getRepositoryContentClass().getId() );
