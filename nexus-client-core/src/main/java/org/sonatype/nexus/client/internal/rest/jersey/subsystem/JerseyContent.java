@@ -75,16 +75,16 @@ public class JerseyContent
     @Override
     public boolean exists( final Location location )
     {
-        return exists( toUri( location, null ) );
+        return exists( location, toUri( location, null ) );
     }
 
     @Override
     public boolean existsWith( final Location location, final Directive directive )
     {
-        return exists( toUri( location, directive ) );
+        return exists( location, toUri( location, directive ) );
     }
 
-    protected boolean exists( final String uri )
+    protected boolean exists( final Location location, final String uri )
     {
         try
         {
@@ -103,7 +103,7 @@ public class JerseyContent
                     {
                         if ( status == Response.Status.NOT_FOUND.getStatusCode() )
                         {
-                            return String.format( "Inexistent path: %s", uri );
+                            return String.format( "Inexistent path: %s", location );
                         }
                         return null;
                     }
@@ -121,17 +121,17 @@ public class JerseyContent
     public void download( final Location location, final File target )
         throws IOException
     {
-        download( toUri( location, null ), target );
+        download( location, toUri( location, null ), target );
     }
 
     @Override
     public void downloadWith( final Location location, final Directive directive, final File target )
         throws IOException
     {
-        download( toUri( location, directive ), target );
+        download( location, toUri( location, directive ), target );
     }
 
-    protected void download( final String uri, final File target )
+    protected void download( final Location location, final String uri, final File target )
         throws IOException
     {
         if ( !target.exists() )
@@ -159,7 +159,7 @@ public class JerseyContent
                     {
                         if ( status == Response.Status.NOT_FOUND.getStatusCode() )
                         {
-                            return String.format( "Inexistent path: %s", uri );
+                            return String.format( "Inexistent path: %s", location );
                         }
                         return null;
                     }
