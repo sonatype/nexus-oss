@@ -42,8 +42,11 @@ import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
+import org.sonatype.nexus.proxy.maven.wl.WLDiscoveryStatus.DStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus.PStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLStatus;
+import org.sonatype.nexus.proxy.maven.wl.internal.scrape.DeliverBehaviour;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -385,12 +388,88 @@ public class RemoteContentDiscovererImplTest
                         MavenRepository.class ) );
                 final String message = status.getDiscoveryStatus().getLastDiscoveryMessage();
                 // Text should be:
-                // "Remote strategy prefix-file detected invalid input," 
-                // "results discarded: Prefix file contains line longer" 
+                // "Remote strategy prefix-file detected invalid input,"
+                // "results discarded: Prefix file contains line longer"
                 // "than allowed (250 characters), refusing to load the file."
                 assertThat( message, containsString( "strategy prefix-file" ) );
                 assertThat( message, containsString( "longer than allowed" ) );
                 assertThat( message, containsString( "refusing" ) );
+            }
+        }
+        finally
+        {
+            server1.stop();
+            server2.stop();
+        }
+    }
+
+    @Test
+    public void prefixStrategyErrorResponseResultsInDiscoveryHardFailure()
+        throws Exception
+    {
+        try
+        {
+            // remote peer will serve HTTP 500 when asked for prefix file
+            final int server1port = server1.getPort();
+            server1.stop();
+            server1 =
+                Server.withPort( server1port ).serve( "/.meta/prefixes.txt" ).withBehaviours(
+                    new DeliverBehaviour( 500, "text/plain", "Ugly server error" ) );
+            server1.start();
+
+            final WLManager wm = lookup( WLManager.class );
+            wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ) );
+            waitForWLBackgroundUpdates();
+            {
+                final WLStatus status =
+                    wm.getStatusFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                        MavenRepository.class ) );
+
+                // WL not published
+                assertThat( status.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
+                // status should be the new ERROR state
+                assertThat( status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ERROR ) );
+                // it is "prefix" strategy that got into error
+                assertThat( status.getDiscoveryStatus().getLastDiscoveryStrategy(),
+                    equalTo( RemotePrefixFileStrategy.ID ) );
+                // message is "Unexpected response code..."
+                assertThat( status.getDiscoveryStatus().getLastDiscoveryMessage(),
+                    containsString( "Unexpected response code" ) );
+            }
+        }
+        finally
+        {
+            server1.stop();
+            server2.stop();
+        }
+    }
+
+    @Test
+    public void prefixStrategyErrorTransportResultsInDiscoveryHardFailure()
+        throws Exception
+    {
+        try
+        {
+            // remote peer will be down
+            server1.stop();
+
+            final WLManager wm = lookup( WLManager.class );
+            wm.updateWhitelist( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenRepository.class ) );
+            waitForWLBackgroundUpdates();
+            {
+                final WLStatus status =
+                    wm.getStatusFor( getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID,
+                        MavenRepository.class ) );
+
+                // WL not published
+                assertThat( status.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
+                // status should be the new ERROR state
+                assertThat( status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ERROR ) );
+                // it is "prefix" strategy that got into error
+                assertThat( status.getDiscoveryStatus().getLastDiscoveryStrategy(),
+                    equalTo( RemotePrefixFileStrategy.ID ) );
+                // message is "Transport error...."
+                assertThat( status.getDiscoveryStatus().getLastDiscoveryMessage(), containsString( "Transport error" ) );
             }
         }
         finally
