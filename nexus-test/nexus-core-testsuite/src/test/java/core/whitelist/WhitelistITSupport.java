@@ -24,6 +24,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Whitelist;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
@@ -57,6 +58,23 @@ public abstract class WhitelistITSupport
     }
 
     /**
+     * Waits for a remote discovery outcomes. The passed in repository IDs must correspond to a Maven2 proxy repository,
+     * otherwise {@link IllegalArgumentException} is thrown. They all will be waited for, in passed in order.
+     * 
+     * @param proxyRepositoryIds
+     * @throws IllegalArgumentException if repository ID is not a maven2 proxy.
+     * @throws InterruptedException
+     */
+    public void waitForWLDiscoveryOutcomes( final String... proxyRepositoryIds )
+        throws IllegalArgumentException, InterruptedException
+    {
+        for ( String proxyRepositoryId : proxyRepositoryIds )
+        {
+            waitForWLDiscoveryOutcome( proxyRepositoryId );
+        }
+    }
+
+    /**
      * Waits for a remote discovery outcome. The passed in repository ID must correspond to a Maven2 proxy repository,
      * otherwise {@link IllegalArgumentException} is thrown.
      * 
@@ -79,6 +97,43 @@ public abstract class WhitelistITSupport
         {
             Thread.sleep( 1000 );
             status = whitelist().getWhitelistStatus( proxyRepositoryId );
+        }
+    }
+
+    /**
+     * Waits for a publishing outcomes. The passed in repository IDs must correspond to a Maven2 repository, otherwise
+     * {@link IllegalArgumentException} is thrown. They all will be waited for, in passed in order.
+     * 
+     * @param repositoryIds
+     * @throws IllegalArgumentException if repository ID is not a maven2 repo.
+     * @throws InterruptedException
+     */
+    public void waitForWLPublishingOutcomes( final String... repositoryIds )
+        throws IllegalArgumentException, InterruptedException
+    {
+        for ( String repositoryId : repositoryIds )
+        {
+            waitForWLPublishingOutcome( repositoryId );
+        }
+    }
+
+    /**
+     * Waits for a publishing outcome. The passed in repository ID must correspond to a Maven2 repository, otherwise
+     * {@link NexusClientBadRequestException} is thrown.
+     * 
+     * @param repositoryId
+     * @throws NexusClientBadRequestException if repository ID is not a maven2 repo.
+     * @throws InterruptedException
+     */
+    public void waitForWLPublishingOutcome( final String repositoryId )
+        throws NexusClientBadRequestException, InterruptedException
+    {
+        // status
+        Status status = whitelist().getWhitelistStatus( repositoryId );
+        while ( status.getPublishedStatus() == Outcome.UNDECIDED )
+        {
+            Thread.sleep( 1000 );
+            status = whitelist().getWhitelistStatus( repositoryId );
         }
     }
 
