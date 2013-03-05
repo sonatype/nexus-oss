@@ -100,6 +100,7 @@ public class RemoteContentDiscovererImpl
             {
                 getLogger().warn( "Remote strategy {} error: {}", strategy.getId(), e.getMessage() );
                 discoveryResult.recordError( strategy.getId(), e );
+                break;
             }
 
             if ( discoveryResult.isSuccessful() )
