@@ -13,18 +13,26 @@
 package org.sonatype.nexus.client.testsuite;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.util.Collection;
 
 import org.junit.Test;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
+import org.sonatype.nexus.client.core.subsystem.security.Privilege;
+import org.sonatype.nexus.client.core.subsystem.security.Privileges;
 import org.sonatype.nexus.client.core.subsystem.security.Role;
 import org.sonatype.nexus.client.core.subsystem.security.Roles;
 import org.sonatype.nexus.client.core.subsystem.security.User;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
+import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTarget;
+import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTargets;
 
 public class SecurityIT
     extends NexusClientITSupport
@@ -172,6 +180,99 @@ public class SecurityIT
         assertThat( user.id(), is( "admin" ) );
     }
 
+    @Test
+    public void getPrivileges()
+    {
+        assertThat( privileges().get(), is( not( empty() ) ) );
+    }
+
+    @Test
+    public void getPrivilege()
+    {
+        // admin privilege
+        final Privilege privilege = privileges().get( "1000" );
+        assertThat( privilege, is( not( nullValue() ) ) );
+        assertThat( privilege.name(), containsString( "Administrator" ) );
+    }
+
+    @Test
+    public void createPrivilege()
+    {
+        final String targetId = createRepoTarget( "createPrivileges" ).id();
+        final Privilege saved = privileges().create()
+            .withName( "foo" )
+            .withDescription( "bar" )
+            .withMethods( "read" )
+            .withRepositoryGroupId( "public" )
+            .withTargetId( targetId )
+            .create().iterator().next();
+
+
+        final Privilege privilege = privileges().get( saved.id() );
+        assertThat( privilege, is( notNullValue() ) );
+        assertThat( privilege.description(), is( "bar" ) );
+
+        // name is mangled on creation - "$name - ($method)"
+        assertThat( privilege.name(), is( saved.name() ) );
+
+        assertThat( privilege.methods(), contains( "read" ) );
+        assertThat( privilege.repositoryGroupId(), is( "public" ) );
+        assertThat( privilege.targetId(), is( targetId ) );
+    }
+
+    @Test( expected = IllegalStateException.class )
+    public void refuseCreateAlreadyExistingPrivilege()
+    {
+        final String targetId = createRepoTarget( "refuseCreatePrivileges" ).id();
+        final Privilege saved = privileges().create()
+            .withName( "foo" )
+            .withDescription( "bar" )
+            .withMethods( "read" )
+            .withRepositoryGroupId( "public" )
+            .withTargetId( targetId )
+            .create().iterator().next();
+
+        saved.create();
+    }
+
+    @Test( expected = UnsupportedOperationException.class )
+    public void unsupportedUpdatePrivilege()
+    {
+        final String targetId = createRepoTarget( "unsupportedUpdatePrivileges" ).id();
+        final Privilege saved = privileges().create()
+            .withName( "foo" )
+            .withDescription( "bar" )
+            .withMethods( "read" )
+            .withRepositoryGroupId( "public" )
+            .withTargetId( targetId )
+            .create().iterator().next();
+
+        saved.save();
+    }
+
+    @Test( expected = NexusClientNotFoundException.class )
+    public void deletePrivilege()
+    {
+        final String targetId = createRepoTarget( "deletePrivileges" ).id();
+        final Privilege saved = privileges().create()
+            .withName( "foo" )
+            .withDescription( "bar" )
+            .withMethods( "read" )
+            .withRepositoryGroupId( "public" )
+            .withTargetId( targetId )
+            .create().iterator().next();
+
+        saved.remove();
+
+        privileges().get( saved.id() );
+    }
+
+    private RepositoryTarget createRepoTarget( final String id )
+    {
+        return targets().create( id ).withContentClass( "maven2" ).withName( id ).withPatterns(
+            "some_pattern" ).save();
+    }
+
     private Roles roles()
     {
         return client().getSubsystem( Roles.class );
@@ -182,4 +283,13 @@ public class SecurityIT
         return client().getSubsystem( Users.class );
     }
 
+    private Privileges privileges()
+    {
+        return client().getSubsystem( Privileges.class );
+    }
+
+    private RepositoryTargets targets()
+    {
+        return client().getSubsystem( RepositoryTargets.class );
+    }
 }
