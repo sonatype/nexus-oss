@@ -204,20 +204,20 @@ public class DefaultTaskConfigManager
                 if ( foundTask != null )
                 {
                     tasks.remove( foundTask );
-                    
+
                     storeableTask.setLastRun( foundTask.getLastRun() );
                 }
 
                 tasks.add( storeableTask );
+            }
 
-                try
-                {
-                    applicationConfiguration.saveConfiguration();
-                }
-                catch ( IOException e )
-                {
-                    logger.warn( "Could not save task changes!", e );
-                }
+            try
+            {
+                applicationConfiguration.saveConfiguration();
+            }
+            catch ( IOException e )
+            {
+                logger.warn( "Could not save task changes!", e );
             }
         }
     }
@@ -233,15 +233,15 @@ public class DefaultTaskConfigManager
             if ( foundTask != null )
             {
                 tasks.remove( foundTask );
+            }
 
-                try
-                {
-                    applicationConfiguration.saveConfiguration();
-                }
-                catch ( IOException e )
-                {
-                    logger.warn( "Could not save task changes!", e );
-                }
+            try
+            {
+                applicationConfiguration.saveConfiguration();
+            }
+            catch ( IOException e )
+            {
+                logger.warn( "Could not save task changes!", e );
             }
         }
 
