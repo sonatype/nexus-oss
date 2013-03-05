@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -645,30 +646,39 @@ public class WLManagerImpl
         PrefixSource prefixSource = null;
         // save merged WL into group's local storage (if all members has WL)
         boolean allMembersHaveWLPublished = true;
-        final ArrayList<PrefixSource> memberEntrySources = new ArrayList<PrefixSource>();
+        final LinkedHashSet<String> entries = new LinkedHashSet<String>();
         for ( Repository member : mavenGroupRepository.getMemberRepositories() )
         {
             if ( member.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
             {
-                final PrefixSource memberEntrySource =
+                final FilePrefixSource memberEntrySource =
                     getPrefixSourceFor( member.adaptToFacet( MavenRepository.class ) );
-                if ( !memberEntrySource.exists() )
+                // lock to prevent file being deleted between exists check and reading it up
+                memberEntrySource.getRepositoryItemUid().getLock().lock( Action.read );
+                try
                 {
-                    getLogger().debug( "{} group's member {} does not have WL published.",
+                    if ( !memberEntrySource.exists() )
+                    {
+                        getLogger().debug( "{} group's member {} does not have WL published.",
+                            RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ),
+                            RepositoryStringUtils.getHumanizedNameString( member ) );
+                        allMembersHaveWLPublished = false;
+                        break;
+                    }
+                    getLogger().debug( "{} group's member {} does have WL published, merging it in...",
                         RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ),
                         RepositoryStringUtils.getHumanizedNameString( member ) );
-                    allMembersHaveWLPublished = false;
-                    break;
+                    entries.addAll( memberEntrySource.readEntries() );
                 }
-                getLogger().debug( "{} group's member {} does have WL published, merging it in...",
-                    RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ),
-                    RepositoryStringUtils.getHumanizedNameString( member ) );
-                memberEntrySources.add( memberEntrySource );
+                finally
+                {
+                    memberEntrySource.getRepositoryItemUid().getLock().unlock();
+                }
             }
         }
         if ( allMembersHaveWLPublished )
         {
-            prefixSource = new MergingPrefixSource( memberEntrySources );
+            prefixSource = new ArrayListPrefixSource( new ArrayList<String>( entries ) );
         }
         return prefixSource;
     }

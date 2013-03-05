@@ -24,6 +24,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -72,30 +74,43 @@ public class RemotePrefixFileStrategy
         {
             getLogger().debug( "Looking for remote prefix on {} at path {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
-            item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
-            if ( item != null )
+            // we keep exclusive lock on UID during discovery to prevent other WL threads grabbing this file
+            // prematurely. We release the lock only when file is present locally, and is validated.
+            // in that moment it's not published yet, but the content is correct and it will be 
+            // the same that will get published.
+            final RepositoryItemUid uid = mavenProxyRepository.createUid( path );
+            uid.getLock().lock( Action.update );
+            try
             {
-                getLogger().debug( "Remote prefix on {} at path {} found!",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
-                long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000L;
-                final PrefixSource prefixSource = createPrefixSource( mavenProxyRepository, path );
-                if ( prefixSource != null )
+                item = retrieveFromRemoteIfExists( mavenProxyRepository, path );
+                if ( item != null )
                 {
-                    if ( prefixFileAgeInDays < 1 )
+                    getLogger().debug( "Remote prefix on {} at path {} found!",
+                        RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), path );
+                    long prefixFileAgeInDays = ( System.currentTimeMillis() - item.getModified() ) / 86400000L;
+                    final PrefixSource prefixSource = createPrefixSource( mavenProxyRepository, path );
+                    if ( prefixSource != null )
                     {
-                        return new StrategyResult( "Remote publishes prefix file (is less than a day old), using it.",
-                            prefixSource );
+                        if ( prefixFileAgeInDays < 1 )
+                        {
+                            return new StrategyResult(
+                                "Remote publishes prefix file (is less than a day old), using it.", prefixSource );
+                        }
+                        else
+                        {
+                            return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
+                                + " days old), using it.", prefixSource );
+                        }
                     }
                     else
                     {
-                        return new StrategyResult( "Remote publishes prefix file (is " + prefixFileAgeInDays
-                            + " days old), using it.", prefixSource );
+                        getLogger().info( "Prefix file retrieved from {} is corrupt, skipping it.", item.getRemoteUrl() );
                     }
                 }
-                else
-                {
-                    getLogger().info( "Prefix file retrieved from {} is corrupt, skipping it.", item.getRemoteUrl() );
-                }
+            }
+            finally
+            {
+                uid.getLock().unlock();
             }
         }
         throw new StrategyFailedException( "Remote does not publish prefix files on paths " + remoteFilePath );
@@ -103,7 +118,7 @@ public class RemotePrefixFileStrategy
 
     // ==
 
-    protected PrefixSource createPrefixSource( final MavenProxyRepository mavenProxyRepository, final String path )
+    protected FilePrefixSource createPrefixSource( final MavenProxyRepository mavenProxyRepository, final String path )
         throws IOException
     {
         final FilePrefixSource result = new FilePrefixSource( mavenProxyRepository, path, config );
