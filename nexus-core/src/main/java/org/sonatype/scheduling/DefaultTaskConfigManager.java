@@ -41,6 +41,7 @@ import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CScheduledTaskCoreConfiguration;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.scheduling.TaskUtils;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.HourlySchedule;
@@ -60,6 +61,9 @@ public class DefaultTaskConfigManager
     extends AbstractConfigurable
     implements TaskConfigManager
 {
+    private final boolean NXCM4979DEBUG = SystemPropertiesHelper.getBoolean(
+        "org.sonatype.scheduling.TaskConfigManager.nxcm4979debug", false );
+
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     /**
@@ -208,6 +212,12 @@ public class DefaultTaskConfigManager
                 tasks.add( storeableTask );
             }
 
+            if ( NXCM4979DEBUG )
+            {
+                logger.info( "Task with ID={} added, config {} modified.", task.getId(), storeableTask != null ? "IS"
+                    : "is NOT", new Exception( "This is an exception only to provide caller backtrace" ) );
+            }
+
             try
             {
                 applicationConfiguration.saveConfiguration();
@@ -230,6 +240,12 @@ public class DefaultTaskConfigManager
             if ( foundTask != null )
             {
                 tasks.remove( foundTask );
+            }
+
+            if ( NXCM4979DEBUG )
+            {
+                logger.info( "Task with ID={} removed, config {} modified.", task.getId(), foundTask != null ? "IS"
+                    : "is NOT", new Exception( "This is an exception only to provide caller backtrace" ) );
             }
 
             try
