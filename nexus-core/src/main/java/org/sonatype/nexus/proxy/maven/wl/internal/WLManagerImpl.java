@@ -182,7 +182,7 @@ public class WLManagerImpl
             initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
             for ( MavenRepository mavenRepository : initableRepositories )
             {
-                if ( isMavenRepositorySupported( mavenRepository ) )
+                if ( isMavenRepositoryUpdateable( mavenRepository ) )
                 {
                     initializeWhitelist( true, mavenRepository );
                 }
@@ -220,13 +220,11 @@ public class WLManagerImpl
 
     @Override
     public void initializeWhitelist( final MavenRepository mavenRepository )
-        throws IllegalStateException
     {
         initializeWhitelist( true, mavenRepository );
     }
 
     protected void initializeWhitelist( final boolean doUpdateIfNeeded, final MavenRepository mavenRepository )
-        throws IllegalStateException
     {
         getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
         final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
