@@ -70,6 +70,10 @@
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.sonatype.sisu.inject</groupId>
+          <artifactId>guice-servlet</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
