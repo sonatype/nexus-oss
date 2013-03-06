@@ -26,6 +26,8 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.CoreProtocolPNames;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.internal.rest.AbstractNexusClientFactory;
@@ -36,6 +38,7 @@ import org.sonatype.nexus.client.rest.ConnectionInfo;
 import org.sonatype.nexus.client.rest.ProxyInfo;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
@@ -50,6 +53,8 @@ import com.thoughtworks.xstream.XStream;
 public class JerseyNexusClientFactory
     extends AbstractNexusClientFactory<JerseyNexusClient>
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( JerseyNexusClientFactory.class );
 
     /**
      * Modified "content-type" used by Nexus Client: it enforces body encoding too for UTF8.
@@ -109,6 +114,11 @@ public class JerseyNexusClientFactory
 
         // NXCM-4547 JERSEY-1293 Enforce proxy setting on httpclient
         enforceProxyUri( config, client );
+
+        if ( LOG.isDebugEnabled() )
+        {
+            client.addFilter( new LoggingFilter() );
+        }
 
         return client;
     }
