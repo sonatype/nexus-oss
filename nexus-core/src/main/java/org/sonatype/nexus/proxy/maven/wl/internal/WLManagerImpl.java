@@ -467,7 +467,6 @@ public class WLManagerImpl
     protected boolean doUpdateWhitelist( final boolean forced, final MavenRepository mavenRepository )
         throws IllegalStateException
     {
-        checkUpdateConditions( mavenRepository );
         final WLUpdateRepositoryRunnable updateRepositoryJob =
             new WLUpdateRepositoryRunnable( new LoggingProgressListener( getLogger() ), applicationStatusSource, this,
                 mavenRepository );
@@ -508,7 +507,15 @@ public class WLManagerImpl
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
-            prefixSource = updateProxyWhitelist( mavenRepository.adaptToFacet( MavenProxyRepository.class ), null );
+            final MavenProxyRepository mavenProxyRepository = mavenRepository.adaptToFacet( MavenProxyRepository.class );
+            final ProxyMode proxyMode = mavenProxyRepository.getProxyMode();
+            if ( ProxyMode.ALLOW != proxyMode )
+            {
+                getLogger().info( "Proxy repository {} is in proxyMode={}, not updating it.",
+                    RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ), proxyMode );
+                return;
+            }
+            prefixSource = updateProxyWhitelist( mavenProxyRepository, null );
         }
         else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) )
         {
