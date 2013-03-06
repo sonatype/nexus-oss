@@ -22,6 +22,7 @@ import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -37,6 +38,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
@@ -180,7 +182,7 @@ public class EventDispatcher
     {
         // we handle repository events after this isActive, is not out of service, and only for non-shadow repository
         // that are Maven2 reposes
-        return isActive() && repository != null && repository.getLocalStatus().shouldServiceRequest()
+        return isActive() && repository != null
             && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
             && !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
             && Maven2ContentClass.ID.equals( repository.getRepositoryContentClass().getId() );
@@ -310,9 +312,9 @@ public class EventDispatcher
      */
     @Subscribe
     @AllowConcurrentEvents
-    public void on( final RepositoryConfigurationUpdatedEvent evt )
+    public void onRepositoryConfigurationUpdatedEvent( final RepositoryConfigurationUpdatedEvent evt )
     {
-        if ( isRepositoryHandled( evt.getRepository() ) && evt.isRemoteUrlChanged() )
+        if ( isRepositoryHandled( evt.getRepository() ) )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
             handleRepositoryModified( mavenRepository );
