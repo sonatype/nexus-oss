@@ -60,31 +60,35 @@ public class PluginConsoleMessageUtil
 
         LOGGER.info( "HTTP GET: " + serviceURI );
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.GET );
-
-        if ( response.getStatus().isSuccess() )
+        final Response response = RequestFacade.sendMessage( serviceURI, Method.GET );
+        try
         {
-            String responseText = response.getEntity().getText();
+            if ( response.getStatus().isSuccess() )
+            {
+                String responseText = response.getEntity().getText();
 
-            LOGGER.debug( "Response Text: \n" + responseText );
+                LOGGER.debug( "Response Text: \n" + responseText );
 
-            XStreamRepresentation representation = new XStreamRepresentation(
-                xmlXstream,
-                responseText,
-                MediaType.APPLICATION_XML );
+                XStreamRepresentation representation =
+                    new XStreamRepresentation( xmlXstream, responseText, MediaType.APPLICATION_XML );
 
-            PluginInfoListResponseDTO responseDTO = (PluginInfoListResponseDTO) representation
-                .getPayload( new PluginInfoListResponseDTO() );
+                PluginInfoListResponseDTO responseDTO =
+                    (PluginInfoListResponseDTO) representation.getPayload( new PluginInfoListResponseDTO() );
 
-            return responseDTO.getData();
+                return responseDTO.getData();
+            }
+            else
+            {
+                LOGGER.warn( "HTTP Error: '" + response.getStatus().getCode() + "'" );
+
+                LOGGER.warn( response.getEntity().getText() );
+
+                return null;
+            }
         }
-        else
+        finally
         {
-            LOGGER.warn( "HTTP Error: '" + response.getStatus().getCode() + "'" );
-
-            LOGGER.warn( response.getEntity().getText() );
-
-            return null;
+            RequestFacade.releaseResponse( response );
         }
     }
 
