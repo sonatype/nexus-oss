@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.google.common.collect.Lists;
+
 import org.apache.velocity.VelocityContext;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsoup.Jsoup;
@@ -41,6 +42,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.rest.UiContributor;
+import org.sonatype.nexus.plugins.rest.UiContributor.UiContribution;
 import org.sonatype.nexus.plugins.restlet1x.BuildNumberService;
 import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
@@ -226,10 +228,13 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "debug", debugMode );
 
         List<UiContributor.UiContribution> contributions = Lists.newArrayList();
-        List<String> preloadUrls = Lists.newArrayList();
-        for ( UiContributor rJs : rJsContributors)
+        for ( UiContributor rJs : rJsContributors )
         {
-            contributions.add( rJs.contribute( debugMode ) );
+            UiContribution contribution = rJs.contribute( debugMode );
+            if ( contribution != null )
+            {
+                contributions.add( contribution );
+            }
         }
         templatingContext.put( "rJsContributions", contributions );
 
