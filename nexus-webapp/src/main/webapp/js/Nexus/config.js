@@ -17,7 +17,7 @@ define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init'], function(E
   // *************************************************
 
   Ext.Ajax.defaultHeaders = {
-    'accept' : 'application/json'
+    'accept' : 'application/json,application/vnd.siesta-error-v1+json,application/vnd.siesta-validation-errors-v1+json'
   };
 
   // Set default HTTP headers //@todo: move this to some other common init
