@@ -16,22 +16,6 @@ define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init'], function(E
   // ********* Set ExtJS options
   // *************************************************
 
-  Ext.Ajax.defaultHeaders = {
-    'accept' : 'application/json,application/vnd.siesta-error-v1+json,application/vnd.siesta-validation-errors-v1+json'
-  };
-
-  Ext.Ajax.on('requestexception', function(connection, response) {
-    var contentType = response.getResponseHeader('Content-Type');
-    if ( contentType === 'application/vnd.siesta-error-v1+json') {
-      response.siestaError = Ext.decode(response.responseText);
-    } else if ( contentType === 'application/vnd.siesta-validation-errors-v1+json') {
-      response.siestaValidationError = Ext.decode(response.responseText);
-    }
-  });
-
-  // Set default HTTP headers //@todo: move this to some other common init
-  // section
-  Ext.lib.Ajax.defaultPostHeader = 'application/json; charset=utf-8';
 
   // set Sonatype defaults for Ext widgets
   Ext.form.Field.prototype.msgTarget = 'under';
