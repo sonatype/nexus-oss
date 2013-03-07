@@ -60,7 +60,7 @@
     <pluginName>Nexus P2 Repository Plugin</pluginName>
     <pluginDescription>P2 repository support.</pluginDescription>
 
-    <capabilities-plugin.version>2.2</capabilities-plugin.version>
+    <capabilities-plugin.version>2.2.1</capabilities-plugin.version>
 
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
   </properties>
