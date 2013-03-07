@@ -14,9 +14,6 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 /**
@@ -33,7 +30,7 @@ public class UiContributionBuilder
 
     private List<String> dependencies = Lists.newLinkedList();
 
-    private Condition constraint = new Condition()
+    private Condition condition = new Condition()
     {
         @Override
         public boolean isSatisfied()
@@ -132,7 +129,7 @@ public class UiContributionBuilder
             withDefaultAggregateDependency();
         }
 
-        return new UiContributor.UiContribution( module, dependencies, constraint.isSatisfied() );
+        return new UiContributor.UiContribution( module, dependencies, condition.isSatisfied() );
     }
 
     /**
@@ -141,9 +138,9 @@ public class UiContributionBuilder
      *
      * @param predicate The predicate to evaluate.
      */
-    public UiContributionBuilder withConstraint( Condition constraint )
+    public UiContributionBuilder withCondition( Condition condition )
     {
-        this.constraint = constraint;
+        this.condition = condition;
         return this;
     }
 
