@@ -210,7 +210,10 @@ public class WLManagerImpl
         constrainedExecutor.cancelAllJobs();
         try
         {
-            executor.awaitTermination( 60L, TimeUnit.SECONDS );
+            if ( !executor.awaitTermination( 15L, TimeUnit.SECONDS ) )
+            {
+                executor.shutdownNow();
+            }
         }
         catch ( InterruptedException e )
         {
