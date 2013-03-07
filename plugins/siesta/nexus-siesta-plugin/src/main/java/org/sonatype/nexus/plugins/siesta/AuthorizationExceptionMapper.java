@@ -17,23 +17,24 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 
 import org.apache.shiro.authz.AuthorizationException;
-import org.sonatype.sisu.siesta.common.internal.ExceptionMapperSupport;
+import org.sonatype.sisu.siesta.common.error.ErrorXO;
+import org.sonatype.sisu.siesta.server.ErrorExceptionMapperSupport;
 
 /**
- * Converts {@link AuthorizationException} to a JAX-RS {@link Response} with {@link Response.Status#FORBIDDEN}.
+ * Maps {@link AuthorizationException} to 403 with a {@link ErrorXO} body.
  *
  * @since 2.4
  */
 @Named
 @Singleton
 public class AuthorizationExceptionMapper
-    extends ExceptionMapperSupport<AuthorizationException>
+    extends ErrorExceptionMapperSupport<AuthorizationException>
 {
 
     @Override
-    protected Response convert( final AuthorizationException exception )
+    protected int getStatusCode( final AuthorizationException exception )
     {
-        return Response.status( Response.Status.FORBIDDEN ).entity( exception.getMessage() ).build();
+        return Response.Status.FORBIDDEN.getStatusCode();
     }
 
 }

@@ -136,6 +136,22 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-common</artifactId>
+      <version>1.4-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-inject-bean</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <!-- For Jersey client: complete HC4 stack + logger -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
