@@ -154,7 +154,7 @@ public class WLStatusResource
                 discoveryPayload.setDiscoveryLastMessage( "" );
 
                 // if we have it run at all
-                if ( DStatus.ENABLED.ordinal() < status.getDiscoveryStatus().getStatus().ordinal() )
+                if ( DStatus.ENABLED_IN_PROGRESS.ordinal() < status.getDiscoveryStatus().getStatus().ordinal() )
                 {
                     if ( DStatus.SUCCESSFUL == status.getDiscoveryStatus().getStatus() )
                     {

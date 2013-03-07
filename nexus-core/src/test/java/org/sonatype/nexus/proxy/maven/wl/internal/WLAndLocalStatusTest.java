@@ -13,10 +13,8 @@
 package org.sonatype.nexus.proxy.maven.wl.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -239,6 +237,7 @@ public class WLAndLocalStatusTest
             getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenProxyRepository.class );
 
         assertThat( proxy1.getLocalStatus(), equalTo( LocalStatus.OUT_OF_SERVICE ) );
+        waitForWLBackgroundUpdates();
 
         // let's check states
 
@@ -247,8 +246,8 @@ public class WLAndLocalStatusTest
             final WLStatus proxy1status = wm.getStatusFor( proxy1 );
             // this repo is Out of Service
             assertThat( proxy1status.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( nullValue() ) );
+            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED_NOT_POSSIBLE ) );
+            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( "none" ) );
             // Remark: the combination of those three above simply means "discovery never tried against it"
             // yet.
         }
@@ -279,9 +278,7 @@ public class WLAndLocalStatusTest
                 wm.getStatusFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                     MavenGroupRepository.class ) );
             // not all members have WL, unpublished
-            assertThat( groupStatus.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
-            // message should refer to proxy1 as reason of not publishing group WL
-            assertThat( groupStatus.getPublishingStatus().getLastPublishedMessage(), containsString( proxy1.getName() ) );
+            assertThat( groupStatus.getPublishingStatus().getStatus(), equalTo( PStatus.PUBLISHED ) );
             assertThat( groupStatus.getDiscoveryStatus().getStatus(), equalTo( DStatus.NOT_A_PROXY ) );
         }
     }
@@ -296,6 +293,7 @@ public class WLAndLocalStatusTest
             getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenProxyRepository.class );
 
         assertThat( proxy1.getLocalStatus(), equalTo( LocalStatus.OUT_OF_SERVICE ) );
+        waitForWLBackgroundUpdates();
 
         // let's check states
         {
@@ -303,8 +301,8 @@ public class WLAndLocalStatusTest
             final WLStatus proxy1status = wm.getStatusFor( proxy1 );
             // this repo is Out of Service
             assertThat( proxy1status.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( nullValue() ) );
+            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED_NOT_POSSIBLE ) );
+            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( "none" ) );
             // Remark: the combination of those three above simply means "discovery never tried against it"
             // yet.
         }
@@ -314,9 +312,7 @@ public class WLAndLocalStatusTest
                 wm.getStatusFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                     MavenGroupRepository.class ) );
             // not all members have WL, unpublished
-            assertThat( groupStatus.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
-            // message should refer to proxy1 as reason of not publishing group WL
-            assertThat( groupStatus.getPublishingStatus().getLastPublishedMessage(), containsString( proxy1.getName() ) );
+            assertThat( groupStatus.getPublishingStatus().getStatus(), equalTo( PStatus.PUBLISHED ) );
             assertThat( groupStatus.getDiscoveryStatus().getStatus(), equalTo( DStatus.NOT_A_PROXY ) );
         }
 
@@ -367,8 +363,8 @@ public class WLAndLocalStatusTest
                     MavenProxyRepository.class ) );
             // this repo is Out of Service
             assertThat( proxy1status.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( nullValue() ) );
+            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED_NOT_POSSIBLE ) );
+            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( "none" ) );
         }
         {
             // group
@@ -376,9 +372,7 @@ public class WLAndLocalStatusTest
                 wm.getStatusFor( getRepositoryRegistry().getRepositoryWithFacet( GROUP_REPO_ID,
                     MavenGroupRepository.class ) );
             // not all members have WL, unpublished
-            assertThat( groupStatus.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
-            // message should refer to proxy1 as reason of not publishing group WL
-            assertThat( groupStatus.getPublishingStatus().getLastPublishedMessage(), containsString( proxy1.getName() ) );
+            assertThat( groupStatus.getPublishingStatus().getStatus(), equalTo( PStatus.PUBLISHED ) );
             assertThat( groupStatus.getDiscoveryStatus().getStatus(), equalTo( DStatus.NOT_A_PROXY ) );
         }
     }

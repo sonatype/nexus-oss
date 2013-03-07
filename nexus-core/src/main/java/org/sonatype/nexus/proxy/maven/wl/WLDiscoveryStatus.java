@@ -41,7 +41,12 @@ public class WLDiscoveryStatus
         /**
          * Remote discovery enabled without results yet (is still working).
          */
-        ENABLED,
+        ENABLED_IN_PROGRESS,
+
+        /**
+         * Remote discovery enabled but not possible to perform it (like proxy being blocked).
+         */
+        ENABLED_NOT_POSSIBLE,
 
         /**
          * Remote discovery enabled and was successful.
@@ -66,7 +71,7 @@ public class WLDiscoveryStatus
          */
         public boolean isEnabled()
         {
-            return this.ordinal() >= ENABLED.ordinal();
+            return this.ordinal() >= ENABLED_IN_PROGRESS.ordinal();
         }
     }
 
@@ -85,7 +90,7 @@ public class WLDiscoveryStatus
      */
     public WLDiscoveryStatus( final DStatus status )
     {
-        checkArgument( status.ordinal() < DStatus.SUCCESSFUL.ordinal() );
+        checkArgument( status.ordinal() < DStatus.ENABLED_NOT_POSSIBLE.ordinal() );
         this.status = checkNotNull( status );
         this.lastDiscoveryStrategy = null;
         this.lastDiscoveryMessage = null;
@@ -103,7 +108,7 @@ public class WLDiscoveryStatus
     public WLDiscoveryStatus( final DStatus status, final String lastDiscoveryStrategy,
                               final String lastDiscoveryMessage, final long lastDiscoveryTimestamp )
     {
-        checkArgument( status.ordinal() >= DStatus.SUCCESSFUL.ordinal() );
+        checkArgument( status.ordinal() >= DStatus.ENABLED_NOT_POSSIBLE.ordinal() );
         checkArgument( lastDiscoveryTimestamp > 0 );
         this.status = checkNotNull( status );
         this.lastDiscoveryStrategy = checkNotNull( lastDiscoveryStrategy );

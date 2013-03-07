@@ -102,7 +102,14 @@ public class EventDispatcher
 
     protected void handleRepositoryModified( final MavenRepository mavenRepository )
     {
-        wlManager.forceUpdateWhitelist( mavenRepository );
+        try
+        {
+            wlManager.forceUpdateWhitelist( mavenRepository );
+        }
+        catch ( IllegalStateException e )
+        {
+            getLogger().info( e.getMessage() );
+        }
     }
 
     protected void handlePrefixFileUpdate( final RepositoryItemEvent evt )

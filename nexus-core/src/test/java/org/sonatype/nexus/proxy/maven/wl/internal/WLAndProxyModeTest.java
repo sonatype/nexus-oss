@@ -16,7 +16,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,7 +48,6 @@ import org.sonatype.nexus.proxy.maven.wl.WLManager;
 import org.sonatype.nexus.proxy.maven.wl.WLPublishingStatus.PStatus;
 import org.sonatype.nexus.proxy.maven.wl.WLStatus;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -240,6 +238,7 @@ public class WLAndProxyModeTest
             getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenProxyRepository.class );
 
         assertThat( proxy1.getProxyMode(), equalTo( ProxyMode.BLOCKED_MANUAL ) );
+        waitForWLBackgroundUpdates();
 
         // let's check states
 
@@ -248,8 +247,8 @@ public class WLAndProxyModeTest
             final WLStatus proxy1status = wm.getStatusFor( proxy1 );
             // this repo is Out of Service
             assertThat( proxy1status.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( nullValue() ) );
+            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED_NOT_POSSIBLE ) );
+            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( "none" ) );
             // Remark: the combination of those three above simply means "discovery never tried against it"
             // yet.
         }
@@ -297,6 +296,7 @@ public class WLAndProxyModeTest
             getRepositoryRegistry().getRepositoryWithFacet( PROXY1_REPO_ID, MavenProxyRepository.class );
 
         assertThat( proxy1.getProxyMode(), equalTo( ProxyMode.BLOCKED_MANUAL ) );
+        waitForWLBackgroundUpdates();
 
         // let's check states
         {
@@ -304,8 +304,8 @@ public class WLAndProxyModeTest
             final WLStatus proxy1status = wm.getStatusFor( proxy1 );
             // this repo is Blocked
             assertThat( proxy1status.getPublishingStatus().getStatus(), equalTo( PStatus.NOT_PUBLISHED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( nullValue() ) );
+            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED_NOT_POSSIBLE ) );
+            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( "none" ) );
             // Remark: the combination of those three above simply means "discovery never tried against it"
             // yet.
         }
@@ -369,8 +369,8 @@ public class WLAndProxyModeTest
                     MavenProxyRepository.class ) );
             // this repo is blocked
             assertThat( proxy1status.getPublishingStatus().getStatus(), equalTo( PStatus.PUBLISHED ) );
-            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.SUCCESSFUL ) );
-            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( RemotePrefixFileStrategy.ID ) );
+            assertThat( proxy1status.getDiscoveryStatus().getStatus(), equalTo( DStatus.ENABLED_NOT_POSSIBLE ) );
+            assertThat( proxy1status.getDiscoveryStatus().getLastDiscoveryStrategy(), is( "none" ) );
         }
         {
             // group
