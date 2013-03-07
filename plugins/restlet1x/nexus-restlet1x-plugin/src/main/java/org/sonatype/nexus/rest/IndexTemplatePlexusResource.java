@@ -231,7 +231,7 @@ public class IndexTemplatePlexusResource
         for ( UiContributor rJs : rJsContributors )
         {
             UiContribution contribution = rJs.contribute( debugMode );
-            if ( contribution != null )
+            if ( contribution.isEnabled() )
             {
                 contributions.add( contribution );
             }
