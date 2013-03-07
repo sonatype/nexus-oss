@@ -22,7 +22,6 @@ import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -38,7 +37,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.maven.wl.PrefixSource;
 import org.sonatype.nexus.proxy.maven.wl.WLManager;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
@@ -88,16 +86,7 @@ public class EventDispatcher
 
     protected void handleRepositoryAdded( final MavenRepository mavenRepository )
     {
-        try
-        {
-            wlManager.initializeWhitelist( mavenRepository );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn(
-                "Problem while updating published WL for newly added repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-        }
+        wlManager.initializeWhitelist( mavenRepository );
     }
 
     protected void handleRepositoryModified( final MavenRepository mavenRepository )
@@ -108,7 +97,9 @@ public class EventDispatcher
         }
         catch ( IllegalStateException e )
         {
-            getLogger().info( e.getMessage() );
+            // we will end up here regularly if reconfiguration was about putting repository out of service
+            getLogger().debug( "Repository {} is in bad state for white-list update: {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e.getMessage() );
         }
     }
 
@@ -122,9 +113,8 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Problem while updating published WL for repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + " in response to " + evt, e );
+            getLogger().warn( "Problem while publishing white-list for repository {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
         }
     }
 
@@ -137,9 +127,8 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Problem while updating published WL for repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + " in response to " + evt, e );
+            getLogger().warn( "Problem while unpublishing white-list for repository {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
         }
     }
 
@@ -151,10 +140,8 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Problem while maintaining WL for hosted repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository )
-                    + ", unable to remove path: " + path, e );
+            getLogger().warn( "Problem while maintaining white-list for hosted repository {}, offered path={}",
+                RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ), path, e );
         }
     }
 
@@ -166,10 +153,8 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Problem while maintaining WL for hosted repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository )
-                    + ", unable to remove path: " + path, e );
+            getLogger().warn( "Problem while maintaining white-list for hosted repository {}, revoked path={}",
+                RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ), path, e );
         }
     }
 

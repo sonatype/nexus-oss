@@ -182,9 +182,9 @@ public class WLManagerImpl
             initableRepositories.addAll( repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) );
             for ( MavenRepository mavenRepository : initableRepositories )
             {
-                if ( isMavenRepositoryUpdateable( mavenRepository ) )
+                if ( mavenRepository.getLocalStatus().shouldServiceRequest() )
                 {
-                    initializeWhitelist( true, mavenRepository );
+                    initializeWhitelist( mavenRepository );
                 }
             }
         }
@@ -217,19 +217,20 @@ public class WLManagerImpl
         }
         catch ( InterruptedException e )
         {
-            getLogger().debug( "Could not cleanly shut down.", e );
+            getLogger().debug( "Could not cleanly shut down", e );
         }
     }
 
     @Override
     public void initializeWhitelist( final MavenRepository mavenRepository )
     {
-        initializeWhitelist( true, mavenRepository );
+        doInitializeWhitelist( mavenRepository );
     }
 
-    protected void initializeWhitelist( final boolean doUpdateIfNeeded, final MavenRepository mavenRepository )
+    protected void doInitializeWhitelist( final MavenRepository mavenRepository )
     {
-        getLogger().debug( "Initializing WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        getLogger().debug( "Initializing white-list of {}",
+            RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
         final PrefixSource prefixSource = getPrefixSourceFor( mavenRepository );
         try
         {
@@ -238,7 +239,7 @@ public class WLManagerImpl
                 // good, we assume is up to date, which should be unless user tampered with it
                 // in that case, just delete it + update and should be fixed.
                 publish( mavenRepository, prefixSource );
-                getLogger().info( "Existing white-list of {} initialized.",
+                getLogger().info( "Existing white-list of {} initialized",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
             else
@@ -246,22 +247,16 @@ public class WLManagerImpl
                 // mark it for noscrape if not marked yet
                 // this is mainly important on 1st boot or newly added reposes
                 unpublish( mavenRepository );
-                if ( doUpdateIfNeeded )
-                {
-                    updateWhitelist( mavenRepository );
-                    getLogger().info( "Updating white-list of {}, it does not exists yet.",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
-                else
-                {
-                    getLogger().info( "White-list of {} not exists yet, marked for noscrape.",
-                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
-                }
+                // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
+                // publish
+                updateWhitelist( mavenRepository );
+                getLogger().info( "Initializing non existing white-list of {}",
+                    RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
         }
         catch ( Exception e )
         {
-            getLogger().warn( "Problem during white-list update of {}",
+            getLogger().warn( "Problem during white-list initialisation of {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
             try
             {
@@ -280,6 +275,7 @@ public class WLManagerImpl
      */
     protected void mayUpdateAllProxyWhitelists()
     {
+        getLogger().trace( "mayUpdateAllProxyWhitelists started" );
         final List<MavenProxyRepository> mavenProxyRepositories =
             repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class );
         for ( MavenProxyRepository mavenProxyRepository : mavenProxyRepositories )
@@ -325,22 +321,22 @@ public class WLManagerImpl
             {
                 if ( discoveryStatus.getStatus() == DStatus.ENABLED_IN_PROGRESS )
                 {
-                    getLogger().debug( "Proxy repository {} has never been discovered before, updating it.",
+                    getLogger().debug( "Proxy {} has never been discovered before",
                         RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 }
                 else if ( discoveryStatus.getStatus() == DStatus.ENABLED_NOT_POSSIBLE )
                 {
-                    getLogger().debug( "Proxy repository {} discovery was not possible before, updating it.",
+                    getLogger().debug( "Proxy {} discovery was not possible before",
                         RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 }
                 else if ( discoveryStatus.getStatus() == DStatus.ERROR )
                 {
-                    getLogger().debug( "Proxy repository {} previous discovery hit an error, updating it.",
+                    getLogger().debug( "Proxy {} previous discovery hit an error",
                         RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 }
                 else
                 {
-                    getLogger().debug( "Proxy repository {} needs periodic remote discovery update, updating it.",
+                    getLogger().debug( "Proxy {} needs periodic remote discovery update",
                         RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 }
                 final boolean updateSpawned = doUpdateWhitelistAsync( false, mavenProxyRepository );
@@ -349,16 +345,20 @@ public class WLManagerImpl
                     // this means that either remote discovery takes too long or user might pressed Force discovery
                     // on UI for moments before this call kicked in. Anyway, warn the user in logs
                     getLogger().info(
-                        "Proxy repository's {} periodic remote discovery not spawned, as there is already an ongoing job doing it. Consider raising the update interval for it.",
+                        "Proxy {} periodic remote discovery skipped as there is an ongoing job updating it, consider raising the update interval for this repository",
                         RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 }
                 return updateSpawned;
             }
+            else
+            {
+                getLogger().debug( "Proxy {} white-list is up to date",
+                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
+            }
         }
         else
         {
-            getLogger().info(
-                "Proxy repository {} white-list update requested, but it's remote discovery is disabled, not updating it.",
+            getLogger().debug( "Proxy {} white-list update requested, but it's remote discovery is disabled",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         }
         return false;
@@ -387,20 +387,20 @@ public class WLManagerImpl
         checkUpdateConditions( mavenProxyRepository );
         try
         {
-            getLogger().debug( "Quick updating WL of {}.",
+            getLogger().debug( "Quick updating white-list of {}",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             constrainedExecutor.cancelRunningWithKey( mavenProxyRepository.getId() );
             final PrefixSource prefixSource =
                 updateProxyWhitelist( mavenProxyRepository, Collections.singletonList( quickRemoteStrategy ) );
             if ( prefixSource != null )
             {
-                getLogger().info( "Updated and published white-list of {}.",
+                getLogger().info( "Updated and published white-list of {}",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 publish( mavenProxyRepository, prefixSource );
             }
             else
             {
-                getLogger().info( "Unpublished white-list of {} (and is marked for noscrape).",
+                getLogger().info( "Unpublished white-list of {} (and is marked for noscrape)",
                     RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
                 unpublish( mavenProxyRepository );
             }
@@ -436,21 +436,6 @@ public class WLManagerImpl
         return true;
     }
 
-    protected boolean isMavenRepositoryUpdateable( final MavenRepository mavenRepository )
-        throws IllegalStateException
-    {
-        if ( !isMavenRepositorySupported( mavenRepository ) )
-        {
-            return false;
-        }
-        final LocalStatus localStatus = mavenRepository.getLocalStatus();
-        if ( !localStatus.shouldServiceRequest() )
-        {
-            return false; // out of service
-        }
-        return true;
-    }
-
     /**
      * Checks conditions for repository, is it updateable. If not for any reason, {@link IllegalStateException} is
      * thrown.
@@ -464,15 +449,15 @@ public class WLManagerImpl
     {
         if ( !isMavenRepositorySupported( mavenRepository ) )
         {
-            throw new IllegalStateException( "Maven repository "
-                + RepositoryStringUtils.getHumanizedNameString( mavenRepository )
-                + " not supported by WL feature (only Maven2 hosted, proxy and group repositories are supported)." );
+            // we should really not see this, it would mean some execution path is buggy as it gets here
+            // with unsupported repo
+            throw new IllegalStateException(
+                "Repository not supported by white-list feature (only Maven2 hosted, proxy and group repositories are supported)" );
         }
-        if ( !isMavenRepositoryUpdateable( mavenRepository ) )
+        final LocalStatus localStatus = mavenRepository.getLocalStatus();
+        if ( !localStatus.shouldServiceRequest() )
         {
-            throw new IllegalStateException( "Maven repository "
-                + RepositoryStringUtils.getHumanizedNameString( mavenRepository )
-                + " not in state to be updated (is out of service)." );
+            throw new IllegalStateException( "Repository out of service" );
         }
     }
 
@@ -500,7 +485,7 @@ public class WLManagerImpl
             {
                 // this is okay, as forced happens rarely, currently only when proxy repo changes remoteURL
                 // (reconfiguration happens)
-                getLogger().debug( "Forced white-list update on {} canceled currently running discovery.",
+                getLogger().debug( "Forced white-list update on {} canceled currently running discovery job",
                     RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
             }
             return canceledPreviousJob;
@@ -514,14 +499,14 @@ public class WLManagerImpl
     protected boolean isUpdateWhitelistJobRunning()
     {
         final Statistics statistics = constrainedExecutor.getStatistics();
-        getLogger().debug( "Running update jobs for {}.", statistics.getCurrentlyRunningJobKeys() );
+        getLogger().debug( "Running update jobs for {}", statistics.getCurrentlyRunningJobKeys() );
         return !statistics.getCurrentlyRunningJobKeys().isEmpty();
     }
 
     protected void updateAndPublishWhitelist( final MavenRepository mavenRepository, final boolean notify )
         throws IOException
     {
-        getLogger().debug( "Updating WL of {}.", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
+        getLogger().debug( "Updating white-list of {}", RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
         try
         {
             final PrefixSource prefixSource;
@@ -539,7 +524,7 @@ public class WLManagerImpl
             }
             else
             {
-                getLogger().info( "Repository {} not supported by white-list feature, not updating it.",
+                getLogger().info( "Repository {} unsupported by white-list feature",
                     RepositoryStringUtils.getFullHumanizedNameString( mavenRepository ) );
                 return;
             }
@@ -547,7 +532,7 @@ public class WLManagerImpl
             {
                 if ( notify )
                 {
-                    getLogger().info( "Updated and published white-list of {}.",
+                    getLogger().info( "Updated and published white-list of {}",
                         RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 }
                 publish( mavenRepository, prefixSource );
@@ -556,7 +541,7 @@ public class WLManagerImpl
             {
                 if ( notify )
                 {
-                    getLogger().info( "Unpublished white-list of {} (and is marked for noscrape).",
+                    getLogger().info( "Unpublished white-list of {} (and is marked for noscrape)",
                         RepositoryStringUtils.getHumanizedNameString( mavenRepository ) );
                 }
                 unpublish( mavenRepository );
@@ -606,14 +591,12 @@ public class WLManagerImpl
                     remoteContentDiscoverer.discoverRemoteContent( mavenProxyRepository, remoteStrategies );
             }
 
+            getLogger().debug( "Results of {} remote discovery: {}", mavenProxyRepository.getId(),
+                discoveryResult.getAllResults() );
+
             if ( discoveryResult.isSuccessful() )
             {
                 prefixSource = discoveryResult.getPrefixSource();
-            }
-            else
-            {
-                getLogger().debug( "{} remote discovery unsuccessful.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
             }
             final Outcome lastOutcome = discoveryResult.getLastResult();
 
@@ -640,7 +623,7 @@ public class WLManagerImpl
         }
         else
         {
-            getLogger().info( "{} remote discovery disabled.",
+            getLogger().info( "{} remote discovery disabled",
                 RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ) );
         }
         return prefixSource;
@@ -659,7 +642,7 @@ public class WLManagerImpl
         }
         else
         {
-            getLogger().debug( "{} local discovery unsuccessful.",
+            getLogger().debug( "{} local discovery unsuccessful",
                 RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ) );
         }
         return prefixSource;
@@ -688,15 +671,9 @@ public class WLManagerImpl
                     {
                         if ( !memberEntrySource.exists() )
                         {
-                            getLogger().debug( "{} group's member {} does not have WL published.",
-                                RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ),
-                                RepositoryStringUtils.getHumanizedNameString( member ) );
                             allMembersHaveWLPublished = false;
                             break;
                         }
-                        getLogger().debug( "{} group's member {} does have WL published, merging it in...",
-                            RepositoryStringUtils.getHumanizedNameString( mavenGroupRepository ),
-                            RepositoryStringUtils.getHumanizedNameString( member ) );
                         entries.addAll( memberEntrySource.readEntries() );
                     }
                     finally
@@ -758,7 +735,7 @@ public class WLManagerImpl
                         }
                     }
                     message =
-                        "Publishing not possible, as following members have no published whitelist: "
+                        "Publishing not possible, following members have no published whitelist: "
                             + Joiner.on( ", " ).join( membersWithoutWhitelists );
                 }
                 else if ( mavenRepository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
@@ -826,7 +803,7 @@ public class WLManagerImpl
                         // is the only place where we actually "calculate" it
                         discoveryStatus =
                             new WLDiscoveryStatus( DStatus.ENABLED_NOT_POSSIBLE, "none",
-                                "Repository is out of service", System.currentTimeMillis() );
+                                "Repository is out of service.", System.currentTimeMillis() );
                     }
                     else
                     {
@@ -1057,10 +1034,9 @@ public class WLManagerImpl
                 catch ( IOException e )
                 {
                     getLogger().warn(
-                        "Problem while cascade updating WL for repository "
-                            + RepositoryStringUtils.getHumanizedNameString( containingGroupRepository )
-                            + " in response to WL update in member "
-                            + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + ".", e );
+                        "Problem while cascading white-list update to group repository {} from it's member {}",
+                        RepositoryStringUtils.getHumanizedNameString( containingGroupRepository ),
+                        RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
                 }
             }
         }

@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.maven.wl.discovery;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -122,6 +123,12 @@ public class DiscoveryResult<R extends MavenRepository>
         {
             return throwable;
         }
+
+        @Override
+        public String toString()
+        {
+            return "Outcome[strategyId=" + strategyId + ", successful=" + successful + ", message=" + message + "]";
+        }
     }
 
     private final R mavenRepository;
@@ -163,13 +170,23 @@ public class DiscoveryResult<R extends MavenRepository>
     }
 
     /**
-     * Returns the succeeded strategy instance.F
+     * Returns the succeeded strategy instance.
      * 
      * @return strategy that succeeded.
      */
     public Outcome getLastResult()
     {
         return getLastOutcome();
+    }
+
+    /**
+     * Returns all the outcomes.
+     * 
+     * @return strategy that succeeded.
+     */
+    public List<Outcome> getAllResults()
+    {
+        return Collections.unmodifiableList( outcomes );
     }
 
     /**
