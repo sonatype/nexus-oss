@@ -48,13 +48,16 @@ public interface UiContributor
 
         private String module;
 
+        private boolean enabled;
+
         /**
          * @see UiContributionBuilder
          */
-        public UiContribution( final String module, final List<String> dependencies )
+        public UiContribution( final String module, final List<String> dependencies, boolean enabled )
         {
             this.dependencies = dependencies;
             this.module = module;
+            this.enabled = enabled;
         }
 
         /**
@@ -73,6 +76,11 @@ public interface UiContributor
          */
         public String getModule() {
             return this.module;
+        }
+
+        public boolean isEnabled()
+        {
+            return enabled;
         }
     }
 
