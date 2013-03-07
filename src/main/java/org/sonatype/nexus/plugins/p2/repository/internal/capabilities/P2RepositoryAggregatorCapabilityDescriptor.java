@@ -12,21 +12,26 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration.REPOSITORY;
 import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor.TYPE_ID;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
+import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 
 @Singleton
-@Named( TYPE_ID )
+@Named(TYPE_ID)
 public class P2RepositoryAggregatorCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
@@ -36,7 +41,10 @@ public class P2RepositoryAggregatorCapabilityDescriptor
 
     private static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
-    public P2RepositoryAggregatorCapabilityDescriptor()
+    private final Validators validators;
+
+    @Inject
+    public P2RepositoryAggregatorCapabilityDescriptor( final Validators validators )
     {
         super(
             TYPE,
@@ -47,8 +55,31 @@ public class P2RepositoryAggregatorCapabilityDescriptor
                 + "<span style=\"font-weight: bold;\">EXPERIMENTAL</span>\n"
                 + "<br/>"
                 + "This is an experimental, unsupported feature.",
-            new RepoOrGroupComboFormField( P2RepositoryAggregatorConfiguration.REPOSITORY, FormField.MANDATORY )
+            new RepoOrGroupComboFormField( REPOSITORY, FormField.MANDATORY )
         );
+        this.validators = checkNotNull( validators );
+    }
+
+    /**
+     * Validate on create that there is only one capability for the configured repository.
+     *
+     * @since 2.3.1
+     */
+    @Override
+    public Validator validator()
+    {
+        return validators.capability().uniquePer( TYPE, REPOSITORY );
+    }
+
+    /**
+     * Validate on update that there is only one capability for the configured repository .
+     *
+     * @since 2.3.1
+     */
+    @Override
+    public Validator validator( final CapabilityIdentity id )
+    {
+        return validators.capability().uniquePerExcluding( id, TYPE, REPOSITORY );
     }
 
 }
