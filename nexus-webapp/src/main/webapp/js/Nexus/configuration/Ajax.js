@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('ext/Ajax', ['extjs'], function(Ext) {
+define('Nexus/configuration/Ajax', ['extjs'], function(Ext) {
   Ext.Ajax.defaultHeaders = {
     'accept' : 'application/json,application/vnd.siesta-error-v1+json,application/vnd.siesta-validation-errors-v1+json'
   };

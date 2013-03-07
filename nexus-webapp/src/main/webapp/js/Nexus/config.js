@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init'], function(Ext, mbox, Sonatype) {
+define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init', 'Nexus/configuration/Ajax'], function(Ext, mbox, Sonatype) {
 
   // ********* Set ExtJS options
   // *************************************************
