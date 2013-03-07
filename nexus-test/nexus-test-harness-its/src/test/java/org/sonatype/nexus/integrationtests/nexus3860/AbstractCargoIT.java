@@ -119,10 +119,10 @@ public abstract class AbstractCargoIT
             // WL does discovery in background. For some reason, codehaus prefix file
             // fetch on bamboo took 20s, so while WL shutdown is not fixed, disabling
             // WL for now here.
-            // TODO: this is disabled for now as it MIGHT actually problem with WL wrt (re)booting
-            // final HashMap<String, String> sysProps = new HashMap<String, String>();
-            // sysProps.put( WLConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString() );
-            // container.setSystemProperties( sysProps );
+
+            final HashMap<String, String> sysProps = new HashMap<String, String>();
+            sysProps.put( WLConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString() );
+            container.setSystemProperties( sysProps );
 
             container.setTimeout( 5 * 60 * 1000 );// 5 minutes
             container.start();
