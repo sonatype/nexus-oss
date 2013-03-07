@@ -86,6 +86,18 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
           });
     },
 
+    parseHTMLErrorMessage : function(text) {
+      var
+            n1 = text.toLowerCase().indexOf('<p>') + 3,
+            n2 = text.toLowerCase().indexOf('</p>');
+
+      if (n2 > n1) {
+        return text.substring(n1, n2);
+      }
+
+      return '';
+    },
+
     /**
      * Show a message box with content according to the response.
      *
@@ -127,13 +139,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
         }
         else
         {
-          var n1 = r.toLowerCase().indexOf('<p>') + 3;
-          var n2 = r.toLowerCase().indexOf('</p>');
-          if (n2 > n1)
-          {
-            serverMessage += '<br /><br />';
-            serverMessage += r.substring(n1, n2);
-          }
+          serverMessage = ns.parseHTMLErrorMessage(r);
         }
       }
 
