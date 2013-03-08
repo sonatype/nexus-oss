@@ -12,32 +12,30 @@
  */
 package org.sonatype.nexus.proxy.router;
 
-import java.io.File;
-import java.net.URL;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.shiro.realm.Realm;
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
@@ -64,6 +62,8 @@ public class DefaultRepositoryRouterTest
     private SecuritySystem securitySystem = null;
 
     private ApplicationConfiguration applicationConfiguration;
+
+    private TargetRegistry targetRegistry;
 
     @Override
     protected void setUp()
@@ -99,7 +99,7 @@ public class DefaultRepositoryRouterTest
         // URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
         // FileUtils.copyURLToFile( url, new File( getConfHomeDir(), "security-configuration.xml" ) );
 
-        TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
+        targetRegistry = this.lookup( TargetRegistry.class );
 
         // shave off defaults
         final Collection<Target> targets = new ArrayList<Target>( targetRegistry.getRepositoryTargets() );
@@ -139,6 +139,59 @@ public class DefaultRepositoryRouterTest
     protected boolean loadConfigurationAtSetUp()
     {
         return false;
+    }
+
+    @Test
+    public void testNXCM4999UseInRepoPathForTargetMatching()
+        throws Exception
+    {
+        // add repo1 to group1
+        repositoryRegistry.getRepositoryWithFacet( "group1", MavenGroupRepository.class ).addMemberRepositoryId(
+            "repo1" );
+        // create a path specific target
+        Target t =
+            new Target( "nxcm4999", "NXCM4999", new Maven2ContentClass(),
+                Arrays.asList( new String[] { "(?!/com/.*-sources.jar).*" } ) );
+        targetRegistry.addRepositoryTarget( t );
+        // flush changes
+        applicationConfiguration.saveConfiguration();
+
+        {
+            final Subject subject = loginUser( "nxcm4999user" );
+            try
+            {
+                final ResourceStoreRequest request1 =
+                    new ResourceStoreRequest( "/repositories/repo1/com/mycorp/artifact/1.0/artifact-1.0.jar" );
+                assertThat( "User should have access to this resource as it has all the needed perms.",
+                    router.authorizePath( request1, Action.read ) );
+                final ResourceStoreRequest request2 =
+                    new ResourceStoreRequest( "/repositories/repo1/com/mycorp/artifact/1.0/artifact-1.0-sources.jar" );
+                assertThat( "User should have access to this resource as it has all the needed perms.",
+                    router.authorizePath( request2, Action.read ) );
+            }
+            finally
+            {
+                securitySystem.logout( subject );
+            }
+        }
+        {
+            final Subject subject = loginUser( "nxcm4999userNoSources" );
+            try
+            {
+                final ResourceStoreRequest request1 =
+                    new ResourceStoreRequest( "/repositories/repo1/com/mycorp/artifact/1.0/artifact-1.0.jar" );
+                assertThat( "User should have access to this resource as it has no needed perms.",
+                    router.authorizePath( request1, Action.read ) );
+                final ResourceStoreRequest request2 =
+                    new ResourceStoreRequest( "/repositories/repo1/com/mycorp/artifact/1.0/artifact-1.0-sources.jar" );
+                assertThat( "User should NOT have access to this resource as it has no needed perms.",
+                    !router.authorizePath( request2, Action.read ) );
+            }
+            finally
+            {
+                securitySystem.logout( subject );
+            }
+        }
     }
 
     @Test
