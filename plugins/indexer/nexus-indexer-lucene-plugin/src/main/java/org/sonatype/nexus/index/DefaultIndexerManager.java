@@ -905,6 +905,7 @@ public class DefaultIndexerManager
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( Repository repository : reposes )
         {
+            TaskUtil.checkInterruption();
             try
             {
                 // going directly to single-shot, we are iterating over all reposes anyway
@@ -922,6 +923,7 @@ public class DefaultIndexerManager
         {
             for ( Repository repository : reposes )
             {
+                TaskUtil.checkInterruption();
                 try
                 {
                     publishRepositoryIndex( repository );
@@ -957,6 +959,7 @@ public class DefaultIndexerManager
             return;
         }
 
+        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         if ( CASCADE )
         {
             if ( ISGROUP( repository ) )
@@ -965,16 +968,30 @@ public class DefaultIndexerManager
 
                 for ( Repository member : members )
                 {
-                    reindexRepository( path, member, fullReindex, processedRepositoryIds );
+                    TaskUtil.checkInterruption();
+                    try
+                    {
+                        reindexRepository( path, member, fullReindex, processedRepositoryIds );
+                    }
+                    catch ( IOException e )
+                    {
+                        exceptions.add( e );
+                    }
                 }
             }
         }
 
+        TaskUtil.checkInterruption();
         reindexRepository( repository, path, fullReindex );
 
         if ( REINDEX_PUBLISHES )
         {
             publishRepositoryIndex( repository );
+        }
+        if ( !exceptions.isEmpty() )
+        {
+            throw new IOException( "Exception(s) happened during reindexAllRepositories()", new CompositeException(
+                "Multiple exceptions happened, please see prior log messages for details.", exceptions ) );
         }
     }
 
@@ -1106,6 +1123,7 @@ public class DefaultIndexerManager
             return;
         }
 
+        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         if ( CASCADE )
         {
             if ( ISGROUP( repository ) )
@@ -1114,14 +1132,28 @@ public class DefaultIndexerManager
 
                 for ( Repository member : members )
                 {
-                    downloadRepositoryIndex( member, processedRepositoryIds );
+                    TaskUtil.checkInterruption();
+                    try
+                    {
+                        downloadRepositoryIndex( member, processedRepositoryIds );
+                    }
+                    catch ( IOException e )
+                    {
+                        exceptions.add( e );
+                    }
                 }
             }
         }
 
         if ( ISPROXY( repository ) )
         {
+            TaskUtil.checkInterruption();
             downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ), false );
+        }
+        if ( !exceptions.isEmpty() )
+        {
+            throw new IOException( "Exception(s) happened during reindexAllRepositories()", new CompositeException(
+                "Multiple exceptions happened, please see prior log messages for details.", exceptions ) );
         }
     }
 
@@ -1356,6 +1388,7 @@ public class DefaultIndexerManager
         // just publish all, since we use merged context, no need for double pass
         for ( Repository repository : reposes )
         {
+            TaskUtil.checkInterruption();
             try
             {
                 publishRepositoryIndex( repository );
@@ -1388,6 +1421,7 @@ public class DefaultIndexerManager
             return;
         }
 
+        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         if ( CASCADE )
         {
             if ( ISGROUP( repository ) )
@@ -1397,15 +1431,25 @@ public class DefaultIndexerManager
                 for ( Repository member : members )
                 {
                     TaskUtil.checkInterruption();
-
-                    publishRepositoryIndex( member, processedRepositoryIds );
+                    try
+                    {
+                        publishRepositoryIndex( member, processedRepositoryIds );
+                    }
+                    catch ( IOException e )
+                    {
+                        exceptions.add( e );
+                    }
                 }
             }
         }
 
         TaskUtil.checkInterruption();
-
         publishRepositoryIndex( repository );
+        if ( !exceptions.isEmpty() )
+        {
+            throw new IOException( "Exception(s) happened during reindexAllRepositories()", new CompositeException(
+                "Multiple exceptions happened, please see prior log messages for details.", exceptions ) );
+        }
     }
 
     protected void publishRepositoryIndex( final Repository repository )
@@ -1598,6 +1642,7 @@ public class DefaultIndexerManager
         final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         for ( Repository repository : repos )
         {
+            TaskUtil.checkInterruption();
             try
             {
                 optimizeRepositoryIndex( repository );
@@ -1631,6 +1676,7 @@ public class DefaultIndexerManager
             return;
         }
 
+        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
         if ( CASCADE )
         {
             if ( ISGROUP( repository ) )
@@ -1640,15 +1686,25 @@ public class DefaultIndexerManager
                 for ( Repository member : group.getMemberRepositories() )
                 {
                     TaskUtil.checkInterruption();
-
-                    optimizeIndex( member, processedRepositoryIds );
+                    try
+                    {
+                        optimizeIndex( member, processedRepositoryIds );
+                    }
+                    catch ( IOException e )
+                    {
+                        exceptions.add( e );
+                    }
                 }
             }
         }
 
         TaskUtil.checkInterruption();
-
         optimizeRepositoryIndex( repository );
+        if ( !exceptions.isEmpty() )
+        {
+            throw new IOException( "Exception(s) happened during reindexAllRepositories()", new CompositeException(
+                "Multiple exceptions happened, please see prior log messages for details.", exceptions ) );
+        }
     }
 
     protected void optimizeRepositoryIndex( final Repository repository )
