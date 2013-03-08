@@ -66,7 +66,8 @@ public class WhitelistDisabledSmokeIT
     public void waitForDiscoveryOutcome()
         throws Exception
     {
-        waitForWLDiscoveryOutcome( "central" );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLDiscoveryOutcome( "central" );
     }
 
     @Test

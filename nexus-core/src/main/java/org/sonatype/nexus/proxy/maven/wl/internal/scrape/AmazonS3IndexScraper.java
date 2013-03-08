@@ -147,6 +147,10 @@ public class AmazonS3IndexScraper
                 continue; // skip it
             }
             final String key = keyElements.get( 0 ).text();
+            if ( key.startsWith( "." ) || key.contains( "/." ) )
+            {
+                continue; // skip it, it's a ".dot" file
+            }
             final long size = Long.parseLong( sizeElements.get( 0 ).text() );
             if ( size > 0 )
             {

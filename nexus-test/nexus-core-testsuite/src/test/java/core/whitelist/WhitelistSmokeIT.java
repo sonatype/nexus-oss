@@ -13,6 +13,7 @@
 package core.whitelist;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -57,7 +58,8 @@ public class WhitelistSmokeIT
     public void waitForDiscoveryOutcome()
         throws Exception
     {
-        waitForWLDiscoveryOutcome( "central" );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLDiscoveryOutcome( "central" );
     }
 
     @Test
@@ -141,13 +143,27 @@ public class WhitelistSmokeIT
         }
     }
 
-    @Test( expected = NexusClientBadRequestException.class )
+    @Test
     public void checkDiscoveryOnBlockedProxyRepository()
+        throws InterruptedException
     {
         try
         {
+            final Status statusBefore = whitelist().getWhitelistStatus( "central" );
+            assertThat( statusBefore.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+            assertThat( statusBefore.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.SUCCEEDED ) );
+
+            // block it
             repositories().get( ProxyRepository.class, "central" ).block().save();
             whitelist().updateWhitelist( "central" );
+            whitelistTest().waitForAllWhitelistUpdateJobToStop();
+            // waitForWLDiscoveryOutcome( "central" );
+
+            // recheck
+            final Status statusAfter = whitelist().getWhitelistStatus( "central" );
+            assertThat( statusAfter.getPublishedStatus(), equalTo( Outcome.SUCCEEDED ) );
+            assertThat( statusAfter.getDiscoveryStatus().getDiscoveryLastStatus(), equalTo( Outcome.FAILED ) );
+            assertThat( statusAfter.getDiscoveryStatus().getDiscoveryLastMessage(), containsString( "blocked" ) );
         }
         finally
         {

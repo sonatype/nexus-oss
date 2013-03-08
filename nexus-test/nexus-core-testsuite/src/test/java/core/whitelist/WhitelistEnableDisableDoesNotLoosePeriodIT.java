@@ -42,7 +42,8 @@ public class WhitelistEnableDisableDoesNotLoosePeriodIT
     public void waitForDiscoveryOutcome()
         throws Exception
     {
-        waitForWLDiscoveryOutcome( "central" );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLDiscoveryOutcome( "central" );
     }
 
     @Test

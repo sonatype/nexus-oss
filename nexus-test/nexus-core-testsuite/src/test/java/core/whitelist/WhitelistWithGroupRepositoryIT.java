@@ -72,8 +72,9 @@ public class WhitelistWithGroupRepositoryIT
         throws Exception
     {
         // wait for central
-        waitForWLDiscoveryOutcome( "central" );
-        waitForWLPublishingOutcomes( "central", REPO_ID );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLDiscoveryOutcome( "central" );
+        // waitForWLPublishingOutcomes( "central", REPO_ID );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
     }
@@ -88,8 +89,9 @@ public class WhitelistWithGroupRepositoryIT
             final DiscoveryConfiguration config = whitelist().getDiscoveryConfigurationFor( "central" );
             config.setEnabled( false );
             whitelist().setDiscoveryConfigurationFor( "central", config );
-            waitForWLDiscoveryOutcome( "central" );
-            waitForWLPublishingOutcomes( "central", REPO_ID );
+            whitelistTest().waitForAllWhitelistUpdateJobToStop();
+            // waitForWLDiscoveryOutcome( "central" );
+            // waitForWLPublishingOutcomes( "central", REPO_ID );
         }
         assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( true ) );
@@ -97,8 +99,9 @@ public class WhitelistWithGroupRepositoryIT
             final DiscoveryConfiguration config = whitelist().getDiscoveryConfigurationFor( "central" );
             config.setEnabled( true );
             whitelist().setDiscoveryConfigurationFor( "central", config );
-            waitForWLDiscoveryOutcome( "central" );
-            waitForWLPublishingOutcomes( "central", REPO_ID );
+            whitelistTest().waitForAllWhitelistUpdateJobToStop();
+            // waitForWLDiscoveryOutcome( "central" );
+            // waitForWLPublishingOutcomes( "central", REPO_ID );
         }
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );

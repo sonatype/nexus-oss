@@ -26,8 +26,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status;
-import org.sonatype.nexus.client.core.subsystem.whitelist.Whitelist;
 import org.sonatype.nexus.client.core.subsystem.whitelist.Status.Outcome;
+import org.sonatype.nexus.client.core.subsystem.whitelist.Whitelist;
+import org.sonatype.nexus.testsuite.client.WhitelistTest;
 
 import com.google.common.io.Closeables;
 
@@ -58,6 +59,16 @@ public abstract class WhitelistITSupport
     }
 
     /**
+     * Returns {@link WhitelistTest} client subsystem.
+     * 
+     * @return client for whitelist ITs.
+     */
+    public WhitelistTest whitelistTest()
+    {
+        return client().getSubsystem( WhitelistTest.class );
+    }
+
+    /**
      * Waits for a remote discovery outcomes. The passed in repository IDs must correspond to a Maven2 proxy repository,
      * otherwise {@link IllegalArgumentException} is thrown. They all will be waited for, in passed in order.
      * 
@@ -65,12 +76,12 @@ public abstract class WhitelistITSupport
      * @throws IllegalArgumentException if repository ID is not a maven2 proxy.
      * @throws InterruptedException
      */
-    public void waitForWLDiscoveryOutcomes( final String... proxyRepositoryIds )
+    public void _waitForWLDiscoveryOutcomes( final String... proxyRepositoryIds )
         throws IllegalArgumentException, InterruptedException
     {
         for ( String proxyRepositoryId : proxyRepositoryIds )
         {
-            waitForWLDiscoveryOutcome( proxyRepositoryId );
+            _waitForWLDiscoveryOutcome( proxyRepositoryId );
         }
     }
 
@@ -82,7 +93,7 @@ public abstract class WhitelistITSupport
      * @throws IllegalArgumentException if repository ID is not a maven2 proxy.
      * @throws InterruptedException
      */
-    public void waitForWLDiscoveryOutcome( final String proxyRepositoryId )
+    public void _waitForWLDiscoveryOutcome( final String proxyRepositoryId )
         throws IllegalArgumentException, InterruptedException
     {
         // status
@@ -108,12 +119,12 @@ public abstract class WhitelistITSupport
      * @throws IllegalArgumentException if repository ID is not a maven2 repo.
      * @throws InterruptedException
      */
-    public void waitForWLPublishingOutcomes( final String... repositoryIds )
+    public void _waitForWLPublishingOutcomes( final String... repositoryIds )
         throws IllegalArgumentException, InterruptedException
     {
         for ( String repositoryId : repositoryIds )
         {
-            waitForWLPublishingOutcome( repositoryId );
+            _waitForWLPublishingOutcome( repositoryId );
         }
     }
 
@@ -125,7 +136,7 @@ public abstract class WhitelistITSupport
      * @throws NexusClientBadRequestException if repository ID is not a maven2 repo.
      * @throws InterruptedException
      */
-    public void waitForWLPublishingOutcome( final String repositoryId )
+    public void _waitForWLPublishingOutcome( final String repositoryId )
         throws NexusClientBadRequestException, InterruptedException
     {
         // status

@@ -75,7 +75,8 @@ public class WhitelistSanityIT
     public void waitForWLDiscoveryOutcome()
         throws Exception
     {
-        waitForWLDiscoveryOutcome( "central" );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        //waitForWLDiscoveryOutcome( "central" );
     }
 
     /**
