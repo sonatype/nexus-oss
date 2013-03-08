@@ -171,9 +171,9 @@ public class DefaultFSLocalRepositoryStorage
             result = new File( repoBase, request.getRequestPath() );
         }
 
-        if ( getLogger().isDebugEnabled() )
+        if ( getLogger().isTraceEnabled() )
         {
-            getLogger().debug( request.getRequestPath() + " --> " + result.getAbsoluteFile() );
+            getLogger().trace( "{} --> {}", request.getRequestPath(), result.getAbsoluteFile() );
         }
 
         // to be foolproof, chrooting it
@@ -258,7 +258,7 @@ public class DefaultFSLocalRepositoryStorage
                     }
                     catch ( NoSuchRepositoryException e )
                     {
-                        getLogger().warn( "Stale link object found on UID: " + uid.toString() + ", deleting it." );
+                        getLogger().warn( "Stale link object found on UID: {}, deleting it.", uid );
 
                         target.delete();
 
