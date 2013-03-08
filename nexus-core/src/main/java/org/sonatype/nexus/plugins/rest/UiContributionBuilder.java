@@ -16,6 +16,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Builder for contributions used to activate plugin UI.
  *
@@ -48,7 +50,7 @@ public class UiContributionBuilder
      * Sets the entry point to use. If no module is set, the builder will use "artifactId-boot" as a default
      * module name.
      */
-    public UiContributionBuilder boot( String module )
+    public UiContributionBuilder boot( final String module )
     {
         this.module = module;
         return this;
@@ -57,14 +59,15 @@ public class UiContributionBuilder
     /**
      * Adds a dependency.
      */
-    public UiContributionBuilder withDependency( String dependency )
+    public UiContributionBuilder withDependency( final String dependency )
     {
+        checkNotNull(dependency);
         dependencies.add( dependency );
         return this;
     }
 
     /**
-     * Adds the default location for a compressed plugin js file: static/js/$artifactId-all.js
+     * Adds the default location for a compressed plugin js file: {@code static/js/${artifactId}-all.js}.
      */
     public UiContributionBuilder withDefaultAggregateDependency()
     {
@@ -72,9 +75,6 @@ public class UiContributionBuilder
         return withDependency( js );
     }
 
-    /**
-     * Adds the default css dependency if it is available: static/js/$artifactId-all.css
-     */
     private void maybeAddDefaultCssDependency()
     {
         final String path = getDefaultPath( "css", false );
@@ -85,7 +85,7 @@ public class UiContributionBuilder
     }
 
     /**
-     * Adds the default css dependency if it is available: static/js/$artifactId-all.css
+     * Adds the default css dependency if it is available: {@code static/js/${artifactId}-all.css}.
      */
     public UiContributionBuilder withDefaultCssDependency()
     {
@@ -114,7 +114,7 @@ public class UiContributionBuilder
      * If no dependencies are set, the builder will add the default JS dependency,
      * unless the debug parameter is set to true.
      */
-    public UiContributor.UiContribution build( boolean debug )
+    public UiContributor.UiContribution build( final boolean debug )
     {
         if ( module == null )
         {
@@ -133,20 +133,21 @@ public class UiContributionBuilder
     }
 
     /**
-     * Add a constraint to the builder that is evaluated on {@link #build}.
-     * If the given predicate returns false, the UiContribution will be disabled.
+     * Add a condition to the builder that is evaluated on {@link #build} to determine if the contribution is enabled or not.
      *
-     * @param predicate The predicate to evaluate.
+     * @param condition The condition which must be satisfied to enable the contribution.
      */
-    public UiContributionBuilder withCondition( Condition condition )
+    public UiContributionBuilder withCondition( final Condition condition )
     {
-        this.condition = condition;
+        this.condition = checkNotNull(condition);
         return this;
     }
 
+    /**
+     * @see #withCondition(Condition)
+     */
     public static interface Condition
     {
-
         boolean isSatisfied();
     }
 }
