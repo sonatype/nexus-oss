@@ -16,6 +16,8 @@ import javax.inject.Singleton;
 
 /**
  * Capabilities {@link UiContributor}.
+ *
+ * @since 2.2.2
  */
 @Named
 @Singleton

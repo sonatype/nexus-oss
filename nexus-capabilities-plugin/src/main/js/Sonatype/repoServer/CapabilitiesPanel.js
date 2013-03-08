@@ -256,7 +256,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         }, {
            layout: 'column',
            monitorResize: true,
-           items : [ {
+           items : [{
                xtype: 'fieldset',
                autoHeight : true,
                border : false,
@@ -474,23 +474,6 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
                     return Nexus.capabilities.Icons.get(iconName).img;
                 }
             },
-            //{
-            //  xtype : 'checkcolumn',
-            //  readOnly : true,
-            //  sortable : true,
-            //  header : 'Enabled',
-            //  dataIndex : 'enabled',
-            //  width : 50,
-            //  id : 'capabilities-enabled-col'
-            //}, {
-            //  xtype : 'checkcolumn',
-            //  readOnly : true,
-            //  sortable : true,
-            //  header : 'Active',
-            //  dataIndex : 'active',
-            //  width : 50,
-            //  id : 'capabilities-active-col'
-            //},
             {
               header : 'Type',
               dataIndex : 'typeName',
