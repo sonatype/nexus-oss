@@ -80,6 +80,7 @@ import org.sonatype.nexus.util.task.executor.ConstrainedExecutorImpl;
 import org.sonatype.nexus.util.task.executor.Statistics;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.Subscribe;
@@ -496,7 +497,14 @@ public class WLManagerImpl
         }
     }
 
-    protected boolean isUpdateWhitelistJobRunning()
+    /**
+     * Is visible to expose over the nexus-it-helper-plugin only, and UTs are using this. Should not be used for other
+     * means.
+     * 
+     * @return {@code true} if there are white-list jobs running.
+     */
+    @VisibleForTesting
+    public boolean isUpdateWhitelistJobRunning()
     {
         final Statistics statistics = constrainedExecutor.getStatistics();
         getLogger().debug( "Running update jobs for {}", statistics.getCurrentlyRunningJobKeys() );
