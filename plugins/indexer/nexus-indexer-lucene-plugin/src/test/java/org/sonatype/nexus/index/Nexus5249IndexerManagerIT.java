@@ -35,6 +35,7 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -149,7 +150,7 @@ public class Nexus5249IndexerManagerIT
             if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
             {
                 final MavenProxyRepository mavenProxyRepository = repository.adaptToFacet( MavenProxyRepository.class );
-                if ( repository.getId().equals( apacheSnapshots.getId() ) )
+                if ( repository.getId().equals( central.getId() ) )
                 {
                     mavenProxyRepository.setDownloadRemoteIndexes( true );
                     failingRepository = mavenProxyRepository;
@@ -226,6 +227,41 @@ public class Nexus5249IndexerManagerIT
         }
     }
 
+    /**
+     * NEXUS-5542: Same as above, but for cascade operations.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void remoteIOExDoesNotFailsCascadeProcessingAtTheEnd()
+        throws Exception
+    {
+        // HTTP 401/403/etc boils down as some other IOException
+        final IOException ex = new IOException( "something bad happened" );
+        prepare( ex );
+
+        try
+        {
+            // reindex public group
+            indexerManager.reindexRepository( null, "public", false );
+
+            // the above line should throw IOex
+            Assert.fail( "There should be exception thrown!" );
+        }
+        catch ( IOException e )
+        {
+            final MavenGroupRepository publicGroup = repositoryRegistry.getRepositoryWithFacet( "public", MavenGroupRepository.class );
+            // ensure we fetched from one we wanted (failingRepository)
+            assertThat( fetchCountingInvocationHandler, new InvocationMatcher( indexedProxyRepositories ) );
+            // ensure we scanned all the repositories (minus the one failed, as it failed _BEFORE_ scan invocation)
+            Assert.assertEquals( publicGroup.getMemberRepositoryIds().size() - 1, scanInvocationCount );
+            // ensure we have composite exception
+            Assert.assertEquals( CompositeException.class, e.getCause().getClass() );
+            // ensure we got back our bad exception
+            Assert.assertEquals( ex, ( (CompositeException) e.getCause() ).getCauses().iterator().next() );
+        }
+    }
+
     // ==
 
     /**
@@ -284,7 +320,6 @@ public class Nexus5249IndexerManagerIT
 
         private List<StackTraceElement[]> invocationsStackTraces;
 
-
         public CountingInvocationHandler( final InvocationHandler delegate, final Method countedMethod )
         {
             super( delegate );
@@ -316,7 +351,7 @@ public class Nexus5249IndexerManagerIT
         {
             return count;
         }
-        
+
         public void reset()
         {
             count = 0;
@@ -387,14 +422,9 @@ public class Nexus5249IndexerManagerIT
         protected void describeMismatchSafely( final CountingInvocationHandler item,
                                                final Description mismatchDescription )
         {
-            mismatchDescription
-                .appendText( "had " )
-                .appendValue( item.getInvocationCount() )
-                .appendText(" invocations of method " )
-                .appendText( item.method.getDeclaringClass().getName() )
-                .appendText( "#" )
-                .appendText( item.method.getName() )
-                .appendText( "\n" );
+            mismatchDescription.appendText( "had " ).appendValue( item.getInvocationCount() ).appendText(
+                " invocations of method " ).appendText( item.method.getDeclaringClass().getName() ).appendText( "#" ).appendText(
+                item.method.getName() ).appendText( "\n" );
 
             if ( item.invocationsArguments.size() > 0 )
             {
@@ -408,29 +438,21 @@ public class Nexus5249IndexerManagerIT
                         if ( argument instanceof IndexUpdateRequest )
                         {
                             IndexUpdateRequest arg = (IndexUpdateRequest) argument;
-                            mismatchDescription
-                                .appendText( "\t\t " )
-                                .appendText( IndexUpdateRequest.class.getSimpleName() )
-                                .appendText( "->" )
-                                .appendText( IndexingContext.class.getSimpleName() )
-                                .appendText( " repository=" ).appendValue( arg.getIndexingContext().getRepositoryId() )
-                                .appendText( "\n" );
+                            mismatchDescription.appendText( "\t\t " ).appendText(
+                                IndexUpdateRequest.class.getSimpleName() ).appendText( "->" ).appendText(
+                                IndexingContext.class.getSimpleName() ).appendText( " repository=" ).appendValue(
+                                arg.getIndexingContext().getRepositoryId() ).appendText( "\n" );
                         }
                         else
                         {
-                            mismatchDescription
-                                .appendText( "\t\t " )
-                                .appendText( argument.toString() )
-                                .appendText( "\n" );
+                            mismatchDescription.appendText( "\t\t " ).appendText( argument.toString() ).appendText(
+                                "\n" );
                         }
                     }
                     mismatchDescription.appendText( "\t Stack trace:\n" );
                     for ( StackTraceElement element : item.invocationsStackTraces.get( i ) )
                     {
-                        mismatchDescription
-                            .appendText( "\t\t " )
-                            .appendText( element.toString() )
-                            .appendText( "\n" );
+                        mismatchDescription.appendText( "\t\t " ).appendText( element.toString() ).appendText( "\n" );
                     }
                 }
                 mismatchDescription.appendText( "\n" );
