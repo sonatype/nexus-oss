@@ -58,7 +58,8 @@ public class WhitelistSmokeIT
     public void waitForDiscoveryOutcome()
         throws Exception
     {
-        waitForWLDiscoveryOutcome( "central" );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLDiscoveryOutcome( "central" );
     }
 
     @Test
@@ -155,7 +156,8 @@ public class WhitelistSmokeIT
             // block it
             repositories().get( ProxyRepository.class, "central" ).block().save();
             whitelist().updateWhitelist( "central" );
-            waitForWLDiscoveryOutcome( "central" );
+            whitelistTest().waitForAllWhitelistUpdateJobToStop();
+            // waitForWLDiscoveryOutcome( "central" );
 
             // recheck
             final Status statusAfter = whitelist().getWhitelistStatus( "central" );
