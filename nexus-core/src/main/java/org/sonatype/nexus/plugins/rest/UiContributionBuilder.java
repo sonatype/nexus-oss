@@ -30,6 +30,15 @@ public class UiContributionBuilder
 
     private List<String> dependencies = Lists.newLinkedList();
 
+    private Condition condition = new Condition()
+    {
+        @Override
+        public boolean isSatisfied()
+        {
+            return true;
+        }
+    };
+
     public UiContributionBuilder( final Object owner, final String groupId, final String artifactId )
     {
         super( owner, groupId, artifactId );
@@ -96,13 +105,12 @@ public class UiContributionBuilder
     }
 
     /**
-     *
      * If no module is set, the builder will use "artifactId-boot" as a default
      * module name.
-     *
+     * <p/>
      * If no dependencies are set, the builder will add the default CSS dependency,
      * if it is available by Classloader resource lookup.
-     *
+     * <p/>
      * If no dependencies are set, the builder will add the default JS dependency,
      * unless the debug parameter is set to true.
      */
@@ -121,6 +129,24 @@ public class UiContributionBuilder
             withDefaultAggregateDependency();
         }
 
-        return new UiContributor.UiContribution( module, dependencies );
+        return new UiContributor.UiContribution( module, dependencies, condition.isSatisfied() );
+    }
+
+    /**
+     * Add a constraint to the builder that is evaluated on {@link #build}.
+     * If the given predicate returns false, the UiContribution will be disabled.
+     *
+     * @param predicate The predicate to evaluate.
+     */
+    public UiContributionBuilder withCondition( Condition condition )
+    {
+        this.condition = condition;
+        return this;
+    }
+
+    public static interface Condition
+    {
+
+        boolean isSatisfied();
     }
 }

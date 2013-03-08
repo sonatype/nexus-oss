@@ -11,18 +11,11 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global define*/
-define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init'], function(Ext, mbox, Sonatype) {
+define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init', 'Nexus/configuration/Ajax'], function(Ext, mbox, Sonatype) {
 
   // ********* Set ExtJS options
   // *************************************************
 
-  Ext.Ajax.defaultHeaders = {
-    'accept' : 'application/json'
-  };
-
-  // Set default HTTP headers //@todo: move this to some other common init
-  // section
-  Ext.lib.Ajax.defaultPostHeader = 'application/json; charset=utf-8';
 
   // set Sonatype defaults for Ext widgets
   Ext.form.Field.prototype.msgTarget = 'under';

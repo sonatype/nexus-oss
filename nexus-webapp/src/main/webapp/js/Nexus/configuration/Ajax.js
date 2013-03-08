@@ -10,19 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-define('Nexus/all',
-      [
-        'Nexus/config',
-        'Nexus/error',
-        'Nexus/ext',
-        'Nexus/form',
-        'Nexus/log',
-        'Nexus/messages',
-        'Nexus/messagebox',
-        'Nexus/navigation',
-        'Nexus/panels',
-        'Nexus/grid',
-        'Nexus/profile',
-        'Nexus/util'
-      ],
-      function() {});
+/*global define*/
+define('Nexus/configuration/Ajax', ['extjs'], function(Ext) {
+  Ext.Ajax.defaultHeaders = {
+    'accept' : 'application/json,application/vnd.siesta-error-v1+json,application/vnd.siesta-validation-errors-v1+json'
+  };
+
+  Ext.Ajax.on('requestexception', function(connection, response) {
+    var contentType = response.getResponseHeader('Content-Type');
+    if ( contentType === 'application/vnd.siesta-error-v1+json') {
+      response.siestaError = Ext.decode(response.responseText);
+    } else if ( contentType === 'application/vnd.siesta-validation-errors-v1+json') {
+      response.siestaValidationError = Ext.decode(response.responseText);
+    }
+  });
+
+  // Set default HTTP headers
+  Ext.lib.Ajax.defaultPostHeader = 'application/json; charset=utf-8';
+});
