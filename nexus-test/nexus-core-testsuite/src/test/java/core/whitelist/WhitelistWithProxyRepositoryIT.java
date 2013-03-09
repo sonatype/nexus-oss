@@ -71,7 +71,8 @@ public class WhitelistWithProxyRepositoryIT
         throws Exception
     {
         // wait for central
-        waitForWLDiscoveryOutcome( REPO_ID );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLDiscoveryOutcome( REPO_ID );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
     }
@@ -86,7 +87,8 @@ public class WhitelistWithProxyRepositoryIT
             final DiscoveryConfiguration config = whitelist().getDiscoveryConfigurationFor( REPO_ID );
             config.setEnabled( false );
             whitelist().setDiscoveryConfigurationFor( REPO_ID, config );
-            waitForWLDiscoveryOutcome( REPO_ID );
+            whitelistTest().waitForAllWhitelistUpdateJobToStop();
+            // waitForWLDiscoveryOutcome( REPO_ID );
         }
         assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( true ) );
@@ -94,7 +96,8 @@ public class WhitelistWithProxyRepositoryIT
             final DiscoveryConfiguration config = whitelist().getDiscoveryConfigurationFor( REPO_ID );
             config.setEnabled( true );
             whitelist().setDiscoveryConfigurationFor( REPO_ID, config );
-            waitForWLDiscoveryOutcome( REPO_ID );
+            whitelistTest().waitForAllWhitelistUpdateJobToStop();
+            // waitForWLDiscoveryOutcome( REPO_ID );
         }
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
@@ -108,11 +111,13 @@ public class WhitelistWithProxyRepositoryIT
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
         content().delete( PREFIX_FILE_LOCATION );
-        waitForWLDiscoveryOutcome( REPO_ID );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLDiscoveryOutcome( REPO_ID );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( false ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( true ) );
         whitelist().updateWhitelist( REPO_ID );
-        waitForWLDiscoveryOutcome( REPO_ID );
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLDiscoveryOutcome( REPO_ID );
         assertThat( exists( PREFIX_FILE_LOCATION ), is( true ) );
         assertThat( exists( NOSCRAPE_FILE_LOCATION ), is( false ) );
     }

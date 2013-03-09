@@ -179,6 +179,10 @@ public class WhitelistFilteringIT
         final MavenProxyRepository proxyRepository =
             repositories().create( MavenProxyRepository.class, repositoryIdForTest( "someorgProxy1" ) ).asProxyOf(
                 server.getUrl().toExternalForm() ).doNotDownloadRemoteIndexes().save();
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLPublishingOutcomes( proxyRepository.id() );
+        client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
+
         try
         {
             // clear recorder
@@ -306,6 +310,10 @@ public class WhitelistFilteringIT
         final MavenProxyRepository proxyRepository =
             repositories().create( MavenProxyRepository.class, repositoryIdForTest( "someorgProxy1" ) ).asProxyOf(
                 server.getUrl().toExternalForm() ).doNotDownloadRemoteIndexes().save();
+        whitelistTest().waitForAllWhitelistUpdateJobToStop();
+        // waitForWLPublishingOutcomes( proxyRepository.id() );
+        client().getSubsystem( Scheduler.class ).waitForAllTasksToStop();
+
         try
         {
             // clear recorder

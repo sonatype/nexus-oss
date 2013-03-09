@@ -86,21 +86,21 @@ public class EventDispatcher
 
     protected void handleRepositoryAdded( final MavenRepository mavenRepository )
     {
-        try
-        {
-            wlManager.initializeWhitelist( mavenRepository );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn(
-                "Problem while updating published WL for newly added repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
-        }
+        wlManager.initializeWhitelist( mavenRepository );
     }
 
     protected void handleRepositoryModified( final MavenRepository mavenRepository )
     {
-        wlManager.forceUpdateWhitelist( mavenRepository );
+        try
+        {
+            wlManager.forceUpdateWhitelist( mavenRepository );
+        }
+        catch ( IllegalStateException e )
+        {
+            // we will end up here regularly if reconfiguration was about putting repository out of service
+            getLogger().debug( "Repository {} is in bad state for white-list update: {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e.getMessage() );
+        }
     }
 
     protected void handlePrefixFileUpdate( final RepositoryItemEvent evt )
@@ -113,9 +113,8 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Problem while updating published WL for repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + " in response to " + evt, e );
+            getLogger().warn( "Problem while publishing white-list for repository {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
         }
     }
 
@@ -128,9 +127,8 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Problem while updating published WL for repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenRepository ) + " in response to " + evt, e );
+            getLogger().warn( "Problem while unpublishing white-list for repository {}",
+                RepositoryStringUtils.getHumanizedNameString( mavenRepository ), e );
         }
     }
 
@@ -142,10 +140,8 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Problem while maintaining WL for hosted repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository )
-                    + ", unable to remove path: " + path, e );
+            getLogger().warn( "Problem while maintaining white-list for hosted repository {}, offered path={}",
+                RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ), path, e );
         }
     }
 
@@ -157,10 +153,8 @@ public class EventDispatcher
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Problem while maintaining WL for hosted repository "
-                    + RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository )
-                    + ", unable to remove path: " + path, e );
+            getLogger().warn( "Problem while maintaining white-list for hosted repository {}, revoked path={}",
+                RepositoryStringUtils.getHumanizedNameString( mavenHostedRepository ), path, e );
         }
     }
 
@@ -180,7 +174,7 @@ public class EventDispatcher
     {
         // we handle repository events after this isActive, is not out of service, and only for non-shadow repository
         // that are Maven2 reposes
-        return isActive() && repository != null && repository.getLocalStatus().shouldServiceRequest()
+        return isActive() && repository != null
             && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
             && !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
             && Maven2ContentClass.ID.equals( repository.getRepositoryContentClass().getId() );
@@ -310,9 +304,9 @@ public class EventDispatcher
      */
     @Subscribe
     @AllowConcurrentEvents
-    public void on( final RepositoryConfigurationUpdatedEvent evt )
+    public void onRepositoryConfigurationUpdatedEvent( final RepositoryConfigurationUpdatedEvent evt )
     {
-        if ( isRepositoryHandled( evt.getRepository() ) && evt.isRemoteUrlChanged() )
+        if ( isRepositoryHandled( evt.getRepository() ) )
         {
             final MavenRepository mavenRepository = evt.getRepository().adaptToFacet( MavenRepository.class );
             handleRepositoryModified( mavenRepository );

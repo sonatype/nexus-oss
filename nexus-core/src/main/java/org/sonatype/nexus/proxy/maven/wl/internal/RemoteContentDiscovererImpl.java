@@ -83,8 +83,6 @@ public class RemoteContentDiscovererImpl
             }
             catch ( StrategyFailedException e )
             {
-                getLogger().debug( "Discovery of {} with strategy failed.",
-                    RepositoryStringUtils.getHumanizedNameString( mavenProxyRepository ), strategy.getId() );
                 discoveryResult.recordFailure( strategy.getId(), e.getMessage() );
             }
             catch ( InvalidInputException e )

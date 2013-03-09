@@ -94,6 +94,13 @@ public class AmazonS3IndexScraperTest
             + "<StorageClass>STANDARD</StorageClass>"//
             + "</Contents>"//
             + "<Contents>"//
+            + "<Key>release/.meta/repository-metadata.xml</Key>"//
+            + "<LastModified>2011-08-25T01:38:05.000Z</LastModified>"//
+            + "<ETag>\"8bf32bb10b5a9c818739cc0031c67ac9\"</ETag>"//
+            + "<Size>267</Size>"//
+            + "<StorageClass>STANDARD</StorageClass>"//
+            + "</Contents>"//
+            + "<Contents>"//
             + "<Key>release/foo/baz/1/baz-2.jar</Key>"//
             + "<LastModified>2013-02-02T10:25:26.000Z</LastModified>"//
             + "<ETag>\"9f25f7c8efd60f815626306442d5e71c\"</ETag>"//

@@ -67,12 +67,8 @@ public interface WLManager
      * repository during boot up).
      * 
      * @param mavenRepository
-     * @throws IOException
-     * @throws IllegalStateException when the passed in repository is unsupported, or for some reason not in state to be
-     *             updated (out of service, or in case of proxy, it's proxyMode does not allow remote access and such).
      */
-    void initializeWhitelist( MavenRepository mavenRepository )
-        throws IOException, IllegalStateException;
+    void initializeWhitelist( MavenRepository mavenRepository );
 
     /**
      * Executes an update of WL for given repository. In case of {@link MavenProxyRepository} instance, it might not do
