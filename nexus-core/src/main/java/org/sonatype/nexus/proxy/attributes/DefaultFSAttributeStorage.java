@@ -118,7 +118,7 @@ public class DefaultFSAttributeStorage
 
     public boolean deleteAttributes( final RepositoryItemUid uid )
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.delete );
 
@@ -152,7 +152,7 @@ public class DefaultFSAttributeStorage
 
     public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.read );
 
@@ -182,7 +182,7 @@ public class DefaultFSAttributeStorage
 
     public void putAttributes( final RepositoryItemUid uid, Attributes attributes )
     {
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.create );
 
