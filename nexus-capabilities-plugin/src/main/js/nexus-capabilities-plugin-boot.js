@@ -10,18 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*
- * Capabilities navigation (menu) setup
- */
 
-/*global Ext,Sonatype,Nexus*/
-Sonatype.Events.addListener('nexusNavigationInit', function(nexusPanel) {
-      nexusPanel.add({
-            enabled : Sonatype.lib.Permissions.checkPermission('nexus:capabilities', Sonatype.lib.Permissions.READ),
-            sectionId : 'st-nexus-config',
-            title : 'Capabilities',
-            tabTitle : 'Capabilities',
-            tabId : 'capabilities',
-            tabCode : Sonatype.repoServer.CapabilitiesPanel
-          });
-    });
+define('nexus-capabilities-plugin-boot', [
+    'Sonatype/repoServer/CapabilitiesPanel'
+]);

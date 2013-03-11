@@ -17,12 +17,11 @@
 /*global Ext, Sonatype, FormFieldGenerator, FormFieldExporter, FormFieldImporter*/
 /*jslint newcap:true*/
 
-(function() {
+define('Sonatype/repoServer/CapabilitiesPanel', ['Nexus/capabilities/Icons'], function() {
 
-var
-      CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities',
-      CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes',
-      CAPABILITY_SETTINGS_PREFIX = '';
+var CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities',
+    CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes',
+    CAPABILITY_SETTINGS_PREFIX = '';
 
 Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
   var
@@ -257,12 +256,12 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         }, {
            layout: 'column',
            monitorResize: true,
-           items : [ {
+           items : [{
                xtype: 'fieldset',
                autoHeight : true,
                border : false,
                width : '400px',
-               items : [{
+               items : [ {
                    xtype : 'checkbox',
                    fieldLabel : 'Enabled',
                    labelStyle : 'margin-left: 15px; width: 60px',
@@ -413,14 +412,14 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         tbar : [{
               id : 'capability-refresh-btn',
               text : 'Refresh',
-              icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+              iconCls : Nexus.capabilities.Icons.get('refresh').cls,
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.reloadAll
             }, {
               id : 'capability-add-btn',
               text : 'Add',
-              icon : Sonatype.config.resourcePath + '/images/icons/add.png',
+              iconCls : Nexus.capabilities.Icons.get('capability_add').cls,
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.addResourceHandler,
@@ -429,7 +428,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
             }, {
               id : 'capability-delete-btn',
               text : 'Delete',
-              icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
+              iconCls : Nexus.capabilities.Icons.get('capability_delete').cls,
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.deleteHandler,
@@ -444,23 +443,38 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         },
         loadMask : true,
         deferredRender : false,
-        columns : [{
-              xtype : 'checkcolumn',
-              readOnly : true,
-              sortable : true,
-              header : 'Enabled',
-              dataIndex : 'enabled',
-              width : 50,
-              id : 'capabilities-enabled-col'
-            }, {
-              xtype : 'checkcolumn',
-              readOnly : true,
-              sortable : true,
-              header : 'Active',
-              dataIndex : 'active',
-              width : 50,
-              id : 'capabilities-active-col'
-            }, {
+        columns : [
+            // icon
+            {
+                width: 25, // some padding here for badges
+                resizable: false,
+                sortable: false,
+                fixed: true,
+                hideable: false,
+                menuDisabled: true,
+                renderer: function (value, metaData, record) {
+                    var typeName = record.get('typeName'),
+                        enabled = record.get('enabled'),
+                        active = record.get('active'),
+                        iconName;
+
+                    if (!typeName) {
+                        iconName = 'capability_new';
+                    }
+                    else if (enabled && active) {
+                        iconName = 'capability_active';
+                    }
+                    else if (enabled && !active) {
+                        iconName = 'capability_passive';
+                    }
+                    else {
+                        iconName = 'capability_disabled';
+                    }
+
+                    return Nexus.capabilities.Icons.get(iconName).img;
+                }
+            },
+            {
               header : 'Type',
               dataIndex : 'typeName',
               sortable : true,
@@ -495,7 +509,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(cfg) {
         items : [this.capabilitiesGridPanel, {
               xtype : 'panel',
               id : 'capability-config-forms',
-              title : 'Configuration',
+              title : 'No Selection',
+              iconCls : Nexus.capabilities.Icons.get('warning').cls,
               layout : 'card',
               region : 'center',
               activeItem : 0,
@@ -951,7 +966,16 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       rowSelect : function(selectionModel, index, rec) {
-        this.formCards.setTitle((rec.data.typeName?rec.data.typeName+' - ':'') + rec.data.description);
+        if (rec.data.typeName) {
+            var title = rec.data.typeName;
+            if (rec.data.description) {
+                title = title + ' - ' + rec.data.description;
+            }
+            this.formCards.setTitle(title, Nexus.capabilities.Icons.get('capability').cls);
+        }
+        else {
+            this.formCards.setTitle(rec.data.description, Nexus.capabilities.Icons.get('capability_new').cls);
+        }
 
         var
               config, settingsPanel, emptySettings,capabilityType, aboutPanel, active, buttonInfoObj,
@@ -1278,4 +1302,15 @@ A capability descriptor form field with an ID of 'custom-type' will then be mapp
 */
 Sonatype.Events.fireEvent('capabilitiesCustomTypeInit', Sonatype.repoServer.CapabilitiesPanel.prototype.customFieldTypes);
 
-}());
+Sonatype.Events.addListener('nexusNavigationInit', function(nexusPanel) {
+  nexusPanel.add({
+        enabled : Sonatype.lib.Permissions.checkPermission('nexus:capabilities', Sonatype.lib.Permissions.READ),
+        sectionId : 'st-nexus-config',
+        title : 'Capabilities',
+        tabTitle : 'Capabilities',
+        tabId : 'capabilities',
+        tabCode : Sonatype.repoServer.CapabilitiesPanel
+      });
+});
+
+});
