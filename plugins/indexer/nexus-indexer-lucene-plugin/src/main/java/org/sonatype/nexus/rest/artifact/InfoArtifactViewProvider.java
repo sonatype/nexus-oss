@@ -26,6 +26,7 @@ import org.restlet.data.Request;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
@@ -137,6 +138,10 @@ public class InfoArtifactViewProvider
                 {
                     // that is fine, user doesn't have access
                     continue;
+                }
+                catch (RepositoryNotAvailableException e) {
+                    // this could happen normally if a repository is not available, do not complain too loudly
+                    getLogger().trace("Repository not available; ignoring", e);
                 }
                 catch ( Exception e )
                 {
