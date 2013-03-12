@@ -23,7 +23,7 @@ Sonatype.repoServer.Maven2InformationPanel = function(config) {
   this.linkLabelId = Ext.id();
 
   Sonatype.repoServer.Maven2InformationPanel.superclass.constructor.call(this, {
-        title : 'Maven Information',
+        title : 'Maven',
         autoScroll : true,
         border : true,
         frame : true,
@@ -132,7 +132,7 @@ Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
 Sonatype.Events.addListener('fileContainerInit', function(items) {
       items.push(new Sonatype.repoServer.Maven2InformationPanel({
             name : 'maven2InformationPanel',
-            tabTitle : 'Maven Information',
+            tabTitle : 'Maven',
             preferredIndex : 10
           }));
     });
@@ -153,7 +153,7 @@ Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, d
 Sonatype.Events.addListener('artifactContainerInit', function(items) {
       items.push(new Sonatype.repoServer.Maven2InformationPanel({
             name : 'maven2InformationPanel',
-            tabTitle : 'Maven Information',
+            tabTitle : 'Maven',
             preferredIndex : 10
           }));
     });
