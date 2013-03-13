@@ -55,4 +55,18 @@ public class RepositoryValidators
         return validatorFactory.repositoryOfType( type, propertyKey, facet );
     }
 
+    /**
+     * Creates a new validator that checks that a repository referenced by specified property key exists.
+     *
+     * @param type        capability type
+     * @param propertyKey key of property that contains the repository id
+     * @return created validator
+     * @since 2.3
+     */
+    public Validator repositoryExists( final CapabilityType type,
+                                       final String propertyKey )
+    {
+        return validatorFactory.repositoryExists( type, propertyKey );
+    }
+
 }

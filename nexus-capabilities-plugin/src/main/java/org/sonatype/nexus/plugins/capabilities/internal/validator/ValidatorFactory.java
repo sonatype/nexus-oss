@@ -14,10 +14,11 @@ package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * {@link org.sonatype.nexus.plugins.capabilities.Validator} factory.
+ * {@link Validator} factory.
  *
  * @since 2.0
  */
@@ -30,6 +31,11 @@ public interface ValidatorFactory
                                                          String... propertyKeys );
 
     RepositoryTypeValidator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet );
+
+    /**
+     * @since 2.3
+     */
+    RepositoryExistsValidator repositoryExists( CapabilityType type, String propertyKey );
 
     DescriptorConstraintsValidator constraintsOf( CapabilityType type );
 
