@@ -23,8 +23,8 @@ import com.google.inject.matcher.Matcher;
 import com.google.inject.name.Names;
 
 /**
- * Workaround to automatically share method interceptors while
- * <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=403108">Sisu feature</a> is implemented.
+ * Workaround to automatically share method interceptors until
+ * <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=403108">proper Sisu feature</a> is implemented.
  *
  * <p>
  * This module is only bound once in its originating realm, when the bindInterceptor method is first called. The Nexus
