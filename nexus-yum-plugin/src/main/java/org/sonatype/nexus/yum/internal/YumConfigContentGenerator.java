@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -31,6 +32,7 @@ import com.google.common.io.Closeables;
  * @since 3.0
  */
 @Named( YumConfigContentGenerator.ID )
+@Singleton
 public class YumConfigContentGenerator
     implements ContentGenerator
 {
