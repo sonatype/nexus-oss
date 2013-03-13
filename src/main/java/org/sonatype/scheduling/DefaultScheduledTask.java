@@ -22,6 +22,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.iterators.NoopSchedulerIterator;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
@@ -30,6 +32,8 @@ import org.sonatype.scheduling.schedules.Schedule;
 public class DefaultScheduledTask<T>
     implements ScheduledTask<T>, Callable<T>
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final String id;
 
     private String name;
@@ -467,6 +471,8 @@ public class DefaultScheduledTask<T>
                 }
                 catch ( Throwable e )
                 {
+                    logger.warn( "Exception in call method of scheduled task {}", getName(), e );
+
                     //in case schedule changed, lets grab it, even in error state
                     if ( peekAfter == null )
                     {
