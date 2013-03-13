@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
@@ -24,6 +25,7 @@ import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 @Named
+@Singleton
 public class P2MetadataGeneratorTaskDescriptor
     extends AbstractScheduledTaskDescriptor
     implements ScheduledTaskDescriptor
