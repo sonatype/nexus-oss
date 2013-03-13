@@ -41,9 +41,12 @@ import org.sonatype.plugin.ExtensionPoint;
  * needed.
  * 
  * @author cstamas
+ *
+ * @deprecated since 2.4. Use {@link UiContributor} instead.
  */
 @ExtensionPoint
 @Singleton
+@Deprecated
 public interface NexusIndexHtmlCustomizer
 {
     /**

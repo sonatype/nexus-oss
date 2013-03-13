@@ -59,17 +59,27 @@ public class HttpdIndexScraper
         final RemoteDetectionResult result = super.detectRemoteRepository( context, page );
         if ( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED == result.getRemoteDetectionOutcome() )
         {
-            final Elements addressElements = page.getDocument().getElementsByTag( "address" );
-            if ( !addressElements.isEmpty() && addressElements.get( 0 ).text().startsWith( "Apache" ) )
+            // Server response header is mandatory
+            if ( !page.hasHeaderAndStartsWith( "Server", "Apache/" ) )
             {
-                if ( page.hasHeaderAndStartsWith( "Server", "Apache/" ) )
-                {
-                    return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED,
-                        getTargetedServer(), "Should be scraped." );
-                }
+                return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(),
+                    "Remote is not a generated index page of " + getTargetedServer() );
             }
+            // NEXUS-5589: Check address element only if present. If present, it MUST contain
+            // required values, if not present, nothing.
+            final Elements addressElements = page.getDocument().getElementsByTag( "address" );
+            if ( !addressElements.isEmpty() && !addressElements.get( 0 ).text().startsWith( "Apache" ) )
+            {
+                return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(),
+                    "Remote is not a generated index page of " + getTargetedServer() );
+            }
+            // if we are here, we say YES for scraping
+            return new RemoteDetectionResult( RemoteDetectionOutcome.RECOGNIZED_SHOULD_BE_SCRAPED, getTargetedServer(),
+                "Should be scraped." );
         }
-        return new RemoteDetectionResult( RemoteDetectionOutcome.UNRECOGNIZED, getTargetedServer(),
-            "Remote is not a generated index page of " + getTargetedServer() );
+        else
+        {
+            return result;
+        }
     }
 }

@@ -26,7 +26,8 @@
           copyright="Sonatype, Inc. ${copyright.year}"
           includeExampleXml="true"
           includeExampleJson="true"
-          includeDefaultDownloads="false">
+          includeDefaultDownloads="false"
+          groupRestResources="byPath">
     </docs>
   </modules>
 

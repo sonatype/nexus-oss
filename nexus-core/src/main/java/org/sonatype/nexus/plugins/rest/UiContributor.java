@@ -14,6 +14,8 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Used to look up plugins contributing proper require.js UI code.
  *
@@ -41,20 +43,22 @@ public interface UiContributor
      * @since 2.4
      * @see UiContributionBuilder
      */
-    public static class UiContribution
+    class UiContribution
     {
+        private String module;
 
         private List<String> dependencies;
 
-        private String module;
+        private boolean enabled;
 
         /**
          * @see UiContributionBuilder
          */
-        public UiContribution( final String module, final List<String> dependencies )
+        public UiContribution( final String module, final List<String> dependencies, final boolean enabled )
         {
-            this.dependencies = dependencies;
-            this.module = module;
+            this.module = checkNotNull(module);
+            this.dependencies = checkNotNull(dependencies);
+            this.enabled = enabled;
         }
 
         /**
@@ -64,15 +68,21 @@ public interface UiContributor
          * @return the list of dependencies to load.
          */
         public List<String> getDependencies() {
-            return this.dependencies;
+            return dependencies;
         }
 
         /**
          * The module that is used to initialize the plugin.
+         *
          * @return the module name.
          */
         public String getModule() {
-            return this.module;
+            return module;
+        }
+
+        public boolean isEnabled()
+        {
+            return enabled;
         }
     }
 

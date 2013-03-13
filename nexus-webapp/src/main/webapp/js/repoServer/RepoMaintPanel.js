@@ -564,14 +564,14 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
               this.toolbarAddButton.disable();
             if (this.toolbarDeleteButton)
               this.toolbarDeleteButton.disable();
-            this.dataStore.proxy.conn.url = Sonatype.config.repos.urls.allRepositories;
+            this.dataStore.proxy.setApi(Ext.data.Api.actions.read, Sonatype.config.repos.urls.allRepositories);
             break;
           case 'user' :
             if (this.toolbarAddButton)
               this.toolbarAddButton.enable();
             if (this.toolbarDeleteButton)
               this.toolbarDeleteButton.enable();
-            this.dataStore.proxy.conn.url = Sonatype.config.repos.urls.repositories;
+            this.dataStore.proxy.setApi(Ext.data.Api.actions.read, Sonatype.config.repos.urls.repositories);
             break;
         }
         this.refreshHandler(button, e);
