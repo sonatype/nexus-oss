@@ -14,7 +14,10 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -405,7 +408,7 @@ public abstract class LayoutConverterShadowRepository
      * @param path
      * @return
      */
-    protected String transformM1toM2( final String path )
+    protected List<String> transformM1toM2( final String path )
     {
         final Gav gav = getM1GavCalculator().pathToGav( path );
 
@@ -428,7 +431,7 @@ public abstract class LayoutConverterShadowRepository
         sb.append( gav.getVersion() );
         sb.append( RepositoryItemUid.PATH_SEPARATOR );
         sb.append( gav.getName() );
-        return sb.toString();
+        return Collections.singletonList( sb.toString() );
     }
 
     /**
@@ -437,7 +440,7 @@ public abstract class LayoutConverterShadowRepository
      * @param path
      * @return
      */
-    protected String transformM2toM1( final String path )
+    protected List<String> transformM2toM1( final String path, final List<String> extraFolders )
     {
         final Gav gav = getM2GavCalculator().pathToGav( path );
 
@@ -446,30 +449,39 @@ public abstract class LayoutConverterShadowRepository
         {
             return null;
         }
-        // m1 repo is layouted as:
-        // g.i.d
-        // poms/jars/java-sources/licenses
-        // files
-        StringBuilder sb = new StringBuilder( RepositoryItemUid.PATH_ROOT );
-        sb.append( gav.getGroupId() );
-        sb.append( RepositoryItemUid.PATH_SEPARATOR );
-        sb.append( gav.getExtension() + "s" );
-        sb.append( RepositoryItemUid.PATH_SEPARATOR );
-        sb.append( gav.getName() );
-        return sb.toString();
+        final ArrayList<String> exts = new ArrayList<String>();
+        exts.add( gav.getExtension() + "s" );
+        if ( extraFolders != null && !extraFolders.isEmpty() )
+        {
+            exts.addAll( extraFolders );
+        }
+        final ArrayList<String> result = new ArrayList<String>( exts.size() );
+        for ( String ext : exts )
+        {
+            // m1 repo is layouted as:
+            // g.i.d
+            // poms/jars/java-sources/licenses
+            // files
+            StringBuilder sb = new StringBuilder( RepositoryItemUid.PATH_ROOT );
+            sb.append( gav.getGroupId() );
+            sb.append( RepositoryItemUid.PATH_SEPARATOR );
+            sb.append( ext );
+            sb.append( RepositoryItemUid.PATH_SEPARATOR );
+            sb.append( gav.getName() );
+            result.add( sb.toString() );
+        }
+        return result;
     }
 
     @Override
     protected StorageLinkItem createLink( final StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
-        String shadowPath = null;
+        List<String> shadowPaths = transformMaster2Shadow( item.getPath() );
 
-        shadowPath = transformMaster2Shadow( item.getPath() );
-
-        if ( shadowPath != null )
+        if ( shadowPaths != null && !shadowPaths.isEmpty() )
         {
-            ResourceStoreRequest req = new ResourceStoreRequest( shadowPath );
+            ResourceStoreRequest req = new ResourceStoreRequest( shadowPaths.get( 0 ) );
 
             req.getRequestContext().putAll( item.getItemContext() );
 
@@ -490,13 +502,11 @@ public abstract class LayoutConverterShadowRepository
     protected void deleteLink( final StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
     {
-        String shadowPath = null;
+        List<String> shadowPaths = transformMaster2Shadow( item.getPath() );
 
-        shadowPath = transformMaster2Shadow( item.getPath() );
-
-        if ( shadowPath != null )
+        if ( shadowPaths != null && !shadowPaths.isEmpty() )
         {
-            ResourceStoreRequest request = new ResourceStoreRequest( shadowPath );
+            ResourceStoreRequest request = new ResourceStoreRequest( shadowPaths.get( 0 ) );
 
             request.getRequestContext().putAll( item.getItemContext() );
 
@@ -560,7 +570,7 @@ public abstract class LayoutConverterShadowRepository
      * @param path the path
      * @return the shadow path
      */
-    protected abstract String transformMaster2Shadow( String path );
+    protected abstract List<String> transformMaster2Shadow( String path );
 
     @Override
     protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
@@ -577,47 +587,54 @@ public abstract class LayoutConverterShadowRepository
         catch ( ItemNotFoundException e )
         {
             // if it is thrown by super.doRetrieveItem()
-            String transformedPath = null;
+            List<String> transformedPaths = transformShadow2Master( request.getRequestPath() );
 
-            transformedPath = transformShadow2Master( request.getRequestPath() );
-
-            if ( transformedPath == null )
+            if ( transformedPaths == null || transformedPaths.isEmpty() )
             {
                 throw new ItemNotFoundException( request, this );
             }
 
-            // delegate the call to the master
-            request.pushRequestPath( transformedPath );
-
-            try
+            for ( String transformedPath : transformedPaths )
             {
-                result = doRetrieveItemFromMaster( request );
-            }
-            finally
-            {
-                request.popRequestPath();
-            }
+                // delegate the call to the master
+                request.pushRequestPath( transformedPath );
 
-            // try to create link on the fly
-            try
-            {
-                StorageLinkItem link = createLink( result );
-
-                if ( link != null )
+                try
                 {
-                    return link;
+                    result = doRetrieveItemFromMaster( request );
                 }
-                else
+                catch ( ItemNotFoundException ex )
+                {
+                    // neglect, we might try another transformed path
+                }
+                finally
+                {
+                    request.popRequestPath();
+                }
+
+                // try to create link on the fly
+                try
+                {
+                    StorageLinkItem link = createLink( result );
+
+                    if ( link != null )
+                    {
+                        return link;
+                    }
+                    else
+                    {
+                        // fallback to result, but will not happen, see above
+                        return result;
+                    }
+                }
+                catch ( Exception e1 )
                 {
                     // fallback to result, but will not happen, see above
                     return result;
                 }
             }
-            catch ( Exception e1 )
-            {
-                // fallback to result, but will not happen, see above
-                return result;
-            }
+
+            throw new ItemNotFoundException( request, this );
         }
     }
 
@@ -627,5 +644,5 @@ public abstract class LayoutConverterShadowRepository
      * @param path the path
      * @return the master path
      */
-    protected abstract String transformShadow2Master( String path );
+    protected abstract List<String> transformShadow2Master( String path );
 }
