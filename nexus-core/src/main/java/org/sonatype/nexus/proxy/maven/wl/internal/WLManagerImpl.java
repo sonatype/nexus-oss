@@ -674,7 +674,8 @@ public class WLManagerImpl
                     final FilePrefixSource memberEntrySource =
                         getPrefixSourceFor( member.adaptToFacet( MavenRepository.class ) );
                     // lock to prevent file being deleted between exists check and reading it up
-                    memberEntrySource.getRepositoryItemUid().getLock().lock( Action.read );
+                    final RepositoryItemUidLock lock = memberEntrySource.getRepositoryItemUid().getLock();
+                    lock.lock( Action.read );
                     try
                     {
                         if ( !memberEntrySource.exists() )
@@ -686,7 +687,7 @@ public class WLManagerImpl
                     }
                     finally
                     {
-                        memberEntrySource.getRepositoryItemUid().getLock().unlock();
+                        lock.unlock();
                     }
                 }
             }
