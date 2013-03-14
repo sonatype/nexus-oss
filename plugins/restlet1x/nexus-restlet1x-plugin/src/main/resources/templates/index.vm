@@ -98,18 +98,23 @@
                     require([ js ], init, errorCallback);
                 });
 
+                var deps = ['require'];
+                var bootModules = [];
+
                 ## for each r.js enabled plugin...
                 #foreach($rJs in $rJsContributions)
-                    var deps = ['require'];
-                    ## ... construct preload/dependency array
                     #foreach($dependency in $rJs.getDependencies())
                         deps.push('$dependency');
                     #end
-                    ## ... and require the bootstrap module with the dependencies
-                    require(deps, function(require) {
-                        require(['$rJs.getModule()'], init, errorCallback);
-                    });
+
+                    bootModules.push('$rJs.getModule()');
                 #end
+
+                require(deps, function(require) {
+                    Ext.each(bootModules, function(mod) {
+                        require([mod], init, errorCallback);
+                    });
+                });
             });
         }
 
