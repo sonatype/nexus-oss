@@ -30,7 +30,7 @@
     <pluginName>Nexus Siesta Plugin</pluginName>
     <pluginDescription>Support for Siesta (Jersey) REST API.</pluginDescription>
 
-    <siesta.version>1.4-SNAPSHOT</siesta.version>
+    <siesta.version>1.4.1</siesta.version>
   </properties>
 
   <dependencies>
