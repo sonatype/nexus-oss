@@ -378,7 +378,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.7</version>
+        <version>1.7.1-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>javax.activation</groupId>
