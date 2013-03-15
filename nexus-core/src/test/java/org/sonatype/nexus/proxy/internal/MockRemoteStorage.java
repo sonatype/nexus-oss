@@ -197,8 +197,21 @@ public class MockRemoteStorage
         public MockRequestRecord( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
         {
             this.repository = repository;
-            this.request = request;
+            this.request = clone( request ); // clone to capture snapshot at the time of the request
             this.baseUrl = baseUrl;
+        }
+
+        private static ResourceStoreRequest clone( ResourceStoreRequest request )
+        {
+            if ( request == null )
+            {
+                return null;
+            }
+            ResourceStoreRequest result =
+                new ResourceStoreRequest( request.getRequestPath(), request.isRequestLocalOnly(),
+                                          request.isRequestRemoteOnly() );
+            // only requestPath is used at the moment
+            return result;
         }
 
         @Override
