@@ -18,22 +18,22 @@ package org.sonatype.nexus.proxy;
  * during upload, recovery is to have client retry upload).
  * 
  * @author cstamas
- * @since 2.3
+ * @since 2.4
  */
-public class LocalStorageEofException
+public class LocalStorageEOFException
     extends LocalStorageException
 {
-    public LocalStorageEofException( String msg )
+    public LocalStorageEOFException( String msg )
     {
         super( msg );
     }
 
-    public LocalStorageEofException( String msg, Throwable cause )
+    public LocalStorageEOFException( String msg, Throwable cause )
     {
         super( msg, cause );
     }
 
-    public LocalStorageEofException( Throwable cause )
+    public LocalStorageEOFException( Throwable cause )
     {
         super( cause.getMessage(), cause );
     }
