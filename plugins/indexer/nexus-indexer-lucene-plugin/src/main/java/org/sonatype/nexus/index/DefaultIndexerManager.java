@@ -330,6 +330,49 @@ public class DefaultIndexerManager
 
     private File tempDirectory;
 
+    /**
+     * Performs the same operation on all immediate members of a group repository. Exceptions thrown during processing
+     * of individual members are collected and return to the caller. Does nothing of provded repository is not a group
+     * repository.
+     */
+    private abstract class GroupOperation
+    {
+        private final Repository repository;
+
+        public GroupOperation( Repository repository )
+        {
+            this.repository = repository;
+        }
+
+        public List<IOException> perform()
+        {
+            final List<IOException> exceptions = new ArrayList<IOException>();
+            if ( ISGROUP( repository ) )
+            {
+                List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
+                for ( Repository member : members )
+                {
+                    TaskUtil.checkInterruption();
+                    try
+                    {
+                        perform( member );
+                    }
+                    catch ( IOException e )
+                    {
+                        exceptions.add( e );
+                    }
+                }
+            }
+            return exceptions;
+        }
+
+        /**
+         * Operation to perform on individual member repositories.
+         */
+        protected abstract void perform( Repository member )
+            throws IOException;
+    }
+
     @VisibleForTesting
     protected void setIndexUpdater( final IndexUpdater indexUpdater )
     {
@@ -884,9 +927,6 @@ public class DefaultIndexerManager
     // TODO: NEXUS-4052 and NEXUS-4053
     // when sorted out, these constants will help the change, just remove them
 
-    // all index related operation cascade (currently yes)
-    private static final boolean CASCADE = true;
-
     // reindex() method does publishing too (currently yes)
     private static final boolean REINDEX_PUBLISHES = true;
 
@@ -959,27 +999,15 @@ public class DefaultIndexerManager
             return;
         }
 
-        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
-        if ( CASCADE )
+        final List<IOException> exceptions = new GroupOperation( repository )
         {
-            if ( ISGROUP( repository ) )
+            @Override
+            protected void perform( Repository member )
+                throws IOException
             {
-                List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
-
-                for ( Repository member : members )
-                {
-                    TaskUtil.checkInterruption();
-                    try
-                    {
-                        reindexRepository( path, member, fullReindex, processedRepositoryIds );
-                    }
-                    catch ( IOException e )
-                    {
-                        exceptions.add( e );
-                    }
-                }
+                reindexRepository( path, member, fullReindex, processedRepositoryIds );
             }
-        }
+        }.perform();
 
         TaskUtil.checkInterruption();
         reindexRepository( repository, path, fullReindex );
@@ -1123,27 +1151,15 @@ public class DefaultIndexerManager
             return;
         }
 
-        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
-        if ( CASCADE )
+        final List<IOException> exceptions = new GroupOperation( repository )
         {
-            if ( ISGROUP( repository ) )
+            @Override
+            protected void perform( Repository member )
+                throws IOException
             {
-                List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
-
-                for ( Repository member : members )
-                {
-                    TaskUtil.checkInterruption();
-                    try
-                    {
-                        downloadRepositoryIndex( member, processedRepositoryIds );
-                    }
-                    catch ( IOException e )
-                    {
-                        exceptions.add( e );
-                    }
-                }
+                downloadRepositoryIndex( member, processedRepositoryIds );
             }
-        }
+        }.perform();
 
         if ( ISPROXY( repository ) )
         {
@@ -1412,7 +1428,7 @@ public class DefaultIndexerManager
         publishRepositoryIndex( repository, new HashSet<String>() );
     }
 
-    protected void publishRepositoryIndex( final Repository repository, Set<String> processedRepositoryIds )
+    protected void publishRepositoryIndex( final Repository repository, final Set<String> processedRepositoryIds )
         throws IOException
     {
         if ( !processedRepositoryIds.add( repository.getId() ) )
@@ -1421,27 +1437,15 @@ public class DefaultIndexerManager
             return;
         }
 
-        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
-        if ( CASCADE )
+        final List<IOException> exceptions = new GroupOperation( repository )
         {
-            if ( ISGROUP( repository ) )
+            @Override
+            protected void perform( Repository member )
+                throws IOException
             {
-                List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
-
-                for ( Repository member : members )
-                {
-                    TaskUtil.checkInterruption();
-                    try
-                    {
-                        publishRepositoryIndex( member, processedRepositoryIds );
-                    }
-                    catch ( IOException e )
-                    {
-                        exceptions.add( e );
-                    }
-                }
+                publishRepositoryIndex( member, processedRepositoryIds );
             }
-        }
+        }.perform();
 
         TaskUtil.checkInterruption();
         publishRepositoryIndex( repository );
@@ -1676,27 +1680,15 @@ public class DefaultIndexerManager
             return;
         }
 
-        final ArrayList<IOException> exceptions = new ArrayList<IOException>();
-        if ( CASCADE )
+        final List<IOException> exceptions = new GroupOperation( repository )
         {
-            if ( ISGROUP( repository ) )
+            @Override
+            protected void perform( Repository member )
+                throws IOException
             {
-                GroupRepository group = repository.adaptToFacet( GroupRepository.class );
-
-                for ( Repository member : group.getMemberRepositories() )
-                {
-                    TaskUtil.checkInterruption();
-                    try
-                    {
-                        optimizeIndex( member, processedRepositoryIds );
-                    }
-                    catch ( IOException e )
-                    {
-                        exceptions.add( e );
-                    }
-                }
+                optimizeIndex( member, processedRepositoryIds );
             }
-        }
+        }.perform();
 
         TaskUtil.checkInterruption();
         optimizeRepositoryIndex( repository );
