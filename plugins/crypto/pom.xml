@@ -28,9 +28,8 @@
 
   <properties>
      <pluginName>Nexus Crypto Services Provider Plugin</pluginName>
-     <pluginDescription>Provides Bouncy Castle JCE provider and provides crypto goodies.</pluginDescription>
+     <pluginDescription>Provides support for cryptography in Nexus.</pluginDescription>
      <bouncycastle.version>1.47</bouncycastle.version>
-     <sisu-goodies.version>1.5.1</sisu-goodies.version>
   </properties>
 
   <dependencies>
@@ -45,20 +44,17 @@
       <artifactId>bcprov-jdk15on</artifactId>
       <version>${bouncycastle.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpg-jdk15on</artifactId>
       <version>${bouncycastle.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
       <version>${bouncycastle.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-crypto</artifactId>
-      <version>${sisu-goodies.version}</version>
     </dependency>
 
     <dependency>
@@ -78,7 +74,7 @@
             <sharedDependency>org.bouncycastle:bcprov-jdk15on</sharedDependency>
             <sharedDependency>org.bouncycastle:bcpg-jdk15on</sharedDependency>
             <sharedDependency>org.bouncycastle:bcpkix-jdk15on</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.goodies:goodies-crypto</sharedDependency>
+            <!--<sharedDependency>org.sonatype.sisu.goodies:goodies-crypto</sharedDependency>-->
           </sharedDependencies>
         </configuration>
       </plugin>
