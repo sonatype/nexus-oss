@@ -28,10 +28,12 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.ByteSource;
 import org.sonatype.inject.Description;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.Sha1ThenMd5CredentialsMatcher;
+import org.sonatype.security.realms.tools.Sha512ThenSha1ThenMd5CredentialsMatcher;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
@@ -51,12 +53,16 @@ public class XmlAuthenticatingRealm
     public static final String ROLE = "XmlAuthenticatingRealm";
 
     private ConfigurationManager configuration;
+    
+    private SecurityConfigurationManager securityConfiguration;
 
     @Inject
-    public XmlAuthenticatingRealm( @Named( "resourceMerging" ) ConfigurationManager configuration )
+    public XmlAuthenticatingRealm( @Named( "resourceMerging" ) ConfigurationManager configuration,
+    							   SecurityConfigurationManager securityConfiguration)
     {
         this.configuration = configuration;
-        setCredentialsMatcher( new Sha1ThenMd5CredentialsMatcher() );
+        this.securityConfiguration = securityConfiguration;
+        setCredentialsMatcher( new Sha512ThenSha1ThenMd5CredentialsMatcher(this.securityConfiguration.getHashIterations()) );
     }
 
     @Override
@@ -85,10 +91,10 @@ public class XmlAuthenticatingRealm
         {
             throw new AccountException( "User '" + upToken.getUsername() + "' has no password, cannot authenticate." );
         }
-
+        
         if ( CUser.STATUS_ACTIVE.equals( user.getStatus() ) )
         {
-            return new SimpleAuthenticationInfo( upToken.getUsername(), user.getPassword().toCharArray(), getName() );
+            return new SimpleAuthenticationInfo( upToken.getUsername(), user.getPassword().toCharArray(), ByteSource.Util.bytes(user.getSalt() != null ? user.getSalt() : ""), getName() );        	
         }
         else if ( CUser.STATUS_DISABLED.equals( user.getStatus() ) )
         {

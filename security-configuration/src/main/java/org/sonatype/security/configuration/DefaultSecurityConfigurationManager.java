@@ -118,6 +118,12 @@ public class DefaultSecurityConfigurationManager
             throw new InvalidConfigurationException( vr );
         }
     }
+    
+    public int getHashIterations()
+    {
+    	//TODO - Add this to security-configuration.xml
+    	return 1024;
+    }
 
     public List<String> getRealms()
     {

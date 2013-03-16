@@ -36,6 +36,8 @@ public interface SecurityConfigurationManager
         throws InvalidConfigurationException;
 
     String getAnonymousPassword();
+    
+    int getHashIterations();
 
     void setRealms( List<String> realms )
         throws InvalidConfigurationException;

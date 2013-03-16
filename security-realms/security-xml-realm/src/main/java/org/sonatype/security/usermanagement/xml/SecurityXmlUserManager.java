@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.usermanagement.xml;
 
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,12 +22,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
+import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
@@ -43,6 +48,10 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import com.google.common.base.Stopwatch;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * A UserManager backed by the security.xml file. This UserManger supports all User CRUD operations.
@@ -60,17 +69,23 @@ public class SecurityXmlUserManager
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public static final String SOURCE = "default";
+    
+    private static final int SALT_LENGTH = 64;
 
     private final ConfigurationManager configuration;
+    
+    private final SecurityConfigurationManager securityConfiguration;
 
     private final SecuritySystem securitySystem;
 
     @Inject
     public SecurityXmlUserManager( @Named( "resourceMerging" ) ConfigurationManager configuration,
-                                   SecuritySystem securitySystem )
+                                   SecuritySystem securitySystem,
+                                   SecurityConfigurationManager securityConfiguration )
     {
         this.configuration = configuration;
-        this.securitySystem = securitySystem;
+        this.securityConfiguration = securityConfiguration;
+        this.securitySystem = securitySystem;        
     }
 
     protected CUser toUser( User user )
@@ -188,7 +203,8 @@ public class SecurityXmlUserManager
         throws InvalidConfigurationException
     {
         CUser secUser = this.toUser( user );
-        secUser.setPassword( this.hashPassword( password ) );
+        secUser.setSalt( this.generateSalt() );
+        secUser.setPassword( this.hashPassword( password, secUser.getSalt() ) );
         this.configuration.createUser( secUser, this.getRoleIdsFromUser( user ) );
         this.saveConfiguration();
 
@@ -210,7 +226,8 @@ public class SecurityXmlUserManager
         {
             this.logger.debug( "User: " + userId + " has no roles." );
         }
-        secUser.setPassword( this.hashPassword( newPassword ) );
+        secUser.setSalt( this.generateSalt() );
+        secUser.setPassword( this.hashPassword( newPassword, secUser.getSalt() ) );
         this.configuration.updateUser( secUser, new HashSet<String>( roles ) );
         this.saveConfiguration();
     }
@@ -222,6 +239,7 @@ public class SecurityXmlUserManager
         CUser oldSecUser = this.configuration.readUser( user.getUserId() );
         CUser newSecUser = this.toUser( user );
         newSecUser.setPassword( oldSecUser.getPassword() );
+        newSecUser.setSalt( oldSecUser.getSalt() );
 
         this.configuration.updateUser( newSecUser, this.getRoleIdsFromUser( user ) );
         this.saveConfiguration();
@@ -311,16 +329,33 @@ public class SecurityXmlUserManager
     {
         return this.securitySystem;
     }
+    
+    private SecurityConfigurationManager getSecurityConfiguration()
+    {
+    	return this.securityConfiguration;
+    }
 
-    private String hashPassword( String clearPassword )
+    private String hashPassword( String clearPassword, String salt )
     {
         // set the password if its not null
         if ( clearPassword != null && clearPassword.trim().length() > 0 )
         {
-            return StringDigester.getSha1Digest( clearPassword );
+        	Stopwatch clock = new Stopwatch();
+        	String foo = new Sha512Hash(clearPassword, salt, getSecurityConfiguration().getHashIterations()).toHex();
+        	String time = clock.toString();
+        	System.out.println(time);
+        	return foo;    
         }
 
         return clearPassword;
+    }
+    
+    private String generateSalt()
+    {
+    	SecureRandom r = new SecureRandom();
+    	byte[] salt = new byte[SALT_LENGTH];
+    	r.nextBytes(salt);
+    	return new String(Hex.encodeHex(salt));
     }
 
     public void setUsersRoles( String userId, String userSource, Set<RoleIdentifier> roleIdentifiers )

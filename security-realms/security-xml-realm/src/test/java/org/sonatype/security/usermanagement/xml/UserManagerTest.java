@@ -118,7 +118,7 @@ public class UserManagerTest
         Assert.assertEquals( secUser.getEmail(), user.getEmailAddress() );
         Assert.assertEquals( secUser.getFirstName(), user.getFirstName() );
         Assert.assertEquals( secUser.getLastName(), user.getLastName() );
-        Assert.assertEquals( secUser.getPassword(), StringDigester.getSha1Digest( "my-password" ) );
+        Assert.assertEquals( secUser.getPassword(), StringDigester.getSha1Digest( secUser.getSalt() + "my-password" ) );
 
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
@@ -141,8 +141,9 @@ public class UserManagerTest
         UserManager userManager = this.getUserManager();
         userManager.changePassword( "test-user", "new-user-password" );
 
-        Assert.assertEquals( this.getConfigurationManager().readUser( "test-user" ).getPassword(),
-                             StringDigester.getSha1Digest( "new-user-password" ) );
+        CUser user = this.getConfigurationManager().readUser( "test-user" );
+        Assert.assertEquals( user.getPassword(),
+                             StringDigester.getSha1Digest( user.getSalt() + "new-user-password" ) );
     }
 
     public void testUpdateUser()

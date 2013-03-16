@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2007-2013 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -25,18 +25,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.security.model.v2_0_4.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.model.v2_0_5.upgrade.BasicVersionUpgrade;
+import org.sonatype.security.model.v2_0_5.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.model.v2_0_6.upgrade.BasicVersionUpgrade;
 
 @Singleton
 @Typed( SecurityUpgrader.class )
-@Named( "2.0.4" )
-public class Upgrade204to205
+@Named( "2.0.5" )
+public class Upgrade205to206
     implements SecurityUpgrader
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    public Upgrade204to205() {
+    public Upgrade205to206() {
     	System.out.println("foo");
     }
     
@@ -70,13 +70,13 @@ public class Upgrade204to205
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.security.model.v2_0_4.Configuration oldc =
-            (org.sonatype.security.model.v2_0_4.Configuration) message.getConfiguration();
+        org.sonatype.security.model.v2_0_5.Configuration oldc =
+            (org.sonatype.security.model.v2_0_5.Configuration) message.getConfiguration();
 
-        org.sonatype.security.model.v2_0_5.Configuration newc = new BasicVersionUpgrade().upgradeConfiguration( oldc );
+        org.sonatype.security.model.Configuration newc = new BasicVersionUpgrade().upgradeConfiguration( oldc );
 
-        newc.setVersion( org.sonatype.security.model.v2_0_5.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.security.model.v2_0_5.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.security.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.security.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 
