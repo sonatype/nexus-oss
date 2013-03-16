@@ -27,7 +27,7 @@
   <packaging>nexus-plugin</packaging>
 
   <properties>
-     <pluginName>Nexus Crypto Services Provider Plugin</pluginName>
+     <pluginName>Nexus Crypto Provider Plugin</pluginName>
      <pluginDescription>Provides support for cryptography in Nexus.</pluginDescription>
      <bouncycastle.version>1.47</bouncycastle.version>
   </properties>
