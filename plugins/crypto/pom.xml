@@ -74,7 +74,6 @@
             <sharedDependency>org.bouncycastle:bcprov-jdk15on</sharedDependency>
             <sharedDependency>org.bouncycastle:bcpg-jdk15on</sharedDependency>
             <sharedDependency>org.bouncycastle:bcpkix-jdk15on</sharedDependency>
-            <!--<sharedDependency>org.sonatype.sisu.goodies:goodies-crypto</sharedDependency>-->
           </sharedDependencies>
         </configuration>
       </plugin>
