@@ -22,6 +22,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.AbstractSecurityTestCase;
@@ -118,7 +119,7 @@ public class UserManagerTest
         Assert.assertEquals( secUser.getEmail(), user.getEmailAddress() );
         Assert.assertEquals( secUser.getFirstName(), user.getFirstName() );
         Assert.assertEquals( secUser.getLastName(), user.getLastName() );
-        Assert.assertEquals( secUser.getPassword(), StringDigester.getSha1Digest( secUser.getSalt() + "my-password" ) );
+        Assert.assertEquals( secUser.getPassword(), this.hashPassword("my-password", secUser.getSalt()) );
 
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
@@ -143,7 +144,7 @@ public class UserManagerTest
 
         CUser user = this.getConfigurationManager().readUser( "test-user" );
         Assert.assertEquals( user.getPassword(),
-                             StringDigester.getSha1Digest( user.getSalt() + "new-user-password" ) );
+        					 this.hashPassword("new-user-password", user.getSalt()));
     }
 
     public void testUpdateUser()
@@ -376,6 +377,11 @@ public class UserManagerTest
         }
 
         return roleIds;
+    }
+    
+    private String hashPassword(String clearPassword, String salt)
+    {
+    	return new Sha512Hash(clearPassword, salt, 1024).toHex();
     }
 
 }
