@@ -441,7 +441,6 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         width : this.COMBO_WIDTH
       },{
         xtype : 'rolemanager',
-        id : 'roleManagerId',
         name : 'roleManager',
         height : 200,
         width : 490,
@@ -507,7 +506,7 @@ Ext.extend(Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
       submitHandler : function(form, action, receivedData) {
         receivedData.mapping = this.payload.data.mapping;
       },
-      validationModifiers : { 'roles' : function(error,panel) { Ext.getCmp('roleManagerId').markInvalid(error.msg); } }
+      validationModifiers : { 'roles' : function(error,panel) { panel.find('name', 'roleManager')[0].markInvalid(error.msg); } }
     });
 
 Sonatype.Events.addListener('roleViewInit', function(cardPanel, rec, gridPanel) {
