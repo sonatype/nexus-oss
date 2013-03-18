@@ -12,13 +12,7 @@
  */
 package org.sonatype.nexus.index.mindexer;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.File;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
 import org.codehaus.plexus.component.annotations.Component;
