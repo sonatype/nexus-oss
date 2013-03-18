@@ -15,6 +15,7 @@ package org.sonatype.security.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +24,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.basic.StringConverter;
+import com.thoughtworks.xstream.converters.collections.CollectionConverter;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -43,6 +47,9 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
+import org.sonatype.security.rest.model.RoleAndPrivilegeListFilterResource;
+import org.sonatype.security.rest.model.RoleAndPrivilegeListResource;
+import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserChangePasswordResource;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.usermanagement.DefaultUser;
@@ -307,8 +314,43 @@ public abstract class AbstractSecurityPlexusResource
     public void configureXStream( final XStream xstream )
     {
         super.configureXStream( xstream );
-        xstream.registerLocalConverter( UserChangePasswordResource.class, "oldPassword", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( UserChangePasswordResource.class, "oldPassword",
+                                        new HtmlUnescapeStringConverter( true ) );
         xstream.registerLocalConverter( UserChangePasswordResource.class, "newPassword", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( RoleResource.class, "id", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( UserResource.class, "userId", new HtmlUnescapeStringConverter( true ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListResource.class, "id", new HtmlUnescapeStringConverter( true) );
+
+        xstream.registerLocalConverter( UserResource.class, "roles", new HtmlUnescapeStringCollectionConverter( xstream ) );
+        xstream.registerLocalConverter( RoleResource.class, "roles", new HtmlUnescapeStringCollectionConverter( xstream ) );
+        xstream.registerLocalConverter( RoleResource.class, "privileges", new HtmlUnescapeStringCollectionConverter( xstream ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "selectedRoleIds", new HtmlUnescapeStringCollectionConverter( xstream ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "selectedPrivilegeIds", new HtmlUnescapeStringCollectionConverter( xstream ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "hiddenRoleIds", new HtmlUnescapeStringCollectionConverter( xstream ) );
+        xstream.registerLocalConverter( RoleAndPrivilegeListFilterResource.class, "hiddenPrivilegeIds", new HtmlUnescapeStringCollectionConverter( xstream ) );
+    }
+
+    private static class HtmlUnescapeStringCollectionConverter
+        extends CollectionConverter
+    {
+
+        public HtmlUnescapeStringCollectionConverter( final XStream xstream )
+        {
+            super( xstream.getMapper() );
+        }
+
+        @Override
+        protected void addCurrentElementToCollection( final HierarchicalStreamReader reader,
+                                                      final UnmarshallingContext context,
+                                                      final Collection collection, final Collection target )
+        {
+            Object item = readItem(reader, context, collection);
+            if ( item instanceof String )
+            {
+                item = StringEscapeUtils.unescapeHtml( (String) item );
+            }
+            target.add(item);
+        }
     }
 
     private class HtmlUnescapeStringConverter
