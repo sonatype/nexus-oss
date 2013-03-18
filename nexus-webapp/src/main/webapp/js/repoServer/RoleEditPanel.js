@@ -430,6 +430,7 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         helpText : ht.name,
         name : 'name',
         allowBlank : false,
+        htmlDecode : true,
         width : this.COMBO_WIDTH
       }, {
         xtype : 'textfield',
@@ -438,6 +439,7 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         helpText : ht.description,
         name : 'description',
         allowBlank : true,
+        htmlDecode : true,
         width : this.COMBO_WIDTH
       },{
         xtype : 'rolemanager',
