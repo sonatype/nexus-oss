@@ -70,7 +70,7 @@ public class Hc4ProviderImplTest
         setParameters();
         try
         {
-            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller );
+            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null );
 
             final HttpClient client = testSubject.createHttpClient();
             // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
@@ -111,7 +111,7 @@ public class Hc4ProviderImplTest
         setParameters();
         try
         {
-            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller );
+            testSubject = new Hc4ProviderImpl( applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null );
 
             // Note: explicitly created instance (like in case of proxies), it does pool and
             // returns customized client

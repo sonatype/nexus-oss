@@ -20,8 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>31</version>
-    <relativePath/>
+    <version>32</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -177,10 +176,10 @@
     <aether.version>1.13.1</aether.version>
     <jetty.version>8.1.8.v20121106</jetty.version>
     <maven.version>3.0.4</maven.version>
-    <plexus-security.version>3.0.2-SNAPSHOT</plexus-security.version>
+    <plexus-security.version>3.0.2</plexus-security.version>
     <shiro.version>1.2.1</shiro.version>
     <jackson.version>1.9.10</jackson.version>
-    <goodies.version>1.5.1</goodies.version>
+    <goodies.version>1.6</goodies.version>
 
     <!-- See 'idea' profile. -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
@@ -213,7 +212,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-model</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
       </dependency>
 
       <dependency>
@@ -379,7 +378,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.7-SNAPSHOT</version>
+        <version>1.7.1</version>
         <exclusions>
           <exclusion>
             <groupId>javax.activation</groupId>
@@ -701,12 +700,6 @@
       </dependency>
 
       <dependency>
-        <groupId>com.ning</groupId>
-        <artifactId>async-http-client</artifactId>
-        <version>1.6.5</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>4.2.2</version>
@@ -796,7 +789,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.6-SNAPSHOT</version>
+        <version>1.6</version>
       </dependency>
 
       <dependency>
@@ -965,6 +958,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-support</artifactId>
+        <version>2.4-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-utils</artifactId>
         <version>2.4-SNAPSHOT</version>
       </dependency>
@@ -1045,7 +1044,7 @@
         <plugin>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.0</version>
           <extensions>true</extensions>
         </plugin>
 
@@ -1059,10 +1058,10 @@
           <!-- TODO this is only used by nexus-webapp, move this there -->
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>1.0.0-SNAPSHOT</version>
+          <version>1.0.0</version>
           <configuration>
-            <!-- 
-               yuicompressor warns when code is not in a shape that's optimized for minifying. 
+            <!--
+               yuicompressor warns when code is not in a shape that's optimized for minifying.
                ATM this only pollutes the log (~9400 warnings)
             -->
             <jswarn>false</jswarn>
@@ -1153,7 +1152,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>provided-dependencies-maven-plugin</artifactId>
-          <version>1.6-SNAPSHOT</version>
+          <version>1.6</version>
         </plugin>
 
         <plugin>
@@ -1178,9 +1177,8 @@
               <!-- we have target pattern in this format because of target package in nexus-core modules -->
               <exclude>**/nexus*/target/**</exclude>
               <exclude>**/ldap-common/target/**</exclude>
-              <exclude>**/h2/target/**</exclude>
-              <exclude>**/ext-2.3/**</exclude>
-              <exclude>**/ext-3.4.0/**</exclude>
+              <exclude>plugin*/**/target/**</exclude>
+              <exclude>**/ext-3.4.1/**</exclude>
               <exclude>**/js/filetree/**</exclude>
               <exclude>**/editarea_0_8_2/**</exclude>
               <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
@@ -1201,6 +1199,7 @@
               <exclude>**/atlassian-ide-plugin.xml</exclude>
               <exclude>nexus-webapp/src/main/webapp/js/ext/ux/**</exclude>
               <exclude>nexus-webapp/src/main/webapp/style/ext/ux/**</exclude>
+              <exclude>nexus-webapp/src/main/webapp/js/lib/**</exclude>
             </excludes>
           </configuration>
         </plugin>

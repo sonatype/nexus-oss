@@ -72,7 +72,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
       });
 
   Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
-        title : 'Artifact Information',
+        title : 'Artifact',
         autoScroll : true,
         border : true,
         frame : true,
@@ -325,7 +325,7 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
 Sonatype.Events.addListener('fileContainerInit', function(items) {
       items.push(new Sonatype.repoServer.ArtifactInformationPanel({
             name : 'artifactInformationPanel',
-            tabTitle : 'Artifact Information',
+            tabTitle : 'Artifact',
             preferredIndex : 20
           }));
     });
@@ -346,7 +346,7 @@ Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, d
 Sonatype.Events.addListener('artifactContainerInit', function(items) {
       items.push(new Sonatype.repoServer.ArtifactInformationPanel({
             name : 'artifactInformationPanel',
-            tabTitle : 'Artifact Information',
+            tabTitle : 'Artifact',
             preferredIndex : 20
           }));
     });

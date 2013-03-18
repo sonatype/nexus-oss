@@ -34,7 +34,7 @@
     </rollingPolicy>
   </appender>
 
-  <logger name="org.sonatype.nexus.rest.NexusApplication" level="ERROR" />
+  <logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN" />
   <logger name="httpclient" level="INFO" />
   <logger name="org.apache.http" level="INFO" />
   <logger name="org.restlet" level="INFO" />

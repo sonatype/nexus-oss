@@ -20,6 +20,8 @@ import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.context.IndexingContext;
+import org.apache.maven.index.treeview.DefaultTreeNodeFactory;
+import org.apache.maven.index.treeview.TreeNode;
 import org.junit.Test;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -143,5 +145,16 @@ public class DefaultIndexerManagerIT
         IndexingContext repoCtx2 = indexerManager.getRepositoryIndexContext( repo );
 
         Assert.assertSame( repoCtx, repoCtx2 );
+    }
+
+    @Test
+    public void testSearchIteratorAfterRepositoryDrop()
+        throws Exception
+    {
+        fillInRepo();
+        indexerManager.reindexAllRepositories( "/", true );
+        TreeNode node = indexerManager.listNodes( new DefaultTreeNodeFactory( central.getId() ), "/", central.getId() );
+        indexerManager.removeRepositoryIndexContext( central, false );
+        Assert.assertEquals( 0, node.listChildren().size() );
     }
 }

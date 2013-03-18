@@ -192,6 +192,22 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
         this.additionalEnvironment = additionalEnvironment;
     }
 
+    /**
+     * These entries are added to the environment map before initializing the LDAP context.
+     *
+     * @param additionalEnvironment additional environment entries to be configured on the LDAP context.
+     */
+    public void addAdditionalEnvironment(Map<String, String> additionalEnvironment) {
+        if ( this.additionalEnvironment == null )
+        {
+            this.additionalEnvironment = additionalEnvironment;
+        }
+        else
+        {
+            this.additionalEnvironment.putAll( additionalEnvironment );
+        }
+    }
+
     /*--------------------------------------------
     |               M E T H O D S               |
     ============================================*/

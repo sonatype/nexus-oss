@@ -84,6 +84,15 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-crypto-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-h2-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
@@ -103,15 +112,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-siesta-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-siesta-test-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -208,6 +208,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-crypto-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-h2-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
@@ -223,13 +230,6 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-siesta-plugin</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-siesta-test-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -309,7 +309,23 @@
               <output>${project.build.outputDirectory}/js/sonatype-lib.js</output>
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <includes>
-                <include>lib/*.js</include>
+                <!-- some order required here -->
+                <include>lib/string.js</include>
+                <include>lib/require-*.js</include>
+                <include>lib/requirejs-css-plugin-*.js</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>js-nx</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/js/nx-all.js</output>
+              <sourceDirectory>src/main/webapp/js</sourceDirectory>
+              <includes>
+                <include>NX/**/*.js</include>
               </includes>
             </configuration>
           </execution>
@@ -323,6 +339,7 @@
               <sourceDirectory>src/main/webapp/js</sourceDirectory>
               <excludes>
                 <exclude>lib/*.js</exclude>
+                <exclude>NX/**/*.js</exclude>
               </excludes>
               <includes>
                 <include>**/*.js</include>
@@ -391,13 +408,13 @@
         <configuration>
           <warSourceIncludes>
             *,
-            ext-3.4.0/adapter/ext/ext-base-debug.js,
-            ext-3.4.0/ext-all-debug.js,
-            ext-3.4.0/adapter/ext/ext-base.js,
-            ext-3.4.0/ext-all.js,
-            ext-3.4.0/resources/css/ext-all.css,
-            ext-3.4.0/resources/css/xtheme-gray.css,
-            ext-3.4.0/resources/images/**,
+            ext-3.4.1/adapter/ext/ext-base-debug.js,
+            ext-3.4.1/ext-all-debug.js,
+            ext-3.4.1/adapter/ext/ext-base.js,
+            ext-3.4.1/ext-all.js,
+            ext-3.4.1/resources/css/ext-all.css,
+            ext-3.4.1/resources/css/xtheme-gray.css,
+            ext-3.4.1/resources/images/**,
             images/**,
             WEB-INF/*,
             style/sonatype-all.css

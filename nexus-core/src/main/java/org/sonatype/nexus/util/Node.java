@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -76,6 +78,16 @@ public class Node<P>
     }
 
     /**
+     * Returns {@code true} if this node is leaf node.
+     * 
+     * @return
+     */
+    public boolean isLeaf()
+    {
+        return children.isEmpty();
+    }
+
+    /**
      * Returns the depth from the "root" node. Root node has depth 0.
      * 
      * @return
@@ -95,11 +107,43 @@ public class Node<P>
     /**
      * Returns the "label" of this node, never {@code null}.
      * 
-     * @return
+     * @return the label of this node.
      */
     public String getLabel()
     {
         return label;
+    }
+
+    /**
+     * Returns the node path, that is string starting with "/" and a series of labels concatenated with "/".
+     * 
+     * @return the path of the node.
+     */
+    public String getPath()
+    {
+        return PathUtils.pathFrom( getPathElements() );
+    }
+
+    /**
+     * Returns the node path elements.
+     * 
+     * @return the path elements of the node, in proper order (root.. current node as last in list).
+     */
+    public List<String> getPathElements()
+    {
+        final ArrayList<String> pathElems = new ArrayList<String>( getDepth() );
+        Node<P> current = this;
+        do
+        {
+            if ( !current.isRoot() )
+            {
+                pathElems.add( current.getLabel() );
+                current = current.getParent();
+            }
+        }
+        while ( !current.isRoot() );
+        Collections.reverse( pathElems );
+        return pathElems;
     }
 
     /**

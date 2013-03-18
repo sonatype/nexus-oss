@@ -15,7 +15,7 @@
 
 define('nexus', ['extjs'], function(Ext){
 
-    Ext.namespace('nexus');
+    Ext.namespace('Nexus');
 
     /**
      * Return the current user.

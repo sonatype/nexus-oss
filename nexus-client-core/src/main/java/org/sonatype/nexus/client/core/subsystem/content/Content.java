@@ -20,8 +20,21 @@ import java.io.IOException;
  */
 public interface Content
 {
+    enum Directive
+    {
+        LOCAL_ONLY, REMOTE_ONLY, GROUP_ONLY, AS_EXPIRED;
+    }
+
+    boolean exists( Location location )
+        throws IOException;
+
+    boolean existsWith( Location location, Directive directive )
+        throws IOException;
 
     void download( Location location, File target )
+        throws IOException;
+
+    void downloadWith( Location location, Directive directive, File target )
         throws IOException;
 
     void upload( Location location, File target )

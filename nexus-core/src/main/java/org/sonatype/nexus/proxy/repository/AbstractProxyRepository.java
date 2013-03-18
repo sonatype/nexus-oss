@@ -35,6 +35,7 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -1164,6 +1165,12 @@ public abstract class AbstractProxyRepository
         }
     }
 
+    protected boolean shouldTryRemote( final ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException
+    {
+        return !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
+    }
+
     protected StorageItem doRetrieveItem0( ResourceStoreRequest request, AbstractStorageItem localItem )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
@@ -1171,7 +1178,7 @@ public abstract class AbstractProxyRepository
         AbstractStorageItem remoteItem = null;
 
         // proxyMode and request.localOnly decides 1st
-        boolean shouldProxy = !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
+        boolean shouldProxy = shouldTryRemote( request );
 
         if ( shouldProxy )
         {
@@ -1286,7 +1293,7 @@ public abstract class AbstractProxyRepository
                                 autoBlockProxying( ex );
                             }
 
-                            if ( ex instanceof RemoteStorageTransportException )
+                            if ( ex instanceof RemoteStorageTransportException || ex instanceof LocalStorageEOFException )
                             {
                                 throw ex;
                             }

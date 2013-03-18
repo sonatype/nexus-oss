@@ -55,6 +55,7 @@
     <module>nexus-test-environment-maven-plugin</module>
     <module>nexus-test-utils</module>
     <module>nexus-test-harness-launcher</module>
+    <module>nexus-core-testsuite</module>
   </modules>
 
   <profiles>

@@ -28,7 +28,7 @@ scanner.scan()
 
 println "Found ${scanner.includedFilesCount} test-classes"
 
-def iter = scanner.includedFiles.toList().iterator()
+def iter = scanner.includedFiles.toList().sort().iterator() // sorting to help get consistent shards regardless of scanner order
 def running = true
 while (running) {
     for (i in 0 ..< shardCount) {

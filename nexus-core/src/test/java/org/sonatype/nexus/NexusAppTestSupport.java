@@ -18,8 +18,14 @@ import java.util.Map;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.NexusProxyTestSupport;
+import org.sonatype.nexus.proxy.maven.wl.WLConfig;
+import org.sonatype.nexus.proxy.maven.wl.internal.WLConfigImpl;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
+
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
 public abstract class NexusAppTestSupport
     extends NexusProxyTestSupport
@@ -34,6 +40,25 @@ public abstract class NexusAppTestSupport
     protected boolean loadConfigurationAtSetUp()
     {
         return true;
+    }
+
+    @Override
+    protected Module[] getTestCustomModules()
+    {
+        final Module[] modules = super.getTestCustomModules();
+        return ObjectArrays.concat( modules, new Module()
+        {
+            @Override
+            public void configure( final Binder binder )
+            {
+                binder.bind( WLConfig.class ).toInstance( new WLConfigImpl( enableWLFeature() ) );
+            }
+        } );
+    }
+
+    protected boolean enableWLFeature()
+    {
+        return false;
     }
 
     @Override
@@ -56,7 +81,6 @@ public abstract class NexusAppTestSupport
         throws Exception
     {
         waitForTasksToStop();
-
         super.tearDown();
     }
 
@@ -138,7 +162,7 @@ public abstract class NexusAppTestSupport
             for ( ScheduledTask<?> task : taskList )
             {
                 System.out.println( task.getName() + " with id " + task.getId() + " is in state "
-                                        + task.getTaskState().toString() );
+                    + task.getTaskState().toString() );
             }
         }
     }

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.email;
 
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
@@ -54,6 +56,9 @@ public class DefaultNexusEmailer
 
     @Requirement
     private EMailer eMailer;
+
+    @Requirement( role = SmtpSessionParametersCustomizer.class )
+    private List<SmtpSessionParametersCustomizer> customizers;
 
     // ==
     
@@ -159,10 +164,10 @@ public class DefaultNexusEmailer
         
         configureEmailer();
     }
-    
+
     private synchronized void configureEmailer()
     {
-        EmailerConfiguration config = new EmailerConfiguration();
+        final EmailerConfiguration config = new NexusEmailerConfiguration( customizers );
         config.setDebug( isSMTPDebug() );
         config.setMailHost( getSMTPHostname() );
         config.setMailPort( getSMTPPort() );

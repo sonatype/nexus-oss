@@ -86,7 +86,7 @@ public class LegacyFSAttributeStorageTest
         final RepositoryItemUid uid = Mockito.mock( RepositoryItemUid.class );
         Mockito.when( uid.getRepository() ).thenReturn( repository );
         Mockito.when( uid.getPath() ).thenReturn( path );
-        Mockito.when( uid.getAttributeLock() ).thenReturn( fakeLock );
+        Mockito.when( uid.getLock() ).thenReturn( fakeLock );
 
         return uid;
     }

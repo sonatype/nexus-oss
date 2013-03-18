@@ -63,6 +63,12 @@
       <artifactId>xstream</artifactId>
     </dependency>
 
+    <!-- Required for date handling in XStream -->
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
+
     <!-- Version (for now all of Aether API/UTIL) -->
     <dependency>
       <groupId>org.sonatype.aether</groupId>
@@ -126,6 +132,22 @@
         <exclusion>
           <groupId>avax.xml.stream</groupId>
           <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-common</artifactId>
+      <version>1.4.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-inject-bean</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

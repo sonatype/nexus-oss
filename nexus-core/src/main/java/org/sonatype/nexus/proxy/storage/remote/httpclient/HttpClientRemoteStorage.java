@@ -38,11 +38,13 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.cookie.DateParseException;
 import org.apache.http.impl.cookie.DateUtils;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
@@ -173,8 +175,8 @@ public class HttpClientRemoteStorage
             InputStream is;
             try
             {
-                is = new InterruptableInputStream( method, httpResponse.getEntity().getContent() );
-
+                is = new Hc4InputStream( repository, new InterruptableInputStream( method, httpResponse.getEntity().getContent() ) );
+                 
                 String mimeType = ContentType.getOrDefault( httpResponse.getEntity() ).getMimeType();
                 if ( mimeType == null )
                 {
@@ -480,7 +482,10 @@ public class HttpClientRemoteStorage
         HttpResponse httpResponse = null;
         try
         {
-            httpResponse = httpClient.execute( httpRequest );
+            final BasicHttpContext httpContext = new BasicHttpContext();
+            httpContext.setAttribute( Hc4Provider.HTTP_CTX_KEY_REPOSITORY, repository );
+
+            httpResponse = httpClient.execute( httpRequest, httpContext );
             final int statusCode = httpResponse.getStatusLine().getStatusCode();
 
             final Header httpServerHeader = httpResponse.getFirstHeader( "server" );

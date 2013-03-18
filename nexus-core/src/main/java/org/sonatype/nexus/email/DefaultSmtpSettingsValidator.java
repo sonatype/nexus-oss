@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.email;
 
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.micromailer.Address;
@@ -34,12 +36,15 @@ public class DefaultSmtpSettingsValidator
     @Requirement
     private EMailer emailer;
 
+    @Requirement( role = SmtpSessionParametersCustomizer.class )
+    private List<SmtpSessionParametersCustomizer> customizers;
+
     private static final String NEXUS_MAIL_ID = "Nexus";
 
     public boolean sendSmtpConfigurationTest( CSmtpConfiguration smtp, String email )
         throws EmailerException
     {
-        EmailerConfiguration config = new EmailerConfiguration();
+        final EmailerConfiguration config = new NexusEmailerConfiguration( customizers );
         config.setDebug( smtp.isDebugMode() );
         config.setMailHost( smtp.getHostname() );
         config.setMailPort( smtp.getPort() );

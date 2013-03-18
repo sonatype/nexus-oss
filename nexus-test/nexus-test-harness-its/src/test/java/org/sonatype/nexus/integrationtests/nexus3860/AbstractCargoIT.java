@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -56,6 +57,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.plugin.nexus2810.PluginConsoleMessageUtil;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
+import org.sonatype.nexus.proxy.maven.wl.internal.WLConfigImpl;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
@@ -64,6 +66,8 @@ import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import com.google.common.collect.Lists;
 
 public abstract class AbstractCargoIT
     extends TestSupport
@@ -90,29 +94,36 @@ public abstract class AbstractCargoIT
     public void setUp()
         throws Exception
     {
-        if (container == null)
+        if ( container == null )
         {
             fixPlexusProperties();
             changeStartupLoggingToDebug();
-    
+
             WAR war = new WAR( getWarFile().getAbsolutePath() );
             war.setContext( "nexus" );
-            
+
             File configHome = new File( "target/conatiner-configs", getContainer() ).getAbsoluteFile();
-    
+
             ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
             LocalConfiguration configuration =
                 (LocalConfiguration) configurationFactory.createConfiguration( getContainer(), ContainerType.INSTALLED,
-                                                                               ConfigurationType.STANDALONE,
-                                                                               configHome.getAbsolutePath() );
+                    ConfigurationType.STANDALONE, configHome.getAbsolutePath() );
             configuration.addDeployable( war );
             configuration.setProperty( ServletPropertySet.PORT, TestProperties.getString( "nexus.application.port" ) );
             container =
                 (InstalledLocalContainer) new DefaultContainerFactory().createContainer( getContainer(),
-                                                                                         ContainerType.INSTALLED,
-                                                                                         configuration );
+                    ContainerType.INSTALLED, configuration );
             container.setHome( getContainerLocation().getAbsolutePath() );
-    
+
+            // Shut down WL feature, as these ITs are bouncing Nexus very frequently, while
+            // WL does discovery in background. For some reason, codehaus prefix file
+            // fetch on bamboo took 20s, so while WL shutdown is not fixed, disabling
+            // WL for now here.
+
+            final HashMap<String, String> sysProps = new HashMap<String, String>();
+            sysProps.put( WLConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString() );
+            container.setSystemProperties( sysProps );
+
             container.setTimeout( 5 * 60 * 1000 );// 5 minutes
             container.start();
         }
@@ -228,6 +239,7 @@ public abstract class AbstractCargoIT
     public void checkStatus()
         throws Exception
     {
+        // this line produces log entries that makes it look like bundle too is started but is actually not
         assertEquals(
             "STARTED",
             new NexusStatusUtil( AbstractNexusIntegrationTest.nexusApplicationPort ).getNexusStatus().getData().getState() );
@@ -261,21 +273,28 @@ public abstract class AbstractCargoIT
     {
         checkStatus();
 
-        Response response = RequestFacade.sendMessage( "service/local/logs", Method.GET );
-        String responseText = response.getEntity().getText();
-
-        Assert.assertEquals( "Status: \n" + responseText, response.getStatus().getCode(), 200 );
-
-        LogsListResourceResponse logListResponse =
-            (LogsListResourceResponse) XStreamFactory.getXmlXStream().fromXML( responseText );
-        List<LogsListResource> logList = logListResponse.getData();
-        Assert.assertTrue( "Log List should contain at least 1 log.", logList.size() > 0 );
-
-        for ( Iterator<LogsListResource> iter = logList.iterator(); iter.hasNext(); )
+        final Response response = RequestFacade.sendMessage( "service/local/logs", Method.GET );
+        try
         {
-            LogsListResource logResource = iter.next();
+            String responseText = response.getEntity().getText();
 
-            this.downloadAndConfirmLog( logResource.getResourceURI(), logResource.getName() );
+            Assert.assertEquals( "Status: \n" + responseText, response.getStatus().getCode(), 200 );
+
+            LogsListResourceResponse logListResponse =
+                (LogsListResourceResponse) XStreamFactory.getXmlXStream().fromXML( responseText );
+            List<LogsListResource> logList = logListResponse.getData();
+            Assert.assertTrue( "Log List should contain at least 1 log.", logList.size() > 0 );
+
+            for ( Iterator<LogsListResource> iter = logList.iterator(); iter.hasNext(); )
+            {
+                LogsListResource logResource = iter.next();
+
+                this.downloadAndConfirmLog( logResource.getResourceURI(), logResource.getName() );
+            }
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
         }
     }
 
@@ -315,10 +334,15 @@ public abstract class AbstractCargoIT
             assertThat( "Should have been DEBUG level logging so there should have been DEBUG in log",
                 downloadedLogStr, containsString( "DEBUG" ) );
 
-            downloadedLogStr = downloadedLogStr.replace(
-                "org.sonatype.nexus.error.reporting.DefaultErrorReportingManager",
-                ""
-            );
+            List<String> falsePositives = Lists.newArrayList();
+            falsePositives.add( "org/sonatype/nexus/rest/error/reporting/ErrorReportingPlexusResource" );
+            falsePositives.add( "org.sonatype.nexus.rest.error.reporting.ErrorReportingPlexusResource" );
+            falsePositives.add( "org.sonatype.nexus.error.reporting.DefaultErrorReportingManager" );
+
+            for ( String fp : falsePositives )
+            {
+                downloadedLogStr = downloadedLogStr.replace( fp, "" );
+            }
 
             assertThat( downloadedLogStr, not( containsString( "error" ) ) );
             assertThat( downloadedLogStr, not( containsString( "exception" ) ) );

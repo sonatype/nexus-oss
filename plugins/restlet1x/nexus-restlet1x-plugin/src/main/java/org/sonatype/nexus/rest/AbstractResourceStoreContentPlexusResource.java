@@ -52,7 +52,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.LocalStorageEofException;
+import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
@@ -164,11 +164,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
         throws ResourceException
     {
 
-        ResourceStoreRequest req = getResourceStoreRequest( request );
-
         try
         {
-            ResourceStore store = getResourceStore( request );
+            final ResourceStore store = getResourceStore( request );
+            final ResourceStoreRequest req = getResourceStoreRequest( request );
 
             try
             {
@@ -227,7 +226,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         try
         {
-            ResourceStoreRequest req = getResourceStoreRequest( request );
+            final ResourceStoreRequest req = getResourceStoreRequest( request );
 
             for ( FileItem fileItem : files )
             {
@@ -247,9 +246,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         try
         {
-            ResourceStore store = getResourceStore( request );
-
-            ResourceStoreRequest req = getResourceStoreRequest( request );
+            final ResourceStore store = getResourceStore( request );
+            final ResourceStoreRequest req = getResourceStoreRequest( request );
 
             store.deleteItem( req );
 
@@ -313,10 +311,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         ResourceStoreRequest result = new ResourceStoreRequest( resourceStorePath );
 
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Created ResourceStore request for " + result.getRequestPath() );
-        }
+        getLogger().trace( "Created ResourceStore request for {}", result.getRequestPath() );
 
         // honor the local only and remote only
         result.setRequestLocalOnly( isLocal( request, resourceStorePath ) );
@@ -886,7 +881,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             {
                 throw (ResourceException) t;
             }
-            else if ( t instanceof LocalStorageEofException )
+            else if ( t instanceof LocalStorageEOFException )
             {
                 // in case client drops connection, this makes not much sense, as he will not
                 // receive this response, but we have to end it somehow.

@@ -14,7 +14,7 @@
 define('Nexus/panels',
       [
         'Nexus/panels/AutoTabPanel',
-        'Nexus/panels/GridViewer',
+        'Sonatype/panels/GridViewer',
         'Nexus/panels/TreePanel'
       ],
       function() {});

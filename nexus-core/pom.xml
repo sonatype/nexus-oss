@@ -123,10 +123,6 @@
       <artifactId>httpclient</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.ning</groupId>
-      <artifactId>async-http-client</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
@@ -315,31 +311,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>ahc-provider</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <configuration>
-                  <reportsDirectory>${project.build.directory}/surefire-reports-ahc-provider</reportsDirectory>
-                  <systemPropertyVariables combine.children="append">
-                    <nexus.default.http.provider>async-http-client</nexus.default.http.provider>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
     <profile>
       <id>hc4-provider</id>
       <build>

@@ -118,10 +118,15 @@ public class DefaultLdapGroupDAO
                     SearchControls ctls = this.getBaseSearchControls( new String[] { groupIdAttribute }, configuration
                         .isGroupSubtree() );
     
-                    groups = this.getGroupIdsFromSearch(
-                        context.search( groupBaseDn, filter, ctls ),
-                        groupIdAttribute,
-                        configuration );
+                    NamingEnumeration<SearchResult> results = context.search( groupBaseDn, filter, ctls );
+                    try
+                    {
+                        groups = this.getGroupIdsFromSearch( results, groupIdAttribute, configuration );
+                    }
+                    finally
+                    {
+                        results.close();
+                    }
                 }
                 else
                 {
@@ -257,13 +262,16 @@ public class DefaultLdapGroupDAO
         {
             SearchControls ctls = this.getBaseSearchControls( new String[] { groupIdAttribute }, configuration
                 .isGroupSubtree() );
-            Set<String> roles = this.getGroupIdsFromSearch(
-                context.search( groupBaseDn, filter, ctls ),
-                groupIdAttribute,
-                configuration );
-
-            return roles;
-
+            NamingEnumeration<SearchResult> results = context.search( groupBaseDn, filter, ctls );
+            try
+            {
+                Set<String> roles = this.getGroupIdsFromSearch( results, groupIdAttribute, configuration );
+                return roles;
+            }
+            finally
+            {
+                results.close();
+            }
         }
         catch ( NamingException e )
         {
@@ -312,10 +320,15 @@ public class DefaultLdapGroupDAO
             Set<String> groups;
             try
             {
-                groups = this.getGroupIdsFromSearch(
-                    context.search( groupBaseDn, filter, ctls ),
-                    groupIdAttribute,
-                    configuration );
+                NamingEnumeration<SearchResult> results = context.search( groupBaseDn, filter, ctls );
+                try
+                {
+                    groups = this.getGroupIdsFromSearch( results, groupIdAttribute, configuration );
+                }
+                finally
+                {
+                    results.close();
+                }
             }
             catch ( NamingException e )
             {

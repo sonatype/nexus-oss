@@ -20,8 +20,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>31</version>
-    <relativePath/>
+    <version>32</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -90,6 +89,25 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-h2-plugin</artifactId>
         <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      Required for plugins which use BouncyCastle/JCE/goodies-crypto.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-crypto-plugin</artifactId>
+        <type>${nexus-plugin.type}</type>
+        <version>${nexus.version}</version>
+      </dependency>
+
+      <!--
+      HACK: Exposed here for a lack of a better way to manage.
+      -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-crypto-plugin</artifactId>
         <version>${nexus.version}</version>
       </dependency>
 
@@ -266,7 +284,7 @@
         <plugin>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.0</version>
           <extensions>true</extensions>
         </plugin>
 
@@ -300,7 +318,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>1.0.0-SNAPSHOT</version>
+          <version>1.0.0</version>
           <configuration>
             <!-- 
                yuicompressor warns when code is not in a shape that's optimized for minifying. 
@@ -413,6 +431,78 @@
             </executions>
           </plugin>
         </plugins>
+      </build>
+    </profile>
+
+    <!--
+    Enable verbose logging for unit tests; defaults to DEBUG.
+    -->
+    <profile>
+      <id>test.debug</id>
+
+      <activation>
+        <property>
+          <name>test.debug</name>
+          <value>true</value>
+        </property>
+      </activation>
+
+      <properties>
+        <test.log.level>DEBUG</test.log.level>
+      </properties>
+
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <test.log.level>${test.log.level}</test.log.level>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Enable verbose logging for integration tests; defaults to DEBUG.
+    -->
+    <profile>
+      <id>it.debug</id>
+
+      <activation>
+        <property>
+          <name>it.debug</name>
+          <value>true</value>
+        </property>
+      </activation>
+
+      <properties>
+        <test.log.level>DEBUG</test.log.level>
+        <it.test.log.level>DEBUG</it.test.log.level>
+        <it.nexus.log.level>DEBUG</it.nexus.log.level>
+      </properties>
+
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <test.log.level>${test.log.level}</test.log.level>
+                  <it.test.log.level>${it.test.log.level}</it.test.log.level>
+                  <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
       </build>
     </profile>
 

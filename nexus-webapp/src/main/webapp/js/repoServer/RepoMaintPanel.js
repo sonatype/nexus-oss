@@ -178,24 +178,29 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
     sortType : Ext.data.SortTypes.asUCString,
     header : 'Repository',
     width : 175,
+    sortable : true,
     renderer : function(value, metadata, record, rowIndex, colIndex, store) {
       return record.get('repoType') == 'group' ? ('<b>' + value + '</b>') : value;
     }
   }, {
     name : 'repoType',
+    sortable : true,
     header : 'Type',
     width : 50
   }, {
     name : 'format',
+    sortable : true,
     header : 'Format',
     width : 70
   }, {
     name : 'repoPolicy',
+    sortable : true,
     header : 'Policy',
     width : 70,
     convert : Strings.upperFirstCharLowerRest
   }, {
     name : 'displayStatus',
+    sortable : true,
     header : 'Repository Status',
     mapping : 'status',
     convert : Sonatype.repoServer.DefaultRepoHandler.statusConverter,
@@ -307,7 +312,7 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
       applyBookmark : function(bookmark) {
         this.updatingBookmark = true;
 
-        if (typeof this.groupStore.lastOptions !== 'object')
+        if (!this.groupStore.lastOptions)
         {
           this.groupStore.on('load', function(store, recs, options) {
                 this.selectBookmarkedItem(bookmark);
@@ -559,14 +564,14 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
               this.toolbarAddButton.disable();
             if (this.toolbarDeleteButton)
               this.toolbarDeleteButton.disable();
-            this.dataStore.proxy.conn.url = Sonatype.config.repos.urls.allRepositories;
+            this.dataStore.proxy.setApi(Ext.data.Api.actions.read, Sonatype.config.repos.urls.allRepositories);
             break;
           case 'user' :
             if (this.toolbarAddButton)
               this.toolbarAddButton.enable();
             if (this.toolbarDeleteButton)
               this.toolbarDeleteButton.enable();
-            this.dataStore.proxy.conn.url = Sonatype.config.repos.urls.repositories;
+            this.dataStore.proxy.setApi(Ext.data.Api.actions.read, Sonatype.config.repos.urls.repositories);
             break;
         }
         this.refreshHandler(button, e);

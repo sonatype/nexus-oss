@@ -32,8 +32,9 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.LocalStorageEofException;
+import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.RemoteStorageEOFException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -118,15 +119,26 @@ public class DefaultFSPeer
 
                 os.flush();
             }
-            catch ( EOFException e )
+            catch ( EOFException e ) // NXCM-4852: Upload premature end (thrown by Jetty org.eclipse.jetty.io.EofException)
             {
                 if ( hiddenTarget != null )
                 {
                     hiddenTarget.delete();
                 }
 
-                throw new LocalStorageEofException( String.format(
+                throw new LocalStorageEOFException( String.format(
                     "EOF during storing on path \"%s\" (while writing to hiddenTarget: \"%s\")",
+                    item.getRepositoryItemUid().toString(), hiddenTarget.getAbsolutePath() ), e );
+            }
+            catch ( RemoteStorageEOFException e ) // NXCM-4852: Proxy remote peer response premature end (should be translated by RRS)
+            {
+                if ( hiddenTarget != null )
+                {
+                    hiddenTarget.delete();
+                }
+
+                throw new LocalStorageEOFException( String.format(
+                    "EOF during caching on path \"%s\" (while writing to hiddenTarget: \"%s\")",
                     item.getRepositoryItemUid().toString(), hiddenTarget.getAbsolutePath() ), e );
             }
             catch ( IOException e )

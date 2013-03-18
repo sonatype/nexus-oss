@@ -29,36 +29,40 @@ public final class LdapUtils
     }
 
     public static String getLabeledUriValue( Attributes attributes, String attrName, String label,
-        String attributeDescription )
+                                             String attributeDescription )
         throws LdapDAOException
     {
         Attribute attribute = attributes.get( attrName );
         if ( attribute != null )
         {
-            NamingEnumeration attrs;
             try
             {
-                attrs = attribute.getAll();
+                NamingEnumeration<?> attrs = attribute.getAll();
+                try
+                {
+                    while ( attrs.hasMoreElements() )
+                    {
+                        Object value = attrs.nextElement();
+
+                        String val = String.valueOf( value );
+
+                        if ( val.endsWith( " " + label ) )
+                        {
+                            return val.substring( 0, val.length() - ( label.length() + 1 ) );
+                        }
+                    }
+                }
+                finally
+                {
+                    attrs.close();
+                }
             }
             catch ( NamingException e )
             {
-                throw new LdapDAOException( "Failed to retrieve " + attributeDescription + " (attribute: \'"
-                    + attrName + "\').", e );
-            }
-
-            while ( attrs.hasMoreElements() )
-            {
-                Object value = attrs.nextElement();
-
-                String val = String.valueOf( value );
-
-                if ( val.endsWith( " " + label ) )
-                {
-                    return val.substring( 0, val.length() - ( label.length() + 1 ) );
-                }
+                throw new LdapDAOException( "Failed to retrieve " + attributeDescription + " (attribute: \'" + attrName
+                    + "\').", e );
             }
         }
-
         return null;
     }
 

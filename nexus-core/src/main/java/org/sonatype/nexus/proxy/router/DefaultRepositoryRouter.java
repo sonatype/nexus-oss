@@ -740,7 +740,7 @@ public class DefaultRepositoryRouter
                 // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
                 try
                 {
-                    request.pushRequestPath( route.getOriginalRequestPath() );
+                    request.pushRequestPath( route.getRepositoryPath() );
 
                     matched.addTargetSet( this.itemAuthorizer.getGroupsTargetSet( route.getTargetedRepository(),
                         request ) );
