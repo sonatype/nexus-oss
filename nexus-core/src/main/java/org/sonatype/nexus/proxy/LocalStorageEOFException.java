@@ -10,27 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.lvo;
+package org.sonatype.nexus.proxy;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
-
-@Component( role = NexusResourceBundle.class, hint = "LvoDocumentationResourceBundle" )
-public class LvoDocumentationResourceBundle
-    extends AbstractDocumentationNexusResourceBundle
+/**
+ * Local storage exception thrown by local storage when stream/content being pushed (stored) ends prematurely (EOFs).
+ * Denotes an unrecoverable state, but is not resolvable by Nexus core (happens when client drops connection
+ * during upload, recovery is to have client retry upload).
+ * 
+ * @author cstamas
+ * @since 2.4
+ */
+public class LocalStorageEOFException
+    extends LocalStorageException
 {
-
-    @Override
-    public String getPluginId()
+    public LocalStorageEOFException( String msg )
     {
-        return "nexus-lvo-plugin";
+        super( msg );
     }
 
-    @Override
-    public String getDescription()
+    public LocalStorageEOFException( String msg, Throwable cause )
     {
-        return "LatestVersionOf Plugin API";
+        super( msg, cause );
     }
 
+    public LocalStorageEOFException( Throwable cause )
+    {
+        super( cause.getMessage(), cause );
+    }
 }

@@ -74,14 +74,6 @@ public abstract class AbstractRepositoryItemUidFactory
         return doCreateUidLockForKey( key );
     }
 
-    @Override
-    public DefaultRepositoryItemUidLock createUidAttributeLock( final RepositoryItemUid uid )
-    {
-        final String key = new String( "attribute:" + uid.getKey() );
-
-        return doCreateUidLockForKey( key );
-    }
-
     // ==
 
     protected synchronized DefaultRepositoryItemUidLock doCreateUidLockForKey( final String key )

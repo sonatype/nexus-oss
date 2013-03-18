@@ -222,15 +222,9 @@
       </activation>
       <build>
         <plugins>
-          <!--
-          NOTE: Using patched version of surefire, which supports includes/excludes from files.
-          https://jira.codehaus.org/browse/SUREFIRE-925
-          TODO: Update to surefire 2.13 when its released, which has this feature.
-          -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.13-SONATYPE</version>
             <configuration>
               <includesFile>${settings.localRepository}/org/sonatype/nexus/${project.artifactId}/shards/shard-${testsuite.shardId}.txt</includesFile>
             </configuration>

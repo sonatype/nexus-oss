@@ -23,6 +23,10 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -47,6 +51,9 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.WrappingInputStream;
+import org.sonatype.tests.http.server.api.Behaviour;
+import org.sonatype.tests.http.server.fluent.Behaviours;
+import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.common.base.Strings;
 
@@ -438,19 +445,20 @@ public class SimplePullTest
             // Asserts
             // one repo is out of service, this class simple name must exists, one of them
             assertThat( dumpStr, containsString( RepositoryNotAvailableException.class.getSimpleName() ) );
-            assertThat( countOccurence( dumpStr, RepositoryNotAvailableException.class.getSimpleName() ), equalTo( 1 ));
+            assertThat( countOccurence( dumpStr, RepositoryNotAvailableException.class.getSimpleName() ), equalTo( 1 ) );
             // groups are throwing this one, 2 of them
             assertThat( dumpStr, containsString( GroupItemNotFoundException.class.getSimpleName() ) );
-            assertThat( countOccurence( dumpStr, GroupItemNotFoundException.class.getSimpleName() ), equalTo( 2 ));
-            // non-groups are throwing this one, 4 of them (counting with space to not include partial matches against GroupItemNotFoundException)
+            assertThat( countOccurence( dumpStr, GroupItemNotFoundException.class.getSimpleName() ), equalTo( 2 ) );
+            // non-groups are throwing this one, 4 of them (counting with space to not include partial matches against
+            // GroupItemNotFoundException)
             assertThat( dumpStr, containsString( ItemNotFoundException.class.getSimpleName() ) );
-            assertThat( countOccurence( dumpStr, " " + ItemNotFoundException.class.getSimpleName() ), equalTo( 4 ));
+            assertThat( countOccurence( dumpStr, " " + ItemNotFoundException.class.getSimpleName() ), equalTo( 4 ) );
         }
     }
 
     /**
-     * NXCM-4582: When Local storage is about to store something, but during "store" operation source stream EOFs,
-     * the new LocalStorage exception should be thrown, to differentiate from other "fatal" (like disk full or what not)
+     * NXCM-4582: When Local storage is about to store something, but during "store" operation source stream EOFs, the
+     * new LocalStorage exception should be thrown, to differentiate from other "fatal" (like disk full or what not)
      * error.
      */
     @Test
@@ -458,13 +466,13 @@ public class SimplePullTest
         throws Exception
     {
         final Repository repository = getRepositoryRegistry().getRepository( "inhouse" );
-        ResourceStoreRequest request =
+        final ResourceStoreRequest request =
             new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar", true );
 
         try
         {
-            repository.storeItem( request, new WrappingInputStream(
-                new ByteArrayInputStream( "123456789012345678901234567890".getBytes() ) )
+            repository.storeItem( request, new WrappingInputStream( new ByteArrayInputStream(
+                "123456789012345678901234567890".getBytes() ) )
             {
                 @Override
                 public int read()
@@ -496,7 +504,7 @@ public class SimplePullTest
 
             Assert.fail( "We expected a LocalStorageEofException to be thrown" );
         }
-        catch ( LocalStorageEofException e )
+        catch ( LocalStorageEOFException e )
         {
             // good, we expected this
         }
@@ -505,10 +513,81 @@ public class SimplePullTest
             // now we have to ensure no remnant files exists
             assertThat( repository.getLocalStorage().containsItem( repository, request ), is( false ) );
             // no tmp files should exists either
-            assertThat( repository.getLocalStorage().listItems( repository, new ResourceStoreRequest( "/.nexus/tmp" ) ), is( empty() ) );
+            assertThat(
+                repository.getLocalStorage().listItems( repository, new ResourceStoreRequest( "/.nexus/tmp" ) ),
+                is( empty() ) );
         }
     }
 
+    /**
+     * NXCM-4582: When remote storage is fetching something, but during "cache" operation source stream EOFs, the new
+     * LocalStorage exception should be thrown, to differentiate from other "fatal" (like disk full or what not) error.
+     */
+    @Test
+    public void testNXCM4852EofFromRemote()
+        throws Exception
+    {
+        final int port = jettyTestsuiteEnvironmentBuilder.getServletServer().getPort();
+        jettyTestsuiteEnvironmentBuilder.stopService();
+
+        final Server server = Server.withPort( port );
+        server.serve( "/*" ).withBehaviours( new DropConnection( server ) ).start();
+        try
+        {
+            final Repository repository = getRepositoryRegistry().getRepository( "repo1" );
+            final ResourceStoreRequest request =
+                new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
+
+            try
+            {
+                final StorageItem item = repository.retrieveItem( request );
+                Assert.fail( "We expected a LocalStorageEofException to be thrown" );
+            }
+            catch ( LocalStorageEOFException e )
+            {
+                // good, we expected this
+            }
+            finally
+            {
+                // now we have to ensure no remnant files exists
+                assertThat( repository.getLocalStorage().containsItem( repository, request ), is( false ) );
+                // no tmp files should exists either
+                assertThat(
+                    repository.getLocalStorage().listItems( repository, new ResourceStoreRequest( "/.nexus/tmp" ) ),
+                    is( empty() ) );
+            }
+        }
+        finally
+        {
+            server.stop();
+        }
+    }
+
+    public static class DropConnection
+        implements Behaviour
+    {
+        private final Server server;
+
+        public DropConnection( final Server server )
+        {
+            this.server = server;
+        }
+
+        @Override
+        public boolean execute( HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx )
+            throws Exception
+        {
+            response.setStatus( 200 );
+            response.setContentType( "application/octet-stream" );
+            response.setContentLength( 500 );
+            response.getOutputStream().write( "partialcontent".getBytes() );
+            response.flushBuffer();
+            // this causes noise in log (java.lang.InterruptedException: sleep interrupted) but is only way to make port
+            // get closed, otherwise SocketTimeout happens (not HC4's ConnectionClosedException)
+            server.stop();
+            return false;
+        }
+    }
 
     //
 

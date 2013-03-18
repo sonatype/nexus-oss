@@ -56,6 +56,8 @@ public class FilePrefixSource
 
     private final TextFilePrefixSourceMarshaller prefixSourceMarshaller;
 
+    private final RepositoryItemUid repositoryItemUid;
+
     /**
      * Constructor.
      * 
@@ -68,6 +70,7 @@ public class FilePrefixSource
         this.mavenRepository = checkNotNull( mavenRepository );
         this.path = checkNotNull( path );
         this.prefixSourceMarshaller = new TextFilePrefixSourceMarshaller( config );
+        this.repositoryItemUid = mavenRepository.createUid( path );
     }
 
     /**
@@ -99,7 +102,7 @@ public class FilePrefixSource
      */
     public RepositoryItemUid getRepositoryItemUid()
     {
-        return getMavenRepository().createUid( getFilePath() );
+        return repositoryItemUid;
     }
 
     protected TextFilePrefixSourceMarshaller getPrefixSourceMarshaller()

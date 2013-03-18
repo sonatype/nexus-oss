@@ -33,6 +33,7 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -1293,7 +1294,7 @@ public abstract class AbstractProxyRepository
                                 autoBlockProxying( ex );
                             }
 
-                            if ( ex instanceof RemoteStorageTransportException )
+                            if ( ex instanceof RemoteStorageTransportException || ex instanceof LocalStorageEOFException )
                             {
                                 throw ex;
                             }

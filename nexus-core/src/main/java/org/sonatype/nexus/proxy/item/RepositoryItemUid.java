@@ -76,30 +76,6 @@ public interface RepositoryItemUid
     RepositoryItemUidLock getLock();
 
     /**
-     * Gets the lock corresponding to this UID's attribute. Lock is lazily created, and re-created if needed. All this
-     * is transparent to the coder, as long as usual locking patterns and correct coding is applied, something like:
-     * 
-     * <pre>
-     *   uid = ...
-     *   
-     *   RepositoryItemUidLock uidAttrLock = uid.getAttributeLock();
-     *   
-     *   uidAttrLock.lock(Action.create);
-     *   try {
-     *     ...
-     *   } finally {
-     *     uidAttrLock.unlock();
-     *   }
-     * </pre>
-     * 
-     * As you can see on {@link RepositoryItemUidLock#unlock()} method javadoc, last of the boxed unlocks (if any boxing
-     * at all, simply last invocation) also releases the lazily created lock.
-     * 
-     * @return
-     */
-    RepositoryItemUidLock getAttributeLock();
-
-    /**
      * Gets an "attribute" from this UID.
      * 
      * @param <T>
